@@ -11,7 +11,7 @@ export function * foreach (array, fn, context) {
   }
 }
 
-export function hidePassword ({action}) {
+export function hidePassword ({action, param}) {
   if (action) {
     if (action['payload'] && action.payload['credentials'] && action.payload.credentials['password']) {
       const hidden = JSON.parse(JSON.stringify(action))
@@ -19,6 +19,15 @@ export function hidePassword ({action}) {
       return hidden
     }
     return action
+  }
+
+  if (param) {
+    if (param['password']) {
+      const hidden = JSON.parse(JSON.stringify(param))
+      hidden.password = '*****'
+      return hidden
+    }
+    return param
   }
 
   return action

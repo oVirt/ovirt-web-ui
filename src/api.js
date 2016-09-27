@@ -1,5 +1,6 @@
 import $ from 'jquery'
 import {logDebug} from './helpers'
+import {Exception} from './exceptions'
 
 let Api = {}
 
@@ -66,20 +67,32 @@ const OvirtApi = {
   },
   _assertStore ({methodName}) {
     if (!this.store) {
-      throw new Error(`OvirtApi in '${methodName}' uninitialized - missing store`)
+      throw new Exception(`OvirtApi in '${methodName}' uninitialized - missing store`)
     }
   },
   _assertLogin ({methodName}) {
     if (!Api._getLoginToken()) {
-      throw new Error(`OvirtApi in '${methodName}': missing login`)
+      throw new Exception(`OvirtApi in '${methodName}': missing login`)
     }
   },
   _getAllVms() { // Fake data for testing only ...
     return Promise.resolve(testVms) // [] | testVms
   },
-
+  _httpGet ({url}) {
+    return $.ajax(url, {
+      type: "GET",
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${Api._getLoginToken()['access_token']}`
+      }
+    }).then(data => Promise.resolve(data))
+      .catch(data => {
+        logDebug(`Ajax failed: ${JSON.stringify(data)}`)
+        return Promise.reject(data)
+      })
+  },
   // ----
-  login (credentials) {
+  login ({credentials}) {
     const url = '/sso/oauth/token?grant_type=urn:ovirt:params:oauth:grant-type:http&scope=ovirt-app-api'
     const user = credentials.username
     const pwd = credentials.password
@@ -99,13 +112,19 @@ const OvirtApi = {
   getAllVms () {
     Api._assertLogin({methodName: 'getAllVms'})
     const url = '/api/vms'
-    return $.ajax(url, {
-      type: "GET",
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${Api._getLoginToken()['access_token']}`
-      }
-    }).then(data => Promise.resolve(data)).catch(data => console.log(`Ajax failed: ${JSON.stringify(data)}`));
+    return Api._httpGet({url})
+  },
+  shutdown ({vm}) {
+    Api._assertLogin({methodName: 'shutdown'})
+    return Api._httpGet({url: `/api/vms/${vm.id}/shutdown`})
+  },
+  start ({vm}) {
+    Api._assertLogin({methodName: 'start'})
+    return Api._httpGet({url: `/api/vms/${vm.id}/start`})
+  },
+  restart ({vm}) {
+    Api._assertLogin({methodName: 'restart'})
+    return Api._httpGet({url: `/api/vms/${vm.id}/reboot`})
   }
 }
 

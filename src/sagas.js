@@ -6,25 +6,36 @@ import Api from './api'
 import {getAllVms, updateVm, loginSuccessful, loginFailed, failedExternalAction} from './actions'
 
 // TODO: Review error handling!! Exceptions + HTTP non-200 codes
+/*
+ Missing token
+ Engine is down / wrong URL
+ Wrong credentials
+ Token time-out
+ non-200 HTTP
 
-function* login (action) {
+ */
+function* callExternalAction(methodName, method, action) {
   try {
-    logDebug(`saga: login() starts on ${JSON.stringify(hidePassword({action}))}`)
-    const token = yield call(Api.login, action.payload.credentials)
-
-    if (token['access_token']) {
-      yield put(loginSuccessful({token}))
-      yield put(getAllVms())
-    } else {
-      yield put(loginFailed())
-    }
-
+    logDebug(`External action ${methodName}() starts on ${JSON.stringify(hidePassword({action}))}`)
+    const result = yield call(method, action.payload)
+    return result
   } catch (e) {
-    yield put(loginFailed())
-    yield put(failedExternalAction({message: e.message, action: hidePassword(action)}))
+    logDebug(`External action exception: ${JSON.stringify(e)}`)
+    yield put(failedExternalAction({message: e, action}))
   }
 }
-/* TODO:
+
+function* login (action) {
+  const token = yield callExternalAction('login', Api.login, action)
+  if (token && token['access_token']) {
+    yield put(loginSuccessful({token}))
+    yield put(getAllVms())
+  } else {
+    yield put(loginFailed())
+  }
+}
+
+/* TODO: not yet called
 function* logout (action) {
   try {
     logDebug(`saga: logout() starts on ${JSON.stringify(action)}`)
@@ -34,57 +45,31 @@ function* logout (action) {
   }
 }
 */
+
 function* fetchAllVms (action) {
-  try {
-    logDebug(`saga: fetchAllVms() starts`)
-    const allVms = yield call(Api.getAllVms)
+  const allVms = yield callExternalAction('getAllVms', Api.getAllVms, action)
 
-    logDebug(`fetchAllVms() data: ${JSON.stringify(allVms)}`)
-
-    if (allVms['vm']) { // array
-      yield* foreach(allVms.vm, function* (vm) {
-        yield put(updateVm({vm: ovirtVmToInternal({vm})}))
-      })
-    }
-  } catch (e) {
-    yield put(failedExternalAction({message: e, action}))
+  if (allVms && allVms['vm']) { // array
+    yield* foreach(allVms.vm, function* (vm) {
+      yield put(updateVm({vm: ovirtVmToInternal({vm})}))
+    })
   }
 }
 
 function* shutdownVm (action) {
-  try {
-    logDebug(`saga: shutdownVm() starts on ${JSON.stringify(action)}`)
-    logDebug(`TODO!`)
-  } catch (e) {
-    yield put(failedExternalAction({message: e.message, action}))
-  }
+  yield callExternalAction('shutdown', Api.shutdown, action)
 }
 
 function* restartVm (action) {
-  try {
-    logDebug(`saga: restartVm() starts on ${JSON.stringify(action)}`)
-    logDebug(`TODO!`)
-  } catch (e) {
-    yield put(failedExternalAction({message: e.message, action}))
-  }
+  yield callExternalAction('restart', Api.restart, action)
 }
 
 function* startVm (action) {
-  try {
-    logDebug(`saga: startVm() starts on ${JSON.stringify(action)}`)
-    logDebug(`TODO!`)
-  } catch (e) {
-    yield put(failedExternalAction({message: e.message, action}))
-  }
+  yield callExternalAction('start', Api.start, action)
 }
 
 function* getConsoleVm (action) {
-  try {
-    logDebug(`saga: getConsoleVm() starts on ${JSON.stringify(action)}`)
-    logDebug(`TODO!`)
-  } catch (e) {
-    yield put(failedExternalAction({message: e.message, action}))
-  }
+  yield callExternalAction('getConsoleToBeDefined', Api.console, action)
 }
 
 function* mySaga () {
