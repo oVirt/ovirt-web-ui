@@ -89,6 +89,10 @@ OvirtApi = {
   restart ({vm}) {
     OvirtApi._assertLogin({methodName: 'restart'})
     return OvirtApi._httpPost({url: `/api/vms/${vm.id}/reboot`, input: '<action />'})
+  },
+  icon ({id}) {
+    OvirtApi._assertLogin({methodName: 'icon'})
+    return OvirtApi._httpGet({url: `/api/icons/${id}`})
   }
 }
 

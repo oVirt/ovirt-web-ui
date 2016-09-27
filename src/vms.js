@@ -149,13 +149,31 @@ VmStatusText.propTypes = {
   vm: React.PropTypes.object.isRequired
 }
 
+class VmIcon extends Component {
+  render () {
+    const {vmIcon, className, missingIconClassName} = this.props
+
+    if (vmIcon.content) {
+      const src = `data:${vmIcon.mediaType};base64,${vmIcon.content}`
+      return (<img src={src} className={className} alt=""/>)
+    }
+
+    return (<span className={missingIconClassName}></span>)
+  }
+}
+VmIcon.propTypes = {
+  vmIcon: React.PropTypes.object.isRequired, // either vm.icons.large or vm.icons.small
+  className: React.PropTypes.string.isRequired, // either card-pf-icon or vm-detail-icon
+  missingIconClassName: React.PropTypes.string.isRequired
+}
+
 class Vm extends Component {
   render () {
     const {vm, dispatch} = this.props
 
     const onSelectVm = () => dispatch(selectVmDetail({vm}))
 
-    // TODO: flip the card for detail:
+    // TODO: improve the card flip:
     // TODO: https://davidwalsh.name/css-flip
     // TODO: http://tympanus.net/codrops/2013/12/18/perspective-page-view-navigation/
     // TODO: https://desandro.github.io/3dtransforms/docs/card-flip.html
@@ -164,7 +182,7 @@ class Vm extends Component {
         <div className="card-pf card-pf-view card-pf-view-select card-pf-view-single-select">
           <div className="card-pf-body">
             <div className="card-pf-top-element" onClick={onSelectVm}>
-              <span className="fa fa-birthday-cake card-pf-icon-circle"></span>
+              <VmIcon vmIcon={vm.icons.large} className="card-pf-icon" missingIconClassName="fa fa-birthday-cake card-pf-icon-circle"/>
             </div>
             <h2 className="card-pf-title text-center" onClick={onSelectVm}>
               {vm.name}
@@ -197,7 +215,7 @@ class VmDetail extends Component {
         <div className="container-fluid move-left-detail">
           <a href="#" className="move-left-close-detail" onClick={onClose}><i className="pficon pficon-close"> Close</i></a>
 
-          <h1>{vm.name}</h1>
+          <h1><VmIcon vmIcon={vm.icons.small} missingIconClassName="pficon pficon-virtual-machine" className="vm-detail-icon"/> {vm.name}</h1>
           <dl>
             <dt>Operating System</dt>
             <dd>{vm.os['type']}</dd>

@@ -3,7 +3,7 @@ import { call, put } from 'redux-saga/effects'
 import {foreach, logDebug, hidePassword, ovirtVmToInternal} from './helpers'
 import Api from './api'
 
-import {getAllVms, updateVm, loginSuccessful, loginFailed, failedExternalAction} from './actions'
+import {getAllVms, getVmIcons, updateVmIcon, updateVm, loginSuccessful, loginFailed, failedExternalAction} from './actions'
 
 // TODO: Review error handling!! Exceptions + HTTP non-200 codes
 /*
@@ -50,9 +50,30 @@ function* fetchAllVms (action) {
   const allVms = yield callExternalAction('getAllVms', Api.getAllVms, action)
 
   if (allVms && allVms['vm']) { // array
+
     yield* foreach(allVms.vm, function* (vm) {
-      yield put(updateVm({vm: ovirtVmToInternal({vm})}))
+      const internalVm = ovirtVmToInternal({vm})
+      yield put(updateVm({vm: internalVm}))
+      yield put(getVmIcons({vm: internalVm}))
     })
+  }
+}
+
+function* fetchVmIcons(action) {
+  const {vm} = action.payload
+
+  if (vm.icons.large.id) {
+    const icon = yield callExternalAction('icon', Api.icon, {payload: {id: vm.icons.large.id}})
+    if (icon['media_type'] && icon['data']) {
+      yield put(updateVmIcon({vmId: vm.id, icon, type: 'large'}))
+    }
+  }
+
+  if (vm.icons.small.id) {
+    const icon = yield callExternalAction('icon', Api.icon, {payload: {id: vm.icons.small.id}})
+    if (icon['media_type'] && icon['data']) {
+      yield put(updateVmIcon({vmId: vm.id, icon, type: 'small'}))
+    }
   }
 }
 
@@ -76,6 +97,7 @@ function* mySaga () {
   yield [
     takeEvery("LOGIN", login),
     takeLatest("GET_ALL_VMS", fetchAllVms),
+    takeEvery("GET_VM_ICONS", fetchVmIcons),
     takeEvery("SHUTDOWN_VM", shutdownVm),
     takeEvery("RESTART_VM", restartVm),
     takeEvery("START_VM", startVm),

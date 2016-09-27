@@ -1,3 +1,4 @@
+import {logDebug} from './helpers'
 // --- External actions -----------------------
 export function login ({username, password}) {
   return {
@@ -15,6 +16,15 @@ export function getAllVms () {
   return {
     type: 'GET_ALL_VMS',
     payload: {}
+  }
+}
+
+export function getVmIcons ({vm}) {
+  return {
+    type: 'GET_VM_ICONS',
+    payload: {
+      vm
+    }
   }
 }
 
@@ -79,6 +89,18 @@ export function updateVm ({vm}) {
     type: 'UPDATE_VM',
     payload: {
       vm
+    }
+  }
+}
+
+export function updateVmIcon ({vmId, icon, type}) {
+  logDebug(`-- updateVmIcon(): ${vmId}, ${icon}, ${type}`)
+  return {
+    type: 'UPDATE_VM_ICON',
+    payload: {
+      vmId,
+      icon,
+      type
     }
   }
 }
