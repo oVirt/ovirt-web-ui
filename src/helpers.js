@@ -34,7 +34,7 @@ export function hidePassword ({action, param}) {
 }
 
 // ---------------------------------
-// TODO: review
+// TODO: review - use VM status functions similar to the ovirt-engine
 export function canStart (state) {
   return state && state === 'down'
 }
