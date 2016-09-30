@@ -204,16 +204,28 @@ Vm.propTypes = {
 }
 
 class VmDetail extends Component {
+  componentDidMount () {
+    this.onKeyDown = (event) => {
+      if (event.keyCode === 27) { // ESC
+        this.onClose()
+      }
+    }
+    this.onClose = () => {
+      this.props.dispatch(closeVmDetail())
+    }
+
+    window.addEventListener('keydown', this.onKeyDown);
+  }
+  componentWillUnmount () {
+    window.removeEventListener('keydown', this.onKeyDown);
+  }
   render () {
     const vm = this.props['vm'] // optional
 
     if (vm) {
-      const dispatch = this.props.dispatch
-      const onClose = () => dispatch(closeVmDetail())
-
       return (
         <div className="container-fluid move-left-detail">
-          <a href="#" className="move-left-close-detail" onClick={onClose}><i className="pficon pficon-close"> Close</i></a>
+          <a href="#" className="move-left-close-detail" onClick={this.onClose}><i className="pficon pficon-close"> Close</i></a>
 
           <h1><VmIcon vmIcon={vm.icons.small} missingIconClassName="pficon pficon-virtual-machine" className="vm-detail-icon"/> {vm.name}</h1>
           <dl>
