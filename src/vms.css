@@ -46,12 +46,10 @@ dd {
 }
 
 .card-pf-icon {
-    height: 100%;
     overflow: hidden;
     display: block;
     height: 106px;
     margin: 0 auto;
-    width: 106px;
 }
 
 .vm-detail-icon { /* small VM icon on detail page*/
