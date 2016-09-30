@@ -18,7 +18,7 @@ OvirtApi = {
   },
   _assertStore ({methodName}) {
     if (!this.store) {
-      throw new Exception(`OvirtApi in '${methodName}' uninitialized - missing store`)
+      throw new Exception(`OvirtApi in '${methodName}' uninitialized - missing store. Call the Api.init() method`)
     }
   },
   _assertLogin ({methodName}) {

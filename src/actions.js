@@ -67,18 +67,29 @@ export function getConsole ({vm}) {
 }
 
 // --- Internal State -------------------------
-export function loginSuccessful ({token}) {
+export function loginSuccessful ({token, username}) {
   return {
     type: 'LOGIN_SUCCESSFUL',
     payload: {
-      token
+      token,
+      username
     }
   }
 }
 
-export function loginFailed () {
+export function loginFailed ({errorCode, message}) {
   return {
     type: 'LOGIN_FAILED',
+    payload: {
+      errorCode,
+      message
+    }
+  }
+}
+
+export function logout () {
+  return {
+    type: 'LOGOUT',
     payload: {
     }
   }
@@ -122,8 +133,38 @@ export function closeVmDetail () {
   }
 }
 
+export function auditLogShow () {
+  return {
+    type: 'SHOW_AUDIT_LOG',
+    payload: {
+    }
+  }
+}
+
+export function auditLogHide () {
+  return {
+    type: 'HIDE_AUDIT_LOG',
+    payload: {
+    }
+  }
+}
+
 // --- FAILURES -------------------------------
-export function failedExternalAction ({message, action}) {
+export function failedExternalAction ({message, exception, action}) {
+  if (exception) {
+//    message = message ? message : (exception['responseText'] ? exception['responseText'] : (exception['statusText'] ? exception['statusText'] : 'UNKNOWN'))
+    message = message ? message : (exception['statusText'] ? exception['statusText'] : 'UNKNOWN') // exception['responseText'] for content
+    const type = exception['status'] ? exception['status'] : 'ERROR'
+    return {
+      type: 'FAILED_EXTERNAL_ACTION',
+      payload: {
+        message: message,
+        type: type,
+        action
+      }
+    }
+  }
+
   return {
     type: 'FAILED_EXTERNAL_ACTION',
     payload: {

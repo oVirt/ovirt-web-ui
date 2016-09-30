@@ -1,3 +1,8 @@
+div .two-columns {
+    -webkit-column-count: 2; /* Chrome, Safari, Opera */
+    -moz-column-count: 2; /* Firefox */
+    column-count: 2;
+}
 .move-left { /* go to the left */
     transition: transform 0.6s;
     transform: translateX(-30%) perspective(100px) rotateY(20deg) translateZ(-10px);
@@ -56,6 +61,23 @@ dd {
 
 }
 
+.navbar-header .navbar-brand
+{
+    padding: 0px 0 5px;
+}
+
+.auditlog-unread {
+    color: red;
+    font-weight: bold;
+}
+
+.auditlog-allread {
+    /*color: white;*/
+}
+
+.user-name {
+
+}
 /*
 html, body, .perspective {
     width: 100%;

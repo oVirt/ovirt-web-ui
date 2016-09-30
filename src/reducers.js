@@ -44,12 +44,15 @@ function updateVmIcon ({vms, payload: {vmId, icon, type}}) {
 
 // --- AuditLog reducer ---------
 function addAuditLogEntry ({state, message, type='ERROR', failedAction}) {
-  return [...state, {
+  const newState = Object.assign({}, state)
+  newState.unread = true
+  newState.records = [...state.records, {
     message,
     type,
     failedAction,
     time: Date.now()
   }]
+  return newState
 }
 
 // -------------------------------
@@ -65,28 +68,45 @@ function vms (state = {vms: [], selectedVm: undefined}, action) {
       return Object.assign({}, state, {selected: action.payload.vm})
     case 'CLOSE_VM_DETAIL':
       return Object.assign({}, state, {selected: null})
+    case 'LOGOUT': // see config() reducer
+      return {vms: []}
     default:
       return state
   }
 }
 
-function config (state = {}, action) {
+function logout ({state}) {
+  const newState = Object.assign({}, state)
+  newState['loginToken'] = undefined
+  newState.user.name = undefined
+  return newState
+}
+
+function config (state = {loginToken: undefined, user: {name: undefined}}, action) {
+  // logDebug(`The 'config' reducer action=${JSON.stringify(hidePassword({action}))}`)
   switch (action.type) {
     case 'LOGIN_SUCCESSFUL':
-      return Object.assign({}, state, {loginToken: action.payload.token})
-    case 'LOGIN_FAILED':
-      const newState = Object.assign({}, state)
-      newState['loginToken'] = undefined
-      return newState
+      return Object.assign({}, state, {loginToken: action.payload.token, user: {name: action.payload.username}})
+    case 'LOGIN_FAILED': // see auditLog() reducer
+      return logout({state})
+    case 'LOGOUT': // see vms() reducer
+      return logout({state})
     default:
       return state
   }
 }
 
-function auditLog (state = [], action) {
+function auditLog (state = {records: [], unread: false, show: false}, action) {
+  // logDebug(`The 'auditLog' reducer action=${JSON.stringify(hidePassword({action}))}`)
   switch (action.type) {
     case 'FAILED_EXTERNAL_ACTION':
-      return addAuditLogEntry({state, message: action.payload.message, type: 'ERROR', failedAction: action.payload.action})
+      return addAuditLogEntry({state, message: action.payload.message, type: action.payload.type, failedAction: action.payload.action})
+    case 'LOGIN_FAILED': // see config() reducer
+      return addAuditLogEntry({state, message: action.payload.message, type: action.payload.errorCode})
+    case 'SHOW_AUDIT_LOG':
+      return Object.assign({}, state, {show: true})
+    case 'HIDE_AUDIT_LOG':
+      return Object.assign({}, state, {show: false})
     default:
       return state
   }

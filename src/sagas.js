@@ -5,15 +5,6 @@ import Api from './api'
 
 import {getAllVms, getVmIcons, updateVmIcon, updateVm, loginSuccessful, loginFailed, failedExternalAction} from './actions'
 
-// TODO: Review error handling!! Exceptions + HTTP non-200 codes
-/*
- Missing token
- Engine is down / wrong URL
- Wrong credentials
- Token time-out
- non-200 HTTP
-
- */
 function* callExternalAction(methodName, method, action) {
   try {
     logDebug(`External action ${methodName}() starts on ${JSON.stringify(hidePassword({action}))}`)
@@ -21,30 +12,28 @@ function* callExternalAction(methodName, method, action) {
     return result
   } catch (e) {
     logDebug(`External action exception: ${JSON.stringify(e)}`)
-    yield put(failedExternalAction({message: e, action}))
+
+    yield put(failedExternalAction({exception: e, action}))
+
+    return {error: e}
   }
 }
 
+// TODO: implement 'renew the token'
 function* login (action) {
   const token = yield callExternalAction('login', Api.login, action)
   if (token && token['access_token']) {
-    yield put(loginSuccessful({token}))
+    yield put(loginSuccessful({token, username: 'User Name'})) // TODO: read proper user name
     yield put(getAllVms())
   } else {
-    yield put(loginFailed())
-  }
-}
+    logDebug(`login(): received data: ${JSON.stringify(token)}`)
 
-/* TODO: not yet called
-function* logout (action) {
-  try {
-    logDebug(`saga: logout() starts on ${JSON.stringify(action)}`)
-    logDebug(`TODO!`)
-  } catch (e) {
-    yield put(failedExternalAction({message: e.message, action}))
+    yield put(loginFailed({
+      errorCode: token['error_code'] ? token['error_code'] : 'no_access',
+      message: token['error'] ? (token.error['statusText'] ? token.error['statusText'] : JSON.stringify(token['error']))  : 'Login Failed'
+    }))
   }
 }
-*/
 
 function* fetchAllVms (action) {
   const allVms = yield callExternalAction('getAllVms', Api.getAllVms, action)
