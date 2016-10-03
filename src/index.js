@@ -7,7 +7,7 @@ import '../node_modules/patternfly/dist/css/patternfly-additions.css'
 
 import store, {sagaMiddleware} from './store'
 import mySaga from './sagas'
-import {login} from './actions'
+import {login, failedExternalAction} from './actions'
 import Api from './api'
 
 import App from './App';
@@ -32,6 +32,8 @@ function start () {
   // initiate data retrieval
   Api.init({store})
   store.dispatch(login({username:'admin@internal', password:'admin'}))
+
+  store.dispatch(failedExternalAction ({message: 'Test', action: {type: 'NONE'}}))
 }
 
 start()

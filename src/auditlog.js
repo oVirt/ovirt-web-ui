@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import './vms.css'
 
-import {logDebug} from './helpers'
+import {logDebug, formatTwoDigits} from './helpers'
 
 class AuditLogRecord extends Component {
     renderTime (time) { // TODO: better!
         const t = new Date(time)
-        return t.getHours() + ":" + t.getMinutes() + ":" + t.getSeconds()
+        return formatTwoDigits(t.getHours()) + ":" + formatTwoDigits(t.getMinutes()) + ":" + formatTwoDigits(t.getSeconds())
     }
     render () {
         const {record} = this.props
@@ -31,7 +31,7 @@ class AuditLog extends Component {
         const {auditLog, config, dispatch} = this.props
 
         if (auditLog.get('show')) {
-            return (<table className="datatable table table-striped table-bordered">
+            return (<table className="datatable table table-striped table-bordered auditlog-table">
                     <thead>
                     <tr>
                         <th>When</th>

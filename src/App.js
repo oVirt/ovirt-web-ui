@@ -16,10 +16,10 @@ class App extends Component {
     const dispatch = store.dispatch
 
     // TODO: better positioning of the AuditLog on the page
-    return (<div>
+    return (<div className="container-fluid">
       <Header auditLog={auditLog} config={config} dispatch={dispatch} />
-         <Vms vms={vms} config={config} dispatch={dispatch} />
-         <AuditLog auditLog={auditLog} config={config} dispatch={dispatch} />
+      <AuditLog auditLog={auditLog} config={config} dispatch={dispatch} />
+      <Vms vms={vms} config={config} dispatch={dispatch} />
     </div>)
     // return (<div> <Playground /> </div>)
   }

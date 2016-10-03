@@ -78,6 +78,10 @@ dd {
 .user-name {
 
 }
+
+.auditlog-table {
+    margin-top: 2px;
+}
 /*
 html, body, .perspective {
     width: 100%;

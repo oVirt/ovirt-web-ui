@@ -33,6 +33,9 @@ export function hidePassword ({action, param}) {
   return action
 }
 
+export function formatTwoDigits (num) {
+  return String("0" + num).slice(-2)
+}
 // ---------------------------------
 // TODO: review - use VM status functions similar to the ovirt-engine
 export function canStart (state) {

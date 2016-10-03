@@ -63,7 +63,7 @@ function auditLog (state, action) {
     case 'LOGIN_FAILED': // see config() reducer
       return addAuditLogEntry({state, message: action.payload.message, type: action.payload.errorCode})
     case 'SHOW_AUDIT_LOG':
-      return state.set('show', true) // Object.assign({}, state, {show: true})
+      return state.set('show', true).set('unread', false) // Object.assign({}, state, {show: true})
     case 'HIDE_AUDIT_LOG':
       return state.set('show', false) // return Object.assign({}, state, {show: false})
     default:
