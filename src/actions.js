@@ -28,40 +28,40 @@ export function getVmIcons ({vm}) {
   }
 }
 
-export function shutdownVm ({vm, force=false}) {
+export function shutdownVm ({vmId, force=false}) {
   return {
     type: 'SHUTDOWN_VM',
     payload: {
-      vm,
+      vmId,
       force
     }
   }
 }
 
-export function restartVm ({vm, force=false}) {
+export function restartVm ({vmId, force=false}) {
   return {
     type: 'RESTART_VM',
     payload: {
-      vm,
+      vmId,
       force
     }
   }
 }
 
-export function startVm ({vm}) {
+export function startVm ({vmId}) {
   return {
     type: 'START_VM',
     payload: {
-      vm
+      vmId
     }
   }
 }
 
-export function getConsole ({vm}) {
+export function getConsole ({vmId}) {
   return {
     type: 'GET_CONSOLE_VM',
     payload: {
-      vm
+      vmId
     }
   }
 }
@@ -95,6 +95,11 @@ export function logout () {
   }
 }
 
+/**
+ * Update or Add
+ * @param vm
+ * @returns {{type: string, payload: {vm: *}}}
+ */
 export function updateVm ({vm}) {
   return {
     type: 'UPDATE_VM',
@@ -116,11 +121,11 @@ export function updateVmIcon ({vmId, icon, type}) {
   }
 }
 
-export function selectVmDetail ({vm}) {
+export function selectVmDetail ({vmId}) {
   return {
     type: 'SELECT_VM_DETAIL',
     payload: {
-      vm
+      vmId
     }
   }
 }

@@ -50,8 +50,8 @@ export function canRestart (state) {
 }
 
 // TODO: review
-export function canConsole ({vm}) {
-  return canRestart(vm.status)
+export function canConsole ({state}) {
+  return canRestart(state)
 }
 /*
  public enum VmStatus {

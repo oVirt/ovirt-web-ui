@@ -14,7 +14,7 @@ OvirtApi = {
   // ----
   _getLoginToken () { // redux store selector
     OvirtApi._assertStore({methodName: '_getLoginToken'})
-    return OvirtApi.store.getState().config['loginToken']
+    return OvirtApi.store.getState().config.get('loginToken')
   },
   _assertStore ({methodName}) {
     if (!this.store) {
@@ -31,7 +31,7 @@ OvirtApi = {
       type: "GET",
       headers: {
         'Accept': 'application/json',
-        'Authorization': `Bearer ${OvirtApi._getLoginToken()['access_token']}`
+        'Authorization': `Bearer ${OvirtApi._getLoginToken().get('access_token')}`
       }
     }).then(data => Promise.resolve(data))
       .catch(data => {
@@ -45,7 +45,7 @@ OvirtApi = {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/xml',
-        'Authorization': `Bearer ${OvirtApi._getLoginToken()['access_token']}`
+        'Authorization': `Bearer ${OvirtApi._getLoginToken().get('access_token')}`
       },
       data: input
     }).then(data => Promise.resolve(data))
@@ -78,17 +78,17 @@ OvirtApi = {
     const url = '/api/vms'
     return OvirtApi._httpGet({url})
   },
-  shutdown ({vm}) {
+  shutdown ({vmId}) {
     OvirtApi._assertLogin({methodName: 'shutdown'})
-    return OvirtApi._httpPost({url: `/api/vms/${vm.id}/shutdown`, input: '<action />'})
+    return OvirtApi._httpPost({url: `/api/vms/${vmId}/shutdown`, input: '<action />'})
   },
-  start ({vm}) {
+  start ({vmId}) {
     OvirtApi._assertLogin({methodName: 'start'})
-    return OvirtApi._httpPost({url: `/api/vms/${vm.id}/start`, input: '<action />'})
+    return OvirtApi._httpPost({url: `/api/vms/${vmId}/start`, input: '<action />'})
   },
-  restart ({vm}) {
+  restart ({vmId}) {
     OvirtApi._assertLogin({methodName: 'restart'})
-    return OvirtApi._httpPost({url: `/api/vms/${vm.id}/reboot`, input: '<action />'})
+    return OvirtApi._httpPost({url: `/api/vms/${vmId}/reboot`, input: '<action />'})
   },
   icon ({id}) {
     OvirtApi._assertLogin({methodName: 'icon'})

@@ -10,9 +10,9 @@ class LoginButton extends Component {
         // const onLogin = () => dispatch(showLoginDialog())
         const onLogin = () => {} // dispatch(showLoginDialog())
 
-        if (config.loginToken) {
+        if (config.get('loginToken')) {
             return (<a className="user-name" href="#" onClick={onLogout}>
-                {config.user.name}&nbsp;<i className="fa fa-sign-out" aria-hidden="true"></i>
+                {config.getIn(['user', 'name'])}&nbsp;<i className="fa fa-sign-out" aria-hidden="true"></i>
             </a>)
         }
         return (<a className="user-name" href="#" onClick={onLogin}><i className="fa fa-sign-out" aria-hidden="true"></i>&nbsp;Login</a>) // TODO: dispatch login action to show login dialog
@@ -28,11 +28,11 @@ LoginButton.propTypes = {
  */
 class Header extends Component {
     isUnread (auditLog) {
-      return auditLog.unread
+      return auditLog.get('unread')
     }
     render () {
         const {auditLog, config, dispatch} = this.props
-        const onStatusClick = auditLog.show ? () => dispatch(auditLogHide()) : () => dispatch(auditLogShow())
+        const onStatusClick = auditLog.get('show') ? () => dispatch(auditLogHide()) : () => dispatch(auditLogShow())
 
         return (<nav className="navbar navbar-default navbar-pf">
                 <div className="navbar-header">

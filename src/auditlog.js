@@ -3,18 +3,34 @@ import './vms.css'
 
 import {logDebug} from './helpers'
 
-/**
- * Component displaying auditLog messages
- */
-class AuditLog extends Component {
+class AuditLogRecord extends Component {
     renderTime (time) { // TODO: better!
         const t = new Date(time)
         return t.getHours() + ":" + t.getMinutes() + ":" + t.getSeconds()
     }
     render () {
+        const {record} = this.props
+        logDebug(`rendering record: ${JSON.stringify(record)}`)
+
+        return (<tr>
+            <td>{this.renderTime(record.time)}</td>
+            <td>{record.message}</td>
+            <td>{record.type}</td>
+        </tr>)
+    }
+}
+AuditLogRecord.propTypes = {
+    record: React.PropTypes.object.isRequired
+}
+
+/**
+ * Component displaying auditLog messages
+ */
+class AuditLog extends Component {
+    render () {
         const {auditLog, config, dispatch} = this.props
 
-        if (auditLog.show) {
+        if (auditLog.get('show')) {
             return (<table className="datatable table table-striped table-bordered">
                     <thead>
                     <tr>
@@ -24,14 +40,7 @@ class AuditLog extends Component {
                     </tr>
                     </thead>
                     <tbody>
-                    {auditLog.records.map( r => {
-                        logDebug(`rendering r: ${JSON.stringify(r)}`)
-                        return (<tr key={r.time}>
-                            <td>{this.renderTime(r.time)}</td>
-                            <td>{r.message}</td>
-                            <td>{r.type}</td>
-                        </tr>)
-                    })}
+                    {auditLog.get('records').map( r => (<AuditLogRecord key={r.time} record={r}/>))}
                     </tbody>
                 </table>
             )

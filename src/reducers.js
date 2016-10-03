@@ -1,92 +1,88 @@
 import { combineReducers } from 'redux'
+import Immutable from 'immutable'
 import { logDebug, hidePassword } from './helpers';
 
-// --- helpers -------------------
-function getFirstIndexOfVm(state, field, value) {
-  return state.findIndex(e => {
-    return e[field] === value;
-  });
-}
-
 // --- Vms reducer ---------------
-function updateVm ({vms, vm}) {
-  const index = vm.id ? getFirstIndexOfVm(vms, 'id', vm.id) : getFirstIndexOfVm(vms, 'name', vm.name)
-  if (index < 0) { // not found --> add
-    return [...vms, vm];
+function updateOrAddVm ({state, payload: {vm}}) {
+  const vmPredicate = vm => vm.get('id') === vm.id
+  const vmIndex = state.get('vms').findIndex(vmPredicate)
+  if (vmIndex < 0) {
+    return state.update('vms', vms => vms.push(Immutable.fromJS(vm)))
+  } else {
+    logDebug(`--- TODO: The vms(UPDATE_VM) reducer is not implemented for update`)
+    // TODO: implement update
+    return state
   }
-
-  // update by merging
-  const updatedVm = Object.assign({}, vms[index], vm)
-
-  return vms.slice(0, index)
-    .concat(updatedVm)
-    .concat(vms.slice(index + 1));
 }
 
-function updateVmIcon ({vms, payload: {vmId, icon, type}}) {
-  logDebug(`updateVmIcon() starts: `)
-
-  const index = getFirstIndexOfVm(vms, 'id', vmId)
-  if (index >= 0) {
-    const updatedVm = Object.assign({}, vms[index])
-    updatedVm.icons[type] = Object.assign({}, updatedVm.icons[type]);
-
-    updatedVm.icons[type].mediaType = icon.media_type
-    updatedVm.icons[type].content = icon.data  // TODO: think a little bit more about storing image content into the internalVm ...
-
-    return vms.slice(0, index)
-        .concat(updatedVm)
-        .concat(vms.slice(index + 1))
-  }
-
-  return vms
+function updateVmIcon ({state, payload: {vmId, icon, type}}) {
+  // TODO: use seq
+  const vmPredicate = vm => vm.get('id') === vmId
+  const vm = state.get('vms').find(vmPredicate)
+  const updatedVm = vm.setIn(['icons', type, 'mediaType'], icon.media_type).setIn(['icons', type, 'content'], icon.data)
+  return state.update('vms', vms => vms.set(vms.findIndex(vmPredicate), updatedVm))
 }
 
-// --- AuditLog reducer ---------
-function addAuditLogEntry ({state, message, type='ERROR', failedAction}) {
-  const newState = Object.assign({}, state)
-  newState.unread = true
-  newState.records = [...state.records, {
-    message,
-    type,
-    failedAction,
-    time: Date.now()
-  }]
-  return newState
-}
-
-// -------------------------------
-function vms (state = {vms: [], selectedVm: undefined}, action) {
+function vms (state, action) {
+  state = state ? state : Immutable.fromJS({vms: [], selected: undefined})
   logDebug(`The 'vms' reducer action=${JSON.stringify(hidePassword({action}))}`)
 
   switch (action.type) {
     case 'UPDATE_VM':
-      return Object.assign({}, state, {vms: updateVm({vms: state.vms, vm: action.payload.vm})})
+      return updateOrAddVm({state, payload: action.payload})
     case 'UPDATE_VM_ICON':
-      return Object.assign({}, state, {vms: updateVmIcon({vms: state.vms, payload: action.payload})})
+      return updateVmIcon({state, payload: action.payload})
     case 'SELECT_VM_DETAIL':
-      return Object.assign({}, state, {selected: action.payload.vm})
+      return state.set('selected', action.payload.vmId)
     case 'CLOSE_VM_DETAIL':
-      return Object.assign({}, state, {selected: null})
+      return state.delete('selected')
     case 'LOGOUT': // see config() reducer
-      return {vms: []}
+      return state.update('vms', vms => vms.clear() )
     default:
       return state
   }
 }
 
-function logout ({state}) {
-  const newState = Object.assign({}, state)
-  newState['loginToken'] = undefined
-  newState.user.name = undefined
-  return newState
+// --- AuditLog reducer ---------
+function addAuditLogEntry ({state, message, type='ERROR', failedAction}) {
+  // TODO: use seq
+  return state.set('unread', true).update('records', records => records.push({
+    message,
+    type,
+    failedAction,
+    time: Date.now()
+  }))
 }
 
-function config (state = {loginToken: undefined, user: {name: undefined}}, action) {
+function auditLog (state, action) {
+  state = state ? state : Immutable.fromJS({records: [], unread: false, show: false})
+  // logDebug(`The 'auditLog' reducer action=${JSON.stringify(hidePassword({action}))}`)
+  switch (action.type) {
+    case 'FAILED_EXTERNAL_ACTION':
+      return addAuditLogEntry({state, message: action.payload.message, type: action.payload.type, failedAction: action.payload.action})
+    case 'LOGIN_FAILED': // see config() reducer
+      return addAuditLogEntry({state, message: action.payload.message, type: action.payload.errorCode})
+    case 'SHOW_AUDIT_LOG':
+      return state.set('show', true) // Object.assign({}, state, {show: true})
+    case 'HIDE_AUDIT_LOG':
+      return state.set('show', false) // return Object.assign({}, state, {show: false})
+    default:
+      return state
+  }
+}
+
+// --- Config reducer -----------
+function logout ({state}) {
+  // TODO: use seq
+  return state.delete('loginToken').deleteIn(['user', 'name'])
+}
+
+function config (state, action) {
+  state = state ? state : Immutable.fromJS({loginToken: undefined, user: {name: undefined}})
   // logDebug(`The 'config' reducer action=${JSON.stringify(hidePassword({action}))}`)
   switch (action.type) {
     case 'LOGIN_SUCCESSFUL':
-      return Object.assign({}, state, {loginToken: action.payload.token, user: {name: action.payload.username}})
+      return state.merge({loginToken: action.payload.token, user: {name: action.payload.username}})
     case 'LOGIN_FAILED': // see auditLog() reducer
       return logout({state})
     case 'LOGOUT': // see vms() reducer
@@ -96,76 +92,9 @@ function config (state = {loginToken: undefined, user: {name: undefined}}, actio
   }
 }
 
-function auditLog (state = {records: [], unread: false, show: false}, action) {
-  // logDebug(`The 'auditLog' reducer action=${JSON.stringify(hidePassword({action}))}`)
-  switch (action.type) {
-    case 'FAILED_EXTERNAL_ACTION':
-      return addAuditLogEntry({state, message: action.payload.message, type: action.payload.type, failedAction: action.payload.action})
-    case 'LOGIN_FAILED': // see config() reducer
-      return addAuditLogEntry({state, message: action.payload.message, type: action.payload.errorCode})
-    case 'SHOW_AUDIT_LOG':
-      return Object.assign({}, state, {show: true})
-    case 'HIDE_AUDIT_LOG':
-      return Object.assign({}, state, {show: false})
-    default:
-      return state
-  }
-}
-
+// ------------------------------
 export default combineReducers({
   config,
   vms,
   auditLog
 })
-
-
-/* import cockpit from 'cockpit';
- import { VMS_CONFIG } from "./config.es6";
-
- // --- compatibility hack for IE
- if (!Array.prototype.findIndex) {
- Array.prototype.findIndex = function(predicate) {
- if (this === null) {
- throw new TypeError('Array.prototype.findIndex called on null or undefined');
- }
- if (typeof predicate !== 'function') {
- throw new TypeError('predicate must be a function');
- }
- var list = Object(this);
- var length = list.length >>> 0;
- var thisArg = arguments[1];
- var value;
-
- for (var i = 0; i < length; i++) {
- value = list[i];
- if (predicate.call(thisArg, value, i, list)) {
- return i;
- }
- }
- return -1;
- };
- }
-
- // --- compatibility hack for PhantomJS
- if (typeof Object.assign != 'function') {
- Object.assign = function(target) {
- 'use strict';
- if (target === null) {
- throw new TypeError('Cannot convert undefined or null to object');
- }
-
- target = Object(target);
- for (var index = 1; index < arguments.length; index++) {
- var source = arguments[index];
- if (source !== null) {
- for (var key in source) {
- if (Object.prototype.hasOwnProperty.call(source, key)) {
- target[key] = source[key];
- }
- }
- }
- }
- return target;
- };
- }
- */

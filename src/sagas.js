@@ -23,7 +23,7 @@ function* callExternalAction(methodName, method, action) {
 function* login (action) {
   const token = yield callExternalAction('login', Api.login, action)
   if (token && token['access_token']) {
-    yield put(loginSuccessful({token, username: 'User Name'})) // TODO: read proper user name
+    yield put(loginSuccessful({token, username: action.payload.credentials.username}))
     yield put(getAllVms())
   } else {
     logDebug(`login(): received data: ${JSON.stringify(token)}`)

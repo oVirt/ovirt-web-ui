@@ -39,15 +39,18 @@ class VmActions extends Component {
   render () {
     const {vm, dispatch} = this.props
 
-    const onShutdown = () => dispatch(shutdownVm({vm, force: false}))
-    const onRestart = () => dispatch(restartVm({vm, force: false}))
-    const onStart = () => dispatch(startVm({vm}))
+    const vmId = vm.get('id')
+    const status = vm.get('status')
+
+    const onShutdown = () => dispatch(shutdownVm({vmId, force: false}))
+    const onRestart = () => dispatch(restartVm({vmId, force: false}))
+    const onStart = () => dispatch(startVm({vmId}))
 
     return (
     <div className="card-pf-items text-center">
-      {canShutdown(vm.status) ? this.button({className: 'fa fa-power-off', tooltip: 'Click to shut down the VM', onClick: onShutdown}): ''}
-      {canRestart(vm.status) ? this.button({className: 'fa fa-refresh', tooltip: 'Click to reboot the VM', onClick: onRestart}) : ''}
-      {canStart(vm.status) ? this.button({className: 'fa fa-angle-double-right', tooltip: 'Click to start the VM', onClick: onStart}) : ''}
+      {canShutdown(status) ? this.button({className: 'fa fa-power-off', tooltip: 'Click to shut down the VM', onClick: onShutdown}): ''}
+      {canRestart(status) ? this.button({className: 'fa fa-refresh', tooltip: 'Click to reboot the VM', onClick: onRestart}) : ''}
+      {canStart(status) ? this.button({className: 'fa fa-angle-double-right', tooltip: 'Click to start the VM', onClick: onStart}) : ''}
     </div>
   )}
 }
@@ -65,7 +68,7 @@ class VmStatusInfo extends Component {
       </span>
     )}
 
-    switch (state) { // TODO: review
+    switch (state) { // TODO: review VM states
       case 'up':
         return iconElement({className: 'pficon pficon-ok icon-1x-vms', tooltip: 'The VM is running.'});
       case 'powering_up':
@@ -115,12 +118,14 @@ class VmStatusInfo extends Component {
   render () {
     const {vm, dispatch} = this.props
 
+    const state = vm.get('status')
+
     return (// fa fa-check
       <div className="card-pf-items text-center">
         <div className="card-pf-item">
-          {this.statusIcon({state: vm.status})}
+          {this.statusIcon({state})}
         </div>
-        {canConsole({vm}) ? this.consoleIcon({vm, dispatch}) : ''}
+        {canConsole({state}) ? this.consoleIcon({vm, dispatch}) : ''}
       </div>
     )
   }
@@ -134,14 +139,14 @@ class VmStatusText extends Component {
   render () {
     const {vm} = this.props
 
-    switch (vm.status) {// TODO: review
+    switch (vm.get('status')) {// TODO: review VM states
       case 'up':
       case 'powering_up':
       case 'paused':
       case 'migrating':
-        return (<p className="card-pf-info text-center"><strong>Started On</strong>{vm['startTime']}</p>)
+        return (<p className="card-pf-info text-center"><strong>Started On</strong>{vm.get('startTime')}</p>)
       default:
-        return (<p className="card-pf-info text-center"><strong>Stopped On: </strong>{vm['stopTime']}</p>)
+        return (<p className="card-pf-info text-center"><strong>Stopped On: </strong>{vm.get('stopTime')}</p>)
     }
   }
 }
@@ -153,8 +158,11 @@ class VmIcon extends Component {
   render () {
     const {vmIcon, className, missingIconClassName} = this.props
 
-    if (vmIcon.content) {
-      const src = `data:${vmIcon.mediaType};base64,${vmIcon.content}`
+    const content = vmIcon.get('content')
+    const mediaType = vmIcon.get('mediaType')
+
+    if (content) {
+      const src = `data:${mediaType};base64,${content}`
       return (<img src={src} className={className} alt=""/>)
     }
 
@@ -171,7 +179,7 @@ class Vm extends Component {
   render () {
     const {vm, dispatch} = this.props
 
-    const onSelectVm = () => dispatch(selectVmDetail({vm}))
+    const onSelectVm = () => dispatch(selectVmDetail({vmId: vm.get('id')}))
 
     // TODO: improve the card flip:
     // TODO: https://davidwalsh.name/css-flip
@@ -182,10 +190,10 @@ class Vm extends Component {
         <div className="card-pf card-pf-view card-pf-view-select card-pf-view-single-select">
           <div className="card-pf-body">
             <div className="card-pf-top-element" onClick={onSelectVm}>
-              <VmIcon vmIcon={vm.icons.large} className="card-pf-icon" missingIconClassName="fa fa-birthday-cake card-pf-icon-circle"/>
+              <VmIcon vmIcon={vm.getIn(['icons', 'large'])} className="card-pf-icon" missingIconClassName="fa fa-birthday-cake card-pf-icon-circle"/>
             </div>
             <h2 className="card-pf-title text-center" onClick={onSelectVm}>
-              {vm.name}
+              {vm.get('name')}
             </h2>
 
             <VmStatusInfo vm={vm} dispatch={dispatch}/>
@@ -227,22 +235,22 @@ class VmDetail extends Component {
         <div className="container-fluid move-left-detail">
           <a href="#" className="move-left-close-detail" onClick={this.onClose}><i className="pficon pficon-close"> Close</i></a>
 
-          <h1><VmIcon vmIcon={vm.icons.small} missingIconClassName="pficon pficon-virtual-machine" className="vm-detail-icon"/> {vm.name}</h1>
+          <h1><VmIcon vmIcon={vm.getIn(['icons', 'small'])} missingIconClassName="pficon pficon-virtual-machine" className="vm-detail-icon"/> {vm.get('name')}</h1>
           <dl>
             <dt>Operating System</dt>
-            <dd>{vm.os['type']}</dd>
+            <dd>{vm.getIn(['os', 'type'])}</dd>
             <dt>State</dt>
-            <dd>{vm.status}</dd>
+            <dd>{vm.get('status')}</dd>
             <dt>ID</dt>
-            <dd>{vm.id}</dd>
+            <dd>{vm.get('id')}</dd>
             <dt>Created On</dt>
-            <dd>{vm['creationTime']}</dd>
+            <dd>{vm.get('creationTime')}</dd>
             <dt>Started On</dt>
-            <dd>{vm['startTime']}</dd>
+            <dd>{vm.get('startTime')}</dd>
             <dt>Stopped On</dt>
-            <dd>{vm['stopTime']}</dd>
+            <dd>{vm.get('stopTime')}</dd>
             <dt>Address</dt>
-            <dd>{vm['fqdn']}</dd>
+            <dd>{vm.get('fqdn')}</dd>
           </dl>
         </div>
       )
@@ -258,21 +266,24 @@ Vm.propTypes = {
 
 class Vms extends Component {
   renderVms ({vms, dispatch}) {
-    const containerClass = 'container-fluid container-cards-pf ' + (vms.selected ? 'move-left' : 'move-left-remove')
+    const selectedVmId = vms.get('selected')
+    const selectedVm = selectedVmId ? vms.get('vms').find( vm => vm.get('id') === selectedVmId) : undefined
+
+    const containerClass = 'container-fluid container-cards-pf ' + (selectedVmId ? 'move-left' : 'move-left-remove')
 
     return (
       <span>
       <div className={containerClass}>
         <div className="row row-cards-pf">
-          {vms.vms.map(vm => <Vm vm={vm} key={vm.id} dispatch={dispatch}/>)}
+          {vms.get('vms').map(vm => <Vm vm={vm} key={vm.get('id')} dispatch={dispatch}/>)}
         </div>
       </div>
-      <VmDetail vm={vms.selected} dispatch={dispatch}/>
+      <VmDetail vm={selectedVm} dispatch={dispatch}/>
       </span>
   )}
   render () {
     const {vms, dispatch} = this.props
-    if (vms.vms && vms.vms.length > 0) {
+    if (vms.get('vms') && !vms.get('vms').isEmpty()) {
       return (this.renderVms({vms, dispatch}))
     } else {
       return (<div className="container-fluid">
