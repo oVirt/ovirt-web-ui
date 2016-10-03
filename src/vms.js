@@ -3,6 +3,9 @@ import './vms.css'
 import {selectVmDetail, closeVmDetail, shutdownVm, restartVm, startVm, getConsole} from './actions'
 import {canRestart, canShutdown, canStart, canConsole, logDebug} from './helpers'
 
+/**
+ * Data are fetched but no VM is available to display
+ */
 class NoVm extends Component {
   render () {// TODO
     return (
@@ -14,7 +17,7 @@ class NoVm extends Component {
           No VM available
         </h1>
         <p>
-          No VM can be retrieved for the logged user.
+          No VM can is available for the logged user.
         </p>
         <p>
           Learn more about this <a href="#">on the documentation</a>.
@@ -28,6 +31,45 @@ class NoVm extends Component {
       </div>
   )}
 }
+
+/**
+ * Login (token) to Engine is missing.
+ */
+class NoLogin extends Component {
+  render () {
+    return (
+        <div className="blank-slate-pf">
+          <div className="blank-slate-pf-icon">
+            <span className="pficon pficon pficon-user"></span>
+          </div>
+          <h1>
+            Please log in
+          </h1>
+          <p>
+            TODO: redirect
+          </p>
+
+        </div>
+    )}
+}
+
+class LoadingData extends Component {
+  render () {
+    return (
+        <div className="blank-slate-pf">
+          <div className="blank-slate-pf-icon">
+            <div className="spinner spinner-lg"></div>
+          </div>
+          <h1>
+            Please wait
+          </h1>
+          <p>
+            Data are being loaded ...
+          </p>
+        </div>
+    )}
+}
+
 class VmActions extends Component {
   button ({className, tooltip='', onClick}) {
     return (
@@ -282,18 +324,27 @@ class Vms extends Component {
       </span>
   )}
   render () {
-    const {vms, dispatch} = this.props
+    const {vms, config, dispatch} = this.props
     if (vms.get('vms') && !vms.get('vms').isEmpty()) {
       return (this.renderVms({vms, dispatch}))
-    } else {
+    } else if (!config.get('loginToken')) { // login is missing
       return (<div className="container-fluid">
-        <NoVm />
+        <NoLogin />
       </div>)
+    } else if (vms.get('loadInProgress')) { // data load in progress
+      return (<div className="container-fluid">
+        <LoadingData />
+      </div>)
+    } else { // No VM available
+        return (<div className="container-fluid">
+          <NoVm />
+        </div>)
+      }
     }
-  }
 }
 Vms.propTypes = {
   vms: React.PropTypes.object.isRequired,
+  config: React.PropTypes.object.isRequired,
   dispatch: React.PropTypes.func.isRequired
 }
 

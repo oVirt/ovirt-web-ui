@@ -10,7 +10,7 @@ function updateOrAddVm ({state, payload: {vm}}) {
     return state.update('vms', vms => vms.push(Immutable.fromJS(vm)))
   } else {
     logDebug(`--- TODO: The vms(UPDATE_VM) reducer is not implemented for update`)
-    // TODO: implement update
+    // TODO: implement update if needed
     return state
   }
 }
@@ -24,7 +24,7 @@ function updateVmIcon ({state, payload: {vmId, icon, type}}) {
 }
 
 function vms (state, action) {
-  state = state ? state : Immutable.fromJS({vms: [], selected: undefined})
+  state = state ? state : Immutable.fromJS({vms: [], selected: undefined, loadInProgress: true})
   logDebug(`The 'vms' reducer action=${JSON.stringify(hidePassword({action}))}`)
 
   switch (action.type) {
@@ -38,6 +38,8 @@ function vms (state, action) {
       return state.delete('selected')
     case 'LOGOUT': // see config() reducer
       return state.update('vms', vms => vms.clear() )
+    case 'SET_LOAD_IN_PROGRESS':
+      return state.set('loadInProgress', action.payload.value)
     default:
       return state
   }

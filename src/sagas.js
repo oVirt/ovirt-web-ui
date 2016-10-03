@@ -3,7 +3,7 @@ import { call, put } from 'redux-saga/effects'
 import {foreach, logDebug, hidePassword, ovirtVmToInternal} from './helpers'
 import Api from './api'
 
-import {getAllVms, getVmIcons, updateVmIcon, updateVm, loginSuccessful, loginFailed, failedExternalAction} from './actions'
+import {getAllVms, getVmIcons, updateVmIcon, updateVm, loginSuccessful, loginFailed, failedExternalAction, loadInProgress} from './actions'
 
 function* callExternalAction(methodName, method, action) {
   try {
@@ -21,6 +21,7 @@ function* callExternalAction(methodName, method, action) {
 
 // TODO: implement 'renew the token'
 function* login (action) {
+  yield put(loadInProgress({value: true}))
   const token = yield callExternalAction('login', Api.login, action)
   if (token && token['access_token']) {
     yield put(loginSuccessful({token, username: action.payload.credentials.username}))
@@ -32,6 +33,7 @@ function* login (action) {
       errorCode: token['error_code'] ? token['error_code'] : 'no_access',
       message: token['error'] ? (token.error['statusText'] ? token.error['statusText'] : JSON.stringify(token['error']))  : 'Login Failed'
     }))
+    yield put(yield put(loadInProgress({value: false})))
   }
 }
 
@@ -39,13 +41,13 @@ function* fetchAllVms (action) {
   const allVms = yield callExternalAction('getAllVms', Api.getAllVms, action)
 
   if (allVms && allVms['vm']) { // array
-
     yield* foreach(allVms.vm, function* (vm) {
       const internalVm = ovirtVmToInternal({vm})
       yield put(updateVm({vm: internalVm}))
       yield put(getVmIcons({vm: internalVm}))
     })
   }
+  yield put(yield put(loadInProgress({value: false})))
 }
 
 function* fetchVmIcons(action) {

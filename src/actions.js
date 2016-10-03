@@ -154,6 +154,15 @@ export function auditLogHide () {
   }
 }
 
+export function loadInProgress({value}) {
+  return {
+    type: 'SET_LOAD_IN_PROGRESS',
+    payload: {
+      value
+    }
+  }
+}
+
 // --- FAILURES -------------------------------
 export function failedExternalAction ({message, exception, action}) {
   if (exception) {

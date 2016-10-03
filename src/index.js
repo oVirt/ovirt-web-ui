@@ -32,8 +32,6 @@ function start () {
   // initiate data retrieval
   Api.init({store})
   store.dispatch(login({username:'admin@internal', password:'admin'}))
-
-  store.dispatch(failedExternalAction ({message: 'Test', action: {type: 'NONE'}}))
 }
 
 start()
