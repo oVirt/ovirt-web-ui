@@ -12,9 +12,7 @@ function* callExternalAction(methodName, method, action) {
     return result
   } catch (e) {
     logDebug(`External action exception: ${JSON.stringify(e)}`)
-
     yield put(failedExternalAction({exception: e, action}))
-
     return {error: e}
   }
 }

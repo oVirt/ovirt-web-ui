@@ -166,8 +166,10 @@ export function loadInProgress({value}) {
 // --- FAILURES -------------------------------
 export function failedExternalAction ({message, exception, action}) {
   if (exception) {
-//    message = message ? message : (exception['responseText'] ? exception['responseText'] : (exception['statusText'] ? exception['statusText'] : 'UNKNOWN'))
-    message = message ? message : (exception['statusText'] ? exception['statusText'] : 'UNKNOWN') // exception['responseText'] for content
+    message = message ? message : (
+        (exception['responseJSON'] && exception.responseJSON.fault && exception.responseJSON.fault.detail) ? (exception.responseJSON.fault.detail) : (
+            exception['statusText'] ? exception['statusText'] : 'UNKNOWN')
+    )
     const type = exception['status'] ? exception['status'] : 'ERROR'
     return {
       type: 'FAILED_EXTERNAL_ACTION',

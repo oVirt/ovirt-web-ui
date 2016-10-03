@@ -78,18 +78,26 @@ class VmActions extends Component {
         </span>
       </div>
   )}
+  emptyAction (state) {
+    if (!canConsole(state) && !canShutdown(state) && !canRestart(state) && !canStart(state)) {
+      return (<div className="card-pf-item"></div>)
+    }
+  }
   render () {
     const {vm, dispatch} = this.props
 
     const vmId = vm.get('id')
     const status = vm.get('status')
 
+    const onGetConsole = () => dispatch(getConsole({vm}))
     const onShutdown = () => dispatch(shutdownVm({vmId, force: false}))
     const onRestart = () => dispatch(restartVm({vmId, force: false}))
     const onStart = () => dispatch(startVm({vmId}))
 
     return (
     <div className="card-pf-items text-center">
+      {this.emptyAction(status)}
+      {canConsole(status) ? this.button({className: 'pficon pficon-screen', tooltip: 'Click to get console', onClick: onGetConsole}): ''}
       {canShutdown(status) ? this.button({className: 'fa fa-power-off', tooltip: 'Click to shut down the VM', onClick: onShutdown}): ''}
       {canRestart(status) ? this.button({className: 'fa fa-refresh', tooltip: 'Click to reboot the VM', onClick: onRestart}) : ''}
       {canStart(status) ? this.button({className: 'fa fa-angle-double-right', tooltip: 'Click to start the VM', onClick: onStart}) : ''}
@@ -101,14 +109,15 @@ VmActions.propTypes = {
   dispatch: React.PropTypes.func.isRequired
 }
 
+class VmStatusIcon extends Component {
+  render () {
+    const {state} = this.props
 
-class VmStatusInfo extends Component {
-  statusIcon ({state}) {
     function iconElement ({className, tooltip}) {
       return (<span title={tooltip} data-toggle="tooltip" data-placement="left">
         <i className={className}></i>
       </span>
-    )}
+      )}
 
     switch (state) { // TODO: review VM states
       case 'up':
@@ -143,52 +152,40 @@ class VmStatusInfo extends Component {
         return iconElement({className: 'pficon pficon-volume icon-1x-vms', tooltip: 'The VM\'s image is locked'});
 
       case undefined: // better not to happen ...
-        logDebug(`-- VmStatusInfo component: VM state is undefined`);
+        logDebug(`-- VmStatusIcon component: VM state is undefined`);
         return (<div />)
       default: // better not to happen ...
-        logDebug(`-- VmStatusInfo component: unrecognized VM state '${state}'`);
+        logDebug(`-- VmStatusIcon component: unrecognized VM state '${state}'`);
         return iconElement({className: 'pficon pficon-zone', tooltip: `The VM state is '${state}'`})
     }
   }
-  consoleIcon ({vm, dispatch}) {
-    const onGetConsole = () => dispatch(getConsole({vm}))
-    return (
-      <div className="card-pf-item">
-        <span className="pficon pficon-screen" title="Click to get console." data-toggle="tooltip" data-placement="left" onClick={onGetConsole}></span>
-      </div>
-  )}
-  render () {
-    const {vm, dispatch} = this.props
-
-    const state = vm.get('status')
-
-    return (// fa fa-check
-      <div className="card-pf-items text-center">
-        <div className="card-pf-item">
-          {this.statusIcon({state})}
-        </div>
-        {canConsole({state}) ? this.consoleIcon({vm, dispatch}) : ''}
-      </div>
-    )
-  }
 }
-VmStatusInfo.propTypes = {
-  vm: React.PropTypes.object.isRequired,
-  dispatch: React.PropTypes.func.isRequired
+VmStatusIcon.propTypes = {
+  state: React.PropTypes.string.isRequired,
 }
 
 class VmStatusText extends Component {
   render () {
     const {vm} = this.props
+    const lastMessage = vm.get('lastMessage')
+    const status = vm.get('status')
 
-    switch (vm.get('status')) {// TODO: review VM states
-      case 'up':
-      case 'powering_up':
-      case 'paused':
-      case 'migrating':
-        return (<p className="card-pf-info text-center"><strong>Started On</strong>{vm.get('startTime')}</p>)
-      default:
-        return (<p className="card-pf-info text-center"><strong>Stopped On: </strong>{vm.get('stopTime')}</p>)
+    if (lastMessage) {
+      return (<div>
+        <p className="crop" title={lastMessage} data-toggle="tooltip">
+        <span className="pficon-warning-triangle-o"></span>&nbsp;{lastMessage}
+        </p>
+      </div>)
+    } else {
+      switch (status) {// TODO: review VM states
+        case 'up':
+        case 'powering_up':
+        case 'paused':
+        case 'migrating':
+          return (<p className="card-pf-info text-center"><strong>Started On</strong>{vm.get('startTime')}</p>)
+        default:
+          return (<p className="card-pf-info text-center"><strong>Stopped On: </strong>{vm.get('stopTime')}</p>)
+      }
     }
   }
 }
@@ -222,6 +219,7 @@ class Vm extends Component {
     const {vm, dispatch} = this.props
 
     const onSelectVm = () => dispatch(selectVmDetail({vmId: vm.get('id')}))
+    const state = vm.get('status')
 
     // TODO: improve the card flip:
     // TODO: https://davidwalsh.name/css-flip
@@ -235,11 +233,10 @@ class Vm extends Component {
               <VmIcon vmIcon={vm.getIn(['icons', 'large'])} className="card-pf-icon" missingIconClassName="fa fa-birthday-cake card-pf-icon-circle"/>
             </div>
             <h2 className="card-pf-title text-center" onClick={onSelectVm}>
-              {vm.get('name')}
+              <VmStatusIcon state={state} />&nbsp;{vm.get('name')}
             </h2>
 
-            <VmStatusInfo vm={vm} dispatch={dispatch}/>
-            <VmActions vm={vm} dispatch={dispatch}/>
+              <VmActions vm={vm} dispatch={dispatch}/>
             <VmStatusText vm={vm} />
 
           </div>

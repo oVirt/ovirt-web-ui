@@ -53,7 +53,7 @@ export function canRestart (state) {
 }
 
 // TODO: review
-export function canConsole ({state}) {
+export function canConsole (state) {
   return canRestart(state)
 }
 /*
@@ -96,6 +96,7 @@ export function ovirtVmToInternal ({vm}) {
     id: vm['id'],
     status: vm['status'] ? vm['status'].toLowerCase() : undefined,
     type: vm['type'],
+    lastMessage: '',
 
     // TODO: improve time conversion
     startTime: vm['start_time'] ? (new Date(vm['start_time'])).toUTCString() : undefined,
