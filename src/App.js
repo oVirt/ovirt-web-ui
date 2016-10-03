@@ -10,17 +10,20 @@ import AuditLog from './auditlog'
 class App extends Component {
   render () {
     const store = this.props.store
-    // logDebug(`App.store: ${JSON.stringify(store.getState())}`)
 
     const {vms, config, auditLog} = store.getState()
     const dispatch = store.dispatch
 
     // TODO: better positioning of the AuditLog on the page
-    return (<div className="container-fluid">
-      <Header auditLog={auditLog} config={config} dispatch={dispatch} />
-      <AuditLog auditLog={auditLog} config={config} dispatch={dispatch} />
-      <Vms vms={vms} config={config} dispatch={dispatch} />
-    </div>)
+    return (
+        <div>
+          <Header auditLog={auditLog} config={config} dispatch={dispatch}/>
+          <div className="container-fluid">
+            <AuditLog auditLog={auditLog} config={config} dispatch={dispatch}/>
+            <Vms vms={vms} config={config} dispatch={dispatch}/>
+          </div>
+        </div>)
+
     // return (<div> <Playground /> </div>)
   }
 }
