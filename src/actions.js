@@ -138,19 +138,10 @@ export function closeVmDetail () {
   }
 }
 
-export function auditLogShow () {
+export function clearAuditLogMessages () {
   return {
-    type: 'SHOW_AUDIT_LOG',
-    payload: {
-    }
-  }
-}
-
-export function auditLogHide () {
-  return {
-    type: 'HIDE_AUDIT_LOG',
-    payload: {
-    }
+    type: 'CLEAR_AUDITLOG_MSGS',
+    payload: {}
   }
 }
 

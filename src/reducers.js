@@ -92,10 +92,8 @@ function auditLog(state, action) {
             })
         case 'LOGIN_FAILED': // see the config() reducer
             return addAuditLogEntry({state, message: action.payload.message, type: action.payload.errorCode})
-        case 'SHOW_AUDIT_LOG':
-            return state.set('show', true).set('unread', false) // Object.assign({}, state, {show: true})
-        case 'HIDE_AUDIT_LOG':
-            return state.set('show', false) // return Object.assign({}, state, {show: false})
+        case 'CLEAR_AUDITLOG_MSGS':
+            return state.update('records', records => records.clear())
         default:
             return state
     }

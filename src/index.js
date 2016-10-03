@@ -5,22 +5,15 @@ import './index.css';
 import '../node_modules/patternfly/dist/css/patternfly.css'
 import '../node_modules/patternfly/dist/css/patternfly-additions.css'
 
-/*window.jQuery = global.jQuery = require('../node_modules/jquery/dist/jquery.min.js');
-//import '../node_modules/jquery/dist/jquery.min.js';
-// require('!!script!../node_modules/jquery/dist/jquery.min.js');
-import '../node_modules/bootstrap/dist/js/bootstrap.min.js';
-import '../node_modules/patternfly/dist/js/patternfly.min.js';
-*
-*
-*/
-
-// window.jQuery = require('script!../node_modules/jquery/dist/jquery.min');
-// require('script!../node_modules/bootstrap/dist/js/bootstrap.min');
-
+window.$ = window.jQuery = require('../node_modules/jquery/dist/jquery');
+var Bootstrap = {};
+Bootstrap.$ = window.$;
+require('../node_modules/bootstrap/dist/js/bootstrap');
+require('../node_modules/patternfly/dist/js/patternfly');
 
 import store, {sagaMiddleware} from './store'
 import mySaga from './sagas'
-import {login} from './actions'
+import {login, failedExternalAction} from './actions'
 import Api from './api'
 
 import App from './App';
