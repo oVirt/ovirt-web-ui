@@ -5,7 +5,7 @@ div .two-columns {
 }
 .move-left { /* go to the left */
     transition: transform 0.6s;
-    transform: translateX(-30%) perspective(100px) rotateY(20deg) translateZ(-10px);
+    transform: translateX(-30%) translateY(100px) perspective(100px) rotateY(20deg) translateZ(-10px);
 }
 
 .move-left-remove {/* go back to normal */
@@ -17,7 +17,7 @@ div .two-columns {
 .move-left-detail {/* VM detail on the right */
     transform: translateX(60%);
     width: 60%;
-    position: absolute;
+    position: fixed;
     top: 50px;
     height:100%;
 }
