@@ -32,7 +32,7 @@ OvirtApi = {
       headers: {
         'Accept': 'application/json',
         'Authorization': `Bearer ${OvirtApi._getLoginToken().get('access_token')}`,
-        'Filter': true
+        'Filter': false
       }
     }).then(data => Promise.resolve(data))
       .catch(data => {
