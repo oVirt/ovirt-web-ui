@@ -4,8 +4,23 @@ import Vms from './vms'
 import Header from './header.js'
 import AuditLog from './auditlog'
 
+import { takeEvery, takeLatest } from 'redux-saga'
+import {fetchAllVms, getConsoleVm, restartVm, shutdownVm, startVm, fetchVmIcons, login} from './sagas'
+
 // import {logDebug} from './helpers'
 // import Playground from './playground'
+
+export function *rootSaga () {
+    yield [
+        takeEvery("LOGIN", login),
+        takeLatest("GET_ALL_VMS", fetchAllVms),
+        takeEvery("GET_VM_ICONS", fetchVmIcons),
+        takeEvery("SHUTDOWN_VM", shutdownVm),
+        takeEvery("RESTART_VM", restartVm),
+        takeEvery("START_VM", startVm),
+        takeEvery("GET_CONSOLE_VM", getConsoleVm)
+    ]
+}
 
 class App extends Component {
   render () {

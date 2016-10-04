@@ -1,4 +1,3 @@
-import { takeEvery, takeLatest } from 'redux-saga'
 import { call, put } from 'redux-saga/effects'
 import {foreach, logDebug, hidePassword} from './helpers'
 import Api from './api'
@@ -18,7 +17,7 @@ function* callExternalAction(methodName, method, action) {
 }
 
 // TODO: implement 'renew the token'
-function* login (action) {
+export function* login (action) {
   yield put(loadInProgress({value: true}))
   const token = yield callExternalAction('login', Api.login, action)
   if (token && token['access_token']) {
@@ -35,7 +34,7 @@ function* login (action) {
   }
 }
 
-function* fetchAllVms (action) {
+export function* fetchAllVms (action) {
   const allVms = yield callExternalAction('getAllVms', Api.getAllVms, action)
 
   if (allVms && allVms['vm']) { // array
@@ -45,10 +44,10 @@ function* fetchAllVms (action) {
       yield put(getVmIcons({vm: internalVm}))
     })
   }
-  yield put(yield put(loadInProgress({value: false})))
+  yield put(loadInProgress({value: false}))
 }
 
-function* fetchVmIcons(action) {
+export function* fetchVmIcons(action) {
   const {vm} = action.payload
 
   if (vm.icons.large.id) {
@@ -66,32 +65,18 @@ function* fetchVmIcons(action) {
   }
 }
 
-function* shutdownVm (action) {
+export function* shutdownVm (action) {
   yield callExternalAction('shutdown', Api.shutdown, action)
 }
 
-function* restartVm (action) {
+export function* restartVm (action) {
   yield callExternalAction('restart', Api.restart, action)
 }
 
-function* startVm (action) {
+export function* startVm (action) {
   yield callExternalAction('start', Api.start, action)
 }
 
-function* getConsoleVm (action) {
+export function* getConsoleVm (action) {
   yield callExternalAction('getConsoleToBeDefined', Api.console, action)
 }
-
-function* mySaga () {
-  yield [
-    takeEvery("LOGIN", login),
-    takeLatest("GET_ALL_VMS", fetchAllVms),
-    takeEvery("GET_VM_ICONS", fetchVmIcons),
-    takeEvery("SHUTDOWN_VM", shutdownVm),
-    takeEvery("RESTART_VM", restartVm),
-    takeEvery("START_VM", startVm),
-    takeEvery("GET_CONSOLE_VM", getConsoleVm)
-  ]
-}
-
-export default mySaga

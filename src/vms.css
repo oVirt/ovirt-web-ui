@@ -1,8 +1,7 @@
 .move-left { /* go to the left */
     transition: transform 1s;
-    /*transform: translateX(-35%) translateZ(-10px) perspective(200px) translateY(50px) rotateY(10deg);*/
     /*transform: translateX(-10%) translateZ(100px) perspective(200px) translateY(50px) rotateY(10deg);*/
-    transform: scale(0.5) translateZ(100px) perspective(200px) translateY(50px) rotateY(10deg);
+    transform: scale(0.5) perspective(200px) translateY(50px) rotateY(10deg);
 }
 
 .move-left-remove {/* go back to normal */

@@ -12,11 +12,10 @@ require('../node_modules/bootstrap/dist/js/bootstrap');
 require('../node_modules/patternfly/dist/js/patternfly');
 
 import store, {sagaMiddleware} from './store'
-import mySaga from './sagas'
-import {login, failedExternalAction} from './actions'
+import {login} from './actions'
 import Api from './api'
 
-import App from './App';
+import App, {rootSaga} from './App';
 
 function renderApp () {
   ReactDOM.render(
@@ -33,7 +32,7 @@ function start () {
   renderApp()
 
   // handle external actions
-  sagaMiddleware.run(mySaga)
+  sagaMiddleware.run(rootSaga)
 
   // initiate data retrieval
   Api.init({store})
@@ -41,3 +40,11 @@ function start () {
 }
 
 start()
+
+/* How to componentify
+Integration code (sort of recent index.js + <App />) - use Provider and react-router
+Component.getSagas() - returns array
+Break VMS - detail and List
+Break vms.js to smaller components
+
+ */

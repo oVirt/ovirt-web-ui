@@ -66,8 +66,8 @@ OvirtApi = {
       if (cpu && cpu.topology) {
         const top = cpu.topology
         let total = top.sockets ? top.sockets : 0
-        total = total * (top.cores ? top.cores : 0)
-        total = total * (top.threads ? top.threads : 0)
+        total *= (top.cores ? top.cores : 0)
+        total *= (top.threads ? top.threads : 0)
         return total
       }
       return 0

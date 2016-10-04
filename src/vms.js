@@ -237,7 +237,7 @@ class Vm extends Component {
             </h2>
 
               <VmActions vm={vm} dispatch={dispatch}/>
-            <VmStatusText vm={vm} />
+              <VmStatusText vm={vm} />
 
           </div>
         </div>
