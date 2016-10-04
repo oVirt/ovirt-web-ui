@@ -294,7 +294,7 @@ class VmDetail extends Component {
         </div>
       )
     } else {
-      return (<div />)
+      return (<div className="move-left-detail-invisible" />)
     }
   }
 }

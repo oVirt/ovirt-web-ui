@@ -1,6 +1,6 @@
 import { takeEvery, takeLatest } from 'redux-saga'
 import { call, put } from 'redux-saga/effects'
-import {foreach, logDebug, hidePassword, ovirtVmToInternal} from './helpers'
+import {foreach, logDebug, hidePassword} from './helpers'
 import Api from './api'
 
 import {getAllVms, getVmIcons, updateVmIcon, updateVm, loginSuccessful, loginFailed, failedExternalAction, loadInProgress} from './actions'
@@ -40,7 +40,7 @@ function* fetchAllVms (action) {
 
   if (allVms && allVms['vm']) { // array
     yield* foreach(allVms.vm, function* (vm) {
-      const internalVm = ovirtVmToInternal({vm})
+      const internalVm = Api.vmToInternal({vm})
       yield put(updateVm({vm: internalVm}))
       yield put(getVmIcons({vm: internalVm}))
     })
