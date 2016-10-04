@@ -282,12 +282,14 @@ class VmDetail extends Component {
             <dd>{vm.get('status')}</dd>
             <dt>ID</dt>
             <dd>{vm.get('id')}</dd>
-            <dt>Created On</dt>
-            <dd>{vm.get('creationTime')}</dd>
-            <dt>Started On</dt>
-            <dd>{vm.get('startTime')}</dd>
-            <dt>Stopped On</dt>
-            <dd>{vm.get('stopTime')}</dd>
+            <dt>Defined Memory</dt>
+            <dd>{vm.getIn(['memory', 'total'])}</dd>
+            <dt>CPUs</dt>
+            <dd>{vm.getIn(['cpu', 'vCPUs'])}</dd>
+            <dt>CPU Arch</dt>
+            <dd>{vm.getIn(['cpu', 'arch'])}</dd>
+            <dt>High Availability</dt>
+            <dd>{vm.getIn(['highAvailability', 'enabled'])}</dd>
             <dt>Address</dt>
             <dd>{vm.get('fqdn')}</dd>
           </dl>

@@ -62,10 +62,12 @@ OvirtApi = {
    */
   vmToInternal ({vm}) {
     function vCpusCount({cpu}) {
-      if (cpu) {
-        let total = cpu['sockets'] ? cpu['sockets'] : 0
-        total = total * cpu['cores'] ? cpu['cores'] : 0
-        total = total * cpu['threads'] ? cpu['threads'] : 0
+      logDebug(`-----vCpusCount() cpu='${JSON.stringify(cpu)}'`)
+      if (cpu && cpu.topology) {
+        const top = cpu.topology
+        let total = top.sockets ? top.sockets : 0
+        total = total * (top.cores ? top.cores : 0)
+        total = total * (top.threads ? top.threads : 0)
         return total
       }
       return 0
