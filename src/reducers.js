@@ -93,7 +93,7 @@ function auditLog(state, action) {
         case 'LOGIN_FAILED': // see the config() reducer
             return addAuditLogEntry({state, message: action.payload.message, type: action.payload.errorCode})
         case 'CLEAR_AUDITLOG_MSGS':
-            return state.update('records', records => records.clear())
+            return state.set('unread', false).update('records', records => records.clear())
         default:
             return state
     }

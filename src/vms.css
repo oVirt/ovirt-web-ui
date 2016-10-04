@@ -1,11 +1,7 @@
-div .two-columns {
-    -webkit-column-count: 2; /* Chrome, Safari, Opera */
-    -moz-column-count: 2; /* Firefox */
-    column-count: 2;
-}
 .move-left { /* go to the left */
-    transition: transform 0.6s;
-    transform: translateX(-30%) translateY(100px) perspective(100px) rotateY(20deg) translateZ(-10px);
+    transition: transform 1s;
+    /* transform: translateY(100px) translateX(-30%) perspective(100px) rotateY(20deg) translateZ(-10px); */
+    transform: translateX(-35%) translateZ(-10px) perspective(200px) translateY(50px) rotateY(10deg);
 }
 
 .move-left-remove {/* go back to normal */
@@ -24,9 +20,9 @@ div .two-columns {
 
 .move-left-close-detail {/* The Close Detail action */
     position:absolute;
-    top: -25px;
+    top: -20px;
     right: 0px;
-    font-size: 1.5em;
+    font-size: 1.1em;
 }
 
 dt {

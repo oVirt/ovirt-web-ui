@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {auditLogShow, auditLogHide, logout} from './actions'
+import {logout} from './actions'
 import './vms.css'
 import AuditLog from './auditlog'
 
