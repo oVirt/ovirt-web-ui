@@ -39,10 +39,8 @@ class App extends Component {
           <Header auditLog={auditLog} config={config} dispatch={dispatch}/>
           <div className="container-fluid">
             <AuditLog auditLog={auditLog} config={config} dispatch={dispatch}/>
-              <span>
                 <Vms vms={vms} config={config} dispatch={dispatch}/>
                 <VmDetail vm={selectedVm} dispatch={dispatch}/>
-              </span>
           </div>
         </div>)
 
