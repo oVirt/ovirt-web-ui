@@ -1,7 +1,12 @@
 import React, { Component } from 'react'
 import './vms.css'
-import {selectVmDetail, closeVmDetail, shutdownVm, restartVm, startVm, getConsole} from './actions'
-import {canRestart, canShutdown, canStart, canConsole, logDebug} from './helpers'
+
+import VmDetail from './VmDetail'
+import VmIcon from './VmIcon'
+import VmStatusIcon from './VmStatusIcon'
+
+import {selectVmDetail, shutdownVm, restartVm, startVm, getConsole} from './actions'
+import {canRestart, canShutdown, canStart, canConsole} from './helpers'
 
 /**
  * Data are fetched but no VM is available to display
@@ -43,7 +48,7 @@ class NoLogin extends Component {
             <span className="pficon pficon pficon-user"></span>
           </div>
           <h1>
-            Please log in
+            Please log in ...
           </h1>
           <p>
             TODO: redirect
@@ -70,6 +75,10 @@ class LoadingData extends Component {
     )}
 }
 
+/**
+ * Active actions on a single VM-card.
+ * List of actions depends on the VM state.
+ */
 class VmActions extends Component {
   button ({className, tooltip='', onClick}) {
     return (
@@ -109,61 +118,6 @@ VmActions.propTypes = {
   dispatch: React.PropTypes.func.isRequired
 }
 
-class VmStatusIcon extends Component {
-  render () {
-    const {state} = this.props
-
-    function iconElement ({className, tooltip}) {
-      return (<span title={tooltip} data-toggle="tooltip" data-placement="left">
-        <i className={className}></i>
-      </span>
-      )}
-
-    switch (state) { // TODO: review VM states
-      case 'up':
-        return iconElement({className: 'pficon pficon-ok icon-1x-vms', tooltip: 'The VM is running.'});
-      case 'powering_up':
-        return iconElement({className: 'fa fa-angle-double-right icon-1x-vms', tooltip: 'The VM is powering up.'});
-      case 'down':
-        return iconElement({className: 'fa fa-arrow-circle-o-down icon-1x-vms', tooltip: 'The VM is down.'});
-      case 'paused':
-        return iconElement({className: 'pficon pficon-pause icon-1x-vms', tooltip: 'The VM is paused.'});
-      case 'suspended':
-        return iconElement({className: 'fa fa-shield icon-1x-vms', tooltip: 'The VM is suspended.'});
-      case 'powering_down':
-        return iconElement({className: 'glyphicon glyphicon-wrench icon-1x-vms', tooltip: 'The VM is going down.'});
-      case 'not_responding':
-        return iconElement({className: 'pficon pficon-warning-triangle-o icon-1x-vms', tooltip: 'The VM is not responding.'});
-      case 'unknown':
-        return iconElement({className: 'pficon pficon-help icon-1x-vms', tooltip: 'The VM status is unknown.'});
-      case 'unassigned':
-        return iconElement({className: 'pficon pficon-help icon-1x-vms', tooltip: 'The VM status is unassigned.'});
-      case 'migrating':
-        return iconElement({className: 'pficon pficon-service icon-1x-vms', tooltip: 'The VM is being migrated.'});
-      case 'wait_for_launch':
-        return iconElement({className: 'pficon pficon-service icon-1x-vms', tooltip: 'The VM is scheduled for launch.'});
-      case 'reboot_in_progress':
-        return iconElement({className: 'fa fa-refresh icon-1x-vms', tooltip: 'The VM is being rebooted.'});
-      case 'saving_state':
-        return iconElement({className: 'pficon pficon-export icon-1x-vms', tooltip: 'The VM is saving its state.'});
-      case 'restoring_state':
-        return iconElement({className: 'pficon pficon-import icon-1x-vms', tooltip: 'The VM is restoring its state.'});
-      case 'image_locked':
-        return iconElement({className: 'pficon pficon-volume icon-1x-vms', tooltip: 'The VM\'s image is locked'});
-
-      case undefined: // better not to happen ...
-        logDebug(`-- VmStatusIcon component: VM state is undefined`);
-        return (<div />)
-      default: // better not to happen ...
-        logDebug(`-- VmStatusIcon component: unrecognized VM state '${state}'`);
-        return iconElement({className: 'pficon pficon-zone', tooltip: `The VM state is '${state}'`})
-    }
-  }
-}
-VmStatusIcon.propTypes = {
-  state: React.PropTypes.string.isRequired,
-}
-
 class VmStatusText extends Component {
   render () {
     const {vm} = this.props
@@ -193,27 +147,9 @@ VmStatusText.propTypes = {
   vm: React.PropTypes.object.isRequired
 }
 
-class VmIcon extends Component {
-  render () {
-    const {vmIcon, className, missingIconClassName} = this.props
-
-    const content = vmIcon.get('content')
-    const mediaType = vmIcon.get('mediaType')
-
-    if (content) {
-      const src = `data:${mediaType};base64,${content}`
-      return (<img src={src} className={className} alt=""/>)
-    }
-
-    return (<span className={missingIconClassName}></span>)
-  }
-}
-VmIcon.propTypes = {
-  vmIcon: React.PropTypes.object.isRequired, // either vm.icons.large or vm.icons.small
-  className: React.PropTypes.string.isRequired, // either card-pf-icon or vm-detail-icon
-  missingIconClassName: React.PropTypes.string.isRequired
-}
-
+/**
+ * Single icon-card in the list
+ */
 class Vm extends Component {
   render () {
     const {vm, dispatch} = this.props
@@ -248,61 +184,6 @@ class Vm extends Component {
 Vm.propTypes = {
   vm: React.PropTypes.object.isRequired,
   dispatch: React.PropTypes.func.isRequired
-}
-
-class VmDetail extends Component {
-  componentDidMount () {
-    this.onKeyDown = (event) => {
-      if (event.keyCode === 27) { // ESC
-        this.onClose()
-      }
-    }
-    this.onClose = () => {
-      this.props.dispatch(closeVmDetail())
-    }
-
-    window.addEventListener('keydown', this.onKeyDown);
-  }
-  componentWillUnmount () {
-    window.removeEventListener('keydown', this.onKeyDown);
-  }
-  render () {
-    const vm = this.props['vm'] // optional
-
-    if (vm) {
-      return (
-        <div className="container-fluid move-left-detail">
-          <a href="#" className="move-left-close-detail" onClick={this.onClose}><i className="pficon pficon-close"> Close</i></a>
-
-          <h1><VmIcon vmIcon={vm.getIn(['icons', 'small'])} missingIconClassName="pficon pficon-virtual-machine" className="vm-detail-icon"/> {vm.get('name')}</h1>
-          <dl>
-            <dt>Operating System</dt>
-            <dd>{vm.getIn(['os', 'type'])}</dd>
-            <dt>State</dt>
-            <dd>{vm.get('status')}</dd>
-            <dt>ID</dt>
-            <dd>{vm.get('id')}</dd>
-            <dt>Defined Memory</dt>
-            <dd>{vm.getIn(['memory', 'total'])}</dd>
-            <dt>CPUs</dt>
-            <dd>{vm.getIn(['cpu', 'vCPUs'])}</dd>
-            <dt>CPU Arch</dt>
-            <dd>{vm.getIn(['cpu', 'arch'])}</dd>
-            <dt>High Availability</dt>
-            <dd>{vm.getIn(['highAvailability', 'enabled'])}</dd>
-            <dt>Address</dt>
-            <dd>{vm.get('fqdn')}</dd>
-          </dl>
-        </div>
-      )
-    } else {
-      return (<div className="move-left-detail-invisible" />)
-    }
-  }
-}
-Vm.propTypes = {
-  vm: React.PropTypes.object,
-  dispatch: React.PropTypes.func
 }
 
 class Vms extends Component {

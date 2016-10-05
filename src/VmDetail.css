@@ -1,0 +1,42 @@
+.move-left-detail { /* VM detail on the right */
+    -webkit-transform: translateX(70%);
+    -ms-transform: translateX(70%);
+    position: fixed;
+    top: 2.5em;
+    height: 100%;
+    display: block;
+    right: 0%;
+    width: 30%;
+    opacity:1;
+    transition:opacity 0.75s ease-in-out;
+}
+
+.move-left-detail-invisible {
+    opacity: 0;
+}
+
+.move-left-close-detail {/* The Close Detail action */
+    font-size: 1.1em;
+    float: right;
+}
+
+dt {
+    clear: left;
+    float: left;
+    width: 100px;
+    min-height: 26px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #888;
+    font-weight: normal;
+    text-align: left;
+}
+
+dd {
+    margin-left: 110px;
+    min-height: 26px;
+    max-width: 1000px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
