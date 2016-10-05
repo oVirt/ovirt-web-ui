@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import './vms.css'
 
-import VmDetail from './VmDetail'
 import VmIcon from './VmIcon'
 import VmStatusIcon from './VmStatusIcon'
 
@@ -189,8 +188,6 @@ Vm.propTypes = {
 class Vms extends Component {
   renderVms ({vms, dispatch}) {
     const selectedVmId = vms.get('selected')
-    const selectedVm = selectedVmId ? vms.get('vms').find( vm => vm.get('id') === selectedVmId) : undefined
-
     const containerClass = 'container-fluid container-cards-pf ' + (selectedVmId ? 'move-left' : 'move-left-remove')
 
     return (
@@ -200,7 +197,6 @@ class Vms extends Component {
           {vms.get('vms').map(vm => <Vm vm={vm} key={vm.get('id')} dispatch={dispatch}/>)}
         </div>
       </div>
-      <VmDetail vm={selectedVm} dispatch={dispatch}/>
       </span>
   )}
   render () {
