@@ -1,8 +1,18 @@
 import { call, put } from 'redux-saga/effects'
-import {foreach, logDebug, hidePassword} from './helpers'
+
+import {logDebug, hidePassword} from 'ovirt-ui-components'
+import {getAllVms, getVmIcons, updateVmIcon, updateVm, loginSuccessful, loginFailed, failedExternalAction, loadInProgress} from 'ovirt-ui-components'
+
 import Api from './api'
 
-import {getAllVms, getVmIcons, updateVmIcon, updateVm, loginSuccessful, loginFailed, failedExternalAction, loadInProgress} from './actions'
+export function * foreach (array, fn, context) {
+  var i = 0
+  var length = array.length
+
+  for (;i < length; i++) {
+    yield * fn.call(context, array[i], i, array)
+  }
+}
 
 function* callExternalAction(methodName, method, action) {
   try {

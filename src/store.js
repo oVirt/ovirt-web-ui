@@ -13,19 +13,3 @@ const store = createStore(
 )
 
 export default store
-
-/*
-import { applyMiddleware, createStore } from 'redux' // compose
-import reducer from './reducers'
-
-// import { thunk } from './middlewares'
-import createSagaMiddleware from 'redux-saga'
-
-const createStoreWithMiddleware = applyMiddleware(
-  thunk
-)(createStore)
-
-const store = createStoreWithMiddleware(reducer)
-
-export default store
-*/

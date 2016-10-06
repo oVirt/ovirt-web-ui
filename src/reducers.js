@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux'
 import Immutable from 'immutable'
-import { logDebug, hidePassword } from './helpers';
+
+import {logDebug, hidePassword} from 'ovirt-ui-components'
 
 // --- Vms reducer ---------------
 function updateOrAddVm({state, payload: {vm}}) {

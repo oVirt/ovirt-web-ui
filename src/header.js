@@ -1,14 +1,15 @@
 import React, { Component } from 'react'
-import {logout} from './actions'
-import './vms.css'
 import AuditLog from './auditlog'
+
+import './header.css'
+
+import {logout} from 'ovirt-ui-components'
 
 class LoginButton extends Component {
     render () {
         const {config, dispatch} = this.props
 
         const onLogout = () => dispatch(logout())
-        // const onLogin = () => dispatch(showLoginDialog())
         const onLogin = () => {} // dispatch(showLoginDialog())
 
         if (config.get('loginToken')) {

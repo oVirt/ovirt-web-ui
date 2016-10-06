@@ -1,8 +1,5 @@
-/**
- * Created by mlibra on 27.9.16.
- */
 import $ from 'jquery'
-import {logDebug} from './helpers'
+import {logDebug} from 'ovirt-ui-components'
 import {Exception} from './exceptions'
 
 let OvirtApi = {}
@@ -62,7 +59,6 @@ OvirtApi = {
    */
   vmToInternal ({vm}) {
     function vCpusCount({cpu}) {
-      logDebug(`-----vCpusCount() cpu='${JSON.stringify(cpu)}'`)
       if (cpu && cpu.topology) {
         const top = cpu.topology
         let total = top.sockets ? top.sockets : 0

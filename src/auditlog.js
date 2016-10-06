@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
-import './vms.css'
 
-import {logDebug, formatTwoDigits} from './helpers'
-import {clearAuditLogMessages} from './actions'
+import './auditlog.css'
+
+import {logDebug, formatTwoDigits} from 'ovirt-ui-components'
+import {clearAuditLogMessages} from 'ovirt-ui-components'
 
 class AuditLogRecord extends Component {
     renderTime(time) { // TODO: better!
