@@ -9,6 +9,8 @@ import VmDetail from './VmDetail'
 import { takeEvery, takeLatest } from 'redux-saga'
 import {fetchAllVms, getConsoleVm, restartVm, shutdownVm, startVm, fetchVmIcons, login} from './sagas'
 
+import {Dummy} from 'ovirt-ui-components'
+
 // import {logDebug} from './helpers'
 // import Playground from './playground'
 
@@ -42,6 +44,7 @@ class App extends Component {
                 <Vms vms={vms} config={config} dispatch={dispatch}/>
                 <VmDetail vm={selectedVm} dispatch={dispatch}/>
           </div>
+            <Dummy />
         </div>)
 
     // return (<div> <Playground /> </div>)

@@ -6,7 +6,6 @@
 
 .move-left-remove {/* go back to normal */
     transition: transform 1s;
-    -webkit-transform: translateZ(0) translateX(0) rotateY(0deg);
     transform: translateZ(0) translateX(0) rotateY(0deg);
 }
 
