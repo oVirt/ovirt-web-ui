@@ -1,7 +1,7 @@
 POC of new oVirt User Portal.
 
 ## Goals
-- Built from reusable components
+- Built on reusable components
     - deploy User Portal as a self-standing app
     - integrate in ManageIQ
     - customize for your own oVirt UI 
