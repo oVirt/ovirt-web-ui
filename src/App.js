@@ -1,18 +1,14 @@
 import React, { Component } from 'react';
 import './App.css';
 
-import Vms from './vms'
 import Header from './header'
 import AuditLog from './auditlog'
-import VmDetail from './VmDetail'
+
+import {VmsList} from 'ovirt-ui-components'
+import {VmDetail} from 'ovirt-ui-components'
 
 import { takeEvery, takeLatest } from 'redux-saga'
 import {fetchAllVms, getConsoleVm, restartVm, shutdownVm, startVm, fetchVmIcons, login} from './sagas'
-
-import {Dummy} from 'ovirt-ui-components'
-
-// import {logDebug} from './helpers'
-// import Playground from './playground'
 
 export function *rootSaga () {
     yield [
@@ -36,18 +32,14 @@ class App extends Component {
     const selectedVmId = vms.get('selected')
     const selectedVm = selectedVmId ? vms.get('vms').find( vm => vm.get('id') === selectedVmId) : undefined
 
-    return (
-        <div>
+    return (<div>
           <Header auditLog={auditLog} config={config} dispatch={dispatch}/>
           <div className="container-fluid">
             <AuditLog auditLog={auditLog} config={config} dispatch={dispatch}/>
-                <Vms vms={vms} config={config} dispatch={dispatch}/>
+                <VmsList vms={vms} config={config} dispatch={dispatch}/>
                 <VmDetail vm={selectedVm} dispatch={dispatch}/>
           </div>
-            <Dummy />
         </div>)
-
-    // return (<div> <Playground /> </div>)
   }
 }
 
