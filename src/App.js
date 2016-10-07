@@ -1,25 +1,24 @@
 import React, { Component } from 'react';
-import './App.css';
 
-import Header from './header'
-import AuditLog from './auditlog'
+import './App.css';
 
 import {VmsList} from 'ovirt-ui-components'
 import {VmDetail} from 'ovirt-ui-components'
+import {VmsPageHeader} from 'ovirt-ui-components'
 
 import { takeEvery, takeLatest } from 'redux-saga'
 import {fetchAllVms, getConsoleVm, restartVm, shutdownVm, startVm, fetchVmIcons, login} from './sagas'
 
 export function *rootSaga () {
-    yield [
-        takeEvery("LOGIN", login),
-        takeLatest("GET_ALL_VMS", fetchAllVms),
-        takeEvery("GET_VM_ICONS", fetchVmIcons),
-        takeEvery("SHUTDOWN_VM", shutdownVm),
-        takeEvery("RESTART_VM", restartVm),
-        takeEvery("START_VM", startVm),
-        takeEvery("GET_CONSOLE_VM", getConsoleVm)
-    ]
+  yield [
+    takeEvery("LOGIN", login),
+    takeLatest("GET_ALL_VMS", fetchAllVms),
+    takeEvery("GET_VM_ICONS", fetchVmIcons),
+    takeEvery("SHUTDOWN_VM", shutdownVm),
+    takeEvery("RESTART_VM", restartVm),
+    takeEvery("START_VM", startVm),
+    takeEvery("GET_CONSOLE_VM", getConsoleVm)
+  ]
 }
 
 class App extends Component {
@@ -30,19 +29,17 @@ class App extends Component {
     const dispatch = store.dispatch
 
     const selectedVmId = vms.get('selected')
-    const selectedVm = selectedVmId ? vms.get('vms').find( vm => vm.get('id') === selectedVmId) : undefined
+    const selectedVm = selectedVmId ? vms.get('vms').find(vm => vm.get('id') === selectedVmId) : undefined
 
     return (<div>
-          <Header auditLog={auditLog} config={config} dispatch={dispatch}/>
-          <div className="container-fluid">
-            <AuditLog auditLog={auditLog} config={config} dispatch={dispatch}/>
-                <VmsList vms={vms} config={config} dispatch={dispatch}/>
-                <VmDetail vm={selectedVm} dispatch={dispatch}/>
-          </div>
-        </div>)
+      <VmsPageHeader auditLog={auditLog} config={config} dispatch={dispatch} title='oVirt User Portal'/>
+      <div className="container-fluid">
+        <VmsList vms={vms} config={config} dispatch={dispatch}/>
+        <VmDetail vm={selectedVm} dispatch={dispatch}/>
+      </div>
+    </div>)
   }
 }
-
 App.propTypes = {
   store: React.PropTypes.object.isRequired
 }
