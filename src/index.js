@@ -12,7 +12,7 @@ require('../node_modules/bootstrap/dist/js/bootstrap');
 require('../node_modules/patternfly/dist/js/patternfly');
 
 import store, {sagaMiddleware} from './store'
-import Api from './api'
+import { OvirtApi as Api } from 'ovirt-ui-components'
 import App, {rootSaga} from './App';
 
 import {login} from 'ovirt-ui-components'
@@ -35,7 +35,7 @@ function start () {
   sagaMiddleware.run(rootSaga)
 
   // initiate data retrieval
-  Api.init({store})
+  Api.init({store}) // TODO: avoid init() call
   store.dispatch(login({username:'admin@internal', password:'admin'}))
 }
 

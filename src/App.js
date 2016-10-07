@@ -6,7 +6,7 @@ import {VmsList} from 'ovirt-ui-components'
 import {VmDetail} from 'ovirt-ui-components'
 import {VmsPageHeader} from 'ovirt-ui-components'
 
-import { takeEvery, takeLatest } from 'redux-saga'
+import {takeEvery, takeLatest} from 'redux-saga'
 import {fetchAllVms, getConsoleVm, restartVm, shutdownVm, startVm, fetchVmIcons, login} from './sagas'
 
 export function *rootSaga () {
@@ -25,14 +25,14 @@ class App extends Component {
   render () {
     const store = this.props.store
 
-    const {vms, config, auditLog} = store.getState()
+    const {vms, config, userMessages} = store.getState()
     const dispatch = store.dispatch
 
     const selectedVmId = vms.get('selected')
     const selectedVm = selectedVmId ? vms.get('vms').find(vm => vm.get('id') === selectedVmId) : undefined
 
     return (<div>
-      <VmsPageHeader auditLog={auditLog} config={config} dispatch={dispatch} title='oVirt User Portal'/>
+      <VmsPageHeader userMessages={userMessages} config={config} dispatch={dispatch} title='oVirt User Portal'/>
       <div className="container-fluid">
         <VmsList vms={vms} config={config} dispatch={dispatch}/>
         <VmDetail vm={selectedVm} dispatch={dispatch}/>
