@@ -39,6 +39,7 @@ For early testing:
 ## Technical Details  
 - components maintained in [ovirt-ui-components](https://github.com/matobet/ovirt-ui-components) 
 - based on React, Patternfly, Redux, Redux-Saga
+- based on ejected [create-react-app](https://facebook.github.io/react/blog/2016/07/22/create-apps-with-no-configuration.html)
 
 ## Author(s)
 Please send author(s) any feedback on the project.
