@@ -3,7 +3,7 @@ import { call, put } from 'redux-saga/effects'
 import {logDebug, hidePassword} from 'ovirt-ui-components'
 import {getAllVms, getVmIcons, updateVmIcon, updateVm, loginSuccessful, loginFailed, failedExternalAction, loadInProgress} from 'ovirt-ui-components'
 
-import { OvirtApi as Api } from 'ovirt-ui-components'
+import Api from './ovirtapi'
 
 export function * foreach (array, fn, context) {
   var i = 0
