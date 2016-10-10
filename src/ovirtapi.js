@@ -119,6 +119,31 @@ OvirtApi = {
       }
     }
   },
+  /**
+   *
+   * @param attachment - single entry from vms/[VM_ID]/diskattachments
+   * @param disk - disk corresponding to the attachment
+   * @returns {} - Internal representation of a single VM disk
+   */
+  diskToInternal({disk, attachment}) {
+    function toBool(val) {
+      return val && val.toLowerCase() === 'true'
+    }
+
+    return {
+      bootable: toBool(attachment['bootable']),
+      active: toBool(attachment['active']),
+      iface: attachment['interface'],
+
+      id: disk.id,
+      name: disk['name'],
+      status: disk['status'],
+
+      actualSize: disk['actual_size'],
+      provisionedSize: disk['provisioned_size'],
+      format: disk['format']
+    }
+  },
   // ----
   login ({credentials}) {
     const url = '/sso/oauth/token?grant_type=urn:ovirt:params:oauth:grant-type:http&scope=ovirt-app-api'
@@ -161,6 +186,14 @@ OvirtApi = {
   icon ({id}) {
     OvirtApi._assertLogin({methodName: 'icon'})
     return OvirtApi._httpGet({url: `/api/icons/${id}`})
+  },
+  diskattachments ({vmId}) {
+    OvirtApi._assertLogin({methodName: 'diskattachments'})
+    return OvirtApi._httpGet({url: `/api/vms/${vmId}/diskattachments`})
+  },
+  disk ({diskId}) {
+    OvirtApi._assertLogin({methodName: 'disk'})
+    return OvirtApi._httpGet({url: `/api/disks/${diskId}`})
   }
 }
 

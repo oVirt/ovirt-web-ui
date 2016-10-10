@@ -7,13 +7,14 @@ import {VmDetail} from 'ovirt-ui-components'
 import {VmsPageHeader} from 'ovirt-ui-components'
 
 import {takeEvery, takeLatest} from 'redux-saga'
-import {fetchAllVms, getConsoleVm, restartVm, shutdownVm, startVm, fetchVmIcons, login, suspendVm} from './sagas'
+import {fetchAllVms, getConsoleVm, restartVm, shutdownVm, startVm, fetchVmIcons, fetchVmDisks, login, suspendVm} from './sagas'
 
 export function *rootSaga () {
   yield [
     takeEvery("LOGIN", login),
     takeLatest("GET_ALL_VMS", fetchAllVms),
     takeEvery("GET_VM_ICONS", fetchVmIcons),
+    takeEvery("GET_VM_DISKS", fetchVmDisks),
     takeEvery("SHUTDOWN_VM", shutdownVm),
     takeEvery("RESTART_VM", restartVm),
     takeEvery("START_VM", startVm),

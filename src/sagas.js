@@ -1,7 +1,9 @@
 import { call, put } from 'redux-saga/effects'
 
 import {logDebug, hidePassword} from 'ovirt-ui-components'
-import {getAllVms, getVmIcons, updateVmIcon, updateVm, loginSuccessful, loginFailed, failedExternalAction, loadInProgress} from 'ovirt-ui-components'
+import {getAllVms, loginSuccessful, loginFailed, failedExternalAction, loadInProgress} from 'ovirt-ui-components'
+
+import {getVmIcons, getVmDisks, updateVmIcon, updateVmDisk, updateVm} from './actions'
 
 import Api from './ovirtapi'
 
@@ -13,6 +15,8 @@ export function * foreach (array, fn, context) {
     yield * fn.call(context, array[i], i, array)
   }
 }
+
+// TODO: following generators should be beter part of the Api -- Revise
 
 function* callExternalAction(methodName, method, action) {
   try {
@@ -34,7 +38,7 @@ export function* login (action) {
     yield put(loginSuccessful({token, username: action.payload.credentials.username}))
     yield put(getAllVms())
   } else {
-    logDebug(`login(): received data: ${JSON.stringify(token)}`)
+    // logDebug(`login(): received data: ${JSON.stringify(token)}`)
 
     yield put(loginFailed({
       errorCode: token['error_code'] ? token['error_code'] : 'no_access',
@@ -48,30 +52,50 @@ export function* fetchAllVms (action) {
   const allVms = yield callExternalAction('getAllVms', Api.getAllVms, action)
 
   if (allVms && allVms['vm']) { // array
+    // TODO: call removeMissgingVMs (those not present in the allVms['vms']) if refresh
     yield* foreach(allVms.vm, function* (vm) {
       const internalVm = Api.vmToInternal({vm})
       yield put(updateVm({vm: internalVm}))
-      yield put(getVmIcons({vm: internalVm}))
+
+      yield put(getVmIcons({vmId: internalVm.id, smallIconId: internalVm.icons.small.id, largeIconId: internalVm.icons.large.id}))
+      yield put(getVmDisks({vmId: internalVm.id}))
     })
   }
   yield put(loadInProgress({value: false}))
 }
 
 export function* fetchVmIcons(action) {
-  const {vm} = action.payload
+  const {vmId, smallIconId, largeIconId} = action.payload
 
-  if (vm.icons.large.id) {
-    const icon = yield callExternalAction('icon', Api.icon, {payload: {id: vm.icons.large.id}})
+  if (largeIconId) {
+    const icon = yield callExternalAction('icon', Api.icon, {payload: {id: largeIconId}})
     if (icon['media_type'] && icon['data']) {
-      yield put(updateVmIcon({vmId: vm.id, icon, type: 'large'}))
+      yield put(updateVmIcon({vmId, icon, type: 'large'}))
     }
   }
 
-  if (vm.icons.small.id) {
-    const icon = yield callExternalAction('icon', Api.icon, {payload: {id: vm.icons.small.id}})
+  if (smallIconId) {
+    const icon = yield callExternalAction('icon', Api.icon, {payload: {id: smallIconId}})
     if (icon['media_type'] && icon['data']) {
-      yield put(updateVmIcon({vmId: vm.id, icon, type: 'small'}))
+      yield put(updateVmIcon({vmId, icon, type: 'small'}))
     }
+  }
+}
+
+export function* fetchVmDisks(action) {
+  const {vmId} = action.payload
+
+  const diskattachments = yield callExternalAction('diskattachments', Api.diskattachments, {payload: {vmId}})
+
+  // TODO: call clearVmDisks if refresh
+  if (diskattachments && diskattachments['disk_attachment']) { // array
+    yield* foreach(diskattachments['disk_attachment'], function* (attachment) {
+      const diskId = attachment.disk.id
+      const disk = yield callExternalAction('disk', Api.disk, {payload: {diskId}})
+
+      const internalDisk = Api.diskToInternal({disk, attachment})
+      yield put(updateVmDisk({vmId, disk: internalDisk}))
+    })
   }
 }
 
