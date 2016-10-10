@@ -90,3 +90,7 @@ export function* startVm (action) {
 export function* getConsoleVm (action) {
   yield callExternalAction('getConsoleToBeDefined', Api.console, action)
 }
+
+export function* suspendVm (action) {
+  yield callExternalAction('suspend', Api.suspend, action)
+}

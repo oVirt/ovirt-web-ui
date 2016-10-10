@@ -150,6 +150,10 @@ OvirtApi = {
     OvirtApi._assertLogin({methodName: 'start'})
     return OvirtApi._httpPost({url: `/api/vms/${vmId}/start`, input: '<action />'})
   },
+  suspend ({vmId}) {
+    OvirtApi._assertLogin({methodName: 'start'})
+    return OvirtApi._httpPost({url: `/api/vms/${vmId}/suspend`, input: '<action />'})
+  },
   restart ({vmId}) {
     OvirtApi._assertLogin({methodName: 'restart'})
     return OvirtApi._httpPost({url: `/api/vms/${vmId}/reboot`, input: '<action />'})
