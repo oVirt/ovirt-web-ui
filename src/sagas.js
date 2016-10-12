@@ -1,6 +1,6 @@
 import { call, put } from 'redux-saga/effects'
 
-import {logDebug, hidePassword} from 'ovirt-ui-components'
+import {logDebug, hidePassword, fileDownload} from 'ovirt-ui-components'
 import {getAllVms, loginSuccessful, loginFailed, failedExternalAction, loadInProgress} from 'ovirt-ui-components'
 
 import {getVmIcons, getVmDisks, updateVmIcon, updateVmDisk, updateVm} from './actions'
@@ -16,7 +16,7 @@ export function * foreach (array, fn, context) {
   }
 }
 
-// TODO: following generators should be beter part of the Api -- Revise
+// TODO: following generators should be better part of the Api -- Revise
 
 function* callExternalAction(methodName, method, action) {
   try {
@@ -112,7 +112,13 @@ export function* startVm (action) {
 }
 
 export function* getConsoleVm (action) {
-  yield callExternalAction('getConsoleToBeDefined', Api.console, action)
+  const consoles = yield callExternalAction('consoles', Api.consoles, action)
+
+  if (consoles && consoles['graphics_console'] && consoles['graphics_console'].length > 0) {
+    let console = consoles['graphics_console'].find( c => 'spice' === c.protocol) || consoles['graphics_console'][0]
+    const data = yield callExternalAction('console', Api.console, {action: 'INTERNAL_CONSOLE', payload: {vmId: action.payload.vmId, consoleId: console.id}})
+    fileDownload({data, fileName: 'console.vv', mimeType: 'application/x-virt-viewer'})
+  }
 }
 
 export function* suspendVm (action) {

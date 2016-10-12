@@ -23,14 +23,16 @@ OvirtApi = {
       throw new Exception(`OvirtApi in '${methodName}': missing login`)
     }
   },
-  _httpGet ({url}) {
+  _httpGet ({url, custHeaders = {'Accept': 'application/json', Filter: false}}) {
+    logDebug(`_httpGet start: url="${url}"`)
+    const headers = Object.assign({
+      'Authorization': `Bearer ${OvirtApi._getLoginToken().get('access_token')}`
+    }, custHeaders)
+    logDebug(`_httpGet: url="${url}", headers="${JSON.stringify(headers)}"`)
+
     return $.ajax(url, {
       type: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${OvirtApi._getLoginToken().get('access_token')}`,
-        'Filter': false
-      }
+      headers
     }).then(data => Promise.resolve(data))
       .catch(data => {
         logDebug(`Ajax failed: ${JSON.stringify(data)}`)
@@ -194,6 +196,14 @@ OvirtApi = {
   disk ({diskId}) {
     OvirtApi._assertLogin({methodName: 'disk'})
     return OvirtApi._httpGet({url: `/api/disks/${diskId}`})
+  },
+  consoles ({vmId}) {
+    OvirtApi._assertLogin({methodName: 'consoles'})
+    return OvirtApi._httpGet({url: `/api/vms/${vmId}/graphicsconsoles`})
+  },
+  console ({vmId, consoleId}) {
+    OvirtApi._assertLogin({methodName: 'console'})
+    return OvirtApi._httpGet({url: `/api/vms/${vmId}/graphicsconsoles/${consoleId}`, custHeaders: {Accept: 'application/x-virt-viewer'}})
   }
 }
 
