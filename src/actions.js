@@ -1,15 +1,4 @@
 // --- External actions -----------------------
-export function getVmIcons ({ vmId, smallIconId, largeIconId }) {
-  return {
-    type: 'GET_VM_ICONS',
-    payload: {
-      vmId,
-      smallIconId,
-      largeIconId
-    }
-  }
-}
-
 export function getVmDisks ({ vmId }) {
   return {
     type: 'GET_VM_DISKS',
@@ -22,25 +11,32 @@ export function getVmDisks ({ vmId }) {
 // --- Internal State -------------------------
 /**
  * Update or Add
- * @param vm
- * @returns {{type: string, payload: {vm: *}}}
+ * @param vms - array of vms
+ * @returns {{type: string, payload: {vms: *}}}
  */
-export function updateVm ({ vm }) {
+export function updateVms ({ vms }) {
   return {
-    type: 'UPDATE_VM',
+    type: 'UPDATE_VMS',
     payload: {
-      vm,
+      vms,
     },
   }
 }
 
-export function updateVmIcon ({ vmId, icon, type }) {
+export function getIcon ({ iconId }) {
   return {
-    type: 'UPDATE_VM_ICON',
+    type: 'GET_VM_ICON',
     payload: {
-      vmId,
+      iconId,
+    },
+  }
+}
+
+export function updateIcon ({ icon }) {
+  return {
+    type: 'UPDATE_ICON',
+    payload: {
       icon,
-      type,
     },
   }
 }

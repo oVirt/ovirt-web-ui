@@ -146,6 +146,13 @@ OvirtApi = {
       format: disk['format']
     }
   },
+  iconToInternal ({icon}) {
+    return {
+      id: icon.id,
+      type: icon['media_type'],
+      data: icon.data
+    }
+  },
   // ----
   login ({credentials}) {
     const url = '/sso/oauth/token?grant_type=urn:ovirt:params:oauth:grant-type:http&scope=ovirt-app-api'

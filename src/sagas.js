@@ -3,7 +3,7 @@ import { call, put } from 'redux-saga/effects'
 import {logDebug, hidePassword, fileDownload} from 'ovirt-ui-components'
 import {getAllVms, loginSuccessful, loginFailed, failedExternalAction, loadInProgress} from 'ovirt-ui-components'
 
-import {getVmIcons, getVmDisks, updateVmIcon, updateVmDisk, updateVm} from './actions'
+import {getVmDisks, getIcon, updateIcon, updateVmDisk, updateVms} from './actions'
 
 import Api from './ovirtapi'
 
@@ -15,6 +15,8 @@ export function * foreach (array, fn, context) {
     yield * fn.call(context, array[i], i, array)
   }
 }
+
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 // TODO: following generators should be better part of the Api -- Revise
 
@@ -52,32 +54,36 @@ export function* fetchAllVms (action) {
   const allVms = yield callExternalAction('getAllVms', Api.getAllVms, action)
 
   if (allVms && allVms['vm']) { // array
-    // TODO: call removeMissgingVMs (those not present in the allVms['vms']) if refresh
-    yield* foreach(allVms.vm, function* (vm) {
-      const internalVm = Api.vmToInternal({vm})
-      yield put(updateVm({vm: internalVm}))
+    // TODO: call remove MissgingVMs (those not present in the allVms['vms']) if refresh
+    const internalVms = allVms.vm.map( vm => Api.vmToInternal({vm}))
 
-      yield put(getVmIcons({vmId: internalVm.id, smallIconId: internalVm.icons.small.id, largeIconId: internalVm.icons.large.id}))
-      yield put(getVmDisks({vmId: internalVm.id}))
+    yield put(updateVms({vms: internalVms}))
+    yield call(delay, 1) // allow rendering
+
+    const iconIds = new Set( internalVms.map( vm => vm.icons.small.id) )
+    internalVms.map( vm => vm.icons.large.id).forEach( id => iconIds.add(id) )
+    yield* foreach([...iconIds], function* (iconId) { // WRONG
+      // TODO: check if exists if refresh
+      yield put(getIcon({iconId}))
     })
+    yield call(delay, 1) // allow rendering
+
+    yield* foreach(internalVms, function* (vm) {
+      yield put(getVmDisks({vmId: vm.id}))
+    })
+    yield call(delay, 1) // allow rendering
   }
+
   yield put(loadInProgress({value: false}))
 }
 
-export function* fetchVmIcons(action) {
-  const {vmId, smallIconId, largeIconId} = action.payload
+export function* fetchIcon (action) {
+  const { iconId } = action.payload
 
-  if (largeIconId) {
-    const icon = yield callExternalAction('icon', Api.icon, {payload: {id: largeIconId}})
+  if (iconId) {
+    const icon = yield callExternalAction('icon', Api.icon, {payload: {id: iconId}})
     if (icon['media_type'] && icon['data']) {
-      yield put(updateVmIcon({vmId, icon, type: 'large'}))
-    }
-  }
-
-  if (smallIconId) {
-    const icon = yield callExternalAction('icon', Api.icon, {payload: {id: smallIconId}})
-    if (icon['media_type'] && icon['data']) {
-      yield put(updateVmIcon({vmId, icon, type: 'small'}))
+      yield put(updateIcon({icon: Api.iconToInternal({icon})}))
     }
   }
 }
