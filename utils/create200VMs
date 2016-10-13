@@ -1,0 +1,8 @@
+#!/bin/bash
+
+rm -f createVMs_result.html
+
+for i in `seq 1 50` ; do 
+	echo Creating $i. VM
+	cat createVM.xml | sed 's/REPLACE_VM_NAME/vm_a'$i'/g' | ./ov-rest.post vms >> createVMs_result.html 
+done
