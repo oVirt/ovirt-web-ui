@@ -1,9 +1,10 @@
 import { call, put } from 'redux-saga/effects'
 
 import {logDebug, hidePassword, fileDownload} from 'ovirt-ui-components'
-import {getAllVms, loginSuccessful, loginFailed, failedExternalAction, loadInProgress} from 'ovirt-ui-components'
+import {getAllVms, loginSuccessful, loginFailed, failedExternalAction, loadInProgress,
+  updateIcon, updateVmDisk, updateVms} from 'ovirt-ui-components'
 
-import {getVmDisks, getIcon, updateIcon, updateVmDisk, updateVms} from './actions'
+import {getVmDisks, getIcon} from './actions'
 
 import Api from './ovirtapi'
 
