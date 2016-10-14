@@ -55,11 +55,12 @@ export function* fetchAllVms (action) {
   const allVms = yield callExternalAction('getAllVms', Api.getAllVms, action)
 
   if (allVms && allVms['vm']) { // array
-    // TODO: call remove MissgingVMs (those not present in the allVms['vms']) if refresh
     const internalVms = allVms.vm.map( vm => Api.vmToInternal({vm}))
 
     yield put(updateVms({vms: internalVms}))
     yield call(delay, 1) // allow rendering
+
+    // TODO: call remove MissgingVMs (those not present in the allVms['vms']) if refresh
 
     const iconIds = new Set( internalVms.map( vm => vm.icons.small.id) )
     internalVms.map( vm => vm.icons.large.id).forEach( id => iconIds.add(id) )
