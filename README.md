@@ -20,6 +20,8 @@ For early testing:
 
 - The oVirt engine running at https://[ENGINE_URL]
     - example: https://engine.local/ovirt-engine 
+- tested with npm version 3.10.8
+    - known issue with missing dependencies with npm v2.15.9
 
 **For Development:**
 
