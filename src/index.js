@@ -12,8 +12,9 @@ require('../node_modules/bootstrap/dist/js/bootstrap');
 require('../node_modules/patternfly/dist/js/patternfly');
 
 import store, {sagaMiddleware} from './store'
-import Api from './ovirtapi'
-import App, {rootSaga} from './App'
+import Api, { rootSaga } from './ovirtapi'
+import App from './App'
+import { rootSaga } from './sagas'
 
 import {login} from 'ovirt-ui-components'
 

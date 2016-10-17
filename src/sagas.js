@@ -8,7 +8,7 @@ import {getVmDisks, getIcon} from './actions'
 
 import Api from './ovirtapi'
 
-export function * foreach (array, fn, context) {
+function * foreach (array, fn, context) {
   var i = 0
   var length = array.length
 
@@ -34,7 +34,7 @@ function* callExternalAction(methodName, method, action) {
 }
 
 // TODO: implement 'renew the token'
-export function* login (action) {
+function* login (action) {
   yield put(loadInProgress({value: true}))
   const token = yield callExternalAction('login', Api.login, action)
   if (token && token['access_token']) {
@@ -51,7 +51,7 @@ export function* login (action) {
   }
 }
 
-export function* fetchAllVms (action) {
+function* fetchAllVms (action) {
   const allVms = yield callExternalAction('getAllVms', Api.getAllVms, action)
 
   if (allVms && allVms['vm']) { // array
@@ -79,7 +79,7 @@ export function* fetchAllVms (action) {
   yield put(loadInProgress({value: false}))
 }
 
-export function* fetchIcon (action) {
+function* fetchIcon (action) {
   const { iconId } = action.payload
 
   if (iconId) {
@@ -90,7 +90,7 @@ export function* fetchIcon (action) {
   }
 }
 
-export function* fetchVmDisks(action) {
+function* fetchVmDisks(action) {
   const {vmId} = action.payload
 
   const diskattachments = yield callExternalAction('diskattachments', Api.diskattachments, {payload: {vmId}})
@@ -119,31 +119,31 @@ function* inProgress({vmId, name, started = true, result}) {
   yield put(vmActionInProgress({vmId, name, started}))
 }
 
-export function* shutdownVm (action) {
+function* shutdownVm (action) {
   yield inProgress({vmId: action.payload.vmId, name: 'shutdown'})
   const result = yield callExternalAction('shutdown', Api.shutdown, action)
   yield inProgress({vmId: action.payload.vmId, name: 'shutdown', started: false, result})
 }
 
-export function* restartVm (action) {
+function* restartVm (action) {
   yield inProgress({vmId: action.payload.vmId, name: 'restart'})
   const result = yield callExternalAction('restart', Api.restart, action)
   yield inProgress({vmId: action.payload.vmId, name: 'restart', started: false, result})
 }
 
-export function* suspendVm (action) {
+function* suspendVm (action) {
   yield inProgress({vmId: action.payload.vmId, name: 'suspend'})
   const result = yield callExternalAction('suspend', Api.suspend, action)
   yield inProgress({vmId: action.payload.vmId, name: 'suspend', started: false, result})
 }
 
-export function* startVm (action) {
+function* startVm (action) {
   yield inProgress({vmId: action.payload.vmId, name: 'start'})
   const result = yield callExternalAction('start', Api.start, action)
   yield inProgress({vmId: action.payload.vmId, name: 'start', started: false, result})
 }
 
-export function* getConsoleVm (action) {
+function* getConsoleVm (action) {
   yield put(vmActionInProgress({vmId: action.payload.vmId, name: 'getConsole', started: true}))
   const consoles = yield callExternalAction('consoles', Api.consoles, action)
   yield put(vmActionInProgress({vmId: action.payload.vmId, name: 'getConsole', started: false}))
@@ -153,4 +153,18 @@ export function* getConsoleVm (action) {
     const data = yield callExternalAction('console', Api.console, {action: 'INTERNAL_CONSOLE', payload: {vmId: action.payload.vmId, consoleId: console.id}})
     fileDownload({data, fileName: 'console.vv', mimeType: 'application/x-virt-viewer'})
   }
+}
+
+export function *rootSaga () {
+  yield [
+    takeEvery("LOGIN", login),
+    takeLatest("GET_ALL_VMS", fetchAllVms),
+    takeEvery("GET_VM_ICON", fetchIcon),
+    takeEvery("GET_VM_DISKS", fetchVmDisks),
+    takeEvery("SHUTDOWN_VM", shutdownVm),
+    takeEvery("RESTART_VM", restartVm),
+    takeEvery("START_VM", startVm),
+    takeEvery("GET_CONSOLE_VM", getConsoleVm),
+    takeEvery("SUSPEND_VM", suspendVm)
+  ]
 }

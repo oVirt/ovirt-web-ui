@@ -7,7 +7,6 @@ import {VmDetail} from 'ovirt-ui-components'
 import {VmsPageHeader} from 'ovirt-ui-components'
 
 import {takeEvery, takeLatest} from 'redux-saga'
-import {fetchAllVms, getConsoleVm, restartVm, shutdownVm, startVm, fetchIcon, fetchVmDisks, login, suspendVm} from './sagas'
 
 // TODO: move to API
 export function *rootSaga () {
