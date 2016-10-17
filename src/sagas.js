@@ -2,7 +2,7 @@ import { call, put } from 'redux-saga/effects'
 
 import {logDebug, hidePassword, fileDownload} from 'ovirt-ui-components'
 import {getAllVms, loginSuccessful, loginFailed, failedExternalAction, loadInProgress,
-  updateIcon, updateVmDisk, updateVms} from 'ovirt-ui-components'
+  updateIcon, updateVmDisk, updateVms, vmActionInProgress} from 'ovirt-ui-components'
 
 import {getVmDisks, getIcon} from './actions'
 
@@ -107,28 +107,50 @@ export function* fetchVmDisks(action) {
   }
 }
 
+function* inProgress({vmId, name, started = true, result}) {
+  logDebug(`--- inProgress called: name: ${name}, started: ${started}, result: ${JSON.stringify(result)}`)
+  if (!started) {
+    if (result && result.status === 'complete') {
+      // do not call 'end of in progress' if successful
+      return
+    }
+  }
+
+  yield put(vmActionInProgress({vmId, name, started}))
+}
+
 export function* shutdownVm (action) {
-  yield callExternalAction('shutdown', Api.shutdown, action)
+  yield inProgress({vmId: action.payload.vmId, name: 'shutdown'})
+  const result = yield callExternalAction('shutdown', Api.shutdown, action)
+  yield inProgress({vmId: action.payload.vmId, name: 'shutdown', started: false, result})
 }
 
 export function* restartVm (action) {
-  yield callExternalAction('restart', Api.restart, action)
+  yield inProgress({vmId: action.payload.vmId, name: 'restart'})
+  const result = yield callExternalAction('restart', Api.restart, action)
+  yield inProgress({vmId: action.payload.vmId, name: 'restart', started: false, result})
+}
+
+export function* suspendVm (action) {
+  yield inProgress({vmId: action.payload.vmId, name: 'suspend'})
+  const result = yield callExternalAction('suspend', Api.suspend, action)
+  yield inProgress({vmId: action.payload.vmId, name: 'suspend', started: false, result})
 }
 
 export function* startVm (action) {
-  yield callExternalAction('start', Api.start, action)
+  yield inProgress({vmId: action.payload.vmId, name: 'start'})
+  const result = yield callExternalAction('start', Api.start, action)
+  yield inProgress({vmId: action.payload.vmId, name: 'start', started: false, result})
 }
 
 export function* getConsoleVm (action) {
+  yield put(vmActionInProgress({vmId: action.payload.vmId, name: 'getConsole', started: true}))
   const consoles = yield callExternalAction('consoles', Api.consoles, action)
+  yield put(vmActionInProgress({vmId: action.payload.vmId, name: 'getConsole', started: false}))
 
   if (consoles && consoles['graphics_console'] && consoles['graphics_console'].length > 0) {
     let console = consoles['graphics_console'].find( c => 'spice' === c.protocol) || consoles['graphics_console'][0]
     const data = yield callExternalAction('console', Api.console, {action: 'INTERNAL_CONSOLE', payload: {vmId: action.payload.vmId, consoleId: console.id}})
     fileDownload({data, fileName: 'console.vv', mimeType: 'application/x-virt-viewer'})
   }
-}
-
-export function* suspendVm (action) {
-  yield callExternalAction('suspend', Api.suspend, action)
 }
