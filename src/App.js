@@ -16,8 +16,9 @@ class App extends Component {
 
     const selectedVmId = vms.get('selected')
     const selectedVm = selectedVmId ? vms.get('vms').find(vm => vm.get('id') === selectedVmId) : undefined
+    const stopNestedPropagation = !selectedVm
 
-    const actions = dispatchVmActions({vm: selectedVm, dispatch, stopNestedPropagation: selectedVmId})
+    const actions = dispatchVmActions({vm: selectedVm, dispatch, stopNestedPropagation})
 
     return (<div>
       <VmsPageHeader userMessages={userMessages} config={config} dispatch={dispatch} title='oVirt User Portal'/>
