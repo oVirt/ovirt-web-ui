@@ -29,7 +29,7 @@ function* callExternalAction(methodName, method, action) {
     return result
   } catch (e) {
     logDebug(`External action exception: ${JSON.stringify(e)}`)
-    yield put(failedExternalAction({exception: e, action}))
+    yield put(failedExternalAction({exception: e, shortMessage: shortErrorMessage({action}), action}))
     return {error: e}
   }
 }
@@ -168,4 +168,18 @@ export function *rootSaga () {
     takeEvery("GET_CONSOLE_VM", getConsoleVm),
     takeEvery("SUSPEND_VM", suspendVm)
   ]
+}
+
+// TODO: translate
+// TODO: move to ovirt-ui-actions
+const shortMessages = {
+  'START_VM': 'Failed to start the VM',
+  'RESTART_VM': 'Failed to restart the VM',
+  'SHUTDOWN_VM': 'Failed to shutdown the VM',
+  'GET_CONSOLE_VM': 'Failed to get the VM console',
+  'SUSPEND_VM': 'Failed to suspend the VM',
+}
+
+function shortErrorMessage({action}) {
+  return shortMessages[action.type] ? shortMessages[action.type] :`${action.type} failed` // TODO: translate
 }
