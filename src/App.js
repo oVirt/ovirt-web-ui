@@ -1,36 +1,31 @@
-import React, { Component } from 'react';
+import React, { PropTypes } from 'react';
+import { connect } from 'react-redux'
 
 import './App.css';
 
 import {VmsList} from 'ovirt-ui-components'
 import {VmDetail} from 'ovirt-ui-components'
 import {VmsPageHeader} from 'ovirt-ui-components'
-import { dispatchVmActions } from 'ovirt-ui-components'
 
-class App extends Component {
-  render () {
-    const store = this.props.store
+const App = ({ vms }) => {
+  const selectedVmId = vms.get('selected')
+  const selectedVm = selectedVmId ? vms.get('vms').find(vm => vm.get('id') === selectedVmId) : undefined
+// const stopNestedPropagation = !selectedVm
 
-    const {vms, config, icons, userMessages} = store.getState()
-    const dispatch = store.dispatch
-
-    const selectedVmId = vms.get('selected')
-    const selectedVm = selectedVmId ? vms.get('vms').find(vm => vm.get('id') === selectedVmId) : undefined
-    const stopNestedPropagation = !selectedVm
-
-    const actions = dispatchVmActions({vm: selectedVm, dispatch, stopNestedPropagation})
-
-    return (<div>
-      <VmsPageHeader userMessages={userMessages} config={config} dispatch={dispatch} title='oVirt User Portal'/>
-      <div className="container-fluid">
-        <VmsList vms={vms} icons={icons} config={config} dispatch={dispatch}/>
-        <VmDetail vm={selectedVm} icons={icons} actions={actions} />
-      </div>
-    </div>)
-  }
+  return (<div>
+    <VmsPageHeader title='oVirt User Portal'/>
+    <div className="container-fluid">
+      <VmsList />
+      <VmDetail vm={selectedVm}/>
+    </div>
+  </div>)
 }
 App.propTypes = {
-  store: React.PropTypes.object.isRequired
+  vms: PropTypes.object.isRequired
 }
 
-export default App
+export default connect(
+  (state) => ({
+    vms: state.vms,
+  })
+)(App)

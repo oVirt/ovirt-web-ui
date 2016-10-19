@@ -13,6 +13,8 @@ require('../node_modules/patternfly/dist/js/patternfly');
 
 import store, {sagaMiddleware} from './store'
 import Api from './ovirtapi'
+
+import { Provider } from 'react-redux'
 import App from './App'
 import { rootSaga } from './sagas'
 
@@ -20,7 +22,9 @@ import {login} from 'ovirt-ui-components'
 
 function renderApp () {
   ReactDOM.render(
-    <App store={store} />,
+    <Provider store={store}>
+      <App />
+    </Provider>,
     document.getElementById('root')
   )
 }
