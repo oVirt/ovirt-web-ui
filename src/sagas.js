@@ -5,9 +5,9 @@ import {logDebug, hidePassword, fileDownload} from 'ovirt-ui-components'
 import {getAllVms, loginSuccessful, loginFailed, failedExternalAction, loadInProgress,
   updateIcon, updateVmDisk, updateVms, vmActionInProgress} from 'ovirt-ui-components'
 
-import {getVmDisks, getIcon} from './actions'
-
+import { getVmDisks, getIcon } from './actions'
 import Api from './ovirtapi'
+import { saveToSessionStorage } from './helpers'
 
 function * foreach (array, fn, context) {
   var i = 0
@@ -37,16 +37,29 @@ function* callExternalAction(methodName, method, action) {
 // TODO: implement 'renew the token'
 function* login (action) {
   yield put(loadInProgress({value: true}))
-  const token = yield callExternalAction('login', Api.login, action)
-  if (token && token['access_token']) {
-    yield put(loginSuccessful({token, username: action.payload.credentials.username}))
+
+  let token
+  let result = {}
+  if (action.payload.token) {
+    token = action.payload.token
+  } else {
+    result = yield callExternalAction('login', Api.login, action)
+    if (result && result['access_token']) {
+      token = result['access_token']
+    }
+  }
+
+  if (token) {
+    const username = action.payload.credentials.username
+    saveToSessionStorage('TOKEN', token)
+    saveToSessionStorage('USERNAME', username)
+
+    yield put(loginSuccessful({token, username}))
     yield put(getAllVms())
   } else {
-    // logDebug(`login(): received data: ${JSON.stringify(token)}`)
-
     yield put(loginFailed({
-      errorCode: token['error_code'] ? token['error_code'] : 'no_access',
-      message: token['error'] ? (token.error['statusText'] ? token.error['statusText'] : JSON.stringify(token['error']))  : 'Login Failed'
+      errorCode: result['error_code'] ? result['error_code'] : 'no_access',
+      message: result['error'] ? (result.error['statusText'] ? result.error['statusText'] : JSON.stringify(token['error']))  : 'Login Failed'
     }))
     yield put(yield put(loadInProgress({value: false})))
   }

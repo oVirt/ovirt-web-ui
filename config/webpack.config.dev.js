@@ -4,6 +4,7 @@ var webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 var WatchMissingNodeModulesPlugin = require('../scripts/utils/WatchMissingNodeModulesPlugin');
+var CopyWebpackPlugin = require('copy-webpack-plugin');
 var paths = require('./paths');
 var env = require('./env');
 
@@ -133,6 +134,15 @@ module.exports = {
           name: 'favicon.ico?[hash:8]'
         }
       },
+      // A special case for config.json to place it into build root directory.
+      {
+        test: /\/config.json$/,
+        include: [paths.appSrc],
+        loader: 'file',
+        query: {
+          name: 'config.json?[hash:8]'
+        }
+      },
       // "url" loader works just like "file" loader but it also embeds
       // assets smaller than specified size as data URLs to avoid requests.
       {
@@ -172,12 +182,10 @@ module.exports = {
       }),
     ];
   },
-/*  externals: {
-    // require("jquery") is external and available on the global var jQuery
-    "jquery": "jQuery",
-    "jquery": "$"
-  },*/
   plugins: [
+    new CopyWebpackPlugin([{
+        from: 'src/userportal.config'
+    }]),
     // Generates an `index.html` file with the <script> injected.
     new HtmlWebpackPlugin({
       inject: true,

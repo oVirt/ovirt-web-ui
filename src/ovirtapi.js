@@ -26,7 +26,7 @@ OvirtApi = {
   _httpGet ({url, custHeaders = {'Accept': 'application/json', Filter: false}}) {
     logDebug(`_httpGet start: url="${url}"`)
     const headers = Object.assign({
-      'Authorization': `Bearer ${OvirtApi._getLoginToken().get('access_token')}`
+      'Authorization': `Bearer ${OvirtApi._getLoginToken()}`
     }, custHeaders)
     logDebug(`_httpGet: url="${url}", headers="${JSON.stringify(headers)}"`)
 
@@ -45,7 +45,7 @@ OvirtApi = {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/xml',
-        'Authorization': `Bearer ${OvirtApi._getLoginToken().get('access_token')}`
+        'Authorization': `Bearer ${OvirtApi._getLoginToken()}`
       },
       data: input
     }).then(data => Promise.resolve(data))
