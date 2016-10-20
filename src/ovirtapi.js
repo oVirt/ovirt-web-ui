@@ -73,6 +73,7 @@ OvirtApi = {
 
     return {
       name: vm['name'],
+      description: vm['description'],
       id: vm['id'],
       status: vm['status'] ? vm['status'].toLowerCase() : undefined,
       type: vm['type'],
