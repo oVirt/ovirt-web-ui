@@ -23,7 +23,6 @@ const App = ({ vms, loginToken }) => {
     </div>)
   }
 
-  console.log('App: loginToken uknown')
   return (<LoginForm />)
 }
 App.propTypes = {

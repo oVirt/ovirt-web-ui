@@ -2,7 +2,9 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux'
 import $ from 'jquery'
 
-import { login } from 'ovirt-ui-components'
+import './styles.css'
+
+import { clearUserMessages, login } from 'ovirt-ui-components'
 
 import logo from './ovirt_top_right_logo.png'
 import brand from './ovirt_top_logo.png'
@@ -35,6 +37,19 @@ const WelcomeText = () => {
   )
 }
 
+const LoginFailed = () => {
+  return (
+    <div className='form-group'>
+      <div className='col-sm-10 col-md-10'>
+        <div className={'login-failed-text'}>
+          Login failed
+        </div>
+      </div>
+    </div>
+  )
+}
+LoginFailed.propTypes = {}
+
 class LoginForm extends Component {
   componentWillMount () {
     $('html').addClass('login-pf')
@@ -47,8 +62,12 @@ class LoginForm extends Component {
   // TODO: user-defined REST API URL
   // TODO: dropdown for Profile
 
+  isLoginFailed (userMessages) {
+    return userMessages.get('records').find((msg) => (msg.type === 'access_denied')) !== undefined
+  }
+
   render () {
-    const { onLogin } = this.props
+    const { userMessages, onLogin } = this.props
 
     let username, password
     const onUserChanged = (e) => {username = e.target.value}
@@ -57,6 +76,8 @@ class LoginForm extends Component {
       e.preventDefault();
       onLogin({username, password})
     }
+
+    const loginFailed = this.isLoginFailed(userMessages) ? (<LoginFailed />) : ''
 
     return (<div>
       <Logo />
@@ -88,6 +109,8 @@ class LoginForm extends Component {
                   <button type='submit' className='btn btn-primary btn-lg' tabIndex='4'>Log In</button>
                 </div>
               </div>
+
+              {loginFailed}
             </form>
           </div>
 
@@ -102,8 +125,13 @@ LoginForm.propTypes = {
 }
 
 export default connect(
-  (state) => ({ }),
+  (state) => ({
+    userMessages: state.userMessages
+  }),
   (dispatch) => ({
-    onLogin: ({username, password}) => {console.log(`onLogin: ${username}, ${password}`); dispatch(login({username, password}))}
+    onLogin: ({username, password}) => {
+      dispatch(clearUserMessages())
+      dispatch(login({username, password}))
+    }
   })
 )(LoginForm)

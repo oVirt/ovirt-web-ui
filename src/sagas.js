@@ -59,7 +59,7 @@ function* login (action) {
   } else {
     yield put(loginFailed({
       errorCode: result['error_code'] ? result['error_code'] : 'no_access',
-      message: result['error'] ? (result.error['statusText'] ? result.error['statusText'] : JSON.stringify(token['error']))  : 'Login Failed'
+      message: result['error'] ? (result.error['statusText'] ? result.error['statusText'] : JSON.stringify(result['error']))  : 'Login Failed'
     }))
     yield put(yield put(loadInProgress({value: false})))
   }
