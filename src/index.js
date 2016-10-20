@@ -13,18 +13,57 @@ require('../node_modules/patternfly/dist/js/patternfly');
 
 import store, {sagaMiddleware} from './store'
 import Api from './ovirtapi'
-import App, {rootSaga} from './App'
+import AppConfiguration, { readConfiguration } from './config'
+import { loadFromSessionStorage } from './helpers'
 
-import {login} from 'ovirt-ui-components'
+import { Provider } from 'react-redux'
+import { rootSaga } from './sagas'
+
+import App from './App'
+import { login } from 'ovirt-ui-components'
 
 function renderApp () {
   ReactDOM.render(
-    <App store={store} />,
+    <Provider store={store}>
+      <App />
+    </Provider>,
     document.getElementById('root')
   )
 }
 
+function fetchToken () {
+  // get token from session storage
+  const token = loadFromSessionStorage('TOKEN');
+  if (token) {
+    const username = loadFromSessionStorage('USERNAME');
+    return {token, username}
+  }
+
+  if (AppConfiguration.sso && AppConfiguration.ssoRedirectURL && AppConfiguration.userPortalURL) {
+    // TODO: get request header for SSO token/username; store to session storage; continue with token
+    // TODO: return {token, username}
+
+    // else redirect to SSO
+    const language = window.navigator.userLanguage || window.navigator.language
+    const ssoUrl = AppConfiguration.ssoRedirectURL
+      .replace('[UP_URL]', encodeURIComponent(AppConfiguration.userPortalURL))
+      .replace('[LOCALE]', encodeURIComponent(language))
+    window.location.replace(ssoUrl)
+    // END OF THIS APP
+  } else {
+    // SSO is not configured, show LoginForm
+    console.log('SSO is not configured, rendering own Login Form. Please consider setting "ssoRedirectURL" and "userPortalURL" in the userportal.config file.')
+    return {}
+  }
+}
+
 function start () {
+  readConfiguration()
+  console.log(`Merged configuration: ${JSON.stringify(AppConfiguration)}`)
+  // ssoRedirectURL
+
+  const {token, username} = fetchToken()
+
   // re-render app every time the state changes
   store.subscribe(renderApp)
 
@@ -35,8 +74,12 @@ function start () {
   sagaMiddleware.run(rootSaga)
 
   // initiate data retrieval
-  Api.init({store}) // TODO: avoid init() call
-  store.dispatch(login({username:'admin@internal', password:'admin'}))
+  Api.init({store})
+
+  if (token) {
+    // store.dispatch(login({username:'admin@internal', password:'admin', token}))
+    store.dispatch(login({username, token}))
+  } // otherwise wait for LoginForm or SSO
 }
 
 start()

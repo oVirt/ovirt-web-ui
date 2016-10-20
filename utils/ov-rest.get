@@ -1,0 +1,20 @@
+#!/bin/bash
+
+REST_PATH=$1
+
+url="https://engine.local/ovirt-engine/api"
+user="admin@internal"
+password="admin"
+
+CMD=curl 
+CMD=$CMD' --insecure' 
+CMD=$CMD' --header "Accept: application/xml"'
+CMD=$CMD' --user "'${user}:${password}'"'
+CMD=$CMD' "'${url}/${REST_PATH}'"'
+
+eval $CMD
+echo
+echo
+echo USAGE: $0 '<REST_SUB_PATH>'
+echo USAGE like: $0 vms
+echo Returned by: ${CMD}

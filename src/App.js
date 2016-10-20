@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+import React, { PropTypes } from 'react';
+import { connect } from 'react-redux'
 
 import './App.css';
 
@@ -6,44 +7,32 @@ import {VmsList} from 'ovirt-ui-components'
 import {VmDetail} from 'ovirt-ui-components'
 import {VmsPageHeader} from 'ovirt-ui-components'
 
-import {takeEvery, takeLatest} from 'redux-saga'
-import {fetchAllVms, getConsoleVm, restartVm, shutdownVm, startVm, fetchIcon, fetchVmDisks, login, suspendVm} from './sagas'
+import LoginForm from './LoginForm'
 
-export function *rootSaga () {
-  yield [
-    takeEvery("LOGIN", login),
-    takeLatest("GET_ALL_VMS", fetchAllVms),
-    takeEvery("GET_VM_ICON", fetchIcon),
-    takeEvery("GET_VM_DISKS", fetchVmDisks),
-    takeEvery("SHUTDOWN_VM", shutdownVm),
-    takeEvery("RESTART_VM", restartVm),
-    takeEvery("START_VM", startVm),
-    takeEvery("GET_CONSOLE_VM", getConsoleVm),
-    takeEvery("SUSPEND_VM", suspendVm)
-  ]
-}
+const App = ({ vms, loginToken }) => {
+  const selectedVmId = vms.get('selected')
+  const selectedVm = selectedVmId ? vms.get('vms').find(vm => vm.get('id') === selectedVmId) : undefined
 
-class App extends Component {
-  render () {
-    const store = this.props.store
-
-    const {vms, config, icons, userMessages} = store.getState()
-    const dispatch = store.dispatch
-
-    const selectedVmId = vms.get('selected')
-    const selectedVm = selectedVmId ? vms.get('vms').find(vm => vm.get('id') === selectedVmId) : undefined
-
+  if (loginToken) {
     return (<div>
-      <VmsPageHeader userMessages={userMessages} config={config} dispatch={dispatch} title='oVirt User Portal'/>
+      <VmsPageHeader title='oVirt User Portal'/>
       <div className="container-fluid">
-        <VmsList vms={vms} icons={icons} config={config} dispatch={dispatch}/>
-        <VmDetail vm={selectedVm} icons={icons} dispatch={dispatch}/>
+        <VmsList />
+        <VmDetail vm={selectedVm}/>
       </div>
     </div>)
   }
+
+  return (<LoginForm />)
 }
 App.propTypes = {
-  store: React.PropTypes.object.isRequired
+  vms: PropTypes.object.isRequired,
+  loginToken: PropTypes.string,
 }
 
-export default App
+export default connect(
+  (state) => ({
+    vms: state.vms,
+    loginToken: state.config.get('loginToken'),
+  })
+)(App)

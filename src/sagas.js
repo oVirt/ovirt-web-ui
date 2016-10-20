@@ -1,14 +1,15 @@
 import { call, put } from 'redux-saga/effects'
+import {takeEvery, takeLatest} from 'redux-saga'
 
 import {logDebug, hidePassword, fileDownload} from 'ovirt-ui-components'
 import {getAllVms, loginSuccessful, loginFailed, failedExternalAction, loadInProgress,
-  updateIcon, updateVmDisk, updateVms} from 'ovirt-ui-components'
+  updateIcon, updateVmDisk, updateVms, vmActionInProgress} from 'ovirt-ui-components'
 
-import {getVmDisks, getIcon} from './actions'
-
+import { getVmDisks, getIcon } from './actions'
 import Api from './ovirtapi'
+import { saveToSessionStorage } from './helpers'
 
-export function * foreach (array, fn, context) {
+function * foreach (array, fn, context) {
   var i = 0
   var length = array.length
 
@@ -28,30 +29,43 @@ function* callExternalAction(methodName, method, action) {
     return result
   } catch (e) {
     logDebug(`External action exception: ${JSON.stringify(e)}`)
-    yield put(failedExternalAction({exception: e, action}))
+    yield put(failedExternalAction({exception: e, shortMessage: shortErrorMessage({action}), action}))
     return {error: e}
   }
 }
 
 // TODO: implement 'renew the token'
-export function* login (action) {
+function* login (action) {
   yield put(loadInProgress({value: true}))
-  const token = yield callExternalAction('login', Api.login, action)
-  if (token && token['access_token']) {
-    yield put(loginSuccessful({token, username: action.payload.credentials.username}))
+
+  let token
+  let result = {}
+  if (action.payload.token) {
+    token = action.payload.token
+  } else {
+    result = yield callExternalAction('login', Api.login, action)
+    if (result && result['access_token']) {
+      token = result['access_token']
+    }
+  }
+
+  if (token) {
+    const username = action.payload.credentials.username
+    saveToSessionStorage('TOKEN', token)
+    saveToSessionStorage('USERNAME', username)
+
+    yield put(loginSuccessful({token, username}))
     yield put(getAllVms())
   } else {
-    // logDebug(`login(): received data: ${JSON.stringify(token)}`)
-
     yield put(loginFailed({
-      errorCode: token['error_code'] ? token['error_code'] : 'no_access',
-      message: token['error'] ? (token.error['statusText'] ? token.error['statusText'] : JSON.stringify(token['error']))  : 'Login Failed'
+      errorCode: result['error_code'] ? result['error_code'] : 'no_access',
+      message: result['error'] ? (result.error['statusText'] ? result.error['statusText'] : JSON.stringify(result['error']))  : 'Login Failed'
     }))
     yield put(yield put(loadInProgress({value: false})))
   }
 }
 
-export function* fetchAllVms (action) {
+function* fetchAllVms (action) {
   const allVms = yield callExternalAction('getAllVms', Api.getAllVms, action)
 
   if (allVms && allVms['vm']) { // array
@@ -79,7 +93,7 @@ export function* fetchAllVms (action) {
   yield put(loadInProgress({value: false}))
 }
 
-export function* fetchIcon (action) {
+function* fetchIcon (action) {
   const { iconId } = action.payload
 
   if (iconId) {
@@ -90,7 +104,7 @@ export function* fetchIcon (action) {
   }
 }
 
-export function* fetchVmDisks(action) {
+function* fetchVmDisks(action) {
   const {vmId} = action.payload
 
   const diskattachments = yield callExternalAction('diskattachments', Api.diskattachments, {payload: {vmId}})
@@ -107,20 +121,46 @@ export function* fetchVmDisks(action) {
   }
 }
 
-export function* shutdownVm (action) {
-  yield callExternalAction('shutdown', Api.shutdown, action)
+function* inProgress({vmId, name, started = true, result}) {
+  logDebug(`--- inProgress called: name: ${name}, started: ${started}, result: ${JSON.stringify(result)}`)
+  if (!started) {
+    if (result && result.status === 'complete') {
+      // do not call 'end of in progress' if successful
+      return
+    }
+  }
+
+  yield put(vmActionInProgress({vmId, name, started}))
 }
 
-export function* restartVm (action) {
-  yield callExternalAction('restart', Api.restart, action)
+function* shutdownVm (action) {
+  yield inProgress({vmId: action.payload.vmId, name: 'shutdown'})
+  const result = yield callExternalAction('shutdown', Api.shutdown, action)
+  yield inProgress({vmId: action.payload.vmId, name: 'shutdown', started: false, result})
 }
 
-export function* startVm (action) {
-  yield callExternalAction('start', Api.start, action)
+function* restartVm (action) {
+  yield inProgress({vmId: action.payload.vmId, name: 'restart'})
+  const result = yield callExternalAction('restart', Api.restart, action)
+  yield inProgress({vmId: action.payload.vmId, name: 'restart', started: false, result})
 }
 
-export function* getConsoleVm (action) {
+function* suspendVm (action) {
+  yield inProgress({vmId: action.payload.vmId, name: 'suspend'})
+  const result = yield callExternalAction('suspend', Api.suspend, action)
+  yield inProgress({vmId: action.payload.vmId, name: 'suspend', started: false, result})
+}
+
+function* startVm (action) {
+  yield inProgress({vmId: action.payload.vmId, name: 'start'})
+  const result = yield callExternalAction('start', Api.start, action)
+  yield inProgress({vmId: action.payload.vmId, name: 'start', started: false, result})
+}
+
+function* getConsoleVm (action) {
+  yield put(vmActionInProgress({vmId: action.payload.vmId, name: 'getConsole', started: true}))
   const consoles = yield callExternalAction('consoles', Api.consoles, action)
+  yield put(vmActionInProgress({vmId: action.payload.vmId, name: 'getConsole', started: false}))
 
   if (consoles && consoles['graphics_console'] && consoles['graphics_console'].length > 0) {
     let console = consoles['graphics_console'].find( c => 'spice' === c.protocol) || consoles['graphics_console'][0]
@@ -129,6 +169,30 @@ export function* getConsoleVm (action) {
   }
 }
 
-export function* suspendVm (action) {
-  yield callExternalAction('suspend', Api.suspend, action)
+export function *rootSaga () {
+  yield [
+    takeEvery("LOGIN", login),
+    takeLatest("GET_ALL_VMS", fetchAllVms),
+    takeEvery("GET_VM_ICON", fetchIcon),
+    takeEvery("GET_VM_DISKS", fetchVmDisks),
+    takeEvery("SHUTDOWN_VM", shutdownVm),
+    takeEvery("RESTART_VM", restartVm),
+    takeEvery("START_VM", startVm),
+    takeEvery("GET_CONSOLE_VM", getConsoleVm),
+    takeEvery("SUSPEND_VM", suspendVm)
+  ]
+}
+
+// TODO: translate
+// TODO: move to ovirt-ui-actions
+const shortMessages = {
+  'START_VM': 'Failed to start the VM',
+  'RESTART_VM': 'Failed to restart the VM',
+  'SHUTDOWN_VM': 'Failed to shutdown the VM',
+  'GET_CONSOLE_VM': 'Failed to get the VM console',
+  'SUSPEND_VM': 'Failed to suspend the VM',
+}
+
+function shortErrorMessage({action}) {
+  return shortMessages[action.type] ? shortMessages[action.type] :`${action.type} failed` // TODO: translate
 }
