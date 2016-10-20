@@ -5,7 +5,6 @@
 REST_PATH=$1  # i.e.: hosts/0656f432-923a-11e0-ad20-5254004ac988/approve
 INPUT_FILE=$2 # cmd.xml
 
-#url="http://localhost:8080/ovirt-engine/api"
 url="https://engine.local/ovirt-engine/api"
 user="admin@internal"
 password="admin"
