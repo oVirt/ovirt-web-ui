@@ -163,6 +163,11 @@ OvirtApi = {
         return Promise.reject(data)
       })
   },
+  getVm ({vmId}) {
+    OvirtApi._assertLogin({methodName: 'getVm'})
+    const url = `/api/vms/${vmId}`
+    return OvirtApi._httpGet({url})
+  },
   getAllVms () {
     OvirtApi._assertLogin({methodName: 'getAllVms'})
     const url = '/api/vms'

@@ -14,7 +14,7 @@ require('../node_modules/patternfly/dist/js/patternfly');
 import store, {sagaMiddleware} from './store'
 import Selectors from './selectors'
 import AppConfiguration, { readConfiguration } from './config'
-import { loadTokenFromSessionStorage, loadStateFromLocalStorage, clearStateInLocalStorage } from './storage'
+import { loadTokenFromSessionStorage, loadStateFromLocalStorage } from './storage'
 
 import { Provider } from 'react-redux'
 import { rootSaga } from './sagas'

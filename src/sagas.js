@@ -3,11 +3,11 @@ import {takeEvery, takeLatest} from 'redux-saga'
 
 import {logDebug, hidePassword, fileDownload} from 'ovirt-ui-components'
 import {getAllVms, loginSuccessful, loginFailed, failedExternalAction, loadInProgress,
-  updateIcons, updateVmDisk, updateVms, vmActionInProgress} from 'ovirt-ui-components'
+  updateIcons, updateVmDisk, updateVms, removeVms, vmActionInProgress} from 'ovirt-ui-components'
 
-import { persistState } from './actions'
+import { persistState, getSingleVm } from './actions'
 import Api from './ovirtapi'
-import { persistStateToLocalStorage, persistTokenToSessionStorage, loadStateFromLocalStorage } from './storage'
+import { persistStateToLocalStorage, persistTokenToSessionStorage } from './storage'
 import Selectors from './selectors'
 
 function * foreach (array, fn, context) {
@@ -23,14 +23,16 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 // TODO: following generators should be better part of the Api -- Revise
 
-function* callExternalAction(methodName, method, action) {
+function* callExternalAction(methodName, method, action, canBeMissing = false) {
   try {
     logDebug(`External action ${methodName}() starts on ${JSON.stringify(hidePassword({action}))}`)
     const result = yield call(method, action.payload)
     return result
   } catch (e) {
-    logDebug(`External action exception: ${JSON.stringify(e)}`)
-    yield put(failedExternalAction({exception: e, shortMessage: shortErrorMessage({action}), action}))
+    if (!canBeMissing || e.status !== 404) {
+      logDebug(`External action exception: ${JSON.stringify(e)}`)
+      yield put(failedExternalAction({exception: e, shortMessage: shortErrorMessage({action}), action}))
+    }
     return {error: e}
   }
 }
@@ -117,6 +119,19 @@ function* fetchDisks({vms}) {
   })
 }
 
+function* fetchSingleVm (action) {
+  const vm = yield callExternalAction('getVm', Api.getVm, action, true)
+
+  if (vm && vm.id) {
+    const internalVm = Api.vmToInternal({vm})
+    yield put(updateVms({vms: [internalVm]}))
+  } else {
+    if (vm && vm.error && vm.error.status === 404) {
+      yield put(removeVms({vmIds: [action.payload.vmId]}))
+    }
+  }
+}
+
 function* fetchVmDisks({vmId}) {
   const diskattachments = yield callExternalAction('diskattachments', Api.diskattachments, {payload: {vmId}})
 
@@ -132,39 +147,49 @@ function* fetchVmDisks({vmId}) {
   }
 }
 
-function* inProgress({vmId, name, started = true, result}) {
-  if (!started) {
-    if (result && result.status === 'complete') {
-      // do not call 'end of in progress' if successful
-      return
-    }
-  }
+function* startProgress ({ vmId, name }) {
+  yield put(vmActionInProgress({vmId, name, started: true}))
+}
 
-  yield put(vmActionInProgress({vmId, name, started}))
+function* stopProgress({ vmId, name, result }) {
+    if (result && result.status === 'complete') {
+      // do not call 'end of in progress' if successful,
+      // since UI will be updated by refresh
+
+      // TODO: correlate
+      yield delay(5 * 1000)
+      yield fetchSingleVm(getSingleVm({vmId}))
+      yield delay(30 * 1000)
+      yield fetchSingleVm(getSingleVm({vmId}))
+      yield delay(3 * 60 * 1000) // 3 minutes
+      yield fetchSingleVm(getSingleVm({vmId}))
+    }
+
+  yield put(vmActionInProgress({vmId, name, started: false}))
 }
 
 function* shutdownVm (action) {
-  yield inProgress({vmId: action.payload.vmId, name: 'shutdown'})
+  yield startProgress({vmId: action.payload.vmId, name: 'shutdown'})
   const result = yield callExternalAction('shutdown', Api.shutdown, action)
-  yield inProgress({vmId: action.payload.vmId, name: 'shutdown', started: false, result})
+  yield stopProgress({vmId: action.payload.vmId, name: 'shutdown', result})
 }
 
 function* restartVm (action) {
-  yield inProgress({vmId: action.payload.vmId, name: 'restart'})
+  yield startProgress({vmId: action.payload.vmId, name: 'restart'})
   const result = yield callExternalAction('restart', Api.restart, action)
-  yield inProgress({vmId: action.payload.vmId, name: 'restart', started: false, result})
+  yield stopProgress({vmId: action.payload.vmId, name: 'restart', result})
 }
 
 function* suspendVm (action) {
-  yield inProgress({vmId: action.payload.vmId, name: 'suspend'})
+  yield startProgress({vmId: action.payload.vmId, name: 'suspend'})
   const result = yield callExternalAction('suspend', Api.suspend, action)
-  yield inProgress({vmId: action.payload.vmId, name: 'suspend', started: false, result})
+  yield stopProgress({vmId: action.payload.vmId, name: 'suspend', result})
 }
 
 function* startVm (action) {
-  yield inProgress({vmId: action.payload.vmId, name: 'start'})
+  yield startProgress({vmId: action.payload.vmId, name: 'start'})
   const result = yield callExternalAction('start', Api.start, action)
-  yield inProgress({vmId: action.payload.vmId, name: 'start', started: false, result})
+  yield stopProgress({vmId: action.payload.vmId, name: 'start', result})
 }
 
 function* getConsoleVm (action) {
