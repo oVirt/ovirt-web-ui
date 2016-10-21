@@ -12,15 +12,15 @@ require('../node_modules/bootstrap/dist/js/bootstrap');
 require('../node_modules/patternfly/dist/js/patternfly');
 
 import store, {sagaMiddleware} from './store'
-import Api from './ovirtapi'
+import Selectors from './selectors'
 import AppConfiguration, { readConfiguration } from './config'
-import { loadFromSessionStorage } from './helpers'
+import { loadTokenFromSessionStorage, loadStateFromLocalStorage, clearStateInLocalStorage } from './storage'
 
 import { Provider } from 'react-redux'
 import { rootSaga } from './sagas'
 
 import App from './App'
-import { login } from 'ovirt-ui-components'
+import { login, updateIcons } from 'ovirt-ui-components'
 
 function renderApp () {
   ReactDOM.render(
@@ -33,9 +33,8 @@ function renderApp () {
 
 function fetchToken () {
   // get token from session storage
-  const token = loadFromSessionStorage('TOKEN');
+  const {token, username} = loadTokenFromSessionStorage()
   if (token) {
-    const username = loadFromSessionStorage('USERNAME');
     return {token, username}
   }
 
@@ -57,10 +56,20 @@ function fetchToken () {
   }
 }
 
+function loadPersistedState () {
+  // load persisted icons, etc ...
+  const {icons} = loadStateFromLocalStorage()
+
+  if (icons) {
+    const iconsArray = Object.values(icons)
+    console.log(`loadPersistedState: ${iconsArray.length} icons loaded`)
+    store.dispatch(updateIcons({icons: iconsArray}))
+  }
+}
+
 function start () {
   readConfiguration()
   console.log(`Merged configuration: ${JSON.stringify(AppConfiguration)}`)
-  // ssoRedirectURL
 
   const {token, username} = fetchToken()
 
@@ -74,10 +83,11 @@ function start () {
   sagaMiddleware.run(rootSaga)
 
   // initiate data retrieval
-  Api.init({store})
+  Selectors.init({store})
+
+  loadPersistedState()
 
   if (token) {
-    // store.dispatch(login({username:'admin@internal', password:'admin', token}))
     store.dispatch(login({username, token}))
   } // otherwise wait for LoginForm or SSO
 }

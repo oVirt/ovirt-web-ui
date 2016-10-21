@@ -1,4 +1,5 @@
 // --- External actions -----------------------
+/*
 export function getVmDisks ({ vmId }) {
   return {
     type: 'GET_VM_DISKS',
@@ -7,7 +8,8 @@ export function getVmDisks ({ vmId }) {
     }
   }
 }
-
+*/
+/*
 export function getIcon ({ iconId }) {
   return {
     type: 'GET_VM_ICON',
@@ -16,5 +18,12 @@ export function getIcon ({ iconId }) {
     },
   }
 }
-
+*/
+export function persistState () {
+  return {
+    type: 'PERSIST_STATE',
+    payload: {
+    },
+  }
+}
 // --- Internal State -------------------------
