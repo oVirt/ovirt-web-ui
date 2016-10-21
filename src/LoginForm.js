@@ -63,7 +63,7 @@ class LoginForm extends Component {
   // TODO: dropdown for Profile
 
   isLoginFailed (userMessages) {
-    return userMessages.get('records').find((msg) => (msg.type === 'access_denied')) !== undefined
+    return userMessages.get('records').find((msg) => (msg.type === 'access_denied' || msg.type === 'no_access')) !== undefined
   }
 
   render () {
