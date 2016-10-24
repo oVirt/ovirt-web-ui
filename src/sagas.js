@@ -2,8 +2,8 @@ import { call, put } from 'redux-saga/effects'
 import {takeEvery, takeLatest} from 'redux-saga'
 
 import {logDebug, hidePassword, fileDownload} from 'ovirt-ui-components'
-import {getAllVms, loginSuccessful, loginFailed, failedExternalAction, loadInProgress,
-  updateIcons, updateVmDisk, clearVmDisks, updateVms, removeVms, removeMissingVms, vmActionInProgress} from 'ovirt-ui-components'
+import {getAllVms, loginSuccessful, loginFailed, failedExternalAction, loadInProgress, setVmDetailToShow,
+  updateIcons, setVmDisks, updateVms, removeVms, removeMissingVms, vmActionInProgress} from 'ovirt-ui-components'
 
 import { persistState, getSingleVm } from './actions'
 import Api from './ovirtapi'
@@ -124,7 +124,11 @@ function* fetchAllVms (action) {
 
 function* fetchDisks({vms}) {
   yield* foreach(vms, function* (vm) {
-    yield fetchVmDisks({vmId: vm.id})
+    const vmId = vm.id
+    const disks = yield fetchVmDisks({ vmId })
+    if (disks && disks.length > 0) {
+      yield put(setVmDisks({vmId, disks}))
+    }
   })
 }
 
@@ -133,6 +137,9 @@ function* fetchSingleVm (action) {
 
   if (vm && vm.id) {
     const internalVm = Api.vmToInternal({vm})
+
+    const disks = yield fetchVmDisks({ vmId: internalVm.id })
+    internalVm.disks = disks
     yield put(updateVms({vms: [internalVm]}))
   } else {
     if (vm && vm.error && vm.error.status === 404) {
@@ -145,15 +152,13 @@ function* fetchVmDisks({vmId}) {
   const diskattachments = yield callExternalAction('diskattachments', Api.diskattachments, {payload: {vmId}})
 
   if (diskattachments && diskattachments['disk_attachment']) { // array
-    yield put(clearVmDisks({ vmId }))
-
+    const internalDisks = []
     yield* foreach(diskattachments['disk_attachment'], function* (attachment) {
       const diskId = attachment.disk.id
       const disk = yield callExternalAction('disk', Api.disk, {payload: {diskId}})
-
-      const internalDisk = Api.diskToInternal({disk, attachment})
-      yield put(updateVmDisk({vmId, disk: internalDisk}))
+      internalDisks.push(Api.diskToInternal({disk, attachment}))
     })
+    return internalDisks
   }
 }
 
@@ -214,6 +219,11 @@ function* getConsoleVm (action) {
   }
 }
 
+function* selectVmDetail (action) {
+  yield put(setVmDetailToShow({ vmId: action.payload.vmId}))
+  yield fetchSingleVm(getSingleVm({vmId: action.payload.vmId}))
+}
+
 function* schedulerPerMinute (action) {
   logDebug('Starting schedulerPerMinute() scheduler')
 
@@ -239,7 +249,9 @@ export function *rootSaga () {
     takeEvery('START_VM', startVm),
     takeEvery('GET_CONSOLE_VM', getConsoleVm),
     takeEvery('SUSPEND_VM', suspendVm),
-    
+
+    takeEvery('SELECT_VM_DETAIL', selectVmDetail),
+
     takeLatest('SCHEDULER__1_MIN', schedulerPerMinute),
   ]
 }

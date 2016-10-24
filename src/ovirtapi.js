@@ -110,7 +110,8 @@ OvirtApi = {
         large: {
           id: vm['large_icon'] ? vm.large_icon['id'] : undefined
         }
-      }
+      },
+      disks: {}
     }
   },
   /**

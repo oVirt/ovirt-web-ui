@@ -12,6 +12,10 @@ Selectors = {
   // --- icons --
   getAllIcons () {
     return getState().icons
+  },
+  // --- vms --
+  getVmDisks ({ vmId }) {
+    return getState().vms.getIn(['vms', vmId, 'disks'])
   }
 }
 
