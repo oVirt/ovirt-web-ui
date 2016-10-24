@@ -18,6 +18,7 @@ import AppConfiguration, { readConfiguration } from './config'
 import { loadTokenFromSessionStorage, loadStateFromLocalStorage } from './storage'
 import { valuesOfObject } from './helpers'
 import { rootSaga } from './sagas'
+import { schedulerOneMinute } from './actions'
 
 import App from './App'
 import { login, updateIcons } from 'ovirt-ui-components'
@@ -90,6 +91,9 @@ function start () {
   if (token) {
     store.dispatch(login({username, token}))
   } // otherwise wait for LoginForm or SSO
+
+  // start cron-jobs
+  store.dispatch(schedulerOneMinute())
 }
 
 start()

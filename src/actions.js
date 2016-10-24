@@ -14,3 +14,10 @@ export function getSingleVm ({ vmId }) {
     },
   }
 }
+
+export function schedulerOneMinute () {
+  return {
+    type: 'SCHEDULER__1_MIN',
+    payload: {},
+  }
+}

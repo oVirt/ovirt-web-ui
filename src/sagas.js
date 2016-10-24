@@ -61,7 +61,7 @@ function* login (action) {
     persistTokenToSessionStorage({token, username})
 
     yield put(loginSuccessful({token, username}))
-    yield put(getAllVms())
+    yield put(getAllVms({ shallowFetch: false }))
   } else {
     yield put(loginFailed({
       errorCode: result['error_code'] ? result['error_code'] : 'no_access',
@@ -95,6 +95,8 @@ function* fetchIcon ({ iconId }) {
 }
 
 function* fetchAllVms (action) {
+  const { shallowFetch } = action.payload
+
   // TODO: paging: split this call to a loop per up to 25 vms
   const allVms = yield callExternalAction('getAllVms', Api.getAllVms, action)
 
@@ -108,7 +110,12 @@ function* fetchAllVms (action) {
 
     // TODO: is removing of icons needed? I.e. when icon is removed or changed on the server
     yield fetchUnknwonIconsForVms({vms: internalVms})
-    yield fetchDisks({vms: internalVms})
+
+    if (!shallowFetch) {
+      yield fetchDisks({vms: internalVms})
+    } else {
+      logDebug('fetchAllVms() shallow fetch requested - skipping other resources')
+    }
   }
 
   yield put(loadInProgress({value: false}))
@@ -207,17 +214,33 @@ function* getConsoleVm (action) {
   }
 }
 
+function* schedulerPerMinute (action) {
+  logDebug('Starting schedulerPerMinute() scheduler')
+
+  // TODO: do we need to stop the loop? Consider takeLatest in the rootSaga 'restarts' the loop if needed
+  while (true) {
+    yield delay(60 * 1000) // 1 minute
+    logDebug('schedulerPerMinute() event')
+
+    // Actions to be executed no more than once per minute:
+    // TODO: allow user to enable/disable the autorefresh
+    yield put(getAllVms({ shallowFetch: true }))
+  }
+}
+
 export function *rootSaga () {
   yield [
-    takeEvery("LOGIN", login),
-    takeLatest("GET_ALL_VMS", fetchAllVms),
+    takeEvery('LOGIN', login),
+    takeLatest('GET_ALL_VMS', fetchAllVms),
     takeLatest('PERSIST_STATE', persistStateSaga),
 
-    takeEvery("SHUTDOWN_VM", shutdownVm),
-    takeEvery("RESTART_VM", restartVm),
-    takeEvery("START_VM", startVm),
-    takeEvery("GET_CONSOLE_VM", getConsoleVm),
-    takeEvery("SUSPEND_VM", suspendVm)
+    takeEvery('SHUTDOWN_VM', shutdownVm),
+    takeEvery('RESTART_VM', restartVm),
+    takeEvery('START_VM', startVm),
+    takeEvery('GET_CONSOLE_VM', getConsoleVm),
+    takeEvery('SUSPEND_VM', suspendVm),
+    
+    takeLatest('SCHEDULER__1_MIN', schedulerPerMinute),
   ]
 }
 
