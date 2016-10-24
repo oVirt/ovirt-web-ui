@@ -3,11 +3,12 @@ import {takeEvery, takeLatest} from 'redux-saga'
 
 import {logDebug, hidePassword, fileDownload} from 'ovirt-ui-components'
 import {getAllVms, loginSuccessful, loginFailed, failedExternalAction, loadInProgress,
-  updateIcon, updateVmDisk, updateVms, vmActionInProgress} from 'ovirt-ui-components'
+  updateIcons, updateVmDisk, updateVms, removeVms, vmActionInProgress} from 'ovirt-ui-components'
 
-import { getVmDisks, getIcon } from './actions'
+import { persistState, getSingleVm } from './actions'
 import Api from './ovirtapi'
-import { saveToSessionStorage } from './helpers'
+import { persistStateToLocalStorage, persistTokenToSessionStorage } from './storage'
+import Selectors from './selectors'
 
 function * foreach (array, fn, context) {
   var i = 0
@@ -22,16 +23,22 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 // TODO: following generators should be better part of the Api -- Revise
 
-function* callExternalAction(methodName, method, action) {
+function* callExternalAction(methodName, method, action, canBeMissing = false) {
   try {
     logDebug(`External action ${methodName}() starts on ${JSON.stringify(hidePassword({action}))}`)
     const result = yield call(method, action.payload)
     return result
   } catch (e) {
-    logDebug(`External action exception: ${JSON.stringify(e)}`)
-    yield put(failedExternalAction({exception: e, shortMessage: shortErrorMessage({action}), action}))
+    if (!canBeMissing || e.status !== 404) {
+      logDebug(`External action exception: ${JSON.stringify(e)}`)
+      yield put(failedExternalAction({exception: e, shortMessage: shortErrorMessage({action}), action}))
+    }
     return {error: e}
   }
+}
+
+function* persistStateSaga () {
+  yield persistStateToLocalStorage({icons: Selectors.getAllIcons().toJS()})
 }
 
 // TODO: implement 'renew the token'
@@ -51,8 +58,7 @@ function* login (action) {
 
   if (token) {
     const username = action.payload.credentials.username
-    saveToSessionStorage('TOKEN', token)
-    saveToSessionStorage('USERNAME', username)
+    persistTokenToSessionStorage({token, username})
 
     yield put(loginSuccessful({token, username}))
     yield put(getAllVms())
@@ -65,48 +71,68 @@ function* login (action) {
   }
 }
 
-function* fetchAllVms (action) {
-  const allVms = yield callExternalAction('getAllVms', Api.getAllVms, action)
+function* fetchUnknwonIconsForVms ({vms}) {
+  // unique iconIds from all vms
+  const vmIconIds = new Set( vms.map( vm => vm.icons.small.id) )
+  vms.map( vm => vm.icons.large.id).forEach( id => vmIconIds.add(id) )
 
-  if (allVms && allVms['vm']) { // array
-    const internalVms = allVms.vm.map( vm => Api.vmToInternal({vm}))
+  // reduce to just unknown
+  const allKnownIcons = Selectors.getAllIcons()
+  const iconIds = [...vmIconIds].filter( id => !allKnownIcons.get(id))
 
-    yield put(updateVms({vms: internalVms}))
-    yield call(delay, 1) // allow rendering
-
-    // TODO: call remove MissgingVMs (those not present in the allVms['vms']) if refresh
-
-    const iconIds = new Set( internalVms.map( vm => vm.icons.small.id) )
-    internalVms.map( vm => vm.icons.large.id).forEach( id => iconIds.add(id) )
-    yield* foreach([...iconIds], function* (iconId) { // WRONG
-      // TODO: check if exists if refresh
-      yield put(getIcon({iconId}))
-    })
-    yield call(delay, 1) // allow rendering
-
-    yield* foreach(internalVms, function* (vm) {
-      yield put(getVmDisks({vmId: vm.id}))
-    })
-    yield call(delay, 1) // allow rendering
-  }
-
-  yield put(loadInProgress({value: false}))
+  yield* foreach(iconIds, function* (iconId) {
+    yield fetchIcon({iconId})
+  })
 }
 
-function* fetchIcon (action) {
-  const { iconId } = action.payload
-
+function* fetchIcon ({ iconId }) {
   if (iconId) {
     const icon = yield callExternalAction('icon', Api.icon, {payload: {id: iconId}})
     if (icon['media_type'] && icon['data']) {
-      yield put(updateIcon({icon: Api.iconToInternal({icon})}))
+      yield put(updateIcons({icons: [Api.iconToInternal({icon})]}))
     }
   }
 }
 
-function* fetchVmDisks(action) {
-  const {vmId} = action.payload
+function* fetchAllVms (action) {
+  // TODO: paging: split this call to a loop per up to 25 vms
+  const allVms = yield callExternalAction('getAllVms', Api.getAllVms, action)
 
+  if (allVms && allVms['vm']) { // array
+    const internalVms = allVms.vm.map( vm => Api.vmToInternal({vm}))
+    yield put(updateVms({vms: internalVms}))
+
+    // TODO: call remove MissgingVMs (those not present in the allVms['vms']) if refresh
+
+    yield fetchUnknwonIconsForVms({vms: internalVms})
+    yield fetchDisks({vms: internalVms})
+  }
+
+  yield put(loadInProgress({value: false}))
+  yield put(persistState())
+}
+
+function* fetchDisks({vms}) {
+  yield* foreach(vms, function* (vm) {
+    // yield put(getVmDisks({vmId: vm.id}))
+    yield fetchVmDisks({vmId: vm.id})
+  })
+}
+
+function* fetchSingleVm (action) {
+  const vm = yield callExternalAction('getVm', Api.getVm, action, true)
+
+  if (vm && vm.id) {
+    const internalVm = Api.vmToInternal({vm})
+    yield put(updateVms({vms: [internalVm]}))
+  } else {
+    if (vm && vm.error && vm.error.status === 404) {
+      yield put(removeVms({vmIds: [action.payload.vmId]}))
+    }
+  }
+}
+
+function* fetchVmDisks({vmId}) {
   const diskattachments = yield callExternalAction('diskattachments', Api.diskattachments, {payload: {vmId}})
 
   // TODO: call clearVmDisks if refresh
@@ -121,40 +147,49 @@ function* fetchVmDisks(action) {
   }
 }
 
-function* inProgress({vmId, name, started = true, result}) {
-  logDebug(`--- inProgress called: name: ${name}, started: ${started}, result: ${JSON.stringify(result)}`)
-  if (!started) {
-    if (result && result.status === 'complete') {
-      // do not call 'end of in progress' if successful
-      return
-    }
-  }
+function* startProgress ({ vmId, name }) {
+  yield put(vmActionInProgress({vmId, name, started: true}))
+}
 
-  yield put(vmActionInProgress({vmId, name, started}))
+function* stopProgress({ vmId, name, result }) {
+    if (result && result.status === 'complete') {
+      // do not call 'end of in progress' if successful,
+      // since UI will be updated by refresh
+
+      // TODO: correlate
+      yield delay(5 * 1000)
+      yield fetchSingleVm(getSingleVm({vmId}))
+      yield delay(30 * 1000)
+      yield fetchSingleVm(getSingleVm({vmId}))
+      yield delay(3 * 60 * 1000) // 3 minutes
+      yield fetchSingleVm(getSingleVm({vmId}))
+    }
+
+  yield put(vmActionInProgress({vmId, name, started: false}))
 }
 
 function* shutdownVm (action) {
-  yield inProgress({vmId: action.payload.vmId, name: 'shutdown'})
+  yield startProgress({vmId: action.payload.vmId, name: 'shutdown'})
   const result = yield callExternalAction('shutdown', Api.shutdown, action)
-  yield inProgress({vmId: action.payload.vmId, name: 'shutdown', started: false, result})
+  yield stopProgress({vmId: action.payload.vmId, name: 'shutdown', result})
 }
 
 function* restartVm (action) {
-  yield inProgress({vmId: action.payload.vmId, name: 'restart'})
+  yield startProgress({vmId: action.payload.vmId, name: 'restart'})
   const result = yield callExternalAction('restart', Api.restart, action)
-  yield inProgress({vmId: action.payload.vmId, name: 'restart', started: false, result})
+  yield stopProgress({vmId: action.payload.vmId, name: 'restart', result})
 }
 
 function* suspendVm (action) {
-  yield inProgress({vmId: action.payload.vmId, name: 'suspend'})
+  yield startProgress({vmId: action.payload.vmId, name: 'suspend'})
   const result = yield callExternalAction('suspend', Api.suspend, action)
-  yield inProgress({vmId: action.payload.vmId, name: 'suspend', started: false, result})
+  yield stopProgress({vmId: action.payload.vmId, name: 'suspend', result})
 }
 
 function* startVm (action) {
-  yield inProgress({vmId: action.payload.vmId, name: 'start'})
+  yield startProgress({vmId: action.payload.vmId, name: 'start'})
   const result = yield callExternalAction('start', Api.start, action)
-  yield inProgress({vmId: action.payload.vmId, name: 'start', started: false, result})
+  yield stopProgress({vmId: action.payload.vmId, name: 'start', result})
 }
 
 function* getConsoleVm (action) {
@@ -173,8 +208,8 @@ export function *rootSaga () {
   yield [
     takeEvery("LOGIN", login),
     takeLatest("GET_ALL_VMS", fetchAllVms),
-    takeEvery("GET_VM_ICON", fetchIcon),
-    takeEvery("GET_VM_DISKS", fetchVmDisks),
+    takeLatest('PERSIST_STATE', persistStateSaga),
+
     takeEvery("SHUTDOWN_VM", shutdownVm),
     takeEvery("RESTART_VM", restartVm),
     takeEvery("START_VM", startVm),

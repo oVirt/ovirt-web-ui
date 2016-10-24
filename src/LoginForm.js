@@ -51,6 +51,32 @@ const LoginFailed = () => {
 LoginFailed.propTypes = {}
 
 class LoginForm extends Component {
+  constructor(props) {
+    super(props)
+
+    this.state = {username: '', password: ''}
+
+    this.onUserChanged = this.onUserChanged.bind(this)
+    this.onPwdChanged = this.onPwdChanged.bind(this)
+    this.handleSubmit = this.handleSubmit.bind(this)
+
+    this.onLogin = props.onLogin
+  }
+
+  onUserChanged (e) {
+    this.setState({username: e.target.value});
+  }
+  onPwdChanged (e) {
+    this.setState({password: e.target.value});
+  }
+  handleSubmit (e) {
+    e.preventDefault();
+    const username = this.state.username
+    const password = this.state.password
+    console.log(`LoginForm.handleSubmit: ${username}, ${password}`)
+    this.onLogin({username, password})
+  }
+
   componentWillMount () {
     $('html').addClass('login-pf')
   }
@@ -67,15 +93,7 @@ class LoginForm extends Component {
   }
 
   render () {
-    const { userMessages, onLogin } = this.props
-
-    let username, password
-    const onUserChanged = (e) => {username = e.target.value}
-    const onPwdChanged = (e) => {password = e.target.value}
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      onLogin({username, password})
-    }
+    const { userMessages } = this.props
 
     const loginFailed = this.isLoginFailed(userMessages) ? (<LoginFailed />) : ''
 
@@ -87,18 +105,18 @@ class LoginForm extends Component {
           <Brand />
 
           <div className='col-sm-7 col-md-6 col-lg-5 login'>
-            <form className='form-horizontal' role='form' onSubmit={handleSubmit}>
+            <form className='form-horizontal' role='form' onSubmit={this.handleSubmit}>
               <div className='form-group'>
                 <label htmlFor='inputUsername' className='col-sm-2 col-md-2 control-label'>Username</label>
                 <div className='col-sm-10 col-md-10'>
-                  <input type='text' className='form-control' id='inputUsername' placeholder='' tabIndex='1' onChange={onUserChanged} />
+                  <input type='text' className='form-control' id='inputUsername' placeholder='' tabIndex='1' value={this.state.username} onChange={this.onUserChanged} />
                 </div>
               </div>
 
               <div className='form-group'>
                 <label htmlFor='inputPassword' className='col-sm-2 col-md-2 control-label'>Password</label>
                 <div className='col-sm-10 col-md-10'>
-                  <input type='password' className='form-control' id='inputPassword' placeholder='' tabIndex='2' onChange={onPwdChanged} />
+                  <input type='password' className='form-control' id='inputPassword' placeholder='' tabIndex='2' value={this.state.password} onChange={this.onPwdChanged} />
                 </div>
               </div>
 

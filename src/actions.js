@@ -1,20 +1,16 @@
-// --- External actions -----------------------
-export function getVmDisks ({ vmId }) {
+export function persistState () {
   return {
-    type: 'GET_VM_DISKS',
+    type: 'PERSIST_STATE',
     payload: {
-      vmId
-    }
-  }
-}
-
-export function getIcon ({ iconId }) {
-  return {
-    type: 'GET_VM_ICON',
-    payload: {
-      iconId,
     },
   }
 }
 
-// --- Internal State -------------------------
+export function getSingleVm ({ vmId }) {
+  return {
+    type: 'GET_VM',
+    payload: {
+      vmId,
+    },
+  }
+}

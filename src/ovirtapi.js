@@ -1,22 +1,13 @@
 import $ from 'jquery'
 
-import {logDebug} from 'ovirt-ui-components'
-import {Exception} from './exceptions'
+import { logDebug } from 'ovirt-ui-components'
+import { Exception } from './exceptions'
+import Selectors from './selectors'
 
 let OvirtApi = {}
 OvirtApi = {
-  init ({store}) { // TODO: avoid init method
-    this.store = store // for connection details
-  },
-  // ----
   _getLoginToken () { // redux store selector
-    OvirtApi._assertStore({methodName: '_getLoginToken'})
-    return OvirtApi.store.getState().config.get('loginToken')
-  },
-  _assertStore ({methodName}) {
-    if (!this.store) {
-      throw new Exception(`OvirtApi in '${methodName}' uninitialized - missing store. Call the Api.init() method`)
-    }
+    return Selectors.getLoginToken()
   },
   _assertLogin ({methodName}) {
     if (!OvirtApi._getLoginToken()) {
@@ -171,6 +162,11 @@ OvirtApi = {
         logDebug(`Ajax failed: ${JSON.stringify(data)}`)
         return Promise.reject(data)
       })
+  },
+  getVm ({vmId}) {
+    OvirtApi._assertLogin({methodName: 'getVm'})
+    const url = `/api/vms/${vmId}`
+    return OvirtApi._httpGet({url})
   },
   getAllVms () {
     OvirtApi._assertLogin({methodName: 'getAllVms'})
