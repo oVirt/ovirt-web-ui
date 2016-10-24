@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux'
 
 import './index.css';
 import '../node_modules/patternfly/dist/css/patternfly.css'
@@ -15,8 +16,7 @@ import store, {sagaMiddleware} from './store'
 import Selectors from './selectors'
 import AppConfiguration, { readConfiguration } from './config'
 import { loadTokenFromSessionStorage, loadStateFromLocalStorage } from './storage'
-
-import { Provider } from 'react-redux'
+import { valuesOfObject } from './helpers'
 import { rootSaga } from './sagas'
 
 import App from './App'
@@ -61,7 +61,7 @@ function loadPersistedState () {
   const {icons} = loadStateFromLocalStorage()
 
   if (icons) {
-    const iconsArray = Object.values(icons)
+    const iconsArray = valuesOfObject(icons)
     console.log(`loadPersistedState: ${iconsArray.length} icons loaded`)
     store.dispatch(updateIcons({icons: iconsArray}))
   }
