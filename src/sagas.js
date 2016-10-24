@@ -3,7 +3,7 @@ import {takeEvery, takeLatest} from 'redux-saga'
 
 import {logDebug, hidePassword, fileDownload} from 'ovirt-ui-components'
 import {getAllVms, loginSuccessful, loginFailed, failedExternalAction, loadInProgress,
-  updateIcons, updateVmDisk, updateVms, removeVms, vmActionInProgress} from 'ovirt-ui-components'
+  updateIcons, updateVmDisk, clearVmDisks, updateVms, removeVms, removeMissingVms, vmActionInProgress} from 'ovirt-ui-components'
 
 import { persistState, getSingleVm } from './actions'
 import Api from './ovirtapi'
@@ -100,10 +100,13 @@ function* fetchAllVms (action) {
 
   if (allVms && allVms['vm']) { // array
     const internalVms = allVms.vm.map( vm => Api.vmToInternal({vm}))
+
+    const vmIdsToPreserve = internalVms.map(vm => vm.id)
+    yield put(removeMissingVms({vmIdsToPreserve}))
+
     yield put(updateVms({vms: internalVms}))
 
-    // TODO: call remove MissgingVMs (those not present in the allVms['vms']) if refresh
-
+    // TODO: is removing of icons needed? I.e. when icon is removed or changed on the server
     yield fetchUnknwonIconsForVms({vms: internalVms})
     yield fetchDisks({vms: internalVms})
   }
@@ -114,7 +117,6 @@ function* fetchAllVms (action) {
 
 function* fetchDisks({vms}) {
   yield* foreach(vms, function* (vm) {
-    // yield put(getVmDisks({vmId: vm.id}))
     yield fetchVmDisks({vmId: vm.id})
   })
 }
@@ -135,8 +137,9 @@ function* fetchSingleVm (action) {
 function* fetchVmDisks({vmId}) {
   const diskattachments = yield callExternalAction('diskattachments', Api.diskattachments, {payload: {vmId}})
 
-  // TODO: call clearVmDisks if refresh
   if (diskattachments && diskattachments['disk_attachment']) { // array
+    yield put(clearVmDisks({ vmId }))
+
     yield* foreach(diskattachments['disk_attachment'], function* (attachment) {
       const diskId = attachment.disk.id
       const disk = yield callExternalAction('disk', Api.disk, {payload: {diskId}})
