@@ -170,13 +170,9 @@ function* stopProgress({ vmId, name, result }) {
     if (result && result.status === 'complete') {
       // do not call 'end of in progress' if successful,
       // since UI will be updated by refresh
-
-      // TODO: correlate
       yield delay(5 * 1000)
       yield fetchSingleVm(getSingleVm({vmId}))
       yield delay(30 * 1000)
-      yield fetchSingleVm(getSingleVm({vmId}))
-      yield delay(3 * 60 * 1000) // 3 minutes
       yield fetchSingleVm(getSingleVm({vmId}))
     }
 

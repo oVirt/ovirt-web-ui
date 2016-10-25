@@ -73,7 +73,6 @@ class LoginForm extends Component {
     e.preventDefault();
     const username = this.state.username
     const password = this.state.password
-    console.log(`LoginForm.handleSubmit: ${username}, ${password}`)
     this.onLogin({username, password})
   }
 
