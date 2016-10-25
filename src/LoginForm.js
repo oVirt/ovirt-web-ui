@@ -7,6 +7,7 @@ import './styles.css'
 
 import { clearUserMessages, login } from 'ovirt-ui-components'
 import { setRedirectUrl } from './actions'
+import AppConfiguration from './config'
 
 import logo from './ovirt_top_right_logo.png'
 import brand from './ovirt_top_logo.png'
@@ -52,6 +53,9 @@ const LoginFailed = () => {
 }
 LoginFailed.propTypes = {}
 
+/**
+ * Deprecated, since oVirt SSO
+ */
 class LoginForm extends Component {
   constructor (props) {
     super(props)
@@ -75,7 +79,7 @@ class LoginForm extends Component {
     e.preventDefault()
     const { username, password } = this.state
     const { location } = this.props
-    const redirectUrl = (location.state && location.state.nextPathname) ? location.state.nextPathname : '/'
+    const redirectUrl = (location.state && location.state.nextPathname) ? location.state.nextPathname : `${AppConfiguration.applicationURL}/`
     console.log(`Redirect url: ${redirectUrl}`)
     this.onLogin({ username, password, redirectUrl })
   }

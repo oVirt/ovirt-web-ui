@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import { Router, Route, browserHistory } from 'react-router'
+// import { Router, Route, browserHistory } from 'react-router'
 
 import './index.css'
 import 'patternfly/dist/css/patternfly.css'
@@ -11,42 +11,54 @@ import 'patternfly/dist/css/patternfly-additions.css'
 // jQuery needs to be globally available (webpack.ProvidePlugin can be also used for this)
 window.$ = window.jQuery = require('jquery')
 require('bootstrap/dist/js/bootstrap')
-require('patternfly/dist/js/patternfly')
+window.patternfly = {}
+window.patternfly = require('patternfly/dist/js/patternfly')
 
 import store, { sagaMiddleware } from './store'
 import Selectors from './selectors'
 import AppConfiguration, { readConfiguration } from './config'
-import { loadTokenFromSessionStorage, loadStateFromLocalStorage } from './storage'
+import { loadStateFromLocalStorage } from './storage'
 import { valuesOfObject } from './helpers'
 import { rootSaga } from './sagas'
 import { schedulerOneMinute } from './actions'
 
 import App from './App'
-import LoginForm from './LoginForm'
-import { login, updateIcons } from 'ovirt-ui-components'
-
+// import LoginForm from './LoginForm'
+import { login, updateIcons, logDebug, logError } from 'ovirt-ui-components'
+/*
 function requireLogin (nextState, replace) {
   let token = store.getState().config.get('loginToken')
   if (!token) {
     replace({
-      pathname: '/login',
+      pathname: `${AppConfiguration.applicationURL}/login`,
       state: { nextPathname: nextState.location.pathname },
     })
   }
 }
+*/
 
 function renderApp () {
   ReactDOM.render(
     <Provider store={store}>
+      <App />
+    </Provider>,
+    document.getElementById('root')
+  )
+}
+/*
+function renderAppWithRouter () {
+  const urlPrefix = `${AppConfiguration.applicationURL}`
+  ReactDOM.render(
+    <Provider store={store}>
       <Router history={browserHistory}>
-        <Route path='/login' component={LoginForm} />
-        <Route path='/' component={App} onEnter={requireLogin} />
+        <Route path={`${urlPrefix}/`} component={App} />
       </Router>
     </Provider>,
     document.getElementById('root')
   )
 }
-
+*/
+/*
 function fetchToken () {
   // get token from session storage
   const { token, username } = loadTokenFromSessionStorage()
@@ -69,6 +81,27 @@ function fetchToken () {
     // SSO is not configured, show LoginForm
     console.log('SSO is not configured, rendering own Login Form. Please consider setting "ssoRedirectURL" and "userPortalURL" in the userportal.config file.')
     return {}
+  }
+}
+*/
+
+/**
+ * oVirt SSO is required
+ *
+ * SsoPostLoginFilter (aaa.jar, ovirt-engine) must be configured to provide logged-user details to session.
+ * HTML entry point (the index.jsp) stored session data into JavaScript's 'window' object.
+ *
+ * See web.xml.
+ */
+function fetchToken () {
+  const userInfo = window.userInfo
+  logDebug(`SSO userInfo: ${JSON.stringify(userInfo)}`)
+
+  if (userInfo) {
+    return {
+      token: userInfo.ssoToken,
+      username: userInfo.userName,
+    }
   }
 }
 
@@ -102,7 +135,9 @@ function start () {
 
   if (token) {
     store.dispatch(login({ username, token }))
-  } // otherwise wait for LoginForm or SSO
+  } else {
+    logError('Missing SSO Token!')
+  }
 
   // start cron-jobs
   store.dispatch(schedulerOneMinute())

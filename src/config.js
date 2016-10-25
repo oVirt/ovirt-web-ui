@@ -1,8 +1,16 @@
 import $ from 'jquery'
 
-const CONFIG_URL = '/userportal.config'
+// For Development
+// const CONFIG_URL = '/userportal.config'
 
-const AppConfiguration = {}
+// TODO: configure path automatically
+// For Production
+const CONFIG_URL = '/ovirt-engine/web-ui/userportal.config'
+
+const AppConfiguration = {
+  'applicationContext': '/ovirt-engine',
+  'applicationURL': '/ovirt-engine/web-ui',
+}
 
 export function readConfiguration () {
   $.ajax({

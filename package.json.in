@@ -1,6 +1,6 @@
 {
   "name": "UserPortal",
-  "version": "0.1.0",
+  "version": "@PACKAGE_VERSION@",
   "private": true,
   "devDependencies": {
     "autoprefixer": "6.4.1",
@@ -99,5 +99,6 @@
   "eslintConfig": {
     "extends": "./config/eslint.js"
   },
-  "proxy": "https://engine.local/ovirt-engine"
+  "proxy": "https://engine.local/ovirt-engine",
+  "productionHomepage": "/ovirt-engine/web-ui/"
 }

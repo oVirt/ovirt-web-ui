@@ -1,0 +1,90 @@
+# Used for rpm-packaging of pre-bundled application with already resolved JS dependencies
+%define use_vdsm %( test -z @VDSM@ && echo 1 || echo 0)
+
+%global _userportaldir %{_datarootdir}/ovirt-web-ui
+%global _ovirt_engine_conf %{_datarootdir}/ovirt-engine/services/ovirt-engine/ovirt-engine.conf
+%global _ovirt_engine_ear_application_xml %{_datarootdir}/ovirt-engine/engine.ear/META-INF/application.xml
+%global product oVirt
+
+%global use_rhev %( test -z @RHEV@ && echo 1 || echo 0)
+%define debug_package %{nil}
+
+## %global source_basename @PACKAGE_TARNAME@-@PACKAGE_VERSION@
+%global source_basename @PACKAGE_TARNAME@
+
+Name:           ovirt-web-ui
+Version:        @PACKAGE_RPM_VERSION@
+Release:        @PACKAGE_RPM_RELEASE@%{?release_suffix}%{?checkout}%{?dist}
+Summary:        User Portal for %{product}
+License:        ASL 2.0
+URL:            https://github.com/mareklibra/userportal
+Source0:        https://github.com/mareklibra/userportal/archive/%{source_basename}-@PACKAGE_VERSION@.tar.gz
+
+
+%if 0%{?rhel}
+ExclusiveArch:  x86_64
+%else
+BuildRequires: nodejs-packaging
+ExclusiveArch: %{nodejs_arches} noarch
+%endif
+
+## This is a hack for copr, but why is it needed?
+## BuildRequires: python
+BuildRequires: ovirt-engine-nodejs = 6.9.1
+# Keep ovirt-engine-nodejs-modules at particular version unless tested on higher
+BuildRequires: ovirt-engine-nodejs-modules = 0.0.16
+
+%description
+This package provides new User Portal for %{product}, so far as technical preview.
+
+%prep
+%setup -q -n"%{source_basename}-%{version}"
+
+# Use the ovirt-engine nodejs installation
+export PATH="%{_datadir}/ovirt-engine-nodejs/bin:${PATH}"
+
+# Copy the Node.js dependencies to the local "node_modules" directory
+ln -s "%{_sharedstatedir}/ovirt-engine-nodejs-modules/node_modules"
+
+%build
+%configure
+
+export PATH="./node_modules/.bin:${PATH}"
+make
+
+%install
+make install DESTDIR=%{buildroot}
+mkdir -p %{buildroot}%{_sysconfdir}/ovirt-engine/branding
+mkdir -p %{buildroot}%{_datarootdir}/ovirt-engine/engine.ear
+ln -s %{_userportaldir}/ovirt-web-ui.war %{buildroot}%{_datarootdir}/ovirt-engine/engine.ear/ovirt-web-ui.war
+# TODO: Branding will be moved to ovirt-engine
+ln -s %{_userportaldir}/branding %{buildroot}%{_sysconfdir}/ovirt-engine/branding/06-ovirt-web-ui.brand
+
+%post
+cp %{_ovirt_engine_ear_application_xml} %{_ovirt_engine_ear_application_xml}.preOvirtWebUi
+cat %{_ovirt_engine_ear_application_xml} | sed -e 's/\(<\/application>\)/ <module><web><web-uri>ovirt-web-ui.war<\/web-uri><context-root>\/ovirt-engine\/web-ui<\/context-root><\/web><\/module> \n\1/' > %{_ovirt_engine_ear_application_xml}.updated
+mv %{_ovirt_engine_ear_application_xml}.updated %{_ovirt_engine_ear_application_xml}
+
+cp %{_ovirt_engine_conf} %{_ovirt_engine_conf}.preOvirtWebUi
+echo 'ENGINE_SSO_AUTH_SEQUENCE_webui=~' >> %{_ovirt_engine_conf}
+
+%postun
+cp %{_ovirt_engine_ear_application_xml} %{_ovirt_engine_ear_application_xml}.preOvirtWebUiUninstall
+cat %{_ovirt_engine_ear_application_xml} | sed -e 's/<module>.*ovirt-web-ui.war.*<\/module>/ /' > %{_ovirt_engine_ear_application_xml}.updated
+mv %{_ovirt_engine_ear_application_xml}.updated %{_ovirt_engine_ear_application_xml}
+
+cp %{_ovirt_engine_conf} %{_ovirt_engine_conf}.preOvirtWebUiUninstall
+cat %{_ovirt_engine_conf} | sed -e 's/ENGINE_SSO_AUTH_SEQUENCE_webui=~//' > %{_ovirt_engine_conf}.updated
+mv %{_ovirt_engine_conf}.updated %{_ovirt_engine_conf}
+
+%files 
+%doc README.md 
+%license LICENSE
+%{_userportaldir}
+%{_sysconfdir}/ovirt-engine/branding/06-ovirt-web-ui.brand
+%{_datarootdir}/ovirt-engine/engine.ear/ovirt-web-ui.war
+
+%changelog
+* Mon Nov 14 2016 Marek Libra <mlibra@redhat.com> - 0.1.0
+- First version, Technical Preview
+
