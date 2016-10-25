@@ -14,7 +14,7 @@ OvirtApi = {
       throw new Exception(`OvirtApi in '${methodName}': missing login`)
     }
   },
-  _httpGet ({url, custHeaders = {'Accept': 'application/json', Filter: false}}) {
+  _httpGet ({url, custHeaders = {'Accept': 'application/json', Filter: true}}) {
     logDebug(`_httpGet start: url="${url}"`)
     const headers = Object.assign({
       'Authorization': `Bearer ${OvirtApi._getLoginToken()}`
