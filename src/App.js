@@ -18,7 +18,7 @@ const App = ({ vms, visibility, loginToken }) => {
   if (showOptions) {
     detailToRender = (<Options />)
   } else if (selectedVmId) {
-    const selectedVm = selectedVmId ? vms.get('vms').find(vm => vm.get('id') === selectedVmId) : undefined
+    const selectedVm = selectedVmId ? vms.getIn(['vms', selectedVmId]) : undefined
     detailToRender = (<VmDetail vm={selectedVm} />)
   }
 

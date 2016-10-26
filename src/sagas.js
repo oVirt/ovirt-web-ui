@@ -2,8 +2,9 @@ import { call, put } from 'redux-saga/effects'
 import {takeEvery, takeLatest} from 'redux-saga'
 
 import {logDebug, hidePassword, fileDownload} from 'ovirt-ui-components'
-import {getAllVms, loginSuccessful, loginFailed, failedExternalAction, loadInProgress, setVmDetailToShow,
-  updateIcons, setVmDisks, updateVms, removeVms, vmActionInProgress, setVmConsoles} from 'ovirt-ui-components'
+import {getAllVms, loginSuccessful, loginFailed, failedExternalAction,
+  loadInProgress, setVmDetailToShow, updateIcons, setVmDisks, updateVms,
+  removeVms, vmActionInProgress, setVmConsoles, removeMissingVms} from 'ovirt-ui-components'
 
 import { persistState, getSingleVm } from './actions'
 import Api from './ovirtapi'
@@ -135,7 +136,8 @@ function* fetchDisks({vms}) {
 
 function* fetchConsoleMetadatas ({ vms }) {
   yield* foreach(vms, function* (vm) {
-    yield fetchConsoleVmMeta({ vmId: vm.id })
+    const consolesInternal = yield fetchConsoleVmMeta({ vmId: vm.id })
+    yield put(setVmConsoles({vmId: vm.id, consoles: consolesInternal}))
   })
 }
 
@@ -145,8 +147,9 @@ function* fetchSingleVm (action) {
   if (vm && vm.id) {
     const internalVm = Api.vmToInternal({vm})
 
-    const disks = yield fetchVmDisks({ vmId: internalVm.id })
-    internalVm.disks = disks
+    internalVm.disks = yield fetchVmDisks({ vmId: internalVm.id })
+    internalVm.consoles = yield fetchConsoleVmMeta({ vmId: internalVm.id })
+
     yield put(updateVms({vms: [internalVm]}))
   } else {
     if (vm && vm.error && vm.error.status === 404) {
@@ -167,6 +170,7 @@ function* fetchVmDisks({vmId}) {
     })
     return internalDisks
   }
+  return []
 }
 
 function* startProgress ({ vmId, name }) {
@@ -215,10 +219,9 @@ function* fetchConsoleVmMeta ({ vmId }) {
   const consoles = yield callExternalAction('consoles', Api.consoles, {action: 'INTERNAL_CONSOLES', payload: {vmId}})
 
   if (consoles && consoles['graphics_console']) {// && consoles['graphics_console'].length > 0) {
-    const consolesInternal = Api.consolesToInternal({consoles})
-    yield put(setVmConsoles({vmId, consoles: consolesInternal}))
-    return consolesInternal
+    return Api.consolesToInternal({consoles})
   }
+  return []
 }
 
 function* getConsoleVm (action) {
@@ -227,6 +230,7 @@ function* getConsoleVm (action) {
   if (!consoleId) {
     yield put(vmActionInProgress({vmId, name: 'getConsole', started: true}))
     const consolesInternal = yield fetchConsoleVmMeta ({ vmId }) // refresh metadata
+    yield put(setVmConsoles({vmId, consoles: consolesInternal}))
     yield put(vmActionInProgress({vmId, name: 'getConsole', started: false}))
 
     // TODO: choose user default over just 'SPICE'
