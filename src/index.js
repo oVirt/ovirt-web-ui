@@ -2,15 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux'
 
-import './index.css';
-import '../node_modules/patternfly/dist/css/patternfly.css'
-import '../node_modules/patternfly/dist/css/patternfly-additions.css'
+// Patternfly dependencies
+// jQuery needs to be globally available (webpack.ProvidePlugin can be also used for this)
+window.$ = window.jQuery = require('jquery')
+require('patternfly/dist/js/patternfly')
 
-window.$ = window.jQuery = require('../node_modules/jquery/dist/jquery');
-var Bootstrap = {};
-Bootstrap.$ = window.$;
-require('../node_modules/bootstrap/dist/js/bootstrap');
-require('../node_modules/patternfly/dist/js/patternfly');
+import 'patternfly/dist/css/patternfly.css'
+import 'patternfly/dist/css/patternfly-additions.css'
+import './index.css';
 
 import store, {sagaMiddleware} from './store'
 import Selectors from './selectors'
