@@ -2,8 +2,8 @@ import { call, put } from 'redux-saga/effects'
 import {takeEvery, takeLatest} from 'redux-saga'
 
 import {logDebug, hidePassword, fileDownload} from 'ovirt-ui-components'
-import {getAllVms, loginSuccessful, loginFailed, failedExternalAction, loadInProgress,
-  updateIcons, updateVmDisk, updateVms, removeVms, vmActionInProgress} from 'ovirt-ui-components'
+import {getAllVms, loginSuccessful, loginFailed, failedExternalAction, loadInProgress, setVmDetailToShow,
+  updateIcons, setVmDisks, updateVms, removeVms, removeMissingVms, vmActionInProgress} from 'ovirt-ui-components'
 
 import { persistState, getSingleVm } from './actions'
 import Api from './ovirtapi'
@@ -61,7 +61,7 @@ function* login (action) {
     persistTokenToSessionStorage({token, username})
 
     yield put(loginSuccessful({token, username}))
-    yield put(getAllVms())
+    yield put(getAllVms({ shallowFetch: false }))
   } else {
     yield put(loginFailed({
       errorCode: result['error_code'] ? result['error_code'] : 'no_access',
@@ -95,17 +95,27 @@ function* fetchIcon ({ iconId }) {
 }
 
 function* fetchAllVms (action) {
+  const { shallowFetch } = action.payload
+
   // TODO: paging: split this call to a loop per up to 25 vms
   const allVms = yield callExternalAction('getAllVms', Api.getAllVms, action)
 
   if (allVms && allVms['vm']) { // array
     const internalVms = allVms.vm.map( vm => Api.vmToInternal({vm}))
+
+    const vmIdsToPreserve = internalVms.map(vm => vm.id)
+    yield put(removeMissingVms({vmIdsToPreserve}))
+
     yield put(updateVms({vms: internalVms}))
 
-    // TODO: call remove MissgingVMs (those not present in the allVms['vms']) if refresh
-
+    // TODO: is removing of icons needed? I.e. when icon is removed or changed on the server
     yield fetchUnknwonIconsForVms({vms: internalVms})
-    yield fetchDisks({vms: internalVms})
+
+    if (!shallowFetch) {
+      yield fetchDisks({vms: internalVms})
+    } else {
+      logDebug('fetchAllVms() shallow fetch requested - skipping other resources')
+    }
   }
 
   yield put(loadInProgress({value: false}))
@@ -114,8 +124,11 @@ function* fetchAllVms (action) {
 
 function* fetchDisks({vms}) {
   yield* foreach(vms, function* (vm) {
-    // yield put(getVmDisks({vmId: vm.id}))
-    yield fetchVmDisks({vmId: vm.id})
+    const vmId = vm.id
+    const disks = yield fetchVmDisks({ vmId })
+    if (disks && disks.length > 0) {
+      yield put(setVmDisks({vmId, disks}))
+    }
   })
 }
 
@@ -124,6 +137,9 @@ function* fetchSingleVm (action) {
 
   if (vm && vm.id) {
     const internalVm = Api.vmToInternal({vm})
+
+    const disks = yield fetchVmDisks({ vmId: internalVm.id })
+    internalVm.disks = disks
     yield put(updateVms({vms: [internalVm]}))
   } else {
     if (vm && vm.error && vm.error.status === 404) {
@@ -135,15 +151,14 @@ function* fetchSingleVm (action) {
 function* fetchVmDisks({vmId}) {
   const diskattachments = yield callExternalAction('diskattachments', Api.diskattachments, {payload: {vmId}})
 
-  // TODO: call clearVmDisks if refresh
   if (diskattachments && diskattachments['disk_attachment']) { // array
+    const internalDisks = []
     yield* foreach(diskattachments['disk_attachment'], function* (attachment) {
       const diskId = attachment.disk.id
       const disk = yield callExternalAction('disk', Api.disk, {payload: {diskId}})
-
-      const internalDisk = Api.diskToInternal({disk, attachment})
-      yield put(updateVmDisk({vmId, disk: internalDisk}))
+      internalDisks.push(Api.diskToInternal({disk, attachment}))
     })
+    return internalDisks
   }
 }
 
@@ -155,13 +170,9 @@ function* stopProgress({ vmId, name, result }) {
     if (result && result.status === 'complete') {
       // do not call 'end of in progress' if successful,
       // since UI will be updated by refresh
-
-      // TODO: correlate
       yield delay(5 * 1000)
       yield fetchSingleVm(getSingleVm({vmId}))
       yield delay(30 * 1000)
-      yield fetchSingleVm(getSingleVm({vmId}))
-      yield delay(3 * 60 * 1000) // 3 minutes
       yield fetchSingleVm(getSingleVm({vmId}))
     }
 
@@ -204,17 +215,40 @@ function* getConsoleVm (action) {
   }
 }
 
+function* selectVmDetail (action) {
+  yield put(setVmDetailToShow({ vmId: action.payload.vmId}))
+  yield fetchSingleVm(getSingleVm({vmId: action.payload.vmId}))
+}
+
+function* schedulerPerMinute (action) {
+  logDebug('Starting schedulerPerMinute() scheduler')
+
+  // TODO: do we need to stop the loop? Consider takeLatest in the rootSaga 'restarts' the loop if needed
+  while (true) {
+    yield delay(60 * 1000) // 1 minute
+    logDebug('schedulerPerMinute() event')
+
+    // Actions to be executed no more than once per minute:
+    // TODO: allow user to enable/disable the autorefresh
+    yield put(getAllVms({ shallowFetch: true }))
+  }
+}
+
 export function *rootSaga () {
   yield [
-    takeEvery("LOGIN", login),
-    takeLatest("GET_ALL_VMS", fetchAllVms),
+    takeEvery('LOGIN', login),
+    takeLatest('GET_ALL_VMS', fetchAllVms),
     takeLatest('PERSIST_STATE', persistStateSaga),
 
-    takeEvery("SHUTDOWN_VM", shutdownVm),
-    takeEvery("RESTART_VM", restartVm),
-    takeEvery("START_VM", startVm),
-    takeEvery("GET_CONSOLE_VM", getConsoleVm),
-    takeEvery("SUSPEND_VM", suspendVm)
+    takeEvery('SHUTDOWN_VM', shutdownVm),
+    takeEvery('RESTART_VM', restartVm),
+    takeEvery('START_VM', startVm),
+    takeEvery('GET_CONSOLE_VM', getConsoleVm),
+    takeEvery('SUSPEND_VM', suspendVm),
+
+    takeEvery('SELECT_VM_DETAIL', selectVmDetail),
+
+    takeLatest('SCHEDULER__1_MIN', schedulerPerMinute),
   ]
 }
 
