@@ -111,7 +111,8 @@ OvirtApi = {
           id: vm['large_icon'] ? vm.large_icon['id'] : undefined
         }
       },
-      disks: {}
+      disks: {},
+      consoles: []
     }
   },
   /**
@@ -145,6 +146,14 @@ OvirtApi = {
       type: icon['media_type'],
       data: icon.data
     }
+  },
+  consolesToInternal ({consoles}) {
+    return consoles['graphics_console'].map(c => {
+      return {
+        id: c.id,
+        protocol: c.protocol,
+      }
+    }).sort( (a, b) => b.protocol.length - a.protocol.length) // Hack: 'VNC' is shorter then 'SPICE'
   },
   // ----
   login ({credentials}) {
