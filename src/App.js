@@ -16,7 +16,7 @@ const App = ({ vms, loginToken }) => {
   if (loginToken) {
     return (<div>
       <VmsPageHeader title='oVirt User Portal'/>
-      <div className="container-fluid">
+      <div className="container-fluid navbar-top-offset">
         <VmsList />
         <VmDetail vm={selectedVm}/>
       </div>
