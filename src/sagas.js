@@ -2,8 +2,9 @@ import { call, put } from 'redux-saga/effects'
 import {takeEvery, takeLatest} from 'redux-saga'
 
 import {logDebug, hidePassword, fileDownload} from 'ovirt-ui-components'
-import {getAllVms, loginSuccessful, loginFailed, failedExternalAction, loadInProgress, setVmDetailToShow,
-  updateIcons, setVmDisks, updateVms, removeVms, removeMissingVms, vmActionInProgress} from 'ovirt-ui-components'
+import {getAllVms, loginSuccessful, loginFailed, failedExternalAction,
+  loadInProgress, setVmDetailToShow, updateIcons, setVmDisks, updateVms,
+  removeVms, vmActionInProgress, setVmConsoles, removeMissingVms} from 'ovirt-ui-components'
 
 import { persistState, getSingleVm } from './actions'
 import Api from './ovirtapi'
@@ -112,6 +113,7 @@ function* fetchAllVms (action) {
     yield fetchUnknwonIconsForVms({vms: internalVms})
 
     if (!shallowFetch) {
+      yield fetchConsoleMetadatas({vms: internalVms})
       yield fetchDisks({vms: internalVms})
     } else {
       logDebug('fetchAllVms() shallow fetch requested - skipping other resources')
@@ -132,14 +134,22 @@ function* fetchDisks({vms}) {
   })
 }
 
+function* fetchConsoleMetadatas ({ vms }) {
+  yield* foreach(vms, function* (vm) {
+    const consolesInternal = yield fetchConsoleVmMeta({ vmId: vm.id })
+    yield put(setVmConsoles({vmId: vm.id, consoles: consolesInternal}))
+  })
+}
+
 function* fetchSingleVm (action) {
   const vm = yield callExternalAction('getVm', Api.getVm, action, true)
 
   if (vm && vm.id) {
     const internalVm = Api.vmToInternal({vm})
 
-    const disks = yield fetchVmDisks({ vmId: internalVm.id })
-    internalVm.disks = disks
+    internalVm.disks = yield fetchVmDisks({ vmId: internalVm.id })
+    internalVm.consoles = yield fetchConsoleVmMeta({ vmId: internalVm.id })
+
     yield put(updateVms({vms: [internalVm]}))
   } else {
     if (vm && vm.error && vm.error.status === 404) {
@@ -160,6 +170,7 @@ function* fetchVmDisks({vmId}) {
     })
     return internalDisks
   }
+  return []
 }
 
 function* startProgress ({ vmId, name }) {
@@ -200,17 +211,37 @@ function* suspendVm (action) {
 function* startVm (action) {
   yield startProgress({vmId: action.payload.vmId, name: 'start'})
   const result = yield callExternalAction('start', Api.start, action)
+  // TODO: check status at refresh --> conditional refresh wait_for_launch
   yield stopProgress({vmId: action.payload.vmId, name: 'start', result})
 }
 
-function* getConsoleVm (action) {
-  yield put(vmActionInProgress({vmId: action.payload.vmId, name: 'getConsole', started: true}))
-  const consoles = yield callExternalAction('consoles', Api.consoles, action)
-  yield put(vmActionInProgress({vmId: action.payload.vmId, name: 'getConsole', started: false}))
+function* fetchConsoleVmMeta ({ vmId }) {
+  const consoles = yield callExternalAction('consoles', Api.consoles, {action: 'INTERNAL_CONSOLES', payload: {vmId}})
 
-  if (consoles && consoles['graphics_console'] && consoles['graphics_console'].length > 0) {
-    let console = consoles['graphics_console'].find( c => 'spice' === c.protocol) || consoles['graphics_console'][0]
-    const data = yield callExternalAction('console', Api.console, {action: 'INTERNAL_CONSOLE', payload: {vmId: action.payload.vmId, consoleId: console.id}})
+  if (consoles && consoles['graphics_console']) {// && consoles['graphics_console'].length > 0) {
+    return Api.consolesToInternal({consoles})
+  }
+  return []
+}
+
+function* getConsoleVm (action) {
+  let { vmId, consoleId } = action.payload
+
+  if (!consoleId) {
+    yield put(vmActionInProgress({vmId, name: 'getConsole', started: true}))
+    const consolesInternal = yield fetchConsoleVmMeta ({ vmId }) // refresh metadata
+    yield put(setVmConsoles({vmId, consoles: consolesInternal}))
+    yield put(vmActionInProgress({vmId, name: 'getConsole', started: false}))
+
+    // TODO: choose user default over just 'SPICE'
+    if (consolesInternal && consolesInternal.length > 0) {
+      let console = consolesInternal.find( c => 'spice' === c.protocol) || consolesInternal[0]
+      consoleId = console.id
+    }
+  }
+
+  if (consoleId) {
+    const data = yield callExternalAction('console', Api.console, {action: 'INTERNAL_CONSOLE', payload: {vmId, consoleId}})
     fileDownload({data, fileName: 'console.vv', mimeType: 'application/x-virt-viewer'})
   }
 }
