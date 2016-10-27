@@ -9,6 +9,8 @@ POC of new oVirt User Portal.
     - improved usability and Look&Feel
     - simplified maintenance & ongoing development
     - faster UI responses (incl. start-up)      
+
+For more info, see [doc/goals.md](https://github.com/mareklibra/userportal/blob/master/doc/goals.md)
  
 ## How To Run
 So far, the UserPortal is under development.
@@ -18,7 +20,7 @@ For early testing:
 
 **Prerequisities:**
 
-- The oVirt engine running at https://[ENGINE_URL]
+- Have the oVirt engine running at https://[ENGINE_URL]
     - example: https://engine.local/ovirt-engine 
 - tested with npm version 3.10.8
     - known issue with missing dependencies with npm v2.15.9
@@ -27,8 +29,8 @@ For early testing:
 
 - update package.json to (see above):
     - "proxy": "https://[ENGINE_URL]"
-- WIP: check index.js for username/pwd 
-    - so far hardcoded, proper Login functionality & SSO will follow
+    - example at the end of the package.json:
+        - "proxy": "https://engine.local/ovirt-engine"
 
 - npm i
 - HTTPS=true npm start
@@ -36,6 +38,7 @@ For early testing:
 **Production Build**
 
 - npm i && npm run build
+- result is in UserPortal/build
 - TODO: an RPM will be provided ...
 
 ## Technical Details  
