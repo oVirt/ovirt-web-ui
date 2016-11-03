@@ -40,6 +40,16 @@ For early testing:
 - `npm i`
 - `HTTPS=true npm start`
 
+**Quick run using Docker**
+
+If you don't like to burden your system with all required Node.js dependencies,
+a prebuilt docker image `matobet/userportal` is available for standalone usage with a running
+oVirt engine instance.
+
+Just specify where your oVirt engine is running and expose the port `3000` from the container. Example:
+
+  `docker run --rm -it -e ENGINE_URL=https://my.ovirt.instance/ovirt-engine/ -p 3000:3000 matobet/userportal`
+
 **Production Build**
 
 - `npm i && npm run build`
