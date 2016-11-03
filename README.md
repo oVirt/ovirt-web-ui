@@ -39,6 +39,7 @@ For early testing:
 
 - `npm i`
 - `HTTPS=true npm start`
+- access the UserPortal at [https://localhost:3000/](https://localhost:3000/)
 
 **Quick run using Docker**
 
@@ -64,4 +65,5 @@ Just specify where your oVirt engine is running and expose the port `3000` from 
 ## Author(s)
 Please send author(s) any feedback on the project.
 
-- Marek Libra (mlibra@redhat.com) 
+- Marek Libra (mlibra@redhat.com)
+
