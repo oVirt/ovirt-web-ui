@@ -28,16 +28,21 @@ For early testing:
 **For Development:**
 
 - update package.json to (see above):
-    - "proxy": "https://[ENGINE_URL]"
+    - `"proxy": "https://[ENGINE_URL]"`
     - example at the end of the package.json:
         - "proxy": "https://engine.local/ovirt-engine"
 
-- npm i
-- HTTPS=true npm start
+- alternatively using the `ENGINE_URL` environment variable
+    - `ENGINE_URL=https://my.other.engine/ovirt-engine npm start`
+    - when using both the `proxy` field in `package.json` and the `ENGINE_URL` environment
+    variable, the environment setting takes precedence.
+
+- `npm i`
+- `HTTPS=true npm start`
 
 **Production Build**
 
-- npm i && npm run build
+- `npm i && npm run build`
 - result is in UserPortal/build
 - TODO: an RPM will be provided ...
 
