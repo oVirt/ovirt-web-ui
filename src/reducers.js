@@ -1,10 +1,12 @@
 import { combineReducers } from 'redux'
 
-import { ConfigReducer as config } from 'ovirt-ui-components'
-import { UserMessages as userMessages } from 'ovirt-ui-components'
-import { VmsReducer as vms } from 'ovirt-ui-components'
-import { IconsReducer as icons } from 'ovirt-ui-components'
-import { VisibilityReducer as visibility } from 'ovirt-ui-components'
+import {
+  ConfigReducer as config,
+  UserMessages as userMessages,
+  VmsReducer as vms,
+  IconsReducer as icons,
+  VisibilityReducer as visibility,
+} from 'ovirt-ui-components'
 
 export default combineReducers({
   config,

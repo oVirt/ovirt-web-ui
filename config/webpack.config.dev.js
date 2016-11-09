@@ -1,12 +1,12 @@
-var path = require('path');
-var autoprefixer = require('autoprefixer');
-var webpack = require('webpack');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
-var WatchMissingNodeModulesPlugin = require('../scripts/utils/WatchMissingNodeModulesPlugin');
-var CopyWebpackPlugin = require('copy-webpack-plugin');
-var paths = require('./paths');
-var env = require('./env');
+var path = require('path')
+var autoprefixer = require('autoprefixer')
+var webpack = require('webpack')
+var HtmlWebpackPlugin = require('html-webpack-plugin')
+var CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
+var WatchMissingNodeModulesPlugin = require('../scripts/utils/WatchMissingNodeModulesPlugin')
+var CopyWebpackPlugin = require('copy-webpack-plugin')
+var paths = require('./paths')
+var env = require('./env')
 
 // This is the development configuration.
 // It is focused on developer experience and fast rebuilds.
@@ -39,7 +39,7 @@ module.exports = {
     // We ship a few polyfills by default.
     require.resolve('./polyfills'),
     // Finally, this is your app's code:
-    paths.appIndexJs
+    paths.appIndexJs,
     // We include the app code last so that if there is a runtime error during
     // initialization, it doesn't blow up the WebpackDevServer client, and
     // changing JS code would still trigger a refresh.
@@ -54,7 +54,7 @@ module.exports = {
     // containing code from all our entry points, and the Webpack runtime.
     filename: 'static/js/bundle.js',
     // In development, we always serve from the root. This makes config easier.
-    publicPath: '/'
+    publicPath: '/',
   },
   resolve: {
     // This allows you to set a fallback for where Webpack should look for modules.
@@ -71,15 +71,15 @@ module.exports = {
     alias: {
       // Support React Native Web
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
-      'react-native': 'react-native-web'
-    }
+      'react-native': 'react-native-web',
+    },
   },
   // Resolve loaders (webpack plugins for CSS, images, transpilation) from the
   // directory of `react-scripts` itself rather than the project directory.
   // You can remove this after ejecting.
   resolveLoader: {
     root: paths.ownNodeModules,
-    moduleTemplates: ['*-loader']
+    moduleTemplates: ['*-loader'],
   },
   module: {
     // First, run the linter.
@@ -89,7 +89,7 @@ module.exports = {
         test: /\.(js|jsx)$/,
         loader: 'eslint',
         include: paths.appSrc,
-      }
+      },
     ],
     loaders: [
       // Process JS with Babel.
@@ -97,7 +97,7 @@ module.exports = {
         test: /\.(js|jsx)$/,
         include: paths.appSrc,
         loader: 'babel',
-        query: require('./babel.dev')
+        query: require('./babel.dev'),
       },
       // "postcss" loader applies autoprefixer to our CSS.
       // "css" loader resolves paths in CSS and adds assets as dependencies.
@@ -106,13 +106,13 @@ module.exports = {
       // in development "style" loader enables hot editing of CSS.
       {
         test: /\.css$/,
-        loader: 'style!css!postcss'
+        loader: 'style!css!postcss',
       },
       // JSON is not enabled by default in Webpack but both Node and Browserify
       // allow it implicitly so we also enable it.
       {
         test: /\.json$/,
-        loader: 'json'
+        loader: 'json',
       },
       // "file" loader makes sure those assets get served by WebpackDevServer.
       // When you `import` an asset, you get its (virtual) filename.
@@ -122,8 +122,8 @@ module.exports = {
         exclude: /\/favicon.ico$/,
         loader: 'file',
         query: {
-          name: 'static/media/[name].[hash:8].[ext]'
-        }
+          name: 'static/media/[name].[hash:8].[ext]',
+        },
       },
       // A special case for favicon.ico to place it into build root directory.
       {
@@ -131,8 +131,8 @@ module.exports = {
         include: [paths.appSrc],
         loader: 'file',
         query: {
-          name: 'favicon.ico?[hash:8]'
-        }
+          name: 'favicon.ico?[hash:8]',
+        },
       },
       // A special case for config.json to place it into build root directory.
       {
@@ -140,8 +140,8 @@ module.exports = {
         include: [paths.appSrc],
         loader: 'file',
         query: {
-          name: 'config.json?[hash:8]'
-        }
+          name: 'config.json?[hash:8]',
+        },
       },
       // "url" loader works just like "file" loader but it also embeds
       // assets smaller than specified size as data URLs to avoid requests.
@@ -150,8 +150,8 @@ module.exports = {
         loader: 'url',
         query: {
           limit: 10000,
-          name: 'static/media/[name].[hash:8].[ext]'
-        }
+          name: 'static/media/[name].[hash:8].[ext]',
+        },
       },
       // "html" loader is used to process template page (index.html) to resolve
       // resources linked with <link href="./relative/path"> HTML tags.
@@ -160,17 +160,17 @@ module.exports = {
         loader: 'html',
         query: {
           attrs: ['link:href'],
-        }
-      }
-    ]
+        },
+      },
+    ],
   },
   // Point ESLint to our predefined config.
   eslint: {
     configFile: path.join(__dirname, 'eslint.js'),
-    useEslintrc: false
+    useEslintrc: false,
   },
   // We use PostCSS for autoprefixing only.
-  postcss: function() {
+  postcss: function () {
     return [
       autoprefixer({
         browsers: [
@@ -178,13 +178,13 @@ module.exports = {
           'last 4 versions',
           'Firefox ESR',
           'not ie < 9', // React doesn't support IE8 anyway
-        ]
+        ],
       }),
-    ];
+    ]
   },
   plugins: [
     new CopyWebpackPlugin([{
-        from: 'src/userportal.config'
+      from: 'src/userportal.config',
     }]),
     // Generates an `index.html` file with the <script> injected.
     new HtmlWebpackPlugin({
@@ -217,6 +217,6 @@ module.exports = {
   node: {
     fs: 'empty',
     net: 'empty',
-    tls: 'empty'
-  }
-};
+    tls: 'empty',
+  },
+}

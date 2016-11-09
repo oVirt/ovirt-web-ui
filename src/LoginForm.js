@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import $ from 'jquery'
 
@@ -29,7 +29,7 @@ const Brand = () => {
 
 const WelcomeText = () => {
   return (
-    <div className="col-sm-5 col-md-6 col-lg-7 details">
+    <div className='col-sm-5 col-md-6 col-lg-7 details'>
       <p>
         <strong>Welcome to oVirt Basic User Portal</strong>
       </p>
@@ -51,10 +51,10 @@ const LoginFailed = () => {
 LoginFailed.propTypes = {}
 
 class LoginForm extends Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
 
-    this.state = {username: '', password: ''}
+    this.state = { username: '', password: '' }
 
     this.onUserChanged = this.onUserChanged.bind(this)
     this.onPwdChanged = this.onPwdChanged.bind(this)
@@ -64,16 +64,16 @@ class LoginForm extends Component {
   }
 
   onUserChanged (e) {
-    this.setState({username: e.target.value});
+    this.setState({ username: e.target.value })
   }
   onPwdChanged (e) {
-    this.setState({password: e.target.value});
+    this.setState({ password: e.target.value })
   }
   handleSubmit (e) {
-    e.preventDefault();
+    e.preventDefault()
     const username = this.state.username
     const password = this.state.password
-    this.onLogin({username, password})
+    this.onLogin({ username, password })
   }
 
   componentWillMount () {
@@ -139,16 +139,17 @@ class LoginForm extends Component {
 }
 LoginForm.propTypes = {
   onLogin: PropTypes.func.isRequired,
+  userMessages: PropTypes.object.isRequired, // TODO: Immutable.js in props?
 }
 
 export default connect(
   (state) => ({
-    userMessages: state.userMessages
+    userMessages: state.userMessages,
   }),
   (dispatch) => ({
-    onLogin: ({username, password}) => {
+    onLogin: ({ username, password }) => {
       dispatch(clearUserMessages())
-      dispatch(login({username, password}))
-    }
+      dispatch(login({ username, password }))
+    },
   })
 )(LoginForm)

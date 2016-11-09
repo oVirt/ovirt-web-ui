@@ -1,5 +1,5 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react'
+import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 
 import './index.css'
@@ -12,7 +12,7 @@ window.$ = window.jQuery = require('jquery')
 require('bootstrap/dist/js/bootstrap')
 require('patternfly/dist/js/patternfly')
 
-import store, {sagaMiddleware} from './store'
+import store, { sagaMiddleware } from './store'
 import Selectors from './selectors'
 import AppConfiguration, { readConfiguration } from './config'
 import { loadTokenFromSessionStorage, loadStateFromLocalStorage } from './storage'
@@ -34,9 +34,9 @@ function renderApp () {
 
 function fetchToken () {
   // get token from session storage
-  const {token, username} = loadTokenFromSessionStorage()
+  const { token, username } = loadTokenFromSessionStorage()
   if (token) {
-    return {token, username}
+    return { token, username }
   }
 
   if (AppConfiguration.sso && AppConfiguration.ssoRedirectURL && AppConfiguration.userPortalURL) {
@@ -59,12 +59,12 @@ function fetchToken () {
 
 function loadPersistedState () {
   // load persisted icons, etc ...
-  const {icons} = loadStateFromLocalStorage()
+  const { icons } = loadStateFromLocalStorage()
 
   if (icons) {
     const iconsArray = valuesOfObject(icons)
     console.log(`loadPersistedState: ${iconsArray.length} icons loaded`)
-    store.dispatch(updateIcons({icons: iconsArray}))
+    store.dispatch(updateIcons({ icons: iconsArray }))
   }
 }
 
@@ -72,7 +72,7 @@ function start () {
   readConfiguration()
   console.log(`Merged configuration: ${JSON.stringify(AppConfiguration)}`)
 
-  const {token, username} = fetchToken()
+  const { token, username } = fetchToken()
 
   // re-render app every time the state changes
   store.subscribe(renderApp)
@@ -84,12 +84,12 @@ function start () {
   sagaMiddleware.run(rootSaga)
 
   // initiate data retrieval
-  Selectors.init({store})
+  Selectors.init({ store })
 
   loadPersistedState()
 
   if (token) {
-    store.dispatch(login({username, token}))
+    store.dispatch(login({ username, token }))
   } // otherwise wait for LoginForm or SSO
 
   // start cron-jobs
