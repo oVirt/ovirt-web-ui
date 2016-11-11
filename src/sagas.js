@@ -22,7 +22,7 @@ import {
 
 import { persistState, getSingleVm } from './actions'
 import Api from './ovirtapi'
-import { persistStateToLocalStorage, persistTokenToSessionStorage } from './storage'
+import { persistStateToLocalStorage, persistTokenToSessionStorage, clearTokenFromSessionStorage } from './storage'
 import Selectors from './selectors'
 
 function * foreach (array, fn, context) {
@@ -84,6 +84,10 @@ function* login (action) {
     }))
     yield put(yield put(loadInProgress({ value: false })))
   }
+}
+
+function* logout () {
+  clearTokenFromSessionStorage()
 }
 
 function* fetchUnknwonIconsForVms ({ vms }) {
@@ -282,6 +286,7 @@ function* schedulerPerMinute (action) {
 export function *rootSaga () {
   yield [
     takeEvery('LOGIN', login),
+    takeEvery('LOGOUT', logout),
     takeLatest('GET_ALL_VMS', fetchAllVms),
     takeLatest('PERSIST_STATE', persistStateSaga),
 

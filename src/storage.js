@@ -11,6 +11,10 @@ export function loadFromSessionStorage (key) {
   return window.sessionStorage.getItem(key)
 }
 
+export function clearFromSessionStorage (key) {
+  window.sessionStorage.removeItem(key)
+}
+
 export function saveToLocalStorage (key, value) {
   window.localStorage.setItem(key, value)
 }
@@ -23,6 +27,11 @@ export function loadFromLocalStorage (key) {
 export function persistTokenToSessionStorage ({ token, username }) {
   saveToSessionStorage('TOKEN', token)
   saveToSessionStorage('USERNAME', username)
+}
+
+export function clearTokenFromSessionStorage () {
+  clearFromSessionStorage('TOKEN')
+  clearFromSessionStorage('USERNAME')
 }
 
 export function loadTokenFromSessionStorage () {
