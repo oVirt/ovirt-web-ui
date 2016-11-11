@@ -1,6 +1,8 @@
 import { call, put } from 'redux-saga/effects'
 import { takeEvery, takeLatest } from 'redux-saga'
 
+import { browserHistory } from 'react-router'
+
 import {
   logDebug,
   hidePassword,
@@ -20,6 +22,7 @@ import {
   removeMissingVms,
 } from 'ovirt-ui-components'
 
+import store from './store'
 import { persistState, getSingleVm } from './actions'
 import Api from './ovirtapi'
 import { persistStateToLocalStorage, persistTokenToSessionStorage, clearTokenFromSessionStorage } from './storage'
@@ -86,8 +89,14 @@ function* login (action) {
   }
 }
 
+function* onLoginSuccessful () {
+  const redirectUrl = store.getState().router
+  browserHistory.replace(redirectUrl)
+}
+
 function* logout () {
   clearTokenFromSessionStorage()
+  browserHistory.replace('/login')
 }
 
 function* fetchUnknwonIconsForVms ({ vms }) {
@@ -286,6 +295,7 @@ function* schedulerPerMinute (action) {
 export function *rootSaga () {
   yield [
     takeEvery('LOGIN', login),
+    takeEvery('LOGIN_SUCCESSFUL', onLoginSuccessful),
     takeEvery('LOGOUT', logout),
     takeLatest('GET_ALL_VMS', fetchAllVms),
     takeLatest('PERSIST_STATE', persistStateSaga),

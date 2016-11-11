@@ -1,10 +1,12 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
+import { locationShape } from 'react-router'
 import $ from 'jquery'
 
 import './styles.css'
 
 import { clearUserMessages, login } from 'ovirt-ui-components'
+import { setRedirectUrl } from './actions'
 
 import logo from './ovirt_top_right_logo.png'
 import brand from './ovirt_top_logo.png'
@@ -71,9 +73,11 @@ class LoginForm extends Component {
   }
   handleSubmit (e) {
     e.preventDefault()
-    const username = this.state.username
-    const password = this.state.password
-    this.onLogin({ username, password })
+    const { username, password } = this.state
+    const { location } = this.props
+    const redirectUrl = (location.state && location.state.nextPathname) ? location.state.nextPathname : '/'
+    console.log(`Redirect url: ${redirectUrl}`)
+    this.onLogin({ username, password, redirectUrl })
   }
 
   componentWillMount () {
@@ -140,15 +144,17 @@ class LoginForm extends Component {
 LoginForm.propTypes = {
   onLogin: PropTypes.func.isRequired,
   userMessages: PropTypes.object.isRequired, // TODO: Immutable.js in props?
+  location: locationShape,
 }
 
 export default connect(
   (state) => ({
     userMessages: state.userMessages,
   }),
-  (dispatch) => ({
-    onLogin: ({ username, password }) => {
+  (dispatch, ownProps) => ({
+    onLogin: ({ username, password, redirectUrl }) => {
       dispatch(clearUserMessages())
+      dispatch(setRedirectUrl(redirectUrl))
       dispatch(login({ username, password }))
     },
   })

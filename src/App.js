@@ -5,9 +5,7 @@ import './App.css'
 
 import { VmsList, VmDetail, VmsPageHeader, Options } from 'ovirt-ui-components'
 
-import LoginForm from './LoginForm'
-
-const App = ({ vms, visibility, loginToken }) => {
+const App = ({ vms, visibility }) => {
   const selectedVmId = visibility.get('selectedVmDetail')
   const showOptions = visibility.get('showOptions')
 
@@ -19,28 +17,24 @@ const App = ({ vms, visibility, loginToken }) => {
     detailToRender = (<VmDetail vm={selectedVm} />)
   }
 
-  if (loginToken) {
-    return (<div>
+  return (
+    <div>
       <VmsPageHeader title='oVirt User Portal' />
       <div className='container-fluid navbar-top-offset'>
         <VmsList />
         {detailToRender}
       </div>
-    </div>)
-  }
-
-  return (<LoginForm />)
+    </div>
+  )
 }
 App.propTypes = {
   vms: PropTypes.object.isRequired,
   visibility: PropTypes.object.isRequired,
-  loginToken: PropTypes.string,
 }
 
 export default connect(
   (state) => ({
     vms: state.vms,
     visibility: state.visibility,
-    loginToken: state.config.get('loginToken'),
   })
 )(App)
