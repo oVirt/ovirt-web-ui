@@ -74,9 +74,6 @@ function start () {
 
   const { token, username } = fetchToken()
 
-  // re-render app every time the state changes
-  store.subscribe(renderApp)
-
   // do initial render
   renderApp()
 
