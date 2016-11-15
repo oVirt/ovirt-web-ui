@@ -13,7 +13,7 @@ export function readConfiguration () {
     error: (result) => {
       console.log(`Failed to load configuration: ${JSON.stringify(result)}`)
     },
-    async: false
+    async: false,
   })
 }
 

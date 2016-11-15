@@ -11,6 +11,10 @@ export function loadFromSessionStorage (key) {
   return window.sessionStorage.getItem(key)
 }
 
+export function clearFromSessionStorage (key) {
+  window.sessionStorage.removeItem(key)
+}
+
 export function saveToLocalStorage (key, value) {
   window.localStorage.setItem(key, value)
 }
@@ -20,15 +24,20 @@ export function loadFromLocalStorage (key) {
 }
 
 // --------------------------------------------------
-export function persistTokenToSessionStorage ({token, username}) {
+export function persistTokenToSessionStorage ({ token, username }) {
   saveToSessionStorage('TOKEN', token)
   saveToSessionStorage('USERNAME', username)
+}
+
+export function clearTokenFromSessionStorage () {
+  clearFromSessionStorage('TOKEN')
+  clearFromSessionStorage('USERNAME')
 }
 
 export function loadTokenFromSessionStorage () {
   return {
     token: loadFromSessionStorage('TOKEN'),
-    username: loadFromSessionStorage('USERNAME')
+    username: loadFromSessionStorage('USERNAME'),
   }
 }
 
@@ -36,7 +45,7 @@ export function clearStateInLocalStorage () {
   saveToLocalStorage('icons', undefined)
 }
 
-export function persistStateToLocalStorage ({icons}) {
+export function persistStateToLocalStorage ({ icons }) {
   logDebug(`persistStateToLocalStorage() called`)
   saveToLocalStorage('icons', JSON.stringify(icons))
 }
@@ -44,6 +53,6 @@ export function persistStateToLocalStorage ({icons}) {
 export function loadStateFromLocalStorage () {
   logDebug(`loadStateFromLocalStorage() called`)
   return {
-    icons: JSON.parse(loadFromLocalStorage('icons'))
+    icons: JSON.parse(loadFromLocalStorage('icons')),
   }
 }

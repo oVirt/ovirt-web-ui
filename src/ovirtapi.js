@@ -9,36 +9,36 @@ OvirtApi = {
   _getLoginToken () { // redux store selector
     return Selectors.getLoginToken()
   },
-  _assertLogin ({methodName}) {
+  _assertLogin ({ methodName }) {
     if (!OvirtApi._getLoginToken()) {
       throw new Exception(`OvirtApi in '${methodName}': missing login`)
     }
   },
-  _httpGet ({url, custHeaders = {'Accept': 'application/json', Filter: true}}) {
+  _httpGet ({ url, custHeaders = { 'Accept': 'application/json', Filter: true } }) {
     logDebug(`_httpGet start: url="${url}"`)
     const headers = Object.assign({
-      'Authorization': `Bearer ${OvirtApi._getLoginToken()}`
+      'Authorization': `Bearer ${OvirtApi._getLoginToken()}`,
     }, custHeaders)
     logDebug(`_httpGet: url="${url}", headers="${JSON.stringify(headers)}"`)
 
     return $.ajax(url, {
       type: 'GET',
-      headers
+      headers,
     }).then(data => Promise.resolve(data))
       .catch(data => {
         logDebug(`Ajax failed: ${JSON.stringify(data)}`)
         return Promise.reject(data)
       })
   },
-  _httpPost ({url, input}) {
+  _httpPost ({ url, input }) {
     return $.ajax(url, {
       type: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/xml',
-        'Authorization': `Bearer ${OvirtApi._getLoginToken()}`
+        'Authorization': `Bearer ${OvirtApi._getLoginToken()}`,
       },
-      data: input
+      data: input,
     }).then(data => Promise.resolve(data))
       .catch(data => {
         logDebug(`Ajax failed: ${JSON.stringify(data)}`)
@@ -50,8 +50,8 @@ OvirtApi = {
    * @param vm - Single entry from oVirt REST /api/vms
    * @returns {} - Internal representation of a VM
    */
-  vmToInternal ({vm}) {
-    function vCpusCount ({cpu}) {
+  vmToInternal ({ vm }) {
+    function vCpusCount ({ cpu }) {
       if (cpu && cpu.topology) {
         const top = cpu.topology
         let total = top.sockets ? top.sockets : 0
@@ -79,40 +79,40 @@ OvirtApi = {
       fqdn: vm['fqdn'],
 
       template: {
-        id: vm['template'] ? vm.template['id'] : undefined
+        id: vm['template'] ? vm.template['id'] : undefined,
       },
       cluster: {
-        id: vm['cluster'] ? vm.cluster['id'] : undefined
+        id: vm['cluster'] ? vm.cluster['id'] : undefined,
       },
       cpu: {
         arch: vm['cpu'] ? vm.cpu['architecture'] : undefined,
-        vCPUs: vCpusCount({cpu: vm['cpu']})
+        vCPUs: vCpusCount({ cpu: vm['cpu'] }),
       },
 
       memory: {
         total: vm['memory'],
-        guaranteed: vm['memory_policy'] ? vm.memory_policy['guaranteed'] : undefined
+        guaranteed: vm['memory_policy'] ? vm.memory_policy['guaranteed'] : undefined,
       },
 
       os: {
-        type: vm['os'] ? vm.os['type'] : undefined
+        type: vm['os'] ? vm.os['type'] : undefined,
       },
 
       highAvailability: {
         enabled: vm['high_availability'] ? vm.high_availability['enabled'] : undefined,
-        priority: vm['high_availability'] ? vm.high_availability['priority'] : undefined
+        priority: vm['high_availability'] ? vm.high_availability['priority'] : undefined,
       },
 
       icons: {
         small: {
-          id: vm['small_icon'] ? vm.small_icon['id'] : undefined
+          id: vm['small_icon'] ? vm.small_icon['id'] : undefined,
         },
         large: {
-          id: vm['large_icon'] ? vm.large_icon['id'] : undefined
-        }
+          id: vm['large_icon'] ? vm.large_icon['id'] : undefined,
+        },
       },
       disks: {},
-      consoles: []
+      consoles: [],
     }
   },
   /**
@@ -121,8 +121,8 @@ OvirtApi = {
    * @param disk - disk corresponding to the attachment
    * @returns {} - Internal representation of a single VM disk
    */
-  diskToInternal({disk, attachment}) {
-    function toBool(val) {
+  diskToInternal ({ disk, attachment }) {
+    function toBool (val) {
       return val && val.toLowerCase() === 'true'
     }
 
@@ -137,26 +137,26 @@ OvirtApi = {
 
       actualSize: disk['actual_size'],
       provisionedSize: disk['provisioned_size'],
-      format: disk['format']
+      format: disk['format'],
     }
   },
-  iconToInternal ({icon}) {
+  iconToInternal ({ icon }) {
     return {
       id: icon.id,
       type: icon['media_type'],
-      data: icon.data
+      data: icon.data,
     }
   },
-  consolesToInternal ({consoles}) {
+  consolesToInternal ({ consoles }) {
     return consoles['graphics_console'].map(c => {
       return {
         id: c.id,
         protocol: c.protocol,
       }
-    }).sort( (a, b) => b.protocol.length - a.protocol.length) // Hack: 'VNC' is shorter then 'SPICE'
+    }).sort((a, b) => b.protocol.length - a.protocol.length) // Hack: 'VNC' is shorter then 'SPICE'
   },
   // ----
-  login ({credentials}) {
+  login ({ credentials }) {
     const url = '/sso/oauth/token?grant_type=urn:ovirt:params:oauth:grant-type:http&scope=ovirt-app-api'
     const user = credentials.username
     const pwd = credentials.password
@@ -165,60 +165,60 @@ OvirtApi = {
       type: 'GET',
       headers: {
         'Accept': 'application/json',
-        'Authorization': 'Basic ' + new Buffer(`${user}:${pwd}`, 'utf8').toString('base64')
-      }
+        'Authorization': 'Basic ' + new Buffer(`${user}:${pwd}`, 'utf8').toString('base64'),
+      },
     }).then(data => Promise.resolve(data))
       .catch(data => {
         logDebug(`Ajax failed: ${JSON.stringify(data)}`)
         return Promise.reject(data)
       })
   },
-  getVm ({vmId}) {
-    OvirtApi._assertLogin({methodName: 'getVm'})
+  getVm ({ vmId }) {
+    OvirtApi._assertLogin({ methodName: 'getVm' })
     const url = `/api/vms/${vmId}`
-    return OvirtApi._httpGet({url})
+    return OvirtApi._httpGet({ url })
   },
   getAllVms () {
-    OvirtApi._assertLogin({methodName: 'getAllVms'})
+    OvirtApi._assertLogin({ methodName: 'getAllVms' })
     const url = '/api/vms'
-    return OvirtApi._httpGet({url})
+    return OvirtApi._httpGet({ url })
   },
-  shutdown ({vmId}) {
-    OvirtApi._assertLogin({methodName: 'shutdown'})
-    return OvirtApi._httpPost({url: `/api/vms/${vmId}/shutdown`, input: '<action />'})
+  shutdown ({ vmId }) {
+    OvirtApi._assertLogin({ methodName: 'shutdown' })
+    return OvirtApi._httpPost({ url: `/api/vms/${vmId}/shutdown`, input: '<action />' })
   },
-  start ({vmId}) {
-    OvirtApi._assertLogin({methodName: 'start'})
-    return OvirtApi._httpPost({url: `/api/vms/${vmId}/start`, input: '<action />'})
+  start ({ vmId }) {
+    OvirtApi._assertLogin({ methodName: 'start' })
+    return OvirtApi._httpPost({ url: `/api/vms/${vmId}/start`, input: '<action />' })
   },
-  suspend ({vmId}) {
-    OvirtApi._assertLogin({methodName: 'start'})
-    return OvirtApi._httpPost({url: `/api/vms/${vmId}/suspend`, input: '<action />'})
+  suspend ({ vmId }) {
+    OvirtApi._assertLogin({ methodName: 'start' })
+    return OvirtApi._httpPost({ url: `/api/vms/${vmId}/suspend`, input: '<action />' })
   },
-  restart ({vmId}) {
-    OvirtApi._assertLogin({methodName: 'restart'})
-    return OvirtApi._httpPost({url: `/api/vms/${vmId}/reboot`, input: '<action />'})
+  restart ({ vmId }) {
+    OvirtApi._assertLogin({ methodName: 'restart' })
+    return OvirtApi._httpPost({ url: `/api/vms/${vmId}/reboot`, input: '<action />' })
   },
-  icon ({id}) {
-    OvirtApi._assertLogin({methodName: 'icon'})
-    return OvirtApi._httpGet({url: `/api/icons/${id}`})
+  icon ({ id }) {
+    OvirtApi._assertLogin({ methodName: 'icon' })
+    return OvirtApi._httpGet({ url: `/api/icons/${id}` })
   },
-  diskattachments ({vmId}) {
-    OvirtApi._assertLogin({methodName: 'diskattachments'})
-    return OvirtApi._httpGet({url: `/api/vms/${vmId}/diskattachments`})
+  diskattachments ({ vmId }) {
+    OvirtApi._assertLogin({ methodName: 'diskattachments' })
+    return OvirtApi._httpGet({ url: `/api/vms/${vmId}/diskattachments` })
   },
-  disk ({diskId}) {
-    OvirtApi._assertLogin({methodName: 'disk'})
-    return OvirtApi._httpGet({url: `/api/disks/${diskId}`})
+  disk ({ diskId }) {
+    OvirtApi._assertLogin({ methodName: 'disk' })
+    return OvirtApi._httpGet({ url: `/api/disks/${diskId}` })
   },
-  consoles ({vmId}) {
-    OvirtApi._assertLogin({methodName: 'consoles'})
-    return OvirtApi._httpGet({url: `/api/vms/${vmId}/graphicsconsoles`})
+  consoles ({ vmId }) {
+    OvirtApi._assertLogin({ methodName: 'consoles' })
+    return OvirtApi._httpGet({ url: `/api/vms/${vmId}/graphicsconsoles` })
   },
-  console ({vmId, consoleId}) {
-    OvirtApi._assertLogin({methodName: 'console'})
-    return OvirtApi._httpGet({url: `/api/vms/${vmId}/graphicsconsoles/${consoleId}`, custHeaders: {Accept: 'application/x-virt-viewer'}})
-  }
+  console ({ vmId, consoleId }) {
+    OvirtApi._assertLogin({ methodName: 'console' })
+    return OvirtApi._httpGet({ url: `/api/vms/${vmId}/graphicsconsoles/${consoleId}`, custHeaders: { Accept: 'application/x-virt-viewer' } })
+  },
 }
 
 const Api = OvirtApi

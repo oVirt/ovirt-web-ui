@@ -21,3 +21,12 @@ export function schedulerOneMinute () {
     payload: {},
   }
 }
+
+export function setRedirectUrl (redirectUrl) {
+  return {
+    type: 'REDIRECT_URL',
+    payload: {
+      redirectUrl,
+    },
+  }
+}

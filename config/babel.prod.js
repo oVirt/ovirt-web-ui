@@ -1,4 +1,4 @@
-var path = require('path');
+var path = require('path')
 
 module.exports = {
   // Don't try to find .babelrc because we want to force this configuration.
@@ -7,7 +7,7 @@ module.exports = {
     // Latest stable ECMAScript features
     require.resolve('babel-preset-latest'),
     // JSX, Flow
-    require.resolve('babel-preset-react')
+    require.resolve('babel-preset-react'),
   ],
   plugins: [
     // class { handleClick = () => { } }
@@ -17,7 +17,7 @@ module.exports = {
     // function* () { yield 42; yield 43; }
     [require.resolve('babel-plugin-transform-regenerator'), {
       // Async functions are converted to generators by babel-preset-latest
-      async: false
+      async: false,
     }],
     // Polyfills the runtime needed for async/await and generators
     [require.resolve('babel-plugin-transform-runtime'), {
@@ -26,7 +26,7 @@ module.exports = {
       regenerator: true,
       // Resolve the Babel runtime relative to the config.
       // You can safely remove this after ejecting:
-      moduleName: path.dirname(require.resolve('babel-runtime/package'))
+      moduleName: path.dirname(require.resolve('babel-runtime/package')),
     }],
     // Optimization: hoist JSX that never changes out of render()
     // Disabled because of issues:
@@ -34,5 +34,5 @@ module.exports = {
     // * https://phabricator.babeljs.io/search/query/pCNlnC2xzwzx/
     // TODO: Enable again when these issues are resolved.
     // require.resolve('babel-plugin-transform-react-constant-elements')
-  ]
-};
+  ],
+}

@@ -1,5 +1,5 @@
-var path = require('path');
-var findCacheDir = require('find-cache-dir');
+var path = require('path')
+var findCacheDir = require('find-cache-dir')
 
 module.exports = {
   // Don't try to find .babelrc because we want to force this configuration.
@@ -9,13 +9,13 @@ module.exports = {
   // directory for faster rebuilds. We use findCacheDir() because of:
   // https://github.com/facebookincubator/create-react-app/issues/483
   cacheDirectory: findCacheDir({
-    name: 'react-scripts'
+    name: 'react-scripts',
   }),
   presets: [
     // Latest stable ECMAScript features
     require.resolve('babel-preset-latest'),
     // JSX, Flow
-    require.resolve('babel-preset-react')
+    require.resolve('babel-preset-react'),
   ],
   plugins: [
     // class { handleClick = () => { } }
@@ -25,7 +25,7 @@ module.exports = {
     // function* () { yield 42; yield 43; }
     [require.resolve('babel-plugin-transform-regenerator'), {
       // Async functions are converted to generators by babel-preset-latest
-      async: false
+      async: false,
     }],
     // Polyfills the runtime needed for async/await and generators
     [require.resolve('babel-plugin-transform-runtime'), {
@@ -34,7 +34,7 @@ module.exports = {
       regenerator: true,
       // Resolve the Babel runtime relative to the config.
       // You can safely remove this after ejecting:
-      moduleName: path.dirname(require.resolve('babel-runtime/package'))
-    }]
-  ]
-};
+      moduleName: path.dirname(require.resolve('babel-runtime/package')),
+    }],
+  ],
+}
