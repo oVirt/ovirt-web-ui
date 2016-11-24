@@ -69,7 +69,6 @@
     "redux-saga": "^0.11.1"
   },
   "scripts": {
-    "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "fix": "eslint -c config/eslint.js config src --fix",
     "prebuild": "npm run test",
@@ -99,6 +98,5 @@
   "eslintConfig": {
     "extends": "./config/eslint.js"
   },
-  "proxy": "https://engine.local/ovirt-engine",
   "productionHomepage": "/ovirt-engine/web-ui/"
 }
