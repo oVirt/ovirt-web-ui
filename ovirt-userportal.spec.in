@@ -54,11 +54,8 @@ make
 
 %install
 make install DESTDIR=%{buildroot}
-mkdir -p %{buildroot}%{_sysconfdir}/ovirt-engine/branding
 mkdir -p %{buildroot}%{_datarootdir}/ovirt-engine/engine.ear
 ln -s %{_userportaldir}/ovirt-web-ui.war %{buildroot}%{_datarootdir}/ovirt-engine/engine.ear/ovirt-web-ui.war
-# TODO: Branding will be moved to ovirt-engine
-ln -s %{_userportaldir}/branding %{buildroot}%{_sysconfdir}/ovirt-engine/branding/06-ovirt-web-ui.brand
 
 %post
 cp %{_ovirt_engine_ear_application_xml} %{_ovirt_engine_ear_application_xml}.preOvirtWebUi
@@ -81,10 +78,8 @@ mv %{_ovirt_engine_conf}.updated %{_ovirt_engine_conf}
 %doc README.md 
 %license LICENSE
 %{_userportaldir}
-%{_sysconfdir}/ovirt-engine/branding/06-ovirt-web-ui.brand
 %{_datarootdir}/ovirt-engine/engine.ear/ovirt-web-ui.war
 
 %changelog
 * Mon Nov 14 2016 Marek Libra <mlibra@redhat.com> - 0.1.0
 - First version, Technical Preview
-

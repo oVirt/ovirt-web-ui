@@ -29,7 +29,6 @@ EXTRA_DIST = \
 	config \
 	doc \
 	scripts \
-	branding \
 	packaging \
 	package.json \
 	index.html \
@@ -87,7 +86,6 @@ all: ovirt-web-ui
 ovirt-web-ui:
 	test -z "$(NPMINSTALL)" || $(NPM) i
 	$(NPM) run build
-	cp -rpv branding build/
 	cp -rpv packaging/* build/
 	cp index.jsp build/
 	awk 'BEGIN{getline l < "index.jsp.template"}/<div id="replace_with_index_jsp_template"\/>/{gsub("<div id=\"replace_with_index_jsp_template\"/>",l)}1' build/index.html >> build/index.jsp
@@ -97,8 +95,6 @@ ovirt-web-ui:
 install-data-local:
 	$(MKDIR_P) $(DESTDIR)$(USER_PORTAL_DIR)
 	cp -rpv build/* $(DESTDIR)$(USER_PORTAL_DIR)
-#	xx$(MKDIR_P) $(DESTDIR)/etc/ovirt-engine/branding
-#   xx$(MKDIR_P) $(DESTDIR)$(OVIRT_EAR_DIR)
 
 distclean-local:
 	rm -rf ${DISTCLEANDIRS}

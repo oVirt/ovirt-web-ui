@@ -1,6 +1,0 @@
-<div class="col-sm-3 col-md-3 col-lg-3 login">
-    <div class="welcome-section-title">{portal_title}</div>
-    <div class="welcome-link"><a id="WelcomePage_userportal_techpreview" href="web-ui/">{portal_user_portal_techpreview}</a></div>
-</div>
-<div class="col-sm-4 col-md-4 col-lg-3 details">
-</div>
