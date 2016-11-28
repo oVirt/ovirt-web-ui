@@ -13,33 +13,27 @@ POC of new oVirt User Portal.
 For more info, see [doc/goals.md](https://github.com/mareklibra/userportal/blob/master/doc/goals.md)
  
 ## How To Run
-So far, the UserPortal is under development.
-User-friendly installation & setup will follow.
-
-For early testing:
-
 **Prerequisities:**
 
 - Have the oVirt engine running at https://[ENGINE_URL]
     - example: https://engine.local/ovirt-engine 
-- tested with npm version 3.10.8
-    - known issue with missing dependencies with npm v2.15.9
+- known issue with missing dependencies with npm v2
 
-**For Development:**
+**Build**
 
-- update package.json to (see above):
-    - `"proxy": "https://[ENGINE_URL]"`
-    - example at the end of the package.json:
-        - "proxy": "https://engine.local/ovirt-engine"
+After _git clone_, run:
 
-- alternatively using the `ENGINE_URL` environment variable
-    - `ENGINE_URL=https://my.other.engine/ovirt-engine npm start`
-    - when using both the `proxy` field in `package.json` and the `ENGINE_URL` environment
-    variable, the environment setting takes precedence.
+    ./autogen.sh
+    make    # to create the 'build' directory 
+    or
+    make rpm    # to create (s)rpms under 'tmp.repos'
 
-- `npm i`
-- `HTTPS=true npm start`
-- access the UserPortal at [https://localhost:3000/](https://localhost:3000/)
+**RPM installation**
+
+The rpm installs to `/user/share/ovirt-web-ui`.
+
+New ovirt-web-ui.war is added to the existing ovirt-engine.ear.
+
 
 **Quick run using Docker**
 
@@ -51,11 +45,6 @@ Just specify where your oVirt engine is running and expose the port `3000` from 
 
   `docker run --rm -it -e ENGINE_URL=https://my.ovirt.instance/ovirt-engine/ -p 3000:3000 matobet/userportal`
 
-**Production Build**
-
-- `npm i && npm run build`
-- result is in UserPortal/build
-- TODO: an RPM will be provided ...
 
 ## Technical Details  
 - components maintained in [ovirt-ui-components](https://github.com/matobet/ovirt-ui-components) 
