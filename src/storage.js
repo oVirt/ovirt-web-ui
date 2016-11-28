@@ -24,6 +24,7 @@ export function loadFromLocalStorage (key) {
 }
 
 // --------------------------------------------------
+/*
 export function persistTokenToSessionStorage ({ token, username }) {
   saveToSessionStorage('TOKEN', token)
   saveToSessionStorage('USERNAME', username)
@@ -40,7 +41,7 @@ export function loadTokenFromSessionStorage () {
     username: loadFromSessionStorage('USERNAME'),
   }
 }
-
+*/
 export function clearStateInLocalStorage () {
   saveToLocalStorage('icons', undefined)
 }

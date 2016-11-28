@@ -3,6 +3,7 @@ import $ from 'jquery'
 import { logDebug } from 'ovirt-ui-components'
 import { Exception } from './exceptions'
 import Selectors from './selectors'
+import AppConfiguration from './config'
 
 let OvirtApi = {}
 OvirtApi = {
@@ -157,7 +158,7 @@ OvirtApi = {
   },
   // ----
   login ({ credentials }) {
-    const url = '/sso/oauth/token?grant_type=urn:ovirt:params:oauth:grant-type:http&scope=ovirt-app-api'
+    const url = `${AppConfiguration.applicationContext}/sso/oauth/token?grant_type=urn:ovirt:params:oauth:grant-type:http&scope=ovirt-app-api`
     const user = credentials.username
     const pwd = credentials.password
 
@@ -175,49 +176,49 @@ OvirtApi = {
   },
   getVm ({ vmId }) {
     OvirtApi._assertLogin({ methodName: 'getVm' })
-    const url = `/api/vms/${vmId}`
+    const url = `${AppConfiguration.applicationContext}/api/vms/${vmId}`
     return OvirtApi._httpGet({ url })
   },
   getAllVms () {
     OvirtApi._assertLogin({ methodName: 'getAllVms' })
-    const url = '/api/vms'
+    const url = `${AppConfiguration.applicationContext}/api/vms`
     return OvirtApi._httpGet({ url })
   },
   shutdown ({ vmId }) {
     OvirtApi._assertLogin({ methodName: 'shutdown' })
-    return OvirtApi._httpPost({ url: `/api/vms/${vmId}/shutdown`, input: '<action />' })
+    return OvirtApi._httpPost({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/shutdown`, input: '<action />' })
   },
   start ({ vmId }) {
     OvirtApi._assertLogin({ methodName: 'start' })
-    return OvirtApi._httpPost({ url: `/api/vms/${vmId}/start`, input: '<action />' })
+    return OvirtApi._httpPost({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/start`, input: '<action />' })
   },
   suspend ({ vmId }) {
     OvirtApi._assertLogin({ methodName: 'start' })
-    return OvirtApi._httpPost({ url: `/api/vms/${vmId}/suspend`, input: '<action />' })
+    return OvirtApi._httpPost({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/suspend`, input: '<action />' })
   },
   restart ({ vmId }) {
     OvirtApi._assertLogin({ methodName: 'restart' })
-    return OvirtApi._httpPost({ url: `/api/vms/${vmId}/reboot`, input: '<action />' })
+    return OvirtApi._httpPost({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/reboot`, input: '<action />' })
   },
   icon ({ id }) {
     OvirtApi._assertLogin({ methodName: 'icon' })
-    return OvirtApi._httpGet({ url: `/api/icons/${id}` })
+    return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/icons/${id}` })
   },
   diskattachments ({ vmId }) {
     OvirtApi._assertLogin({ methodName: 'diskattachments' })
-    return OvirtApi._httpGet({ url: `/api/vms/${vmId}/diskattachments` })
+    return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/diskattachments` })
   },
   disk ({ diskId }) {
     OvirtApi._assertLogin({ methodName: 'disk' })
-    return OvirtApi._httpGet({ url: `/api/disks/${diskId}` })
+    return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/disks/${diskId}` })
   },
   consoles ({ vmId }) {
     OvirtApi._assertLogin({ methodName: 'consoles' })
-    return OvirtApi._httpGet({ url: `/api/vms/${vmId}/graphicsconsoles` })
+    return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/graphicsconsoles` })
   },
   console ({ vmId, consoleId }) {
     OvirtApi._assertLogin({ methodName: 'console' })
-    return OvirtApi._httpGet({ url: `/api/vms/${vmId}/graphicsconsoles/${consoleId}`, custHeaders: { Accept: 'application/x-virt-viewer' } })
+    return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/graphicsconsoles/${consoleId}`, custHeaders: { Accept: 'application/x-virt-viewer' } })
   },
 }
 

@@ -1,8 +1,19 @@
 import $ from 'jquery'
 
-const CONFIG_URL = '/userportal.config'
+import { setLogDebug } from 'ovirt-ui-components'
 
-const AppConfiguration = {}
+// For Development
+// const CONFIG_URL = '/userportal.config'
+
+// TODO: configure path automatically
+// For Production
+const CONFIG_URL = '/ovirt-engine/web-ui/userportal.config'
+
+const AppConfiguration = {
+  debug: true,
+  applicationContext: '/ovirt-engine',
+  applicationURL: '/ovirt-engine/web-ui',
+}
 
 export function readConfiguration () {
   $.ajax({
@@ -12,6 +23,9 @@ export function readConfiguration () {
     },
     error: (result) => {
       console.log(`Failed to load configuration: ${JSON.stringify(result)}`)
+    },
+    complete: () => {
+      setLogDebug(AppConfiguration.debug)
     },
     async: false,
   })

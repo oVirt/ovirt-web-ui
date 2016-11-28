@@ -1,7 +1,7 @@
 import { call, put } from 'redux-saga/effects'
 import { takeEvery, takeLatest } from 'redux-saga'
 
-import { browserHistory } from 'react-router'
+// import { browserHistory } from 'react-router'
 
 import {
   logDebug,
@@ -22,11 +22,12 @@ import {
   removeMissingVms,
 } from 'ovirt-ui-components'
 
-import store from './store'
+// import store from './store'
 import { persistState, getSingleVm } from './actions'
 import Api from './ovirtapi'
-import { persistStateToLocalStorage, persistTokenToSessionStorage, clearTokenFromSessionStorage } from './storage'
+import { persistStateToLocalStorage } from './storage'
 import Selectors from './selectors'
+import AppConfiguration from './config'
 
 function * foreach (array, fn, context) {
   var i = 0
@@ -67,7 +68,7 @@ function* login (action) {
   let result = {}
   if (action.payload.token) {
     token = action.payload.token
-  } else {
+  } else { // recently not used since SSO
     result = yield callExternalAction('login', Api.login, action)
     if (result && result['access_token']) {
       token = result['access_token']
@@ -76,7 +77,7 @@ function* login (action) {
 
   if (token) {
     const username = action.payload.credentials.username
-    persistTokenToSessionStorage({ token, username })
+    // persistTokenToSessionStorage({ token, username })
 
     yield put(loginSuccessful({ token, username }))
     yield put(getAllVms({ shallowFetch: false }))
@@ -88,15 +89,17 @@ function* login (action) {
     yield put(yield put(loadInProgress({ value: false })))
   }
 }
-
+/*
 function* onLoginSuccessful () {
   const redirectUrl = store.getState().router
   browserHistory.replace(redirectUrl)
 }
+*/
 
 function* logout () {
-  clearTokenFromSessionStorage()
-  browserHistory.replace('/login')
+  window.location.href = `${AppConfiguration.applicationURL}/sso/logout`
+//  clearTokenFromSessionStorage()
+//  browserHistory.replace('/login')
 }
 
 function* fetchUnknwonIconsForVms ({ vms }) {
@@ -295,7 +298,7 @@ function* schedulerPerMinute (action) {
 export function *rootSaga () {
   yield [
     takeEvery('LOGIN', login),
-    takeEvery('LOGIN_SUCCESSFUL', onLoginSuccessful),
+    // takeEvery('LOGIN_SUCCESSFUL', onLoginSuccessful),
     takeEvery('LOGOUT', logout),
     takeLatest('GET_ALL_VMS', fetchAllVms),
     takeLatest('PERSIST_STATE', persistStateSaga),

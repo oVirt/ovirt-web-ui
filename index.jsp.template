@@ -1,0 +1,1 @@
+<script type="text/javascript"><c:if test="${sessionScope['userInfo'] != null}">var userInfo = {<c:forEach items="${sessionScope['userInfo']}" var="entry">"${entry.key}": "${entry.value}",</c:forEach>};</c:if></script>

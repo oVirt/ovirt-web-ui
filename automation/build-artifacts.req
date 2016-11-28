@@ -1,0 +1,8 @@
+autoconf
+automake
+gcc-c++
+git
+ovirt-engine-nodejs
+ovirt-engine-nodejs-modules
+rpmbuild
+yum-utils
