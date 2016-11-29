@@ -24,7 +24,7 @@ config.status
 configure
 install-sh
 missing
-ovirt-userportal.spec
+ovirt-web-ui.spec
 package.json
 tmp.repos/
 

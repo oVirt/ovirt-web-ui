@@ -33,6 +33,7 @@ AM_INIT_AUTOMAKE([-Wall -Werror foreign -Wno-portability tar-pax])
 AC_ARG_VAR([RPMBUILD], [path to rpmbuild utility])
 AC_CHECK_PROGS([RPMBUILD], [rpmbuild])
 
+echo ${PATH}
 AC_ARG_VAR([NPM], [path to npm utility])
 AC_CHECK_PROGS([NPM], [npm])
 
@@ -41,7 +42,7 @@ test -z "${NPM}" && AC_MSG_ERROR([NodeJS npm program not found])
 AC_CONFIG_FILES([
 	Makefile
 	package.json
-	ovirt-userportal.spec
+	ovirt-web-ui.spec
 ])
 
 

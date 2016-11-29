@@ -21,8 +21,8 @@ export PATH := /usr/share/ovirt-engine-nodejs/bin:../node_modules/.bin:$(PATH)
 
 EXTRA_DIST = \
 	autogen.sh \
-	ovirt-userportal.spec \
-	ovirt-userportal.spec.in \
+	ovirt-web-ui.spec \
+  ovirt-web-ui.spec.in \
 	README.md \
 	LICENSE \
 	src \
