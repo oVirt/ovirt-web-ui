@@ -38,17 +38,15 @@ BuildRequires: ovirt-engine-nodejs-modules = 0.0.16
 This package provides new User Portal for %{product}, so far as technical preview.
 
 %prep
-%setup -q -n"%{source_basename}-%{version}"
-
 # Use the ovirt-engine nodejs installation
 export PATH="%{_datadir}/ovirt-engine-nodejs/bin:${PATH}"
-
+%setup -q -n"%{source_basename}-%{version}"
 # Copy the Node.js dependencies to the local "node_modules" directory
 ln -s "%{_sharedstatedir}/ovirt-engine-nodejs-modules/node_modules"
 
 %build
+export PATH="%{_datadir}/ovirt-engine-nodejs/bin:${PATH}"
 %configure
-
 export PATH="./node_modules/.bin:${PATH}"
 make
 
