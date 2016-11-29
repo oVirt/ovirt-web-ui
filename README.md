@@ -19,6 +19,10 @@ For more info, see [doc/goals.md](https://github.com/mareklibra/userportal/blob/
     - example: https://engine.local/ovirt-engine 
 - known issue with missing dependencies with npm v2
 
+**Copr repo**
+
+See [https://copr.fedorainfracloud.org/coprs/mlibra/ovirt-web-ui/](https://copr.fedorainfracloud.org/coprs/mlibra/ovirt-web-ui/)
+
 **Build**
 
 After _git clone_, run:
