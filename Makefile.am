@@ -14,7 +14,7 @@
 
 OVIRT_CACHE_DIR	?= $(HOME)/ovirt-cache
 USER_PORTAL_DIR = $(datarootdir)/ovirt-web-ui
-OVIRT_EAR_DIR = $(datarootdir)/ovirt-engine/engine.ear
+OVIRT_ENGINE_DIR = $(datarootdir)/ovirt-engine
 
 SHELL := /bin/bash
 export PATH := /usr/share/ovirt-engine-nodejs/bin:../node_modules/.bin:$(PATH)
@@ -22,7 +22,7 @@ export PATH := /usr/share/ovirt-engine-nodejs/bin:../node_modules/.bin:$(PATH)
 EXTRA_DIST = \
 	autogen.sh \
 	ovirt-web-ui.spec \
-  ovirt-web-ui.spec.in \
+    ovirt-web-ui.spec.in \
 	README.md \
 	LICENSE \
 	src \
@@ -94,7 +94,11 @@ ovirt-web-ui:
 
 install-data-local:
 	$(MKDIR_P) $(DESTDIR)$(USER_PORTAL_DIR)
-	cp -rpv build/* $(DESTDIR)$(USER_PORTAL_DIR)
+	$(MKDIR_P) $(DESTDIR)$(OVIRT_ENGINE_DIR)
+	cp -rpv build/ovirt-web-ui.war $(DESTDIR)$(USER_PORTAL_DIR)
+	cp -rpv build/etc $(DESTDIR)/$(sysconfdir)
+	echo "ln -s" $(DESTDIR)$(USER_PORTAL_DIR)/ovirt-web-ui.war $(DESTDIR)$(OVIRT_ENGINE_DIR)/ovirt-web-ui.war
+	ln -s ../ovirt-web-ui/ovirt-web-ui.war $(DESTDIR)$(OVIRT_ENGINE_DIR)/ovirt-web-ui.war
 
 distclean-local:
 	rm -rf ${DISTCLEANDIRS}
