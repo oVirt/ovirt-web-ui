@@ -44,31 +44,13 @@ make
 
 %install
 make install DESTDIR=%{buildroot}
-mkdir -p %{buildroot}%{_datarootdir}/ovirt-engine/engine.ear
-ln -s %{_userportaldir}/ovirt-web-ui.war %{buildroot}%{_datarootdir}/ovirt-engine/engine.ear/ovirt-web-ui.war
 
-%post
-cp %{_ovirt_engine_ear_application_xml} %{_ovirt_engine_ear_application_xml}.preOvirtWebUi
-cat %{_ovirt_engine_ear_application_xml} | sed -e 's/\(<\/application>\)/ <module><web><web-uri>ovirt-web-ui.war<\/web-uri><context-root>\/ovirt-engine\/web-ui<\/context-root><\/web><\/module> \n\1/' > %{_ovirt_engine_ear_application_xml}.updated
-mv %{_ovirt_engine_ear_application_xml}.updated %{_ovirt_engine_ear_application_xml}
-
-cp %{_ovirt_engine_conf} %{_ovirt_engine_conf}.preOvirtWebUi
-echo 'ENGINE_SSO_AUTH_SEQUENCE_webui=~' >> %{_ovirt_engine_conf}
-
-%postun
-cp %{_ovirt_engine_ear_application_xml} %{_ovirt_engine_ear_application_xml}.preOvirtWebUiUninstall
-cat %{_ovirt_engine_ear_application_xml} | sed -e 's/<module>.*ovirt-web-ui.war.*<\/module>/ /' > %{_ovirt_engine_ear_application_xml}.updated
-mv %{_ovirt_engine_ear_application_xml}.updated %{_ovirt_engine_ear_application_xml}
-
-cp %{_ovirt_engine_conf} %{_ovirt_engine_conf}.preOvirtWebUiUninstall
-cat %{_ovirt_engine_conf} | sed -e 's/ENGINE_SSO_AUTH_SEQUENCE_webui=~//' > %{_ovirt_engine_conf}.updated
-mv %{_ovirt_engine_conf}.updated %{_ovirt_engine_conf}
-
-%files 
+%files
 %doc README.md 
 %license LICENSE
 %{_userportaldir}
-%{_datarootdir}/ovirt-engine/engine.ear/ovirt-web-ui.war
+%{_datarootdir}/ovirt-engine/ovirt-web-ui.war
+%{_sysconfdir}/ovirt-engine/engine.conf.d/50-ovirt-web-ui.conf
 
 %changelog
 * Mon Nov 14 2016 Marek Libra <mlibra@redhat.com> - 0.1.0

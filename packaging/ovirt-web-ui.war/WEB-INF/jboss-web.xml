@@ -22,6 +22,7 @@ limitations under the License.
   xsi:schemaLocation="http://www.jboss.com/xml/ns/javaee http://www.jboss.org/j2ee/schema/jboss-web_8_0.xsd"
   version="8.0">
 
+  <context-root>/ovirt-engine/web-ui</context-root>
   <symbolic-linking-enabled>true</symbolic-linking-enabled>
 
 </jboss-web>
