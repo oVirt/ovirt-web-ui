@@ -24,7 +24,7 @@ ExclusiveArch:  x86_64
 
 BuildRequires: ovirt-engine-nodejs = 6.9.1
 # Keep ovirt-engine-nodejs-modules at particular version unless tested on higher
-BuildRequires: ovirt-engine-nodejs-modules = 0.0.16
+BuildRequires: ovirt-engine-nodejs-modules = 0.0.17
 
 %description
 This package provides new User Portal for %{product}, so far as technical preview.
