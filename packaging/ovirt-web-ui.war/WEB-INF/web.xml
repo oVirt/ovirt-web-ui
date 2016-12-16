@@ -43,6 +43,7 @@
     <filter-mapping>
         <filter-name>SsoLoginFilter</filter-name>
         <url-pattern>/index.jsp</url-pattern>
+        <url-pattern>/authorizedRedirect.jsp</url-pattern>
     </filter-mapping>
 
     <filter>
@@ -52,6 +53,7 @@
     <filter-mapping>
         <filter-name>SsoPostLoginFilter</filter-name>
         <url-pattern>/index.jsp</url-pattern>
+        <url-pattern>/authorizedRedirect.jsp</url-pattern>
     </filter-mapping>
 
     <filter>
