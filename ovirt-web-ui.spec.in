@@ -53,5 +53,7 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-engine/engine.conf.d/50-ovirt-web-ui.conf
 
 %changelog
+* Fri Dec 16 2016 Marek Libra <mlibra@redhat.com> - 0.1.1
+- Minor UI fixes, authorizedRedirect.jsp
 * Mon Nov 14 2016 Marek Libra <mlibra@redhat.com> - 0.1.0
 - First version, Technical Preview
