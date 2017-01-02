@@ -1,5 +1,5 @@
 {
-  "name": "UserPortal",
+  "name": "ovirt-web-ui",
   "version": "@PACKAGE_VERSION@",
   "private": true,
   "devDependencies": {

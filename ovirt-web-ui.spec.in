@@ -1,6 +1,4 @@
 # Used for rpm-packaging of pre-bundled application with already resolved JS dependencies
-%define use_vdsm %( test -z @VDSM@ && echo 1 || echo 0)
-
 %global _userportaldir %{_datarootdir}/ovirt-web-ui
 %global _ovirt_engine_conf %{_datarootdir}/ovirt-engine/services/ovirt-engine/ovirt-engine.conf
 %global _ovirt_engine_ear_application_xml %{_datarootdir}/ovirt-engine/engine.ear/META-INF/application.xml
@@ -17,8 +15,8 @@ Version:        @PACKAGE_RPM_VERSION@
 Release:        @PACKAGE_RPM_RELEASE@%{?release_suffix}%{?checkout}%{?dist}
 Summary:        User Portal for %{product}
 License:        ASL 2.0
-URL:            https://github.com/mareklibra/userportal
-Source0:        https://github.com/mareklibra/userportal/archive/%{source_basename}-@PACKAGE_VERSION@.tar.gz
+URL:            https://github.com/mareklibra/ovirt-web-ui
+Source0:        https://github.com/mareklibra/ovirt-web-ui/archive/%{source_basename}-@PACKAGE_VERSION@.tar.gz
 
 ExclusiveArch:  x86_64
 
