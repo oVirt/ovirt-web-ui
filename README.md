@@ -10,7 +10,7 @@ POC of new oVirt User Portal.
     - simplified maintenance & ongoing development
     - faster UI responses (incl. start-up)      
 
-For more info, see [doc/goals.md](https://github.com/mareklibra/userportal/blob/master/doc/goals.md)
+For more info, see [doc/goals.md](https://github.com/oVirt/userportal/blob/master/doc/goals.md)
  
 ## How To Run
 **Prerequisities:**

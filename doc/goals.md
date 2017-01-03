@@ -154,6 +154,6 @@ TBD: size and expected data examples
 
 ## Links
 
-- [User Portal](https://github.com/mareklibra/userportal)
+- [User Portal](https://github.com/oVirt/userportal)
 - [ovirt-ui-components](https://github.com/matobet/ovirt-ui-components)
 
