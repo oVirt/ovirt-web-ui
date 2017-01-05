@@ -56,7 +56,9 @@
     "webpack": "1.13.2",
     "webpack-dev-server": "1.16.1",
     "whatwg-fetch": "1.0.0",
-    "react-router": "~3.0.0"
+    "react-router": "~3.0.0",
+    "readline-sync": "~1.4.5",
+    "request": "~2.79.0"
   },
   "dependencies": {
     "jquery": "^3.1.1",
@@ -69,6 +71,7 @@
     "redux-saga": "^0.11.1"
   },
   "scripts": {
+    "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "fix": "eslint -c config/eslint.js config src --fix",
     "prebuild": "npm run test",

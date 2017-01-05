@@ -118,7 +118,7 @@ function loadPersistedState () {
 
 function start () {
   readConfiguration()
-  console.log(`Merged configuration: ${JSON.stringify(AppConfiguration)}`)
+  console.log(`Current configuration: ${JSON.stringify(AppConfiguration)}`)
 
   const { token, username } = fetchToken()
 

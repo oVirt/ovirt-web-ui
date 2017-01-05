@@ -2,6 +2,8 @@ process.env.NODE_ENV = 'development';
 
 var path = require('path');
 var chalk = require('chalk');
+var readlineSync = require('readline-sync');
+var request = require('request');
 var webpack = require('webpack');
 var WebpackDevServer = require('webpack-dev-server');
 var historyApiFallback = require('connect-history-api-fallback');
@@ -13,6 +15,7 @@ var checkRequiredFiles = require('./utils/checkRequiredFiles');
 var prompt = require('./utils/prompt');
 var config = require('../config/webpack.config.dev');
 var paths = require('../config/paths');
+var env = require('../config/env')
 
 // Tools like Cloud9 rely on this.
 var DEFAULT_PORT = process.env.PORT || 3000;
@@ -301,8 +304,13 @@ function runDevServer(port, protocol) {
 function run(port) {
   var protocol = process.env.HTTPS === 'true' ? "https" : "http";
   checkRequiredFiles();
-  setupCompiler(port, protocol);
-  runDevServer(port, protocol);
+  getUserInfo().then(userInfo => {
+    injectUserInfo(userInfo);
+    setupCompiler(port, protocol);
+    runDevServer(port, protocol);
+  }).catch(err => {
+    console.error(`Failed obtaining oVirt auth token: ${err}`)
+  })
 }
 
 // We attempt to use the default port but if it is busy, we offer the user to
@@ -324,3 +332,45 @@ detect(DEFAULT_PORT).then(port => {
     }
   });
 });
+
+function getUserInfo () {
+  const engineUrl = process.env.ENGINE_URL;
+  console.log(`Please authenticate against oVirt running at ${engineUrl}`);
+
+  const DEFAULT_USER = 'admin@internal'
+  let username = readlineSync.question(`oVirt user (${DEFAULT_USER}): `, {
+    defaultInput: DEFAULT_USER
+  });
+
+  let password = readlineSync.question('oVirt password: ', {
+    noEchoBack: true
+  });
+
+  return new Promise((resolve, reject) => {
+    request(`${engineUrl}/sso/oauth/token?` +
+      'grant_type=urn:ovirt:params:oauth:grant-type:http&scope=ovirt-app-api', {
+      json: true,
+      auth: {
+        user: username,
+        pass: password,
+      },
+      strictSSL: false,
+    }, (err, response, body) => {
+      if (err) {
+        return reject(err)
+      }
+      if ('access_token' in body) {
+        resolve({
+          userName: username,
+          ssoToken: body.access_token,
+        })
+      } else {
+        reject(JSON.stringify(body))
+      }
+    })
+  });
+}
+
+function injectUserInfo (userInfo) {
+  env['window.userInfo'] = JSON.stringify(userInfo);
+}
