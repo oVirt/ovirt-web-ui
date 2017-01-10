@@ -40,6 +40,12 @@ The rpm installs to `/user/share/ovirt-web-ui`.
 
 New ovirt-web-ui.war is added to the existing ovirt-engine.ear.
 
+**Development mode**
+
+`ENGINE_URL=https://my.ovirt.instance/ovirt-engine/ npm start`
+
+When asked, provide valid username (in the form of `user@domain`) and password so
+the application can start in the context of a logged in user.
 
 **Quick run using Docker**
 
@@ -49,7 +55,7 @@ oVirt engine instance.
 
 Just specify where your oVirt engine is running and expose the port `3000` from the container. Example:
 
-  `docker run --rm -it -e ENGINE_URL=https://my.ovirt.instance/ovirt-engine/ -p 3000:3000 matobet/userportal`
+  `docker run --rm -it -e ENGINE_URL=https://my.ovirt.instance/ovirt-engine/ -p 3000:3000 matobet/ovirt-web-ui`
 
 
 ## Technical Details  
