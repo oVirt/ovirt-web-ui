@@ -335,6 +335,9 @@ detect(DEFAULT_PORT).then(port => {
 
 function getUserInfo () {
   const engineUrl = process.env.ENGINE_URL;
+  if (!engineUrl) {
+    throw new Error('Please run script with the `ENGINE_URL` environment variable set.')
+  }
   console.log(`Please authenticate against oVirt running at ${engineUrl}`);
 
   const DEFAULT_USER = 'admin@internal'
