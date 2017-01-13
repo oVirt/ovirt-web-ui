@@ -41,7 +41,6 @@ test -z "${NPM}" && AC_MSG_ERROR([NodeJS npm program not found])
 
 AC_CONFIG_FILES([
 	Makefile
-	package.json
 	ovirt-web-ui.spec
 ])
 
