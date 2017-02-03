@@ -25,6 +25,5 @@ configure
 install-sh
 missing
 ovirt-web-ui.spec
-package.json
 tmp.repos/
 

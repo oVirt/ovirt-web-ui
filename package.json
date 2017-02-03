@@ -1,6 +1,6 @@
 {
   "name": "ovirt-web-ui",
-  "version": "@PACKAGE_VERSION@",
+  "version": "0.0.0",
   "private": true,
   "devDependencies": {
     "autoprefixer": "6.4.1",
