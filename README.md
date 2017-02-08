@@ -47,6 +47,14 @@ New ovirt-web-ui.war is added to the existing ovirt-engine.ear.
 When asked, provide valid username (in the form of `user@domain`) and password so
 the application can start in the context of a logged in user.
 
+**Redux Dev Tools**
+The Redux Dev Tools can significantly simplify debuging of the application.
+
+For Chrome: [https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd)
+
+For Firefox: [https://addons.mozilla.org/en-us/firefox/addon/remotedev/](https://addons.mozilla.org/en-us/firefox/addon/remotedev/)
+
+
 **Quick run using Docker**
 
 If you don't like to burden your system with all required Node.js dependencies,
