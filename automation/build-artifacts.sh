@@ -15,7 +15,7 @@ export PATH=/usr/share/ovirt-engine-nodejs/bin:${PATH}
 ./autogen.sh
 
 # create rpm
-yum-builddep ovirt-userportal.spec
+yum-builddep ovirt-web-ui.spec
 make rpm
 cp *.tar.gz tmp.repos/
 
