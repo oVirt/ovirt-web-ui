@@ -137,7 +137,7 @@ function* fetchAllVms (action) {
     const vmIdsToPreserve = internalVms.map(vm => vm.id)
     yield put(removeMissingVms({ vmIdsToPreserve }))
 
-    yield put(updateVms({ vms: internalVms }))
+    yield put(updateVms({ vms: internalVms, copySubResources: true }))
 
     // TODO: is removing of icons needed? I.e. when icon is removed or changed on the server
     yield fetchUnknwonIconsForVms({ vms: internalVms })
