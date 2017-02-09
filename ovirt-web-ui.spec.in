@@ -1,5 +1,5 @@
 # Used for rpm-packaging of pre-bundled application with already resolved JS dependencies
-%global _userportaldir %{_datarootdir}/ovirt-web-ui
+%global _ovirtwebuidir %{_datarootdir}/ovirt-web-ui
 %global _ovirt_engine_conf %{_datarootdir}/ovirt-engine/services/ovirt-engine/ovirt-engine.conf
 %global _ovirt_engine_ear_application_xml %{_datarootdir}/ovirt-engine/engine.ear/META-INF/application.xml
 %global product oVirt
@@ -46,7 +46,7 @@ make install DESTDIR=%{buildroot}
 %files
 %doc README.md 
 %license LICENSE
-%{_userportaldir}
+%{_ovirtwebuidir}
 %{_datarootdir}/ovirt-engine/ovirt-web-ui.war
 %{_sysconfdir}/ovirt-engine/engine.conf.d/50-ovirt-web-ui.conf
 

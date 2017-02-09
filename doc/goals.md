@@ -1,5 +1,5 @@
 ## Project Goals
-The UserPortal project states following goals:
+The **ovirt-web-ui** project states following goals:
 
 - Improved **User Experience** in comparison to recent GWT-based User Portal
     - **Faster**  
@@ -27,7 +27,7 @@ The UserPortal project states following goals:
 First version of the project mimics recent GWT Basic User Portal from the functional perspective.
 
 Ongoing development will lead to the refined scope of recent Extended User Portal.
-Preferably, new integrating application will be introduced to implement the "Extended User Portal" scope while reusing recent code (User Portal, ovirt-ui-components).
+Preferably, new integrating application will be introduced to implement the "Extended User Portal" scope while reusing recent code (ovirt-web-ui, ovirt-ui-components).
  
 TBD: More detailed scope - both recent and future
     
@@ -35,7 +35,7 @@ TBD: More detailed scope - both recent and future
 
 The web-based project is split into modules:
 
-- The UserPortal project
+- The ovirt-web-ui project
   Integrates all parts together, provides application context and setup.
   Acts as a how-to example for other integrating projects.
   In particular, it provides:
@@ -44,7 +44,7 @@ The web-based project is split into modules:
     - top-level webpage composition              
   
 - The ovirt-ui-components project
-  Holds reusable UI components the UserPortal is built from.
+  Holds reusable UI components the ovirt-web-ui is built from.
   To reuse them in other project, the context needs to be provided by the integrating project (see above).
 
 Implementation is not specific to particular provider, recently oVirt REST API and ManageIQ are taken into consideration.
@@ -98,7 +98,7 @@ Multiple strategies are possible to resolve this 'n+1 issue':
 At the time of writing this document, following promising options needs to be evaluated to address these API limitation:
  
 - Resource collection paging support
-- Resource queries are supported but their benefit for UserPortal's use-case is so far unclear
+- Resource queries are supported but their benefit for this project's use-case is so far unclear
  
 ### High Level Data Flow
 **App Start:**
@@ -154,6 +154,6 @@ TBD: size and expected data examples
 
 ## Links
 
-- [User Portal](https://github.com/oVirt/userportal)
+- [oVirt web-ui project on Github](https://github.com/oVirt/ovirt-web-ui)
 - [ovirt-ui-components](https://github.com/matobet/ovirt-ui-components)
 
