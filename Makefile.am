@@ -22,7 +22,7 @@ export PATH := /usr/share/ovirt-engine-nodejs/bin:../node_modules/.bin:$(PATH)
 EXTRA_DIST = \
 	autogen.sh \
 	ovirt-web-ui.spec \
-    ovirt-web-ui.spec.in \
+	ovirt-web-ui.spec.in \
 	README.md \
 	LICENSE \
 	src \
@@ -33,7 +33,8 @@ EXTRA_DIST = \
 	package.json \
 	index.html \
   index.jsp \
-	index.jsp.template
+	index.jsp.template \
+	yarn.lock
 	
 
 DISTCLEANFILES = $(PACKAGE)-$(VERSION).tar.gz \
