@@ -64,6 +64,7 @@
     "jquery": "^3.1.1",
     "ovirt-ui-components": "*",
     "patternfly": "^3.11.0",
+    "bootstrap-switch": "3.3.2",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
     "react-redux": "^4.4.5",
@@ -74,7 +75,7 @@
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "fix": "eslint -c config/eslint.js config src --fix",
-    "prebuild": "npm run test",
+    "prebuild": "yarn run test",
     "test": "jest --no-watchman --env=jsdom",
     "test:watch": "jest --watch --no-watchman --env=jsdom"
   },
