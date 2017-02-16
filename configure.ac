@@ -34,10 +34,10 @@ AC_ARG_VAR([RPMBUILD], [path to rpmbuild utility])
 AC_CHECK_PROGS([RPMBUILD], [rpmbuild])
 
 echo ${PATH}
-AC_ARG_VAR([NPM], [path to npm utility])
-AC_CHECK_PROGS([NPM], [npm])
+AC_ARG_VAR([YARN], [path to yarn utility])
+AC_CHECK_PROGS([YARN], [yarn])
 
-test -z "${NPM}" && AC_MSG_ERROR([NodeJS npm program not found])
+test -z "${YARN}" && AC_MSG_ERROR([YARN program not found (install ovirt-engine-yarn, ovirt-engine-nodejs-modules, ovirt-engine-nodejs])
 
 AC_CONFIG_FILES([
 	Makefile
@@ -46,3 +46,4 @@ AC_CONFIG_FILES([
 
 
 AC_OUTPUT
+

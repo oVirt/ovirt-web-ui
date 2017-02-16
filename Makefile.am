@@ -84,8 +84,7 @@ distclean-local:
 all: ovirt-web-ui
 
 ovirt-web-ui:
-	test -z "$(NPMINSTALL)" || $(NPM) i
-	$(NPM) run build
+	$(YARN) run build
 	cp -rpv packaging/* build/
 	cp index.jsp build/
 	awk 'BEGIN{getline l < "index.jsp.template"}/<div id="replace_with_index_jsp_template"\/>/{gsub("<div id=\"replace_with_index_jsp_template\"/>",l)}1' build/index.html >> build/index.jsp
@@ -104,6 +103,6 @@ distclean-local:
 	rm -rf ${DISTCLEANDIRS}
 
 check-local: 
-	$(NPM) test
+	$(YARN) test
 
 # vim: ts=2
