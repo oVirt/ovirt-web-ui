@@ -7,6 +7,7 @@
 
 export PATH=/usr/share/ovirt-engine-nodejs/bin:/usr/share/ovirt-engine-yarn/bin:${PATH}
 echo === In check-patch.sh: PATH=${PATH}
+rpm -qa | grep ovirt-engine-nodejs
 source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh
 ./autogen.sh && make check-local
 

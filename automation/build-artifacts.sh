@@ -17,6 +17,7 @@ mkdir exported-artifacts
 # generate automake/autoconf files
 export PATH=/usr/share/ovirt-engine-nodejs/bin:/usr/share/ovirt-engine-yarn/bin:${PATH}
 echo === In build-artifacts.sh: PATH=${PATH}
+rpm -qa | grep ovirt-engine-nodejs
 ./autogen.sh
 
 # create rpm
