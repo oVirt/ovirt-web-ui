@@ -2,9 +2,11 @@
 
 shopt -s nullglob
 
-#dependencies="$(sed -e '/^[ \t]*$/d' -e '/^#/d' automation/packages.force)"
-#yum clean metadata || dnf clean metadata
-#yum -y install ${dependencies} || dnf -y install ${dependencies}
+dependencies="$(sed -e '/^[ \t]*$/d' -e '/^#/d' automation/packages.force)"
+# yum clean metadata || dnf clean metadata
+# yum -y install ${dependencies} || dnf -y install ${dependencies}
+yum-deprecated clean metadata || yum clean metadata
+yum-deprecated -y install ${dependencies} || yum -y install ${dependencies}
 
 # cleanup
 rm -Rf \
