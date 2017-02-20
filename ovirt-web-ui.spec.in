@@ -23,7 +23,7 @@ ExclusiveArch:  x86_64
 # Keep ovirt-engine-{nodejs|nodejs-modules|yarn} at particular version unless tested on higher
 # Please keep in sync with the automation/*.req files
 BuildRequires: ovirt-engine-nodejs = 6.9.4
-BuildRequires: ovirt-engine-nodejs-modules = 1.0.4
+BuildRequires: ovirt-engine-nodejs-modules = 1.0.4-3
 BuildRequires: ovirt-engine-yarn = 0.19.1
 
 %description
@@ -56,6 +56,8 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-engine/engine.conf.d/50-ovirt-web-ui.conf
 
 %changelog
+* Mon Feb 20 2017 Marek Libra <mlibra@redhat.com> - 0.1.2
+- Minor UI fixes, npm replaced by yarn
 * Fri Dec 16 2016 Marek Libra <mlibra@redhat.com> - 0.1.1
 - Minor UI fixes, authorizedRedirect.jsp
 * Mon Nov 14 2016 Marek Libra <mlibra@redhat.com> - 0.1.0
