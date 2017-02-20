@@ -20,19 +20,24 @@ Source0:        https://github.com/oVirt/ovirt-web-ui/archive/%{source_basename}
 
 ExclusiveArch:  x86_64
 
-BuildRequires: ovirt-engine-nodejs = 6.9.1
-# Keep ovirt-engine-nodejs-modules at particular version unless tested on higher
-BuildRequires: ovirt-engine-nodejs-modules = 0.0.17
+# Keep ovirt-engine-{nodejs|nodejs-modules|yarn} at particular version unless tested on higher
+# Please keep in sync with the automation/*.req files
+BuildRequires: ovirt-engine-nodejs = 6.9.4
+BuildRequires: ovirt-engine-nodejs-modules = 1.0.4
+BuildRequires: ovirt-engine-yarn = 0.19.1
 
 %description
 This package provides new User Portal for %{product}, so far as technical preview.
 
 %prep
 # Use the ovirt-engine nodejs installation
-export PATH="%{_datadir}/ovirt-engine-nodejs/bin:${PATH}"
+# export PATH="%{_datadir}/ovirt-engine-nodejs/bin:${PATH}"
+
 %setup -q -n"%{source_basename}-%{version}"
+rpm -qa | grep ovirt-engine-nodejs
+source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh
 # Copy the Node.js dependencies to the local "node_modules" directory
-ln -s "%{_sharedstatedir}/ovirt-engine-nodejs-modules/node_modules"
+# ln -s "%{_sharedstatedir}/ovirt-engine-nodejs-modules/node_modules"
 
 %build
 export PATH="%{_datadir}/ovirt-engine-nodejs/bin:${PATH}"
