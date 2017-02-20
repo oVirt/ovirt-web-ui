@@ -34,6 +34,7 @@ This package provides new User Portal for %{product}, so far as technical previe
 # export PATH="%{_datadir}/ovirt-engine-nodejs/bin:${PATH}"
 
 %setup -q -n"%{source_basename}-%{version}"
+rpm -qa | grep ovirt-engine-nodejs
 source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh
 # Copy the Node.js dependencies to the local "node_modules" directory
 # ln -s "%{_sharedstatedir}/ovirt-engine-nodejs-modules/node_modules"
