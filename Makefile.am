@@ -79,7 +79,6 @@ publish:
 distclean-local:
 	rm -rf ${DISTCLEANDIRS}
 
-
 .PHONY: rpms publish srpms
 
 all: ovirt-web-ui
@@ -99,9 +98,6 @@ install-data-local:
 	cp -rpv build/etc $(DESTDIR)/$(sysconfdir)
 	echo "ln -s" $(DESTDIR)$(USER_PORTAL_DIR)/ovirt-web-ui.war $(DESTDIR)$(OVIRT_ENGINE_DIR)/ovirt-web-ui.war
 	ln -s ../ovirt-web-ui/ovirt-web-ui.war $(DESTDIR)$(OVIRT_ENGINE_DIR)/ovirt-web-ui.war
-
-distclean-local:
-	rm -rf ${DISTCLEANDIRS}
 
 check-local: 
 	$(YARN) test
