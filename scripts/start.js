@@ -334,18 +334,18 @@ detect(DEFAULT_PORT).then(port => {
 });
 
 function getUserInfo () {
-  const engineUrl = process.env.ENGINE_URL;
+  var engineUrl = process.env.ENGINE_URL;
   if (!engineUrl) {
     throw new Error('Please run script with the `ENGINE_URL` environment variable set.')
   }
   console.log(`Please authenticate against oVirt running at ${engineUrl}`);
 
-  const DEFAULT_USER = 'admin@internal'
-  let username = readlineSync.question(`oVirt user (${DEFAULT_USER}): `, {
+  var DEFAULT_USER = 'admin@internal';
+  var username = readlineSync.question(`oVirt user (${DEFAULT_USER}): `, {
     defaultInput: DEFAULT_USER
   });
 
-  let password = readlineSync.question('oVirt password: ', {
+  var password = readlineSync.question('oVirt password: ', {
     noEchoBack: true
   });
 
