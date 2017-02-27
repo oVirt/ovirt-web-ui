@@ -19,7 +19,7 @@ For more info, see [doc/goals.md](https://github.com/oVirt/ovirt-web-ui/blob/mas
     - example: https://engine.local/ovirt-engine 
 - Have `yarn` installed
     - it's not strictly required but **suggested** to use ovirt-engine-\* JS packages:
-    - from `ovirt/tested` yum repo [http://resources.ovirt.org/repos/ovirt/tested/master/rpm](http://resources.ovirt.org/repos/ovirt/tested/master/rpm) [BZ 1427045](https://bugzilla.redhat.com/show_bug.cgi?id=1427045)
+    - from `ovirt/tested` yum repo [http://resources.ovirt.org/repos/ovirt/tested/master/rpm](http://resources.ovirt.org/repos/ovirt/tested/master/rpm) (see [BZ 1427045](https://bugzilla.redhat.com/show_bug.cgi?id=1427045))
         - `dnf install ovirt-engine-nodejs-6.9.4 ovirt-engine-nodejs-modules-1.0.4 ovirt-engine-yarn-0.19.1`
 
 **RPMs**
