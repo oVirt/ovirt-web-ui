@@ -21,39 +21,40 @@ For more info, see [doc/goals.md](https://github.com/oVirt/ovirt-web-ui/blob/mas
     - it's not strictly required but **suggested** to use ovirt-engine-\* JS packages:
     - from `ovirt/tested` yum repo [http://resources.ovirt.org/repos/ovirt/tested/master/rpm](http://resources.ovirt.org/repos/ovirt/tested/master/rpm) (see [BZ 1427045](https://bugzilla.redhat.com/show_bug.cgi?id=1427045))
         - `dnf install ovirt-engine-nodejs-6.9.4 ovirt-engine-nodejs-modules-1.0.4 ovirt-engine-yarn-0.19.1`
+        - use: `export PATH=/usr/share/ovirt-engine-yarn/bin:/usr/share/ovirt-engine-nodejs/bin:$PATH`
 
 **RPMs**
 
 oVirt resources: look for ovirt-web-ui in [http://resources.ovirt.org/repos/ovirt/tested/master/rpm](http://resources.ovirt.org/repos/ovirt/tested/master/rpm) yum repository.
 
-
-**Build**
-
-After _git clone_ and meeting all **Prerequisities**, run:
-
-    source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh   # to set PATH and ./node_modules directory
-    ./autogen.sh
-    make    # to create the 'build' directory 
-    or
-    make rpm    # to create (s)rpms under 'tmp.repos'
-
-Please consider updating your PATH to:
-
-    `export PATH=/usr/share/ovirt-engine-yarn/bin:/usr/share/ovirt-engine-nodejs/bin:$PATH`
-
-**RPM installation**
+**Installation from RPM**
 
 The `yum install ovirt-web-ui` installs to `/user/share/ovirt-web-ui` and new *ovirt-web-ui.war* is added to the existing ovirt-engine.ear.
 
 You can access the application at: `https://[ENGINE_URL]/web-ui`
 
+Please note, starting ovirt-4.1, the ovirt-web-ui is installed with ovirt-engine by default.
+
+**Build**
+
+After `git clone` and meeting all **Prerequisities** above, you can build from source by:
+
+    source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh   # to set PATH and ./node_modules directory based on yarn offline cache
+    ./autogen.sh
+    
+    export PATH=/usr/share/ovirt-engine-yarn/bin:/usr/share/ovirt-engine-nodejs/bin:$PATH    # please consider adding to ~/.bashrc
+    
+    make    # to create the 'build' directory 
+    # or
+    make rpm    # to create (s)rpms under 'tmp.repos'
+
 **Development mode**
 
 Please check, you can **build** the application (see above).
 
-Then try:
+Then to shorten development cycle (change-build-deploy-check), you can:
 
-    `ENGINE_URL=https://my.ovirt.instance/ovirt-engine/ yarn start`
+    ENGINE_URL=https://my.ovirt.instance/ovirt-engine/ yarn start
 
 When asked, provide valid username (in the form of `user@domain`) and password so
 the application can start in the context of a logged in user.
