@@ -13,7 +13,7 @@ POC of new oVirt User Portal.
 For more info, see [doc/goals.md](https://github.com/oVirt/ovirt-web-ui/blob/master/doc/goals.md)
  
 ## How To Run
-**Prerequisities:**
+**Prerequisities**
 
 - Have the **oVirt engine running** at https://[ENGINE_URL]
     - example: https://engine.local/ovirt-engine 
@@ -23,10 +23,6 @@ For more info, see [doc/goals.md](https://github.com/oVirt/ovirt-web-ui/blob/mas
         - `dnf install ovirt-engine-nodejs-6.9.4 ovirt-engine-nodejs-modules-1.0.4 ovirt-engine-yarn-0.19.1`
         - use: `export PATH=/usr/share/ovirt-engine-yarn/bin:/usr/share/ovirt-engine-nodejs/bin:$PATH`
 
-**RPMs**
-
-oVirt resources: look for ovirt-web-ui in [http://resources.ovirt.org/repos/ovirt/tested/master/rpm](http://resources.ovirt.org/repos/ovirt/tested/master/rpm) yum repository.
-
 **Installation from RPM**
 
 The `yum install ovirt-web-ui` installs to `/user/share/ovirt-web-ui` and new *ovirt-web-ui.war* is added to the existing ovirt-engine.ear.
@@ -35,9 +31,11 @@ You can access the application at: `https://[ENGINE_URL]/web-ui`
 
 Please note, starting ovirt-4.1, the ovirt-web-ui is installed with ovirt-engine by default.
 
+Latest ovirt-web-ui RPM can be found in the [http://resources.ovirt.org/repos/ovirt/tested/master/rpm](http://resources.ovirt.org/repos/ovirt/tested/master/rpm) yum repository. 
+
 **Build**
 
-After `git clone` and meeting all **Prerequisities** above, you can build from source by:
+After `git clone` and meeting all **Prerequisities** above, you can build from sources by:
 
     source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh   # to set PATH and ./node_modules directory based on yarn offline cache
     ./autogen.sh
