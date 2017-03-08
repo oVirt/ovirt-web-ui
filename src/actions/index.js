@@ -1,6 +1,7 @@
 export * from './error'
 export * from './vm'
 export * from './visibility'
+export * from './dialog'
 
 export function persistState () {
   return {
