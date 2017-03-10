@@ -3,7 +3,9 @@ import { connect } from 'react-redux'
 
 import './App.css'
 
-import { VmsList, VmDetail, VmsPageHeader, Options } from 'ovirt-ui-components'
+import VmsPageHeader from './components/VmsPageHeader'
+
+import { VmsList, VmDetail, Options } from 'ovirt-ui-components'
 
 const App = ({ vms, visibility }) => {
   const selectedVmId = visibility.get('selectedVmDetail')
