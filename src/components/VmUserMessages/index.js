@@ -40,7 +40,7 @@ const VmUserMessages = ({ userMessages, onClearMessages }) => {
       <div className='dropdown-menu infotip bottom-right'>
         <div className={`arrow ${style['fix-arrow-position']}`} />
 
-        <ul className='list-group'>
+        <ul className='list-group messages-list'>
           {userMessages.get('records').map(r => (<UserMessage key={r.time} record={r} />))}
         </ul>
         <div className='footer'><a href='#' onClick={onClearMessages}>Clear Messages</a></div>
