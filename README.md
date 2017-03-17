@@ -1,4 +1,31 @@
-POC of new oVirt User Portal.
+# User Portal for oVirt
+Modern UI for standard (non-admin) oVirt users.
+
+This project aims to be a drop-in replacement of the existing Basic User Portal which includes selected functionality of the Power User Portal.
+Revised list of Extended User Portal features will be implemented to ideally replace it as well.
+
+The application is built with performance in mind.
+
+This project is not intended to be full-feature oVirt admin UI, its focus is on standard users with no or limited administration skills or privileges.
+
+## Milestones
+For most current list of features please refer the [Milestones](https://github.com/oVirt/ovirt-web-ui/milestones) or [Issues](https://github.com/oVirt/ovirt-web-ui/issues) GitHub sections.
+
+The upcoming milestones:
+
+### [v0.1.3](https://github.com/oVirt/ovirt-web-ui/milestone/1)
+With this release, majority of oVirt Basic User Portal functionality is supported, namely:
+
+ - list of VMs (not pools)
+ - basic operations (start, shut down, reboot, suspend)
+ - take console
+ - present VM details
+
+### [v0.2.0](https://github.com/oVirt/ovirt-web-ui/milestone/2)
+The release shall include all features of the Basic User Portal and selected functionality of the Power User Portal, namely:
+ 
+ - add/edit VM (basic properties only)
+ - VM pools
 
 ## Goals
 - Built on reusable components
@@ -13,7 +40,7 @@ POC of new oVirt User Portal.
 For more info, see [doc/goals.md](https://github.com/oVirt/ovirt-web-ui/blob/master/doc/goals.md)
  
 ## How To Run
-**Prerequisities**
+**Prerequisites**
 
 - Have the **oVirt engine running** at https://[ENGINE_URL]
     - example: https://engine.local/ovirt-engine 
