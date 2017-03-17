@@ -3,8 +3,6 @@
 shopt -s nullglob
 
 dependencies="$(sed -e '/^[ \t]*$/d' -e '/^#/d' automation/packages.force)"
-# yum clean metadata || dnf clean metadata
-# yum -y install ${dependencies} || dnf -y install ${dependencies}
 yum-deprecated clean metadata || yum clean metadata
 yum-deprecated -y install ${dependencies} || yum -y install ${dependencies}
 
@@ -22,8 +20,10 @@ echo === In build-artifacts.sh: PATH=${PATH}
 rpm -qa | grep ovirt-engine-nodejs
 ./autogen.sh
 
-# create rpm
+# install deps
 yum-builddep ovirt-web-ui.spec
+
+# create rpm
 make rpm
 cp *.tar.gz tmp.repos/
 
