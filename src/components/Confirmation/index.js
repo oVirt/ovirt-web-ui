@@ -26,7 +26,7 @@ import style from './style.css'
  *      Delete Something
  * </button>
  */
-const OnClickTopConfirmation = ({ target, confirmationText, cancelLabel, okLabel, extraButtonLabel, id, onOk, onExtra, width, height }) => {
+const OnClickTopConfirmation = ({ target, confirmationText, cancelLabel, okLabel, extraButtonLabel, id, onOk, onExtra, onCancel, width, height }) => {
   showConfirmation({
     confirmationText,
     okLabel,
@@ -43,10 +43,15 @@ const OnClickTopConfirmation = ({ target, confirmationText, cancelLabel, okLabel
         onOk()
       } else if (result === 'extra' && onExtra) {
         onExtra()
+      } else if (onCancel) {
+        onCancel()
       }
     },
     (result) => {
       logDebug('OnClickTopConfirmation: cancel called', result)
+      if (onCancel) {
+        onCancel()
+      }
     }
   )
 }
@@ -270,7 +275,7 @@ class ConfirmationContent extends React.Component {
               </p>)
               : confirmationText }
           <ButtonToolbar className={style['confirmation-toolbar']}>
-            <Button bsSize='xsmall' className='button-l' bsStyle='info' onClick={onOkClicked}>
+            <Button bsSize='xsmall' className={`button-l ${style['ok-button']}`} bsStyle='info' onClick={onOkClicked}>
               {okLabel}
             </Button>
             <Button bsSize='xsmall' onClick={onCancelClicked}>

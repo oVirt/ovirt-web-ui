@@ -1,9 +1,9 @@
 import {
   ADD_NEW_VM,
   CLEAR_USER_MSGS,
+  DOWNLOAD_CONSOLE_VM,
   EDIT_VM,
   GET_ALL_VMS,
-  GET_CONSOLE_VM,
   LOGIN,
   LOGIN_SUCCESSFUL,
   LOGOUT,
@@ -15,6 +15,7 @@ import {
   SET_OVIRT_API_VERSION,
   SET_VM_CONSOLES,
   SET_VM_DISKS,
+  SET_VM_SESSIONS,
   SHUTDOWN_VM,
   START_VM,
   SUSPEND_VM,
@@ -82,9 +83,9 @@ export function startVm ({ vmId }) {
   }
 }
 
-export function getConsole ({ vmId, consoleId }) {
+export function downloadConsole ({ vmId, consoleId }) {
   return {
-    type: GET_CONSOLE_VM,
+    type: DOWNLOAD_CONSOLE_VM,
     payload: {
       vmId,
       consoleId,
@@ -266,3 +267,12 @@ export function setVmConsoles ({ vmId, consoles }) {
   }
 }
 
+export function setVmSessions ({ vmId, sessions }) {
+  return {
+    type: SET_VM_SESSIONS,
+    payload: {
+      vmId,
+      sessions,
+    },
+  }
+}

@@ -23,6 +23,7 @@ import {
   removeMissingClusters,
   removeMissingTemplates,
   removeMissingOSs,
+  setVmSessions,
   persistState,
   setOvirtApiVersion,
 
@@ -64,7 +65,7 @@ import {
   GET_ALL_TEMPLATES,
   GET_ALL_VMS,
   GET_CONSOLE_OPTIONS,
-  GET_CONSOLE_VM,
+  DOWNLOAD_CONSOLE_VM,
   LOGIN,
   LOGOUT,
   PERSIST_STATE,
@@ -86,6 +87,7 @@ import { persistStateToLocalStorage } from './storage'
 import Selectors from './selectors'
 import AppConfiguration from './config'
 import OptionsManager from './optionsManager'
+import SagasWorkers from './sagasBuilder'
 
 function * foreach (array, fn, context) {
   var i = 0
@@ -291,6 +293,7 @@ function* fetchAllVms (action) {
     if (!shallowFetch) {
       yield fetchConsoleMetadatas({ vms: internalVms })
       yield fetchDisks({ vms: internalVms })
+      yield fetchVmsSessions({ vms: internalVms })
     } else {
       logDebug('fetchAllVms() shallow fetch requested - skipping other resources')
     }
@@ -331,6 +334,13 @@ function* fetchSinglePool (action) {
   yield put(updateVmsPoolsCount())
 }
 
+function* fetchVmsSessions ({ vms }) {
+  yield * foreach(vms, function* (vm) {
+    const sessionsInternal = yield fetchVmSessions({ vmId: vm.id })
+    yield put(setVmSessions({ vmId: vm.id, sessions: sessionsInternal }))
+  })
+}
+
 export function* fetchSingleVm (action) {
   const vm = yield callExternalAction('getVm', Api.getVm, action, true)
 
@@ -339,6 +349,7 @@ export function* fetchSingleVm (action) {
 
     internalVm.disks = yield fetchVmDisks({ vmId: internalVm.id })
     internalVm.consoles = yield fetchConsoleVmMeta({ vmId: internalVm.id })
+    internalVm.sessions = yield fetchVmSessions({ vmId: internalVm.id })
 
     yield put(updateVms({ vms: [internalVm] }))
     yield fetchUnknwonIconsForVms({ vms: [internalVm] })
@@ -457,7 +468,16 @@ function* fetchConsoleVmMeta ({ vmId }) {
   return []
 }
 
-function* getConsoleVm (action) {
+function* fetchVmSessions ({ vmId }) {
+  const sessions = yield callExternalAction('sessions', Api.sessions, { payload: { vmId } })
+
+  if (sessions && sessions['session']) {
+    return Api.sessionsToInternal({ sessions })
+  }
+  return []
+}
+
+function* downloadVmConsole (action) {
   let { vmId, consoleId } = action.payload
 
   if (!consoleId) {
@@ -504,7 +524,7 @@ function* autoConnectCheck (action) {
   if (vmId && vmId.length > 0) {
     const vm = yield callExternalAction('getVm', Api.getVm, getSingleVm({ vmId }), true)
     if (vm && vm.id && vm.status !== 'down') {
-      yield getConsoleVm(getConsole({ vmId }))
+      yield downloadVmConsole(getConsole({ vmId }))
     }
   }
 }
@@ -600,6 +620,12 @@ function* changeUserFilterPermission (action) {
   yield put(getAllOperatingSystems())
   yield put(getAllTemplates({ shallowFetch: false }))
 }
+// Sagas workers for using in different sagas modules
+let sagasFunctions = {
+  foreach,
+  callExternalAction,
+  fetchVmSessions,
+}
 
 export function *rootSaga () {
   yield [
@@ -614,7 +640,7 @@ export function *rootSaga () {
     takeEvery(SHUTDOWN_VM, shutdownVm),
     takeEvery(RESTART_VM, restartVm),
     takeEvery(START_VM, startVm),
-    takeEvery(GET_CONSOLE_VM, getConsoleVm),
+    takeEvery(DOWNLOAD_CONSOLE_VM, downloadVmConsole),
     takeEvery(SUSPEND_VM, suspendVm),
     takeEvery(START_POOL, startPool),
     takeEvery(REMOVE_VM, removeVm),
@@ -632,6 +658,7 @@ export function *rootSaga () {
     takeEvery(CHANGE_FILTER_PERMISSION, changeUserFilterPermission),
     takeEvery(SELECT_POOL_DETAIL, selectPoolDetail),
     takeLatest(SCHEDULER__1_MIN, schedulerPerMinute),
+    ...SagasWorkers(sagasFunctions),
   ]
 }
 
@@ -640,7 +667,7 @@ const shortMessages = {
   'START_VM': 'Failed to start the VM',
   'RESTART_VM': 'Failed to restart the VM',
   'SHUTDOWN_VM': 'Failed to shutdown the VM',
-  'GET_CONSOLE_VM': 'Failed to get the VM console',
+  'DOWNLOAD_CONSOLE_VM': 'Failed to get the VM console',
   'SUSPEND_VM': 'Failed to suspend the VM',
   'REMOVE_VM': 'Failed to remove the VM',
 

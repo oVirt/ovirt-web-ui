@@ -1,9 +1,11 @@
 // Keep alphabetically sorted
-
+// TODO: sort alphabetically
+// TODO: remove all constants except those used within sagas
 export const ADD_NEW_VM = 'ADD_NEW_VM'
 export const CHANGE_FILTER_PERMISSION = 'CHANGE_FILTER_PERMISSION'
 export const CHECK_TOKEN_EXPIRED = 'CHECK_TOKEN_EXPIRED'
 export const CLEAR_USER_MSGS = 'CLEAR_USER_MSGS'
+export const DOWNLOAD_CONSOLE_VM = 'DOWNLOAD_CONSOLE_VM'
 export const EDIT_VM = 'EDIT_VM'
 export const FAILED_EXTERNAL_ACTION = 'FAILED_EXTERNAL_ACTION'
 export const GET_ALL_CLUSTERS = 'GET_ALL_CLUSTERS'
@@ -13,7 +15,6 @@ export const GET_ALL_TEMPLATES = 'GET_ALL_TEMPLATES'
 export const GET_ALL_VMS = 'GET_ALL_VMS'
 export const GET_VM = 'GET_VM'
 export const GET_CONSOLE_OPTIONS = 'GET_CONSOLE_OPTIONS'
-export const GET_CONSOLE_VM = 'GET_CONSOLE_VM'
 export const GET_POOL = 'GET_POOL'
 export const LOGIN_FAILED = 'LOGIN_FAILED'
 export const LOGIN = 'LOGIN'
@@ -40,6 +41,7 @@ export const SET_USER_FILTER_PERMISSION = 'SET_USER_FILTER_PERMISSION'
 export const SET_VM_CONSOLES = 'SET_VM_CONSOLES'
 export const SET_VM_DETAIL_TO_SHOW = 'SET_VM_DETAIL_TO_SHOW'
 export const SET_VM_DISKS = 'SET_VM_DISKS'
+export const SET_VM_SESSIONS = 'SET_VM_SESSIONS'
 export const SHUTDOWN_VM = 'SHUTDOWN_VM'
 export const START_POOL = 'START_POOL'
 export const START_VM = 'START_VM'
