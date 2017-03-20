@@ -3910,9 +3910,9 @@ os-tmpdir@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/os-tmpdir/-/os-tmpdir-1.0.2.tgz#bbe67406c79aa85c5cfec766fe5734555dfa1274"
 
-ovirt-ui-components@*:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/ovirt-ui-components/-/ovirt-ui-components-0.1.2.tgz#5b64c1b6abf4b4027f9b3407f2c372c0ca17849d"
+ovirt-ui-components@0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/ovirt-ui-components/-/ovirt-ui-components-0.2.0.tgz#5c42f867c743f7f5f76436936fe914c088577458"
 
 pako@~0.2.0:
   version "0.2.9"
