@@ -28,7 +28,7 @@ import AppConfiguration, { readConfiguration } from './config'
 import { loadStateFromLocalStorage } from './storage'
 import { logDebug, logError, valuesOfObject } from './helpers'
 import { rootSaga } from './sagas'
-import { schedulerOneMinute, login, updateIcons } from './actions'
+import { schedulerOneMinute, login, updateIcons, setDomain } from './actions'
 
 import App from './App'
 
@@ -49,7 +49,7 @@ function renderApp () {
  *
  * See web.xml.
  */
-function fetchToken (): { token: string, username: string } {
+function fetchToken (): { token: string, username: string, domain: string } {
   const userInfo = window.userInfo
   logDebug(`SSO userInfo: ${JSON.stringify(userInfo)}`)
 
@@ -57,11 +57,13 @@ function fetchToken (): { token: string, username: string } {
     return {
       token: userInfo.ssoToken,
       username: userInfo.userName,
+      domain: userInfo.domain,
     }
   }
   return {
     token: '',
     username: '',
+    domain: '',
   }
 }
 
@@ -80,7 +82,7 @@ function start () {
   readConfiguration()
   console.log(`Current configuration: ${JSON.stringify(AppConfiguration)}`)
 
-  const { token, username } = fetchToken()
+  const { token, username, domain }: { token: string, username: string, domain: string } = fetchToken()
 
   // do initial render
   renderApp()
@@ -93,6 +95,7 @@ function start () {
 
   loadPersistedState()
 
+  store.dispatch(setDomain({ domain }))
   if (token) {
     store.dispatch(login({ username, token }))
   } else {

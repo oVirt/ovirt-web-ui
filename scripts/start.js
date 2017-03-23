@@ -349,12 +349,17 @@ function getUserInfo () {
   console.log(`Please authenticate against oVirt running at ${engineUrl}`);
 
   var DEFAULT_USER = 'admin@internal';
+  var DEFAULT_DOMAIN = 'internal-authz';
   var username = readlineSync.question(`oVirt user (${DEFAULT_USER}): `, {
     defaultInput: DEFAULT_USER
   });
 
   var password = readlineSync.question('oVirt password: ', {
     noEchoBack: true
+  });
+
+  var domain = readlineSync.question(`oVirt domain (${DEFAULT_DOMAIN}): `, {
+    defaultInput: DEFAULT_DOMAIN
   });
 
   return new Promise((resolve, reject) => {
@@ -372,8 +377,9 @@ function getUserInfo () {
       }
       if (body['access_token']) {
         resolve({
-          userName: username,
+          userName: username.slice(0, username.indexOf('@')),
           ssoToken: body.access_token,
+          domain: domain
         })
       } else {
         reject(JSON.stringify(body))

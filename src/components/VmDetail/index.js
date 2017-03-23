@@ -9,7 +9,10 @@ import {
   downloadConsole,
   getConsoleOptions,
   saveConsoleOptions,
+  getRDP,
 } from '../../actions/index'
+
+import { isWindows } from '../../helpers'
 
 import Time from '../Time'
 import DetailContainer from '../DetailContainer'
@@ -42,7 +45,7 @@ LastMessage.propTypes = {
   userMessages: PropTypes.object.isRequired,
 }
 
-const VmConsoles = ({ vm, onConsole }) => {
+const VmConsoles = ({ vm, onConsole, onRDP }) => {
   return (
     <dd>
       {canConsole(vm.get('status')) ? vm.get('consoles').map(c => (
@@ -58,12 +61,20 @@ const VmConsoles = ({ vm, onConsole }) => {
           {c.get('protocol').toUpperCase()}
         </a>
       )) : ''}
+      {
+        canConsole(vm.get('status')) && isWindows(vm.getIn(['os', 'type']))
+        ? (<a href='#' key={vm.get('id')} onClick={onRDP} className={style['left-delimiter']}>
+          RDP
+        </a>)
+        : ''
+      }
     </dd>
   )
 }
 VmConsoles.propTypes = {
   vm: PropTypes.object.isRequired,
   onConsole: PropTypes.func.isRequired,
+  onRDP: PropTypes.func.isRequired,
 }
 
 class VmDetail extends Component {
@@ -90,6 +101,7 @@ class VmDetail extends Component {
       onConsoleOptionsSave,
       options,
       pool,
+      onRDP,
     } = this.props
 
     const name = isPool ? pool.get('name') : vm.get('name')
@@ -150,7 +162,7 @@ class VmDetail extends Component {
           </dl>
           <dl className={style['vm-properties']}>
             <dt><span className='pficon pficon-screen' /> Console&nbsp;{consoleOptionsShowHide}</dt>
-            <VmConsoles vm={vm} onConsole={onConsole} />
+            <VmConsoles vm={vm} onConsole={onConsole} onRDP={onRDP} />
             <ConsoleOptions options={optionsJS} onSave={onConsoleOptionsSave} open={this.state.openConsoleSettings} />
             <dt><span className='fa fa-database' /> Disks&nbsp;{disksShowHide}</dt>
             <dd>{disksElement}</dd>
@@ -170,6 +182,8 @@ VmDetail.propTypes = {
   onConsoleOptionsOpen: PropTypes.func.isRequired,
   options: PropTypes.object.isRequired,
   isPool: PropTypes.bool,
+  config: PropTypes.object.isRequired,
+  onRDP: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -179,9 +193,10 @@ export default connect(
     options: state.options,
   }),
 
-  (dispatch, { vm }) => ({
+  (dispatch, { vm, config }) => ({
     onConsole: ({ vmId, consoleId }) => dispatch(downloadConsole({ vmId, consoleId })),
     onConsoleOptionsSave: ({ options }) => dispatch(saveConsoleOptions({ vmId: vm.get('id'), options })),
     onConsoleOptionsOpen: () => dispatch(getConsoleOptions({ vmId: vm.get('id') })),
+    onRDP: () => dispatch(getRDP({ vmName: vm.get('name'), username: config.getIn([ 'user', 'name' ]), domain: config.get('domain'), fqdn: vm.get('fqdn') })),
   })
 )(VmDetail)
