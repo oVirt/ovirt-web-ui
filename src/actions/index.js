@@ -1,3 +1,7 @@
+export * from './error'
+export * from './vm'
+export * from './visibility'
+
 export function persistState () {
   return {
     type: 'PERSIST_STATE',

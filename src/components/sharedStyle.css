@@ -1,0 +1,14 @@
+.move-left-detail { /* VM detail on the right */
+    position: fixed;
+    top: 2.5em;
+    height: 100%;
+    display: block;
+    left: 50%;
+    width: 50%;
+    opacity:1;
+    transition:opacity 0.75s ease-in-out;
+}
+
+.move-left-detail-invisible {
+    opacity: 0;
+}

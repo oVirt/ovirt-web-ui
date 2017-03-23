@@ -3,10 +3,9 @@ import { takeEvery, takeLatest } from 'redux-saga'
 
 // import { browserHistory } from 'react-router'
 
+import { logDebug, hidePassword, fileDownload } from './helpers'
+
 import {
-  logDebug,
-  hidePassword,
-  fileDownload,
   getAllVms,
   loginSuccessful,
   loginFailed,
@@ -20,10 +19,11 @@ import {
   vmActionInProgress,
   setVmConsoles,
   removeMissingVms,
-} from 'ovirt-ui-components'
+  persistState,
+  getSingleVm,
+} from './actions'
 
 // import store from './store'
-import { persistState, getSingleVm } from './actions'
 import Api from './ovirtapi'
 import { persistStateToLocalStorage } from './storage'
 import Selectors from './selectors'

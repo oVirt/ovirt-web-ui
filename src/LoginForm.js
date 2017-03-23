@@ -3,10 +3,9 @@ import { connect } from 'react-redux'
 import { locationShape } from 'react-router'
 import $ from 'jquery'
 
-import './styles.css'
+import style from './styles.css'
 
-import { clearUserMessages, login } from 'ovirt-ui-components'
-import { setRedirectUrl } from './actions'
+import { setRedirectUrl, clearUserMessages, login } from './actions'
 import AppConfiguration from './config'
 
 import logo from './ovirt_top_right_logo.png'
@@ -44,7 +43,7 @@ const LoginFailed = () => {
   return (
     <div className='form-group'>
       <div className='col-sm-10 col-md-10'>
-        <div className={'login-failed-text'}>
+        <div className={style['login-failed-text']}>
           Login failed
         </div>
       </div>

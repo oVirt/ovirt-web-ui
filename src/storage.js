@@ -1,4 +1,4 @@
-import { logDebug } from 'ovirt-ui-components'
+import { logDebug } from './helpers'
 
 /*
 Local/Session Storage manipulation

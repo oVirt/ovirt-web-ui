@@ -1,12 +1,10 @@
 import { combineReducers } from 'redux'
 
-import {
-  ConfigReducer as config,
-  UserMessages as userMessages,
-  VmsReducer as vms,
-  IconsReducer as icons,
-  VisibilityReducer as visibility,
-} from 'ovirt-ui-components'
+import config from './config'
+import userMessages from './userMessages'
+import vms from './vms'
+import icons from './icons'
+import visibility from './visibility'
 
 function router (redirectUrl = '/', action) {
   switch (action.type) {
