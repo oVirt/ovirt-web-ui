@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/oVirt/ovirt-web-ui.svg?branch=master)](https://travis-ci.org/oVirt/ovirt-web-ui)
+
 # User Portal for oVirt
 Modern UI for standard (non-admin) oVirt users.
 
