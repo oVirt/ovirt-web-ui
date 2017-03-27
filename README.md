@@ -10,6 +10,8 @@ The application is built with performance in mind.
 
 This project is not intended to be full-feature oVirt admin UI, its focus is on standard users with no or limited administration skills or privileges.
 
+For screenshots, see the [doc/screenshots](https://github.com/oVirt/ovirt-web-ui/blob/master/doc/screenshots) directory.
+
 ## Milestones
 For most current list of features please refer the [Milestones](https://github.com/oVirt/ovirt-web-ui/milestones) or [Issues](https://github.com/oVirt/ovirt-web-ui/issues) GitHub sections.
 
