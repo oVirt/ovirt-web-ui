@@ -1,0 +1,18 @@
+.action-disabled {
+    color: lightgrey;
+}
+
+.left-delimiter {
+    padding: 0 13px 0 15px;
+    font-size: 16px;
+    color: black;
+}
+
+.left-delimiter + .left-delimiter {
+    border-left: 1px solid #d1d1d1;
+}
+
+.left-padding {
+    text-align: left;
+    padding-left: 5em;
+}

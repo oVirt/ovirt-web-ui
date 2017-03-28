@@ -1,11 +1,13 @@
 import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 
-import './App.css'
+import style from './App.css'
 
 import VmsPageHeader from './components/VmsPageHeader'
 
-import { VmsList, VmDetail, Options } from 'ovirt-ui-components'
+import VmsList from './components/VmsList'
+import VmDetail from './components/VmDetail'
+import Options from './components/Options'
 
 const App = ({ vms, visibility }) => {
   const selectedVmId = visibility.get('selectedVmDetail')
@@ -22,7 +24,7 @@ const App = ({ vms, visibility }) => {
   return (
     <div>
       <VmsPageHeader title='oVirt User Portal' />
-      <div className='container-fluid navbar-top-offset'>
+      <div className={'container-fluid ' + style['navbar-top-offset']}>
         <VmsList />
         {detailToRender}
       </div>

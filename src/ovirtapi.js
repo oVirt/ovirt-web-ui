@@ -1,6 +1,6 @@
 import $ from 'jquery'
 
-import { logDebug } from 'ovirt-ui-components'
+import { logDebug } from './helpers'
 import { Exception } from './exceptions'
 import Selectors from './selectors'
 import AppConfiguration from './config'

@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 // import { Router, Route, browserHistory } from 'react-router'
 
-import './index.css'
+import './index-nomodules.css'
 import 'patternfly/dist/css/patternfly.css'
 import 'patternfly/dist/css/patternfly-additions.css'
 
@@ -18,13 +18,12 @@ import store, { sagaMiddleware } from './store'
 import Selectors from './selectors'
 import AppConfiguration, { readConfiguration } from './config'
 import { loadStateFromLocalStorage } from './storage'
-import { valuesOfObject } from './helpers'
+import { logDebug, logError, valuesOfObject } from './helpers'
 import { rootSaga } from './sagas'
-import { schedulerOneMinute } from './actions'
+import { schedulerOneMinute, login, updateIcons } from './actions'
 
 import App from './App'
 // import LoginForm from './LoginForm'
-import { login, updateIcons, logDebug, logError } from 'ovirt-ui-components'
 /*
 function requireLogin (nextState, replace) {
   let token = store.getState().config.get('loginToken')
