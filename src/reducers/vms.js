@@ -4,6 +4,7 @@ import { actionReducer, removeMissingItems } from './utils'
 
 const initialState = Immutable.fromJS({
   vms: {},
+  pools: {},
   loadInProgress: true,
 })
 
@@ -38,10 +39,54 @@ const vms = actionReducer(initialState, {
     return state
   },
   VM_ACTION_IN_PROGRESS (state, { payload: { vmId, name, started } }) {
-    return state.setIn(['vms', vmId, 'actionInProgress', name], started)
+    if (state.getIn(['vms', vmId])) {
+      return state.setIn(['vms', vmId, 'actionInProgress', name], started)
+    }
+    return state
+  },
+  POOL_ACTION_IN_PROGRESS (state, { payload: { poolId, name, started } }) {
+    return state.setIn(['pools', poolId, 'vm', 'actionInProgress', name], started)
   },
   SET_VM_CONSOLES (state, { payload: { vmId, consoles } }) {
     return state.setIn(['vms', vmId, 'consoles'], Immutable.fromJS(consoles))
+  },
+  UPDATE_POOLS (state, { payload: { pools } }) {
+    const updates = {}
+    pools.forEach(pool => {
+      updates[pool.id] = pool
+    })
+    const imUpdates = Immutable.fromJS(updates)
+
+    return state.mergeIn(['pools'], imUpdates)
+  },
+  REMOVE_POOLS (state, { payload: { poolIds } }) {
+    const mutable = state.asMutable()
+    poolIds.forEach(poolId => mutable.deleteIn([ 'pools', poolId ]))
+    return mutable.asImmutable()
+  },
+  REMOVE_MISSING_POOLS (state, { payload: { poolIdsToPreserve } }) {
+    const newPools = poolIdsToPreserve
+      .reduce((pools, poolId) => {
+        const pool = state.getIn(['pools', poolId])
+        if (pool) {
+          pools.set(poolId, pool)
+        }
+        return pools
+      }, Map().asMutable())
+      .asImmutable()
+    return state.set('pools', newPools)
+  },
+  UPDATE_VMPOOLS_COUNT (state) {
+    state.get('pools').toList().map(pool => {
+      state = state.setIn(['pools', pool.id, 'vmsCount'], 0)
+    })
+
+    state.get('vms').toList().map(vm => {
+      if (vm.getIn(['pool', 'id'])) {
+        state = state.updateIn(['pools', vm.getIn(['pool', 'id']), 'vmsCount'], count => count + 1)
+      }
+    })
+    return state
   },
   LOGOUT (state) { // see the config() reducer
     return state.set('vms', Immutable.fromJS({}))
@@ -60,7 +105,6 @@ const vms = actionReducer(initialState, {
     if (payload.message && payload.action && payload.action.payload) {
       if (payload.action.payload.vmId) {
         const vmId = payload.action.payload.vmId
-
         if (state.getIn(['vms', vmId])) {
           return state.setIn(['vms', vmId, 'lastMessage'], payload.shortMessage ? payload.shortMessage : payload.message)
         } else { // fail, if VM not found

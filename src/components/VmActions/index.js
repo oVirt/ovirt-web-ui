@@ -9,7 +9,6 @@ import {
   shutdownVm,
   restartVm,
   suspendVm,
-  startVm,
   openEditVmDialog,
 } from '../../actions/index'
 
@@ -108,6 +107,7 @@ const VmActions = ({
   onStart,
   onSuspend,
   onEdit,
+  isPool,
 }) => {
   const status = vm.get('status')
 
@@ -141,7 +141,7 @@ const VmActions = ({
   })
 
   let consoleProtocol = ''
-  if (!vm.get('consoles').isEmpty()) {
+  if (vm.get('consoles') && !vm.get('consoles').isEmpty()) {
     const vConsole = vm.get('consoles').find(c => c.get('protocol') === 'spice') ||
       vm.getIn(['consoles', 0])
     const protocol = vConsole.get('protocol').toUpperCase()
@@ -151,25 +151,25 @@ const VmActions = ({
   return (
     <div className={isOnCard ? 'card-pf-items text-center' : style['left-padding']}>
       <EmptyAction state={status} isOnCard={isOnCard} />
-      <Button isOnCard={isOnCard} actionDisabled={!canConsole(status) || vm.getIn(['actionInProgress', 'getConsole'])}
+      <Button isOnCard={isOnCard} actionDisabled={isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole'])}
         className='pficon pficon-screen'
         tooltip={consoleProtocol}
         onClick={onGetConsole} />
 
-      <Button isOnCard={isOnCard} actionDisabled={!canShutdown(status) || vm.getIn(['actionInProgress', 'shutdown'])}
+      <Button isOnCard={isOnCard} actionDisabled={isPool || !canShutdown(status) || vm.getIn(['actionInProgress', 'shutdown'])}
         className='fa fa-power-off'
         tooltip='Shut down the VM'
         onClick={confirmShutdown} />
 
-      <Button isOnCard={isOnCard} actionDisabled={!canRestart(status) || vm.getIn(['actionInProgress', 'restart'])}
+      <Button isOnCard={isOnCard} actionDisabled={isPool || !canRestart(status) || vm.getIn(['actionInProgress', 'restart'])}
         className='pficon pficon-restart'
         tooltip='Reboot the VM'
         onClick={confirmRestart} />
 
-      <Button isOnCard={isOnCard} actionDisabled={!canStart(status) || vm.getIn(['actionInProgress', 'start'])}
+      <Button isOnCard={isOnCard} actionDisabled={(!isPool && !canStart(status)) || vm.getIn(['actionInProgress', 'start'])}
         className='fa fa-play' tooltip='Start the VM' onClick={onStart} />
 
-      <Button isOnCard={isOnCard} actionDisabled={!canSuspend(status) || vm.getIn(['actionInProgress', 'suspend'])}
+      <Button isOnCard={isOnCard} actionDisabled={isPool || !canSuspend(status) || vm.getIn(['actionInProgress', 'suspend'])}
         className='fa fa-pause'
         tooltip='Suspend the VM'
         onClick={confirmSuspend} />
@@ -182,11 +182,12 @@ const VmActions = ({
 VmActions.propTypes = {
   vm: PropTypes.object.isRequired,
   isOnCard: PropTypes.bool,
+  isPool: PropTypes.bool,
   onGetConsole: PropTypes.func.isRequired,
+  onStart: PropTypes.func.isRequired,
   onShutdown: PropTypes.func.isRequired,
   onRestart: PropTypes.func.isRequired,
   onForceShutdown: PropTypes.func.isRequired,
-  onStart: PropTypes.func.isRequired,
   onSuspend: PropTypes.func.isRequired,
   onEdit: PropTypes.func.isRequired,
 }
@@ -200,7 +201,6 @@ export default connect(
     onShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: false })),
     onRestart: () => dispatch(restartVm({ vmId: vm.get('id'), force: false })),
     onForceShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: true })),
-    onStart: () => dispatch(startVm({ vmId: vm.get('id') })),
     onSuspend: () => dispatch(suspendVm({ vmId: vm.get('id') })),
     onEdit: () => dispatch(openEditVmDialog({ vmId: vm.get('id') })),
   })

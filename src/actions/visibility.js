@@ -1,3 +1,8 @@
+import {
+  SELECT_POOL_DETAIL,
+  SET_POOL_DETAIL_TO_SHOW,
+} from '../constants'
+
 export function toggleOptions () {
   return {
     type: 'TOGGLE_OPTIONS',
@@ -32,6 +37,15 @@ export function openAddVmDialog () {
   }
 }
 
+export function selectPoolDetail ({ poolId }) {
+  return {
+    type: SELECT_POOL_DETAIL,
+    payload: {
+      poolId,
+    },
+  }
+}
+
 export function openEditVmDialog ({ vmId }) {
   return {
     type: 'OPEN_EDIT_VM_DIALOG',
@@ -46,6 +60,15 @@ export function closeDialog ({ force = false }) {
     type: 'CLOSE_DIALOG',
     payload: {
       force,
+    },
+  }
+}
+
+export function setPoolDetailToShow ({ poolId }) {
+  return {
+    type: SET_POOL_DETAIL_TO_SHOW,
+    payload: {
+      poolId,
     },
   }
 }

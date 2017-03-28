@@ -1,18 +1,11 @@
-/**
- * This file will be replaced by autogen.sh processing, see version.js.in.
- * Kept for testing purpose.
- *
- * There's usually no need to do changes here. Please consider version.js.in instead.
- */
-
 const Product = {
   name: 'oVirt Basic Portal',
-  version: '0.1.2',
-  release: '4.invalid',
+  version: '0.1.4',
+  release: '2',
 
   ovirtApiVersionRequired: {
     major: 4,
-    minor: 1,
+    minor: 0,
   },
 }
 

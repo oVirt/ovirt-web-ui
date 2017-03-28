@@ -11,6 +11,7 @@ import {
 
   loadInProgress,
   setVmDetailToShow,
+  setPoolDetailToShow,
   updateIcons,
   setVmDisks,
   updateVms,
@@ -25,6 +26,7 @@ import {
   setOvirtApiVersion,
 
   getAllVms,
+  getAllPools,
   getSingleVm,
   getAllTemplates,
   getAllClusters,
@@ -35,6 +37,13 @@ import {
   addAllOS,
 
   closeDialog,
+
+  getSinglePool,
+  removeMissingPools,
+  removePools,
+  updatePools,
+  updateVmsPoolsCount,
+  poolActionInProgress,
 
   setUserFilterPermission,
   setAdministrator,
@@ -62,6 +71,9 @@ import {
   CHANGE_FILTER_PERMISSION,
   GET_CONSOLE_OPTIONS,
   SAVE_CONSOLE_OPTIONS,
+  GET_ALL_POOLS,
+  START_POOL,
+  SELECT_POOL_DETAIL,
 } from './constants/index'
 
 // import store from './store'
@@ -258,6 +270,37 @@ function* fetchAllVms (action) {
   yield put(persistState())
 }
 
+function* fetchAllPools (action) {
+  const allPools = yield callExternalAction('getAllPools', Api.getAllPools, action)
+
+  if (allPools && allPools['vm_pool']) { // array
+    const internalPools = allPools.vm_pool.map(pool => Api.poolToInternal({ pool }))
+
+    const poolIdsToPreserve = internalPools.map(pool => pool.id)
+    yield put(removeMissingPools({ poolIdsToPreserve }))
+
+    yield put(updatePools({ pools: internalPools }))
+    yield put(updateVmsPoolsCount())
+  }
+
+  yield put(persistState())
+}
+
+function* fetchSinglePool (action) {
+  const pool = yield callExternalAction('getPool', Api.getPool, action, true)
+
+  if (pool && pool.id) {
+    const internalPool = Api.poolToInternal({ pool })
+
+    yield put(updatePools({ pools: [internalPool] }))
+  } else {
+    if (pool && pool.error && pool.error.status === 404) {
+      yield put(removePools({ poolIds: [action.payload.poolId] }))
+    }
+  }
+  yield put(updateVmsPoolsCount())
+}
+
 function* fetchSingleVm (action) {
   const vm = yield callExternalAction('getVm', Api.getVm, action, true)
 
@@ -274,6 +317,7 @@ function* fetchSingleVm (action) {
       yield put(removeVms({ vmIds: [action.payload.vmId] }))
     }
   }
+  yield put(updateVmsPoolsCount())
 }
 
 function* fetchDisks ({ vms }) {
@@ -308,21 +352,30 @@ function* fetchVmDisks ({ vmId }) {
   return []
 }
 
-function* startProgress ({ vmId, name }) {
-  yield put(vmActionInProgress({ vmId, name, started: true }))
+function* startProgress ({ vmId, poolId, name }) {
+  if (vmId) {
+    yield put(vmActionInProgress({ vmId, name, started: true }))
+  } else {
+    yield put(poolActionInProgress({ poolId, name, started: true }))
+  }
 }
 
-function* stopProgress ({ vmId, name, result }) {
+function* stopProgress ({ vmId, poolId, name, result }) {
+  const fetchSingle = vmId ? fetchSingleVm : fetchSinglePool
+  const getSingle = vmId ? getSingleVm : getSinglePool
+  const actionInProgress = vmId ? vmActionInProgress : poolActionInProgress
+
+  const params = vmId ? { vmId } : { poolId }
   if (result && result.status === 'complete') {
-      // do not call 'end of in progress' if successful,
-      // since UI will be updated by refresh
+    // do not call 'end of in progress' if successful,
+    // since UI will be updated by refresh
     yield delay(5 * 1000)
-    yield fetchSingleVm(getSingleVm({ vmId }))
+    yield fetchSingle(getSingle(params))
     yield delay(30 * 1000)
-    yield fetchSingleVm(getSingleVm({ vmId }))
+    yield fetchSingle(getSingle(params))
   }
 
-  yield put(vmActionInProgress({ vmId, name, started: false }))
+  yield put(actionInProgress(Object.assign(params, { name, started: false })))
 }
 
 function* shutdownVm (action) {
@@ -348,6 +401,12 @@ function* startVm (action) {
   const result = yield callExternalAction('start', Api.start, action)
   // TODO: check status at refresh --> conditional refresh wait_for_launch
   yield stopProgress({ vmId: action.payload.vmId, name: 'start', result })
+}
+
+function* startPool (action) {
+  yield startProgress({ poolId: action.payload.poolId, name: 'start' })
+  const result = yield callExternalAction('startPool', Api.startPool, action)
+  yield stopProgress({ poolId: action.payload.poolId, name: 'start', result })
 }
 
 function* fetchConsoleVmMeta ({ vmId }) {
@@ -411,6 +470,11 @@ function* autoConnectCheck (action) {
   }
 }
 
+function* selectPoolDetail (action) {
+  yield put(setPoolDetailToShow({ poolId: action.payload.poolId }))
+  yield fetchSinglePool(getSinglePool({ poolId: action.payload.poolId }))
+}
+
 function* schedulerPerMinute (action) {
   logDebug('Starting schedulerPerMinute() scheduler')
 
@@ -424,6 +488,7 @@ function* schedulerPerMinute (action) {
       // Actions to be executed no more than once per minute:
       // TODO: allow user to enable/disable the autorefresh
       yield put(getAllVms({ shallowFetch: true }))
+      yield put(getAllPools())
     } else {
       logDebug('schedulerPerMinute() event skipped since oVirt API version does not match')
     }
@@ -491,6 +556,7 @@ function* fetchPermissionWithoutFilter (action) {
 function* changeUserFilterPermission (action) {
   yield put(setUserFilterPermission(action.payload.filter))
   yield put(getAllVms({ shallowFetch: false }))
+  yield put(getAllPools())
   yield put(getAllClusters()) // no shallow
   yield put(getAllOperatingSystems())
   yield put(getAllTemplates({ shallowFetch: false }))
@@ -501,6 +567,7 @@ export function *rootSaga () {
     takeEvery(LOGIN, login),
     takeEvery(LOGOUT, logout),
     takeLatest(GET_ALL_VMS, fetchAllVms),
+    takeLatest(GET_ALL_POOLS, fetchAllPools),
     takeLatest(PERSIST_STATE, persistStateSaga),
 
     takeEvery(SHUTDOWN_VM, shutdownVm),
@@ -508,6 +575,7 @@ export function *rootSaga () {
     takeEvery(START_VM, startVm),
     takeEvery(GET_CONSOLE_VM, getConsoleVm),
     takeEvery(SUSPEND_VM, suspendVm),
+    takeEvery(START_POOL, startPool),
 
     takeLatest(ADD_NEW_VM, createNewVm),
     takeLatest(EDIT_VM, editVm),
@@ -520,6 +588,7 @@ export function *rootSaga () {
     takeEvery(SAVE_CONSOLE_OPTIONS, saveConsoleOptions),
 
     takeEvery(CHANGE_FILTER_PERMISSION, changeUserFilterPermission),
+    takeEvery(SELECT_POOL_DETAIL, selectPoolDetail),
     takeLatest(SCHEDULER__1_MIN, schedulerPerMinute),
   ]
 }

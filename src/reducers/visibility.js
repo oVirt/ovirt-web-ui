@@ -13,6 +13,7 @@ import { actionReducer } from './utils'
 const visibility = actionReducer(Immutable.fromJS({
   dialogToShow: undefined, // undefined, 'VmDetail', 'VmDialog', 'Options'
   selectedVmDetail: undefined, // applicable if dialogToShow === 'VmDetail'
+  selectedPoolDetail: undefined,
 
   dialogConfirmationRequested: undefined, // if true, rendered dialog contains dirty data
   dialogCloseConfirmationToShow: undefined, // if true, the dialog is about to close but contains changes requiring user confirmation
@@ -25,6 +26,7 @@ const visibility = actionReducer(Immutable.fromJS({
 
     return state
       .delete('selectedVmDetail')
+      .delete('selectedPoolDetail')
       .set('dialogToShow', null)
       .set('dialogConfirmationRequested', null)
       .set('dialogCloseConfirmationToShow', null)
@@ -45,7 +47,11 @@ const visibility = actionReducer(Immutable.fromJS({
       .set('selectedVmDetail', action.payload.vmId)
       .set('dialogToShow', 'VmDetail')
   },
-
+  SET_POOL_DETAIL_TO_SHOW (state, { payload: { poolId } }) {
+    return state
+      .set('selectedPoolDetail', poolId)
+      .set('dialogToShow', 'PoolDetail')
+  },
   OPEN_ADD_VM_DIALOG (state) {
     return state
       .set('dialogToShow', 'VmDialog')

@@ -17,7 +17,9 @@ import VmDialog from './components/VmDialog/index'
 
 const App = ({ vms, visibility }) => {
   const selectedVmId = visibility.get('selectedVmDetail') // TODO: move to 'connect()' function
+  const selectedPoolId = visibility.get('selectedPoolDetail')
   const selectedVm = selectedVmId ? vms.getIn(['vms', selectedVmId]) : undefined
+  const selectedPool = selectedPoolId ? vms.getIn(['pools', selectedPoolId, 'vm']) : undefined
   const isCloseDialogConfirmation = visibility.get('dialogCloseConfirmationToShow')
 
   let detailToRender = null
@@ -30,6 +32,9 @@ const App = ({ vms, visibility }) => {
       break
     case 'VmDetail':
       detailToRender = (<VmDetail vm={selectedVm} />)
+      break
+    case 'PoolDetail':
+      detailToRender = (<VmDetail vm={selectedPool} pool={vms.getIn(['pools', selectedPoolId])} isPool />)
       break
   }
 
