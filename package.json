@@ -64,7 +64,7 @@
   "dependencies": {
     "bootstrap-switch": "3.3.2",
     "jquery": "^3.1.1",
-    "ovirt-ui-components": "0.2.0",
+    "ovirt-ui-components": "0.2.1",
     "patternfly": "^3.11.0",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
