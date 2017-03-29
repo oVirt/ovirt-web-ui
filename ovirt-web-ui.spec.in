@@ -23,8 +23,10 @@ ExclusiveArch:  x86_64
 # Keep ovirt-engine-{nodejs|nodejs-modules|yarn} at particular version unless tested on higher
 # Please keep in sync with the automation/*.req files
 BuildRequires: ovirt-engine-nodejs = 6.9.4
-BuildRequires: ovirt-engine-nodejs-modules = 1.0.7 # contains ovirt-ui-components-0.2.1
 BuildRequires: ovirt-engine-yarn = 0.19.1
+
+# contains ovirt-ui-components-0.2.1
+BuildRequires: ovirt-engine-nodejs-modules = 1.0.7 
 
 %description
 This package provides new User Portal for %{product}, so far as technical preview.
