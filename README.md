@@ -17,7 +17,7 @@ For most current list of features please refer the [Milestones](https://github.c
 
 The upcoming milestones:
 
-### [v0.1.3](https://github.com/oVirt/ovirt-web-ui/milestone/1)
+### [v1.0.0](https://github.com/oVirt/ovirt-web-ui/milestone/1)
 With this release, majority of oVirt Basic User Portal functionality is supported, namely:
 
  - list of VMs (not pools)
@@ -25,7 +25,7 @@ With this release, majority of oVirt Basic User Portal functionality is supporte
  - take console
  - present VM details
 
-### [v0.2.0](https://github.com/oVirt/ovirt-web-ui/milestone/2)
+### [v1.1.0](https://github.com/oVirt/ovirt-web-ui/milestone/2)
 The release shall include all features of the Basic User Portal and selected functionality of the Power User Portal, namely:
  
  - add/edit VM (basic properties only)
