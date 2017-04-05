@@ -1,4 +1,5 @@
 import Immutable from 'immutable'
+import { TOGGLE_OPTIONS, SET_VM_DETAIL_TO_SHOW, CLOSE_DETAIL } from '../constants'
 
 /**
  * The Visibility reducer
@@ -13,11 +14,11 @@ function visibility (state, action) {
   state = state || Immutable.fromJS({ showOptions: false, selectedVmDetail: undefined })
 
   switch (action.type) {
-    case 'TOGGLE_OPTIONS':
+    case TOGGLE_OPTIONS:
       return state.set('showOptions', !state.get('showOptions'))
-    case 'SET_VM_DETAIL_TO_SHOW':
+    case SET_VM_DETAIL_TO_SHOW:
       return state.set('selectedVmDetail', action.payload.vmId)
-    case 'CLOSE_DETAIL':
+    case CLOSE_DETAIL:
       return state.delete('selectedVmDetail').set('showOptions', false)
     default:
       return state

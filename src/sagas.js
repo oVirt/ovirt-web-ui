@@ -23,6 +23,20 @@ import {
   getSingleVm,
 } from './actions'
 
+import {
+  LOGIN,
+  LOGOUT,
+  GET_ALL_VMS,
+  PERSIST_STATE,
+  SHUTDOWN_VM,
+  RESTART_VM,
+  START_VM,
+  GET_CONSOLE_VM,
+  SUSPEND_VM,
+  SELECT_VM_DETAIL,
+  SCHEDULER__1_MIN,
+} from './constants'
+
 // import store from './store'
 import Api from './ovirtapi'
 import { persistStateToLocalStorage } from './storage'
@@ -297,21 +311,21 @@ function* schedulerPerMinute (action) {
 
 export function *rootSaga () {
   yield [
-    takeEvery('LOGIN', login),
+    takeEvery(LOGIN, login),
     // takeEvery('LOGIN_SUCCESSFUL', onLoginSuccessful),
-    takeEvery('LOGOUT', logout),
-    takeLatest('GET_ALL_VMS', fetchAllVms),
-    takeLatest('PERSIST_STATE', persistStateSaga),
+    takeEvery(LOGOUT, logout),
+    takeLatest(GET_ALL_VMS, fetchAllVms),
+    takeLatest(PERSIST_STATE, persistStateSaga),
 
-    takeEvery('SHUTDOWN_VM', shutdownVm),
-    takeEvery('RESTART_VM', restartVm),
-    takeEvery('START_VM', startVm),
-    takeEvery('GET_CONSOLE_VM', getConsoleVm),
-    takeEvery('SUSPEND_VM', suspendVm),
+    takeEvery(SHUTDOWN_VM, shutdownVm),
+    takeEvery(RESTART_VM, restartVm),
+    takeEvery(START_VM, startVm),
+    takeEvery(GET_CONSOLE_VM, getConsoleVm),
+    takeEvery(SUSPEND_VM, suspendVm),
 
-    takeEvery('SELECT_VM_DETAIL', selectVmDetail),
+    takeEvery(SELECT_VM_DETAIL, selectVmDetail),
 
-    takeLatest('SCHEDULER__1_MIN', schedulerPerMinute),
+    takeLatest(SCHEDULER__1_MIN, schedulerPerMinute),
   ]
 }
 

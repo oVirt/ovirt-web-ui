@@ -1,6 +1,17 @@
 import Immutable, { Map } from 'immutable'
 
 import { logDebug, logError, hidePassword } from '../helpers'
+import {
+  UPDATE_VMS,
+  REMOVE_VMS,
+  REMOVE_MISSING_VMS,
+  SET_VM_DISKS,
+  VM_ACTION_IN_PROGRESS,
+  SET_VM_CONSOLES,
+  LOGOUT,
+  SET_LOAD_IN_PROGRESS,
+  FAILED_EXTERNAL_ACTION,
+} from '../constants'
 
 function updateOrAddVm ({ state, payload: { vms, copySubResources } }) {
   const emptyMap = Map()
@@ -84,23 +95,23 @@ function vms (state, action) {
   logDebug(`The 'vms' reducer action=${JSON.stringify(hidePassword({ action }))}`)
 
   switch (action.type) {
-    case 'UPDATE_VMS':
+    case UPDATE_VMS:
       return updateOrAddVm({ state, payload: action.payload })
-    case 'REMOVE_VMS':
+    case REMOVE_VMS:
       return removeVms({ state, payload: action.payload })
-    case 'REMOVE_MISSING_VMS':
+    case REMOVE_MISSING_VMS:
       return removeMissingVms({ state, payload: action.payload })
-    case 'SET_VM_DISKS':
+    case SET_VM_DISKS:
       return setVmDisks({ state, payload: action.payload })
-    case 'VM_ACTION_IN_PROGRESS':
+    case VM_ACTION_IN_PROGRESS:
       return state.setIn(['vms', action.payload.vmId, 'actionInProgress', action.payload.name], action.payload.started)
-    case 'SET_VM_CONSOLES':
+    case SET_VM_CONSOLES:
       return state.setIn(['vms', action.payload.vmId, 'consoles'], Immutable.fromJS(action.payload.consoles))
-    case 'LOGOUT': // see the config() reducer
+    case LOGOUT: // see the config() reducer
       return state.set('vms', Immutable.fromJS({}))
-    case 'SET_LOAD_IN_PROGRESS':
+    case SET_LOAD_IN_PROGRESS:
       return state.set('loadInProgress', action.payload.value)
-    case 'FAILED_EXTERNAL_ACTION': // see the userMessages() reducer
+    case FAILED_EXTERNAL_ACTION: // see the userMessages() reducer
       return failedExternalActionVmMessage({ state, payload: action.payload })
     default:
       return state
