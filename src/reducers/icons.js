@@ -1,4 +1,5 @@
 import { Map } from 'immutable'
+import { UPDATE_ICONS } from '../constants'
 
 function updateOrAdd ({ state, payload: { icons } }) {
   const updates = {}
@@ -16,7 +17,7 @@ function updateOrAdd ({ state, payload: { icons } }) {
  */
 function icons (state = Map(), action) {
   switch (action.type) {
-    case 'UPDATE_ICONS': // add or update
+    case UPDATE_ICONS: // add or update
       return updateOrAdd({ state, payload: action.payload })
     default:
       return state

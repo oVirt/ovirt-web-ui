@@ -1,6 +1,28 @@
+import {
+  LOGIN,
+  GET_ALL_VMS,
+  SHUTDOWN_VM,
+  RESTART_VM,
+  START_VM,
+  GET_CONSOLE_VM,
+  SUSPEND_VM,
+  LOGIN_SUCCESSFUL,
+  LOGIN_FAILED,
+  LOGOUT,
+  CLEAR_USER_MSGS,
+  SET_LOAD_IN_PROGRESS,
+  UPDATE_VMS,
+  REMOVE_VMS,
+  REMOVE_MISSING_VMS,
+  UPDATE_ICONS,
+  SET_VM_DISKS,
+  VM_ACTION_IN_PROGRESS,
+  SET_VM_CONSOLES,
+} from '../constants'
+
 export function login ({ username, password, token }) {
   return {
-    type: 'LOGIN',
+    type: LOGIN,
     payload: {
       credentials: {
         username,
@@ -21,7 +43,7 @@ export function login ({ username, password, token }) {
  */
 export function getAllVms ({ shallowFetch = false }) {
   return {
-    type: 'GET_ALL_VMS',
+    type: GET_ALL_VMS,
     payload: {
       shallowFetch,
     },
@@ -30,7 +52,7 @@ export function getAllVms ({ shallowFetch = false }) {
 
 export function shutdownVm ({ vmId, force = false }) {
   return {
-    type: 'SHUTDOWN_VM',
+    type: SHUTDOWN_VM,
     payload: {
       vmId,
       force,
@@ -40,7 +62,7 @@ export function shutdownVm ({ vmId, force = false }) {
 
 export function restartVm ({ vmId, force = false }) {
   return {
-    type: 'RESTART_VM',
+    type: RESTART_VM,
     payload: {
       vmId,
       force,
@@ -50,7 +72,7 @@ export function restartVm ({ vmId, force = false }) {
 
 export function startVm ({ vmId }) {
   return {
-    type: 'START_VM',
+    type: START_VM,
     payload: {
       vmId,
     },
@@ -59,7 +81,7 @@ export function startVm ({ vmId }) {
 
 export function getConsole ({ vmId, consoleId }) {
   return {
-    type: 'GET_CONSOLE_VM',
+    type: GET_CONSOLE_VM,
     payload: {
       vmId,
       consoleId,
@@ -69,7 +91,7 @@ export function getConsole ({ vmId, consoleId }) {
 
 export function suspendVm ({ vmId }) {
   return {
-    type: 'SUSPEND_VM',
+    type: SUSPEND_VM,
     payload: {
       vmId,
     },
@@ -79,7 +101,7 @@ export function suspendVm ({ vmId }) {
 // --- Internal State -------------------------
 export function loginSuccessful ({ token, username }) {
   return {
-    type: 'LOGIN_SUCCESSFUL',
+    type: LOGIN_SUCCESSFUL,
     payload: {
       token,
       username,
@@ -89,7 +111,7 @@ export function loginSuccessful ({ token, username }) {
 
 export function loginFailed ({ errorCode, message }) {
   return {
-    type: 'LOGIN_FAILED',
+    type: LOGIN_FAILED,
     payload: {
       errorCode,
       message,
@@ -99,7 +121,7 @@ export function loginFailed ({ errorCode, message }) {
 
 export function logout () {
   return {
-    type: 'LOGOUT',
+    type: LOGOUT,
     payload: {
     },
   }
@@ -107,14 +129,14 @@ export function logout () {
 
 export function clearUserMessages () {
   return {
-    type: 'CLEAR_USER_MSGS',
+    type: CLEAR_USER_MSGS,
     payload: {},
   }
 }
 
 export function loadInProgress ({ value }) {
   return {
-    type: 'SET_LOAD_IN_PROGRESS',
+    type: SET_LOAD_IN_PROGRESS,
     payload: {
       value,
     },
@@ -128,7 +150,7 @@ export function loadInProgress ({ value }) {
  */
 export function updateVms ({ vms, copySubResources = false }) {
   return {
-    type: 'UPDATE_VMS',
+    type: UPDATE_VMS,
     payload: {
       vms,
       copySubResources,
@@ -144,7 +166,7 @@ export function updateVms ({ vms, copySubResources = false }) {
  */
 export function removeVms ({ vmIds }) {
   return {
-    type: 'REMOVE_VMS',
+    type: REMOVE_VMS,
     payload: {
       vmIds,
     },
@@ -158,7 +180,7 @@ export function removeVms ({ vmIds }) {
  */
 export function removeMissingVms ({ vmIdsToPreserve }) {
   return {
-    type: 'REMOVE_MISSING_VMS',
+    type: REMOVE_MISSING_VMS,
     payload: {
       vmIdsToPreserve,
     },
@@ -167,7 +189,7 @@ export function removeMissingVms ({ vmIdsToPreserve }) {
 
 export function updateIcons ({ icons }) {
   return {
-    type: 'UPDATE_ICONS',
+    type: UPDATE_ICONS,
     payload: {
       icons,
     },
@@ -176,7 +198,7 @@ export function updateIcons ({ icons }) {
 
 export function setVmDisks ({ vmId, disks }) {
   return {
-    type: 'SET_VM_DISKS',
+    type: SET_VM_DISKS,
     payload: {
       vmId,
       disks,
@@ -186,7 +208,7 @@ export function setVmDisks ({ vmId, disks }) {
 
 export function vmActionInProgress ({ vmId, name, started }) {
   return {
-    type: 'VM_ACTION_IN_PROGRESS',
+    type: VM_ACTION_IN_PROGRESS,
     payload: {
       vmId,
       name,
@@ -197,7 +219,7 @@ export function vmActionInProgress ({ vmId, name, started }) {
 
 export function setVmConsoles ({ vmId, consoles }) {
   return {
-    type: 'SET_VM_CONSOLES',
+    type: SET_VM_CONSOLES,
     payload: {
       vmId,
       consoles,

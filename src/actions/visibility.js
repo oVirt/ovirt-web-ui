@@ -1,6 +1,8 @@
+import { SHOW_LOGIN, TOGGLE_OPTIONS, SELECT_VM_DETAIL, SET_VM_DETAIL_TO_SHOW, CLOSE_DETAIL } from '../constants'
+
 export function showLoginDialog () {
   return {
-    type: 'SHOW_LOGIN',
+    type: SHOW_LOGIN,
     payload: {
     },
   }
@@ -8,7 +10,7 @@ export function showLoginDialog () {
 
 export function toggleOptions () {
   return {
-    type: 'TOGGLE_OPTIONS',
+    type: TOGGLE_OPTIONS,
     payload: {
     },
   }
@@ -16,7 +18,7 @@ export function toggleOptions () {
 
 export function selectVmDetail ({ vmId }) {
   return {
-    type: 'SELECT_VM_DETAIL',
+    type: SELECT_VM_DETAIL,
     payload: {
       vmId,
     },
@@ -25,7 +27,7 @@ export function selectVmDetail ({ vmId }) {
 
 export function setVmDetailToShow ({ vmId }) {
   return {
-    type: 'SET_VM_DETAIL_TO_SHOW',
+    type: SET_VM_DETAIL_TO_SHOW,
     payload: {
       vmId,
     },
@@ -34,7 +36,7 @@ export function setVmDetailToShow ({ vmId }) {
 
 export function closeDetail () {
   return {
-    type: 'CLOSE_DETAIL',
+    type: CLOSE_DETAIL,
     payload: {
     },
   }

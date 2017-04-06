@@ -1,4 +1,5 @@
 import Immutable from 'immutable'
+import { FAILED_EXTERNAL_ACTION, LOGIN_FAILED, CLEAR_USER_MSGS } from '../constants'
 
 function addLogEntry ({ state, message, type = 'ERROR', failedAction }) {
   // TODO: use seq
@@ -21,7 +22,7 @@ function userMessages (state, action) {
   state = state || Immutable.fromJS({ records: [], unread: false, show: false })
 
   switch (action.type) {
-    case 'FAILED_EXTERNAL_ACTION': // see the vms() reducer
+    case FAILED_EXTERNAL_ACTION: // see the vms() reducer
       return addLogEntry({
         state,
         message: action.payload.message,
@@ -29,9 +30,9 @@ function userMessages (state, action) {
         type: action.payload.type,
         failedAction: action.payload.action,
       })
-    case 'LOGIN_FAILED': // see the config() reducer
+    case LOGIN_FAILED: // see the config() reducer
       return addLogEntry({ state, message: action.payload.message, type: action.payload.errorCode })
-    case 'CLEAR_USER_MSGS':
+    case CLEAR_USER_MSGS:
       return state.set('unread', false).update('records', records => records.clear())
     default:
       return state
