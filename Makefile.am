@@ -89,7 +89,7 @@ ovirt-web-ui:
 	cp index.jsp build/
 	awk 'BEGIN{getline l < "index.jsp.template"}/<div id="replace_with_index_jsp_template"\/>/{gsub("<div id=\"replace_with_index_jsp_template\"/>",l)}1' build/index.html >> build/index.jsp
 	rm build/index.html
-	mv build/static build/index.jsp build/favicon.ico build/userportal.config build/ovirt-web-ui.war/
+	mv build/static build/index.jsp build/favicon.ico build/ovirt-web-ui.config build/ovirt-web-ui.war/
 
 install-data-local:
 	$(MKDIR_P) $(DESTDIR)$(USER_PORTAL_DIR)

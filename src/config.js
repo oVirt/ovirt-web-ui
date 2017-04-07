@@ -2,7 +2,7 @@ import $ from 'jquery'
 
 import { setLogDebug } from './helpers'
 
-const CONFIG_URL = '/ovirt-engine/web-ui/userportal.config'
+const CONFIG_URL = '/ovirt-engine/web-ui/ovirt-web-ui.config'
 
 const AppConfiguration = {
   debug: true,
