@@ -9,6 +9,9 @@ Selectors = {
   getLoginToken () {
     return getState().config.get('loginToken')
   },
+  getOvirtVersion () {
+    return getState().config.get('oVirtApiVersion')
+  },
   // --- icons --
   getAllIcons () {
     return getState().icons

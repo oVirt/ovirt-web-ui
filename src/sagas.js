@@ -3,6 +3,7 @@ import { takeEvery, takeLatest } from 'redux-saga'
 
 // import { browserHistory } from 'react-router'
 
+import Product from './version'
 import { logDebug, hidePassword, fileDownload } from './helpers'
 
 import {
@@ -21,6 +22,7 @@ import {
   removeMissingVms,
   persistState,
   getSingleVm,
+  setOvirtApiVersion,
 } from './actions'
 
 import {
@@ -82,7 +84,7 @@ function* login (action) {
   let result = {}
   if (action.payload.token) {
     token = action.payload.token
-  } else { // recently not used since SSO
+  } else { // recently not used since SSO, TODO: remove
     result = yield callExternalAction('login', Api.login, action)
     if (result && result['access_token']) {
       token = result['access_token']
@@ -92,9 +94,18 @@ function* login (action) {
   if (token) {
     const username = action.payload.credentials.username
     // persistTokenToSessionStorage({ token, username })
-
     yield put(loginSuccessful({ token, username }))
-    yield put(getAllVms({ shallowFetch: false }))
+
+    const oVirtMeta = yield callExternalAction('getOvirtApiMeta', Api.getOvirtApiMeta, action)
+    if (yield checkOvirtApiVersion(oVirtMeta)) {
+      yield put(getAllVms({ shallowFetch: false }))
+    } else { // oVirt API of incompatible version
+      console.error('oVirt api version check failed')
+      yield put(failedExternalAction({
+        message: composeIncompatibleOVirtApiVersionMessage(oVirtMeta),
+        shortMessage: 'oVirt API version check failed' }))
+      yield put(yield put(loadInProgress({ value: false })))
+    }
   } else {
     yield put(loginFailed({
       errorCode: result['error_code'] ? result['error_code'] : 'no_access',
@@ -103,6 +114,53 @@ function* login (action) {
     yield put(yield put(loadInProgress({ value: false })))
   }
 }
+
+function composeIncompatibleOVirtApiVersionMessage (oVirtMeta) {
+  const requested = `${Product.ovirtApiVersionRequired.major}.${Product.ovirtApiVersionRequired.minor}`
+  let found
+  if (!(oVirtMeta && oVirtMeta['product_info'] && oVirtMeta['product_info']['version'] &&
+    oVirtMeta['product_info']['version']['major'] && oVirtMeta['product_info']['version']['minor'])) {
+    found = JSON.stringify(oVirtMeta)
+  } else {
+    const version = oVirtMeta['product_info']['version']
+    found = `${version.major}.${version.minor}`
+  }
+  return `oVirt API version requested >= ${requested}, but ${found} found`
+}
+
+function compareVersion (actual, required) {
+  logDebug(`compareVersion(), actual=${JSON.stringify(actual)}, required=${JSON.stringify(required)}`)
+
+  // assuming backward compatibility of oVirt API
+  if (actual.major >= required.major) {
+    if (actual.major === required.major) {
+      if (actual.minor < required.minor) {
+        return false
+      }
+    }
+    return true
+  }
+  return false
+}
+
+function* checkOvirtApiVersion (oVirtMeta) {
+  if (!(oVirtMeta && oVirtMeta['product_info'] && oVirtMeta['product_info']['version'] &&
+    oVirtMeta['product_info']['version']['major'] && oVirtMeta['product_info']['version']['minor'])) {
+    console.error('Incompatible oVirt API version: ', oVirtMeta)
+    yield put(setOvirtApiVersion({ passed: false, ...oVirtMeta }))
+    return false
+  }
+
+  const actual = oVirtMeta['product_info']['version']
+
+  const required = Product.ovirtApiVersionRequired
+  const passed = compareVersion({ major: parseInt(actual.major), minor: parseInt(actual.minor) }, required)
+
+  yield put(setOvirtApiVersion({ passed, ...actual }))
+
+  return passed
+}
+
 /*
 function* onLoginSuccessful () {
   const redirectUrl = store.getState().router
@@ -303,9 +361,14 @@ function* schedulerPerMinute (action) {
     yield delay(60 * 1000) // 1 minute
     logDebug('schedulerPerMinute() event')
 
-    // Actions to be executed no more than once per minute:
-    // TODO: allow user to enable/disable the autorefresh
-    yield put(getAllVms({ shallowFetch: true }))
+    const oVirtVersion = Selectors.getOvirtVersion()
+    if (oVirtVersion.passed) {
+      // Actions to be executed no more than once per minute:
+      // TODO: allow user to enable/disable the autorefresh
+      yield put(getAllVms({ shallowFetch: true }))
+    } else {
+      logDebug('schedulerPerMinute() event skipped since oVirt API version does not match')
+    }
   }
 }
 

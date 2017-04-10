@@ -1,10 +1,18 @@
-import React from 'react'
+import React, { PropTypes } from 'react'
+import { connect } from 'react-redux'
+
 import Product from '../version'
 import logo from '../ovirt_top_right_logo.png'
 
-const AboutDialog = () => {
+const AboutDialog = ({ oVirtApiVersion }) => {
   // TODO: link documentation: https://github.com/oVirt/ovirt-web-ui/issues/134
   // TODO: oVirt API version
+
+  let apiVersion = 'unknown'
+  if (oVirtApiVersion && oVirtApiVersion.get('major')) {
+    apiVersion = `${oVirtApiVersion.get('major')}.${oVirtApiVersion.get('minor')}`
+    console.log(apiVersion)
+  }
 
   return (
     <div className='modal fade' id='about-modal' tabIndex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
@@ -21,6 +29,7 @@ const AboutDialog = () => {
             <div className='product-versions-pf'>
               <ul className='list-unstyled'>
                 <li>Version <strong>{Product.version}-{Product.release}</strong></li>
+                <li>oVirt API Version <strong>{apiVersion}</strong></li>
                 <li>Please report issues on <strong><a href='https://github.com/oVirt/ovirt-web-ui/issues' target='_blank'>GitHub Issue Tracker</a></strong></li>
               </ul>
             </div>
@@ -38,5 +47,12 @@ const AboutDialog = () => {
     </div>
   )
 }
+AboutDialog.propTypes = {
+  oVirtApiVersion: PropTypes.object,
+}
 
-export default AboutDialog
+export default connect(
+  (state) => ({
+    oVirtApiVersion: state.config.get('oVirtApiVersion'),
+  })
+)(AboutDialog)
