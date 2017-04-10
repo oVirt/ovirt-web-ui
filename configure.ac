@@ -42,6 +42,7 @@ test -z "${YARN}" && AC_MSG_ERROR([YARN program not found (install ovirt-engine-
 AC_CONFIG_FILES([
 	Makefile
 	ovirt-web-ui.spec
+	src/version.js
 ])
 
 

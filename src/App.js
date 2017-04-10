@@ -8,6 +8,7 @@ import VmsPageHeader from './components/VmsPageHeader'
 import VmsList from './components/VmsList'
 import VmDetail from './components/VmDetail'
 import Options from './components/Options'
+import AboutDialog from './components/About'
 
 const App = ({ vms, visibility }) => {
   const selectedVmId = visibility.get('selectedVmDetail')
@@ -28,6 +29,7 @@ const App = ({ vms, visibility }) => {
         <VmsList />
         {detailToRender}
       </div>
+      <AboutDialog />
     </div>
   )
 }
