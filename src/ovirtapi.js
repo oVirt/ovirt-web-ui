@@ -19,6 +19,7 @@ OvirtApi = {
     logDebug(`_httpGet start: url="${url}"`)
     const headers = Object.assign({
       'Authorization': `Bearer ${OvirtApi._getLoginToken()}`,
+      'Accept-Language': AppConfiguration.queryParams.locale,
     }, custHeaders)
     logDebug(`_httpGet: url="${url}", headers="${JSON.stringify(headers)}"`)
 
@@ -38,6 +39,7 @@ OvirtApi = {
         'Accept': 'application/json',
         'Content-Type': 'application/xml',
         'Authorization': `Bearer ${OvirtApi._getLoginToken()}`,
+        'Accept-Language': AppConfiguration.queryParams.locale, // can be: undefined, empty or string
       },
       data: input,
     }).then(data => Promise.resolve(data))

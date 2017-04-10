@@ -94,3 +94,21 @@ export function fileDownload ({ data, fileName = 'myFile.dat', mimeType = 'appli
 export function valuesOfObject (obj) {
   return Object.keys(obj).map(key => obj[key])
 }
+
+export function getURLQueryParameterByName (name, url) {
+  if (!url) {
+    url = window.location.href
+  }
+  name = name.replace(/[\[\]]/g, '\\$&')
+  const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)')
+  const results = regex.exec(url)
+
+  if (!results) {
+    return null
+  }
+  if (!results[2]) {
+    return ''
+  }
+
+  return decodeURIComponent(results[2].replace(/\+/g, ' '))
+}
