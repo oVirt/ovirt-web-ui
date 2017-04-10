@@ -184,9 +184,14 @@ OvirtApi = {
     const url = `${AppConfiguration.applicationContext}/api/vms`
     return OvirtApi._httpGet({ url })
   },
-  shutdown ({ vmId }) {
+  shutdown ({ vmId, force }) {
     OvirtApi._assertLogin({ methodName: 'shutdown' })
-    return OvirtApi._httpPost({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/shutdown`, input: '<action />' })
+    const action = '<action />'
+    let restMethod = 'shutdown'
+    if (force) {
+      restMethod = 'stop'
+    }
+    return OvirtApi._httpPost({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/${restMethod}`, input: action })
   },
   start ({ vmId }) {
     OvirtApi._assertLogin({ methodName: 'start' })
@@ -196,7 +201,7 @@ OvirtApi = {
     OvirtApi._assertLogin({ methodName: 'start' })
     return OvirtApi._httpPost({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/suspend`, input: '<action />' })
   },
-  restart ({ vmId }) {
+  restart ({ vmId }) { // 'force' is not exposed by oVirt API
     OvirtApi._assertLogin({ methodName: 'restart' })
     return OvirtApi._httpPost({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/reboot`, input: '<action />' })
   },

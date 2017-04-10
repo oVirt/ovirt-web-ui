@@ -1,0 +1,14 @@
+.confirmation-text {
+    margin: 0;
+    padding: .3em 0;
+    font-size: small;
+}
+
+.confirmation-toolbar {
+    paddingBottom: 6px;
+    float: right;
+}
+
+.confirmation-extra-button {
+    margin-left: 15px !important;
+}

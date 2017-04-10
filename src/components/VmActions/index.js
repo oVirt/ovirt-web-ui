@@ -6,6 +6,8 @@ import style from './style.css'
 import { canRestart, canShutdown, canStart, canConsole, canSuspend } from 'ovirt-ui-components'
 import { getConsole, shutdownVm, restartVm, suspendVm, startVm } from '../../actions/vm'
 
+import OnClickTopConfirmation from '../Confirmation'
+
 class Button extends React.Component {
   constructor (props) {
     super(props)
@@ -89,23 +91,38 @@ EmptyAction.propTypes = {
  * Active actions on a single VM-card.
  * List of actions depends on the VM state.
  */
-const VmActions = ({ vm, isOnCard = false, onGetConsole, onShutdown, onRestart, onStart, onSuspend }) => {
+const VmActions = ({ vm, isOnCard = false, onGetConsole, onShutdown, onRestart, onForceShutdown, onStart, onSuspend }) => {
   const status = vm.get('status')
 
-  const confirmShutdown = {
-    confirmText: 'Shut down?',
-    cancelText: 'Cancel',
-  }
+  const confirmShutdown = (e) => OnClickTopConfirmation({
+    id: vm.get('id'),
+    target: e.target,
+    confirmationText: 'Shut down the VM?',
+    cancelLabel: 'Cancel',
+    okLabel: 'Yes',
+    extraButtonLabel: 'Force',
+    onOk: onShutdown,
+    onExtra: onForceShutdown,
+  })
 
-  const confirmRestart = {
-    confirmText: 'Restart?',
-    cancelText: 'Cancel',
-  }
+  const confirmRestart = (e) => OnClickTopConfirmation({
+    id: vm.get('id'),
+    target: e.target,
+    confirmationText: 'Restart the VM?',
+    cancelLabel: 'Cancel',
+    okLabel: 'Yes',
+    onOk: onRestart,
+  })
 
-  const confirmSuspend = {
-    confirmText: 'Suspend?',
-    cancelText: 'Cancel',
-  }
+  const confirmSuspend = (e) => OnClickTopConfirmation({
+    id: vm.get('id'),
+    target: e.target,
+    confirmationText: 'Suspend the VM?',
+    cancelLabel: 'Cancel',
+    okLabel: 'Yes',
+    onOk: onSuspend,
+  })
+
   let consoleProtocol = ''
   if (!vm.get('consoles').isEmpty()) {
     const vConsole = vm.get('consoles').find(c => c.get('protocol') === 'spice') ||
@@ -113,19 +130,30 @@ const VmActions = ({ vm, isOnCard = false, onGetConsole, onShutdown, onRestart, 
     const protocol = vConsole.get('protocol').toUpperCase()
     consoleProtocol = `Open ${protocol} Console`
   }
+
   return (
     <div className={isOnCard ? 'card-pf-items text-center' : style['left-padding']}>
       <EmptyAction state={status} isOnCard={isOnCard} />
       <Button isOnCard={isOnCard} actionDisabled={!canConsole(status) || vm.getIn(['actionInProgress', 'getConsole'])}
         className='pficon pficon-screen' tooltip={consoleProtocol} onClick={onGetConsole} />
+
       <Button isOnCard={isOnCard} actionDisabled={!canShutdown(status) || vm.getIn(['actionInProgress', 'shutdown'])}
-        className='fa fa-power-off' tooltip='Shut down the VM' onClick={onShutdown} confirmRequired={confirmShutdown} />
+        className='fa fa-power-off'
+        tooltip='Shut down the VM'
+        onClick={confirmShutdown} />
+
       <Button isOnCard={isOnCard} actionDisabled={!canRestart(status) || vm.getIn(['actionInProgress', 'restart'])}
-        className='pficon pficon-restart' tooltip='Reboot the VM' onClick={onRestart} confirmRequired={confirmRestart} />
+        className='pficon pficon-restart'
+        tooltip='Reboot the VM'
+        onClick={confirmRestart} />
+
       <Button isOnCard={isOnCard} actionDisabled={!canStart(status) || vm.getIn(['actionInProgress', 'start'])}
         className='fa fa-play' tooltip='Start the VM' onClick={onStart} />
+
       <Button isOnCard={isOnCard} actionDisabled={!canSuspend(status) || vm.getIn(['actionInProgress', 'suspend'])}
-        className='fa fa-pause' tooltip='Suspend the VM' onClick={onSuspend} confirmRequired={confirmSuspend} />
+        className='fa fa-pause'
+        tooltip='Suspend the VM'
+        onClick={confirmSuspend} />
     </div>
   )
 }
@@ -135,6 +163,7 @@ VmActions.propTypes = {
   onGetConsole: PropTypes.func.isRequired,
   onShutdown: PropTypes.func.isRequired,
   onRestart: PropTypes.func.isRequired,
+  onForceShutdown: PropTypes.func.isRequired,
   onStart: PropTypes.func.isRequired,
   onSuspend: PropTypes.func.isRequired,
 }
@@ -147,6 +176,7 @@ export default connect(
     onGetConsole: () => dispatch(getConsole({ vmId: vm.get('id') })),
     onShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: false })),
     onRestart: () => dispatch(restartVm({ vmId: vm.get('id'), force: false })),
+    onForceShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: true })),
     onStart: () => dispatch(startVm({ vmId: vm.get('id') })),
     onSuspend: () => dispatch(suspendVm({ vmId: vm.get('id') })),
   })
