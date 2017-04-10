@@ -195,7 +195,7 @@ module.exports = {
   },
   plugins: [
     new CopyWebpackPlugin([{
-      from: 'src/userportal.config',
+      from: 'src/ovirt-web-ui.config',
     }]),
     // Generates an `index.html` file with the <script> injected.
     new HtmlWebpackPlugin({

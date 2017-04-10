@@ -13,7 +13,6 @@ build
 .DS_Store
 npm-debug.log
 .idea
-userportal.iml
 
 Makefile
 Makefile.in
