@@ -96,9 +96,6 @@ function setupCompiler(port, protocol) {
       console.log();
       console.log('  ' + chalk.cyan(protocol + '://localhost:' + port + '/'));
       console.log();
-      console.log('Note that the development build is not optimized.');
-      console.log('To create a production build, use ' + chalk.cyan('npm run build') + '.');
-      console.log();
       return;
     }
 
@@ -162,7 +159,9 @@ function openBrowser(port, protocol) {
   }
   // Fallback to opn
   // (It will always open new tab)
-  opn(protocol + '://localhost:' + port + '/');
+  opn(protocol + '://localhost:' + port + '/').catch(err => {
+    // ignore errors - can happen when starting the server in docker container
+  })
 }
 
 // We need to provide a custom onError function for httpProxyMiddleware.
@@ -281,6 +280,9 @@ function runDevServer(port, protocol) {
     watchOptions: {
       ignored: /node_modules/
     },
+
+    stats: 'errors-only',
+
     // Enable HTTPS if the HTTPS environment variable is set to 'true'
     https: protocol === "https" ? true : false
   });
@@ -295,7 +297,7 @@ function runDevServer(port, protocol) {
     }
 
     clearConsole();
-    console.log(chalk.cyan('Starting the development server...'));
+    console.log(chalk.cyan('Starting server...'));
     console.log();
     openBrowser(port, protocol);
   });
@@ -331,6 +333,8 @@ detect(DEFAULT_PORT).then(port => {
       run(port);
     }
   });
+}).catch(err => {
+    console.error(err);
 });
 
 function getUserInfo () {
