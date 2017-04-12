@@ -24,6 +24,9 @@ Selectors = {
     return getState().operatingSystems.get('operatingSystems').toList().find(os =>
       os.get('name') === name)
   },
+  getFilter () {
+    return getState().config.get('filter')
+  },
 }
 
 function getState () {
