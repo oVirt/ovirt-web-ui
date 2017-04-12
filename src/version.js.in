@@ -1,0 +1,8 @@
+const Product = {
+  name: 'oVirt Basic Portal',
+  version: '@PACKAGE_RPM_VERSION@',
+  release: '@PACKAGE_RPM_RELEASE@',
+}
+
+export default Product
+

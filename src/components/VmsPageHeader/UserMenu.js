@@ -20,6 +20,10 @@ const UserMenu = ({ config, onLogout, onLogin }) => {
         </a>
         <ul className='dropdown-menu'>
           <li>
+            <a href='#' data-toggle='modal' data-target='#about-modal'>About</a>
+          </li>
+
+          <li>
             <a href='#' onClick={onLogout}>Log out</a>
           </li>
         </ul>
