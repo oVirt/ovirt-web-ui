@@ -174,6 +174,11 @@ OvirtApi = {
         return Promise.reject(data)
       })
   },
+  getOvirtApiMeta () {
+    OvirtApi._assertLogin({ methodName: 'checkOvirtApiVersion' })
+    const url = `${AppConfiguration.applicationContext}/api/`
+    return OvirtApi._httpGet({ url })
+  },
   getVm ({ vmId }) {
     OvirtApi._assertLogin({ methodName: 'getVm' })
     const url = `${AppConfiguration.applicationContext}/api/vms/${vmId}`

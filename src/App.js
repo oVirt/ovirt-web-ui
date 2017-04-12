@@ -9,6 +9,7 @@ import VmsList from './components/VmsList'
 import VmDetail from './components/VmDetail'
 import Options from './components/Options'
 import AboutDialog from './components/About'
+import OvirtApiCheckFailed from './components/OvirtApiCheckFailed'
 
 const App = ({ vms, visibility }) => {
   const selectedVmId = visibility.get('selectedVmDetail')
@@ -30,6 +31,7 @@ const App = ({ vms, visibility }) => {
         {detailToRender}
       </div>
       <AboutDialog />
+      <OvirtApiCheckFailed />
     </div>
   )
 }

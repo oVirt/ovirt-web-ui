@@ -18,6 +18,7 @@ import {
   SET_VM_DISKS,
   VM_ACTION_IN_PROGRESS,
   SET_VM_CONSOLES,
+  SET_OVIRT_API_VERSION,
 } from '../constants'
 
 export function login ({ username, password, token }) {
@@ -115,6 +116,15 @@ export function loginFailed ({ errorCode, message }) {
     payload: {
       errorCode,
       message,
+    },
+  }
+}
+
+export function setOvirtApiVersion (oVirtApiVersion) {
+  return {
+    type: SET_OVIRT_API_VERSION,
+    payload: {
+      oVirtApiVersion,
     },
   }
 }
