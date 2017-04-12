@@ -22,7 +22,7 @@ const VmsPageHeader = ({ title, onRefresh }) => {
 
         <ul className='nav navbar-nav navbar-utility'>
           <li>
-            <a href='#' data-toggle='dropdown' onClick={onRefresh}>
+            <a href='#' onClick={onRefresh}>
               <span className='fa fa-refresh' />&nbsp;Refresh
             </a>
           </li>
