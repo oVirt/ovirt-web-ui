@@ -28,6 +28,21 @@ function isUnread (userMessages) {
   return userMessages.get('unread')
 }
 
+const ContactAdminInfo = ({ userMessages }) => {
+  if (userMessages.get('records').size === 0) {
+    return null
+  }
+
+  return (
+    <div className={style['contact-admin']}>
+      Contact your administrator in case of issues
+    </div>
+  )
+}
+ContactAdminInfo.propTypes = {
+  userMessages: PropTypes.object.isRequired,
+}
+
 const VmUserMessages = ({ userMessages, onClearMessages }) => {
   return (
     <li className='dropdown'>
@@ -43,6 +58,7 @@ const VmUserMessages = ({ userMessages, onClearMessages }) => {
         <ul className='list-group messages-list'>
           {userMessages.get('records').map(r => (<UserMessage key={r.time} record={r} />))}
         </ul>
+        <ContactAdminInfo userMessages={userMessages} />
         <div className='footer'><a href='#' onClick={onClearMessages}>Clear Messages</a></div>
       </div>
     </li>
