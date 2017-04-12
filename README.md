@@ -99,13 +99,22 @@ For Firefox: [https://addons.mozilla.org/en-us/firefox/addon/remotedev/](https:/
 **Quick run using Docker**
 
 If you don't like to burden your system with all required Node.js dependencies,
-a prebuilt docker image `matobet/userportal` is available for standalone usage with a running
+a prebuilt docker image `mareklibra/ovirt-web-ui` is available for standalone usage with a running
 oVirt engine instance.
 
-Just specify where your oVirt engine is running and expose the port `3000` from the container. Example:
+Just specify where your oVirt engine is running in one of following example:
 
-  `docker run --rm -it -e ENGINE_URL=https://my.ovirt.instance/ovirt-engine/ -p 3000:3000 matobet/ovirt-web-ui`
+  - Most recent image, build from (recent) master branch:
+    `docker run --rm -it -e ENGINE_URL=https://[YOUR.OVIRT.INSTANCE.com]/ovirt-engine/ -p 3000:3000 mareklibra/ovirt-web-ui:master`
 
+  - Latest officially released version (see [Releases](https://github.com/oVirt/ovirt-web-ui/releases)):
+    `docker run --rm -it -e ENGINE_URL=https://[YOUR.OVIRT.INSTANCE.com]/ovirt-engine/ -p 3000:3000 mareklibra/ovirt-web-ui:latest`
+
+  - Particular officially released version (see [Releases](https://github.com/oVirt/ovirt-web-ui/releases)):
+    `docker run --rm -it -e ENGINE_URL=https://[YOUR.OVIRT.INSTANCE.com]/ovirt-engine/ -p 3000:3000 mareklibra/ovirt-web-ui:ovirt-web-ui-[VERSION_NUMBER]`
+    where **VERSION_NUMBER** is like **0.1.3**
+
+The ovirt-web-ui is then accessible on [http://localhost:3000](http://localhost:3000)
 
 ## Technical Details  
 - components maintained in [ovirt-ui-components](https://github.com/matobet/ovirt-ui-components) 

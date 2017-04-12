@@ -4,7 +4,7 @@ COPY index.html /
 COPY scripts /scripts
 COPY config /config
 COPY package.json /
-RUN npm install
+RUN yarn install
 COPY src /src
 
-ENTRYPOINT ["npm", "start"]
+ENTRYPOINT ["yarn", "start"]
