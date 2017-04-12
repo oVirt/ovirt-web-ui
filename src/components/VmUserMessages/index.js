@@ -10,10 +10,10 @@ import { clearUserMessages } from '../../actions/vm'
 const UserMessage = ({ record }) => {
   // TODO: render record.type
   return (
-    <li className={'list-group-item ' + style.crop} title={record.message} data-toggle='tooltip'>
+    <li className={`list-group-item ${style.crop}`} title={record.message} data-toggle='tooltip'>
       <span>
-        <Time time={record.time} />
-        <pre>
+        <pre className={style['message-box']}>
+          <Time time={record.time} cssClass={style['usermsg-time']} />
           {record.message}
         </pre>
       </span>
@@ -55,7 +55,7 @@ const VmUserMessages = ({ userMessages, onClearMessages }) => {
       <div className='dropdown-menu infotip bottom-right'>
         <div className={`arrow ${style['fix-arrow-position']}`} />
 
-        <ul className='list-group messages-list'>
+        <ul className={`list-group ${style['messages-list']}`}>
           {userMessages.get('records').map(r => (<UserMessage key={r.time} record={r} />))}
         </ul>
         <ContactAdminInfo userMessages={userMessages} />

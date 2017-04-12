@@ -2,16 +2,17 @@ import React, { PropTypes } from 'react'
 
 import { formatTwoDigits } from '../helpers'
 
-const Time = ({ time }) => {
+const Time = ({ time, cssClass }) => {
   const t = new Date(time)
   return (
-    <div>
+    <div className={cssClass}>
       {`${formatTwoDigits(t.getHours())}:${formatTwoDigits(t.getMinutes())}:${formatTwoDigits(t.getSeconds())}`}
     </div>
   )
 }
 Time.propTypes = {
   time: PropTypes.number.isRequired,
+  cssClass: PropTypes.string,
 }
 
 export default Time
