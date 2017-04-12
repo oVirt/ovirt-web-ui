@@ -105,13 +105,17 @@ oVirt engine instance.
 Just specify where your oVirt engine is running in one of following example:
 
   - Most recent image, build from (recent) master branch:
+  
     `docker run --rm -it -e ENGINE_URL=https://[YOUR.OVIRT.INSTANCE.com]/ovirt-engine/ -p 3000:3000 mareklibra/ovirt-web-ui:master`
 
   - Latest officially released version (see [Releases](https://github.com/oVirt/ovirt-web-ui/releases)):
+  
     `docker run --rm -it -e ENGINE_URL=https://[YOUR.OVIRT.INSTANCE.com]/ovirt-engine/ -p 3000:3000 mareklibra/ovirt-web-ui:latest`
 
   - Particular officially released version (see [Releases](https://github.com/oVirt/ovirt-web-ui/releases)):
+  
     `docker run --rm -it -e ENGINE_URL=https://[YOUR.OVIRT.INSTANCE.com]/ovirt-engine/ -p 3000:3000 mareklibra/ovirt-web-ui:ovirt-web-ui-[VERSION_NUMBER]`
+    
     where **VERSION_NUMBER** is like **0.1.3**
 
 The ovirt-web-ui is then accessible on [http://localhost:3000](http://localhost:3000)
