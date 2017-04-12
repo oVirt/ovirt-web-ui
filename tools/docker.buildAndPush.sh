@@ -41,6 +41,7 @@ function clone {
 
 function dockerBuild {
   echo Building docker image: $1
+  ./autogen.sh
   docker build -t $1 .
   docker images
 
