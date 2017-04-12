@@ -344,7 +344,9 @@ function* getConsoleVm (action) {
 
   if (consoleId) {
     const data = yield callExternalAction('console', Api.console, { action: 'INTERNAL_CONSOLE', payload: { vmId, consoleId } })
-    fileDownload({ data, fileName: 'console.vv', mimeType: 'application/x-virt-viewer' })
+    if (data.error === undefined) {
+      fileDownload({ data, fileName: 'console.vv', mimeType: 'application/x-virt-viewer' })
+    }
   }
 }
 
