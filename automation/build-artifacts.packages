@@ -1,0 +1,6 @@
+autoconf
+automake
+gcc-c++
+git
+rpmbuild
+yum-utils
