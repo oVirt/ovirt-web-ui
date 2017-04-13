@@ -205,7 +205,7 @@ function* fetchUnknwonIconsForVms ({ vms }) {
 
 function* fetchIcon ({ iconId }) {
   if (iconId) {
-    const icon = yield callExternalAction('icon', Api.icon, { payload: { id: iconId } })
+    const icon = yield callExternalAction('icon', Api.icon, { type: 'GET_ICON', payload: { id: iconId } })
     if (icon['media_type'] && icon['data']) {
       yield put(updateIcons({ icons: [Api.iconToInternal({ icon })] }))
     }
@@ -276,13 +276,13 @@ function* fetchSingleVm (action) {
 }
 
 function* fetchVmDisks ({ vmId }) {
-  const diskattachments = yield callExternalAction('diskattachments', Api.diskattachments, { payload: { vmId } })
+  const diskattachments = yield callExternalAction('diskattachments', Api.diskattachments, { type: 'GET_DISK_ATTACHMENTS', payload: { vmId } })
 
   if (diskattachments && diskattachments['disk_attachment']) { // array
     const internalDisks = []
     yield * foreach(diskattachments['disk_attachment'], function* (attachment) {
       const diskId = attachment.disk.id
-      const disk = yield callExternalAction('disk', Api.disk, { payload: { diskId } })
+      const disk = yield callExternalAction('disk', Api.disk, { type: 'GET_DISK_DETAILS', payload: { diskId } })
       internalDisks.push(Api.diskToInternal({ disk, attachment }))
     })
     return internalDisks
@@ -333,7 +333,7 @@ function* startVm (action) {
 }
 
 function* fetchConsoleVmMeta ({ vmId }) {
-  const consoles = yield callExternalAction('consoles', Api.consoles, { action: 'INTERNAL_CONSOLES', payload: { vmId } })
+  const consoles = yield callExternalAction('consoles', Api.consoles, { type: 'INTERNAL_CONSOLES', payload: { vmId } })
 
   if (consoles && consoles['graphics_console']) { // && consoles['graphics_console'].length > 0) {
     return Api.consolesToInternal({ consoles })
@@ -358,7 +358,7 @@ function* getConsoleVm (action) {
   }
 
   if (consoleId) {
-    const data = yield callExternalAction('console', Api.console, { action: 'INTERNAL_CONSOLE', payload: { vmId, consoleId } })
+    const data = yield callExternalAction('console', Api.console, { type: 'INTERNAL_CONSOLE', payload: { vmId, consoleId } })
     if (data.error === undefined) {
       fileDownload({ data, fileName: 'console.vv', mimeType: 'application/x-virt-viewer' })
     }
@@ -410,13 +410,18 @@ export function *rootSaga () {
 }
 
 // TODO: translate
-// TODO: move to ovirt-ui-actions
 const shortMessages = {
   'START_VM': 'Failed to start the VM',
   'RESTART_VM': 'Failed to restart the VM',
   'SHUTDOWN_VM': 'Failed to shutdown the VM',
   'GET_CONSOLE_VM': 'Failed to get the VM console',
   'SUSPEND_VM': 'Failed to suspend the VM',
+
+  'GET_ICON': 'Failed to retrieve VM icon',
+  'INTERNAL_CONSOLE': 'Failed to retrieve VM console details',
+  'INTERNAL_CONSOLES': 'Failed to retrieve list of VM consoles',
+  'GET_DISK_DETAILS': 'Failed to retrieve disk details',
+  'GET_DISK_ATTACHMENTS': 'Failed to retrieve VM disk attachments',
 }
 
 function shortErrorMessage ({ action }) {

@@ -198,7 +198,7 @@ OvirtApi = {
     return OvirtApi._httpPost({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/start`, input: '<action />' })
   },
   suspend ({ vmId }) {
-    OvirtApi._assertLogin({ methodName: 'start' })
+    OvirtApi._assertLogin({ methodName: 'suspend' })
     return OvirtApi._httpPost({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/suspend`, input: '<action />' })
   },
   restart ({ vmId }) {
