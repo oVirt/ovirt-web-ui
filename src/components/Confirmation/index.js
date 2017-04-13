@@ -60,12 +60,21 @@ const showConfirmation = (options) => {
   return createConfirmation(Confirmation)({ containerId, ...options })
 }
 
+export const closeAllConfirmationComponents = () => {
+  const containers = document.getElementsByClassName('confirmation-container')
+  for (let i = 0; i < containers.length; i++) {
+    const container = containers[i]
+    ReactDOM.unmountComponentAtNode(container)
+  }
+}
+
 const createConfirmation = () => {
   return (props) => {
     const { containerId } = props
     const container = document.getElementById(containerId)
     const wrapper = document.body.appendChild(container || document.createElement('div'))
     wrapper.id = containerId
+    wrapper.className = 'confirmation-container'
 
     function dispose () {
       setTimeout(() => {
