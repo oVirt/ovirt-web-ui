@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/oVirt/ovirt-web-ui.svg?branch=master)](https://travis-ci.org/oVirt/ovirt-web-ui)
 
-# User Portal for oVirt
+# VM Portal for oVirt
 Modern UI for standard (non-admin) oVirt users.
 
 This project aims to be a drop-in replacement of the existing Basic User Portal which includes selected functionality of the Power User Portal.
@@ -12,6 +12,17 @@ This project is not intended to be full-feature oVirt admin UI, its focus is on 
 
 For screenshots, see the [doc/screenshots](https://github.com/oVirt/ovirt-web-ui/blob/master/doc/screenshots) directory.
 
+## Try it!
+In oVirt 4.1 it is installed already. You can access the application at:
+
+    https://[ENGINE_FQDN]/ovirt-engine/web-ui
+
+Or you can run it stand-alone and connect to any oVirt 4.0+ setup using docker by running:
+
+    docker run --rm -it -e ENGINE_URL=https://[ENGINE.FQDN]/ovirt-engine -p 3000:3000 mareklibra/ovirt-web-ui
+
+and access the VM Portal on [http://localhost:3000](http://localhost:3000)
+
 ## Milestones
 For most current list of features please refer the [Milestones](https://github.com/oVirt/ovirt-web-ui/milestones) or [Issues](https://github.com/oVirt/ovirt-web-ui/issues) GitHub sections.
 
@@ -22,7 +33,7 @@ With this release, majority of oVirt Basic User Portal functionality is supporte
 
  - list of VMs (not pools)
  - basic operations (start, shut down, reboot, suspend)
- - take console
+ - open graphical console
  - present VM details
 
 ### [v1.1.0](https://github.com/oVirt/ovirt-web-ui/milestone/2)
@@ -32,43 +43,17 @@ The release shall include all features of the Basic User Portal and selected fun
  - VM pools
 
 ## Goals
-- Built on reusable components
-    - deploy User Portal as a self-standing app
-    - integrate in ManageIQ
-    - customize for your own oVirt UI 
-- In comparison to recent GWT UserPortal:
-    - improved usability and Look&Feel
+- The project focuses on reusability, extensibility and simplicity. Compared to the current GWT User Portal it provides:
+    - improved usability and look&feel
     - simplified maintenance & ongoing development
     - faster UI responses (incl. start-up)      
+    - easy customization for your own oVirt UI implementation
+    - can be deployed as a self-standing lightweight app (docker image)
+    - integration with other components like Cockpit or ManageIQ
 
 For more info, see [doc/goals.md](https://github.com/oVirt/ovirt-web-ui/blob/master/doc/goals.md)
  
-## How To Run
-### Quick run using Docker
-
-If you don't like to burden your system with all required Node.js dependencies,
-a prebuilt docker image `mareklibra/ovirt-web-ui` is available for standalone usage 
-**with a running oVirt engine instance**.
-
-Just specify where your oVirt engine is running in one of following example:
-
-  - **Most recent image**, built from (recent) master branch:
-
-    `docker run --rm -it -e ENGINE_URL=https://[OVIRT.ENGINE.FQDN]/ovirt-engine/ -p 3000:3000 mareklibra/ovirt-web-ui:master`
-
-  - **Latest officially released version** (see [Releases](https://github.com/oVirt/ovirt-web-ui/releases)):
-
-    `docker run --rm -it -e ENGINE_URL=https://[OVIRT.ENGINE.FQDN]/ovirt-engine/ -p 3000:3000 mareklibra/ovirt-web-ui:latest`
-
-
-Wait till following message is displayed:
-
-    The app is running at:
-    
-      http://localhost:3000/
-    
-The ovirt-web-ui is then accessible on [http://localhost:3000](http://localhost:3000)
-
+## Development setup
 
 ### Prerequisites
 
@@ -89,6 +74,31 @@ You can access the application at: `https://[ENGINE_URL]/web-ui`
 Please note, starting ovirt-4.1, the ovirt-web-ui is installed with ovirt-engine by default.
 
 Latest ovirt-web-ui RPM can be found in the [http://resources.ovirt.org/repos/ovirt/tested/master/rpm](http://resources.ovirt.org/repos/ovirt/tested/master/rpm) yum repository. 
+
+### Quick run using Docker
+
+If you don't like to burden your system with all required Node.js dependencies,
+a prebuilt docker image `mareklibra/ovirt-web-ui` is available for standalone usage 
+**with a running oVirt engine instance**.
+
+Just specify where your oVirt engine is running in one of following example:
+
+  - **Latest released version** (see [Releases](https://github.com/oVirt/ovirt-web-ui/releases)):
+
+    `docker run --rm -it -e ENGINE_URL=https://[OVIRT.ENGINE.FQDN]/ovirt-engine/ -p 3000:3000 mareklibra/ovirt-web-ui:latest`
+
+  - **Most recent image**, built from master branch:
+
+    `docker run --rm -it -e ENGINE_URL=https://[OVIRT.ENGINE.FQDN]/ovirt-engine/ -p 3000:3000 mareklibra/ovirt-web-ui:master`
+
+
+Wait till the application gets ready:
+
+    The app is running at:
+    
+      http://localhost:3000/
+    
+The ovirt-web-ui is then accessible on [http://localhost:3000](http://localhost:3000)
 
 ### Build
 
