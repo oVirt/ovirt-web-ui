@@ -56,6 +56,11 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-engine/engine.conf.d/50-ovirt-web-ui.conf
 
 %changelog
+* Wed Apr 12 2017 Marek Libra <mlibra@redhat.com> - 0.1.3
+- UI fixes
+- docker builds
+- oVirt API version check
+- About dialog
 * Mon Feb 20 2017 Marek Libra <mlibra@redhat.com> - 0.1.2
 - Minor UI fixes, npm replaced by yarn
 * Fri Dec 16 2016 Marek Libra <mlibra@redhat.com> - 0.1.1
