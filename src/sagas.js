@@ -77,7 +77,7 @@ import {
 } from './constants/index'
 
 // import store from './store'
-import Api from './ovirtapi'
+import Api from 'ovirtapi'
 import { persistStateToLocalStorage } from './storage'
 import Selectors from './selectors'
 import AppConfiguration from './config'
@@ -301,7 +301,7 @@ function* fetchSinglePool (action) {
   yield put(updateVmsPoolsCount())
 }
 
-function* fetchSingleVm (action) {
+export function* fetchSingleVm (action) {
   const vm = yield callExternalAction('getVm', Api.getVm, action, true)
 
   if (vm && vm.id) {
@@ -445,7 +445,7 @@ function* getConsoleVm (action) {
 /**
  * VmDetail is to be rendered.
  */
-function* selectVmDetail (action) {
+export function* selectVmDetail (action) {
   yield put(setVmDetailToShow({ vmId: action.payload.vmId }))
   yield fetchSingleVm(getSingleVm({ vmId: action.payload.vmId })) // async data refresh
 }
