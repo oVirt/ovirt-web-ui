@@ -25,7 +25,7 @@ const App = ({ vms, visibility }) => {
 
   return (
     <div>
-      <VmsPageHeader title='oVirt User Portal' />
+      <VmsPageHeader title='oVirt VM Portal' />
       <div className={'container-fluid ' + style['navbar-top-offset']}>
         <VmsList />
         {detailToRender}
