@@ -13,7 +13,7 @@
 Name:           ovirt-web-ui
 Version:        @PACKAGE_RPM_VERSION@
 Release:        @PACKAGE_RPM_RELEASE@%{?release_suffix}%{?checkout}%{?dist}
-Summary:        User Portal for %{product}
+Summary:        VM Portal for %{product}
 License:        ASL 2.0
 URL:            https://github.com/oVirt/ovirt-web-ui
 Source0:        https://github.com/oVirt/ovirt-web-ui/archive/%{source_basename}-@PACKAGE_VERSION@.tar.gz
@@ -29,7 +29,7 @@ BuildRequires: ovirt-engine-yarn = 0.19.1
 BuildRequires: ovirt-engine-nodejs-modules = 1.0.7 
 
 %description
-This package provides new User Portal for %{product}, so far as technical preview.
+This package provides new VM Portal for %{product}, so far as technical preview.
 
 %prep
 # Use the ovirt-engine nodejs installation
