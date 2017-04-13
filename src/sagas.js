@@ -66,7 +66,18 @@ function* callExternalAction (methodName, method, action, canBeMissing = false) 
   } catch (e) {
     if (!canBeMissing || e.status !== 404) {
       logDebug(`External action exception: ${JSON.stringify(e)}`)
-      yield put(failedExternalAction({ exception: e, shortMessage: shortErrorMessage({ action }), action }))
+
+      let shortMessage = shortErrorMessage({ action })
+      if (e.status === 0 && e.statusText === 'error') { // special case, mixing https and http
+        shortMessage = 'oVirt API connection failed'
+        e.statusText = 'Unable to connect to oVirt REST API. Please check URL and protocol (https).'
+      }
+
+      yield put(failedExternalAction({
+        exception: e,
+        shortMessage,
+        action,
+      }))
     }
     return { error: e }
   }
@@ -97,14 +108,18 @@ function* login (action) {
     yield put(loginSuccessful({ token, username }))
 
     const oVirtMeta = yield callExternalAction('getOvirtApiMeta', Api.getOvirtApiMeta, action)
-    if (yield checkOvirtApiVersion(oVirtMeta)) {
-      yield put(getAllVms({ shallowFetch: false }))
-    } else { // oVirt API of incompatible version
-      console.error('oVirt api version check failed')
-      yield put(failedExternalAction({
-        message: composeIncompatibleOVirtApiVersionMessage(oVirtMeta),
-        shortMessage: 'oVirt API version check failed' }))
+    if (!oVirtMeta['product_info']) { // REST API call failed
       yield put(yield put(loadInProgress({ value: false })))
+    } else {
+      if (yield checkOvirtApiVersion(oVirtMeta)) {
+        yield put(getAllVms({ shallowFetch: false }))
+      } else { // oVirt API of incompatible version
+        console.error('oVirt api version check failed')
+        yield put(failedExternalAction({
+          message: composeIncompatibleOVirtApiVersionMessage(oVirtMeta),
+          shortMessage: 'oVirt API version check failed' }))
+        yield put(yield put(loadInProgress({ value: false })))
+      }
     }
   } else {
     yield put(loginFailed({
