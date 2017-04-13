@@ -161,6 +161,7 @@ class ConfirmationContent extends React.Component {
   }
 
   onScroll () {
+    logDebug('onScroll() called')
     this.computePosition()
   }
 
@@ -168,10 +169,7 @@ class ConfirmationContent extends React.Component {
     this.computePosition()
 
     window.addEventListener('resize', this.onScroll)
-
-    // TODO: none of following is working when scrolling:
-    document.getElementById('root').addEventListener('scroll', this.onScroll)
-    window.addEventListener('scroll', this.onScroll)
+    document.querySelector('.container-cards-pf').addEventListener('scroll', this.onScroll)
   }
 
   componentWillUnmount () {
@@ -270,13 +268,9 @@ class ConfirmationContent extends React.Component {
   }
 
   getElementPosition (e) {
-    let x = 0
-    let y = 0
-    while (e != null) {
-      x += e.offsetLeft
-      y += e.offsetTop
-      e = e.offsetParent
-    }
+    const rect = e.getBoundingClientRect()
+    const x = rect.left
+    const y = rect.top
     return { x, y }
   }
 }
