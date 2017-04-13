@@ -44,7 +44,33 @@ The release shall include all features of the Basic User Portal and selected fun
 For more info, see [doc/goals.md](https://github.com/oVirt/ovirt-web-ui/blob/master/doc/goals.md)
  
 ## How To Run
-**Prerequisites**
+### Quick run using Docker
+
+If you don't like to burden your system with all required Node.js dependencies,
+a prebuilt docker image `mareklibra/ovirt-web-ui` is available for standalone usage 
+**with a running oVirt engine instance**.
+
+Just specify where your oVirt engine is running in one of following example:
+
+  - **Most recent image**, built from (recent) master branch:
+
+    `docker run --rm -it -e ENGINE_URL=https://[OVIRT.ENGINE.FQDN]/ovirt-engine/ -p 3000:3000 mareklibra/ovirt-web-ui:master`
+
+  - **Latest officially released version** (see [Releases](https://github.com/oVirt/ovirt-web-ui/releases)):
+
+    `docker run --rm -it -e ENGINE_URL=https://[OVIRT.ENGINE.FQDN]/ovirt-engine/ -p 3000:3000 mareklibra/ovirt-web-ui:latest`
+
+
+Wait till following message is displayed:
+
+    The app is running at:
+    
+      http://localhost:3000/
+    
+The ovirt-web-ui is then accessible on [http://localhost:3000](http://localhost:3000)
+
+
+### Prerequisites
 
 - Have the **oVirt engine running** at https://[ENGINE_URL]
     - example: https://engine.local/ovirt-engine 
@@ -64,7 +90,7 @@ Please note, starting ovirt-4.1, the ovirt-web-ui is installed with ovirt-engine
 
 Latest ovirt-web-ui RPM can be found in the [http://resources.ovirt.org/repos/ovirt/tested/master/rpm](http://resources.ovirt.org/repos/ovirt/tested/master/rpm) yum repository. 
 
-**Build**
+### Build
 
 After `git clone` and meeting all **Prerequisities** above, you can build from sources by:
 
@@ -77,7 +103,7 @@ After `git clone` and meeting all **Prerequisities** above, you can build from s
     # or
     make rpm    # to create (s)rpms under 'tmp.repos'
 
-**Development mode**
+### Development mode
 
 Please check, you can **build** the application (see above).
 
@@ -88,43 +114,13 @@ Then to shorten development cycle (change-build-deploy-check), you can:
 When asked, provide valid username (in the form of `user@domain`) and password so
 the application can start in the context of a logged in user.
 
-**Redux Dev Tools**
+### Redux Dev Tools
 The Redux Dev Tools can significantly simplify debuging of the application.
 
 For Chrome: [https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd)
 
 For Firefox: [https://addons.mozilla.org/en-us/firefox/addon/remotedev/](https://addons.mozilla.org/en-us/firefox/addon/remotedev/)
 
-
-**Quick run using Docker**
-
-If you don't like to burden your system with all required Node.js dependencies,
-a prebuilt docker image `mareklibra/ovirt-web-ui` is available for standalone usage with a running
-oVirt engine instance.
-
-Just specify where your oVirt engine is running in one of following example:
-
-  - **Most recent image**, built from (recent) master branch:
-
-    `docker run --rm -it -e ENGINE_URL=https://[YOUR.OVIRT.INSTANCE.com]/ovirt-engine/ -p 3000:3000 mareklibra/ovirt-web-ui:master`
-
-  - **Latest officially released version** (see [Releases](https://github.com/oVirt/ovirt-web-ui/releases)):
-
-    `docker run --rm -it -e ENGINE_URL=https://[YOUR.OVIRT.INSTANCE.com]/ovirt-engine/ -p 3000:3000 mareklibra/ovirt-web-ui:latest`
-
-  - **Particular officially released version** (see [Releases](https://github.com/oVirt/ovirt-web-ui/releases)):
-
-    `docker run --rm -it -e ENGINE_URL=https://[YOUR.OVIRT.INSTANCE.com]/ovirt-engine/ -p 3000:3000 mareklibra/ovirt-web-ui:ovirt-web-ui-[VERSION_NUMBER]`
-    
-    where **VERSION_NUMBER** is like **0.1.3**
-
-Wait till following message is displayed:
-
-    The app is running at:
-    
-      http://localhost:3000/
-    
-The ovirt-web-ui is then accessible on [http://localhost:3000](http://localhost:3000)
 
 ## Technical Details  
 - components maintained in [ovirt-ui-components](https://github.com/matobet/ovirt-ui-components) 
