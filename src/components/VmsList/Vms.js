@@ -5,6 +5,7 @@ import style from './style.css'
 import Vm from './Vm'
 
 import { closeDetail } from '../../actions'
+import { closeAllConfirmationComponents } from '../Confirmation'
 
 const Vms = ({ vms, visibility, onCloseDetail }) => {
   const isDetailVisible = visibility.get('selectedVmDetail') || visibility.get('showOptions')
@@ -13,6 +14,7 @@ const Vms = ({ vms, visibility, onCloseDetail }) => {
 
   const closeDetail = isDetailVisible
     ? (event) => {
+      closeAllConfirmationComponents()
       onCloseDetail()
       event.stopPropagation()
     }
