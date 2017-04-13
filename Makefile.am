@@ -47,7 +47,8 @@ DISTCLEANFILES = $(PACKAGE)-$(VERSION).tar.gz \
 DISTCLEANDIRS = autom4te.cache \
 	engine-plugin \
 	tmp.repos \
-	build
+	build \
+	dockerbuild
 
 TMPREPOS = tmp.repos
 RPMBUILD_ARGS := 
