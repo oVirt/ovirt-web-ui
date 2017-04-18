@@ -366,7 +366,7 @@ function getUserInfo () {
       if (err) {
         return reject(err)
       }
-      if ('access_token' in body) {
+      if (body['access_token']) {
         resolve({
           userName: username,
           ssoToken: body.access_token,
