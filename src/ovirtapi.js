@@ -228,7 +228,9 @@ OvirtApi = {
   },
   console ({ vmId, consoleId }) {
     OvirtApi._assertLogin({ methodName: 'console' })
-    return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/graphicsconsoles/${consoleId}`, custHeaders: { Accept: 'application/x-virt-viewer' } })
+    return OvirtApi._httpGet({
+      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/graphicsconsoles/${consoleId}`,
+      custHeaders: { Accept: 'application/x-virt-viewer', Filter: true } })
   },
 }
 
