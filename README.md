@@ -1,6 +1,8 @@
 [![Build Status](https://travis-ci.org/oVirt/ovirt-web-ui.svg?branch=master)](https://travis-ci.org/oVirt/ovirt-web-ui)
 
 # VM Portal for oVirt
+![Alt text](https://raw.githubusercontent.com/oVirt/ovirt-web-ui/master/doc/screenshots/v0.1.3_2017-Feb/02_vmDetail.png "Screenshot")
+
 Modern UI for standard (non-admin) oVirt users.
 
 This project aims to be a drop-in replacement of the existing Basic User Portal which includes selected functionality of the Power User Portal.
@@ -10,7 +12,7 @@ The application is built with performance in mind.
 
 This project is not intended to be full-feature oVirt admin UI, its focus is on standard users with no or limited administration skills or privileges.
 
-For screenshots, see the [doc/screenshots](https://github.com/oVirt/ovirt-web-ui/blob/master/doc/screenshots) directory.
+For more screenshots, see the [doc/screenshots](https://github.com/oVirt/ovirt-web-ui/blob/master/doc/screenshots) directory.
 
 ## Try it!
 In oVirt 4.1 it is installed already. You can access the application at:
