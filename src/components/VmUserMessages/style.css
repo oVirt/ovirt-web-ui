@@ -3,7 +3,7 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    width: inherit;
+    margin-left: 15px !important;
 }
 
 .fix-arrow-position {
@@ -20,9 +20,21 @@
 
 .messages-list {
 	height: 300px;
+	width: 500px;
 	overflow-y: auto;
+	overflow-x: auto;
 }
 
 .contact-admin {
     padding: 6px 15px;
+}
+
+pre.message-box {
+	white-space: pre-wrap;
+}
+
+.usermsg-time {
+	text-align: right;
+    border-bottom: solid 1px lightgray;
+    margin-bottom: 10px;
 }
