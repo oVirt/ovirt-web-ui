@@ -3,9 +3,8 @@ import React, { PropTypes } from 'react'
 const LabeledTextField = ({
   id,
   label,
-  setValue,
+  onChange,
   placeholder = label,
-  getValue,
   value,
   type = 'text',
   disabled = false,
@@ -22,8 +21,7 @@ const LabeledTextField = ({
         className='form-control'
         id={id}
         placeholder={placeholder}
-        ref={getValue}
-        onChange={setValue}
+        onChange={onChange}
         value={value}
         min={min}
         step={step}
@@ -33,13 +31,11 @@ const LabeledTextField = ({
 )
 
 LabeledTextField.propTypes = {
-  getValue: PropTypes.func.isRequired,
-  setValue: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
   id: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
   placeholder: PropTypes.string,
   type: PropTypes.string,
-  key: PropTypes.string,
   value: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.number,

@@ -2,7 +2,7 @@ import { Exception } from './exceptions'
 
 let Selectors = {}
 Selectors = {
-  init ({ store }) { // TODO: avoid init method
+  init ({ store }) {
     Selectors.store = store
   },
   // --- config --
@@ -19,23 +19,6 @@ Selectors = {
   // --- vms --
   getVmDisks ({ vmId }) {
     return getState().vms.getIn(['vms', vmId, 'disks'])
-  },
-  getFirstCluster () {
-    return getState().clusters.get('clusters').toList().first()
-  },
-  getClusterById (id) {
-    return getState().clusters.get('clusters').get(id)
-  },
-  getClusterByName (name) {
-    return getState().clusters.get('clusters').toList().find(cluster =>
-      cluster.get('name') === name)
-  },
-  getTemplateById (id) {
-    return getState().templates.get('templates').get(id)
-  },
-  getTemplateByName (name) {
-    return getState().templates.get('templates').toList().find(template =>
-      template.get('name') === name)
   },
   getOperatingSystemByName (name) {
     return getState().operatingSystems.get('operatingSystems').toList().find(os =>

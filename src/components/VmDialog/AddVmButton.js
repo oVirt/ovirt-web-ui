@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 
-import { blankAddNewVm } from './actions'
+import { openAddVmDialog } from '../../actions/index'
 
 const AddVmButton = ({ name, toggleDialog }) => (
   <div>
@@ -10,8 +10,7 @@ const AddVmButton = ({ name, toggleDialog }) => (
       type='button'
       className='btn btn-primary'
       onClick={toggleDialog}>
-      <span className='pfincon pficon pficon-add-circle-o' />
-      {name}
+      <span className='pfincon pficon pficon-add-circle-o' />&nbsp;{name}
     </button>
   </div>
 )
@@ -25,6 +24,6 @@ export default connect(
   (state) => ({}),
   (dispatch) => ({
     toggleDialog: () =>
-      dispatch(blankAddNewVm()),
+      dispatch(openAddVmDialog()),
   })
 )(AddVmButton)

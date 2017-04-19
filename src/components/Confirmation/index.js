@@ -47,7 +47,6 @@ const OnClickTopConfirmation = ({ target, confirmationText, cancelLabel, okLabel
   )
 }
 
-// --------------------------------------------------------------------------------
 /**
  * A Promise is returned
  */

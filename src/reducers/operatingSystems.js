@@ -1,5 +1,5 @@
 import { fromJS } from 'immutable'
-import { actionReducer } from './utils'
+import { actionReducer, removeMissingItems } from './utils'
 
 const operatingSystems = actionReducer(fromJS({ operatingSystems: {}, loadInProgress: true }), {
   ADD_ALL_OS (state, { payload: { os } }) {
@@ -9,6 +9,10 @@ const operatingSystems = actionReducer(fromJS({ operatingSystems: {}, loadInProg
     })
     const imUpdates = fromJS(updates)
     return state.mergeIn(['operatingSystems'], imUpdates)
+  },
+
+  REMOVE_MISSING_OSS (state, { payload: { osIdsToPreserve } }) {
+    return removeMissingItems({ state, subStateName: 'operatingSystems', idsToPreserve: osIdsToPreserve })
   },
 })
 

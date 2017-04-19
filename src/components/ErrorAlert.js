@@ -6,7 +6,7 @@ const ErrorAlert = ({ message }) => {
       <span className='pficon pficon-error-circle-o' />
       <strong>{message}</strong>
     </div>
-  ) : (<div />)
+  ) : null
 }
 ErrorAlert.propTypes = {
   message: PropTypes.string,

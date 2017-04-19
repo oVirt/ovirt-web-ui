@@ -1,7 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-// import { Router, Route, browserHistory } from 'react-router'
 
 import './index-nomodules.css'
 import 'patternfly/dist/css/patternfly.css'
@@ -25,18 +24,6 @@ import { rootSaga } from './sagas'
 import { schedulerOneMinute, login, updateIcons } from './actions'
 
 import App from './App'
-// import LoginForm from './LoginForm'
-/*
-function requireLogin (nextState, replace) {
-  let token = store.getState().config.get('loginToken')
-  if (!token) {
-    replace({
-      pathname: `${AppConfiguration.applicationURL}/login`,
-      state: { nextPathname: nextState.location.pathname },
-    })
-  }
-}
-*/
 
 function renderApp () {
   ReactDOM.render(
@@ -46,45 +33,6 @@ function renderApp () {
     document.getElementById('root')
   )
 }
-/*
-function renderAppWithRouter () {
-  const urlPrefix = `${AppConfiguration.applicationURL}`
-  ReactDOM.render(
-    <Provider store={store}>
-      <Router history={browserHistory}>
-        <Route path={`${urlPrefix}/`} component={App} />
-      </Router>
-    </Provider>,
-    document.getElementById('root')
-  )
-}
-*/
-/*
-function fetchToken () {
-  // get token from session storage
-  const { token, username } = loadTokenFromSessionStorage()
-  if (token) {
-    return { token, username }
-  }
-
-  if (AppConfiguration.sso && AppConfiguration.ssoRedirectURL && AppConfiguration.userPortalURL) {
-    // TODO: get request header for SSO token/username; store to session storage; continue with token
-    // TODO: return {token, username}
-
-    // else redirect to SSO
-    const language = window.navigator.userLanguage || window.navigator.language
-    const ssoUrl = AppConfiguration.ssoRedirectURL
-      .replace('[UP_URL]', encodeURIComponent(AppConfiguration.userPortalURL))
-      .replace('[LOCALE]', encodeURIComponent(language))
-    window.location.replace(ssoUrl)
-    // END OF THIS APP
-  } else {
-    // SSO is not configured, show LoginForm
-    console.log('SSO is not configured, rendering own Login Form. Please consider setting "ssoRedirectURL" and "userPortalURL" in the userportal.config file.')
-    return {}
-  }
-}
-*/
 
 /**
  * oVirt SSO is required

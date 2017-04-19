@@ -9,9 +9,7 @@ import visibility from './visibility'
 import templates from './templates'
 import clusters from './clusters'
 import operatingSystems from './operatingSystems'
-import dialogVisibility from './dialogVisibility'
 import vmDialog from './vmDialog'
-import editTemplate from './editTemplate'
 
 function router (redirectUrl = '/', action) {
   switch (action.type) {
@@ -31,8 +29,6 @@ export default combineReducers({
   router,
   templates,
   clusters,
-  dialogVisibility,
   vmDialog,
   operatingSystems,
-  editTemplate,
 })

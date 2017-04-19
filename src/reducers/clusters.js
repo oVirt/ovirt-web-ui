@@ -1,5 +1,5 @@
 import { fromJS } from 'immutable'
-import { actionReducer } from './utils'
+import { actionReducer, removeMissingItems } from './utils'
 
 const clusters = actionReducer(fromJS({ clusters: {}, loadInProgress: true }), {
   ADD_CLUSTERS (state, { payload: { clusters } }) {
@@ -9,6 +9,10 @@ const clusters = actionReducer(fromJS({ clusters: {}, loadInProgress: true }), {
     })
     const imUpdates = fromJS(updates)
     return state.mergeIn(['clusters'], imUpdates)
+  },
+
+  REMOVE_MISSING_CLUSTERS (state, { payload: { clusterIdsToPreserve } }) {
+    return removeMissingItems({ state, subStateName: 'clusters', idsToPreserve: clusterIdsToPreserve })
   },
 })
 

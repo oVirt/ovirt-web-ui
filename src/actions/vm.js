@@ -19,6 +19,8 @@ import {
   VM_ACTION_IN_PROGRESS,
   SET_VM_CONSOLES,
   SET_OVIRT_API_VERSION,
+  ADD_NEW_VM,
+  EDIT_VM,
 } from '../constants'
 
 export function login ({ username, password, token }) {
@@ -99,9 +101,25 @@ export function suspendVm ({ vmId }) {
   }
 }
 
-export function showEditVm ({ vm }) {
+/**
+ * New VM will be created in oVirt (REST API)
+ */
+export function createVm (vm, runImmediately) {
   return {
-    type: 'SHOW_EDIT_VM',
+    type: ADD_NEW_VM,
+    payload: {
+      vm,
+      runImmediately,
+    },
+  }
+}
+
+/**
+ * Existing VM definition will be updated in oVirt (REST API)
+ */
+export function editVm (vm) {
+  return {
+    type: EDIT_VM,
     payload: {
       vm,
     },

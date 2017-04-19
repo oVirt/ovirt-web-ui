@@ -5,37 +5,42 @@ import style from './App.css'
 
 import VmsPageHeader from './components/VmsPageHeader'
 
-import VmsList from './components/VmsList'
+import VmsList from './components/VmsList/index'
 import VmDetail from './components/VmDetail'
 import Options from './components/Options'
 import AboutDialog from './components/About'
 import OvirtApiCheckFailed from './components/OvirtApiCheckFailed'
 
-import AddVmButton from './AddVmButton'
-import VmDialog from './AddVmDialog'
+import AddVmButton from './components/VmDialog/AddVmButton'
+import VmDialog from './components/VmDialog/index'
 
-const App = ({ vms, visibility, dialogVisibility }) => {
-  const selectedVmId = visibility.get('selectedVmDetail')
-  const showOptions = visibility.get('showOptions')
-  const showVmDialog = dialogVisibility.get('showVmDialog')
-  const showVmDetail = dialogVisibility.get('showVmDetail')
+const App = ({ vms, visibility }) => {
+  const selectedVmId = visibility.get('selectedVmDetail') // TODO: move to 'connect()' function
+  const selectedVm = selectedVmId ? vms.getIn(['vms', selectedVmId]) : undefined
 
-  let detailToRender = ''
-  if (showOptions) {
-    detailToRender = (<Options />)
-  } else if (showVmDialog) {
-    detailToRender = (<VmDialog />)
-  } else if (showVmDetail && selectedVmId) {
-    const selectedVm = selectedVmId ? vms.getIn(['vms', selectedVmId]) : undefined
-    detailToRender = (<VmDetail vm={selectedVm} />)
+  let detailToRender = null
+  switch (visibility.get('dialogToShow')) {
+    case 'Options':
+      detailToRender = (<Options />)
+      break
+    case 'VmDialog':
+      detailToRender = (<VmDialog vm={selectedVm} />)
+      break
+    case 'VmDetail':
+      detailToRender = (<VmDetail vm={selectedVm} />)
+      break
   }
+
+  const addVmButton = detailToRender ? null : <AddVmButton name='Add New Virtual Machine' />
 
   return (
     <div>
       <VmsPageHeader title='oVirt VM Portal' />
       <div className={'container-fluid ' + style['navbar-top-offset']}>
-        <hr />
-        <AddVmButton name='Add New Virtual Machine' />
+        <div className={style['main-actions']}>
+          {addVmButton}
+        </div>
+
         <VmsList />
         {detailToRender}
       </div>
@@ -47,13 +52,11 @@ const App = ({ vms, visibility, dialogVisibility }) => {
 App.propTypes = {
   vms: PropTypes.object.isRequired,
   visibility: PropTypes.object.isRequired,
-  dialogVisibility: PropTypes.object.isRequired,
 }
 
 export default connect(
   (state) => ({
     vms: state.vms,
     visibility: state.visibility,
-    dialogVisibility: state.dialogVisibility,
   })
 )(App)

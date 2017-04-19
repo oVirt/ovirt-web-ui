@@ -1,5 +1,5 @@
 import Immutable from 'immutable'
-import { TOGGLE_OPTIONS, SET_VM_DETAIL_TO_SHOW, CLOSE_DETAIL } from '../constants'
+import { actionReducer } from './utils'
 
 /**
  * The Visibility reducer
@@ -10,19 +10,36 @@ import { TOGGLE_OPTIONS, SET_VM_DETAIL_TO_SHOW, CLOSE_DETAIL } from '../constant
  * @param action
  * @returns {*}
  */
-function visibility (state, action) {
-  state = state || Immutable.fromJS({ showOptions: false, selectedVmDetail: undefined })
+const visibility = actionReducer(Immutable.fromJS({
+  dialogToShow: undefined, // undefined, 'VmDetail', 'VmDialog', 'Options'
+  selectedVmDetail: undefined, // applicable if dialogToShow === 'VmDetail'
+}), {
+  CLOSE_DIALOG (state) {
+    return state
+      .delete('selectedVmDetail')
+      .set('dialogToShow', null)
+  },
 
-  switch (action.type) {
-    case TOGGLE_OPTIONS:
-      return state.set('showOptions', !state.get('showOptions'))
-    case SET_VM_DETAIL_TO_SHOW:
-      return state.set('selectedVmDetail', action.payload.vmId)
-    case CLOSE_DETAIL:
-      return state.delete('selectedVmDetail').set('showOptions', false)
-    default:
-      return state
-  }
-}
+  TOGGLE_OPTIONS (state) { // TODO: rename to OPEN_SETTINGS
+    return state
+      .set('dialogToShow', state.get('dialogToShow') === 'Options' ? null : 'Options')
+  },
+  SET_VM_DETAIL_TO_SHOW (state, action) { // rename to OPEN_VM_DETAIL
+    return state
+      .set('selectedVmDetail', action.payload.vmId)
+      .set('dialogToShow', 'VmDetail')
+  },
+
+  OPEN_ADD_VM_DIALOG (state) {
+    return state
+      .set('dialogToShow', 'VmDialog')
+  },
+
+  OPEN_EDIT_VM_DIALOG (state, action) {
+    return state
+      .set('dialogToShow', 'VmDialog')
+      .set('selectedVmDetail', action.payload.vmId)
+  },
+})
 
 export default visibility

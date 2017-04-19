@@ -6,8 +6,6 @@ import Vms from './Vms'
 
 /**
  * Data are fetched but no VM is available to display
- *
- * TODO: make use of New VM Dialog once this component is ready
  */
 const NoVm = () => {
   return (

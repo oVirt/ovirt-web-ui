@@ -4,7 +4,14 @@ import { connect } from 'react-redux'
 import style from './style.css'
 
 import { canRestart, canShutdown, canStart, canConsole, canSuspend } from 'ovirt-ui-components'
-import { getConsole, shutdownVm, restartVm, suspendVm, startVm, showEditVm } from '../../actions/vm'
+import {
+  getConsole,
+  shutdownVm,
+  restartVm,
+  suspendVm,
+  startVm,
+  openEditVmDialog,
+} from '../../actions/index'
 
 import OnClickTopConfirmation from '../Confirmation'
 
@@ -96,6 +103,7 @@ const VmActions = ({
   isOnCard = false,
   onGetConsole,
   onShutdown,
+  onForceShutdown,
   onRestart,
   onStart,
   onSuspend,
@@ -144,7 +152,9 @@ const VmActions = ({
     <div className={isOnCard ? 'card-pf-items text-center' : style['left-padding']}>
       <EmptyAction state={status} isOnCard={isOnCard} />
       <Button isOnCard={isOnCard} actionDisabled={!canConsole(status) || vm.getIn(['actionInProgress', 'getConsole'])}
-        className='pficon pficon-screen' tooltip={consoleProtocol} onClick={onGetConsole} />
+        className='pficon pficon-screen'
+        tooltip={consoleProtocol}
+        onClick={onGetConsole} />
 
       <Button isOnCard={isOnCard} actionDisabled={!canShutdown(status) || vm.getIn(['actionInProgress', 'shutdown'])}
         className='fa fa-power-off'
@@ -192,6 +202,6 @@ export default connect(
     onForceShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: true })),
     onStart: () => dispatch(startVm({ vmId: vm.get('id') })),
     onSuspend: () => dispatch(suspendVm({ vmId: vm.get('id') })),
-    onEdit: () => dispatch(showEditVm({ vm: vm })),
+    onEdit: () => dispatch(openEditVmDialog({ vmId: vm.get('id') })),
   })
 )(VmActions)
