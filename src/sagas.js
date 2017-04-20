@@ -379,7 +379,7 @@ function* schedulerPerMinute (action) {
     logDebug('schedulerPerMinute() event')
 
     const oVirtVersion = Selectors.getOvirtVersion()
-    if (oVirtVersion.passed) {
+    if (oVirtVersion.get('passed')) {
       // Actions to be executed no more than once per minute:
       // TODO: allow user to enable/disable the autorefresh
       yield put(getAllVms({ shallowFetch: true }))
