@@ -26,7 +26,7 @@ BuildRequires: ovirt-engine-nodejs = 6.9.4
 BuildRequires: ovirt-engine-yarn = 0.19.1
 
 # contains ovirt-ui-components-0.2.1
-BuildRequires: ovirt-engine-nodejs-modules = 1.0.7 
+BuildRequires: ovirt-engine-nodejs-modules = 1.0.9 
 
 %description
 This package provides new VM Portal for %{product}, so far as technical preview.
