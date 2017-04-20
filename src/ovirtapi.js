@@ -1,3 +1,5 @@
+// @flow
+
 import $ from 'jquery'
 
 import { logDebug } from './helpers'
@@ -5,17 +7,22 @@ import { Exception } from './exceptions'
 import Selectors from './selectors'
 import AppConfiguration from './config'
 
+type VmIdType = { vmId: string };
+type PoolIdType = { poolId: string };
+type InputRequestType = { url: string, input: string, contentType?: string };
+type VmType = { vm: Object };
+
 let OvirtApi = {}
 OvirtApi = {
-  _getLoginToken () { // redux store selector
+  _getLoginToken (): string { // redux store selector
     return Selectors.getLoginToken()
   },
-  _assertLogin ({ methodName }) {
+  _assertLogin ({ methodName }: { methodName: string }) {
     if (!OvirtApi._getLoginToken()) {
       throw new Exception(`OvirtApi in '${methodName}': missing login`)
     }
   },
-  _httpGet ({ url, custHeaders = { 'Accept': 'application/json', Filter: Selectors.getFilter() } }) {
+  _httpGet ({ url, custHeaders = { 'Accept': 'application/json', Filter: Selectors.getFilter() } }: { url: string, custHeaders?: Object}): Promise<Object> {
     logDebug(`_httpGet start: url="${url}"`)
     const headers = Object.assign({
       'Authorization': `Bearer ${OvirtApi._getLoginToken()}`,
@@ -25,13 +32,13 @@ OvirtApi = {
     return $.ajax(url, {
       type: 'GET',
       headers,
-    }).then(data => Promise.resolve(data))
-      .catch(data => {
+    }).then((data: Object): Promise<Object> => Promise.resolve(data))
+      .catch((data: Object): Promise<Object> => {
         logDebug(`Ajax failed: ${JSON.stringify(data)}`)
         return Promise.reject(data)
       })
   },
-  _httpPost ({ url, input, contentType = 'application/json' }) {
+  _httpPost ({ url, input, contentType = 'application/json' }: InputRequestType): Promise<Object> {
     return $.ajax(url, {
       type: 'POST',
       headers: {
@@ -41,23 +48,23 @@ OvirtApi = {
         'Filter': 'true',
       },
       data: input,
-    }).then(data => Promise.resolve(data))
-      .catch(data => {
+    }).then((data: Object): Promise<Object> => Promise.resolve(data))
+      .catch((data: Object): Promise<Object> => {
         logDebug(`Ajax failed: ${JSON.stringify(data)}`)
         return Promise.reject(data)
       })
   },
-  _httpPut ({ url, input }) {
+  _httpPut ({ url, input, contentType = 'application/json' }: InputRequestType): Promise<Object> {
     return $.ajax(url, {
       type: 'PUT',
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        'Content-Type': contentType,
         'Authorization': `Bearer ${OvirtApi._getLoginToken()}`,
       },
       data: input,
-    }).then(data => Promise.resolve(data))
-      .catch(data => {
+    }).then((data: Object): Promise<Object> => Promise.resolve(data))
+      .catch((data: Object): Promise<Object> => {
         logDebug(`Ajax failed: ${JSON.stringify(data)}`)
         return Promise.reject(data)
       })
@@ -68,8 +75,8 @@ OvirtApi = {
    * @param vm - Single entry from oVirt REST /api/vms
    * @returns {} - Internal representation of a VM
    */
-  vmToInternal ({ vm }) {
-    function vCpusCount ({ cpu }) {
+  vmToInternal ({ vm }: VmType): Object {
+    function vCpusCount ({ cpu }: { cpu: Object }): number {
       if (cpu && cpu.topology) {
         const top = cpu.topology
         let total = top.sockets ? top.sockets : 0
@@ -146,7 +153,7 @@ OvirtApi = {
    * @param pool - Single entry from oVirt REST /api/pools
    * @returns {} - Internal representation of a Pool
    */
-  poolToInternal ({ pool }) {
+  poolToInternal ({ pool }: { pool: Object }): Object {
     return {
       name: pool['name'],
       description: pool['description'],
@@ -163,7 +170,7 @@ OvirtApi = {
     }
   },
 
-  internalVmToOvirt ({ vm }) {
+  internalVmToOvirt ({ vm }: VmType): Object {
     return {
       name: vm.name,
       description: vm.description, // TODO: add to VmDialog
@@ -199,9 +206,9 @@ OvirtApi = {
    * @param disk - disk corresponding to the attachment
    * @returns {} - Internal representation of a single VM disk
    */
-  diskToInternal ({ disk, attachment }) {
-    function toBool (val) {
-      return val && val.toLowerCase() === 'true'
+  diskToInternal ({ disk, attachment }: { disk: Object, attachment: Object }): Object {
+    function toBool (val?: string): boolean {
+      return val !== undefined && val.toLowerCase() === 'true'
     }
 
     return {
@@ -218,7 +225,7 @@ OvirtApi = {
       format: disk['format'],
     }
   },
-  templateToInternal ({ template }) {
+  templateToInternal ({ template }: { template: Object}): Object {
     const version = {
       name: template.version ? template.version.version_name : undefined,
       number: template.version ? template.version.version_number : undefined,
@@ -247,36 +254,36 @@ OvirtApi = {
 
     }
   },
-  clusterToInternal ({ cluster }) {
+  clusterToInternal ({ cluster }: { cluster: Object }): Object {
     return {
       id: cluster.id,
       name: cluster.name,
     }
   },
-  OSToInternal ({ os }) {
+  OSToInternal ({ os }: { os: Object }): Object {
     return {
       id: os.id,
       name: os.name,
       description: os.description,
     }
   },
-  iconToInternal ({ icon }) {
+  iconToInternal ({ icon }: { icon: Object }): Object {
     return {
       id: icon.id,
       type: icon['media_type'],
       data: icon.data,
     }
   },
-  consolesToInternal ({ consoles }) {
-    return consoles['graphics_console'].map(c => {
+  consolesToInternal ({ consoles }: { consoles: Object }): Array<Object> {
+    return consoles['graphics_console'].map((c: Object): Object => {
       return {
         id: c.id,
         protocol: c.protocol,
       }
-    }).sort((a, b) => b.protocol.length - a.protocol.length) // Hack: 'VNC' is shorter then 'SPICE'
+    }).sort((a: Object, b: Object): number => b.protocol.length - a.protocol.length) // Hack: 'VNC' is shorter then 'SPICE'
   },
   // ----
-  login ({ credentials }) {
+  login ({ credentials }: { credentials: { username: string, password: string }}): Promise<Object> {
     const url = `${AppConfiguration.applicationContext}/sso/oauth/token?grant_type=urn:ovirt:params:oauth:grant-type:http&scope=ovirt-app-api`
     const user = credentials.username
     const pwd = credentials.password
@@ -287,28 +294,28 @@ OvirtApi = {
         'Accept': 'application/json',
         'Authorization': 'Basic ' + new Buffer(`${user}:${pwd}`, 'utf8').toString('base64'),
       },
-    }).then(data => Promise.resolve(data))
-      .catch(data => {
+    }).then((data: Object): Promise<Object> => Promise.resolve(data))
+      .catch((data: Object): Promise<Object> => {
         logDebug(`Ajax failed: ${JSON.stringify(data)}`)
         return Promise.reject(data)
       })
   },
-  getOvirtApiMeta () {
+  getOvirtApiMeta (): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'checkOvirtApiVersion' })
     const url = `${AppConfiguration.applicationContext}/api/`
     return OvirtApi._httpGet({ url })
   },
-  getVm ({ vmId }) {
+  getVm ({ vmId }: VmIdType): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'getVm' })
     const url = `${AppConfiguration.applicationContext}/api/vms/${vmId}`
     return OvirtApi._httpGet({ url })
   },
-  getAllVms () {
+  getAllVms (): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'getAllVms' })
     const url = `${AppConfiguration.applicationContext}/api/vms`
     return OvirtApi._httpGet({ url })
   },
-  shutdown ({ vmId, force }) {
+  shutdown ({ vmId, force }: { vmId: string, force: boolean }): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'shutdown' })
     let restMethod = 'shutdown'
     if (force) {
@@ -319,22 +326,22 @@ OvirtApi = {
       input: '{}',
     })
   },
-  getAllTemplates () {
+  getAllTemplates (): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'getAllTemplates' })
     const url = `${AppConfiguration.applicationContext}/api/templates`
     return OvirtApi._httpGet({ url })
   },
-  getAllClusters () {
+  getAllClusters (): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'getAllClusters' })
     const url = `${AppConfiguration.applicationContext}/api/clusters`
     return OvirtApi._httpGet({ url })
   },
-  getAllOperatingSystems () {
+  getAllOperatingSystems (): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'getAllOperatingSystems' })
     const url = `${AppConfiguration.applicationContext}/api/operatingsystems`
     return OvirtApi._httpGet({ url })
   },
-  addNewVm ({ vm }) {
+  addNewVm ({ vm }: VmType): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'addNewVm' })
     const input = JSON.stringify(OvirtApi.internalVmToOvirt({ vm }))
     logDebug(`OvirtApi.addNewVm(): ${input}`)
@@ -343,34 +350,34 @@ OvirtApi = {
       input,
     })
   },
-  editVm ({ vm }) {
+  editVm ({ vm }: VmType): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'editVm' })
     return OvirtApi._httpPut({
       url: `${AppConfiguration.applicationContext}/api/vms/${vm.id}`,
       input: JSON.stringify(vm),
     })
   },
-  start ({ vmId }) {
+  start ({ vmId }: VmIdType): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'start' })
     return OvirtApi._httpPost({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/start`,
       input: '{}' })
   },
-  suspend ({ vmId }) {
+  suspend ({ vmId }: VmIdType): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'suspend' })
     return OvirtApi._httpPost({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/suspend`,
       input: '{}',
     })
   },
-  restart ({ vmId }) { // 'force' is not exposed by oVirt API
+  restart ({ vmId }: VmIdType): Promise<Object> { // 'force' is not exposed by oVirt API
     OvirtApi._assertLogin({ methodName: 'restart' })
     return OvirtApi._httpPost({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/reboot`,
       input: '{}',
     })
   },
-  startPool ({ poolId }) {
+  startPool ({ poolId }: PoolIdType): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'startPool' })
     return OvirtApi._httpPost({
       url: `${AppConfiguration.applicationContext}/api/vmpools/${poolId}/allocatevm`,
@@ -378,40 +385,40 @@ OvirtApi = {
       contentType: 'application/xml',
     })
   },
-  icon ({ id }) {
+  icon ({ id }: { id: string }): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'icon' })
     return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/icons/${id}` })
   },
-  diskattachments ({ vmId }) {
+  diskattachments ({ vmId }: VmIdType): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'diskattachments' })
     return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/diskattachments` })
   },
-  disk ({ diskId }) {
+  disk ({ diskId }: { diskId: string }): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'disk' })
     return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/disks/${diskId}` })
   },
-  consoles ({ vmId }) {
+  consoles ({ vmId }: VmIdType): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'consoles' })
     return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/graphicsconsoles` })
   },
-  console ({ vmId, consoleId }) {
+  console ({ vmId, consoleId }: { vmId: string, consoleId: string }): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'console' })
     return OvirtApi._httpGet({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/graphicsconsoles/${consoleId}`,
       custHeaders: { Accept: 'application/x-virt-viewer', Filter: Selectors.getFilter() } })
   },
-  checkFilter () {
+  checkFilter (): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'checkFilter' })
     return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/permissions`, custHeaders: { Filter: false } })
   },
 
-  getAllPools () {
+  getAllPools (): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'getAllPools' })
     const url = `${AppConfiguration.applicationContext}/api/vmpools`
     return OvirtApi._httpGet({ url })
   },
 
-  getPool ({ poolId }) {
+  getPool ({ poolId }: PoolIdType): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'getPool' })
     const url = `${AppConfiguration.applicationContext}/api/vmpools/${poolId}`
     return OvirtApi._httpGet({ url })

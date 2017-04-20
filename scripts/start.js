@@ -16,6 +16,7 @@ var prompt = require('./utils/prompt');
 var config = require('../config/webpack.config.dev');
 var paths = require('../config/paths');
 var env = require('../config/env')
+var rimraf = require('rimraf')
 
 // Tools like Cloud9 rely on this.
 var DEFAULT_PORT = process.env.PORT || 3000;
@@ -70,6 +71,9 @@ function clearConsole() {
 }
 
 function setupCompiler(port, protocol) {
+
+  // Delete flow folder, because package flow wan't to do that before start
+  rimraf('/tmp/flow', function () { console.log('Flow folder deleted'); });
   // "Compiler" is a low-level interface to Webpack.
   // It lets us listen to some events and provide our own custom messages.
   compiler = webpack(config, handleCompile);
