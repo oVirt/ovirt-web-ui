@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import style from './style.css'
 
 import { canRestart, canShutdown, canStart, canConsole, canSuspend } from 'ovirt-ui-components'
-import { getConsole, shutdownVm, restartVm, suspendVm, startVm } from '../../actions/vm'
+import { getConsole, shutdownVm, restartVm, suspendVm, startVm, showEditVm } from '../../actions/vm'
 
 import OnClickTopConfirmation from '../Confirmation'
 
@@ -91,7 +91,16 @@ EmptyAction.propTypes = {
  * Active actions on a single VM-card.
  * List of actions depends on the VM state.
  */
-const VmActions = ({ vm, isOnCard = false, onGetConsole, onShutdown, onRestart, onForceShutdown, onStart, onSuspend }) => {
+const VmActions = ({
+  vm,
+  isOnCard = false,
+  onGetConsole,
+  onShutdown,
+  onRestart,
+  onStart,
+  onSuspend,
+  onEdit,
+}) => {
   const status = vm.get('status')
 
   const confirmShutdown = (e) => OnClickTopConfirmation({
@@ -154,6 +163,9 @@ const VmActions = ({ vm, isOnCard = false, onGetConsole, onShutdown, onRestart, 
         className='fa fa-pause'
         tooltip='Suspend the VM'
         onClick={confirmSuspend} />
+
+      <Button isOnCard={isOnCard}
+        className='pficon pficon-edit' tooltip='Edit the VM' onClick={onEdit} />
     </div>
   )
 }
@@ -166,6 +178,7 @@ VmActions.propTypes = {
   onForceShutdown: PropTypes.func.isRequired,
   onStart: PropTypes.func.isRequired,
   onSuspend: PropTypes.func.isRequired,
+  onEdit: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -179,5 +192,6 @@ export default connect(
     onForceShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: true })),
     onStart: () => dispatch(startVm({ vmId: vm.get('id') })),
     onSuspend: () => dispatch(suspendVm({ vmId: vm.get('id') })),
+    onEdit: () => dispatch(showEditVm({ vm: vm })),
   })
 )(VmActions)

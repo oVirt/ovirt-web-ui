@@ -23,6 +23,37 @@ import {
   persistState,
   getSingleVm,
   setOvirtApiVersion,
+
+  getAllTemplates,
+  getAllClusters,
+  getAllOperatingSystems,
+  addClusters,
+  addTemplates,
+  addAllOS,
+  updateCluster,
+  changeCluster,
+  updateTemplate,
+  changeTemplate,
+  updateOperatingSystem,
+  updateVmMemory,
+  updateVmCpu,
+  updateVmName,
+  updateDialogType,
+  updateVmId,
+  updateEditTemplateName,
+  updateEditTemplateDescription,
+  updateEditTemplateOS,
+  updateEditTemplateMemory,
+  updateEditTemplateCpu,
+  openVmDialog,
+  closeVmDialog,
+  openVmDetail,
+  closeVmDetail,
+  updateEditTemplate,
+  closeEditTemplate,
+  closeDetail,
+  updateVmDialogErrorMessage,
+  updateEditTemplateErrorMessage,
 } from './actions'
 
 import {
@@ -113,6 +144,10 @@ function* login (action) {
     } else {
       if (yield checkOvirtApiVersion(oVirtMeta)) {
         yield put(getAllVms({ shallowFetch: false }))
+
+        yield put(getAllClusters()) // no shallow
+        yield put(getAllOperatingSystems())
+        yield put(getAllTemplates({ shallowFetch: false }))
       } else { // oVirt API of incompatible version
         console.error('oVirt api version check failed')
         yield put(failedExternalAction({
@@ -332,6 +367,80 @@ function* startVm (action) {
   yield stopProgress({ vmId: action.payload.vmId, name: 'start', result })
 }
 
+function* showEditVm (action) {
+  yield put(updateDialogType('edit'))
+  const cluster = Selectors.getClusterById(action.payload.vm.get('cluster').get('id'))
+  yield put(updateCluster(cluster))
+
+  const template = Selectors.getTemplateById(action.payload.vm.get('template').get('id'))
+  yield put(updateTemplate(template))
+
+  yield put(updateVmId(action.payload.vm.get('id')))
+
+  const os = Selectors.getOperatingSystemByName(action.payload.vm.get('os').get('type'))
+  yield put(updateOperatingSystem(os))
+
+  const name = action.payload.vm.get('name')
+  yield put(updateVmName(name))
+
+  const memory = action.payload.vm.get('memory').get('total')
+  yield put(updateVmMemory(memory))
+
+  const cpu = action.payload.vm.get('cpu').get('vCPUs')
+  yield put(updateVmCpu(cpu))
+  yield put(openVmDialog())
+  yield put(setVmDetailToShow({ vmId: action.payload.vm.get('id') }))
+}
+
+function* showAddNewVm (action) {
+  yield put(setVmDetailToShow({ vmId: '0' }))
+  yield put(updateDialogType('create'))
+  const cluster = Selectors.getFirstCluster()
+  yield put(changeCluster(cluster))
+  yield put(updateVmId('0'))
+  yield put(updateVmName(''))
+  yield put(openVmDialog())
+}
+
+function* handleClusterChange (action) {
+  yield put(updateCluster(action.payload.cluster))
+  // After every cluster change, set template to Blank
+  const blankTemplate = Selectors.getTemplateById('00000000-0000-0000-0000-000000000000')
+  yield put(changeTemplate(blankTemplate))
+}
+
+function* handleTemplateChange (action) {
+  const template = action.payload.template
+  yield put(updateTemplate(template))
+  yield put(updateVmMemory(template.get('memory')))
+  yield put(updateVmCpu(template.get('cpu')))
+
+  const os = Selectors.getOperatingSystemByName(template.get('os'))
+  yield put(updateOperatingSystem(os))
+}
+
+function* handleEditTemplateChange (action) {
+  const template = action.payload.template
+  yield put(updateEditTemplate(template))
+  yield put(updateEditTemplateName(template.get('name')))
+  yield put(updateEditTemplateMemory(template.get('memory')))
+  yield put(updateEditTemplateCpu(template.get('cpu')))
+  yield put(updateEditTemplateDescription(template.get('description')))
+  yield put(updateEditTemplateOS(template.get('os')))
+}
+
+function* showEditTemplate () {
+  yield put(setVmDetailToShow({ vmId: '0' }))
+}
+
+function* closeDialog () {
+  yield put(updateVmDialogErrorMessage(''))
+  yield put(updateEditTemplateErrorMessage(''))
+  yield put(closeVmDialog())
+  yield put(closeVmDetail())
+  yield put(closeEditTemplate())
+}
+
 function* fetchConsoleVmMeta ({ vmId }) {
   const consoles = yield callExternalAction('consoles', Api.consoles, { type: 'INTERNAL_CONSOLES', payload: { vmId } })
 
@@ -366,6 +475,7 @@ function* getConsoleVm (action) {
 }
 
 function* selectVmDetail (action) {
+  yield put(openVmDetail())
   yield put(setVmDetailToShow({ vmId: action.payload.vmId }))
   yield fetchSingleVm(getSingleVm({ vmId: action.payload.vmId }))
 }
@@ -389,6 +499,80 @@ function* schedulerPerMinute (action) {
   }
 }
 
+function* createNewVm (action) {
+  yield put(updateVmDialogErrorMessage(''))
+  const result = yield callExternalAction('addNewVm', Api.addNewVm, action)
+  if (result.error) {
+    let msg = (result.error.responseJSON && result.error.responseJSON.detail) || ''
+    yield put(updateVmDialogErrorMessage(msg.replace(/^\[|\]$/mg, '')))
+  } else {
+    yield put(closeDetail())
+    yield put(getAllVms({ shallowFetch: false }))
+  }
+}
+
+function* editVm (action) {
+  yield put(updateVmDialogErrorMessage(''))
+  const result = yield callExternalAction('editVm', Api.editVm, action)
+  if (result.error) {
+    let msg = (result.error.responseJSON && result.error.responseJSON.detail) || ''
+    yield put(updateVmDialogErrorMessage(msg.replace(/^\[|\]$/mg, '')))
+  } else {
+    yield put(closeDetail())
+    yield put(getAllVms({ shallowFetch: false }))
+  }
+}
+
+function* editTemplate (action) {
+  yield put(updateEditTemplateErrorMessage(''))
+  const result = yield callExternalAction('editTemplate', Api.editTemplate, action)
+  if (result.error) {
+    let msg = (result.error.responseJSON && result.error.responseJSON.detail) || ''
+    yield put(updateEditTemplateErrorMessage(msg.replace(/^\[|\]$/mg, '')))
+  } else {
+    yield put(closeDetail())
+    yield put(getAllVms({ shallowFetch: false }))
+  }
+}
+
+function* fetchAllTemplates (action) {
+  const templates = yield callExternalAction('getAllTemplates', Api.getAllTemplates, action)
+
+  if (templates && templates['template']) {
+    const templatesInternal = templates.template.map(template => Api.templateToInternal({ template }))
+    yield put(addTemplates({ templates: templatesInternal }))
+    // update template in store for add vm dialog
+    const activeTemplate = Selectors.getTemplateById('00000000-0000-0000-0000-000000000000')
+    yield put(updateTemplate(activeTemplate))
+    yield put(updateVmMemory(activeTemplate.memory))
+    yield put(updateVmCpu(activeTemplate.cpu))
+    yield put(updateVmName(''))
+    // update template in store for edit template dialog
+    yield put(updateEditTemplate(activeTemplate))
+  }
+}
+
+function* fetchAllClusters (action) {
+  const clusters = yield callExternalAction('getAllClusters', Api.getAllClusters, action)
+
+  if (clusters && clusters['cluster']) {
+    const clustersInternal = clusters.cluster.map(cluster => Api.clusterToInternal({ cluster }))
+    yield put(addClusters({ clusters: clustersInternal }))
+    yield put(updateCluster(clustersInternal[0]))
+  }
+}
+
+function* fetchAllOS (action) {
+  const operatingSystems = yield callExternalAction('getAllOperatingSystems', Api.getAllOperatingSystems, action)
+
+  if (operatingSystems && operatingSystems['operating_system']) {
+    const operatingSystemsInternal = operatingSystems.operating_system.map(os => Api.OSToInternal({ os }))
+    yield put(addAllOS({ os: operatingSystemsInternal }))
+    const activeOperatingSystem = operatingSystemsInternal.find(os => os.name === 'other')
+    yield put(updateOperatingSystem(activeOperatingSystem))
+  }
+}
+
 export function *rootSaga () {
   yield [
     takeEvery(LOGIN, login),
@@ -402,6 +586,21 @@ export function *rootSaga () {
     takeEvery(START_VM, startVm),
     takeEvery(GET_CONSOLE_VM, getConsoleVm),
     takeEvery(SUSPEND_VM, suspendVm),
+
+    takeLatest('ADD_NEW_VM', createNewVm),
+    takeLatest('EDIT_VM', editVm),
+    takeLatest('EDIT_TEMPLATE', editTemplate),
+    takeLatest('GET_ALL_CLUSTERS', fetchAllClusters),
+    takeLatest('GET_ALL_TEMPLATES', fetchAllTemplates),
+    takeLatest('GET_ALL_OS', fetchAllOS),
+
+    takeEvery('SHOW_EDIT_VM', showEditVm),
+    takeEvery('SHOW_EDIT_TEMPLATE', showEditTemplate),
+    takeEvery('SHOW_BLANK_DIALOG', showAddNewVm),
+    takeEvery('CHANGE_CLUSTER', handleClusterChange),
+    takeEvery('CHANGE_TEMPLATE', handleTemplateChange),
+    takeEvery('CHANGE_EDIT_TEMPLATE', handleEditTemplateChange),
+    takeEvery('CLOSE_DETAIL', closeDialog),
 
     takeEvery(SELECT_VM_DETAIL, selectVmDetail),
 

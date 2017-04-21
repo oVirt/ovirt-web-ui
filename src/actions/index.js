@@ -3,6 +3,7 @@ import { PERSIST_STATE, GET_VM, SCHEDULER__1_MIN, REDIRECT_URL } from '../consta
 export * from './error'
 export * from './vm'
 export * from './visibility'
+export * from './dialog'
 
 export function persistState () {
   return {
