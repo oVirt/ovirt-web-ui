@@ -1,3 +1,5 @@
+import { Map } from 'immutable'
+
 /**
  * Takes initial state of the reducer and a map of action handlers and returns a redux-compatible reducer.
  *
@@ -36,4 +38,17 @@ export const actionReducer = (initialState, handlers) => (state = initialState, 
     return handlers[action.type](state, action)
   }
   return state
+}
+
+export function removeMissingItems ({ state, subStateName, idsToPreserve }) {
+  const newItems = idsToPreserve
+    .reduce((items, id) => {
+      const item = state.getIn([subStateName, id])
+      if (item) {
+        items.set(id, item)
+      }
+      return items
+    }, Map().asMutable())
+    .asImmutable()
+  return state.set(subStateName, newItems)
 }

@@ -1,3 +1,8 @@
 .navbar-top-offset {
     padding-top: 29px;
 }
+
+.main-actions {
+    padding: 5px;
+    text-align: right;
+}

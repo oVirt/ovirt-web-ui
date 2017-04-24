@@ -2,7 +2,7 @@ import { Exception } from './exceptions'
 
 let Selectors = {}
 Selectors = {
-  init ({ store }) { // TODO: avoid init method
+  init ({ store }) {
     Selectors.store = store
   },
   // --- config --
@@ -19,6 +19,10 @@ Selectors = {
   // --- vms --
   getVmDisks ({ vmId }) {
     return getState().vms.getIn(['vms', vmId, 'disks'])
+  },
+  getOperatingSystemByName (name) {
+    return getState().operatingSystems.get('operatingSystems').toList().find(os =>
+      os.get('name') === name)
   },
 }
 

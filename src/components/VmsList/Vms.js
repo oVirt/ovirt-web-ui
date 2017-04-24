@@ -4,11 +4,11 @@ import { connect } from 'react-redux'
 import style from './style.css'
 import Vm from './Vm'
 
-import { closeDetail } from '../../actions'
+import { closeDialog } from '../../actions'
 import { closeAllConfirmationComponents } from '../Confirmation'
 
 const Vms = ({ vms, visibility, onCloseDetail }) => {
-  const isDetailVisible = visibility.get('selectedVmDetail') || visibility.get('showOptions')
+  const isDetailVisible = !!visibility.get('dialogToShow')
   const containerClass = ['container-fluid', 'container-cards-pf', style['movable-left'],
     isDetailVisible ? style['moved-left'] : ''].join(' ')
 
@@ -46,6 +46,6 @@ export default connect(
     visibility: state.visibility,
   }),
   (dispatch) => ({
-    onCloseDetail: () => dispatch(closeDetail()),
+    onCloseDetail: () => dispatch(closeDialog()),
   })
 )(Vms)

@@ -1,6 +1,8 @@
 import Immutable, { Map } from 'immutable'
 
 import { logDebug, logError, hidePassword } from '../helpers'
+import { removeMissingItems } from './utils'
+
 import {
   UPDATE_VMS,
   REMOVE_VMS,
@@ -32,13 +34,7 @@ function removeVms ({ state, payload: { vmIds } }) {
   vmIds.forEach(vmId => mutable.deleteIn([ 'vms', vmId ]))
   return mutable.asImmutable()
 }
-
-/**
- *
- * @param state
- * @param vmIdsToPreserve array
- * @returns {*}
- */
+/*
 function removeMissingVms ({ state, payload: { vmIdsToPreserve } }) {
   const newVms = vmIdsToPreserve
     .reduce((vms, vmId) => {
@@ -51,6 +47,7 @@ function removeMissingVms ({ state, payload: { vmIdsToPreserve } }) {
     .asImmutable()
   return state.set('vms', newVms)
 }
+*/
 
 function setVmDisks ({ state, payload: { vmId, disks } }) {
   if (state.getIn(['vms', vmId])) {
@@ -100,7 +97,7 @@ function vms (state, action) {
     case REMOVE_VMS:
       return removeVms({ state, payload: action.payload })
     case REMOVE_MISSING_VMS:
-      return removeMissingVms({ state, payload: action.payload })
+      return removeMissingItems({ state, subStateName: 'vms', idsToPreserve: action.payload.vmIdsToPreserve })
     case SET_VM_DISKS:
       return setVmDisks({ state, payload: action.payload })
     case VM_ACTION_IN_PROGRESS:

@@ -8,7 +8,7 @@ import VmActions from '../VmActions'
 import { VmIcon, VmStatusIcon } from 'ovirt-ui-components'
 import { closeAllConfirmationComponents } from '../Confirmation'
 
-import { selectVmDetail } from '../../actions'
+import { selectVmDetail } from '../../actions/index'
 
 /**
  * Single icon-card in the list

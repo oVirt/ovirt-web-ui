@@ -9,6 +9,7 @@ import Time from '../Time'
 import VmActions from '../VmActions'
 import DetailContainer from '../DetailContainer'
 import { canConsole, userFormatOfBytes, VmIcon, VmDisks, VmStatusIcon } from 'ovirt-ui-components'
+import Selectors from '../../selectors'
 
 const LastMessage = ({ vmId, userMessages }) => {
   const vmMessages = userMessages.get('records')
@@ -66,6 +67,7 @@ class VmDetail extends Component {
     const iconId = vm.getIn(['icons', 'small', 'id'])
     const icon = icons.get(iconId)
     const disks = vm.get('disks')
+    const os = Selectors.getOperatingSystemByName(vm.getIn(['os', 'type']))
 
     const onToggleRenderDisks = () => { this.setState({ renderDisks: !this.state.renderDisks }) }
     const disksElement = this.state.renderDisks ? (<VmDisks disks={disks} />) : ''
@@ -85,7 +87,7 @@ class VmDetail extends Component {
           <dt>Description</dt>
           <dd>{vm.get('description')}</dd>
           <dt>Operating System</dt>
-          <dd>{vm.getIn(['os', 'type'])}</dd>
+          <dd>{os ? os.get('description') : vm.getIn(['os', 'type'])}</dd>
           <dt><span className='pficon pficon-memory' /> Defined Memory</dt>
           <dd>{userFormatOfBytes(vm.getIn(['memory', 'total'])).str}</dd>
           <dt><span className='pficon pficon-cpu' /> CPUs</dt>

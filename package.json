@@ -62,16 +62,20 @@
     "whatwg-fetch": "1.0.0"
   },
   "dependencies": {
+    "bootstrap-select": "^1.12.2",
     "bootstrap-switch": "3.3.2",
+    "immutable": "^3.8.1",
     "jquery": "^3.1.1",
     "ovirt-ui-components": "0.2.1",
     "patternfly": "^3.11.0",
     "prop-types": "^15.5.8",
+    "patternfly-bootstrap-combobox": "^1.1.7",
     "react": "^15.3.2",
     "react-bootstrap": "^0.30.8",
     "react-dom": "^15.3.2",
     "react-redux": "^4.4.5",
     "redux": "^3.6.0",
+    "redux-devtools-extension": "^1.0.0",
     "redux-saga": "^0.11.1"
   },
   "scripts": {

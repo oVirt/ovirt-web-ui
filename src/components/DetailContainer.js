@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 
-import { closeDetail } from '../actions'
+import { closeDialog } from '../actions'
 import { closeAllConfirmationComponents } from './Confirmation'
 
 import sharedStyle from './sharedStyle.css'
@@ -40,6 +40,6 @@ export default connect(
   (state) => ({
   }),
   (dispatch) => ({
-    onCloseDetail: () => dispatch(closeDetail()),
+    onCloseDetail: () => dispatch(closeDialog()),
   })
 )(DetailContainer)
