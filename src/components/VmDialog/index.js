@@ -261,6 +261,16 @@ class VmDialog extends React.Component {
 
     const submitText = isEdit ? 'Update VM' : 'Create VM'
 
+    const templateNameRenderer = (template) => {
+      const version = template.get('version')
+      const versionName = version.get('name')
+      const templateName = template.get('name')
+
+      return versionName
+        ? (`${templateName} (${versionName})`)
+        : templateName
+    }
+
     return (
       <DetailContainer>
         <h1>{isEdit ? 'Edit Virtual Machine' : 'Create A New Virtual Machine'}</h1>
@@ -290,7 +300,8 @@ class VmDialog extends React.Component {
             selectClass='combobox form-control'
             onChange={this.onChangeTemplate}
             value={template ? template.get('id') : ''}
-            data={sortedTemplates} />
+            data={sortedTemplates}
+            renderer={templateNameRenderer} />
 
           <LabeledSelect
             id='operatingSystemSelect'

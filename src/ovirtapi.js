@@ -195,6 +195,13 @@ OvirtApi = {
     }
   },
   templateToInternal ({ template }) {
+    console.log('========= template: ', template)
+    const version = {
+      name: template.version ? template.version.version_name : undefined,
+      number: template.version ? template.version.version_number : undefined,
+      baseTemplateId: template.version && template.version.base_template ? template.version.base_template.id : undefined,
+    }
+
     return {
       id: template.id,
       name: template.name,
@@ -202,7 +209,7 @@ OvirtApi = {
       clusterId: template.cluster ? template.cluster.id : null,
       memory: template.memory,
       cpu: template.cpu.topology.sockets,
-      version_number: template.version.version_number,
+      version,
       os: template.os.type,
     }
   },
