@@ -22,6 +22,8 @@ function sortedBy (immutableCollection, sortBy) { // TODO: move to helpers
   )
 }
 
+const zeroUID = '00000000-0000-0000-0000-000000000000'
+
 class VmDialog extends React.Component {
   constructor (props) {
     super(props)
@@ -49,7 +51,9 @@ class VmDialog extends React.Component {
 
     this.onChangeCluster = this.onChangeCluster.bind(this)
     this.onChangeTemplate = this.onChangeTemplate.bind(this)
+    this.doChangeTemplateIdTo = this.doChangeTemplateIdTo.bind(this)
     this.onChangeOperatingSystem = this.onChangeOperatingSystem.bind(this)
+    this.doChangeOsIdTo = this.doChangeOsIdTo.bind(this)
     this.onChangeVmName = this.onChangeVmName.bind(this)
     this.onChangeVmMemory = this.onChangeVmMemory.bind(this)
     this.onChangeVmCpu = this.onChangeVmCpu.bind(this)
@@ -140,8 +144,12 @@ class VmDialog extends React.Component {
   }
 
   onChangeOperatingSystem (event) {
+    this.doChangeOsIdTo(event.target.value)
+  }
+
+  doChangeOsIdTo (osId) {
     this.setState({
-      osId: event.target.value,
+      osId,
     })
   }
 
@@ -171,12 +179,17 @@ class VmDialog extends React.Component {
    */
   onChangeTemplate (event) {
     const templateId = event.target.value
+    this.doChangeTemplateIdTo(templateId)
+  }
+
+  doChangeTemplateIdTo (templateId) {
     const template = this.getTemplate(templateId)
     let { memory, cpus, osId } = this.state
 
     if (template) {
       memory = template.get('memory')
       cpus = template.getIn(['cpu', 'topology', 'cores'], 1) * template.getIn(['cpu', 'topology', 'sockets'], 1) * template.getIn(['cpu', 'topology', 'threads'], 1)
+
       osId = this.getOsIdFromType(template.getIn(['os', 'type'], 'Blank'))
     }
 
@@ -184,8 +197,11 @@ class VmDialog extends React.Component {
       templateId,
       memory,
       cpus,
-      osId,
     })
+
+    if (this.state.osId !== osId) {
+      this.doChangeOsIdTo(osId)
+    }
     // fire external data retrieval here if needed after Template change
   }
 
@@ -208,9 +224,16 @@ class VmDialog extends React.Component {
    * User selected different cluster.
    */
   onChangeCluster (event) {
+    const clusterId = event.target.value
     this.setState({
-      clusterId: event.target.value,
+      clusterId,
     })
+
+    const template = this.getTemplate(this.state.templateId)
+    if (template && template.get('clusterId') && template.get('clusterId') !== clusterId) {
+      this.doChangeTemplateIdTo(zeroUID) // Careful: this.state.clusterId still contains previous clusterId, call setTimeout(fnc, 0) if needed otherwise
+    }
+
     // fire external data retrieval here if needed after Cluster change
   }
 
@@ -231,7 +254,6 @@ class VmDialog extends React.Component {
 
   initDefaults () {
     const stateChange = {}
-    const zeroUID = '00000000-0000-0000-0000-000000000000'
     const defaultClusterName = 'Default'
 
     if (!this.getCluster()) {
