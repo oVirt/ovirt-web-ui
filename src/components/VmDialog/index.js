@@ -147,7 +147,8 @@ class VmDialog extends React.Component {
 
   getOsIdFromType (type) {
     // hack: this.props.operatingSystems shall be used instead, but this is harmless reuse of code
-    return Selectors.getOperatingSystemByName(type)
+    const os = Selectors.getOperatingSystemByName(type)
+    return os ? os.get('id') : undefined
   }
 
   /**
@@ -169,8 +170,21 @@ class VmDialog extends React.Component {
    * User selected different template.
    */
   onChangeTemplate (event) {
+    const templateId = event.target.value
+    const template = this.getTemplate(templateId)
+    let { memory, cpus, osId } = this.state
+
+    if (template) {
+      memory = template.get('memory')
+      cpus = template.getIn(['cpu', 'topology', 'cores'], 1) * template.getIn(['cpu', 'topology', 'sockets'], 1) * template.getIn(['cpu', 'topology', 'threads'], 1)
+      osId = this.getOsIdFromType(template.getIn(['os', 'type'], 'Blank'))
+    }
+
     this.setState({
-      templateId: event.target.value,
+      templateId,
+      memory,
+      cpus,
+      osId,
     })
     // fire external data retrieval here if needed after Template change
   }
@@ -178,8 +192,8 @@ class VmDialog extends React.Component {
   /**
    * @returns template object conforming this.state.templateId
    */
-  getTemplate () { // TODO: avoid copy&paste
-    const templateId = this.state.templateId
+  getTemplate (templateId) {
+    templateId = templateId || this.state.templateId
     if (templateId) {
       const template = this.props.templates.get('templates').get(templateId)
       if (template) {
