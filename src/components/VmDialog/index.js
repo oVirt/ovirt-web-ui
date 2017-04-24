@@ -31,6 +31,7 @@ class VmDialog extends React.Component {
     this.state = {
       id: undefined,
       name: '',
+      description: '',
       cpus: 1,
       memory: 1024 * 1024 * 1024,
 
@@ -55,6 +56,7 @@ class VmDialog extends React.Component {
     this.onChangeOperatingSystem = this.onChangeOperatingSystem.bind(this)
     this.doChangeOsIdTo = this.doChangeOsIdTo.bind(this)
     this.onChangeVmName = this.onChangeVmName.bind(this)
+    this.onChangeVmDescription = this.onChangeVmDescription.bind(this)
     this.onChangeVmMemory = this.onChangeVmMemory.bind(this)
     this.onChangeVmCpu = this.onChangeVmCpu.bind(this)
   }
@@ -65,6 +67,7 @@ class VmDialog extends React.Component {
       this.setState({
         id: vm.get('id'),
         name: vm.get('name'),
+        description: vm.get('description'),
         cpus: vm.getIn(['cpu', 'vCPUs']),
         memory: vm.getIn(['memory', 'total']),
 
@@ -96,6 +99,7 @@ class VmDialog extends React.Component {
     return {
       'id': this.state.id,
       'name': this.state.name,
+      'description': this.state.description,
       'template': { 'id': this.state.templateId },
       'cluster': { 'id': this.state.clusterId },
       'memory': this.state.memory,
@@ -118,9 +122,10 @@ class VmDialog extends React.Component {
   }
 
   onChangeVmName (event) {
-    this.setState({
-      name: event.target.value,
-    })
+    this.setState({ name: event.target.value })
+  }
+  onChangeVmDescription (event) {
+    this.setState({ description: event.target.value })
   }
 
   onChangeVmMemory (event) {
@@ -320,6 +325,14 @@ class VmDialog extends React.Component {
             placeholder='Enter VM Name'
             value={this.state.name}
             onChange={this.onChangeVmName} />
+
+          <LabeledTextField
+            selectClass='combobox form-control'
+            id='vmDescription'
+            label='Description'
+            placeholder='Enter VM Description (optional)'
+            value={this.state.description}
+            onChange={this.onChangeVmDescription} />
 
           <LabeledSelect
             id='clusterSelect'
