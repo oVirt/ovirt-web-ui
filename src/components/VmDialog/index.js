@@ -12,6 +12,7 @@ import ErrorAlert from './../ErrorAlert'
 import Selectors from './../../selectors'
 import {
   closeDialog,
+  requestCloseDialogConfirmation,
   createVm,
   editVm,
 } from '../../actions/index'
@@ -108,7 +109,7 @@ class VmDialog extends React.Component {
       },
       'cpu': {
         'topology': {
-          'cores': '1',
+          'cores': '1', // TODO: fix to conform topology in template!
           'sockets': this.state.cpus,
           'threads': '1',
         },
@@ -118,10 +119,15 @@ class VmDialog extends React.Component {
 
   closeDialog (e) {
     e.preventDefault()
-    this.props.closeDialog()
+    this.props.onCloseDialog()
+  }
+
+  onChangeGeneral () {
+    this.props.requestCloseDialogConfirmation() // enforce confirmation dialog in case of Cancel action
   }
 
   onChangeVmName (event) {
+    this.onChangeGeneral()
     this.setState({ name: event.target.value })
   }
   onChangeVmDescription (event) {
@@ -398,7 +404,8 @@ VmDialog.propTypes = {
   operatingSystems: PropTypes.object.isRequired,
   errorMessage: PropTypes.string,
 
-  closeDialog: PropTypes.func.isRequired,
+  onCloseDialog: PropTypes.func.isRequired,
+  requestCloseDialogConfirmation: PropTypes.func.isRequired,
   addVm: PropTypes.func.isRequired,
   updateVm: PropTypes.func.isRequired,
 }
@@ -411,7 +418,8 @@ export default connect(
     errorMessage: state.vmDialog.get('errorMessage'), // TODO: refactor to use UserMessages instead
   }),
   (dispatch) => ({
-    closeDialog: () => dispatch(closeDialog()),
+    onCloseDialog: () => dispatch(closeDialog({ force: false })),
+    requestCloseDialogConfirmation: () => dispatch(requestCloseDialogConfirmation()),
     addVm: (vm) => dispatch(createVm(vm)),
     updateVm: (vm) => dispatch(editVm(vm)),
   })

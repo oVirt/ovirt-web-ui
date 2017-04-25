@@ -40,6 +40,6 @@ export default connect(
   (state) => ({
   }),
   (dispatch) => ({
-    onCloseDetail: () => dispatch(closeDialog()),
+    onCloseDetail: () => dispatch(closeDialog({ force: false })),
   })
 )(DetailContainer)

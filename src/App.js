@@ -10,6 +10,7 @@ import VmDetail from './components/VmDetail'
 import Options from './components/Options'
 import AboutDialog from './components/About'
 import OvirtApiCheckFailed from './components/OvirtApiCheckFailed'
+import CloseDialogConfirmation from './components/CloseDialogConfirmation/index'
 
 import AddVmButton from './components/VmDialog/AddVmButton'
 import VmDialog from './components/VmDialog/index'
@@ -17,6 +18,7 @@ import VmDialog from './components/VmDialog/index'
 const App = ({ vms, visibility }) => {
   const selectedVmId = visibility.get('selectedVmDetail') // TODO: move to 'connect()' function
   const selectedVm = selectedVmId ? vms.getIn(['vms', selectedVmId]) : undefined
+  const isCloseDialogConfirmation = visibility.get('dialogCloseConfirmationToShow')
 
   let detailToRender = null
   switch (visibility.get('dialogToShow')) {
@@ -29,6 +31,11 @@ const App = ({ vms, visibility }) => {
     case 'VmDetail':
       detailToRender = (<VmDetail vm={selectedVm} />)
       break
+  }
+
+  let closeDialogConfirmation = null
+  if (detailToRender && isCloseDialogConfirmation) {
+    closeDialogConfirmation = (<CloseDialogConfirmation />)
   }
 
   const addVmButton = detailToRender ? null : <AddVmButton name='Add New Virtual Machine' />
@@ -44,6 +51,7 @@ const App = ({ vms, visibility }) => {
         <VmsList />
         {detailToRender}
       </div>
+      {closeDialogConfirmation}
       <AboutDialog />
       <OvirtApiCheckFailed />
     </div>
