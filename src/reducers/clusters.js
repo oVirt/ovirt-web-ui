@@ -1,7 +1,12 @@
 import { fromJS } from 'immutable'
 import { actionReducer, removeMissingItems } from './utils'
 
-const clusters = actionReducer(fromJS({ clusters: {}, loadInProgress: true }), {
+const initialState = fromJS({
+  clusters: {},
+  loadInProgress: true,
+})
+
+const clusters = actionReducer(initialState, {
   ADD_CLUSTERS (state, { payload: { clusters } }) {
     const updates = {}
     clusters.forEach(cluster => {

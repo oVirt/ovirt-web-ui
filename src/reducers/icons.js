@@ -1,27 +1,15 @@
 import { Map } from 'immutable'
-import { UPDATE_ICONS } from '../constants'
+import { actionReducer } from './utils'
 
-function updateOrAdd ({ state, payload: { icons } }) {
-  const updates = {}
-  icons.forEach(icon => { updates[icon.id] = icon })
-  // we don't need deep-immutable
-  return state.merge(updates)
-}
+const initialState = Map()
 
-/**
- * The Icons reducer
- *
- * @param state
- * @param action
- * @returns {*}
- */
-function icons (state = Map(), action) {
-  switch (action.type) {
-    case UPDATE_ICONS: // add or update
-      return updateOrAdd({ state, payload: action.payload })
-    default:
-      return state
-  }
-}
+const icons = actionReducer(initialState, {
+  UPDATE_ICONS (state, { payload: { icons } }) {
+    const updates = {}
+    icons.forEach(icon => { updates[icon.id] = icon })
+    // we don't need deep-immutable
+    return state.merge(updates)
+  },
+})
 
 export default icons

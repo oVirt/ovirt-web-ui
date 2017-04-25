@@ -1,48 +1,31 @@
 import Immutable from 'immutable'
-import {
-  LOGIN_SUCCESSFUL,
-  LOGIN_FAILED,
-  LOGOUT,
-  SET_OVIRT_API_VERSION,
-} from '../constants'
+import { actionReducer } from './utils'
 
-function logout ({ state }) {
-  // TODO: use seq
-  return state.delete('loginToken').deleteIn(['user', 'name'])
-}
+const initialState = Immutable.fromJS({
+  loginToken: undefined,
+  user: {
+    name: undefined,
+  },
+  oVirtApiVersion: {
+    major: undefined,
+    minor: undefined,
+    passed: undefined,
+  },
+})
 
-/**
- * The Config reducer
- *
- * @param state
- * @param action
- * @returns {*}
- */
-function config (state, action) {
-  state = state || Immutable.fromJS({
-    loginToken: undefined,
-    user: {
-      name: undefined,
-    },
-    oVirtApiVersion: {
-      major: undefined,
-      minor: undefined,
-      passed: undefined,
-    },
-  })
-
-  switch (action.type) {
-    case LOGIN_SUCCESSFUL:
-      return state.merge({ loginToken: action.payload.token, user: { name: action.payload.username } })
-    case LOGIN_FAILED: // see the userMessages() reducer
-      return logout({ state })
-    case LOGOUT: // see the vms() reducer
-      return logout({ state })
-    case SET_OVIRT_API_VERSION:
-      return state.merge({ oVirtApiVersion: action.payload.oVirtApiVersion })
-    default:
-      return state
-  }
-}
+const config = actionReducer(initialState, {
+  LOGIN_SUCCESSFUL (state, { payload: { token, username } }) {
+    return state.merge({ loginToken: token, user: { name: username } })
+  },
+  LOGIN_FAILED (state) {
+    return state.delete('loginToken').deleteIn(['user', 'name'])
+  },
+  LOGOUT (state) {
+    return state.delete('loginToken').deleteIn(['user', 'name'])
+  },
+  SET_OVIRT_API_VERSION (state, { payload: { oVirtApiVersion } }) {
+    return state.merge({ oVirtApiVersion: oVirtApiVersion })
+  },
+})
 
 export default config
