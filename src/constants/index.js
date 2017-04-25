@@ -1,4 +1,5 @@
 // TODO: sort alphabetically
+// TODO: remove all constants except those used within sagas
 export const LOGIN_SUCCESSFUL = 'LOGIN_SUCCESSFUL'
 export const LOGIN_FAILED = 'LOGIN_FAILED'
 export const LOGOUT = 'LOGOUT'

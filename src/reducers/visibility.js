@@ -13,11 +13,27 @@ import { actionReducer } from './utils'
 const visibility = actionReducer(Immutable.fromJS({
   dialogToShow: undefined, // undefined, 'VmDetail', 'VmDialog', 'Options'
   selectedVmDetail: undefined, // applicable if dialogToShow === 'VmDetail'
+
+  dialogConfirmationRequested: undefined, // if true, rendered dialog contains dirty data
+  dialogCloseConfirmationToShow: undefined, // if true, the dialog is about to close but contains changes requiring user confirmation
 }), {
-  CLOSE_DIALOG (state) {
+  CLOSE_DIALOG (state, action) {
+    if (!action.payload.force && state.get('dialogConfirmationRequested')) {
+      return state
+        .set('dialogCloseConfirmationToShow', true)
+    }
+
     return state
       .delete('selectedVmDetail')
       .set('dialogToShow', null)
+      .set('dialogConfirmationRequested', null)
+      .set('dialogCloseConfirmationToShow', null)
+  },
+
+  REQUEST_CLOSE_DIALOG_CONFIRMATION (state) {
+    return state
+      .set('dialogConfirmationRequested', true)
+      .set('dialogCloseConfirmationToShow', false)
   },
 
   TOGGLE_OPTIONS (state) { // TODO: rename to OPEN_SETTINGS

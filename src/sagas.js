@@ -413,7 +413,7 @@ function* createNewVm (action) {
     let msg = (result.error.responseJSON && result.error.responseJSON.detail) || ''
     yield put(updateVmDialogErrorMessage(msg.replace(/^\[|\]$/mg, '')))
   } else {
-    yield put(closeDialog())
+    yield put(closeDialog({ force: true }))
     yield put(getAllVms({ shallowFetch: false })) // fetchSingleVm() can't be used since vmId is unknown
   }
 }
@@ -425,7 +425,7 @@ function* editVm (action) {
     let msg = (result.error.responseJSON && result.error.responseJSON.detail) || ''
     yield put(updateVmDialogErrorMessage(msg.replace(/^\[|\]$/mg, '')))
   } else {
-    yield put(closeDialog())
+    yield put(closeDialog({ force: true }))
 
     yield fetchSingleVm(getSingleVm({ vmId: action.payload.vm.id }))
     // yield put(getAllVms({ shallowFetch: false })) // fetchSingleVm is probably enough

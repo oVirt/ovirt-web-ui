@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import style from './style.css'
 import Vm from './Vm'
 
-import { closeDialog } from '../../actions'
+import { closeDialog } from '../../actions/index'
 import { closeAllConfirmationComponents } from '../Confirmation'
 
 const Vms = ({ vms, visibility, onCloseDetail }) => {
@@ -46,6 +46,6 @@ export default connect(
     visibility: state.visibility,
   }),
   (dispatch) => ({
-    onCloseDetail: () => dispatch(closeDialog()),
+    onCloseDetail: () => dispatch(closeDialog({ force: false })),
   })
 )(Vms)

@@ -41,9 +41,18 @@ export function openEditVmDialog ({ vmId }) {
   }
 }
 
-export function closeDialog () {
+export function closeDialog ({ force = false }) {
   return {
     type: 'CLOSE_DIALOG',
+    payload: {
+      force,
+    },
+  }
+}
+
+export function requestCloseDialogConfirmation () {
+  return {
+    type: 'REQUEST_CLOSE_DIALOG_CONFIRMATION',
     payload: {
     },
   }

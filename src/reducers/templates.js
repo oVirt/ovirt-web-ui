@@ -1,7 +1,12 @@
 import { fromJS } from 'immutable'
 import { actionReducer, removeMissingItems } from './utils'
 
-const templates = actionReducer(fromJS({ templates: {}, loadInProgress: true }), {
+const initialState = fromJS({
+  templates: {},
+  loadInProgress: true,
+})
+
+const templates = actionReducer(initialState, {
   ADD_TEMPLATES (state, { payload: { templates } }) {
     const updates = {}
     templates.forEach(template => {

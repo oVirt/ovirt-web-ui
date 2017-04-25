@@ -195,15 +195,32 @@ OvirtApi = {
     }
   },
   templateToInternal ({ template }) {
+    const version = {
+      name: template.version ? template.version.version_name : undefined,
+      number: template.version ? template.version.version_number : undefined,
+      baseTemplateId: template.version && template.version.base_template ? template.version.base_template.id : undefined,
+    }
+
     return {
       id: template.id,
       name: template.name,
       description: template.description,
       clusterId: template.cluster ? template.cluster.id : null,
       memory: template.memory,
-      cpu: template.cpu.topology.sockets,
-      version_number: template.version.version_number,
-      os: template.os.type,
+
+      cpu: {
+        topology: {
+          cores: template.cpu.topology.cores,
+          sockets: template.cpu.topology.sockets,
+          threads: template.cpu.topology.threads,
+        },
+      },
+
+      version,
+      os: {
+        type: template.os ? template.os.type : undefined,
+      },
+
     }
   },
   clusterToInternal ({ cluster }) {

@@ -12,6 +12,7 @@ import ErrorAlert from './../ErrorAlert'
 import Selectors from './../../selectors'
 import {
   closeDialog,
+  requestCloseDialogConfirmation,
   createVm,
   editVm,
 } from '../../actions/index'
@@ -22,6 +23,8 @@ function sortedBy (immutableCollection, sortBy) { // TODO: move to helpers
   )
 }
 
+const zeroUID = '00000000-0000-0000-0000-000000000000'
+
 class VmDialog extends React.Component {
   constructor (props) {
     super(props)
@@ -29,6 +32,7 @@ class VmDialog extends React.Component {
     this.state = {
       id: undefined,
       name: '',
+      description: '',
       cpus: 1,
       memory: 1024 * 1024 * 1024,
 
@@ -49,8 +53,11 @@ class VmDialog extends React.Component {
 
     this.onChangeCluster = this.onChangeCluster.bind(this)
     this.onChangeTemplate = this.onChangeTemplate.bind(this)
+    this.doChangeTemplateIdTo = this.doChangeTemplateIdTo.bind(this)
     this.onChangeOperatingSystem = this.onChangeOperatingSystem.bind(this)
+    this.doChangeOsIdTo = this.doChangeOsIdTo.bind(this)
     this.onChangeVmName = this.onChangeVmName.bind(this)
+    this.onChangeVmDescription = this.onChangeVmDescription.bind(this)
     this.onChangeVmMemory = this.onChangeVmMemory.bind(this)
     this.onChangeVmCpu = this.onChangeVmCpu.bind(this)
   }
@@ -61,6 +68,7 @@ class VmDialog extends React.Component {
       this.setState({
         id: vm.get('id'),
         name: vm.get('name'),
+        description: vm.get('description'),
         cpus: vm.getIn(['cpu', 'vCPUs']),
         memory: vm.getIn(['memory', 'total']),
 
@@ -92,6 +100,7 @@ class VmDialog extends React.Component {
     return {
       'id': this.state.id,
       'name': this.state.name,
+      'description': this.state.description,
       'template': { 'id': this.state.templateId },
       'cluster': { 'id': this.state.clusterId },
       'memory': this.state.memory,
@@ -100,7 +109,7 @@ class VmDialog extends React.Component {
       },
       'cpu': {
         'topology': {
-          'cores': '1',
+          'cores': '1', // TODO: fix to conform topology in template!
           'sockets': this.state.cpus,
           'threads': '1',
         },
@@ -110,13 +119,19 @@ class VmDialog extends React.Component {
 
   closeDialog (e) {
     e.preventDefault()
-    this.props.closeDialog()
+    this.props.onCloseDialog()
+  }
+
+  onChangeGeneral () {
+    this.props.requestCloseDialogConfirmation() // enforce confirmation dialog in case of Cancel action
   }
 
   onChangeVmName (event) {
-    this.setState({
-      name: event.target.value,
-    })
+    this.onChangeGeneral()
+    this.setState({ name: event.target.value })
+  }
+  onChangeVmDescription (event) {
+    this.setState({ description: event.target.value })
   }
 
   onChangeVmMemory (event) {
@@ -140,14 +155,19 @@ class VmDialog extends React.Component {
   }
 
   onChangeOperatingSystem (event) {
+    this.doChangeOsIdTo(event.target.value)
+  }
+
+  doChangeOsIdTo (osId) {
     this.setState({
-      osId: event.target.value,
+      osId,
     })
   }
 
   getOsIdFromType (type) {
     // hack: this.props.operatingSystems shall be used instead, but this is harmless reuse of code
-    return Selectors.getOperatingSystemByName(type)
+    const os = Selectors.getOperatingSystemByName(type)
+    return os ? os.get('id') : undefined
   }
 
   /**
@@ -169,17 +189,38 @@ class VmDialog extends React.Component {
    * User selected different template.
    */
   onChangeTemplate (event) {
+    const templateId = event.target.value
+    this.doChangeTemplateIdTo(templateId)
+  }
+
+  doChangeTemplateIdTo (templateId) {
+    const template = this.getTemplate(templateId)
+    let { memory, cpus, osId } = this.state
+
+    if (template) {
+      memory = template.get('memory')
+      cpus = template.getIn(['cpu', 'topology', 'cores'], 1) * template.getIn(['cpu', 'topology', 'sockets'], 1) * template.getIn(['cpu', 'topology', 'threads'], 1)
+
+      osId = this.getOsIdFromType(template.getIn(['os', 'type'], 'Blank'))
+    }
+
     this.setState({
-      templateId: event.target.value,
+      templateId,
+      memory,
+      cpus,
     })
+
+    if (this.state.osId !== osId) {
+      this.doChangeOsIdTo(osId)
+    }
     // fire external data retrieval here if needed after Template change
   }
 
   /**
    * @returns template object conforming this.state.templateId
    */
-  getTemplate () { // TODO: avoid copy&paste
-    const templateId = this.state.templateId
+  getTemplate (templateId) {
+    templateId = templateId || this.state.templateId
     if (templateId) {
       const template = this.props.templates.get('templates').get(templateId)
       if (template) {
@@ -194,9 +235,16 @@ class VmDialog extends React.Component {
    * User selected different cluster.
    */
   onChangeCluster (event) {
+    const clusterId = event.target.value
     this.setState({
-      clusterId: event.target.value,
+      clusterId,
     })
+
+    const template = this.getTemplate(this.state.templateId)
+    if (template && template.get('clusterId') && template.get('clusterId') !== clusterId) {
+      this.doChangeTemplateIdTo(zeroUID) // Careful: this.state.clusterId still contains previous clusterId, call setTimeout(fnc, 0) if needed otherwise
+    }
+
     // fire external data retrieval here if needed after Cluster change
   }
 
@@ -217,7 +265,6 @@ class VmDialog extends React.Component {
 
   initDefaults () {
     const stateChange = {}
-    const zeroUID = '00000000-0000-0000-0000-000000000000'
     const defaultClusterName = 'Default'
 
     if (!this.getCluster()) {
@@ -261,6 +308,16 @@ class VmDialog extends React.Component {
 
     const submitText = isEdit ? 'Update VM' : 'Create VM'
 
+    const templateNameRenderer = (template) => {
+      const version = template.get('version')
+      const versionName = version.get('name')
+      const templateName = template.get('name')
+
+      return versionName
+        ? (`${templateName} (${versionName})`)
+        : templateName
+    }
+
     return (
       <DetailContainer>
         <h1>{isEdit ? 'Edit Virtual Machine' : 'Create A New Virtual Machine'}</h1>
@@ -274,6 +331,14 @@ class VmDialog extends React.Component {
             placeholder='Enter VM Name'
             value={this.state.name}
             onChange={this.onChangeVmName} />
+
+          <LabeledTextField
+            selectClass='combobox form-control'
+            id='vmDescription'
+            label='Description'
+            placeholder='Enter VM Description (optional)'
+            value={this.state.description}
+            onChange={this.onChangeVmDescription} />
 
           <LabeledSelect
             id='clusterSelect'
@@ -290,7 +355,8 @@ class VmDialog extends React.Component {
             selectClass='combobox form-control'
             onChange={this.onChangeTemplate}
             value={template ? template.get('id') : ''}
-            data={sortedTemplates} />
+            data={sortedTemplates}
+            renderer={templateNameRenderer} />
 
           <LabeledSelect
             id='operatingSystemSelect'
@@ -338,7 +404,8 @@ VmDialog.propTypes = {
   operatingSystems: PropTypes.object.isRequired,
   errorMessage: PropTypes.string,
 
-  closeDialog: PropTypes.func.isRequired,
+  onCloseDialog: PropTypes.func.isRequired,
+  requestCloseDialogConfirmation: PropTypes.func.isRequired,
   addVm: PropTypes.func.isRequired,
   updateVm: PropTypes.func.isRequired,
 }
@@ -351,7 +418,8 @@ export default connect(
     errorMessage: state.vmDialog.get('errorMessage'), // TODO: refactor to use UserMessages instead
   }),
   (dispatch) => ({
-    closeDialog: () => dispatch(closeDialog()),
+    onCloseDialog: () => dispatch(closeDialog({ force: false })),
+    requestCloseDialogConfirmation: () => dispatch(requestCloseDialogConfirmation()),
     addVm: (vm) => dispatch(createVm(vm)),
     updateVm: (vm) => dispatch(editVm(vm)),
   })

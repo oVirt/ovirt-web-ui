@@ -1,7 +1,11 @@
 import { fromJS } from 'immutable'
 import { actionReducer, removeMissingItems } from './utils'
 
-const operatingSystems = actionReducer(fromJS({ operatingSystems: {}, loadInProgress: true }), {
+const initialState = fromJS({
+  operatingSystems: {},
+  loadInProgress: true,
+})
+const operatingSystems = actionReducer(initialState, {
   ADD_ALL_OS (state, { payload: { os } }) {
     const updates = {}
     os.forEach(os => {
