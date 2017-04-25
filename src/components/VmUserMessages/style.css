@@ -34,7 +34,7 @@ pre.message-box {
 }
 
 .usermsg-time {
-	text-align: right;
+	text-align: left;
     border-bottom: solid 1px lightgray;
     margin-bottom: 10px;
 }
