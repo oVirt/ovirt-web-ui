@@ -20,13 +20,16 @@ const Vms = ({ vms, visibility, onCloseDetail }) => {
     }
     : undefined
 
+  const sortFunction = (vmA, vmB) => vmA.get('name').localeCompare(vmB.get('name'))
+
   return (
     <div onClickCapture={closeDetail}>
       <div className={containerClass}>
         <div className={style['scrollingWrapper']}>
           <div className='row row-cards-pf'>
-            {vms.get('vms').toList().map(vm =>
-              <Vm vm={vm} key={vm.get('id')} />)}
+            {vms.get('vms').toList()
+              .sort(sortFunction)
+              .map(vm => <Vm vm={vm} key={vm.get('id')} />)}
           </div>
           <div className={style['overlay']} />
         </div>
