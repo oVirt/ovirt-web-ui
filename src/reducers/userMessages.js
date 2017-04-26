@@ -25,11 +25,10 @@ const initialState = Immutable.fromJS({
   records: [],
   unread: false,
   show: false,
-
 })
 
 const userMessages = actionReducer(initialState, {
-  FAILED_EXTERNAL_ACTION (state, { message, shortMessage, type, action }) { // see the vms() reducer
+  FAILED_EXTERNAL_ACTION (state, { payload: { message, shortMessage, type, action } }) { // see the vms() reducer
     return addLogEntry({
       state,
       message: message,

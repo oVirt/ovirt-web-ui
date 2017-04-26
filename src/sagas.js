@@ -35,7 +35,6 @@ import {
 
   closeDialog,
 
-  updateVmDialogErrorMessage,
   setUserFilterPermission,
   setAdministrator,
 } from './actions/index'
@@ -405,32 +404,22 @@ function* schedulerPerMinute (action) {
 }
 
 function* createNewVm (action) {
-  yield put(updateVmDialogErrorMessage(''))
   const result = yield callExternalAction('addNewVm', Api.addNewVm, action)
-  if (result.error) {
-    let msg = (result.error.responseJSON && result.error.responseJSON.detail) || ''
-    yield put(updateVmDialogErrorMessage(msg.replace(/^\[|\]$/mg, '')))
-  } else {
+  if (!result.error) {
     yield put(closeDialog({ force: true }))
     yield put(getAllVms({ shallowFetch: false })) // fetchSingleVm() can't be used since vmId is unknown
   }
 }
 
 function* editVm (action) {
-  yield put(updateVmDialogErrorMessage(''))
   const result = yield callExternalAction('editVm', Api.editVm, action)
-  if (result.error) {
-    let msg = (result.error.responseJSON && result.error.responseJSON.detail) || ''
-    yield put(updateVmDialogErrorMessage(msg.replace(/^\[|\]$/mg, '')))
-  } else {
+  if (!result.error) {
     yield put(closeDialog({ force: true }))
-
     yield fetchSingleVm(getSingleVm({ vmId: action.payload.vm.id }))
-    // yield put(getAllVms({ shallowFetch: false })) // fetchSingleVm is probably enough
   }
 }
 
-function* fetchAllTemplates (action) { // TODO: remove missing templates, like in case of All VMs
+function* fetchAllTemplates (action) {
   const templates = yield callExternalAction('getAllTemplates', Api.getAllTemplates, action)
 
   if (templates && templates['template']) {
@@ -442,7 +431,7 @@ function* fetchAllTemplates (action) { // TODO: remove missing templates, like i
   }
 }
 
-function* fetchAllClusters (action) { // TODO: remove missing clusters, like in case of All VMs
+function* fetchAllClusters (action) {
   const clusters = yield callExternalAction('getAllClusters', Api.getAllClusters, action)
 
   if (clusters && clusters['cluster']) {
@@ -454,7 +443,7 @@ function* fetchAllClusters (action) { // TODO: remove missing clusters, like in 
   }
 }
 
-function* fetchAllOS (action) { // TODO: remove missing OSs, like in case of All VMs
+function* fetchAllOS (action) {
   const operatingSystems = yield callExternalAction('getAllOperatingSystems', Api.getAllOperatingSystems, action)
 
   if (operatingSystems && operatingSystems['operating_system']) {
