@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
 
-import { logDebug } from '../../helpers'
+import { logDebug, generateUnique } from '../../helpers'
 
 import style from './style.css'
 
@@ -30,7 +30,10 @@ class VmDialog extends React.Component {
     super(props)
 
     this.state = {
+      actionUniqueId: undefined,
+
       id: undefined,
+
       name: '',
       description: '',
       cpus: 1,
@@ -80,11 +83,30 @@ class VmDialog extends React.Component {
     setTimeout(() => this.initDefaults(), 0)
   }
 
+  generateActionUniqueId () {
+    const actionUniqueId = generateUnique('vm-dialog-')
+    this.setState({
+      actionUniqueId,
+    })
+    return actionUniqueId
+  }
+
   submitHandler (e) {
+    const actionUniqueId = this.generateActionUniqueId()
     e.preventDefault()
     this.props.vm
-      ? this.props.updateVm(this.composeVm())
-      : this.props.addVm(this.composeVm())
+      ? this.props.updateVm(this.composeVm(), actionUniqueId)
+      : this.props.addVm(this.composeVm(), actionUniqueId)
+  }
+
+  getLatestUserMessage () {
+    const { actionUniqueId } = this.state
+    const filtered = this.props.userMessages
+      .get('records')
+      .filter(record => record.failedAction && record.failedAction.actionUniqueId === actionUniqueId)
+    const last = filtered.last()
+
+    return last ? last.message : undefined
   }
 
   /**
@@ -322,7 +344,7 @@ class VmDialog extends React.Component {
       <DetailContainer>
         <h1>{isEdit ? 'Edit Virtual Machine' : 'Create A New Virtual Machine'}</h1>
         <hr />
-        <ErrorAlert message={this.props.errorMessage} />
+        <ErrorAlert message={this.getLatestUserMessage()} />
         <form className='form-horizontal'>
           <LabeledTextField
             selectClass='combobox form-control'
@@ -402,7 +424,7 @@ VmDialog.propTypes = {
   clusters: PropTypes.object.isRequired,
   templates: PropTypes.object.isRequired,
   operatingSystems: PropTypes.object.isRequired,
-  errorMessage: PropTypes.string,
+  userMessages: PropTypes.object.isRequired,
 
   onCloseDialog: PropTypes.func.isRequired,
   requestCloseDialogConfirmation: PropTypes.func.isRequired,
@@ -415,12 +437,12 @@ export default connect(
     clusters: state.clusters,
     templates: state.templates,
     operatingSystems: state.operatingSystems,
-    errorMessage: state.vmDialog.get('errorMessage'), // TODO: refactor to use UserMessages instead
+    userMessages: state.userMessages,
   }),
   (dispatch) => ({
     onCloseDialog: () => dispatch(closeDialog({ force: false })),
     requestCloseDialogConfirmation: () => dispatch(requestCloseDialogConfirmation()),
-    addVm: (vm) => dispatch(createVm(vm)),
-    updateVm: (vm) => dispatch(editVm(vm)),
+    addVm: (vm, actionUniqueId) => dispatch(createVm(vm, actionUniqueId)),
+    updateVm: (vm, actionUniqueId) => dispatch(editVm(vm, actionUniqueId)),
   })
 )(VmDialog)

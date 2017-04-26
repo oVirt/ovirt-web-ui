@@ -11,7 +11,6 @@ import {
 export * from './error'
 export * from './vm'
 export * from './visibility'
-export * from './editVmDialog' // TODO: remove this file
 export * from './clusters'
 export * from './operatingSystems'
 export * from './templates'
