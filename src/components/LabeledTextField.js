@@ -1,5 +1,7 @@
 import React, { PropTypes } from 'react'
 
+import style from './sharedStyle.css'
+
 const LabeledTextField = ({
   id,
   label,
@@ -10,24 +12,26 @@ const LabeledTextField = ({
   disabled = false,
   step = 1,
   min = 0,
-}) => (
-  <div className='form-group'>
-    <label className='col-sm-2 control-label' htmlFor={id} >
-      {label}
-    </label>
-    <div className='col-sm-10'>
-      <input
-        type={type}
-        className='form-control'
-        id={id}
-        placeholder={placeholder}
-        onChange={onChange}
-        value={value}
-        min={min}
-        step={step}
-        disabled={disabled} />
+  fieldHelp,
+  }) => (
+    <div className='form-group'>
+      <label className={`col-sm-2 control-label ${style['labeled-field']}`} >
+        {label}
+        &nbsp;{fieldHelp}
+      </label>
+      <div className='col-sm-10'>
+        <input
+          type={type}
+          className='form-control'
+          id={id}
+          placeholder={placeholder}
+          onChange={onChange}
+          value={value}
+          min={min}
+          step={step}
+          disabled={disabled} />
+      </div>
     </div>
-  </div>
 )
 
 LabeledTextField.propTypes = {
@@ -43,6 +47,7 @@ LabeledTextField.propTypes = {
   step: PropTypes.number,
   min: PropTypes.number,
   disabled: PropTypes.bool,
+  fieldHelp: PropTypes.object,
 }
 
 export default LabeledTextField

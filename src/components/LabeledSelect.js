@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react'
 
-// use 'combobox form-control' class for patternfly combobox
+import style from './sharedStyle.css'
+
 const LabeledSelect = ({
   selectClass = 'selectpicker',
   data,
@@ -8,9 +9,13 @@ const LabeledSelect = ({
   onChange,
   label,
   renderer = (item) => item.get('name'),
+  fieldHelp,
 }) => (
   <div className='form-group'>
-    <label className='col-sm-2 control-label'>{label}</label>
+    <label className={`col-sm-2 control-label ${style['labeled-field']}`}>
+      {label}
+      &nbsp;{fieldHelp}
+    </label>
     <div className='col-sm-10'>
       <select
         className={selectClass}
@@ -28,12 +33,12 @@ const LabeledSelect = ({
 
 LabeledSelect.propTypes = {
   onChange: PropTypes.func.isRequired,
-//  getValue: PropTypes.func.isRequired,
   value: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
   data: PropTypes.object.isRequired,
   renderer: PropTypes.func,
   selectClass: PropTypes.string,
+  fieldHelp: PropTypes.object,
 }
 
 export default LabeledSelect

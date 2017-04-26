@@ -5,11 +5,13 @@ import { logDebug, generateUnique } from '../../helpers'
 
 import style from './style.css'
 
-import LabeledSelect from './../LabeledSelect'
-import LabeledTextField from './../LabeledTextField'
-import DetailContainer from './../DetailContainer'
-import ErrorAlert from './../ErrorAlert'
-import Selectors from './../../selectors'
+import LabeledSelect from '../LabeledSelect'
+import LabeledTextField from '../LabeledTextField'
+import DetailContainer from '../DetailContainer'
+import ErrorAlert from '../ErrorAlert'
+import FieldHelp from '../FieldHelp'
+
+import Selectors from '../../selectors'
 import {
   closeDialog,
   requestCloseDialogConfirmation,
@@ -352,6 +354,7 @@ class VmDialog extends React.Component {
             label='Name'
             placeholder='Enter VM Name'
             value={this.state.name}
+            fieldHelp={<FieldHelp title='Name' content='Unique name of the virtual machine.' />}
             onChange={this.onChangeVmName} />
 
           <LabeledTextField
@@ -360,6 +363,7 @@ class VmDialog extends React.Component {
             label='Description'
             placeholder='Enter VM Description (optional)'
             value={this.state.description}
+            fieldHelp={<FieldHelp title='Description' content='Optional user description of the virtual machine.' />}
             onChange={this.onChangeVmDescription} />
 
           <LabeledSelect
@@ -369,6 +373,7 @@ class VmDialog extends React.Component {
             onChange={this.onChangeCluster}
             value={cluster ? cluster.get('id') : ''}
             data={sortedClusters}
+            fieldHelp={<FieldHelp title='Cluster' content='Group of hosts the virtual machine can be running on.' />}
           />
 
           <LabeledSelect
@@ -378,6 +383,7 @@ class VmDialog extends React.Component {
             onChange={this.onChangeTemplate}
             value={template ? template.get('id') : ''}
             data={sortedTemplates}
+            fieldHelp={<FieldHelp title='Template' content='Contains the configuration and disks which will be used to create this virtual machine. Please customize as needed.' />}
             renderer={templateNameRenderer} />
 
           <LabeledSelect
@@ -387,6 +393,7 @@ class VmDialog extends React.Component {
             onChange={this.onChangeOperatingSystem}
             value={os ? os.get('id') : ''}
             data={sortedOSs}
+            fieldHelp={<FieldHelp title='Operating System' content='Operating system installed on the virtual machine.' />}
             renderer={(item) => item.get('description')} />
 
           <LabeledTextField
@@ -396,6 +403,7 @@ class VmDialog extends React.Component {
             placeholder='VM Memory'
             value={this.state.memory / 1024 / 1024}
             onChange={this.onChangeVmMemory}
+            fieldHelp={<FieldHelp title='Memory' content='Total memory the virtual machine will be equipped with. In megabytes.' />}
             step={256} />
 
           <LabeledTextField
@@ -405,6 +413,7 @@ class VmDialog extends React.Component {
             placeholder='CPUs'
             value={this.state.cpus}
             onChange={this.onChangeVmCpu}
+            fieldHelp={<FieldHelp title='Number of CPUs' content='Total count of virtual processors the virtual machine will be equipped with.' />}
             min={1}
           />
 

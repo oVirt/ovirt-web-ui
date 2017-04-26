@@ -12,3 +12,8 @@
 .move-left-detail-invisible {
     opacity: 0;
 }
+
+.labeled-field {
+    white-space: nowrap;
+    text-align: left !important;
+}
