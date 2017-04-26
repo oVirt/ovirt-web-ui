@@ -75,7 +75,7 @@ You can access the application at: `https://[ENGINE_URL]/web-ui`
 
 Please note, starting ovirt-4.1, the ovirt-web-ui is installed with ovirt-engine by default.
 
-Latest ovirt-web-ui RPM can be found in the [http://resources.ovirt.org/repos/ovirt/tested/master/rpm](http://resources.ovirt.org/repos/ovirt/tested/master/rpm) yum repository. 
+Latest ovirt-web-ui RPM can be found in the [Copr build system](https://copr.fedorainfracloud.org/coprs/mlibra/ovirt-web-ui/) or [project's yum repository](http://people.redhat.com/mlibra/repos/ovirt-web-ui/). 
 
 ### Quick run using Docker
 
