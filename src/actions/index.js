@@ -1,4 +1,12 @@
-import { PERSIST_STATE, GET_VM, SCHEDULER__1_MIN, REDIRECT_URL } from '../constants'
+import {
+  PERSIST_STATE,
+  GET_VM,
+  SCHEDULER__1_MIN,
+  REDIRECT_URL,
+  SET_USER_FILTER_PERMISSION,
+  CHANGE_FILTER_PERMISSION,
+  SET_ADMINISTATOR,
+} from '../constants'
 
 export * from './error'
 export * from './vm'
@@ -37,6 +45,33 @@ export function setRedirectUrl (redirectUrl) {
     type: REDIRECT_URL,
     payload: {
       redirectUrl,
+    },
+  }
+}
+
+export function setUserFilterPermission (filter) {
+  return {
+    type: SET_USER_FILTER_PERMISSION,
+    payload: {
+      filter,
+    },
+  }
+}
+
+export function changeFilterPermissions (filter) {
+  return {
+    type: CHANGE_FILTER_PERMISSION,
+    payload: {
+      filter,
+    },
+  }
+}
+
+export function setAdministrator (administrator) {
+  return {
+    type: SET_ADMINISTATOR,
+    payload: {
+      administrator,
     },
   }
 }

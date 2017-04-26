@@ -3,3 +3,36 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+
+.styled-checkbox {
+  width: 100%;
+}
+
+.styled-checkbox:before {
+  outline: 1px solid black;
+  font-family: 'Glyphicons Halflings';
+  content: '';
+  margin-top: 5px;
+  width: 15px;
+  height: 15px;
+  position: absolute;
+  display: inline-block;
+  font-size: 11px;
+  text-align: center;
+  line-height: 15px;
+}
+
+.styled-checkbox.checked:before 
+{
+  content: '\e013';
+}
+
+.styled-checkbox > input[type='checkbox'] {
+  opacity: 0;
+}
+
+.styled-checkbox > span {
+  height: 100%;
+  margin-left: 10px;
+  font-weight: normal;
+}

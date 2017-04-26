@@ -15,7 +15,7 @@ OvirtApi = {
       throw new Exception(`OvirtApi in '${methodName}': missing login`)
     }
   },
-  _httpGet ({ url, custHeaders = { 'Accept': 'application/json', Filter: true } }) {
+  _httpGet ({ url, custHeaders = { 'Accept': 'application/json', Filter: Selectors.getFilter() } }) {
     logDebug(`_httpGet start: url="${url}"`)
     const headers = Object.assign({
       'Authorization': `Bearer ${OvirtApi._getLoginToken()}`,
@@ -366,7 +366,11 @@ OvirtApi = {
     OvirtApi._assertLogin({ methodName: 'console' })
     return OvirtApi._httpGet({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/graphicsconsoles/${consoleId}`,
-      custHeaders: { Accept: 'application/x-virt-viewer', Filter: true } })
+      custHeaders: { Accept: 'application/x-virt-viewer', Filter: Selectors.getFilter() } })
+  },
+  checkFilter () {
+    OvirtApi._assertLogin({ methodName: 'checkFilter' })
+    return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/permissions`, custHeaders: { Filter: false } })
   },
 }
 

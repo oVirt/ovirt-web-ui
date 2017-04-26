@@ -36,6 +36,8 @@ import {
   closeDialog,
 
   updateVmDialogErrorMessage,
+  setUserFilterPermission,
+  setAdministrator,
 } from './actions/index'
 
 import {
@@ -55,6 +57,7 @@ import {
   GET_ALL_CLUSTERS,
   GET_ALL_TEMPLATES,
   GET_ALL_OS,
+  CHANGE_FILTER_PERMISSION,
 } from './constants/index'
 
 // import store from './store'
@@ -124,17 +127,12 @@ function* login (action) {
     const username = action.payload.credentials.username
     // persistTokenToSessionStorage({ token, username })
     yield put(loginSuccessful({ token, username }))
-
     const oVirtMeta = yield callExternalAction('getOvirtApiMeta', Api.getOvirtApiMeta, action)
     if (!oVirtMeta['product_info']) { // REST API call failed
       yield put(yield put(loadInProgress({ value: false })))
     } else {
       if (yield checkOvirtApiVersion(oVirtMeta)) {
-        yield put(getAllVms({ shallowFetch: false }))
-
-        yield put(getAllClusters()) // no shallow
-        yield put(getAllOperatingSystems())
-        yield put(getAllTemplates({ shallowFetch: false }))
+        yield fetchPermissionWithoutFilter({})
       } else { // oVirt API of incompatible version
         console.error('oVirt api version check failed')
         yield put(failedExternalAction({
@@ -468,6 +466,20 @@ function* fetchAllOS (action) { // TODO: remove missing OSs, like in case of All
   }
 }
 
+function* fetchPermissionWithoutFilter (action) {
+  const data = yield callExternalAction('checkFilter', Api.checkFilter, { action: 'CHECK_FILTER' })
+  yield changeUserFilterPermission({ payload: { filter: data.error !== undefined } })
+  yield put(setAdministrator(data.error === undefined))
+}
+
+function* changeUserFilterPermission (action) {
+  yield put(setUserFilterPermission(action.payload.filter))
+  yield put(getAllVms({ shallowFetch: false }))
+  yield put(getAllClusters()) // no shallow
+  yield put(getAllOperatingSystems())
+  yield put(getAllTemplates({ shallowFetch: false }))
+}
+
 export function *rootSaga () {
   yield [
     takeEvery(LOGIN, login),
@@ -489,6 +501,7 @@ export function *rootSaga () {
 
     takeEvery(SELECT_VM_DETAIL, selectVmDetail),
 
+    takeEvery(CHANGE_FILTER_PERMISSION, changeUserFilterPermission),
     takeLatest(SCHEDULER__1_MIN, schedulerPerMinute),
   ]
 }
