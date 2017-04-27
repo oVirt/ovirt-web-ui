@@ -9,8 +9,11 @@ import { closeAllConfirmationComponents } from '../Confirmation'
 
 const Vms = ({ vms, visibility, onCloseDetail }) => {
   const isDetailVisible = !!visibility.get('dialogToShow')
-  const containerClass = ['container-fluid', 'container-cards-pf', style['movable-left'],
-    isDetailVisible ? style['moved-left'] : ''].join(' ')
+  const containerClass = ['container-fluid',
+    'container-cards-pf',
+    style['movable-left'],
+    isDetailVisible ? style['moved-left'] : '',
+  ].join(' ')
 
   const closeDetail = isDetailVisible
     ? (event) => {

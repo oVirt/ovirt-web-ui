@@ -55,7 +55,9 @@ const LoadingData = () => {
   )
 }
 
-const VmsList = ({ vms, config }) => {
+const VmsList = ({ vms, config, visibility }) => {
+  const isDetailVisible = !!visibility.get('dialogToShow')
+
   if (vms.get('vms') && !vms.get('vms').isEmpty()) {
     return (
       <Vms />
@@ -66,28 +68,34 @@ const VmsList = ({ vms, config }) => {
         <NoLogin />
       </ContainerFluid>
     )
-  } else if (vms.get('loadInProgress')) { // data load in progress
-    return (
-      <ContainerFluid>
-        <LoadingData />
-      </ContainerFluid>
-    )
-  } else { // No VM available
-    return (
-      <ContainerFluid>
-        <NoVm />
-      </ContainerFluid>
-    )
+  } else if (!isDetailVisible) {
+    if (vms.get('loadInProgress')) { // data load in progress
+      return (
+        <ContainerFluid>
+          <LoadingData />
+        </ContainerFluid>
+      )
+    } else { // No VM available
+      return (
+        <ContainerFluid>
+          <NoVm />
+        </ContainerFluid>
+      )
+    }
+  } else {
+    return null
   }
 }
 VmsList.propTypes = {
   vms: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
+  visibility: PropTypes.object.isRequired,
 }
 
 export default connect(
   (state) => ({
     vms: state.vms,
     config: state.config,
+    visibility: state.visibility,
   })
 )(VmsList)
