@@ -1,5 +1,10 @@
 import { FAILED_EXTERNAL_ACTION } from '../constants'
 
+function customizeErrorMessage (message) {
+  const result = message.replace('Vm ', 'VM ')
+  return result
+}
+
 export function failedExternalAction ({ message, shortMessage, exception, action }) {
   if (exception) {
     message = message || (
@@ -7,7 +12,10 @@ export function failedExternalAction ({ message, shortMessage, exception, action
         ? (exception.responseJSON.detail || exception.responseJSON.fault.detail)
         : (exception['statusText'] || 'UNKNOWN')
       )
+    message = customizeErrorMessage(message)
+
     const type = exception['status'] ? exception['status'] : 'ERROR'
+
     return {
       type: FAILED_EXTERNAL_ACTION,
       payload: {
