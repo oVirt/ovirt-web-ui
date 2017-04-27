@@ -15,11 +15,10 @@ const LabeledTextField = ({
   fieldHelp,
   }) => (
     <div className='form-group'>
-      <label className={`col-sm-2 control-label ${style['labeled-field']}`} >
-        {label}
-        &nbsp;{fieldHelp}
+      <label className={`col-sm-3 control-label ${style['labeled-field']}`} >
+        {label}&nbsp;{fieldHelp}
       </label>
-      <div className='col-sm-10'>
+      <div className='col-sm-9'>
         <input
           type={type}
           className='form-control'
