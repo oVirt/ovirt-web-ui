@@ -12,6 +12,7 @@ const Vms = ({ vms, visibility, onCloseDetail }) => {
   const containerClass = ['container-fluid',
     'container-cards-pf',
     style['movable-left'],
+    style['max-window-height'],
     isDetailVisible ? style['moved-left'] : '',
   ].join(' ')
 

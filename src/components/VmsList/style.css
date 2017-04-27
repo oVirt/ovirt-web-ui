@@ -55,3 +55,7 @@
 .selectedVm {
     z-index: 20;
 }
+
+.max-window-height {
+    height: calc(100vh - 100px);
+}
