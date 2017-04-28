@@ -14,6 +14,7 @@ export * from './visibility'
 export * from './clusters'
 export * from './operatingSystems'
 export * from './templates'
+export * from './options'
 
 export function persistState () {
   return {

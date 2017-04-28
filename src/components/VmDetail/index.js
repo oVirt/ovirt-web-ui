@@ -3,12 +3,12 @@ import { connect } from 'react-redux'
 
 import style from './style.css'
 
-import { getConsole } from '../../actions'
+import { getConsole, getConsoleOptions, saveConsoleOptions } from '../../actions'
 
 import Time from '../Time'
 import VmActions from '../VmActions'
 import DetailContainer from '../DetailContainer'
-import { canConsole, userFormatOfBytes, VmIcon, VmDisks, VmStatusIcon } from 'ovirt-ui-components'
+import { canConsole, userFormatOfBytes, VmIcon, VmDisks, VmStatusIcon, ConsoleOptions } from 'ovirt-ui-components'
 import Selectors from '../../selectors'
 
 const LastMessage = ({ vmId, userMessages }) => {
@@ -56,10 +56,18 @@ class VmDetail extends Component {
   constructor (props) {
     super(props)
     this.state = { renderDisks: true }
+    this.consoleSettings = this.consoleSettings.bind(this)
+  }
+
+  consoleSettings () {
+    this.props.onConsoleOptionsOpen()
+    this.setState({
+      openConsoleSettings: !this.state.openConsoleSettings,
+    })
   }
 
   render () {
-    const { vm, icons, userMessages, onConsole } = this.props
+    const { vm, icons, userMessages, onConsole, options, onConsoleOptionsSave } = this.props
 
     if (!vm) {
       return null
@@ -72,6 +80,10 @@ class VmDetail extends Component {
     const onToggleRenderDisks = () => { this.setState({ renderDisks: !this.state.renderDisks }) }
     const disksElement = this.state.renderDisks ? (<VmDisks disks={disks} />) : ''
     const hasDisks = disks.size > 0
+
+    let optionsJS = options.hasIn(['options', 'consoleOptions', vm.get('id')]) ? options.getIn(['options', 'consoleOptions', vm.get('id')]).toJS() : {}
+    const iconClass = this.state.openConsoleSettings ? 'glyphicon-menu-up' : 'glyphicon-menu-down'
+    const text = this.state.openConsoleSettings ? 'Hide' : 'Show'
 
     return (
       <DetailContainer>
@@ -94,8 +106,11 @@ class VmDetail extends Component {
           <dd>{vm.getIn(['cpu', 'vCPUs'])}</dd>
           <dt><span className='pficon pficon-network' /> Address</dt>
           <dd>{vm.get('fqdn')}</dd>
-          <dt><span className='pficon pficon-screen' /> Console</dt>
+          <dt><span className='pficon pficon-screen' /> Console
+            <a href='#' onClick={this.consoleSettings} className={style['options-btn']}><i className={`glyphicon ${iconClass}`} />{text}</a>
+          </dt>
           <VmConsoles vm={vm} onConsole={onConsole} />
+          <ConsoleOptions options={optionsJS} onSave={onConsoleOptionsSave} open={this.state.openConsoleSettings} />
           <dt><span className='fa fa-database' /> Disks&nbsp;
             <small>
               ({hasDisks
@@ -115,14 +130,20 @@ VmDetail.propTypes = {
   icons: PropTypes.object.isRequired,
   userMessages: PropTypes.object.isRequired,
   onConsole: PropTypes.func.isRequired,
+  onConsoleOptionsSave: PropTypes.func.isRequired,
+  onConsoleOptionsOpen: PropTypes.func.isRequired,
+  options: PropTypes.object.isRequired,
 }
 
 export default connect(
   (state) => ({
     icons: state.icons,
     userMessages: state.userMessages,
+    options: state.options,
   }),
-  (dispatch) => ({
+  (dispatch, { vm }) => ({
     onConsole: ({ vmId, consoleId }) => dispatch(getConsole({ vmId, consoleId })),
+    onConsoleOptionsSave: ({ options }) => dispatch(saveConsoleOptions({ vmId: vm.get('id'), options })),
+    onConsoleOptionsOpen: () => dispatch(getConsoleOptions({ vmId: vm.get('id') })),
   })
 )(VmDetail)

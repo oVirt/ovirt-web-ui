@@ -253,3 +253,4 @@ export function setVmConsoles ({ vmId, consoles }) {
     },
   }
 }
+

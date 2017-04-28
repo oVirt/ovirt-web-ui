@@ -5,6 +5,7 @@ import userMessages from './userMessages'
 import vms from './vms'
 import icons from './icons'
 import visibility from './visibility'
+import options from './options'
 
 import templates from './templates'
 import clusters from './clusters'
@@ -25,6 +26,7 @@ export default combineReducers({
   userMessages,
   icons,
   visibility,
+  options,
   router,
   templates,
   clusters,

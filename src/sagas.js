@@ -29,6 +29,7 @@ import {
   getAllTemplates,
   getAllClusters,
   getAllOperatingSystems,
+  getConsole,
   addClusters,
   addTemplates,
   addAllOS,
@@ -37,6 +38,8 @@ import {
 
   setUserFilterPermission,
   setAdministrator,
+
+  setConsoleOptions,
 } from './actions/index'
 
 import {
@@ -57,6 +60,8 @@ import {
   GET_ALL_TEMPLATES,
   GET_ALL_OS,
   CHANGE_FILTER_PERMISSION,
+  GET_CONSOLE_OPTIONS,
+  SAVE_CONSOLE_OPTIONS,
 } from './constants/index'
 
 // import store from './store'
@@ -64,6 +69,7 @@ import Api from './ovirtapi'
 import { persistStateToLocalStorage } from './storage'
 import Selectors from './selectors'
 import AppConfiguration from './config'
+import OptionsManager from './optionsManager'
 
 function * foreach (array, fn, context) {
   var i = 0
@@ -132,6 +138,7 @@ function* login (action) {
     } else {
       if (yield checkOvirtApiVersion(oVirtMeta)) {
         yield fetchPermissionWithoutFilter({})
+        yield autoConnectCheck({})
       } else { // oVirt API of incompatible version
         console.error('oVirt api version check failed')
         yield put(failedExternalAction({
@@ -384,6 +391,26 @@ function* selectVmDetail (action) {
   yield fetchSingleVm(getSingleVm({ vmId: action.payload.vmId })) // async data refresh
 }
 
+function* getConsoleOptions (action) {
+  const options = OptionsManager.loadConsoleOptions(action.payload)
+  yield put(setConsoleOptions({ vmId: action.payload.vmId, options }))
+}
+
+function* saveConsoleOptions (action) {
+  OptionsManager.saveConsoleOptions(action.payload)
+  yield getConsoleOptions({ payload: { vmId: action.payload.vmId } })
+}
+
+function* autoConnectCheck (action) {
+  const vmId = OptionsManager.loadAutoConnectOption()
+  if (vmId && vmId.length > 0) {
+    const vm = yield callExternalAction('getVm', Api.getVm, getSingleVm({ vmId }), true)
+    if (vm && vm.id && vm.status !== 'down') {
+      yield getConsoleVm(getConsole({ vmId }))
+    }
+  }
+}
+
 function* schedulerPerMinute (action) {
   logDebug('Starting schedulerPerMinute() scheduler')
 
@@ -489,6 +516,8 @@ export function *rootSaga () {
     takeLatest(GET_ALL_OS, fetchAllOS),
 
     takeEvery(SELECT_VM_DETAIL, selectVmDetail),
+    takeEvery(GET_CONSOLE_OPTIONS, getConsoleOptions),
+    takeEvery(SAVE_CONSOLE_OPTIONS, saveConsoleOptions),
 
     takeEvery(CHANGE_FILTER_PERMISSION, changeUserFilterPermission),
     takeLatest(SCHEDULER__1_MIN, schedulerPerMinute),

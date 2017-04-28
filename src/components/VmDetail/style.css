@@ -35,3 +35,9 @@ dd {
     padding-left: 13px;
     border-left: 1px solid #d1d1d1;
 }
+
+.options-btn {
+    vertical-align: middle;
+    margin-left: 5px;
+    color: gray;
+}
