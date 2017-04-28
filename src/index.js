@@ -1,3 +1,10 @@
+// @flow
+
+/**
+  Flow agreement:
+  For simple types, like number, boolean, string and etc.: use lower-case,
+  For complex types, like Object, Array and etc.: use first letter in upper-case
+**/
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
@@ -42,7 +49,7 @@ function renderApp () {
  *
  * See web.xml.
  */
-function fetchToken () {
+function fetchToken (): { token: string, username: string } {
   const userInfo = window.userInfo
   logDebug(`SSO userInfo: ${JSON.stringify(userInfo)}`)
 
@@ -51,6 +58,10 @@ function fetchToken () {
       token: userInfo.ssoToken,
       username: userInfo.userName,
     }
+  }
+  return {
+    token: '',
+    username: '',
   }
 }
 

@@ -466,7 +466,7 @@ babel-plugin-syntax-exponentiation-operator@^6.8.0:
   version "6.13.0"
   resolved "https://registry.yarnpkg.com/babel-plugin-syntax-exponentiation-operator/-/babel-plugin-syntax-exponentiation-operator-6.13.0.tgz#9ee7e8337290da95288201a6a57f4170317830de"
 
-babel-plugin-syntax-flow@^6.18.0, babel-plugin-syntax-flow@^6.3.13:
+babel-plugin-syntax-flow@^6.18.0, babel-plugin-syntax-flow@^6.3.13, babel-plugin-syntax-flow@^6.8.0:
   version "6.18.0"
   resolved "https://registry.yarnpkg.com/babel-plugin-syntax-flow/-/babel-plugin-syntax-flow-6.18.0.tgz#4c3ab20a2af26aa20cd25995c398c4eb70310c8d"
 
@@ -672,6 +672,13 @@ babel-plugin-transform-exponentiation-operator@^6.22.0:
   dependencies:
     babel-helper-builder-binary-assignment-operator-visitor "^6.22.0"
     babel-plugin-syntax-exponentiation-operator "^6.8.0"
+    babel-runtime "^6.22.0"
+
+babel-plugin-transform-flow-comments@^6.17.0:
+  version "6.22.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-transform-flow-comments/-/babel-plugin-transform-flow-comments-6.22.0.tgz#8d9491132f2b48abd0656f96c20f3bbd6fc17529"
+  dependencies:
+    babel-plugin-syntax-flow "^6.8.0"
     babel-runtime "^6.22.0"
 
 babel-plugin-transform-flow-strip-types@^6.3.13:
@@ -1939,6 +1946,12 @@ eslint-loader@1.5.0:
     loader-utils "^0.2.7"
     object-assign "^4.0.1"
 
+eslint-plugin-flowtype@2.32.1:
+  version "2.32.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-flowtype/-/eslint-plugin-flowtype-2.32.1.tgz#bbee185dedf97e5f63ec975cdcddd199bd2a2501"
+  dependencies:
+    lodash "^4.15.0"
+
 eslint-plugin-promise@~3.3.0:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/eslint-plugin-promise/-/eslint-plugin-promise-3.3.2.tgz#c1169ae6487a87cdeae44f659f4cf05131b8dc66"
@@ -2256,6 +2269,17 @@ flat-cache@^1.2.1:
 flatten@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/flatten/-/flatten-1.0.2.tgz#dae46a9d78fbe25292258cc1e780a41d95c03782"
+
+flow-babel-webpack-plugin@1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/flow-babel-webpack-plugin/-/flow-babel-webpack-plugin-1.0.1.tgz#0e6a8d765abee53f6801b077717f1aea40b816b3"
+  dependencies:
+    babel-plugin-transform-flow-comments "^6.17.0"
+    flow-bin "^0.33.0"
+
+flow-bin@^0.33.0:
+  version "0.33.0"
+  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.33.0.tgz#ef011eace7a6100f1ae08b852db78279032b8750"
 
 font-awesome@~4.6.3:
   version "4.6.3"
@@ -3430,7 +3454,7 @@ lodash.words@^3.0.0:
   dependencies:
     lodash._root "^3.0.0"
 
-lodash@^4.0.0, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.14.2, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.3.0:
+lodash@^4.0.0, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.14.2, lodash@^4.15.0, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.3.0:
   version "4.17.4"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
 
@@ -4756,6 +4780,12 @@ right-align@^0.1.1:
 rimraf@2, rimraf@2.5.4, rimraf@^2.2.8, rimraf@^2.4.4, rimraf@~2.5.1, rimraf@~2.5.4:
   version "2.5.4"
   resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-2.5.4.tgz#96800093cbf1a0c86bd95b4625467535c29dfa04"
+  dependencies:
+    glob "^7.0.5"
+
+rimraf@^2.6.1:
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-2.6.1.tgz#c2338ec643df7a1b7fe5c54fa86f57428a55f33d"
   dependencies:
     glob "^7.0.5"
 
