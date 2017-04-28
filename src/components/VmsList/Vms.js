@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 
 import style from './style.css'
 import Vm from './Vm'
+import Pool from './Pool'
 
 import { closeDialog } from '../../actions/index'
 import { closeAllConfirmationComponents } from '../Confirmation'
@@ -34,6 +35,15 @@ const Vms = ({ vms, visibility, onCloseDetail }) => {
             {vms.get('vms').toList()
               .sort(sortFunction)
               .map(vm => <Vm vm={vm} key={vm.get('id')} />)}
+            {vms.get('pools').toList()
+              .sort(sortFunction)
+              .map(pool => {
+                if (pool.get('vmsCount') < pool.get('maxUserVms')) {
+                  return <Pool pool={pool} key={pool.get('id')} />
+                } else {
+                  return null
+                }
+              })}
           </div>
           <div className={style['overlay']} />
         </div>

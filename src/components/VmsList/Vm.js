@@ -8,12 +8,12 @@ import VmActions from '../VmActions'
 import { VmIcon, VmStatusIcon } from 'ovirt-ui-components'
 import { closeAllConfirmationComponents } from '../Confirmation'
 
-import { selectVmDetail } from '../../actions/index'
+import { selectVmDetail, startVm } from '../../actions/index'
 
 /**
  * Single icon-card in the list
  */
-const Vm = ({ vm, icons, onSelectVm, visibility }) => {
+const Vm = ({ vm, icons, onSelectVm, visibility, onStart }) => {
   const state = vm.get('status')
 
   const iconId = vm.getIn(['icons', 'large', 'id'])
@@ -43,7 +43,7 @@ const Vm = ({ vm, icons, onSelectVm, visibility }) => {
             </p>
           </h2>
 
-          <VmActions vm={vm} isOnCard />
+          <VmActions vm={vm} isOnCard onStart={onStart} />
           <VmStatusText vm={vm} />
 
         </div>
@@ -51,10 +51,12 @@ const Vm = ({ vm, icons, onSelectVm, visibility }) => {
     </div>
   )
 }
+
 Vm.propTypes = {
   vm: PropTypes.object.isRequired,
   icons: PropTypes.object.isRequired,
   onSelectVm: PropTypes.func.isRequired,
+  onStart: PropTypes.func.isRequired,
   visibility: PropTypes.object.isRequired,
 }
 
@@ -65,5 +67,6 @@ export default connect(
   }),
   (dispatch, { vm }) => ({
     onSelectVm: () => dispatch(selectVmDetail({ vmId: vm.get('id') })),
+    onStart: () => dispatch(startVm({ vmId: vm.get('id') })),
   })
 )(Vm)

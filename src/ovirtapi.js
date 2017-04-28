@@ -31,12 +31,12 @@ OvirtApi = {
         return Promise.reject(data)
       })
   },
-  _httpPost ({ url, input }) {
+  _httpPost ({ url, input, contentType = 'application/json' }) {
     return $.ajax(url, {
       type: 'POST',
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        'Content-Type': contentType,
         'Authorization': `Bearer ${OvirtApi._getLoginToken()}`,
         'Filter': 'true',
       },
@@ -136,6 +136,30 @@ OvirtApi = {
       },
       disks: {},
       consoles: [],
+      pool: {
+        id: vm['vm_pool'] ? vm.vm_pool['id'] : undefined,
+      },
+    }
+  },
+  // ----
+  /**
+   * @param pool - Single entry from oVirt REST /api/pools
+   * @returns {} - Internal representation of a Pool
+   */
+  poolToInternal ({ pool }) {
+    return {
+      name: pool['name'],
+      description: pool['description'],
+      id: pool['id'],
+      status: 'down',
+      type: pool['type'],
+      lastMessage: '',
+
+      size: pool['size'],
+      maxUserVms: pool['max_user_vms'],
+      preStartedVms: pool['prestarted_vms'],
+      vm: this.vmToInternal(pool),
+      vmsCount: 0,
     }
   },
 
@@ -346,6 +370,14 @@ OvirtApi = {
       input: '{}',
     })
   },
+  startPool ({ poolId }) {
+    OvirtApi._assertLogin({ methodName: 'startPool' })
+    return OvirtApi._httpPost({
+      url: `${AppConfiguration.applicationContext}/api/vmpools/${poolId}/allocatevm`,
+      input: '<action />',
+      contentType: 'application/xml',
+    })
+  },
   icon ({ id }) {
     OvirtApi._assertLogin({ methodName: 'icon' })
     return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/icons/${id}` })
@@ -371,6 +403,18 @@ OvirtApi = {
   checkFilter () {
     OvirtApi._assertLogin({ methodName: 'checkFilter' })
     return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/permissions`, custHeaders: { Filter: false } })
+  },
+
+  getAllPools () {
+    OvirtApi._assertLogin({ methodName: 'getAllPools' })
+    const url = `${AppConfiguration.applicationContext}/api/vmpools`
+    return OvirtApi._httpGet({ url })
+  },
+
+  getPool ({ poolId }) {
+    OvirtApi._assertLogin({ methodName: 'getPool' })
+    const url = `${AppConfiguration.applicationContext}/api/vmpools/${poolId}`
+    return OvirtApi._httpGet({ url })
   },
 }
 

@@ -3,7 +3,13 @@ import { connect } from 'react-redux'
 
 import style from './style.css'
 
-import { getConsole, getConsoleOptions, saveConsoleOptions } from '../../actions'
+import {
+  getConsole,
+  startPool,
+  startVm,
+  getConsoleOptions,
+  saveConsoleOptions,
+} from '../../actions'
 
 import Time from '../Time'
 import VmActions from '../VmActions'
@@ -67,11 +73,33 @@ class VmDetail extends Component {
   }
 
   render () {
-    const { vm, icons, userMessages, onConsole, options, onConsoleOptionsSave } = this.props
+    const {
+      vm,
+      icons,
+      userMessages,
+      onConsole,
+      isPool,
+      onStartPool,
+      onStartVm,
+      onConsoleOptionsSave,
+      options,
+      pool,
+    } = this.props
 
-    if (!vm) {
+    let onStart = onStartVm
+
+    if (!vm && !isPool) {
       return null
     }
+
+    if (isPool && pool) {
+      onStart = onStartPool
+    }
+    if (isPool && !pool) {
+      return null
+    }
+
+    const name = isPool ? pool.get('name') : vm.get('name')
     const iconId = vm.getIn(['icons', 'small', 'id'])
     const icon = icons.get(iconId)
     const disks = vm.get('disks')
@@ -89,9 +117,9 @@ class VmDetail extends Component {
       <DetailContainer>
         <h1>
           <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' className={style['vm-detail-icon']} />
-          &nbsp;{vm.get('name')}
+          &nbsp;{name}
         </h1>
-        <VmActions vm={vm} userMessages={userMessages} />
+        <VmActions vm={vm} userMessages={userMessages} isPool={isPool} onStart={onStart} />
         <LastMessage vmId={vm.get('id')} userMessages={userMessages} />
         <dl className={style['vm-properties']}>
           <dt>State</dt>
@@ -127,12 +155,16 @@ class VmDetail extends Component {
 }
 VmDetail.propTypes = {
   vm: PropTypes.object,
+  pool: PropTypes.object,
   icons: PropTypes.object.isRequired,
   userMessages: PropTypes.object.isRequired,
   onConsole: PropTypes.func.isRequired,
   onConsoleOptionsSave: PropTypes.func.isRequired,
   onConsoleOptionsOpen: PropTypes.func.isRequired,
   options: PropTypes.object.isRequired,
+  onStartPool: PropTypes.func.isRequired,
+  onStartVm: PropTypes.func.isRequired,
+  isPool: PropTypes.bool,
 }
 
 export default connect(
@@ -141,9 +173,11 @@ export default connect(
     userMessages: state.userMessages,
     options: state.options,
   }),
-  (dispatch, { vm }) => ({
+  (dispatch, { vm, pool }) => ({
     onConsole: ({ vmId, consoleId }) => dispatch(getConsole({ vmId, consoleId })),
     onConsoleOptionsSave: ({ options }) => dispatch(saveConsoleOptions({ vmId: vm.get('id'), options })),
     onConsoleOptionsOpen: () => dispatch(getConsoleOptions({ vmId: vm.get('id') })),
+    onStartPool: () => dispatch(startPool({ poolId: pool.get('id') })),
+    onStartVm: () => dispatch(startVm({ vmId: vm.get('id') })),
   })
 )(VmDetail)
