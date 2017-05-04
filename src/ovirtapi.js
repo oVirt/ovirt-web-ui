@@ -343,12 +343,15 @@ OvirtApi = {
   },
   remove ({ vmId, force, preserveDisks }: { vmId: string, force: boolean, preserveDisks: boolean }): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'remove' })
+    let url = `${AppConfiguration.applicationContext}/api/vms/${vmId}`
+    if (preserveDisks) {
+      url = url + ';detach_only=true'
+    }
     return OvirtApi._httpDelete({
-      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}`,
+      url,
       custHeaders: {
         'Accept': 'application/json',
         force: !!force,
-        detach_only: !!preserveDisks,
       },
     })
   },

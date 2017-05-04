@@ -24,7 +24,7 @@ import style from './style.css'
  *      Delete Something
  * </button>
  */
-const OnClickTopConfirmation = ({ target, confirmationText, cancelLabel, okLabel, extraButtonLabel, id, onOk, onExtra }) => {
+const OnClickTopConfirmation = ({ target, confirmationText, cancelLabel, okLabel, extraButtonLabel, id, onOk, onExtra, width, height }) => {
   showConfirmation({
     confirmationText,
     okLabel,
@@ -33,6 +33,8 @@ const OnClickTopConfirmation = ({ target, confirmationText, cancelLabel, okLabel
     placement: 'top',
     element: target,
     uniqueId: id,
+    width,
+    height,
   }).then(
     (result) => {
       if (result === 'ok' && onOk) {
@@ -159,7 +161,7 @@ class ConfirmationContent extends React.Component {
 
     this.state = {
       width: this.props.width || 200,
-      height: this.props.height || 70,
+      height: this.props.height || 80,
       positionLeft: 0,
       positionTop: 0,
     }
@@ -194,7 +196,8 @@ class ConfirmationContent extends React.Component {
       switch (placement) {
         case 'top': {
           positionLeft = x + element.clientWidth / 2 - width / 2
-          positionTop = y - 10 - 66
+          positionTop = y - 10 - (height - 4)
+          positionTop = positionTop >= 0 ? positionTop : 0
           break
         }
         case 'bottom': {
@@ -258,9 +261,12 @@ class ConfirmationContent extends React.Component {
           placement={placement}
           positionLeft={positionLeft}
           positionTop={positionTop}>
-          <p className={style['confirmation-text']}>
-            {confirmationText}
-          </p>
+          {typeof confirmationText === 'string'
+            ? (
+              <p className={style['confirmation-text']}>
+                {confirmationText}
+              </p>)
+              : confirmationText }
           <ButtonToolbar className={style['confirmation-toolbar']}>
             <Button bsSize='xsmall' className='button-l' bsStyle='info' onClick={onOkClicked}>
               {okLabel}
@@ -286,7 +292,7 @@ ConfirmationContent.propTypes = {
   okLabel: React.PropTypes.string,
   cancelLabel: React.PropTypes.string,
   extraButtonLabel: React.PropTypes.string,
-  confirmationText: React.PropTypes.string.isRequired,
+  confirmationText: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.object]),
 
   onOkClicked: React.PropTypes.func,
   onCancelClicked: React.PropTypes.func,
