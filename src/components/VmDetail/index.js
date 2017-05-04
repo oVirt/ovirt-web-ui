@@ -46,7 +46,15 @@ const VmConsoles = ({ vm, onConsole }) => {
   return (
     <dd>
       {canConsole(vm.get('status')) ? vm.get('consoles').map(c => (
-        <a href='#' key={c.get('id')} onClick={() => onConsole({ vmId: vm.get('id'), consoleId: c.get('id') })} className={style['left-delimiter']}>
+        <a
+          href='#'
+          data-toggle='tooltip'
+          data-placement='left'
+          title={`Open ${c.get('protocol').toUpperCase()} console`}
+          key={c.get('id')}
+          onClick={() => onConsole({ vmId: vm.get('id'), consoleId: c.get('id') })}
+          className={style['left-delimiter']}
+          >
           {c.get('protocol').toUpperCase()}
         </a>
       )) : ''}
