@@ -10,6 +10,7 @@ import {
   restartVm,
   suspendVm,
   openEditVmDialog,
+  removeVm,
 } from '../../actions/index'
 
 import OnClickTopConfirmation from '../Confirmation'
@@ -107,6 +108,8 @@ const VmActions = ({
   onStart,
   onSuspend,
   onEdit,
+  onRemove,
+  onForceRemove,
   isPool,
 }) => {
   const status = vm.get('status')
@@ -138,6 +141,17 @@ const VmActions = ({
     cancelLabel: 'Cancel',
     okLabel: 'Yes',
     onOk: onSuspend,
+  })
+
+  const confirmRemove = (e) => OnClickTopConfirmation({
+    id: vm.get('id'),
+    target: e.target,
+    confirmationText: 'Remove the VM?',
+    cancelLabel: 'Cancel',
+    okLabel: 'Yes',
+    extraButtonLabel: 'Force',
+    onOk: onRemove,
+    onExtra: onForceRemove,
   })
 
   let consoleProtocol = ''
@@ -180,6 +194,13 @@ const VmActions = ({
       <Button isOnCard={isOnCard}
         className='pficon pficon-edit' tooltip='Edit the VM' onClick={onEdit} />
 
+      {!isOnCard ? (
+        <Button isOnCard={isOnCard} actionDisabled={isPool || vm.getIn(['actionInProgress', 'remove'])}
+          className='pficon pficon-remove'
+          tooltip='Remove the VM'
+          onClick={confirmRemove} />
+      ) : null}
+
     </div>
   )
 }
@@ -194,6 +215,8 @@ VmActions.propTypes = {
   onForceShutdown: PropTypes.func.isRequired,
   onSuspend: PropTypes.func.isRequired,
   onEdit: PropTypes.func.isRequired,
+  onRemove: PropTypes.func.isRequired,
+  onForceRemove: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -207,5 +230,7 @@ export default connect(
     onForceShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: true })),
     onSuspend: () => dispatch(suspendVm({ vmId: vm.get('id') })),
     onEdit: () => dispatch(openEditVmDialog({ vmId: vm.get('id') })),
+    onRemove: () => dispatch(removeVm({ vmId: vm.get('id'), force: false })),
+    onForceRemove: () => dispatch(removeVm({ vmId: vm.get('id'), force: true })),
   })
 )(VmActions)

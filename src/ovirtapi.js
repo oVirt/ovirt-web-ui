@@ -69,6 +69,21 @@ OvirtApi = {
         return Promise.reject(data)
       })
   },
+  _httpDelete ({ url, custHeaders = { 'Accept': 'application/json' } }: { url: string, custHeaders?: Object }): Promise<Object> {
+    const headers = Object.assign({
+      'Authorization': `Bearer ${OvirtApi._getLoginToken()}`,
+    }, custHeaders)
+    logDebug(`_httpDelete: url="${url}", headers="${JSON.stringify(headers)}"`)
+
+    return $.ajax(url, {
+      type: 'DELETE',
+      headers,
+    }).then((data: Object): Promise<Object> => Promise.resolve(data))
+      .catch((data: Object): Promise<Object> => {
+        logDebug(`Ajax failed: ${JSON.stringify(data)}`)
+        return Promise.reject(data)
+      })
+  },
 
   // ----
   /**
@@ -324,6 +339,17 @@ OvirtApi = {
     return OvirtApi._httpPost({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/${restMethod}`,
       input: '{}',
+    })
+  },
+  remove ({ vmId, force, preserveDisks }: { vmId: string, force: boolean, preserveDisks: boolean }): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'remove' })
+    return OvirtApi._httpDelete({
+      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}`,
+      custHeaders: {
+        'Accept': 'application/json',
+        force: !!force,
+        detach_only: !!preserveDisks,
+      },
     })
   },
   getAllTemplates (): Promise<Object> {

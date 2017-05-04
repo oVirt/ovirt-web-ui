@@ -51,7 +51,7 @@ import {
   setConsoleOptions,
 } from './actions/index'
 
-import {
+import { // TODO: sort alphabetically
   LOGIN,
   LOGOUT,
   GET_ALL_VMS,
@@ -74,6 +74,7 @@ import {
   GET_ALL_POOLS,
   START_POOL,
   SELECT_POOL_DETAIL,
+  REMOVE_VM,
 } from './constants/index'
 
 // import store from './store'
@@ -409,6 +410,15 @@ function* startPool (action) {
   yield stopProgress({ poolId: action.payload.poolId, name: 'start', result })
 }
 
+function* removeVm (action) {
+  yield startProgress({ vmId: action.payload.vmId, name: 'remove' })
+  const result = yield callExternalAction('remove', Api.remove, action)
+  if (result.status === 'complete') {
+    yield put(closeDialog({ force: false }))
+  }
+  yield stopProgress({ vmId: action.payload.vmId, name: 'remove', result })
+}
+
 function* fetchConsoleVmMeta ({ vmId }) {
   const consoles = yield callExternalAction('consoles', Api.consoles, { type: 'INTERNAL_CONSOLES', payload: { vmId } })
 
@@ -576,6 +586,7 @@ export function *rootSaga () {
     takeEvery(GET_CONSOLE_VM, getConsoleVm),
     takeEvery(SUSPEND_VM, suspendVm),
     takeEvery(START_POOL, startPool),
+    takeEvery(REMOVE_VM, removeVm),
 
     takeLatest(ADD_NEW_VM, createNewVm),
     takeLatest(EDIT_VM, editVm),
@@ -600,6 +611,7 @@ const shortMessages = {
   'SHUTDOWN_VM': 'Failed to shutdown the VM',
   'GET_CONSOLE_VM': 'Failed to get the VM console',
   'SUSPEND_VM': 'Failed to suspend the VM',
+  'REMOVE_VM': 'Failed to remove the VM',
 
   'GET_ICON': 'Failed to retrieve VM icon',
   'INTERNAL_CONSOLE': 'Failed to retrieve VM console details',
