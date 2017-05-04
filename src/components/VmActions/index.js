@@ -151,10 +151,16 @@ const VmActions = ({
   return (
     <div className={isOnCard ? 'card-pf-items text-center' : style['left-padding']}>
       <EmptyAction state={status} isOnCard={isOnCard} />
-      <Button isOnCard={isOnCard} actionDisabled={isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole'])}
-        className='pficon pficon-screen'
-        tooltip={consoleProtocol}
-        onClick={onGetConsole} />
+
+      <Button isOnCard={isOnCard} actionDisabled={(!isPool && !canStart(status)) || vm.getIn(['actionInProgress', 'start'])}
+        className='fa fa-play'
+        tooltip='Start the VM'
+        onClick={onStart} />
+
+      <Button isOnCard={isOnCard} actionDisabled={isPool || !canSuspend(status) || vm.getIn(['actionInProgress', 'suspend'])}
+        className='fa fa-pause'
+        tooltip='Suspend the VM'
+        onClick={confirmSuspend} />
 
       <Button isOnCard={isOnCard} actionDisabled={isPool || !canShutdown(status) || vm.getIn(['actionInProgress', 'shutdown'])}
         className='fa fa-power-off'
@@ -166,16 +172,14 @@ const VmActions = ({
         tooltip='Reboot the VM'
         onClick={confirmRestart} />
 
-      <Button isOnCard={isOnCard} actionDisabled={(!isPool && !canStart(status)) || vm.getIn(['actionInProgress', 'start'])}
-        className='fa fa-play' tooltip='Start the VM' onClick={onStart} />
-
-      <Button isOnCard={isOnCard} actionDisabled={isPool || !canSuspend(status) || vm.getIn(['actionInProgress', 'suspend'])}
-        className='fa fa-pause'
-        tooltip='Suspend the VM'
-        onClick={confirmSuspend} />
+      <Button isOnCard={isOnCard} actionDisabled={isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole'])}
+        className='pficon pficon-screen'
+        tooltip={consoleProtocol}
+        onClick={onGetConsole} />
 
       <Button isOnCard={isOnCard}
         className='pficon pficon-edit' tooltip='Edit the VM' onClick={onEdit} />
+
     </div>
   )
 }
