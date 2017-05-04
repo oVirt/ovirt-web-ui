@@ -32,7 +32,7 @@ class VmDialog extends React.Component {
     super(props)
 
     this.state = {
-      actionUniqueId: undefined,
+      actionUniqueId: generateUnique('vm-dialog-'),
 
       id: undefined,
 
@@ -102,6 +102,7 @@ class VmDialog extends React.Component {
   }
 
   getLatestUserMessage () {
+    console.log('actionUniqueId: ', actionUniqueId)
     const { actionUniqueId } = this.state
     const filtered = this.props.userMessages
       .get('records')
