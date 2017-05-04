@@ -118,8 +118,28 @@ class VmDetail extends Component {
     const hasDisks = disks.size > 0
 
     let optionsJS = options.hasIn(['options', 'consoleOptions', vm.get('id')]) ? options.getIn(['options', 'consoleOptions', vm.get('id')]).toJS() : {}
-    const iconClass = this.state.openConsoleSettings ? 'glyphicon-menu-up' : 'glyphicon-menu-down'
-    const text = this.state.openConsoleSettings ? 'Hide' : 'Show'
+
+    const consoleOptionsIconClass = this.state.openConsoleSettings ? 'glyphicon-menu-up' : 'glyphicon-menu-down'
+    const consoleOptionsShowHide = (
+      <small>
+        (<a href='#' onClick={this.consoleSettings}>
+          <i className={`glyphicon ${consoleOptionsIconClass}`} />&nbsp;
+          {this.state.openConsoleSettings ? 'hide' : 'show'}
+        </a>)
+      </small>)
+
+    const disksIconClass = this.state.renderDisks ? 'glyphicon-menu-up' : 'glyphicon-menu-down'
+    const disksShowHide = (
+      <small>
+        ({hasDisks
+        ? (<a href='#' onClick={onToggleRenderDisks}>
+          <i className={`glyphicon ${disksIconClass}`} />&nbsp;
+          {this.state.renderDisks ? 'hide' : 'show'}
+        </a>)
+        : 'no disks'
+      })
+      </small>
+    )
 
     return (
       <DetailContainer>
@@ -142,19 +162,10 @@ class VmDetail extends Component {
           <dd>{vm.getIn(['cpu', 'vCPUs'])}</dd>
           <dt><span className='pficon pficon-network' /> Address</dt>
           <dd>{vm.get('fqdn')}</dd>
-          <dt><span className='pficon pficon-screen' /> Console
-            <a href='#' onClick={this.consoleSettings} className={style['options-btn']}><i className={`glyphicon ${iconClass}`} />{text}</a>
-          </dt>
+          <dt><span className='pficon pficon-screen' /> Console&nbsp;{consoleOptionsShowHide}</dt>
           <VmConsoles vm={vm} onConsole={onConsole} />
           <ConsoleOptions options={optionsJS} onSave={onConsoleOptionsSave} open={this.state.openConsoleSettings} />
-          <dt><span className='fa fa-database' /> Disks&nbsp;
-            <small>
-              ({hasDisks
-                ? (<a href='#' onClick={onToggleRenderDisks}>{this.state.renderDisks ? 'hide' : 'show'}</a>)
-                : 'no disks'
-              })
-            </small>
-          </dt>
+          <dt><span className='fa fa-database' /> Disks&nbsp;{disksShowHide}</dt>
           <dd>{disksElement}</dd>
         </dl>
       </DetailContainer>
