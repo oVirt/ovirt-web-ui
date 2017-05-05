@@ -1,4 +1,6 @@
 import React from 'react'
+import PropTypes from 'prop-types'
+
 import ReactDOM from 'react-dom'
 import { Popover, Button, ButtonToolbar } from 'react-bootstrap'
 
@@ -151,8 +153,8 @@ class Confirmation extends React.Component {
   }
 }
 Confirmation.propTypes = {
-  reject: React.PropTypes.func,
-  resolve: React.PropTypes.func,
+  reject: PropTypes.func,
+  resolve: PropTypes.func,
 }
 
 class ConfirmationContent extends React.Component {
@@ -289,23 +291,23 @@ class ConfirmationContent extends React.Component {
   }
 }
 ConfirmationContent.propTypes = {
-  okLabel: React.PropTypes.string,
-  cancelLabel: React.PropTypes.string,
-  extraButtonLabel: React.PropTypes.string,
-  confirmationText: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.object]),
+  okLabel: PropTypes.string,
+  cancelLabel: PropTypes.string,
+  extraButtonLabel: PropTypes.string,
+  confirmationText: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
 
-  onOkClicked: React.PropTypes.func,
-  onCancelClicked: React.PropTypes.func,
-  onExtraButtonClicked: React.PropTypes.func,
+  onOkClicked: PropTypes.func,
+  onCancelClicked: PropTypes.func,
+  onExtraButtonClicked: PropTypes.func,
 
-  element: React.PropTypes.object.isRequired,
+  element: PropTypes.object.isRequired,
 
-  placement: React.PropTypes.string,
-  width: React.PropTypes.number,
-  height: React.PropTypes.number,
+  placement: PropTypes.string,
+  width: PropTypes.number,
+  height: PropTypes.number,
 
-  positionLeft: React.PropTypes.number,
-  positionTop: React.PropTypes.number,
+  positionLeft: PropTypes.number,
+  positionTop: PropTypes.number,
 }
 
 export default OnClickTopConfirmation
