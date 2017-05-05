@@ -1,7 +1,7 @@
 import {
   SELECT_POOL_DETAIL,
   SET_POOL_DETAIL_TO_SHOW,
-} from '../constants'
+} from '../constants/index'
 
 export function toggleOptions () {
   return {

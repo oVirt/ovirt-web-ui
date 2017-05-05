@@ -1,12 +1,12 @@
 import {
-  PERSIST_STATE,
-  GET_VM,
-  SCHEDULER__1_MIN,
-  REDIRECT_URL,
-  SET_USER_FILTER_PERMISSION,
   CHANGE_FILTER_PERMISSION,
+  GET_VM,
+  PERSIST_STATE,
+  REDIRECT_URL,
+  SCHEDULER__1_MIN,
   SET_ADMINISTATOR,
-} from '../constants'
+  SET_USER_FILTER_PERMISSION,
+} from '../constants/index'
 
 export * from './error'
 export * from './vm'
