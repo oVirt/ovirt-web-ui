@@ -5,6 +5,7 @@
 }
 
 .confirmation-toolbar {
+    margin-top: 10px;
     paddingBottom: 6px;
     float: right;
 }

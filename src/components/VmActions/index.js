@@ -3,16 +3,27 @@ import { connect } from 'react-redux'
 
 import style from './style.css'
 
-import { canRestart, canShutdown, canStart, canConsole, canSuspend } from 'ovirt-ui-components'
+import {
+  Checkbox,
+
+  canRestart,
+  canShutdown,
+  canStart,
+  canConsole,
+  canSuspend,
+  canRemove,
+} from 'ovirt-ui-components'
+
 import {
   getConsole,
   shutdownVm,
   restartVm,
   suspendVm,
   openEditVmDialog,
+  removeVm,
 } from '../../actions/index'
 
-import OnClickTopConfirmation from '../Confirmation'
+import OnClickTopConfirmation from '../Confirmation/index'
 
 class Button extends React.Component {
   constructor (props) {
@@ -93,6 +104,61 @@ EmptyAction.propTypes = {
   isOnCard: PropTypes.bool.isRequired,
 }
 
+class RemoveVmAction extends React.Component {
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      preserveDisks: false,
+    }
+  }
+
+  render () {
+    const { isOnCard, isPool, vm, onRemove } = this.props
+
+    if (isOnCard) {
+      return null
+    }
+
+    const confirmRemoveText = (
+      <div>
+        Remove the VM?
+        <br />
+        <Checkbox checked={this.state.preserveDisks}
+          onClick={() => this.setState({ preserveDisks: !this.state.preserveDisks })}
+          label='Preserve disks' />
+      </div>)
+
+    const confirmRemove = (e) => OnClickTopConfirmation({
+      id: vm.get('id'),
+      target: e.target,
+      confirmationText: confirmRemoveText,
+      cancelLabel: 'Cancel',
+      okLabel: 'Yes',
+      extraButtonLabel: 'Force',
+      onOk: () => onRemove({ force: false, preserveDisks: this.state.preserveDisks }),
+      onExtra: () => onRemove({ force: true, preserveDisks: this.state.preserveDisks }),
+      height: 100,
+    })
+
+    const status = vm.get('status')
+    const isDisabled = isPool || vm.getIn(['actionInProgress', 'remove']) || !canRemove(status)
+
+    return (
+      <Button isOnCard={false} actionDisabled={isDisabled}
+        className='pficon pficon-remove'
+        tooltip='Remove the VM'
+        onClick={confirmRemove} />
+    )
+  }
+}
+RemoveVmAction.propTypes = {
+  vm: PropTypes.object.isRequired,
+  isOnCard: PropTypes.bool,
+  isPool: PropTypes.bool,
+  onRemove: PropTypes.func.isRequired,
+}
+
 /**
  * Active actions on a single VM-card.
  * List of actions depends on the VM state.
@@ -107,6 +173,7 @@ const VmActions = ({
   onStart,
   onSuspend,
   onEdit,
+  onRemove,
   isPool,
 }) => {
   const status = vm.get('status')
@@ -180,6 +247,7 @@ const VmActions = ({
       <Button isOnCard={isOnCard}
         className='pficon pficon-edit' tooltip='Edit the VM' onClick={onEdit} />
 
+      <RemoveVmAction isOnCard={isOnCard} isPool={isPool} vm={vm} onRemove={onRemove} />
     </div>
   )
 }
@@ -194,6 +262,7 @@ VmActions.propTypes = {
   onForceShutdown: PropTypes.func.isRequired,
   onSuspend: PropTypes.func.isRequired,
   onEdit: PropTypes.func.isRequired,
+  onRemove: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -207,5 +276,6 @@ export default connect(
     onForceShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: true })),
     onSuspend: () => dispatch(suspendVm({ vmId: vm.get('id') })),
     onEdit: () => dispatch(openEditVmDialog({ vmId: vm.get('id') })),
+    onRemove: ({ preserveDisks, force }) => dispatch(removeVm({ vmId: vm.get('id'), force, preserveDisks })),
   })
 )(VmActions)

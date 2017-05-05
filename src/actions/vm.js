@@ -20,7 +20,8 @@ import {
   SET_OVIRT_API_VERSION,
   ADD_NEW_VM,
   EDIT_VM,
-} from '../constants'
+  REMOVE_VM,
+} from '../constants/index'
 
 export function login ({ username, password, token }) {
   return {
@@ -109,6 +110,17 @@ export function createVm (vm, actionUniqueId) {
     actionUniqueId,
     payload: {
       vm,
+    },
+  }
+}
+
+export function removeVm ({ vmId, force = false, preserveDisks = false }) {
+  return {
+    type: REMOVE_VM,
+    payload: {
+      vmId,
+      force,
+      preserveDisks,
     },
   }
 }
