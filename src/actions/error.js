@@ -1,4 +1,4 @@
-import { FAILED_EXTERNAL_ACTION } from '../constants'
+import { FAILED_EXTERNAL_ACTION } from '../constants/index'
 
 function customizeErrorMessage (message) {
   const result = message.replace('Vm ', 'VM ')
@@ -45,3 +45,4 @@ export function loginFailed ({ errorCode, message }) {
     },
   }
 }
+

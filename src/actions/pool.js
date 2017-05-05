@@ -1,13 +1,13 @@
 import {
   GET_ALL_POOLS,
+  GET_POOL,
+  POOL_ACTION_IN_PROGRESS,
+  REMOVE_MISSING_POOLS,
+  REMOVE_POOL,
   START_POOL,
   UPDATE_POOLS,
-  REMOVE_POOL,
-  REMOVE_MISSING_POOLS,
-  GET_POOL,
   UPDATE_VMPOOLS_COUNT,
-  POOL_ACTION_IN_PROGRESS,
-} from '../constants'
+} from '../constants/index'
 
 /**
  * Read all Pools data and related subresources

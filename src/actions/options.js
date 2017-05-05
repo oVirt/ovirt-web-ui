@@ -1,4 +1,7 @@
-import { GET_CONSOLE_OPTIONS, SAVE_CONSOLE_OPTIONS } from '../constants/index'
+import {
+  GET_CONSOLE_OPTIONS,
+  SAVE_CONSOLE_OPTIONS,
+} from '../constants/index'
 
 export function setConsoleOptions ({ vmId, options }) {
   return {
