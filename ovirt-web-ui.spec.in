@@ -22,11 +22,11 @@ ExclusiveArch:  x86_64
 
 # Keep ovirt-engine-{nodejs|nodejs-modules|yarn} at particular version unless tested on higher
 # Please keep in sync with the automation/*.req files
-BuildRequires: ovirt-engine-nodejs = 6.9.4
-BuildRequires: ovirt-engine-yarn = 0.19.1
+BuildRequires: ovirt-engine-nodejs = 6.10.3
+BuildRequires: ovirt-engine-yarn = 0.24.4
 
 # contains ovirt-ui-components-0.2.2
-BuildRequires: ovirt-engine-nodejs-modules = 1.0.10 
+BuildRequires: ovirt-engine-nodejs-modules = 1.0.11
 
 %description
 This package provides new VM Portal for %{product}, so far as technical preview.
@@ -56,6 +56,8 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-engine/engine.conf.d/50-ovirt-web-ui.conf
 
 %changelog
+* Mon May 15 2017 Marek Libra <mlibra@redhat.com> - 0.2.1
+- React and Redux updated to latest version
 * Fri May 12 2017 Marek Libra <mlibra@redhat.com> - 0.2.0
 - Add/Edit VM Dialog
 - Autoconnect and Console options
