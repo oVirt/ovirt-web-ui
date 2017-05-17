@@ -180,7 +180,7 @@ OvirtApi = {
       size: pool['size'],
       maxUserVms: pool['max_user_vms'],
       preStartedVms: pool['prestarted_vms'],
-      vm: this.vmToInternal(pool),
+      vm: this.vmToInternal({ vm: pool }),
       vmsCount: 0,
     }
   },
