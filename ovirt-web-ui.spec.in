@@ -56,6 +56,8 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-engine/engine.conf.d/50-ovirt-web-ui.conf
 
 %changelog
+* Mon May 15 2017 Marek Libra <mlibra@redhat.com> - 0.2.2
+- Minor fixes for pools
 * Mon May 15 2017 Marek Libra <mlibra@redhat.com> - 0.2.1
 - React and Redux updated to latest version
 * Fri May 12 2017 Marek Libra <mlibra@redhat.com> - 0.2.0

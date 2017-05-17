@@ -34,7 +34,8 @@ EXTRA_DIST = \
 	index.html \
   index.jsp \
 	index.jsp.template \
-	yarn.lock
+	yarn.lock \
+	.flowconfig
 	
 
 DISTCLEANFILES = $(PACKAGE)-$(VERSION).tar.gz \
