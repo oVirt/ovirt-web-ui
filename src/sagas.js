@@ -618,6 +618,8 @@ const shortMessages = {
   'INTERNAL_CONSOLES': 'Failed to retrieve list of VM consoles',
   'GET_DISK_DETAILS': 'Failed to retrieve disk details',
   'GET_DISK_ATTACHMENTS': 'Failed to retrieve VM disk attachments',
+
+  'GET_VM': 'Failed to retireve VM details',
 }
 
 function shortErrorMessage ({ action }) {

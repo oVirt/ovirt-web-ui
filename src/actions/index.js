@@ -2,7 +2,6 @@ import {
   CHANGE_FILTER_PERMISSION,
   GET_VM,
   PERSIST_STATE,
-  REDIRECT_URL,
   SCHEDULER__1_MIN,
   SET_ADMINISTATOR,
   SET_USER_FILTER_PERMISSION,
@@ -38,15 +37,6 @@ export function schedulerOneMinute () {
   return {
     type: SCHEDULER__1_MIN,
     payload: {},
-  }
-}
-
-export function setRedirectUrl (redirectUrl) {
-  return {
-    type: REDIRECT_URL,
-    payload: {
-      redirectUrl,
-    },
   }
 }
 

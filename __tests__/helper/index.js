@@ -5,3 +5,5 @@ export default (generator) => {
 		})
 	}
 }
+
+describe('Empty test: ', () => {})

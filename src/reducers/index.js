@@ -13,8 +13,6 @@ import operatingSystems from './operatingSystems'
 
 function router (redirectUrl = '/', action) {
   switch (action.type) {
-    case 'SET_REDIRECT_URL':
-      return action.payload.redirectUrl
     default:
       return redirectUrl
   }
