@@ -1,8 +1,6 @@
 import {
-  ADD_NEW_VM,
   CLEAR_USER_MSGS,
   DOWNLOAD_CONSOLE_VM,
-  EDIT_VM,
   GET_ALL_VMS,
   LOGIN,
   LOGIN_SUCCESSFUL,
@@ -116,19 +114,6 @@ export function suspendVm ({ vmId }) {
   }
 }
 
-/**
- * New VM will be created in oVirt (REST API)
- */
-export function createVm (vm, actionUniqueId) {
-  return {
-    type: ADD_NEW_VM,
-    actionUniqueId,
-    payload: {
-      vm,
-    },
-  }
-}
-
 export function removeVm ({ vmId, force = false, preserveDisks = false }) {
   return {
     type: REMOVE_VM,
@@ -136,19 +121,6 @@ export function removeVm ({ vmId, force = false, preserveDisks = false }) {
       vmId,
       force,
       preserveDisks,
-    },
-  }
-}
-
-/**
- * Existing VM definition will be updated in oVirt (REST API)
- */
-export function editVm (vm, actionUniqueId) {
-  return {
-    type: EDIT_VM,
-    actionUniqueId,
-    payload: {
-      vm,
     },
   }
 }

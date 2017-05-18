@@ -1,74 +1,91 @@
 import React, { PropTypes } from 'react'
 import { connect } from 'react-redux'
-
-import style from './App.css'
+import {
+  BrowserRouter as Router,
+} from 'react-router-dom'
+import { renderRoutes } from 'react-router-config'
 
 import VmsPageHeader from './components/VmsPageHeader/index'
 
-import VmsList from './components/VmsList/index'
-import VmDetail from './components/VmDetail'
 import Options from './components/Options'
 import AboutDialog from './components/About'
 import OvirtApiCheckFailed from './components/OvirtApiCheckFailed'
 import CloseDialogConfirmation from './components/CloseDialogConfirmation/index'
 import TokenExpired from './components/TokenExpired'
+import ContainerFluid from './components/ContainerFluid'
 import LoadingData from './components/LoadingData/index'
 
-import AddVmButton from './components/VmDialog/AddVmButton'
-import VmDialog from './components/VmDialog/index'
+import VerticalMenu from './components/VerticalMenu'
 
-const App = ({ vms, visibility }) => {
-  const selectedVmId = visibility.get('selectedVmDetail') // TODO: move to 'connect()' function
-  const selectedPoolId = visibility.get('selectedPoolDetail')
-  const selectedVm = selectedVmId ? vms.getIn(['vms', selectedVmId]) : undefined
-  const selectedPool = selectedPoolId ? vms.getIn(['pools', selectedPoolId, 'vm']) : undefined
-  const isCloseDialogConfirmation = visibility.get('dialogCloseConfirmationToShow')
+import { getRoutes, getMenu } from './routes'
+import rednerModal from './components/VmModals/rednerModal'
+import AppConfiguration from './config'
 
+/**
+ * Login (token) to Engine is missing.
+ */
+const NoLogin = () => {
+  return (
+    <div className='blank-slate-pf'>
+      <div className='blank-slate-pf-icon'>
+        <span className='pficon pficon pficon-user' />
+      </div>
+      <h1>
+        Please log in ...
+      </h1>
+    </div>
+  )
+}
+
+const App = ({ vms, visibility, config }) => {
   let detailToRender = null
   switch (visibility.get('dialogToShow')) {
     case 'Options':
       detailToRender = (<Options />)
       break
-    case 'VmDialog':
-      detailToRender = (<VmDialog vm={selectedVm} />)
-      break
-    case 'VmDetail':
-      detailToRender = (<VmDetail vm={selectedVm} />)
-      break
-    case 'PoolDetail':
-      detailToRender = (<VmDetail vm={selectedPool} pool={vms.getIn(['pools', selectedPoolId])} isPool />)
-      break
   }
 
-  let closeDialogConfirmation = null
-  if (detailToRender && isCloseDialogConfirmation) {
-    closeDialogConfirmation = (<CloseDialogConfirmation />)
+  const routes = getRoutes(vms)
+  const menu = getMenu()
+
+  if (!config.get('loginToken')) { // login is missing
+    return (
+      <ContainerFluid>
+        <NoLogin />
+      </ContainerFluid>
+    )
   }
 
-  const addVmButton = detailToRender ? null : <AddVmButton name='Add New Virtual Machine' />
+  const openConfirmation = (message, callback) => {
+    rednerModal({
+      Component: CloseDialogConfirmation,
+      onYes: () => {
+        callback(true)
+      },
+      onNo: () => {
+        callback(false)
+      },
+    })
+  }
 
   return (
-    <div>
-      <VmsPageHeader title='oVirt VM Portal' />
-      <div className={'container-fluid ' + style['navbar-top-offset']}>
-        <div className={style['main-actions']}>
-          {addVmButton}
-        </div>
-
+    <Router getUserConfirmation={openConfirmation} basename={AppConfiguration.applicationURL}>
+      <div>
+        <VmsPageHeader title='oVirt VM Portal' />
+        <VerticalMenu menuItems={menu} />
         <TokenExpired />
         <LoadingData />
-
-        <VmsList />
+        {renderRoutes(routes)}
         {detailToRender}
+        <AboutDialog />
+        <OvirtApiCheckFailed />
       </div>
-      {closeDialogConfirmation}
-      <AboutDialog />
-      <OvirtApiCheckFailed />
-    </div>
+    </Router>
   )
 }
 App.propTypes = {
   vms: PropTypes.object.isRequired,
+  config: PropTypes.object.isRequired,
   visibility: PropTypes.object.isRequired,
 }
 
@@ -76,5 +93,6 @@ export default connect(
   (state) => ({
     vms: state.vms,
     visibility: state.visibility,
+    config: state.config,
   })
 )(App)

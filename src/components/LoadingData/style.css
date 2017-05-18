@@ -6,4 +6,6 @@
     top: 2.4em;
     margin-left: 50%;
     border-color: #ecc89e;
+    min-width: 100px;
+    text-align: center;
 }

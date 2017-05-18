@@ -36,3 +36,14 @@ body {
   margin-left: 10px;
   font-weight: normal;
 }
+
+div.toolbar-pf {
+  height: 38px;
+  padding-top: 0;
+  margin-top: 5px;
+}
+
+.alert {
+  top: 30px;
+  margin-left: 201px;
+}

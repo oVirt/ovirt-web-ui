@@ -14,5 +14,13 @@
 
 .left-padding {
     text-align: left;
-    padding-left: 5em;
+    /*padding-left: 5em;*/
+}
+
+.action-link {
+	color: #363636;
+}
+
+.link {
+	height: 27px;
 }

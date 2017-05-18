@@ -1,5 +1,6 @@
 .vm-properties {
     font-size: large;
+    width: 50%;
 }
 
 dt {
@@ -34,4 +35,18 @@ dd {
 .left-delimiter + .left-delimiter {
     padding-left: 13px;
     border-left: 1px solid #d1d1d1;
+}
+
+.options-btn {
+    vertical-align: middle;
+    margin-left: 5px;
+    color: gray;
+}
+
+.header {
+    padding-bottom: 15px;
+}
+
+.vm-detail-container {
+    display: flex;
 }

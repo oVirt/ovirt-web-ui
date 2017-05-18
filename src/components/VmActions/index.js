@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 
 import style from './style.css'
 
@@ -20,7 +21,8 @@ import {
   shutdownVm,
   restartVm,
   suspendVm,
-  openEditVmDialog,
+  startPool,
+  startVm,
   removeVm,
 } from '../../actions/index'
 import { checkConsoleInUse, setConsoleInUse } from './actions'
@@ -34,7 +36,16 @@ class Button extends React.Component {
   }
 
   render () {
-    let { className, tooltip = '', actionDisabled = false, isOnCard, onClick, confirmRequired } = this.props
+    let {
+      className,
+      tooltip = '',
+      actionDisabled = false,
+      isOnCard,
+      onClick,
+      confirmRequired,
+      shortTitle,
+      button,
+    } = this.props
 
     const toggleConfirm = () => {
       this.setState({ toBeConfirmed: !this.state.toBeConfirmed })
@@ -71,15 +82,19 @@ class Button extends React.Component {
 
     if (actionDisabled) {
       return (
-        <span className={style['left-delimiter']}>
-          <span className={className} data-toggle='tooltip' data-placement='left' title={tooltip} />
-        </span>
+        <button className={button} disabled='disabled'>
+          <span data-toggle='tooltip' data-placement='left' title={tooltip}>
+            {shortTitle}
+          </span>
+        </button>
       )
     }
 
     return (
-      <a href='#' onClick={onClick} className={style['left-delimiter']}>
-        <span className={className} data-toggle='tooltip' data-placement='left' title={tooltip} />
+      <a href='#' onClick={onClick} className={`${button} ${style['link']}`}>
+        <span data-toggle='tooltip' data-placement='left' title={tooltip}>
+          {shortTitle}
+        </span>
       </a>
     )
   }
@@ -87,10 +102,57 @@ class Button extends React.Component {
 Button.propTypes = {
   className: PropTypes.string.isRequired,
   tooltip: PropTypes.string,
+  shortTitle: PropTypes.string.isRequired,
+  button: PropTypes.string.isRequired,
   onClick: PropTypes.func,
   actionDisabled: PropTypes.bool,
   isOnCard: PropTypes.bool.isRequired,
   confirmRequired: PropTypes.object,
+}
+
+const LinkButton = ({ className, tooltip, to, actionDisabled, isOnCard, shortTitle, button }) => {
+  if (actionDisabled) {
+    className = `${className} ${style['action-disabled']}`
+    to = undefined
+  }
+
+  if (isOnCard) {
+    return (
+      <div className='card-pf-item'>
+        <Link to={to}>
+          <span className={className} data-toggle='tooltip' data-placement='left' title={tooltip} />
+        </Link>
+      </div>
+    )
+  }
+
+  if (actionDisabled) {
+    return (
+      <button className={button} disabled='disabled'>
+        <span data-toggle='tooltip' data-placement='left' title={tooltip}>
+          {shortTitle}
+        </span>
+      </button>
+    )
+  }
+
+  return (
+    <Link to={to} className={`${button} ${style['link']}`}>
+      <span data-toggle='tooltip' data-placement='left' title={tooltip}>
+        {shortTitle}
+      </span>
+    </Link>
+  )
+}
+
+LinkButton.propTypes = {
+  className: PropTypes.string.isRequired,
+  tooltip: PropTypes.string,
+  shortTitle: PropTypes.string.isRequired,
+  button: PropTypes.string.isRequired,
+  to: PropTypes.string.isRequired,
+  actionDisabled: PropTypes.bool,
+  isOnCard: PropTypes.bool.isRequired,
 }
 
 const EmptyAction = ({ state, isOnCard }) => {
@@ -150,6 +212,8 @@ class RemoveVmAction extends React.Component {
       <Button isOnCard={false} actionDisabled={isDisabled}
         className='pficon pficon-remove'
         tooltip='Remove the VM'
+        button='btn btn-danger'
+        shortTitle='Remove'
         onClick={confirmRemove} />
     )
   }
@@ -260,12 +324,22 @@ class VmActions extends React.Component {
   render () {
     let {
       vm,
+      pool,
       isOnCard = false,
-      onStart,
+      onStartVm,
+      onStartPool,
       isPool,
-      onEdit,
       onRemove,
     } = this.props
+
+    let onStart = onStartVm
+    if (isPool && pool) {
+      onStart = onStartPool
+    }
+    if (isPool && !pool) {
+      return null
+    }
+
     const status = vm.get('status')
 
     let consoleProtocol = ''
@@ -281,36 +355,49 @@ class VmActions extends React.Component {
     }
 
     return (
-      <div className={isOnCard ? 'card-pf-items text-center' : style['left-padding']}>
+      <div className={`actions-line ${isOnCard ? 'card-pf-items text-center' : style['left-padding']}`}>
         <EmptyAction state={status} isOnCard={isOnCard} />
 
         <Button isOnCard={isOnCard} actionDisabled={(!isPool && !canStart(status)) || vm.getIn(['actionInProgress', 'start'])}
+          shortTitle='Start'
+          button='btn btn-success'
           className='fa fa-play'
           tooltip='Start the VM'
           onClick={onStart} />
 
         <Button isOnCard={isOnCard} actionDisabled={isPool || !canSuspend(status) || vm.getIn(['actionInProgress', 'suspend'])}
+          shortTitle='Suspend'
+          button='btn btn-default'
           className='fa fa-pause'
           tooltip='Suspend the VM'
           onClick={this.confirmSuspend} />
 
         <Button isOnCard={isOnCard} actionDisabled={isPool || !canShutdown(status) || vm.getIn(['actionInProgress', 'shutdown'])}
           className='fa fa-power-off'
+          button='btn btn-danger'
           tooltip='Shut down the VM'
+          shortTitle='Shut down'
           onClick={this.confirmShutdown} />
 
         <Button isOnCard={isOnCard} actionDisabled={isPool || !canRestart(status) || vm.getIn(['actionInProgress', 'restart'])}
           className='pficon pficon-restart'
+          button='btn btn-default'
           tooltip='Reboot the VM'
+          shortTitle='Reboot'
           onClick={this.confirmRestart} />
 
         <Button isOnCard={isOnCard} actionDisabled={isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole'])}
+          button='btn btn-default'
           className='pficon pficon-screen'
           tooltip={consoleProtocol}
+          shortTitle='Console'
           onClick={this.consoleConfirmationAboutToOpen} />
 
-        <Button isOnCard={isOnCard}
-          className='pficon pficon-edit' tooltip='Edit the VM' onClick={onEdit} />
+        <LinkButton isOnCard={isOnCard}
+          shortTitle='Edit'
+          button='btn btn-primary'
+          className={`pficon pficon-edit ${style['action-link']}`}
+          tooltip='Edit the VM' to={`/vm/${vm.get('id')}/edit`} />
 
         <RemoveVmAction isOnCard={isOnCard} isPool={isPool} vm={vm} onRemove={onRemove} />
       </div>
@@ -323,7 +410,7 @@ VmActions.propTypes = {
   VmAction: PropTypes.object.isRequired,
   isOnCard: PropTypes.bool,
   isPool: PropTypes.bool,
-  onStart: PropTypes.func.isRequired,
+  pool: PropTypes.object,
   onDownloadConsole: PropTypes.func.isRequired,
   onConsoleSessionConfirmaClose: PropTypes.func.isRequired,
   onCheckConsoleSessionInUse: PropTypes.func.isRequired,
@@ -331,8 +418,9 @@ VmActions.propTypes = {
   onRestart: PropTypes.func.isRequired,
   onForceShutdown: PropTypes.func.isRequired,
   onSuspend: PropTypes.func.isRequired,
-  onEdit: PropTypes.func.isRequired,
   onRemove: PropTypes.func.isRequired,
+  onStartPool: PropTypes.func.isRequired,
+  onStartVm: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -340,15 +428,16 @@ export default connect(
     icons: state.icons,
     VmAction: state.VmAction,
   }),
-  (dispatch, { vm }) => ({
+  (dispatch, { vm, pool }) => ({
     onCheckConsoleSessionInUse: () => dispatch(checkConsoleInUse({ vmId: vm.get('id') })),
-    onDownloadConsole: () => dispatch(downloadConsole({ vmId: vm.get('id') })),
     onConsoleSessionConfirmaClose: () => dispatch(setConsoleInUse({ vmId: vm.get('id'), consoleInUse: false })),
+    onDownloadConsole: () => dispatch(downloadConsole({ vmId: vm.get('id') })),
     onShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: false })),
     onRestart: () => dispatch(restartVm({ vmId: vm.get('id'), force: false })),
     onForceShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: true })),
     onSuspend: () => dispatch(suspendVm({ vmId: vm.get('id') })),
-    onEdit: () => dispatch(openEditVmDialog({ vmId: vm.get('id') })),
     onRemove: ({ preserveDisks, force }) => dispatch(removeVm({ vmId: vm.get('id'), force, preserveDisks })),
+    onStartPool: () => dispatch(startPool({ poolId: pool.get('id') })),
+    onStartVm: () => dispatch(startVm({ vmId: vm.get('id') })),
   })
 )(VmActions)

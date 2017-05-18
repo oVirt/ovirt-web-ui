@@ -186,7 +186,7 @@ class ConfirmationContent extends React.Component {
     this.computePosition()
 
     window.addEventListener('resize', this.onScroll)
-    document.querySelector('.container-cards-pf').addEventListener('scroll', this.onScroll)
+    document.querySelector('.actions-line').addEventListener('scroll', this.onScroll)
   }
 
   componentWillUnmount () {

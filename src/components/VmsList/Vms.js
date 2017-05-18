@@ -7,30 +7,17 @@ import style from './style.css'
 import Vm from './Vm'
 import Pool from './Pool'
 
-import { closeDialog } from '../../actions/index'
-import { closeAllConfirmationComponents } from '../Confirmation'
-
-const Vms = ({ vms, visibility, onCloseDetail }) => {
-  const isDetailVisible = !!visibility.get('dialogToShow')
+const Vms = ({ vms, visibility }) => {
   const containerClass = ['container-fluid',
     'container-cards-pf',
     style['movable-left'],
-    style['max-window-height'],
-    isDetailVisible ? style['moved-left'] : '',
+    style['full-window'],
   ].join(' ')
-
-  const closeDetail = isDetailVisible
-    ? (event) => {
-      closeAllConfirmationComponents()
-      onCloseDetail()
-      event.stopPropagation()
-    }
-    : undefined
 
   const sortFunction = (vmA, vmB) => vmA.get('name').localeCompare(vmB.get('name'))
 
   return (
-    <div onClickCapture={closeDetail}>
+    <div>
       <div className={containerClass}>
         <div className={style['scrollingWrapper']}>
           <div className='row row-cards-pf'>
@@ -56,7 +43,6 @@ const Vms = ({ vms, visibility, onCloseDetail }) => {
 Vms.propTypes = {
   vms: PropTypes.object.isRequired,
   visibility: PropTypes.object.isRequired,
-  onCloseDetail: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -65,6 +51,5 @@ export default connect(
     visibility: state.visibility,
   }),
   (dispatch) => ({
-    onCloseDetail: () => dispatch(closeDialog({ force: false })),
   })
 )(Vms)

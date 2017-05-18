@@ -1,12 +1,10 @@
 // Keep alphabetically sorted
 // TODO: sort alphabetically
 // TODO: remove all constants except those used within sagas
-export const ADD_NEW_VM = 'ADD_NEW_VM'
 export const CHANGE_FILTER_PERMISSION = 'CHANGE_FILTER_PERMISSION'
 export const CHECK_TOKEN_EXPIRED = 'CHECK_TOKEN_EXPIRED'
 export const CLEAR_USER_MSGS = 'CLEAR_USER_MSGS'
 export const DOWNLOAD_CONSOLE_VM = 'DOWNLOAD_CONSOLE_VM'
-export const EDIT_VM = 'EDIT_VM'
 export const FAILED_EXTERNAL_ACTION = 'FAILED_EXTERNAL_ACTION'
 export const GET_ALL_CLUSTERS = 'GET_ALL_CLUSTERS'
 export const GET_ALL_OS = 'GET_ALL_OS'
@@ -37,10 +35,8 @@ export const SELECT_VM_DETAIL = 'SELECT_VM_DETAIL'
 export const SET_ADMINISTATOR = 'SET_ADMINISTATOR'
 export const SET_LOAD_IN_PROGRESS = 'SET_LOAD_IN_PROGRESS'
 export const SET_OVIRT_API_VERSION = 'SET_OVIRT_API_VERSION'
-export const SET_POOL_DETAIL_TO_SHOW = 'SET_POOL_DETAIL_TO_SHOW'
 export const SET_USER_FILTER_PERMISSION = 'SET_USER_FILTER_PERMISSION'
 export const SET_VM_CONSOLES = 'SET_VM_CONSOLES'
-export const SET_VM_DETAIL_TO_SHOW = 'SET_VM_DETAIL_TO_SHOW'
 export const SET_VM_DISKS = 'SET_VM_DISKS'
 export const SET_VM_SESSIONS = 'SET_VM_SESSIONS'
 export const SHUTDOWN_VM = 'SHUTDOWN_VM'

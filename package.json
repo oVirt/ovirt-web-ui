@@ -78,7 +78,9 @@
     "react-test-renderer": "15.5.4",
     "redux": "3.6.0",
     "redux-devtools-extension": "2.13.2",
-    "redux-saga": "0.15.3"
+    "redux-saga": "0.15.3",
+    "react-router-config": "1.0.0-beta.3",
+    "react-router-dom": "4.1.1"
   },
   "scripts": {
     "start": "node scripts/start.js",
