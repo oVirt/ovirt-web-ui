@@ -3,6 +3,7 @@ import { actionReducer } from './utils'
 
 const initialState = Immutable.fromJS({
   loginToken: undefined,
+  isTokenExpired: false,
   user: {
     name: undefined,
   },
@@ -33,6 +34,10 @@ const config = actionReducer(initialState, {
   },
   SET_ADMINISTATOR (state, { payload: { administrator } }) {
     return state.set('administrator', administrator)
+  },
+  SHOW_TOKEN_EXPIRED_MSG (state) {
+    return state
+      .set('isTokenExpired', true)
   },
 })
 

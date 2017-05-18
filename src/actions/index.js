@@ -5,6 +5,7 @@ import {
   SCHEDULER__1_MIN,
   SET_ADMINISTATOR,
   SET_USER_FILTER_PERMISSION,
+  CHECK_TOKEN_EXPIRED,
 } from '../constants/index'
 
 export * from './error'
@@ -64,5 +65,19 @@ export function setAdministrator (administrator) {
     payload: {
       administrator,
     },
+  }
+}
+
+export function checkTokenExpired () {
+  return {
+    type: CHECK_TOKEN_EXPIRED,
+    payload: {},
+  }
+}
+
+export function showTokenExpiredMessage () {
+  return {
+    type: 'SHOW_TOKEN_EXPIRED_MSG',
+    payload: {},
   }
 }
