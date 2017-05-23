@@ -51,7 +51,7 @@ const LoadingData = () => {
         Please wait
       </h1>
       <p>
-        Data are being loaded ...
+        Data is being loaded ...
       </p>
     </div>
   )
