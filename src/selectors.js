@@ -9,6 +9,9 @@ Selectors = {
   getLoginToken () {
     return getState().config.get('loginToken')
   },
+  isTokenExpired () {
+    return getState().config.get('isTokenExpired')
+  },
   getOvirtVersion () {
     return getState().config.get('oVirtApiVersion')
   },

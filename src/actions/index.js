@@ -2,10 +2,10 @@ import {
   CHANGE_FILTER_PERMISSION,
   GET_VM,
   PERSIST_STATE,
-  REDIRECT_URL,
   SCHEDULER__1_MIN,
   SET_ADMINISTATOR,
   SET_USER_FILTER_PERMISSION,
+  CHECK_TOKEN_EXPIRED,
 } from '../constants/index'
 
 export * from './error'
@@ -41,15 +41,6 @@ export function schedulerOneMinute () {
   }
 }
 
-export function setRedirectUrl (redirectUrl) {
-  return {
-    type: REDIRECT_URL,
-    payload: {
-      redirectUrl,
-    },
-  }
-}
-
 export function setUserFilterPermission (filter) {
   return {
     type: SET_USER_FILTER_PERMISSION,
@@ -74,5 +65,19 @@ export function setAdministrator (administrator) {
     payload: {
       administrator,
     },
+  }
+}
+
+export function checkTokenExpired () {
+  return {
+    type: CHECK_TOKEN_EXPIRED,
+    payload: {},
+  }
+}
+
+export function showTokenExpiredMessage () {
+  return {
+    type: 'SHOW_TOKEN_EXPIRED_MSG',
+    payload: {},
   }
 }

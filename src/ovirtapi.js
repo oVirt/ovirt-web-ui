@@ -21,6 +21,9 @@ OvirtApi = {
     if (!OvirtApi._getLoginToken()) {
       throw new Exception(`OvirtApi in '${methodName}': missing login`)
     }
+    if (Selectors.isTokenExpired()) {
+      throw new Exception(`OvirtApi in '${methodName}': sso token is expired`)
+    }
   },
   _httpGet ({ url, custHeaders = { 'Accept': 'application/json', Filter: Selectors.getFilter() } }: { url: string, custHeaders?: Object}): Promise<Object> {
     logDebug(`_httpGet start: url="${url}"`)

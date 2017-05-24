@@ -8,6 +8,7 @@ import {
   loginSuccessful,
   loginFailed,
   failedExternalAction,
+  showTokenExpiredMessage,
 
   loadInProgress,
   setVmDetailToShow,
@@ -47,6 +48,7 @@ import {
 
   setUserFilterPermission,
   setAdministrator,
+  checkTokenExpired,
 
   setConsoleOptions,
 } from './actions/index'
@@ -54,6 +56,7 @@ import {
 import {
   ADD_NEW_VM,
   CHANGE_FILTER_PERMISSION,
+  CHECK_TOKEN_EXPIRED,
   EDIT_VM,
   GET_ALL_CLUSTERS,
   GET_ALL_OS,
@@ -105,6 +108,10 @@ function* callExternalAction (methodName, method, action, canBeMissing = false) 
   } catch (e) {
     if (!canBeMissing || e.status !== 404) {
       logDebug(`External action exception: ${JSON.stringify(e)}`)
+
+      if (e.status === 401) { // Unauthorized
+        yield put(checkTokenExpired())
+      }
 
       let shortMessage = shortErrorMessage({ action })
       if (e.status === 0 && e.statusText === 'error') { // special case, mixing https and http
@@ -166,6 +173,28 @@ function* login (action) {
       message: result['error'] ? (result.error['statusText'] ? result.error['statusText'] : JSON.stringify(result['error'])) : 'Login Failed',
     }))
     yield put(yield put(loadInProgress({ value: false })))
+  }
+}
+
+function* doCheckTokenExpired (action) {
+  try {
+    yield call(Api.getOvirtApiMeta, action.payload)
+    console.info('doCheckTokenExpired(): token is still valid') // info level: to pair former HTTP 401 error message with updated information
+    return
+  } catch (error) {
+    if (error.status === 401) {
+      console.info('Token expired, going to reload the page')
+      yield put(showTokenExpiredMessage())
+
+      // Reload the page after a delay
+      // No matter saga is canceled for whatever reason, the reload must happen, so here comes the ugly setTimeout()
+      setTimeout(() => {
+        console.info('======= doCheckTokenExpired() issuing page reload')
+        window.top.location.reload(true)
+      }, 5 * 1000)
+      return
+    }
+    console.error('doCheckTokenExpired(): unexpected oVirt API error: ', error)
   }
 }
 
@@ -576,6 +605,8 @@ export function *rootSaga () {
   yield [
     takeEvery(LOGIN, login),
     takeEvery(LOGOUT, logout),
+    takeLatest(CHECK_TOKEN_EXPIRED, doCheckTokenExpired),
+
     takeLatest(GET_ALL_VMS, fetchAllVms),
     takeLatest(GET_ALL_POOLS, fetchAllPools),
     takeLatest(PERSIST_STATE, persistStateSaga),
@@ -618,6 +649,8 @@ const shortMessages = {
   'INTERNAL_CONSOLES': 'Failed to retrieve list of VM consoles',
   'GET_DISK_DETAILS': 'Failed to retrieve disk details',
   'GET_DISK_ATTACHMENTS': 'Failed to retrieve VM disk attachments',
+
+  'GET_VM': 'Failed to retireve VM details',
 }
 
 function shortErrorMessage ({ action }) {

@@ -11,6 +11,7 @@ import Options from './components/Options'
 import AboutDialog from './components/About'
 import OvirtApiCheckFailed from './components/OvirtApiCheckFailed'
 import CloseDialogConfirmation from './components/CloseDialogConfirmation/index'
+import TokenExpired from './components/TokenExpired'
 
 import AddVmButton from './components/VmDialog/AddVmButton'
 import VmDialog from './components/VmDialog/index'
@@ -53,6 +54,7 @@ const App = ({ vms, visibility }) => {
           {addVmButton}
         </div>
 
+        <TokenExpired />
         <VmsList />
         {detailToRender}
       </div>
