@@ -7,7 +7,7 @@ import ContainerFluid from '../ContainerFluid'
 import VmUserMessages from '../VmUserMessages'
 import UserMenu from './UserMenu'
 
-import { getAllVms } from '../../actions/vm'
+import { refresh } from '../../actions/vm'
 
 /**
  * Main application header on top of the page
@@ -44,6 +44,6 @@ VmsPageHeader.propTypes = {
 export default connect(
   (state) => ({ }),
   (dispatch) => ({
-    onRefresh: () => dispatch(getAllVms({ shallowFetch: false })),
+    onRefresh: () => dispatch(refresh({ quiet: false, shallowFetch: false })),
   })
 )(VmsPageHeader)

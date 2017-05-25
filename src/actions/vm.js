@@ -7,6 +7,7 @@ import {
   LOGIN,
   LOGIN_SUCCESSFUL,
   LOGOUT,
+  REFRESH_DATA,
   REMOVE_MISSING_VMS,
   REMOVE_VM,
   REMOVE_VMS,
@@ -32,6 +33,19 @@ export function login ({ username, password, token }) {
         password,
       },
       token,
+    },
+  }
+}
+
+/**
+ * I.e. the Refresh button is clicked or scheduler event occurred (polling)
+ */
+export function refresh ({ quiet = false, shallowFetch = false }) {
+  return {
+    type: REFRESH_DATA,
+    payload: {
+      quiet,
+      shallowFetch,
     },
   }
 }

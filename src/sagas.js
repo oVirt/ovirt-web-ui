@@ -9,6 +9,7 @@ import {
   loginFailed,
   failedExternalAction,
   showTokenExpiredMessage,
+  refresh,
 
   loadInProgress,
   setVmDetailToShow,
@@ -68,6 +69,7 @@ import {
   LOGIN,
   LOGOUT,
   PERSIST_STATE,
+  REFRESH_DATA,
   REMOVE_VM,
   RESTART_VM,
   SAVE_CONSOLE_OPTIONS,
@@ -271,6 +273,16 @@ function* fetchIcon ({ iconId }) {
   }
 }
 
+function* refreshData (action) {
+  console.log('refreshData(): ', action.payload)
+  if (!action.payload.quiet) {
+    console.log('refreshData(): not quiet')
+    yield put(loadInProgress({ value: true }))
+  }
+  yield put(getAllVms({ shallowFetch: !!action.payload.shallowFetch }))
+  yield put(getAllPools())
+}
+
 function* fetchAllVms (action) {
   const { shallowFetch } = action.payload
 
@@ -332,6 +344,8 @@ function* fetchSinglePool (action) {
 }
 
 export function* fetchSingleVm (action) {
+  yield startProgress({ vmId: action.payload.vmId, name: 'refresh_single' })
+
   const vm = yield callExternalAction('getVm', Api.getVm, action, true)
 
   if (vm && vm.id) {
@@ -347,6 +361,8 @@ export function* fetchSingleVm (action) {
       yield put(removeVms({ vmIds: [action.payload.vmId] }))
     }
   }
+  yield stopProgress({ vmId: action.payload.vmId, name: 'refresh_single' })
+
   yield put(updateVmsPoolsCount())
 }
 
@@ -525,9 +541,7 @@ function* schedulerPerMinute (action) {
     const oVirtVersion = Selectors.getOvirtVersion()
     if (oVirtVersion.get('passed')) {
       // Actions to be executed no more than once per minute:
-      // TODO: allow user to enable/disable the autorefresh
-      yield put(getAllVms({ shallowFetch: true }))
-      yield put(getAllPools())
+      yield put(refresh({ quiet: true, shallowFetch: true }))
     } else {
       logDebug('schedulerPerMinute() event skipped since oVirt API version does not match')
     }
@@ -538,7 +552,10 @@ function* createNewVm (action) {
   const result = yield callExternalAction('addNewVm', Api.addNewVm, action)
   if (!result.error) {
     yield put(closeDialog({ force: true }))
-    yield put(getAllVms({ shallowFetch: false })) // fetchSingleVm() can't be used since vmId is unknown
+
+    // fetchSingleVm() can't be used since vmId is unknown
+    // full refresh (pools) is not required
+    yield put(getAllVms({ shallowFetch: false }))
   }
 }
 
@@ -594,8 +611,9 @@ function* fetchPermissionWithoutFilter (action) {
 
 function* changeUserFilterPermission (action) {
   yield put(setUserFilterPermission(action.payload.filter))
-  yield put(getAllVms({ shallowFetch: false }))
-  yield put(getAllPools())
+
+  yield put(refresh({ quiet: false, shallowFetch: false }))
+
   yield put(getAllClusters()) // no shallow
   yield put(getAllOperatingSystems())
   yield put(getAllTemplates({ shallowFetch: false }))
@@ -607,6 +625,7 @@ export function *rootSaga () {
     takeEvery(LOGOUT, logout),
     takeLatest(CHECK_TOKEN_EXPIRED, doCheckTokenExpired),
 
+    takeLatest(REFRESH_DATA, refreshData),
     takeLatest(GET_ALL_VMS, fetchAllVms),
     takeLatest(GET_ALL_POOLS, fetchAllPools),
     takeLatest(PERSIST_STATE, persistStateSaga),

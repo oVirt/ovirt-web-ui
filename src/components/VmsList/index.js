@@ -41,24 +41,9 @@ const NoLogin = () => {
   )
 }
 
-const LoadingData = () => {
-  return (
-    <div className='blank-slate-pf'>
-      <div className='blank-slate-pf-icon'>
-        <div className='spinner spinner-lg' />
-      </div>
-      <h1>
-        Please wait
-      </h1>
-      <p>
-        Data is being loaded ...
-      </p>
-    </div>
-  )
-}
-
 const VmsList = ({ vms, config, visibility }) => {
   const isDetailVisible = !!visibility.get('dialogToShow')
+  const loadInProgress = !!vms.get('loadInProgress')
 
   if (vms.get('vms') && !vms.get('vms').isEmpty()) {
     return (
@@ -70,23 +55,15 @@ const VmsList = ({ vms, config, visibility }) => {
         <NoLogin />
       </ContainerFluid>
     )
-  } else if (!isDetailVisible) {
-    if (vms.get('loadInProgress')) { // data load in progress
-      return (
-        <ContainerFluid>
-          <LoadingData />
-        </ContainerFluid>
-      )
-    } else { // No VM available
-      return (
-        <ContainerFluid>
-          <NoVm />
-        </ContainerFluid>
-      )
-    }
-  } else {
-    return null
+  } else if (!isDetailVisible && !loadInProgress) { // No VM available
+    return (
+      <ContainerFluid>
+        <NoVm />
+      </ContainerFluid>
+    )
   }
+
+  return null
 }
 VmsList.propTypes = {
   vms: PropTypes.object.isRequired,
