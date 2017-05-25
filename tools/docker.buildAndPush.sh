@@ -91,7 +91,7 @@ function actual {
   echo Build from recent sources
 
   pwd
-  dockerBuild ${DOCKER_BASE_TAG}:devel_${DATE}
+  dockerBuild ${DOCKER_BASE_TAG}-devel:devel_${DATE}
 }
 
 function release {
@@ -116,7 +116,7 @@ function pr {
   clone
   pwd
   git pull --no-edit origin pull/$1/head
-  dockerBuild ${DOCKER_TAG}:pullrequest_$1
+  dockerBuild ${DOCKER_TAG}-devel:pullrequest_$1
 }
 
 ######################
