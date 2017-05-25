@@ -3,17 +3,13 @@ import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
 
-import { Checkbox } from 'ovirt-ui-components'
 import {
   logout,
   toggleOptions,
   clearUserMessages,
-  changeFilterPermissions,
 } from '../../actions/index'
 
-import sharedStyle from '../sharedStyle.css'
-
-const UserMenu = ({ config, onLogout, onAdministratorFilterClick }) => {
+const UserMenu = ({ config, onLogout }) => {
 /* TODO: allow 'Options' in the menu
  <li>
  <a href='#' onClick={onOptions}>Options</a>
@@ -28,10 +24,6 @@ const UserMenu = ({ config, onLogout, onAdministratorFilterClick }) => {
       </li>
     )
   } else {
-    let checkbox = null
-    if (config.get('administrator')) {
-      checkbox = (<li><a><Checkbox checked={config.get('filter')} onClick={onAdministratorFilterClick} label='Filter VM' /></a></li>)
-    }
     return (
       <li className='dropdown'>
         <a className={`dropdown-toggle`} data-toggle='dropdown' href='#'>
@@ -39,8 +31,7 @@ const UserMenu = ({ config, onLogout, onAdministratorFilterClick }) => {
           {config.getIn(['user', 'name'])}
           <b className='caret' />
         </a>
-        <ul className={`${sharedStyle['usermenu-z-index']} + dropdown-menu`}>
-          {checkbox}
+        <ul className='dropdown-menu'>
           <li>
             <a href='#' data-toggle='modal' data-target='#about-modal'>About</a>
           </li>
@@ -58,7 +49,6 @@ UserMenu.propTypes = {
   config: PropTypes.object.isRequired,
   onLogout: PropTypes.func.isRequired,
   onOptions: PropTypes.func.isRequired,
-  onAdministratorFilterClick: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -69,6 +59,5 @@ export default connect(
     onClearMessages: () => dispatch(clearUserMessages()),
     onLogout: () => dispatch(logout()),
     onOptions: () => dispatch(toggleOptions()),
-    onAdministratorFilterClick: (filter) => dispatch(changeFilterPermissions(filter)),
   })
 )(UserMenu)

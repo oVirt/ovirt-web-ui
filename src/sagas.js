@@ -54,7 +54,6 @@ import {
 } from './actions/index'
 
 import {
-  CHANGE_FILTER_PERMISSION,
   CHECK_TOKEN_EXPIRED,
   GET_ALL_CLUSTERS,
   GET_ALL_OS,
@@ -636,18 +635,12 @@ function* fetchAllOS (action) {
 
 function* fetchPermissionWithoutFilter (action) {
   const data = yield callExternalAction('checkFilter', Api.checkFilter, { action: 'CHECK_FILTER' })
-  yield changeUserFilterPermission({ payload: { filter: data.error !== undefined } })
-  yield put(setAdministrator(data.error === undefined))
-}
-
-function* changeUserFilterPermission (action) {
-  yield put(setUserFilterPermission(action.payload.filter))
-
+  yield put(setUserFilterPermission(data.error !== undefined))
   yield put(refresh({ quiet: false, shallowFetch: false }))
-
   yield put(getAllClusters()) // no shallow
   yield put(getAllOperatingSystems())
   yield put(getAllTemplates({ shallowFetch: false }))
+  yield put(setAdministrator(data.error === undefined))
 }
 // Sagas workers for using in different sagas modules
 let sagasFunctions = {
@@ -684,7 +677,6 @@ export function *rootSaga () {
     takeEvery(GET_CONSOLE_OPTIONS, getConsoleOptions),
     takeEvery(SAVE_CONSOLE_OPTIONS, saveConsoleOptions),
 
-    takeEvery(CHANGE_FILTER_PERMISSION, changeUserFilterPermission),
     takeEvery(SELECT_POOL_DETAIL, selectPoolDetail),
     takeLatest(SCHEDULER__1_MIN, schedulerPerMinute),
     ...SagasWorkers(sagasFunctions),
