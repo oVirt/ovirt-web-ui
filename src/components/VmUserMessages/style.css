@@ -38,3 +38,7 @@ pre.message-box {
     border-bottom: solid 1px lightgray;
     margin-bottom: 10px;
 }
+
+.close-button {
+    float: right;
+}
