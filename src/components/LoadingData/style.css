@@ -1,0 +1,9 @@
+.loading-data {
+    max-width: 10em;
+    position: absolute;
+    z-index: 2000;
+    padding: 2px;
+    top: 2.4em;
+    margin-left: 50%;
+    border-color: #ecc89e;
+}

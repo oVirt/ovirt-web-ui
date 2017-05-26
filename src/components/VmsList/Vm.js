@@ -27,10 +27,6 @@ const Vm = ({ vm, icons, onSelectVm, visibility, onStart }) => {
     onSelectVm()
   }
 
-  // TODO: improve the card flip:
-  // TODO: https://davidwalsh.name/css-flip
-  // TODO: http://tympanus.net/codrops/2013/12/18/perspective-page-view-navigation/
-  // TODO: https://desandro.github.io/3dtransforms/docs/card-flip.html
   return (
     <div className={`col-xs-12 col-sm-6 col-md-4 col-lg-3 ${isSelected ? style['selectedVm'] : ''}`}>
       <div className='card-pf card-pf-view card-pf-view-select card-pf-view-single-select'>

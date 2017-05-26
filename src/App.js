@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import style from './App.css'
 
-import VmsPageHeader from './components/VmsPageHeader'
+import VmsPageHeader from './components/VmsPageHeader/index'
 
 import VmsList from './components/VmsList/index'
 import VmDetail from './components/VmDetail'
@@ -12,6 +12,7 @@ import AboutDialog from './components/About'
 import OvirtApiCheckFailed from './components/OvirtApiCheckFailed'
 import CloseDialogConfirmation from './components/CloseDialogConfirmation/index'
 import TokenExpired from './components/TokenExpired'
+import LoadingData from './components/LoadingData/index'
 
 import AddVmButton from './components/VmDialog/AddVmButton'
 import VmDialog from './components/VmDialog/index'
@@ -55,6 +56,8 @@ const App = ({ vms, visibility }) => {
         </div>
 
         <TokenExpired />
+        <LoadingData />
+
         <VmsList />
         {detailToRender}
       </div>

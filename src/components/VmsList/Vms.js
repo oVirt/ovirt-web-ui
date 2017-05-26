@@ -37,7 +37,7 @@ const Vms = ({ vms, visibility, onCloseDetail }) => {
             {vms.get('vms').toList()
               .sort(sortFunction)
               .map(vm => <Vm vm={vm} key={vm.get('id')} />)}
-            {vms.get('pools').toList()
+            {vms.get('pools').toList()// TODO: sort vms and pools together!
               .sort(sortFunction)
               .map(pool => {
                 if (pool.get('vmsCount') < pool.get('maxUserVms')) {
