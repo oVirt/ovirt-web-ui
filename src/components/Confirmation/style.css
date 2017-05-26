@@ -2,14 +2,22 @@
     margin: 0;
     padding: .3em 0;
     font-size: small;
+    text-align: center;
+    margin-bottom: 5px;
 }
 
 .confirmation-toolbar {
     margin-top: 10px;
     paddingBottom: 6px;
-    float: right;
+    display: flex;
+    justify-content: center;
 }
 
 .confirmation-extra-button {
     margin-left: 15px !important;
+}
+
+.ok-button {
+	margin-right: 2px;
+    margin-left: 23px !important;
 }
