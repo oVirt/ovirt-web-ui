@@ -17,3 +17,7 @@
     text-align: right !important;
     padding-right: 2px;
 }
+
+.detail-z-index {
+	z-index: 1050;
+}

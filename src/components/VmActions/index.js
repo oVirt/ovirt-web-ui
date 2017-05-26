@@ -7,7 +7,6 @@ import style from './style.css'
 
 import {
   Checkbox,
-
   canRestart,
   canShutdown,
   canStart,
@@ -17,13 +16,14 @@ import {
 } from 'ovirt-ui-components'
 
 import {
-  getConsole,
+  downloadConsole,
   shutdownVm,
   restartVm,
   suspendVm,
   openEditVmDialog,
   removeVm,
 } from '../../actions/index'
+import { checkConsoleInUse, setConsoleInUse } from './actions'
 
 import OnClickTopConfirmation from '../Confirmation/index'
 
@@ -102,7 +102,7 @@ const EmptyAction = ({ state, isOnCard }) => {
   return null
 }
 EmptyAction.propTypes = {
-  state: PropTypes.string.isRequired,
+  state: PropTypes.string,
   isOnCard: PropTypes.bool.isRequired,
 }
 
@@ -165,100 +165,168 @@ RemoveVmAction.propTypes = {
  * Active actions on a single VM-card.
  * List of actions depends on the VM state.
  */
-const VmActions = ({
-  vm,
-  isOnCard = false,
-  onGetConsole,
-  onShutdown,
-  onForceShutdown,
-  onRestart,
-  onStart,
-  onSuspend,
-  onEdit,
-  onRemove,
-  isPool,
-}) => {
-  const status = vm.get('status')
-
-  const confirmShutdown = (e) => OnClickTopConfirmation({
-    id: vm.get('id'),
-    target: e.target,
-    confirmationText: 'Shut down the VM?',
-    cancelLabel: 'Cancel',
-    okLabel: 'Yes',
-    extraButtonLabel: 'Force',
-    onOk: onShutdown,
-    onExtra: onForceShutdown,
-  })
-
-  const confirmRestart = (e) => OnClickTopConfirmation({
-    id: vm.get('id'),
-    target: e.target,
-    confirmationText: 'Restart the VM?',
-    cancelLabel: 'Cancel',
-    okLabel: 'Yes',
-    onOk: onRestart,
-  })
-
-  const confirmSuspend = (e) => OnClickTopConfirmation({
-    id: vm.get('id'),
-    target: e.target,
-    confirmationText: 'Suspend the VM?',
-    cancelLabel: 'Cancel',
-    okLabel: 'Yes',
-    onOk: onSuspend,
-  })
-
-  let consoleProtocol = ''
-  if (vm.get('consoles') && !vm.get('consoles').isEmpty()) {
-    const vConsole = vm.get('consoles').find(c => c.get('protocol') === 'spice') ||
-      vm.getIn(['consoles', 0])
-    const protocol = vConsole.get('protocol').toUpperCase()
-    consoleProtocol = `Open ${protocol} Console`
+class VmActions extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      openModal: false,
+      notificationTarget: null,
+    }
+    this.consoleConfirmationAboutToOpen = this.consoleConfirmationAboutToOpen.bind(this)
+    this.onConsoleConfirmationClose = this.onConsoleConfirmationClose.bind(this)
+    this.onConsoleDownload = this.onConsoleDownload.bind(this)
+    this.confirmShutdown = this.confirmShutdown.bind(this)
+    this.confirmRestart = this.confirmRestart.bind(this)
+    this.confirmSuspend = this.confirmSuspend.bind(this)
   }
 
-  return (
-    <div className={isOnCard ? 'card-pf-items text-center' : style['left-padding']}>
-      <EmptyAction state={status} isOnCard={isOnCard} />
+  consoleConfirmationAboutToOpen (e) {
+    this.setState({
+      openModal: true,
+      notificationTarget: e.target,
+    })
+    this.props.onCheckConsoleSessionInUse()
+  }
 
-      <Button isOnCard={isOnCard} actionDisabled={(!isPool && !canStart(status)) || vm.getIn(['actionInProgress', 'start'])}
-        className='fa fa-play'
-        tooltip='Start the VM'
-        onClick={onStart} />
+  onConsoleConfirmationClose () {
+    this.setState({
+      openModal: false,
+      notificationTarget: null,
+    })
+    this.props.onConsoleSessionConfirmaClose()
+  }
 
-      <Button isOnCard={isOnCard} actionDisabled={isPool || !canSuspend(status) || vm.getIn(['actionInProgress', 'suspend'])}
-        className='fa fa-pause'
-        tooltip='Suspend the VM'
-        onClick={confirmSuspend} />
+  onConsoleDownload () {
+    this.setState({
+      openModal: false,
+      notificationTarget: null,
+    })
 
-      <Button isOnCard={isOnCard} actionDisabled={isPool || !canShutdown(status) || vm.getIn(['actionInProgress', 'shutdown'])}
-        className='fa fa-power-off'
-        tooltip='Shut down the VM'
-        onClick={confirmShutdown} />
+    this.props.onDownloadConsole()
+  }
 
-      <Button isOnCard={isOnCard} actionDisabled={isPool || !canRestart(status) || vm.getIn(['actionInProgress', 'restart'])}
-        className='pficon pficon-restart'
-        tooltip='Reboot the VM'
-        onClick={confirmRestart} />
+  componentDidUpdate (prevProps, prevState) {
+    if (
+        this.props.VmAction.getIn(['vms', this.props.vm.get('id'), 'consoleInUse']) === true &&
+        this.state.openModal === true
+      ) {
+      OnClickTopConfirmation({
+        id: this.props.vm.get('id'),
+        target: this.state.notificationTarget,
+        confirmationText: 'Console in use, continue?',
+        cancelLabel: 'Cancel',
+        okLabel: 'Yes',
+        onOk: this.onConsoleDownload,
+        onCancel: this.onConsoleConfirmationClose,
+      })
+    }
+  }
 
-      <Button isOnCard={isOnCard} actionDisabled={isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole'])}
-        className='pficon pficon-screen'
-        tooltip={consoleProtocol}
-        onClick={onGetConsole} />
+  confirmShutdown (e) {
+    OnClickTopConfirmation({
+      id: this.props.vm.get('id'),
+      target: e.target,
+      confirmationText: 'Shut down the VM?',
+      cancelLabel: 'Cancel',
+      okLabel: 'Yes',
+      extraButtonLabel: 'Force',
+      onOk: this.props.onShutdown,
+      onExtra: this.props.onForceShutdown,
+    })
+  }
 
-      <Button isOnCard={isOnCard}
-        className='pficon pficon-edit' tooltip='Edit the VM' onClick={onEdit} />
+  confirmRestart (e) {
+    return OnClickTopConfirmation({
+      id: this.props.vm.get('id'),
+      target: e.target,
+      confirmationText: 'Restart the VM?',
+      cancelLabel: 'Cancel',
+      okLabel: 'Yes',
+      onOk: this.props.onRestart,
+    })
+  }
 
-      <RemoveVmAction isOnCard={isOnCard} isPool={isPool} vm={vm} onRemove={onRemove} />
-    </div>
-  )
+  confirmSuspend (e) {
+    return OnClickTopConfirmation({
+      id: this.props.vm.get('id'),
+      target: e.target,
+      confirmationText: 'Suspend the VM?',
+      cancelLabel: 'Cancel',
+      okLabel: 'Yes',
+      onOk: this.props.onSuspend,
+    })
+  }
+
+  render () {
+    let {
+      vm,
+      isOnCard = false,
+      onStart,
+      isPool,
+      onEdit,
+      onRemove,
+    } = this.props
+    const status = vm.get('status')
+
+    let consoleProtocol = ''
+    if (!vm.get('consoles').isEmpty()) {
+      const vConsole = vm.get('consoles').find(c => c.get('protocol') === 'spice') ||
+        vm.getIn(['consoles', 0])
+      const protocol = vConsole.get('protocol').toUpperCase()
+      consoleProtocol = `Open ${protocol} Console`
+    }
+
+    if (vm.get('consoleInUse')) {
+      consoleProtocol = 'Console in use'
+    }
+
+    return (
+      <div className={isOnCard ? 'card-pf-items text-center' : style['left-padding']}>
+        <EmptyAction state={status} isOnCard={isOnCard} />
+
+        <Button isOnCard={isOnCard} actionDisabled={(!isPool && !canStart(status)) || vm.getIn(['actionInProgress', 'start'])}
+          className='fa fa-play'
+          tooltip='Start the VM'
+          onClick={onStart} />
+
+        <Button isOnCard={isOnCard} actionDisabled={isPool || !canSuspend(status) || vm.getIn(['actionInProgress', 'suspend'])}
+          className='fa fa-pause'
+          tooltip='Suspend the VM'
+          onClick={this.confirmSuspend} />
+
+        <Button isOnCard={isOnCard} actionDisabled={isPool || !canShutdown(status) || vm.getIn(['actionInProgress', 'shutdown'])}
+          className='fa fa-power-off'
+          tooltip='Shut down the VM'
+          onClick={this.confirmShutdown} />
+
+        <Button isOnCard={isOnCard} actionDisabled={isPool || !canRestart(status) || vm.getIn(['actionInProgress', 'restart'])}
+          className='pficon pficon-restart'
+          tooltip='Reboot the VM'
+          onClick={this.confirmRestart} />
+
+        <Button isOnCard={isOnCard} actionDisabled={isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole'])}
+          className='pficon pficon-screen'
+          tooltip={consoleProtocol}
+          onClick={this.consoleConfirmationAboutToOpen} />
+
+        <Button isOnCard={isOnCard}
+          className='pficon pficon-edit' tooltip='Edit the VM' onClick={onEdit} />
+
+        <RemoveVmAction isOnCard={isOnCard} isPool={isPool} vm={vm} onRemove={onRemove} />
+      </div>
+    )
+  }
 }
+
 VmActions.propTypes = {
   vm: PropTypes.object.isRequired,
+  VmAction: PropTypes.object.isRequired,
   isOnCard: PropTypes.bool,
   isPool: PropTypes.bool,
-  onGetConsole: PropTypes.func.isRequired,
   onStart: PropTypes.func.isRequired,
+  onDownloadConsole: PropTypes.func.isRequired,
+  onConsoleSessionConfirmaClose: PropTypes.func.isRequired,
+  onCheckConsoleSessionInUse: PropTypes.func.isRequired,
   onShutdown: PropTypes.func.isRequired,
   onRestart: PropTypes.func.isRequired,
   onForceShutdown: PropTypes.func.isRequired,
@@ -270,9 +338,12 @@ VmActions.propTypes = {
 export default connect(
   (state) => ({
     icons: state.icons,
+    VmAction: state.VmAction,
   }),
   (dispatch, { vm }) => ({
-    onGetConsole: () => dispatch(getConsole({ vmId: vm.get('id') })),
+    onCheckConsoleSessionInUse: () => dispatch(checkConsoleInUse({ vmId: vm.get('id') })),
+    onDownloadConsole: () => dispatch(downloadConsole({ vmId: vm.get('id') })),
+    onConsoleSessionConfirmaClose: () => dispatch(setConsoleInUse({ vmId: vm.get('id'), consoleInUse: false })),
     onShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: false })),
     onRestart: () => dispatch(restartVm({ vmId: vm.get('id'), force: false })),
     onForceShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: true })),

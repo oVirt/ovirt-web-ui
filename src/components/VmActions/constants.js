@@ -1,0 +1,4 @@
+
+// -----Redux Actions
+export const CONSOLE_IN_USE = 'VM_ACTIONS_CONSOLE_IN_USE'
+export const SET_CONSOLE_IN_USE = 'VM_ACTIONS_SET_CONSOLE_IN_USE'

@@ -10,6 +10,7 @@ import options from './options'
 import templates from './templates'
 import clusters from './clusters'
 import operatingSystems from './operatingSystems'
+import { reducer as VmAction } from '../components/VmActions/reducer'
 
 function router (redirectUrl = '/', action) {
   switch (action.type) {
@@ -29,4 +30,5 @@ export default combineReducers({
   templates,
   clusters,
   operatingSystems,
+  VmAction,
 })

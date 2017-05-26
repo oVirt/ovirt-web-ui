@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import style from './style.css'
 
 import {
-  getConsole,
+  downloadConsole,
   startPool,
   startVm,
   getConsoleOptions,
@@ -195,7 +195,7 @@ export default connect(
     options: state.options,
   }),
   (dispatch, { vm, pool }) => ({
-    onConsole: ({ vmId, consoleId }) => dispatch(getConsole({ vmId, consoleId })),
+    onConsole: ({ vmId, consoleId }) => dispatch(downloadConsole({ vmId, consoleId })),
     onConsoleOptionsSave: ({ options }) => dispatch(saveConsoleOptions({ vmId: vm.get('id'), options })),
     onConsoleOptionsOpen: () => dispatch(getConsoleOptions({ vmId: vm.get('id') })),
     onStartPool: () => dispatch(startPool({ poolId: pool.get('id') })),
