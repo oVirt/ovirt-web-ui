@@ -50,6 +50,17 @@ const vms = actionReducer(initialState, {
   SET_VM_CONSOLES (state, { payload: { vmId, consoles } }) {
     return state.setIn(['vms', vmId, 'consoles'], Immutable.fromJS(consoles))
   },
+  SET_VM_SESSIONS (state, { payload: { vmId, sessions } }) {
+    let consoleInUse = false
+    for (var i in sessions) {
+      if (sessions[i].consoleUser) {
+        consoleInUse = true
+        break
+      }
+    }
+    state = state.setIn(['vms', vmId, 'sessions'], Immutable.fromJS(sessions))
+    return state.setIn(['vms', vmId, 'consoleInUse'], consoleInUse)
+  },
   UPDATE_POOLS (state, { payload: { pools } }) {
     const updates = {}
     pools.forEach(pool => {

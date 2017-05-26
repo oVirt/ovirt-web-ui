@@ -243,6 +243,7 @@ OvirtApi = {
       format: disk['format'],
     }
   },
+
   templateToInternal ({ template }: { template: Object}): Object {
     const version = {
       name: template.version ? template.version.version_name : undefined,
@@ -278,6 +279,7 @@ OvirtApi = {
       name: cluster.name,
     }
   },
+
   OSToInternal ({ os }: { os: Object }): Object {
     return {
       id: os.id,
@@ -285,6 +287,16 @@ OvirtApi = {
       description: os.description,
     }
   },
+
+  sessionsToInternal ({ sessions }: { sessions: Object }): Object {
+    return sessions['session'].map((c: Object): Object => {
+      return {
+        id: c.id,
+        consoleUser: c.console_user === 'true',
+      }
+    })
+  },
+
   iconToInternal ({ icon }: { icon: Object }): Object {
     return {
       id: icon.id,
@@ -292,6 +304,7 @@ OvirtApi = {
       data: icon.data,
     }
   },
+
   consolesToInternal ({ consoles }: { consoles: Object }): Array<Object> {
     return consoles['graphics_console'].map((c: Object): Object => {
       return {
@@ -454,6 +467,10 @@ OvirtApi = {
     OvirtApi._assertLogin({ methodName: 'getPool' })
     const url = `${AppConfiguration.applicationContext}/api/vmpools/${poolId}`
     return OvirtApi._httpGet({ url })
+  },
+  sessions ({ vmId }: VmIdType): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'sessions' })
+    return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/sessions` })
   },
 }
 
