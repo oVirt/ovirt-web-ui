@@ -45,28 +45,51 @@ ContactAdminInfo.propTypes = {
   userMessages: PropTypes.object.isRequired,
 }
 
-const VmUserMessages = ({ userMessages, onClearMessages }) => {
-  return (
-    <li className='dropdown'>
-      <a href='#' data-toggle='dropdown'>
-        <div className={isUnread(userMessages) ? style['usermsgs-unread'] : style['usermsgs-allread']}>
-          <span className='pficon pficon-info' />&nbsp;Messages
+class VmUserMessages extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      show: false,
+    }
+  }
+
+  render () {
+    const { userMessages, onClearMessages } = this.props
+
+    const onToggle = () => {
+      this.setState({ show: !this.state.show })
+    }
+
+    let show = ''
+    if (this.state.show) {
+      show = 'show'
+    }
+
+    return (
+      <li className='dropdown'>
+        <a href='#' onClick={onToggle}>
+          <div className={isUnread(userMessages) ? style['usermsgs-unread'] : style['usermsgs-allread']}>
+            <span className='pficon pficon-info' />&nbsp;Messages
+          </div>
+        </a>
+
+        <div className={`dropdown-menu dropdown-menu-right infotip bottom-right ${show}`}>
+          <div className={`arrow ${style['fix-arrow-position']}`} />
+
+          <ul className={`list-group ${style['messages-list']}`}>
+            {userMessages.get('records').map(r => (<UserMessage key={r.time} record={r} />))}
+          </ul>
+          <ContactAdminInfo userMessages={userMessages} />
+
+          <div className='footer'>
+            <a href='#' onClick={onClearMessages}>Clear Messages</a>
+            <a href='#' onClick={onToggle} className={style['close-button']}>Close</a>
+          </div>
         </div>
-      </a>
-
-      <div className='dropdown-menu infotip bottom-right'>
-        <div className={`arrow ${style['fix-arrow-position']}`} />
-
-        <ul className={`list-group ${style['messages-list']}`}>
-          {userMessages.get('records').map(r => (<UserMessage key={r.time} record={r} />))}
-        </ul>
-        <ContactAdminInfo userMessages={userMessages} />
-        <div className='footer'><a href='#' onClick={onClearMessages}>Clear Messages</a></div>
-      </div>
-    </li>
-  )
+      </li>
+    )
+  }
 }
-
 VmUserMessages.propTypes = {
   userMessages: PropTypes.object.isRequired,
   onClearMessages: PropTypes.func.isRequired,
