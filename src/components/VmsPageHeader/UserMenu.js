@@ -11,6 +11,8 @@ import {
   changeFilterPermissions,
 } from '../../actions/index'
 
+import sharedStyle from '../sharedStyle.css'
+
 const UserMenu = ({ config, onLogout, onAdministratorFilterClick }) => {
 /* TODO: allow 'Options' in the menu
  <li>
@@ -37,7 +39,7 @@ const UserMenu = ({ config, onLogout, onAdministratorFilterClick }) => {
           {config.getIn(['user', 'name'])}
           <b className='caret' />
         </a>
-        <ul className='dropdown-menu'>
+        <ul className={`${sharedStyle['usermenu-z-index']} + dropdown-menu`}>
           {checkbox}
           <li>
             <a href='#' data-toggle='modal' data-target='#about-modal'>About</a>
