@@ -13,9 +13,13 @@ export function setLogDebug (enabled) {
  * Write DEBUG log message to console
  * @param msg
  */
-export function logDebug (msg) {
+export function logDebug (msg, ...params) {
   if (logDebugEnabled) {
-    console.log(msg)
+    if (params) {
+      console.log(msg, ...params)
+    } else {
+      console.log(msg)
+    }
   }
 }
 

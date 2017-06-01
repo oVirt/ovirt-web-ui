@@ -9,11 +9,12 @@ import {
   downloadConsole,
   getConsoleOptions,
   saveConsoleOptions,
-} from '../../actions'
+} from '../../actions/index'
 
 import Time from '../Time'
 import DetailContainer from '../DetailContainer'
-import { canConsole, userFormatOfBytes, VmIcon, VmDisks, VmStatusIcon, ConsoleOptions } from 'ovirt-ui-components'
+import ConsoleOptions from '../ConsoleOptions/index'
+import { canConsole, userFormatOfBytes, VmIcon, VmDisks, VmStatusIcon } from 'ovirt-ui-components'
 import Selectors from '../../selectors'
 
 const LastMessage = ({ vmId, userMessages }) => {

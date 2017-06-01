@@ -1,0 +1,10 @@
+.vm-detail-settings {
+    transition: height 1s;
+    height: 0px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.open-settings {
+    height: 50px;
+}
