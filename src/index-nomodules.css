@@ -47,3 +47,13 @@ div.toolbar-pf {
   top: 30px;
   margin-left: 201px;
 }
+
+.bootstrap-switch-container .bootstrap-switch-label {
+  height: 27px !important;
+  margin-bottom: -8px !important;
+}
+
+.bootstrap-switch-handle-on {
+  padding: 4px !important;
+}
+
