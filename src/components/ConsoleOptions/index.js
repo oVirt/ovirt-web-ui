@@ -16,13 +16,9 @@ class ConsoleOptions extends React.Component {
   onChangeOptions (option) {
     return function (elem, value) {
       const delta = {}
-      switch (option) {
-        case 'autoConnect':
-        default:
-          delta[option] = value
-          break
-      }
-      this.props.onSave({ options: Object.assign({}, this.state, delta) })
+      delta[option] = value
+      // redux change follows -> props will be changed
+      this.props.onSave({ options: Object.assign({}, this.props.options, delta) })
     }.bind(this)
   }
 
@@ -39,14 +35,33 @@ class ConsoleOptions extends React.Component {
     return (
       <div className={classes}>
         <dl>
-          <dt>Connect automatically</dt>
+          <dt className={style['console-option-description']}>Connect automatically</dt>
           <dd>
             <Switch
-              animate={false}
+              animate
               value={!!this.props.options.autoConnect}
               onChange={this.onChangeOptions('autoConnect')}
             />
           </dd>
+
+          <dt className={style['console-option-description']}>Fullscreen</dt>
+          <dd>
+            <Switch
+              animate
+              value={!!this.props.options.fullscreen}
+              onChange={this.onChangeOptions('fullscreen')}
+            />
+          </dd>
+
+          <dt className={style['console-option-description']}>Map ctrl+alt+del shortcut to ctrl+alt+end</dt>
+          <dd>
+            <Switch
+              animate
+              value={!!this.props.options.ctrlAltDelToEnd}
+              onChange={this.onChangeOptions('ctrlAltDelToEnd')}
+            />
+          </dd>
+
         </dl>
       </div>
     )

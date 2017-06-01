@@ -6,5 +6,10 @@
 }
 
 .open-settings {
-    height: 50px;
+    height: 110px;
+    margin-left: 2em;
+}
+
+.console-option-description {
+    width: 20em;
 }
