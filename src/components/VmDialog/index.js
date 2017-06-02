@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
+import { Link, Redirect, Prompt } from 'react-router-dom'
 
 import { logDebug, generateUnique } from '../../helpers'
 
@@ -16,10 +17,13 @@ import FieldHelp from '../FieldHelp'
 import Selectors from '../../selectors'
 import {
   closeDialog,
-  requestCloseDialogConfirmation,
-  createVm,
-  editVm,
 } from '../../actions/index'
+
+import {
+  editVm,
+  createVm,
+  setSavedVm,
+} from './actions'
 
 function sortedBy (immutableCollection, sortBy) { // TODO: move to helpers
   return immutableCollection.sort(
@@ -46,6 +50,8 @@ class VmDialog extends React.Component {
       clusterId: undefined,
       templateId: undefined,
       osId: undefined,
+      saved: false,
+      isChanged: false,
     }
 
     this.closeDialog = this.closeDialog.bind(this)
@@ -67,6 +73,10 @@ class VmDialog extends React.Component {
     this.onChangeVmDescription = this.onChangeVmDescription.bind(this)
     this.onChangeVmMemory = this.onChangeVmMemory.bind(this)
     this.onChangeVmCpu = this.onChangeVmCpu.bind(this)
+  }
+
+  componentWillMount () {
+    this.props.onInit()
   }
 
   componentDidMount () {
@@ -101,6 +111,9 @@ class VmDialog extends React.Component {
     this.props.vm
       ? this.props.updateVm(this.composeVm(), actionUniqueId)
       : this.props.addVm(this.composeVm(), actionUniqueId)
+    this.setState({
+      saved: true,
+    })
   }
 
   getLatestUserMessage () {
@@ -149,20 +162,15 @@ class VmDialog extends React.Component {
     this.props.onCloseDialog()
   }
 
-  onChangeGeneral () {
-    this.props.requestCloseDialogConfirmation() // enforce confirmation dialog in case of Cancel action
-  }
-
   onChangeVmName (event) {
-    this.onChangeGeneral()
-    this.setState({ name: event.target.value })
+    this.setState({ name: event.target.value, isChanged: true })
   }
   onChangeVmDescription (event) {
-    this.setState({ description: event.target.value })
+    this.setState({ description: event.target.value, isChanged: true })
   }
 
   onChangeVmMemory (event) {
-    this.onIntegerChanged({ stateProp: 'memory', value: event.target.value, factor: 1024 * 1024 })
+    this.onIntegerChanged({ stateProp: 'memory', value: event.target.value, factor: 1024 * 1024, isChanged: true })
   }
 
   onChangeVmCpu (event) {
@@ -174,6 +182,7 @@ class VmDialog extends React.Component {
     if (!isNaN(intVal)) {
       const stateChange = {}
       stateChange[stateProp] = intVal * factor
+      stateChange['isChanged'] = true
       this.setState(stateChange)
     } else {
       console.log('not an integer: ', value)
@@ -188,6 +197,7 @@ class VmDialog extends React.Component {
   doChangeOsIdTo (osId) {
     this.setState({
       osId,
+      isChanged: true,
     })
   }
 
@@ -235,6 +245,7 @@ class VmDialog extends React.Component {
       templateId,
       memory,
       cpus,
+      isChanged: true,
     })
 
     if (this.state.osId !== osId) {
@@ -318,6 +329,10 @@ class VmDialog extends React.Component {
   }
 
   render () {
+    if (this.state.saved && this.props.vmDialog.getIn(['vm', 'id'])) {
+      return (<Redirect to={`/vm/${this.props.vmDialog.getIn(['vm', 'id'])}`} />)
+    }
+
     const isEdit = !!this.props.vm
 
     const sortedClusters = sortedBy(this.props.clusters.get('clusters'), 'name')
@@ -351,12 +366,18 @@ class VmDialog extends React.Component {
         <hr />
         <ErrorAlert message={this.getLatestUserMessage()} />
         <form className='form-horizontal'>
+          <Prompt
+            when={this.state.isChanged}
+            message={location => (
+              `Are you sure you want to go to ${location.pathname}`
+            )}
+          />
           <LabeledTextField
             selectClass='combobox form-control'
             id='vmName'
             label='Name'
             placeholder='Enter VM Name'
-            value={this.state.name}
+            value={this.state.name || ''}
             fieldHelp={<FieldHelp title='Name' content='Unique name of the virtual machine.' />}
             onChange={this.onChangeVmName} />
 
@@ -365,7 +386,7 @@ class VmDialog extends React.Component {
             id='vmDescription'
             label='Description'
             placeholder='Enter VM Description (optional)'
-            value={this.state.description}
+            value={this.state.description || ''}
             fieldHelp={<FieldHelp title='Description' content='Optional user description of the virtual machine.' />}
             onChange={this.onChangeVmDescription} />
 
@@ -404,7 +425,7 @@ class VmDialog extends React.Component {
             id='vmMemory'
             label='Memory (MB)'
             placeholder='VM Memory'
-            value={this.state.memory / 1024 / 1024}
+            value={this.state.memory / 1024 / 1024 || 1024}
             onChange={this.onChangeVmMemory}
             fieldHelp={<FieldHelp title='Memory' content='Total memory the virtual machine will be equipped with. In megabytes.' />}
             step={256} />
@@ -414,14 +435,14 @@ class VmDialog extends React.Component {
             id='vmCpu'
             label='Number of CPUs'
             placeholder='CPUs'
-            value={this.state.cpus}
+            value={this.state.cpus || 1}
             onChange={this.onChangeVmCpu}
             fieldHelp={<FieldHelp title='Number of CPUs' content='Total count of virtual processors the virtual machine will be equipped with.' />}
             min={1}
           />
 
           <div className={style['vm-dialog-buttons']}>
-            <button className='btn btn-default' type='button' onClick={this.closeDialog}>Close</button>
+            <Link className='btn btn-default' to={this.props.vm ? `/vm/${this.props.vm.get('id')}` : '/'}>Close</Link>
             <button className='btn btn-primary' type='button' onClick={this.submitHandler}>{submitText}</button>
           </div>
         </form>
@@ -437,11 +458,12 @@ VmDialog.propTypes = {
   templates: PropTypes.object.isRequired,
   operatingSystems: PropTypes.object.isRequired,
   userMessages: PropTypes.object.isRequired,
+  vmDialog: PropTypes.object.isRequired,
 
   onCloseDialog: PropTypes.func.isRequired,
-  requestCloseDialogConfirmation: PropTypes.func.isRequired,
   addVm: PropTypes.func.isRequired,
   updateVm: PropTypes.func.isRequired,
+  onInit: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -450,11 +472,12 @@ export default connect(
     templates: state.templates,
     operatingSystems: state.operatingSystems,
     userMessages: state.userMessages,
+    vmDialog: state.VmDialog,
   }),
   (dispatch) => ({
     onCloseDialog: () => dispatch(closeDialog({ force: false })),
-    requestCloseDialogConfirmation: () => dispatch(requestCloseDialogConfirmation()),
     addVm: (vm, actionUniqueId) => dispatch(createVm(vm, actionUniqueId)),
     updateVm: (vm, actionUniqueId) => dispatch(editVm(vm, actionUniqueId)),
+    onInit: () => dispatch(setSavedVm({ vm: null })),
   })
 )(VmDialog)

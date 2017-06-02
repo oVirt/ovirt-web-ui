@@ -7,14 +7,11 @@ import style from './style.css'
 
 import {
   downloadConsole,
-  startPool,
-  startVm,
   getConsoleOptions,
   saveConsoleOptions,
 } from '../../actions'
 
 import Time from '../Time'
-import VmActions from '../VmActions'
 import DetailContainer from '../DetailContainer'
 import { canConsole, userFormatOfBytes, VmIcon, VmDisks, VmStatusIcon, ConsoleOptions } from 'ovirt-ui-components'
 import Selectors from '../../selectors'
@@ -89,25 +86,10 @@ class VmDetail extends Component {
       userMessages,
       onConsole,
       isPool,
-      onStartPool,
-      onStartVm,
       onConsoleOptionsSave,
       options,
       pool,
     } = this.props
-
-    let onStart = onStartVm
-
-    if (!vm && !isPool) {
-      return null
-    }
-
-    if (isPool && pool) {
-      onStart = onStartPool
-    }
-    if (isPool && !pool) {
-      return null
-    }
 
     const name = isPool ? pool.get('name') : vm.get('name')
     const iconId = vm.getIn(['icons', 'small', 'id'])
@@ -145,31 +127,34 @@ class VmDetail extends Component {
 
     return (
       <DetailContainer>
-        <h1>
+        <h1 className={style['header']}>
           <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' className={style['vm-detail-icon']} />
           &nbsp;{name}
         </h1>
-        <VmActions vm={vm} userMessages={userMessages} isPool={isPool} onStart={onStart} />
         <LastMessage vmId={vm.get('id')} userMessages={userMessages} />
-        <dl className={style['vm-properties']}>
-          <dt>State</dt>
-          <dd><VmStatusIcon state={vm.get('status')} /> {vm.get('status')}</dd>
-          <dt>Description</dt>
-          <dd>{vm.get('description')}</dd>
-          <dt>Operating System</dt>
-          <dd>{os ? os.get('description') : vm.getIn(['os', 'type'])}</dd>
-          <dt><span className='pficon pficon-memory' /> Defined Memory</dt>
-          <dd>{userFormatOfBytes(vm.getIn(['memory', 'total'])).str}</dd>
-          <dt><span className='pficon pficon-cpu' /> CPUs</dt>
-          <dd>{vm.getIn(['cpu', 'vCPUs'])}</dd>
-          <dt><span className='pficon pficon-network' /> Address</dt>
-          <dd>{vm.get('fqdn')}</dd>
-          <dt><span className='pficon pficon-screen' /> Console&nbsp;{consoleOptionsShowHide}</dt>
-          <VmConsoles vm={vm} onConsole={onConsole} />
-          <ConsoleOptions options={optionsJS} onSave={onConsoleOptionsSave} open={this.state.openConsoleSettings} />
-          <dt><span className='fa fa-database' /> Disks&nbsp;{disksShowHide}</dt>
-          <dd>{disksElement}</dd>
-        </dl>
+        <div className={style['vm-detail-container']}>
+          <dl className={style['vm-properties']}>
+            <dt>State</dt>
+            <dd><VmStatusIcon state={vm.get('status')} /> {vm.get('status')}</dd>
+            <dt>Description</dt>
+            <dd>{vm.get('description')}</dd>
+            <dt>Operating System</dt>
+            <dd>{os ? os.get('description') : vm.getIn(['os', 'type'])}</dd>
+            <dt><span className='pficon pficon-memory' /> Defined Memory</dt>
+            <dd>{userFormatOfBytes(vm.getIn(['memory', 'total'])).str}</dd>
+            <dt><span className='pficon pficon-cpu' /> CPUs</dt>
+            <dd>{vm.getIn(['cpu', 'vCPUs'])}</dd>
+            <dt><span className='pficon pficon-network' /> Address</dt>
+            <dd>{vm.get('fqdn')}</dd>
+          </dl>
+          <dl className={style['vm-properties']}>
+            <dt><span className='pficon pficon-screen' /> Console&nbsp;{consoleOptionsShowHide}</dt>
+            <VmConsoles vm={vm} onConsole={onConsole} />
+            <ConsoleOptions options={optionsJS} onSave={onConsoleOptionsSave} open={this.state.openConsoleSettings} />
+            <dt><span className='fa fa-database' /> Disks&nbsp;{disksShowHide}</dt>
+            <dd>{disksElement}</dd>
+          </dl>
+        </div>
       </DetailContainer>
     )
   }
@@ -183,8 +168,6 @@ VmDetail.propTypes = {
   onConsoleOptionsSave: PropTypes.func.isRequired,
   onConsoleOptionsOpen: PropTypes.func.isRequired,
   options: PropTypes.object.isRequired,
-  onStartPool: PropTypes.func.isRequired,
-  onStartVm: PropTypes.func.isRequired,
   isPool: PropTypes.bool,
 }
 
@@ -194,11 +177,10 @@ export default connect(
     userMessages: state.userMessages,
     options: state.options,
   }),
-  (dispatch, { vm, pool }) => ({
+
+  (dispatch, { vm }) => ({
     onConsole: ({ vmId, consoleId }) => dispatch(downloadConsole({ vmId, consoleId })),
     onConsoleOptionsSave: ({ options }) => dispatch(saveConsoleOptions({ vmId: vm.get('id'), options })),
     onConsoleOptionsOpen: () => dispatch(getConsoleOptions({ vmId: vm.get('id') })),
-    onStartPool: () => dispatch(startPool({ poolId: pool.get('id') })),
-    onStartVm: () => dispatch(startVm({ vmId: vm.get('id') })),
   })
 )(VmDetail)

@@ -32,35 +32,9 @@ const visibility = actionReducer(Immutable.fromJS({
       .set('dialogCloseConfirmationToShow', null)
   },
 
-  REQUEST_CLOSE_DIALOG_CONFIRMATION (state) {
-    return state
-      .set('dialogConfirmationRequested', true)
-      .set('dialogCloseConfirmationToShow', false)
-  },
-
   TOGGLE_OPTIONS (state) { // TODO: rename to OPEN_SETTINGS
     return state
       .set('dialogToShow', state.get('dialogToShow') === 'Options' ? null : 'Options')
-  },
-  SET_VM_DETAIL_TO_SHOW (state, action) { // rename to OPEN_VM_DETAIL
-    return state
-      .set('selectedVmDetail', action.payload.vmId)
-      .set('dialogToShow', 'VmDetail')
-  },
-  SET_POOL_DETAIL_TO_SHOW (state, { payload: { poolId } }) {
-    return state
-      .set('selectedPoolDetail', poolId)
-      .set('dialogToShow', 'PoolDetail')
-  },
-  OPEN_ADD_VM_DIALOG (state) {
-    return state
-      .set('dialogToShow', 'VmDialog')
-  },
-
-  OPEN_EDIT_VM_DIALOG (state, action) {
-    return state
-      .set('dialogToShow', 'VmDialog')
-      .set('selectedVmDetail', action.payload.vmId)
   },
 })
 

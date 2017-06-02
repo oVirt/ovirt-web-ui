@@ -7,7 +7,7 @@ const CONFIG_URL = '/ovirt-engine/web-ui/ovirt-web-ui.config'
 const AppConfiguration = {
   debug: true,
   applicationContext: '',
-  applicationURL: '',
+  applicationURL: '/',
 }
 
 export function readConfiguration () {

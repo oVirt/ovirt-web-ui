@@ -12,8 +12,6 @@ import {
   refresh,
 
   loadInProgress,
-  setVmDetailToShow,
-  setPoolDetailToShow,
   updateIcons,
   setVmDisks,
   updateVms,
@@ -39,8 +37,6 @@ import {
   addTemplates,
   addAllOS,
 
-  closeDialog,
-
   getSinglePool,
   removeMissingPools,
   removePools,
@@ -53,13 +49,12 @@ import {
   checkTokenExpired,
 
   setConsoleOptions,
+  redirectRoute,
 } from './actions/index'
 
 import {
-  ADD_NEW_VM,
   CHANGE_FILTER_PERMISSION,
   CHECK_TOKEN_EXPIRED,
-  EDIT_VM,
   GET_ALL_CLUSTERS,
   GET_ALL_OS,
   GET_ALL_POOLS,
@@ -83,7 +78,6 @@ import {
   SUSPEND_VM,
 } from './constants/index'
 
-// import store from './store'
 import Api from 'ovirtapi'
 import { persistStateToLocalStorage } from './storage'
 import Selectors from './selectors'
@@ -470,7 +464,7 @@ function* removeVm (action) {
   yield startProgress({ vmId: action.payload.vmId, name: 'remove' })
   const result = yield callExternalAction('remove', Api.remove, action)
   if (result.status === 'complete') {
-    yield put(closeDialog({ force: false }))
+    yield put(redirectRoute({ route: '/' }))
   }
   yield stopProgress({ vmId: action.payload.vmId, name: 'remove', result })
 }
@@ -521,8 +515,8 @@ function* downloadVmConsole (action) {
  * VmDetail is to be rendered.
  */
 export function* selectVmDetail (action) {
-  yield put(setVmDetailToShow({ vmId: action.payload.vmId }))
   yield fetchSingleVm(getSingleVm({ vmId: action.payload.vmId })) // async data refresh
+  yield put(loadInProgress({ value: false }))
 }
 
 function* getConsoleOptions (action) {
@@ -546,8 +540,8 @@ function* autoConnectCheck (action) {
 }
 
 function* selectPoolDetail (action) {
-  yield put(setPoolDetailToShow({ poolId: action.payload.poolId }))
   yield fetchSinglePool(getSinglePool({ poolId: action.payload.poolId }))
+  yield put(loadInProgress({ value: false }))
 }
 
 function* schedulerPerMinute (action) {
@@ -565,25 +559,6 @@ function* schedulerPerMinute (action) {
     } else {
       logDebug('schedulerPerMinute() event skipped since oVirt API version does not match')
     }
-  }
-}
-
-function* createNewVm (action) {
-  const result = yield callExternalAction('addNewVm', Api.addNewVm, action)
-  if (!result.error) {
-    yield put(closeDialog({ force: true }))
-
-    // fetchSingleVm() can't be used since vmId is unknown
-    // full refresh (pools) is not required
-    yield put(getAllVms({ shallowFetch: false }))
-  }
-}
-
-function* editVm (action) {
-  const result = yield callExternalAction('editVm', Api.editVm, action)
-  if (!result.error) {
-    yield put(closeDialog({ force: true }))
-    yield fetchSingleVm(getSingleVm({ vmId: action.payload.vm.id }))
   }
 }
 
@@ -643,6 +618,7 @@ let sagasFunctions = {
   foreach,
   callExternalAction,
   fetchVmSessions,
+  fetchSingleVm,
 }
 
 export function *rootSaga () {
@@ -664,8 +640,6 @@ export function *rootSaga () {
     takeEvery(START_POOL, startPool),
     takeEvery(REMOVE_VM, removeVm),
 
-    takeLatest(ADD_NEW_VM, createNewVm),
-    takeLatest(EDIT_VM, editVm),
     takeLatest(GET_ALL_CLUSTERS, fetchAllClusters),
     takeLatest(GET_ALL_TEMPLATES, fetchAllTemplates),
     takeLatest(GET_ALL_OS, fetchAllOS),

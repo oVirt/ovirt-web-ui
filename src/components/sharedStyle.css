@@ -1,12 +1,8 @@
 .move-left-detail { /* VM detail on the right */
-    position: fixed;
-    top: 2.5em;
     height: 100%;
     display: block;
-    left: 50%;
-    width: 50%;
+    width: 100%;
     opacity:1;
-    transition:opacity 0.75s ease-in-out;
 }
 
 .move-left-detail-invisible {
@@ -24,4 +20,19 @@
 
 .usermenu-z-index {
     z-index: 2000;
+}
+
+.vertical-menu {
+	top: 29px !important;
+}
+
+.breadcrumb {
+    border-bottom: solid gray;
+    padding-left: 15px;
+    margin-bottom: 5px;
+}
+
+.navbar-top-offset {
+    padding-top: 29px;
+    margin-left: 200px;
 }
