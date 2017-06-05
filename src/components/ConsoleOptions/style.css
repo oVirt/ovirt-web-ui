@@ -1,0 +1,15 @@
+.vm-detail-settings {
+    transition: height 1s;
+    height: 0px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.open-settings {
+    height: 110px;
+    margin-left: 2em;
+}
+
+.console-option-description {
+    width: 20em;
+}

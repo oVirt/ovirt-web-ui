@@ -30,6 +30,9 @@ Selectors = {
   getFilter () {
     return getState().config.get('filter')
   },
+  getConsoleOptions ({ vmId }) {
+    return getState().options.getIn(['options', 'consoleOptions', vmId])
+  },
 }
 
 function getState () {

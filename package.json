@@ -73,6 +73,7 @@
     "prop-types": "15.5.8",
     "react": "15.5.4",
     "react-bootstrap": "0.31.0",
+    "react-bootstrap-switch": "15.5.0-a",
     "react-dom": "15.5.4",
     "react-redux": "5.0.4",
     "react-test-renderer": "15.5.4",

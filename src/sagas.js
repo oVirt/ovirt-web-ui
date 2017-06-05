@@ -32,7 +32,6 @@ import {
   getAllTemplates,
   getAllClusters,
   getAllOperatingSystems,
-  getConsole,
   addClusters,
   addTemplates,
   addAllOS,
@@ -50,6 +49,8 @@ import {
 
   setConsoleOptions,
   redirectRoute,
+  downloadConsole,
+  getConsoleOptions as getConsoleOptionsAction,
 } from './actions/index'
 
 import {
@@ -487,6 +488,32 @@ function* fetchVmSessions ({ vmId }) {
   return []
 }
 
+function adjustVVFile ({ data, options }) {
+  // to simplify other flow, let's handle both 'options' from redux (immutableJs) or plain JS object from getConsoleOptions()
+  // logDebug('adjustVVFile data before: ', data)
+  logDebug('adjustVVFile options: ', options)
+
+  if (options && (options.get && options.get('fullscreen') || options.fullscreen)) {
+    data = data.replace(/^fullscreen=0/mg, 'fullscreen=1')
+  }
+
+  const pattern = /^secure-attention=.*$/mg
+  let text = 'secure-attention=ctrl+alt+del'
+  if (options && (options.get && options.get('ctrlAltDelToEnd') || options.ctrlAltDelToEnd)) {
+    text = 'secure-attention=ctrl+alt+end'
+  }
+  if (data.match(pattern)) {
+    logDebug('secure-attention found, replacing by ', text)
+    data = data.replace(pattern, text)
+  } else {
+    logDebug('secure-attention was not found, inserting ', text)
+    data = data.replace(/^\[virt-viewer\]$/mg, `[virt-viewer]\n${text}`) // ending \n is already there
+  }
+
+  logDebug('adjustVVFile data after adjustment: ', data)
+  return data
+}
+
 function* downloadVmConsole (action) {
   let { vmId, consoleId } = action.payload
 
@@ -504,8 +531,16 @@ function* downloadVmConsole (action) {
   }
 
   if (consoleId) {
-    const data = yield callExternalAction('console', Api.console, { type: 'INTERNAL_CONSOLE', payload: { vmId, consoleId } })
+    let data = yield callExternalAction('console', Api.console, { type: 'INTERNAL_CONSOLE', payload: { vmId, consoleId } })
+
     if (data.error === undefined) {
+      let options = Selectors.getConsoleOptions({ vmId })
+      if (!options) {
+        logDebug('downloadVmConsole() console options not yet present, trying to load from local storage')
+        options = yield getConsoleOptions(getConsoleOptionsAction({ vmId }))
+      }
+
+      data = adjustVVFile({ data, options })
       fileDownload({ data, fileName: 'console.vv', mimeType: 'application/x-virt-viewer' })
     }
   }
@@ -522,11 +557,12 @@ export function* selectVmDetail (action) {
 function* getConsoleOptions (action) {
   const options = OptionsManager.loadConsoleOptions(action.payload)
   yield put(setConsoleOptions({ vmId: action.payload.vmId, options }))
+  return options
 }
 
 function* saveConsoleOptions (action) {
   OptionsManager.saveConsoleOptions(action.payload)
-  yield getConsoleOptions({ payload: { vmId: action.payload.vmId } })
+  yield getConsoleOptions(getConsoleOptionsAction({ vmId: action.payload.vmId }))
 }
 
 function* autoConnectCheck (action) {
@@ -534,7 +570,7 @@ function* autoConnectCheck (action) {
   if (vmId && vmId.length > 0) {
     const vm = yield callExternalAction('getVm', Api.getVm, getSingleVm({ vmId }), true)
     if (vm && vm.id && vm.status !== 'down') {
-      yield downloadVmConsole(getConsole({ vmId }))
+      yield downloadVmConsole(downloadConsole({ vmId }))
     }
   }
 }

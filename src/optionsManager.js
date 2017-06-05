@@ -1,9 +1,20 @@
 import { saveToLocalStorage, loadFromLocalStorage } from './storage'
 
+import { logDebug } from './helpers'
+
 export default {
   loadConsoleOptions ({ vmId }) {
     const autoOpenVmId = loadFromLocalStorage('autoConnect')
-    const options = {}
+
+    const optionsJson = loadFromLocalStorage(`consoleOptions.${vmId}`)
+    let options
+    try {
+      options = (optionsJson && JSON.parse(optionsJson)) || {}
+    } catch (e) {
+      logDebug('Unable to parse consoleOptions from local storrage: ', optionsJson)
+      options = {}
+    }
+
     if (vmId === autoOpenVmId) {
       options.autoConnect = true
     }
@@ -19,7 +30,8 @@ export default {
         saveToLocalStorage('autoConnect', '')
       }
     }
-    saveToLocalStorage(`consoleOptions.${vmId}`, options)
+
+    saveToLocalStorage(`consoleOptions.${vmId}`, JSON.stringify(options))
   },
 
   loadAutoConnectOption () {
