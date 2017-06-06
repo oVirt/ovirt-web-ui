@@ -30,7 +30,7 @@ const NoVm = () => {
 const VmsList = ({ vms, config, visibility }) => {
   const isDetailVisible = !!visibility.get('dialogToShow')
 
-  if (vms.get('vms') && !vms.get('vms').isEmpty()) {
+  if ((vms.get('vms') && !vms.get('vms').isEmpty()) || (vms.get('pools') && !vms.get('pools').isEmpty())) {
     return (
       <Vms />
     )

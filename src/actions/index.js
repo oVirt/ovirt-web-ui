@@ -1,5 +1,4 @@
 import {
-  CHANGE_FILTER_PERMISSION,
   GET_VM,
   PERSIST_STATE,
   SCHEDULER__1_MIN,
@@ -45,15 +44,6 @@ export function schedulerOneMinute () {
 export function setUserFilterPermission (filter) {
   return {
     type: SET_USER_FILTER_PERMISSION,
-    payload: {
-      filter,
-    },
-  }
-}
-
-export function changeFilterPermissions (filter) {
-  return {
-    type: CHANGE_FILTER_PERMISSION,
     payload: {
       filter,
     },

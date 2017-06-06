@@ -1,7 +1,6 @@
 // Keep alphabetically sorted
 // TODO: sort alphabetically
 // TODO: remove all constants except those used within sagas
-export const CHANGE_FILTER_PERMISSION = 'CHANGE_FILTER_PERMISSION'
 export const CHECK_TOKEN_EXPIRED = 'CHECK_TOKEN_EXPIRED'
 export const CLEAR_USER_MSGS = 'CLEAR_USER_MSGS'
 export const DOWNLOAD_CONSOLE_VM = 'DOWNLOAD_CONSOLE_VM'
