@@ -1,5 +1,4 @@
-import { put } from 'redux-saga/effects'
-import { takeEvery } from 'redux-saga'
+import { put, takeEvery } from 'redux-saga/effects'
 import { downloadConsole } from '../../actions/vm'
 import { CONSOLE_IN_USE } from './constants'
 import { setConsoleInUse } from './actions'

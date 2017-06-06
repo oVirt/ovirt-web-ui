@@ -6,7 +6,6 @@ import { withRouter } from 'react-router-dom'
 
 import ContainerFluid from '../ContainerFluid'
 import Vms from './Vms'
-import LoadingData from '../LoadingData'
 
 /**
  * Data are fetched but no VM is available to display
@@ -27,7 +26,7 @@ const NoVm = () => {
   )
 }
 
-const VmsList = ({ vms, config, visibility }) => {
+const VmsList = ({ vms, visibility }) => {
   const isDetailVisible = !!visibility.get('dialogToShow')
 
   if ((vms.get('vms') && !vms.get('vms').isEmpty()) || (vms.get('pools') && !vms.get('pools').isEmpty())) {
@@ -35,13 +34,9 @@ const VmsList = ({ vms, config, visibility }) => {
       <Vms />
     )
   } else if (!isDetailVisible) {
-    if (vms.get('loadInProgress')) { // data load in progress
-      return (
-        <ContainerFluid>
-          <LoadingData />
-        </ContainerFluid>
-      )
-    } else { // No VM available
+    if (vms.get('loadInProgress')) {
+      return <div /> // "Loading Data ..." message rendered elsewhere
+    } else { // No VM available and initial data load is finished
       return (
         <ContainerFluid>
           <NoVm />
@@ -54,14 +49,12 @@ const VmsList = ({ vms, config, visibility }) => {
 }
 VmsList.propTypes = {
   vms: PropTypes.object.isRequired,
-  config: PropTypes.object.isRequired,
   visibility: PropTypes.object.isRequired,
 }
 
 export default withRouter(connect(
   (state) => ({
     vms: state.vms,
-    config: state.config,
     visibility: state.visibility,
   })
 )(VmsList))
