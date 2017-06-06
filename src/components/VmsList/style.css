@@ -4,7 +4,7 @@
     transition-timing-function: ease-out;
 
     overflow: auto;
-    height: calc(100vh - 49px);
+/*    height: calc(100vh - 49px);*/
 }
 
 .moved-left { /* altered state */
@@ -57,6 +57,9 @@
 }
 
 .full-window {
-    height: calc(100vh - 160px);
+/*    height: calc(100vh - 160px);*/
 }
 
+.vm-detail-link {
+    color: black;
+}
