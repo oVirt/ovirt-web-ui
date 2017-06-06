@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/oVirt/ovirt-web-ui.svg?branch=master)](https://travis-ci.org/oVirt/ovirt-web-ui)
 
 # VM Portal for oVirt
-![Alt text](https://cloud.githubusercontent.com/assets/3332176/26204711/d9996be0-3bdf-11e7-82e4-2df709dfe0f0.png "Screenshot")
+![Alt text](https://raw.githubusercontent.com/oVirt/ovirt-web-ui/master/doc/screenshots/v1.0.0_2017-Jun/01_vmsList.png "Screenshot")
 
 Modern UI for standard (non-admin) oVirt users.
 
