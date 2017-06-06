@@ -1,5 +1,9 @@
-import { call, put } from 'redux-saga/effects'
-import { takeEvery, takeLatest } from 'redux-saga'
+import {
+  call,
+  put,
+  takeEvery,
+  takeLatest,
+} from 'redux-saga/effects'
 
 import Product from './version'
 import { logDebug, hidePassword, fileDownload } from './helpers'

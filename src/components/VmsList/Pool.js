@@ -15,6 +15,8 @@ import { VmIcon, VmStatusIcon } from 'ovirt-ui-components'
 
 import { startPool } from '../../actions'
 
+import { logDebug } from '../../helpers'
+
 /**
  * Single icon-card in the list
  */
@@ -36,6 +38,7 @@ class Pool extends React.Component {
     const isSelected = pool.get('id') === visibility.get('selectedPoolDetail')
 
     const onCardClick = () => {
+      logDebug('Pool card clicked: ', pool.get('name'))
       this.setState({ openDetail: true })
     }
 

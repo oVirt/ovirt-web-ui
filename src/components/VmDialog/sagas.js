@@ -1,5 +1,4 @@
-import { put } from 'redux-saga/effects'
-import { takeEvery, takeLatest } from 'redux-saga'
+import { put, takeEvery, takeLatest } from 'redux-saga/effects'
 import { getAllVms, getSingleVm } from '../../actions/index'
 import { ADD_NEW_VM, EDIT_VM } from './constants'
 import { setSavedVm } from './actions'

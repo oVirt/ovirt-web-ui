@@ -16,22 +16,24 @@ import { closeAllConfirmationComponents } from '../Confirmation'
 
 import { startVm } from '../../actions/index'
 
+import { logDebug } from '../../helpers'
+
 /**
  * Single icon-card in the list
  */
 class Vm extends React.Component {
-  constructor (props) {
+/*  constructor (props) {
     super(props)
     this.state = { openDetail: false }
   }
-
+*/
   render () {
     let { vm, icons, visibility, onStart } = this.props
-
+/*
     if (this.state.openDetail) {
       return (<Redirect to={`/vm/${vm.get('id')}`} />)
     }
-
+*/
     const state = vm.get('status')
 
     const iconId = vm.getIn(['icons', 'large', 'id'])
@@ -39,15 +41,13 @@ class Vm extends React.Component {
     const isSelected = vm.get('id') === visibility.get('selectedVmDetail')
 
     const onCardClick = () => {
+      logDebug('========== VM card clicked: ', vm.get('name'))
       closeAllConfirmationComponents()
       // onSelectVm()
-      this.setState({ openDetail: true })
+//      this.setState({ openDetail: true })
+      return (<Redirect to={`/vm/${vm.get('id')}`} />)
     }
 
-    // TODO: improve the card flip:
-    // TODO: https://davidwalsh.name/css-flip
-    // TODO: http://tympanus.net/codrops/2013/12/18/perspective-page-view-navigation/
-    // TODO: https://desandro.github.io/3dtransforms/docs/card-flip.html
     return (
       <div className={`col-xs-12 col-sm-6 col-md-4 col-lg-3 ${isSelected ? style['selectedVm'] : ''}`}>
         <div className='card-pf card-pf-view card-pf-view-select card-pf-view-single-select'>
