@@ -65,10 +65,30 @@ const findExactMatch = (branches) => {
 }
 
 class PageRouter extends React.Component {
+  constructor (props) {
+    super(props)
+    this.handleKeyPress = this.handleKeyPress.bind(this)
+    this.keyPressed = null
+  }
+
+  handleKeyPress (event) {
+    if (event.key === 'Escape' && this.keyPressed !== event.key) {
+      this.keyPressed = event.key
+      if (this.currentBranch.length > 1) {
+        this.props.redirectRoute(this.currentBranch[this.currentBranch.length - 2].match.url)
+      }
+    }
+  }
+
   componentDidUpdate () {
     if (this.props.routeReducer.get('redirect') && this.props.routeReducer.get('redirect') !== this.props.location.pathname) {
       this.props.onRedirect()
     }
+  }
+
+  componentDidMount () {
+    window.addEventListener('keydown', this.handleKeyPress)
+    window.addEventListener('keyup', (e) => { this.keyPressed = null })
   }
 
   render () {
@@ -79,6 +99,8 @@ class PageRouter extends React.Component {
     const branches = matchRoutes(route.routes, location.pathname)
 
     let branch = findExactMatch(branches)
+    this.currentBranch = branches.slice()
+    this.currentBranch.unshift({ match: { url: '/' } })
     let tools = []
     if (branch) {
       for (let i in branch.route.toolbars) {
@@ -104,6 +126,7 @@ PageRouter.propTypes = {
   route: PropTypes.object.isRequired,
   routeReducer: PropTypes.object.isRequired,
   onRedirect: PropTypes.func.isRequired,
+  redirectRoute: PropTypes.func.isRequired,
 }
 
 export default withRouter(connect(
@@ -112,5 +135,6 @@ export default withRouter(connect(
   }),
   (dispatch) => ({
     onRedirect: () => dispatch(redirectRoute({ route: null })),
+    redirectRoute: (url) => dispatch(redirectRoute({ route: url })),
   })
 )(PageRouter))
