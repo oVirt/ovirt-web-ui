@@ -80,6 +80,7 @@ import {
   START_POOL,
   START_VM,
   SUSPEND_VM,
+  GET_RDP_VM,
 } from './constants/index'
 
 import Api from 'ovirtapi'
@@ -88,6 +89,7 @@ import Selectors from './selectors'
 import AppConfiguration from './config'
 import OptionsManager from './optionsManager'
 import SagasWorkers from './sagasBuilder'
+import RDPBuilder from './rdp-builder'
 
 function * foreach (array, fn, context) {
   var i = 0
@@ -654,6 +656,12 @@ let sagasFunctions = {
   fetchSingleVm,
 }
 
+function* getRDPVm (action) {
+  const rdpBuilder = new RDPBuilder(action.payload)
+  const data = rdpBuilder.buildRDP()
+  fileDownload({ data, fileName: 'console.rdp', mimeType: 'application/rdp' })
+}
+
 export function *rootSaga () {
   yield [
     takeEvery(LOGIN, login),
@@ -669,6 +677,7 @@ export function *rootSaga () {
     takeEvery(RESTART_VM, restartVm),
     takeEvery(START_VM, startVm),
     takeEvery(DOWNLOAD_CONSOLE_VM, downloadVmConsole),
+    takeEvery(GET_RDP_VM, getRDPVm),
     takeEvery(SUSPEND_VM, suspendVm),
     takeEvery(START_POOL, startPool),
     takeEvery(REMOVE_VM, removeVm),

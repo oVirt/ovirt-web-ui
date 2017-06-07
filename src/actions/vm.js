@@ -21,6 +21,8 @@ import {
   UPDATE_ICONS,
   UPDATE_VMS,
   VM_ACTION_IN_PROGRESS,
+  GET_RDP_VM,
+  SET_DOMAIN,
 } from '../constants/index'
 
 export function login ({ username, password, token }) {
@@ -32,6 +34,15 @@ export function login ({ username, password, token }) {
         password,
       },
       token,
+    },
+  }
+}
+
+export function setDomain ({ domain }) {
+  return {
+    type: SET_DOMAIN,
+    payload: {
+      domain,
     },
   }
 }
@@ -259,6 +270,18 @@ export function setVmSessions ({ vmId, sessions }) {
     payload: {
       vmId,
       sessions,
+    },
+  }
+}
+
+export function getRDP ({ vmName, username, domain, fqdn }) {
+  return {
+    type: GET_RDP_VM,
+    payload: {
+      vmName,
+      username,
+      domain,
+      fqdn,
     },
   }
 }

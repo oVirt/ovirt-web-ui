@@ -12,9 +12,9 @@ class VmDetailPage extends React.Component {
   }
 
   render () {
-    let { match, vms } = this.props
+    let { match, vms, config } = this.props
     if (vms.getIn(['vms', match.params.id])) {
-      return (<VmDetail vm={vms.getIn(['vms', match.params.id])} />)
+      return (<VmDetail vm={vms.getIn(['vms', match.params.id])} config={config} />)
     }
     return null
   }
@@ -22,6 +22,7 @@ class VmDetailPage extends React.Component {
 
 VmDetailPage.propTypes = {
   vms: PropTypes.object.isRequired,
+  config: PropTypes.object.isRequired,
   getVms: PropTypes.func.isRequired,
   route: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
@@ -34,9 +35,9 @@ class PoolDetailPage extends React.Component {
     this.props.getPools({ poolId: this.props.match.params.id })
   }
   render () {
-    let { match, vms } = this.props
+    let { match, vms, config } = this.props
     if (vms.getIn(['pools', match.params.id, 'vm'])) {
-      return (<VmDetail vm={vms.getIn(['pools', match.params.id, 'vm'])} pool={vms.getIn(['pools', match.params.id])} isPool />)
+      return (<VmDetail vm={vms.getIn(['pools', match.params.id, 'vm'])} pool={vms.getIn(['pools', match.params.id])} config={config} isPool />)
     }
     return null
   }
@@ -44,6 +45,7 @@ class PoolDetailPage extends React.Component {
 
 PoolDetailPage.propTypes = {
   vms: PropTypes.object.isRequired,
+  config: PropTypes.object.isRequired,
   getPools: PropTypes.func.isRequired,
   route: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
@@ -79,6 +81,7 @@ VmDialogPage.propTypes = {
 const VmDetailPageConnected = connect(
   (state) => ({
     vms: state.vms,
+    config: state.config,
   }),
   (dispatch) => ({
     getVms: ({ vmId }) => dispatch(selectVmDetail({ vmId })),
@@ -88,6 +91,7 @@ const VmDetailPageConnected = connect(
 const PoolDetailPageConnected = connect(
   (state) => ({
     vms: state.vms,
+    config: state.config,
   }),
   (dispatch) => ({
     getPools: ({ poolId }) => dispatch(selectPoolDetail({ poolId })),

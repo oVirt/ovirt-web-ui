@@ -39,6 +39,9 @@ const config = actionReducer(initialState, {
     return state
       .set('isTokenExpired', true)
   },
+  SET_DOMAIN (state, { payload: { domain } }) {
+    return state.set('domain', domain)
+  },
 })
 
 export default config

@@ -107,3 +107,7 @@ export function generateUnique (prefix) {
     return v.toString(16)
   })
 }
+
+export function isWindows (name) {
+  return name.toLowerCase().indexOf('windows') > -1
+}
