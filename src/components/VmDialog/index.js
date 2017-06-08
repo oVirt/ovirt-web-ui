@@ -12,6 +12,8 @@ import sharedStyle from '../sharedStyle.css'
 import DetailContainer from '../DetailContainer'
 import ErrorAlert from '../ErrorAlert'
 
+import FieldHelp from '../FieldHelp/index'
+
 import { VmIcon } from 'ovirt-ui-components'
 
 import Selectors from '../../selectors'
@@ -365,15 +367,6 @@ class VmDialog extends React.Component {
         <h1>Create A New Virtual Machine</h1>
       )
 
-    /* className='form-horizontal'
-     <FieldHelp title='Name' content='Unique name of the virtual machine.' />
-     <FieldHelp title='Description' content='Optional user description of the virtual machine.' />
-     <FieldHelp title='Cluster' content='Group of hosts the virtual machine can be running on.' />
-     <FieldHelp title='Template' content='Contains the configuration and disks which will be used to create this virtual machine. Please customize as needed.' />
-     <FieldHelp title='Operating System' content='Operating system installed on the virtual machine.' />
-     <FieldHelp title='Memory' content='Total memory the virtual machine will be equipped with. In megabytes.' />
-     <FieldHelp title='Number of CPUs' content='Total count of virtual processors the virtual machine will be equipped with.' />
-    */
     return (
       <DetailContainer>
         {title}
@@ -388,7 +381,9 @@ class VmDialog extends React.Component {
 
           <div className={style['vm-dialog-container']}>
             <dl className={sharedStyle['vm-properties']}>
-              <dt>Name</dt>
+              <dt>Name
+                <FieldHelp title='Name' content='Unique name of the virtual machine.' />
+              </dt>
               <dd>
                 <input
                   type='text'
@@ -399,7 +394,9 @@ class VmDialog extends React.Component {
                   value={this.state.name || ''} />
               </dd>
 
-              <dt>Description</dt>
+              <dt>Description
+                <FieldHelp title='Description' content='Optional user description of the virtual machine.' />
+              </dt>
               <dd>
                 <input
                   type='text'
@@ -410,7 +407,9 @@ class VmDialog extends React.Component {
                   value={this.state.description || ''} />
               </dd>
 
-              <dt>Cluster</dt>
+              <dt>Cluster
+                <FieldHelp title='Cluster' content='Group of hosts the virtual machine can be running on.' />
+              </dt>
               <dd>
                 <select
                   className='combobox form-control'
@@ -424,7 +423,9 @@ class VmDialog extends React.Component {
                 </select>
               </dd>
 
-              <dt>Template</dt>
+              <dt>Template
+                <FieldHelp title='Template' content='Contains the configuration and disks which will be used to create this virtual machine. Please customize as needed.' />
+              </dt>
               <dd>
                 <select
                   className='combobox form-control'
@@ -438,7 +439,9 @@ class VmDialog extends React.Component {
                 </select>
               </dd>
 
-              <dt>Operating System</dt>
+              <dt>Operating System
+                <FieldHelp title='Operating System' content='Operating system installed on the virtual machine.' />
+              </dt>
               <dd>
                 <select
                   className='combobox form-control'
@@ -452,7 +455,9 @@ class VmDialog extends React.Component {
                 </select>
               </dd>
 
-              <dt><span className='pficon pficon-memory' /> Defined Memory</dt>
+              <dt><span className='pficon pficon-memory' />&nbsp;Defined Memory
+                <FieldHelp title='Memory' content='Total memory the virtual machine will be equipped with. In megabytes.' />
+              </dt>
               <dd>
                 <input
                   type='number'
@@ -465,7 +470,9 @@ class VmDialog extends React.Component {
                   step={256} />
               </dd>
 
-              <dt><span className='pficon pficon-cpu' /> CPUs</dt>
+              <dt><span className='pficon pficon-cpu' />&nbsp;CPUs
+                <FieldHelp title='Number of CPUs' content='Total count of virtual processors the virtual machine will be equipped with.' />
+              </dt>
               <dd>
                 <input
                   type='number'

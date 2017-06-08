@@ -16,6 +16,7 @@ import {
 import { isWindows, templateNameRenderer } from '../../helpers'
 
 import Time from '../Time'
+import FieldHelp from '../FieldHelp/index'
 import DetailContainer from '../DetailContainer'
 import ConsoleOptions from '../ConsoleOptions/index'
 import { canConsole, userFormatOfBytes, VmIcon, VmDisks, VmStatusIcon } from 'ovirt-ui-components'
@@ -150,28 +151,45 @@ class VmDetail extends Component {
         <LastMessage vmId={vm.get('id')} userMessages={userMessages} />
         <div className={style['vm-detail-container']}>
           <dl className={sharedStyle['vm-properties']}>
-            <dt>State</dt>
-            <dd><VmStatusIcon state={vm.get('status')} /> {vm.get('status')}</dd>
+            <dt>State
+              <FieldHelp title='State' content='The actual state the virtual machine is in.' />
+            </dt>
+            <dd><VmStatusIcon state={vm.get('status')} />&nbsp;{vm.get('status')}
+            </dd>
 
-            <dt>Description</dt>
+            <dt>Description
+              <FieldHelp title='Description' content='Optional user description of the virtual machine.' />
+            </dt>
             <dd>{vm.get('description')}</dd>
 
-            <dt>Cluster</dt>
+            <dt>Cluster
+              <FieldHelp title='Cluster' content='Group of hosts the virtual machine can be running on.' />
+            </dt>
             <dd>{cluster ? cluster.get('name') : ''}</dd>
 
-            <dt>Template</dt>
+            <dt>Template
+              <FieldHelp title='Template' content='Contains the configuration and disks which will be used to create this virtual machine. Please customize as needed.' />
+            </dt>
             <dd>{template ? templateNameRenderer(template) : ''}</dd>
 
-            <dt>Operating System</dt>
+            <dt>Operating System
+              <FieldHelp title='Operating System' content='Operating system installed on the virtual machine.' />
+            </dt>
             <dd>{os ? os.get('description') : vm.getIn(['os', 'type'])}</dd>
 
-            <dt><span className='pficon pficon-memory' /> Defined Memory</dt>
+            <dt><span className='pficon pficon-memory' />&nbsp;Defined Memory
+              <FieldHelp title='Memory' content='Total memory the virtual machine will be equipped with. In megabytes.' />
+            </dt>
             <dd>{userFormatOfBytes(vm.getIn(['memory', 'total'])).str}</dd>
 
-            <dt><span className='pficon pficon-cpu' /> CPUs</dt>
+            <dt><span className='pficon pficon-cpu' />&nbsp;CPUs
+              <FieldHelp title='Number of CPUs' content='Total count of virtual processors the virtual machine will be equipped with.' />
+            </dt>
             <dd>{vm.getIn(['cpu', 'vCPUs'])}</dd>
 
-            <dt><span className='pficon pficon-network' /> Address</dt>
+            <dt><span className='pficon pficon-network' />&nbsp;Address
+              <FieldHelp title='FQDN' content='Fully Qualified Domain Name of the virtual machine. Please not, guest agent must be installed within the virtual machine to collect this value.' />
+            </dt>
             <dd>{vm.get('fqdn')}</dd>
           </dl>
 
