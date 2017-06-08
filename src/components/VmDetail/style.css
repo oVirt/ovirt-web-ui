@@ -1,9 +1,8 @@
-.vm-properties {
-    font-size: large;
-    width: 50%;
+.vm-detail-container {
+    display: flex;
 }
 
-dt {
+.vm-detail-container dt {
     clear: left;
     float: left;
     width: 200px;
@@ -16,16 +15,13 @@ dt {
     text-align: left;
 }
 
-dd {
+.vm-detail-container dd {
     margin-left: 110px;
     min-height: 26px;
     max-width: 1000px;
     overflow: hidden;
     text-overflow: ellipsis;
     padding-top: 2px;
-}
-
-.vm-detail-icon { /* small VM icon on detail page*/
 }
 
 .left-delimiter {
@@ -45,8 +41,4 @@ dd {
 
 .header {
     padding-bottom: 15px;
-}
-
-.vm-detail-container {
-    display: flex;
 }

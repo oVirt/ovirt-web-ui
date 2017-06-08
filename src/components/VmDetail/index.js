@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import style from './style.css'
+import sharedStyle from '../sharedStyle.css'
 
 import {
   downloadConsole,
@@ -12,7 +13,7 @@ import {
   getRDP,
 } from '../../actions/index'
 
-import { isWindows } from '../../helpers'
+import { isWindows, templateNameRenderer } from '../../helpers'
 
 import Time from '../Time'
 import DetailContainer from '../DetailContainer'
@@ -109,6 +110,8 @@ class VmDetail extends Component {
     const icon = icons.get(iconId)
     const disks = vm.get('disks')
     const os = Selectors.getOperatingSystemByName(vm.getIn(['os', 'type']))
+    const cluster = Selectors.getClusterById(vm.getIn(['cluster', 'id']))
+    const template = Selectors.getTemplateById(vm.getIn(['template', 'id']))
 
     const onToggleRenderDisks = () => { this.setState({ renderDisks: !this.state.renderDisks }) }
     // const disksElement = this.state.renderDisks ? (<VmDisks disks={disks} />) : ''
@@ -141,26 +144,38 @@ class VmDetail extends Component {
     return (
       <DetailContainer>
         <h1 className={style['header']}>
-          <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' className={style['vm-detail-icon']} />
+          <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' className={sharedStyle['vm-detail-icon']} />
           &nbsp;{name}
         </h1>
         <LastMessage vmId={vm.get('id')} userMessages={userMessages} />
         <div className={style['vm-detail-container']}>
-          <dl className={style['vm-properties']}>
+          <dl className={sharedStyle['vm-properties']}>
             <dt>State</dt>
             <dd><VmStatusIcon state={vm.get('status')} /> {vm.get('status')}</dd>
+
             <dt>Description</dt>
             <dd>{vm.get('description')}</dd>
+
+            <dt>Cluster</dt>
+            <dd>{cluster ? cluster.get('name') : ''}</dd>
+
+            <dt>Template</dt>
+            <dd>{template ? templateNameRenderer(template) : ''}</dd>
+
             <dt>Operating System</dt>
             <dd>{os ? os.get('description') : vm.getIn(['os', 'type'])}</dd>
+
             <dt><span className='pficon pficon-memory' /> Defined Memory</dt>
             <dd>{userFormatOfBytes(vm.getIn(['memory', 'total'])).str}</dd>
+
             <dt><span className='pficon pficon-cpu' /> CPUs</dt>
             <dd>{vm.getIn(['cpu', 'vCPUs'])}</dd>
+
             <dt><span className='pficon pficon-network' /> Address</dt>
             <dd>{vm.get('fqdn')}</dd>
           </dl>
-          <dl className={style['vm-properties']}>
+
+          <dl className={sharedStyle['vm-properties']}>
             <dt><span className='pficon pficon-screen' /> Console&nbsp;{consoleOptionsShowHide}</dt>
             <VmConsoles vm={vm} onConsole={onConsole} onRDP={onRDP} />
             <ConsoleOptions options={optionsJS} onSave={onConsoleOptionsSave} open={this.state.openConsoleSettings} />

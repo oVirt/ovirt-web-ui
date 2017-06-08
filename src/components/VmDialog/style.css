@@ -1,5 +1,36 @@
+.vm-dialog-container {
+    display: flex;
+}
+
+.vm-dialog-container dt {
+    clear: left;
+    float: left;
+    width: 200px;
+    min-height: 26px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #888;
+    font-weight: normal;
+    text-align: left;
+}
+
+.vm-dialog-container dd {
+    margin-left: 110px;
+    min-height: 26px;
+    max-width: 1000px;
+    width: 50%;
+    min-width: 250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-top: 4px;
+}
+
 .vm-dialog-buttons {
-    text-align: right;
+    /* Ugly hack, but so far better than increase complexity via Toolbar component since buttons relies on VmDialog's state*/
+    position: absolute;
+    right: 10px;
+    top: 6em;
 }
 
 .vm-dialog-buttons button {
