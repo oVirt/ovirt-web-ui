@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import { Redirect } from 'react-router-dom'
 
 import VmDetail from '../VmDetail'
 import VmDialog from '../VmDialog/index'
@@ -15,8 +16,12 @@ class VmDetailPage extends React.Component {
     let { match, vms, config } = this.props
     if (vms.getIn(['vms', match.params.id])) {
       return (<VmDetail vm={vms.getIn(['vms', match.params.id])} config={config} />)
+    } else {
+      if (vms.get('loadInProgress')) {
+        return null
+      }
     }
-    return null
+    return <Redirect to='/' />
   }
 }
 
@@ -38,8 +43,12 @@ class PoolDetailPage extends React.Component {
     let { match, vms, config } = this.props
     if (vms.getIn(['pools', match.params.id, 'vm'])) {
       return (<VmDetail vm={vms.getIn(['pools', match.params.id, 'vm'])} pool={vms.getIn(['pools', match.params.id])} config={config} isPool />)
+    } else {
+      if (vms.get('loadInProgress')) {
+        return null
+      }
     }
-    return null
+    return <Redirect to='/' />
   }
 }
 
