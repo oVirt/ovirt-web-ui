@@ -178,19 +178,27 @@ class RemoveVmAction extends React.Component {
   }
 
   render () {
-    const { isOnCard, isPool, vm, onRemove } = this.props
+    const { isOnCard, isPool, vm, onRemove, isDisks } = this.props
 
     if (isOnCard) {
       return null
+    }
+
+    let checkbox = null
+    let height = 80
+
+    if (isDisks) {
+      checkbox = (<Checkbox checked={this.state.preserveDisks}
+        onClick={() => this.setState({ preserveDisks: !this.state.preserveDisks })}
+        label='Preserve disks' />)
+      height = 100
     }
 
     const confirmRemoveText = (
       <div>
         Remove the VM?
         <br />
-        <Checkbox checked={this.state.preserveDisks}
-          onClick={() => this.setState({ preserveDisks: !this.state.preserveDisks })}
-          label='Preserve disks' />
+        {checkbox}
       </div>)
 
     const confirmRemove = (e) => OnClickTopConfirmation({
@@ -202,7 +210,7 @@ class RemoveVmAction extends React.Component {
       extraButtonLabel: 'Force',
       onOk: () => onRemove({ force: false, preserveDisks: this.state.preserveDisks }),
       onExtra: () => onRemove({ force: true, preserveDisks: this.state.preserveDisks }),
-      height: 100,
+      height: height,
     })
 
     const status = vm.get('status')
@@ -223,6 +231,7 @@ RemoveVmAction.propTypes = {
   isOnCard: PropTypes.bool,
   isPool: PropTypes.bool,
   onRemove: PropTypes.func.isRequired,
+  isDisks: PropTypes.bool,
 }
 
 /**
@@ -399,7 +408,7 @@ class VmActions extends React.Component {
           className={`pficon pficon-edit ${style['action-link']}`}
           tooltip='Edit the VM' to={`/vm/${vm.get('id')}/edit`} />
 
-        <RemoveVmAction isOnCard={isOnCard} isPool={isPool} vm={vm} onRemove={onRemove} />
+        <RemoveVmAction isOnCard={isOnCard} isPool={isPool} vm={vm} isDisks={vm.get('disks').size > 0} onRemove={onRemove} />
       </div>
     )
   }
