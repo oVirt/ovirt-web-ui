@@ -6,10 +6,14 @@
 }
 
 .open-settings {
-    height: 110px;
+    height: 7em;
     margin-left: 2em;
 }
 
 .console-option-description {
     width: 20em;
+}
+
+.console-client-resources {
+    color: #888;
 }
