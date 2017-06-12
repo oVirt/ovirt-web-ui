@@ -62,6 +62,9 @@ class ConsoleOptions extends React.Component {
             />
           </dd>
 
+          <div className={style['console-client-resources']}>
+            Refer <a href='https://www.ovirt.org/documentation/admin-guide/virt/console-client-resources/' target='_blank'>Console Client Resources</a> in case of troubles.
+          </div>
         </dl>
       </div>
     )
