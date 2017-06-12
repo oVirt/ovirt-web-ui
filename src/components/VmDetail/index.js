@@ -111,7 +111,7 @@ class VmDetail extends Component {
     const os = Selectors.getOperatingSystemByName(vm.getIn(['os', 'type']))
 
     const onToggleRenderDisks = () => { this.setState({ renderDisks: !this.state.renderDisks }) }
-    const disksElement = this.state.renderDisks ? (<VmDisks disks={disks} />) : ''
+    // const disksElement = this.state.renderDisks ? (<VmDisks disks={disks} />) : ''
     const hasDisks = disks.size > 0
 
     let optionsJS = options.hasIn(['options', 'consoleOptions', vm.get('id')]) ? options.getIn(['options', 'consoleOptions', vm.get('id')]).toJS() : {}
@@ -165,7 +165,7 @@ class VmDetail extends Component {
             <VmConsoles vm={vm} onConsole={onConsole} onRDP={onRDP} />
             <ConsoleOptions options={optionsJS} onSave={onConsoleOptionsSave} open={this.state.openConsoleSettings} />
             <dt><span className='fa fa-database' /> Disks&nbsp;{disksShowHide}</dt>
-            <dd>{disksElement}</dd>
+            <dd><VmDisks disks={disks} open={this.state.renderDisks} /></dd>
           </dl>
         </div>
       </DetailContainer>
