@@ -160,43 +160,43 @@ class VmDetail extends Component {
         <div className={style['vm-detail-container']}>
           <dl className={sharedStyle['vm-properties']}>
             <dt>
-              <FieldHelp title='State' content='The actual state the virtual machine is in.' text='State' />
+              <FieldHelp content='The actual state the virtual machine is in.' text='State' />
             </dt>
             <dd><VmStatusIcon state={vm.get('status')} />&nbsp;{vm.get('status')}
             </dd>
 
             <dt>
-              <FieldHelp title='Description' content='Optional user description of the virtual machine.' text='Description' />
+              <FieldHelp content='Optional user description of the virtual machine.' text='Description' />
             </dt>
             <dd>{vm.get('description')}</dd>
 
             <dt>
-              <FieldHelp title='Cluster' content='Group of hosts the virtual machine can be running on.' text='Cluster' />
+              <FieldHelp content='Group of hosts the virtual machine can be running on.' text='Cluster' />
             </dt>
             <dd>{cluster ? cluster.get('name') : ''}</dd>
 
             <dt>
-              <FieldHelp title='Template' content='Contains the configuration and disks which will be used to create this virtual machine. Please customize as needed.' text='Template' />
+              <FieldHelp content='Contains the configuration and disks which will be used to create this virtual machine. Please customize as needed.' text='Template' />
             </dt>
             <dd>{template ? templateNameRenderer(template) : ''}</dd>
 
             <dt>
-              <FieldHelp title='Operating System' content='Operating system installed on the virtual machine.' text='Operating System' />
+              <FieldHelp content='Operating system installed on the virtual machine.' text='Operating System' />
             </dt>
             <dd>{os ? os.get('description') : vm.getIn(['os', 'type'])}</dd>
 
             <dt><span className='pficon pficon-memory' />&nbsp;
-              <FieldHelp title='Memory' content='Total memory the virtual machine will be equipped with. In megabytes.' text='Defined Memory' />
+              <FieldHelp content='Total memory the virtual machine will be equipped with. In megabytes.' text='Defined Memory' />
             </dt>
             <dd>{userFormatOfBytes(vm.getIn(['memory', 'total'])).str}</dd>
 
             <dt><span className='pficon pficon-cpu' />&nbsp;
-              <FieldHelp title='Number of CPUs' content='Total count of virtual processors the virtual machine will be equipped with.' text='CPUs' />
+              <FieldHelp content='Total count of virtual processors the virtual machine will be equipped with.' text='CPUs' />
             </dt>
             <dd>{vm.getIn(['cpu', 'vCPUs'])}</dd>
 
             <dt><span className='pficon pficon-network' />&nbsp;
-              <FieldHelp title='FQDN' content='Fully Qualified Domain Name of the virtual machine. Please note, guest agent must be installed within the virtual machine to collect this value.' text='Address' />
+              <FieldHelp content='Fully Qualified Domain Name (FQDN) of the virtual machine. Please note, guest agent must be installed within the virtual machine to collect this value.' text='Address' />
             </dt>
             <dd>{vm.get('fqdn')}</dd>
           </dl>
@@ -204,7 +204,7 @@ class VmDetail extends Component {
           <dl className={sharedStyle['vm-properties']}>
             <dt><span className='pficon pficon-screen' />
               &nbsp;
-              <FieldHelp title='Consoles' content={consolesHelp} text='Consoles' />
+              <FieldHelp content={consolesHelp} text='Consoles' />
               &nbsp;
               {consoleOptionsShowHide}
             </dt>
@@ -213,7 +213,7 @@ class VmDetail extends Component {
 
             <dt><span className='fa fa-database' />
               &nbsp;
-              <FieldHelp title='Disks' content='Storage connected to the virtual machines.' text='Disks' />
+              <FieldHelp content='Storage connected to the virtual machines.' text='Disks' />
               &nbsp;
               {disksShowHide}
             </dt>

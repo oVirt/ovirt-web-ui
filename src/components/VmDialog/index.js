@@ -382,7 +382,7 @@ class VmDialog extends React.Component {
           <div className={style['vm-dialog-container']}>
             <dl className={sharedStyle['vm-properties']}>
               <dt>
-                <FieldHelp title='Name' content='Unique name of the virtual machine.' text='Name' />
+                <FieldHelp content='Unique name of the virtual machine.' text='Name' />
               </dt>
               <dd>
                 <input
@@ -395,7 +395,7 @@ class VmDialog extends React.Component {
               </dd>
 
               <dt>
-                <FieldHelp title='Description' content='Optional user description of the virtual machine.' text='Description' />
+                <FieldHelp content='Optional user description of the virtual machine.' text='Description' />
               </dt>
               <dd>
                 <input
@@ -408,7 +408,7 @@ class VmDialog extends React.Component {
               </dd>
 
               <dt>
-                <FieldHelp title='Cluster' content='Group of hosts the virtual machine can be running on.' text='Cluster' />
+                <FieldHelp content='Group of hosts the virtual machine can be running on.' text='Cluster' />
               </dt>
               <dd>
                 <select
@@ -424,7 +424,7 @@ class VmDialog extends React.Component {
               </dd>
 
               <dt>
-                <FieldHelp title='Template' content='Contains the configuration and disks which will be used to create this virtual machine. Please customize as needed.' text='Template' />
+                <FieldHelp content='Contains the configuration and disks which will be used to create this virtual machine. Please customize as needed.' text='Template' />
               </dt>
               <dd>
                 <select
@@ -440,7 +440,7 @@ class VmDialog extends React.Component {
               </dd>
 
               <dt>
-                <FieldHelp title='Operating System' content='Operating system installed on the virtual machine.' text='Operating System' />
+                <FieldHelp content='Operating system installed on the virtual machine.' text='Operating System' />
               </dt>
               <dd>
                 <select
@@ -458,7 +458,7 @@ class VmDialog extends React.Component {
               <dt>
                 <span className='pficon pficon-memory' />
                 &nbsp;
-                <FieldHelp title='Memory' content='Total memory the virtual machine will be equipped with. In megabytes.' text='Defined Memory' />
+                <FieldHelp content='Total memory the virtual machine will be equipped with. In megabytes.' text='Defined Memory' />
               </dt>
               <dd>
                 <input
@@ -475,7 +475,7 @@ class VmDialog extends React.Component {
               <dt>
                 <span className='pficon pficon-cpu' />
                 &nbsp;
-                <FieldHelp title='Number of CPUs' content='Total count of virtual processors the virtual machine will be equipped with.' text='CPUs' />
+                <FieldHelp content='Total count of virtual processors the virtual machine will be equipped with.' text='CPUs' />
               </dt>
               <dd>
                 <input
