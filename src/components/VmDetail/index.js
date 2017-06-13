@@ -122,25 +122,25 @@ class VmDetail extends Component {
 
     let optionsJS = options.hasIn(['options', 'consoleOptions', vm.get('id')]) ? options.getIn(['options', 'consoleOptions', vm.get('id')]).toJS() : {}
 
-    const consoleOptionsIconClass = this.state.openConsoleSettings ? 'glyphicon-menu-up' : 'glyphicon-menu-down'
+    const consoleOptionsIconClass = this.state.openConsoleSettings ? 'glyphicon-menu-down' : 'glyphicon-menu-right'
     const consoleOptionsShowHide = (
       <small>
-        (<a href='#' onClick={this.consoleSettings}>
-          <i className={`glyphicon ${consoleOptionsIconClass}`} />&nbsp;
+        <a href='#' onClick={this.consoleSettings}>
+          <i className={`glyphicon ${consoleOptionsIconClass} ${style['show-hide-arrow']}`} />&nbsp;
           {this.state.openConsoleSettings ? 'hide' : 'show'}
-        </a>)
+        </a>
       </small>)
 
-    const disksIconClass = this.state.renderDisks ? 'glyphicon-menu-up' : 'glyphicon-menu-down'
+    const disksIconClass = this.state.renderDisks ? 'glyphicon-menu-down' : 'glyphicon-menu-right'
     const disksShowHide = (
       <small>
-        ({hasDisks
+        {hasDisks
         ? (<a href='#' onClick={onToggleRenderDisks}>
-          <i className={`glyphicon ${disksIconClass}`} />&nbsp;
+          <i className={`glyphicon ${disksIconClass} ${style['show-hide-arrow']}`} />&nbsp;
           {this.state.renderDisks ? 'hide' : 'show'}
         </a>)
         : 'no disks'
-      })
+      }
       </small>
     )
 

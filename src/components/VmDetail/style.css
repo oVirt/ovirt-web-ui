@@ -42,3 +42,8 @@
 .header {
     padding-bottom: 15px;
 }
+
+.show-hide-arrow {
+    font-size: small;
+    margin-left: 1em;
+}
