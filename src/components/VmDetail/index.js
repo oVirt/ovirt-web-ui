@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
 
+import AppConfiguration from '../../config'
+
 import style from './style.css'
 import sharedStyle from '../sharedStyle.css'
 
@@ -142,6 +144,12 @@ class VmDetail extends Component {
       </small>
     )
 
+    const consolesHelp = (
+      <div>
+        <p>Graphics Console of the virtual machine.</p>
+        <p>Please refer to <a href={AppConfiguration.consoleClientResourcesURL} target='_blank'>documentation</a> for more information.</p>
+      </div>
+    )
     return (
       <DetailContainer>
         <h1 className={style['header']}>
@@ -151,54 +159,65 @@ class VmDetail extends Component {
         <LastMessage vmId={vm.get('id')} userMessages={userMessages} />
         <div className={style['vm-detail-container']}>
           <dl className={sharedStyle['vm-properties']}>
-            <dt>State
-              <FieldHelp title='State' content='The actual state the virtual machine is in.' />
+            <dt>
+              <FieldHelp title='State' content='The actual state the virtual machine is in.' text='State' />
             </dt>
             <dd><VmStatusIcon state={vm.get('status')} />&nbsp;{vm.get('status')}
             </dd>
 
-            <dt>Description
-              <FieldHelp title='Description' content='Optional user description of the virtual machine.' />
+            <dt>
+              <FieldHelp title='Description' content='Optional user description of the virtual machine.' text='Description' />
             </dt>
             <dd>{vm.get('description')}</dd>
 
-            <dt>Cluster
-              <FieldHelp title='Cluster' content='Group of hosts the virtual machine can be running on.' />
+            <dt>
+              <FieldHelp title='Cluster' content='Group of hosts the virtual machine can be running on.' text='Cluster' />
             </dt>
             <dd>{cluster ? cluster.get('name') : ''}</dd>
 
-            <dt>Template
-              <FieldHelp title='Template' content='Contains the configuration and disks which will be used to create this virtual machine. Please customize as needed.' />
+            <dt>
+              <FieldHelp title='Template' content='Contains the configuration and disks which will be used to create this virtual machine. Please customize as needed.' text='Template' />
             </dt>
             <dd>{template ? templateNameRenderer(template) : ''}</dd>
 
-            <dt>Operating System
-              <FieldHelp title='Operating System' content='Operating system installed on the virtual machine.' />
+            <dt>
+              <FieldHelp title='Operating System' content='Operating system installed on the virtual machine.' text='Operating System' />
             </dt>
             <dd>{os ? os.get('description') : vm.getIn(['os', 'type'])}</dd>
 
-            <dt><span className='pficon pficon-memory' />&nbsp;Defined Memory
-              <FieldHelp title='Memory' content='Total memory the virtual machine will be equipped with. In megabytes.' />
+            <dt><span className='pficon pficon-memory' />&nbsp;
+              <FieldHelp title='Memory' content='Total memory the virtual machine will be equipped with. In megabytes.' text='Defined Memory' />
             </dt>
             <dd>{userFormatOfBytes(vm.getIn(['memory', 'total'])).str}</dd>
 
-            <dt><span className='pficon pficon-cpu' />&nbsp;CPUs
-              <FieldHelp title='Number of CPUs' content='Total count of virtual processors the virtual machine will be equipped with.' />
+            <dt><span className='pficon pficon-cpu' />&nbsp;
+              <FieldHelp title='Number of CPUs' content='Total count of virtual processors the virtual machine will be equipped with.' text='CPUs' />
             </dt>
             <dd>{vm.getIn(['cpu', 'vCPUs'])}</dd>
 
-            <dt><span className='pficon pficon-network' />&nbsp;Address
-              <FieldHelp title='FQDN' content='Fully Qualified Domain Name of the virtual machine. Please not, guest agent must be installed within the virtual machine to collect this value.' />
+            <dt><span className='pficon pficon-network' />&nbsp;
+              <FieldHelp title='FQDN' content='Fully Qualified Domain Name of the virtual machine. Please note, guest agent must be installed within the virtual machine to collect this value.' text='Address' />
             </dt>
             <dd>{vm.get('fqdn')}</dd>
           </dl>
 
           <dl className={sharedStyle['vm-properties']}>
-            <dt><span className='pficon pficon-screen' /> Console&nbsp;{consoleOptionsShowHide}</dt>
+            <dt><span className='pficon pficon-screen' />
+              &nbsp;
+              <FieldHelp title='Consoles' content={consolesHelp} text='Consoles' />
+              &nbsp;
+              {consoleOptionsShowHide}
+            </dt>
             <VmConsoles vm={vm} onConsole={onConsole} onRDP={onRDP} />
             <ConsoleOptions options={optionsJS} onSave={onConsoleOptionsSave} open={this.state.openConsoleSettings} />
-            <dt><span className='fa fa-database' /> Disks&nbsp;{disksShowHide}</dt>
-            <dd><VmDisks disks={disks} open={this.state.renderDisks} /></dd>
+
+            <dt><span className='fa fa-database' />
+              &nbsp;
+              <FieldHelp title='Disks' content='Storage connected to the virtual machines.' text='Disks' />
+              &nbsp;
+              {disksShowHide}
+            </dt>
+            <dd>{disksElement}</dd>
           </dl>
         </div>
       </DetailContainer>

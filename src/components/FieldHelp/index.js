@@ -10,8 +10,9 @@ import style from './style.css'
  * Text (help) is displayed on click.
  */
 const FieldHelp = ({
-  title,
-  content,
+  title, // help title
+  content, // help content
+  text, // field description
   tooltip = 'Click for help',
   }) => {
   const popover = (
@@ -21,15 +22,16 @@ const FieldHelp = ({
 
   return (
     <OverlayTrigger trigger='click' rootClose placement='top' overlay={popover}>
-      <a role='button' title={tooltip} className={style['field-help']}>
-        <span className='fa fa-info-circle' />
-      </a>
+      <div role='button' title={tooltip} className={style['field-text']}>
+        {text}
+      </div>
     </OverlayTrigger>
   )
 }
 FieldHelp.propTypes = {
   title: PropTypes.string.isRequired,
   content: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  text: PropTypes.string.isRequired,
   tooltip: PropTypes.string,
 }
 

@@ -8,6 +8,8 @@ const AppConfiguration = {
   debug: true,
   applicationContext: '',
   applicationURL: '/',
+
+  consoleClientResourcesURL: 'https://www.ovirt.org/documentation/admin-guide/virt/console-client-resources/',
 }
 
 export function readConfiguration () {
