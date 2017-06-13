@@ -50,28 +50,49 @@ LastMessage.propTypes = {
 }
 
 const VmConsoles = ({ vm, onConsole, onRDP }) => {
+  if (canConsole(vm.get('status'))) {
+    return (
+      <dd>
+        {
+          vm.get('consoles').map(c => (
+            <a
+              href='#'
+              data-toggle='tooltip'
+              data-placement='left'
+              title={`Open ${c.get('protocol').toUpperCase()} console`}
+              key={c.get('id')}
+              onClick={() => onConsole({ vmId: vm.get('id'), consoleId: c.get('id') })}
+              className={style['left-delimiter']}>
+              {c.get('protocol').toUpperCase()}
+            </a>))
+        }
+
+        {
+          isWindows(vm.getIn(['os', 'type']))
+            ? (<a href='#' key={vm.get('id')} onClick={onRDP} className={style['left-delimiter']}>RDP</a>) : null
+        }
+      </dd>
+    )
+  }
+
   return (
     <dd>
-      {canConsole(vm.get('status')) ? vm.get('consoles').map(c => (
-        <a
-          href='#'
-          data-toggle='tooltip'
-          data-placement='left'
-          title={`Open ${c.get('protocol').toUpperCase()} console`}
-          key={c.get('id')}
-          onClick={() => onConsole({ vmId: vm.get('id'), consoleId: c.get('id') })}
-          className={style['left-delimiter']}
-          >
-          {c.get('protocol').toUpperCase()}
-        </a>
-      )) : ''}
-      {
-        canConsole(vm.get('status')) && isWindows(vm.getIn(['os', 'type']))
-        ? (<a href='#' key={vm.get('id')} onClick={onRDP} className={style['left-delimiter']}>
-          RDP
-        </a>)
-        : ''
-      }
+      <span>
+        {
+          vm.get('consoles').map(c => (
+            <span
+              className={style['console-vm-not-running']}
+              key={c.get('id')}>
+              {c.get('protocol').toUpperCase()}
+            </span>
+          ))
+        }
+
+        {
+          isWindows(vm.getIn(['os', 'type']))
+            ? (<span onClick={onRDP} className={style['console-vm-not-running']}>RDP</span>) : null
+        }
+      </span>
     </dd>
   )
 }
@@ -122,12 +143,10 @@ class VmDetail extends Component {
 
     let optionsJS = options.hasIn(['options', 'consoleOptions', vm.get('id')]) ? options.getIn(['options', 'consoleOptions', vm.get('id')]).toJS() : {}
 
-    const consoleOptionsIconClass = this.state.openConsoleSettings ? 'glyphicon-menu-down' : 'glyphicon-menu-right'
     const consoleOptionsShowHide = (
       <small>
         <a href='#' onClick={this.consoleSettings}>
-          <i className={`glyphicon ${consoleOptionsIconClass} ${style['show-hide-arrow']}`} />&nbsp;
-          {this.state.openConsoleSettings ? 'hide' : 'show'}
+          <i className={`pficon pficon-equalizer`} />&nbsp;
         </a>
       </small>)
 
@@ -146,7 +165,7 @@ class VmDetail extends Component {
 
     const consolesHelp = (
       <div>
-        <p>Graphics Console of the virtual machine.</p>
+        <p>If the virtual machines is running, click to access it's Graphics Console.</p>
         <p>Please refer to <a href={AppConfiguration.consoleClientResourcesURL} target='_blank'>documentation</a> for more information.</p>
       </div>
     )

@@ -47,3 +47,13 @@
     font-size: small;
     margin-left: 1em;
 }
+
+.console-vm-not-running {
+    color: #888;
+    padding: 0 13px 0 0;
+}
+
+.console-vm-not-running + .console-vm-not-running {
+    padding-left: 13px;
+    border-left: 1px solid #d1d1d1;
+}
