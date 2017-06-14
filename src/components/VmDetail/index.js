@@ -147,7 +147,7 @@ class VmDetail extends Component {
     const consoleOptionsShowHide = (
       <small>
         <a href='#' onClick={this.consoleSettings}>
-          <i className={`pficon pficon-equalizer`} />&nbsp;
+          <i className={`pficon pficon-edit`} />&nbsp;
         </a>
       </small>)
 
