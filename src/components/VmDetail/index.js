@@ -21,7 +21,8 @@ import Time from '../Time'
 import FieldHelp from '../FieldHelp/index'
 import DetailContainer from '../DetailContainer'
 import ConsoleOptions from '../ConsoleOptions/index'
-import { canConsole, userFormatOfBytes, VmIcon, VmDisks, VmStatusIcon } from 'ovirt-ui-components'
+import VmDisks from '../VmDisks/index'
+import { canConsole, userFormatOfBytes, VmIcon, VmStatusIcon } from 'ovirt-ui-components'
 import Selectors from '../../selectors'
 
 const LastMessage = ({ vmId, userMessages }) => {
@@ -236,7 +237,7 @@ class VmDetail extends Component {
               &nbsp;
               {disksShowHide}
             </dt>
-            <dd>{disksElement}</dd>
+            {disksElement}
           </dl>
         </div>
       </DetailContainer>

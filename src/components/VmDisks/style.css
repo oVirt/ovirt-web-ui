@@ -1,0 +1,27 @@
+.disks-list {
+    /*
+        list-style-type: none;
+        padding: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.25s ease-out;
+        */
+    transition: height 1s;
+/*    height: 0px; */
+    overflow: hidden;
+    width: 100%;
+}
+
+.disks-ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.open-disks {
+    /*    max-height: 500px; */
+    transition: max-height 1s ease-in;
+}
+
+.smaller {
+    font-size: 75%;
+}
