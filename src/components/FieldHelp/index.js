@@ -29,9 +29,9 @@ const FieldHelp = ({
   )
 }
 FieldHelp.propTypes = {
-  title: PropTypes.string.isRequired,
+  title: PropTypes.string,
   content: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-  text: PropTypes.string.isRequired,
+  text: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   tooltip: PropTypes.string,
 }
 

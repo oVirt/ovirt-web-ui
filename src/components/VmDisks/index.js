@@ -2,6 +2,8 @@ import React, { PropTypes } from 'react'
 
 import { userFormatOfBytes } from 'ovirt-ui-components'
 
+import FieldHelp from '../FieldHelp/index'
+
 import style from './style.css'
 
 const VmDisk = ({ disk }) => {
@@ -11,11 +13,23 @@ const VmDisk = ({ disk }) => {
   const provSize = userFormatOfBytes(disk.get('provisionedSize'))
   const actSize = userFormatOfBytes(disk.get('actualSize'), provSize.suffix)
 
+  const capacityInfoContent = (
+    <div>
+      Used: {actSize.str}
+      <br />
+      Total: {provSize.str}
+    </div>
+  )
+  const capacityInfo = (<FieldHelp
+    title='Disk Capacity'
+    content={capacityInfoContent}
+    text={<span className={style['light']}>({actSize.number}/{provSize.str} used)</span>} />)
+
   return (
     <li>
       <span>
         {disk.get('name')}&nbsp;
-        <span className={style['light']}>({actSize.number}/{provSize.str} used)</span>&nbsp;
+        {capacityInfo}
         {bootable}
         {inactive}
       </span>
