@@ -64,7 +64,7 @@ class VmDisks extends Component {
     }
 */
 
-    let disksToRender = disks.sort((a, b) => a.get('name').localeCompare(b.get('name')))
+    let disksToRender = disks.sort((a, b) => a.get('name').localeCompare(b.get('name')) - (a.get('bootable') ? 1000 : 0))
     if (!this.state.renderMore) {
       disksToRender = disksToRender.slice(0, 2)
     }

@@ -51,11 +51,12 @@ LastMessage.propTypes = {
 }
 
 const VmConsoles = ({ vm, onConsole, onRDP }) => {
+  const vmConsoles = vm.get('consoles').valueSeq()
   if (canConsole(vm.get('status'))) {
     return (
       <dd>
         {
-          vm.get('consoles').map(c => (
+          vmConsoles.map(c => (
             <a
               href='#'
               data-toggle='tooltip'
@@ -80,7 +81,7 @@ const VmConsoles = ({ vm, onConsole, onRDP }) => {
     <dd>
       <span>
         {
-          vm.get('consoles').map(c => (
+          vmConsoles.map(c => (
             <span
               className={style['console-vm-not-running']}
               key={c.get('id')}>
