@@ -39,15 +39,17 @@ class ConsoleOptions extends React.Component {
           <dd>
             <Switch
               animate
+              bsSize='mini'
               value={!!this.props.options.autoConnect}
               onChange={this.onChangeOptions('autoConnect')}
-            />
+              />
           </dd>
 
           <dt className={style['console-option-description']}>Fullscreen</dt>
           <dd>
             <Switch
               animate
+              bsSize='mini'
               value={!!this.props.options.fullscreen}
               onChange={this.onChangeOptions('fullscreen')}
             />
@@ -57,6 +59,7 @@ class ConsoleOptions extends React.Component {
           <dd>
             <Switch
               animate
+              bsSize='mini'
               value={!!this.props.options.ctrlAltDelToEnd}
               onChange={this.onChangeOptions('ctrlAltDelToEnd')}
             />
