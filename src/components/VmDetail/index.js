@@ -138,9 +138,8 @@ class VmDetail extends Component {
     const cluster = Selectors.getClusterById(vm.getIn(['cluster', 'id']))
     const template = Selectors.getTemplateById(vm.getIn(['template', 'id']))
 
-    const onToggleRenderDisks = () => { this.setState({ renderDisks: !this.state.renderDisks }) }
+//    const onToggleRenderDisks = () => { this.setState({ renderDisks: !this.state.renderDisks }) }
     const disksElement = (<VmDisks disks={disks} open={this.state.renderDisks} />)
-    const hasDisks = disks.size > 0
 
     let optionsJS = options.hasIn(['options', 'consoleOptions', vm.get('id')]) ? options.getIn(['options', 'consoleOptions', vm.get('id')]).toJS() : {}
 
@@ -151,19 +150,25 @@ class VmDetail extends Component {
         </a>
       </small>)
 
-    const disksIconClass = this.state.renderDisks ? 'glyphicon-menu-down' : 'glyphicon-menu-right'
-    const disksShowHide = (
-      <small>
-        {hasDisks
-        ? (<a href='#' onClick={onToggleRenderDisks}>
-          <i className={`glyphicon ${disksIconClass} ${style['show-hide-arrow']}`} />&nbsp;
-          {this.state.renderDisks ? 'hide' : 'show'}
-        </a>)
-        : 'no disks'
-      }
-      </small>
-    )
+    const hasDisks = disks.size > 0
+    const noDisks = hasDisks || (<small>no disks</small>)
 
+    /* TODO: uncomment following and add {disksShowHide} to rendering bellow to have show/hide working (might be needed e.g. with networks)
+        const onToggleRenderDisks = () => { this.setState({ renderDisks: !this.state.renderDisks }) }
+
+        const disksIconClass = this.state.renderDisks ? 'glyphicon-menu-down' : 'glyphicon-menu-right'
+        const disksShowHide = (
+          <small>
+            {hasDisks
+            ? (<a href='#' onClick={onToggleRenderDisks}>
+              <i className={`glyphicon ${disksIconClass} ${style['show-hide-arrow']}`} />&nbsp;
+              {this.state.renderDisks ? 'hide' : 'show'}
+            </a>)
+            : 'no disks'
+          }
+          </small>
+        )
+    */
     const consolesHelp = (
       <div>
         <p>If the virtual machines is running, click to access it's Graphics Console.</p>
@@ -235,8 +240,8 @@ class VmDetail extends Component {
               &nbsp;
               <FieldHelp content='Storage connected to the virtual machines.' text='Disks' />
               &nbsp;
-              {disksShowHide}
             </dt>
+            {noDisks}
             {disksElement}
           </dl>
         </div>
