@@ -13,10 +13,12 @@ const VmDisk = ({ disk }) => {
 
   return (
     <li>
-      <b>{disk.get('name')}</b>&nbsp;
-      ({actSize.number} used from {provSize.str})&nbsp;
-      {bootable}
-      {inactive}
+      <span>
+        {disk.get('name')}&nbsp;
+        <span className={style['light']}>({actSize.number}/{provSize.str} used)</span>&nbsp;
+        {bootable}
+        {inactive}
+      </span>
     </li>
   )
 }
@@ -33,7 +35,7 @@ const VmDisks = ({ disks, open }) => {
 
     return (
       <div className={classes}>
-        <ul className='disks-ul'>
+        <ul className={style['disks-ul']}>
           {disks.map(disk => <VmDisk disk={disk} key={disk.get('id')} />)}
         </ul>
       </div>

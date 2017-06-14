@@ -139,7 +139,7 @@ class VmDetail extends Component {
     const template = Selectors.getTemplateById(vm.getIn(['template', 'id']))
 
     const onToggleRenderDisks = () => { this.setState({ renderDisks: !this.state.renderDisks }) }
-    // const disksElement = this.state.renderDisks ? (<VmDisks disks={disks} />) : ''
+    const disksElement = (<VmDisks disks={disks} open={this.state.renderDisks} />)
     const hasDisks = disks.size > 0
 
     let optionsJS = options.hasIn(['options', 'consoleOptions', vm.get('id')]) ? options.getIn(['options', 'consoleOptions', vm.get('id')]).toJS() : {}
