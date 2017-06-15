@@ -8,6 +8,7 @@ import style from './style.css'
 import Time from '../Time'
 
 import { clearUserMessages } from '../../actions/vm'
+import { hrefWithoutHistory } from '../../helpers'
 
 const UserMessage = ({ record }) => {
   // TODO: render record.type
@@ -67,7 +68,7 @@ class VmUserMessages extends React.Component {
 
     return (
       <li className='dropdown'>
-        <a href='#' onClick={onToggle}>
+        <a href='#' onClick={hrefWithoutHistory(onToggle)}>
           <div className={isUnread(userMessages) ? style['usermsgs-unread'] : style['usermsgs-allread']}>
             <span className='pficon pficon-info' />&nbsp;Messages
           </div>
@@ -82,8 +83,8 @@ class VmUserMessages extends React.Component {
           <ContactAdminInfo userMessages={userMessages} />
 
           <div className='footer'>
-            <a href='#' onClick={onClearMessages}>Clear Messages</a>
-            <a href='#' onClick={onToggle} className={style['close-button']}>Close</a>
+            <a href='#' onClick={hrefWithoutHistory(onClearMessages)}>Clear Messages</a>
+            <a href='#' onClick={hrefWithoutHistory(onToggle)} className={style['close-button']}>Close</a>
           </div>
         </div>
       </li>

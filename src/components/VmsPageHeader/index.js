@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import ContainerFluid from '../ContainerFluid'
 import VmUserMessages from '../VmUserMessages'
 import UserMenu from './UserMenu'
+import { hrefWithoutHistory } from '../../helpers'
 
 import { refresh } from '../../actions/vm'
 
@@ -24,7 +25,7 @@ const VmsPageHeader = ({ title, onRefresh }) => {
 
         <ul className='nav navbar-nav navbar-utility'>
           <li>
-            <a href='#' onClick={onRefresh}>
+            <a href='#' onClick={hrefWithoutHistory(onRefresh)}>
               <span className='fa fa-refresh' />&nbsp;Refresh
             </a>
           </li>
