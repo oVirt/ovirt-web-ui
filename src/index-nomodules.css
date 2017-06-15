@@ -50,10 +50,9 @@ div.toolbar-pf {
 
 .bootstrap-switch-container .bootstrap-switch-label {
   height: 27px !important;
-  margin-bottom: -8px !important;
+  margin-bottom: -9px !important;
 }
 
 .bootstrap-switch-handle-on {
-  padding: 4px !important;
+  padding: 5px !important;
 }
-

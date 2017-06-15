@@ -22,13 +22,14 @@ const VmDetailToolbarConnected = connect(
   })
 )(VmDetailToolbar)
 
+// --------------------------
+
 const PoolDetailToolbar = ({ match, vms }) => {
   if (vms.getIn(['pools', match.params.id])) {
     return (<VmActions vm={vms.getIn(['pools', match.params.id, 'vm'])} key='vmaction' pool={vms.getIn(['pools', match.params.id])} isPool />)
   }
   return null
 }
-
 PoolDetailToolbar.propTypes = {
   vms: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
@@ -40,4 +41,9 @@ const PoolDetailToolbarConnected = connect(
   })
 )(PoolDetailToolbar)
 
-export { VmDetailToolbarConnected as VmDetailToolbar, PoolDetailToolbarConnected as PoolDetailToolbar }
+// --------------------------
+
+export {
+  VmDetailToolbarConnected as VmDetailToolbar,
+  PoolDetailToolbarConnected as PoolDetailToolbar,
+}

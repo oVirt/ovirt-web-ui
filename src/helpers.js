@@ -111,3 +111,13 @@ export function generateUnique (prefix) {
 export function isWindows (name) {
   return name.toLowerCase().indexOf('windows') > -1
 }
+
+export function templateNameRenderer (template) {
+  const version = template.get('version')
+  const versionName = version.get('name')
+  const templateName = template.get('name')
+
+  return versionName
+    ? (`${templateName} (${versionName})`)
+    : templateName
+}

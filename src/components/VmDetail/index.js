@@ -3,7 +3,10 @@ import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
 
+import AppConfiguration from '../../config'
+
 import style from './style.css'
+import sharedStyle from '../sharedStyle.css'
 
 import {
   downloadConsole,
@@ -12,12 +15,14 @@ import {
   getRDP,
 } from '../../actions/index'
 
-import { isWindows } from '../../helpers'
+import { isWindows, templateNameRenderer } from '../../helpers'
 
 import Time from '../Time'
+import FieldHelp from '../FieldHelp/index'
 import DetailContainer from '../DetailContainer'
 import ConsoleOptions from '../ConsoleOptions/index'
-import { canConsole, userFormatOfBytes, VmIcon, VmDisks, VmStatusIcon } from 'ovirt-ui-components'
+import VmDisks from '../VmDisks/index'
+import { canConsole, userFormatOfBytes, VmIcon, VmStatusIcon } from 'ovirt-ui-components'
 import Selectors from '../../selectors'
 
 const LastMessage = ({ vmId, userMessages }) => {
@@ -46,28 +51,50 @@ LastMessage.propTypes = {
 }
 
 const VmConsoles = ({ vm, onConsole, onRDP }) => {
+  const vmConsoles = vm.get('consoles').valueSeq()
+  if (canConsole(vm.get('status'))) {
+    return (
+      <dd>
+        {
+          vmConsoles.map(c => (
+            <a
+              href='#'
+              data-toggle='tooltip'
+              data-placement='left'
+              title={`Open ${c.get('protocol').toUpperCase()} console`}
+              key={c.get('id')}
+              onClick={() => onConsole({ vmId: vm.get('id'), consoleId: c.get('id') })}
+              className={style['left-delimiter']}>
+              {c.get('protocol').toUpperCase()}
+            </a>))
+        }
+
+        {
+          isWindows(vm.getIn(['os', 'type']))
+            ? (<a href='#' key={vm.get('id')} onClick={onRDP} className={style['left-delimiter']}>RDP</a>) : null
+        }
+      </dd>
+    )
+  }
+
   return (
     <dd>
-      {canConsole(vm.get('status')) ? vm.get('consoles').map(c => (
-        <a
-          href='#'
-          data-toggle='tooltip'
-          data-placement='left'
-          title={`Open ${c.get('protocol').toUpperCase()} console`}
-          key={c.get('id')}
-          onClick={() => onConsole({ vmId: vm.get('id'), consoleId: c.get('id') })}
-          className={style['left-delimiter']}
-          >
-          {c.get('protocol').toUpperCase()}
-        </a>
-      )) : ''}
-      {
-        canConsole(vm.get('status')) && isWindows(vm.getIn(['os', 'type']))
-        ? (<a href='#' key={vm.get('id')} onClick={onRDP} className={style['left-delimiter']}>
-          RDP
-        </a>)
-        : ''
-      }
+      <span>
+        {
+          vmConsoles.map(c => (
+            <span
+              className={style['console-vm-not-running']}
+              key={c.get('id')}>
+              {c.get('protocol').toUpperCase()}
+            </span>
+          ))
+        }
+
+        {
+          isWindows(vm.getIn(['os', 'type']))
+            ? (<span onClick={onRDP} className={style['console-vm-not-running']}>RDP</span>) : null
+        }
+      </span>
     </dd>
   )
 }
@@ -109,63 +136,114 @@ class VmDetail extends Component {
     const icon = icons.get(iconId)
     const disks = vm.get('disks')
     const os = Selectors.getOperatingSystemByName(vm.getIn(['os', 'type']))
+    const cluster = Selectors.getClusterById(vm.getIn(['cluster', 'id']))
+    const template = Selectors.getTemplateById(vm.getIn(['template', 'id']))
 
-    const onToggleRenderDisks = () => { this.setState({ renderDisks: !this.state.renderDisks }) }
-    // const disksElement = this.state.renderDisks ? (<VmDisks disks={disks} />) : ''
-    const hasDisks = disks.size > 0
+//    const onToggleRenderDisks = () => { this.setState({ renderDisks: !this.state.renderDisks }) }
+    const disksElement = (<VmDisks disks={disks} open={this.state.renderDisks} />)
 
     let optionsJS = options.hasIn(['options', 'consoleOptions', vm.get('id')]) ? options.getIn(['options', 'consoleOptions', vm.get('id')]).toJS() : {}
 
-    const consoleOptionsIconClass = this.state.openConsoleSettings ? 'glyphicon-menu-up' : 'glyphicon-menu-down'
     const consoleOptionsShowHide = (
       <small>
-        (<a href='#' onClick={this.consoleSettings}>
-          <i className={`glyphicon ${consoleOptionsIconClass}`} />&nbsp;
-          {this.state.openConsoleSettings ? 'hide' : 'show'}
-        </a>)
+        <a href='#' onClick={this.consoleSettings}>
+          <i className={`pficon pficon-edit`} />&nbsp;
+        </a>
       </small>)
 
-    const disksIconClass = this.state.renderDisks ? 'glyphicon-menu-up' : 'glyphicon-menu-down'
-    const disksShowHide = (
-      <small>
-        ({hasDisks
-        ? (<a href='#' onClick={onToggleRenderDisks}>
-          <i className={`glyphicon ${disksIconClass}`} />&nbsp;
-          {this.state.renderDisks ? 'hide' : 'show'}
-        </a>)
-        : 'no disks'
-      })
-      </small>
-    )
+    const hasDisks = disks.size > 0
+    const noDisks = hasDisks || (<small>no disks</small>)
 
+    /* TODO: uncomment following and add {disksShowHide} to rendering bellow to have show/hide working (might be needed e.g. with networks)
+        const onToggleRenderDisks = () => { this.setState({ renderDisks: !this.state.renderDisks }) }
+
+        const disksIconClass = this.state.renderDisks ? 'glyphicon-menu-down' : 'glyphicon-menu-right'
+        const disksShowHide = (
+          <small>
+            {hasDisks
+            ? (<a href='#' onClick={onToggleRenderDisks}>
+              <i className={`glyphicon ${disksIconClass} ${style['show-hide-arrow']}`} />&nbsp;
+              {this.state.renderDisks ? 'hide' : 'show'}
+            </a>)
+            : 'no disks'
+          }
+          </small>
+        )
+    */
+    const consolesHelp = (
+      <div>
+        <p>If the virtual machines is running, click to access it's Graphics Console.</p>
+        <p>Please refer to <a href={AppConfiguration.consoleClientResourcesURL} target='_blank'>documentation</a> for more information.</p>
+      </div>
+    )
     return (
       <DetailContainer>
         <h1 className={style['header']}>
-          <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' className={style['vm-detail-icon']} />
+          <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' className={sharedStyle['vm-detail-icon']} />
           &nbsp;{name}
         </h1>
         <LastMessage vmId={vm.get('id')} userMessages={userMessages} />
         <div className={style['vm-detail-container']}>
-          <dl className={style['vm-properties']}>
-            <dt>State</dt>
-            <dd><VmStatusIcon state={vm.get('status')} /> {vm.get('status')}</dd>
-            <dt>Description</dt>
+          <dl className={sharedStyle['vm-properties']}>
+            <dt>
+              <FieldHelp content='The actual state the virtual machine is in.' text='State' />
+            </dt>
+            <dd><VmStatusIcon state={vm.get('status')} />&nbsp;{vm.get('status')}
+            </dd>
+
+            <dt>
+              <FieldHelp content='Optional user description of the virtual machine.' text='Description' />
+            </dt>
             <dd>{vm.get('description')}</dd>
-            <dt>Operating System</dt>
+
+            <dt>
+              <FieldHelp content='Group of hosts the virtual machine can be running on.' text='Cluster' />
+            </dt>
+            <dd>{cluster ? cluster.get('name') : ''}</dd>
+
+            <dt>
+              <FieldHelp content='Contains the configuration and disks which will be used to create this virtual machine. Please customize as needed.' text='Template' />
+            </dt>
+            <dd>{template ? templateNameRenderer(template) : ''}</dd>
+
+            <dt>
+              <FieldHelp content='Operating system installed on the virtual machine.' text='Operating System' />
+            </dt>
             <dd>{os ? os.get('description') : vm.getIn(['os', 'type'])}</dd>
-            <dt><span className='pficon pficon-memory' /> Defined Memory</dt>
+
+            <dt><span className='pficon pficon-memory' />&nbsp;
+              <FieldHelp content='Total memory the virtual machine will be equipped with. In megabytes.' text='Defined Memory' />
+            </dt>
             <dd>{userFormatOfBytes(vm.getIn(['memory', 'total'])).str}</dd>
-            <dt><span className='pficon pficon-cpu' /> CPUs</dt>
+
+            <dt><span className='pficon pficon-cpu' />&nbsp;
+              <FieldHelp content='Total count of virtual processors the virtual machine will be equipped with.' text='CPUs' />
+            </dt>
             <dd>{vm.getIn(['cpu', 'vCPUs'])}</dd>
-            <dt><span className='pficon pficon-network' /> Address</dt>
+
+            <dt><span className='pficon pficon-network' />&nbsp;
+              <FieldHelp content='Fully Qualified Domain Name (FQDN) of the virtual machine. Please note, guest agent must be installed within the virtual machine to collect this value.' text='Address' />
+            </dt>
             <dd>{vm.get('fqdn')}</dd>
           </dl>
-          <dl className={style['vm-properties']}>
-            <dt><span className='pficon pficon-screen' /> Console&nbsp;{consoleOptionsShowHide}</dt>
+
+          <dl className={sharedStyle['vm-properties']}>
+            <dt><span className='pficon pficon-screen' />
+              &nbsp;
+              <FieldHelp content={consolesHelp} text='Consoles' />
+              &nbsp;
+              {consoleOptionsShowHide}
+            </dt>
             <VmConsoles vm={vm} onConsole={onConsole} onRDP={onRDP} />
             <ConsoleOptions options={optionsJS} onSave={onConsoleOptionsSave} open={this.state.openConsoleSettings} />
-            <dt><span className='fa fa-database' /> Disks&nbsp;{disksShowHide}</dt>
-            <dd><VmDisks disks={disks} open={this.state.renderDisks} /></dd>
+
+            <dt><span className='fa fa-database' />
+              &nbsp;
+              <FieldHelp content='Storage connected to the virtual machines.' text='Disks' />
+              &nbsp;
+            </dt>
+            {noDisks}
+            {disksElement}
           </dl>
         </div>
       </DetailContainer>

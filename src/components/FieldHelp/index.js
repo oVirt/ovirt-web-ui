@@ -3,13 +3,16 @@ import PropTypes from 'prop-types'
 
 import { OverlayTrigger, Popover } from 'react-bootstrap'
 
+import style from './style.css'
+
 /**
  * Renders small blue info icon.
  * Text (help) is displayed on click.
  */
 const FieldHelp = ({
-  title,
-  content,
+  title, // help title
+  content, // help content
+  text, // field description
   tooltip = 'Click for help',
   }) => {
   const popover = (
@@ -19,15 +22,16 @@ const FieldHelp = ({
 
   return (
     <OverlayTrigger trigger='click' rootClose placement='top' overlay={popover}>
-      <a role='button' title={tooltip}>
-        <span className='fa fa-info-circle' />
-      </a>
+      <div role='button' title={tooltip} className={style['field-text']}>
+        {text}
+      </div>
     </OverlayTrigger>
   )
 }
 FieldHelp.propTypes = {
-  title: PropTypes.string.isRequired,
+  title: PropTypes.string,
   content: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  text: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   tooltip: PropTypes.string,
 }
 

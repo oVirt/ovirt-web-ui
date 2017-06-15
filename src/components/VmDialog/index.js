@@ -4,15 +4,17 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link, Redirect, Prompt } from 'react-router-dom'
 
-import { logDebug, generateUnique } from '../../helpers'
+import { logDebug, generateUnique, templateNameRenderer } from '../../helpers'
 
 import style from './style.css'
+import sharedStyle from '../sharedStyle.css'
 
-import LabeledSelect from '../LabeledSelect'
-import LabeledTextField from '../LabeledTextField'
 import DetailContainer from '../DetailContainer'
 import ErrorAlert from '../ErrorAlert'
-import FieldHelp from '../FieldHelp'
+
+import FieldHelp from '../FieldHelp/index'
+
+import { VmIcon } from 'ovirt-ui-components'
 
 import Selectors from '../../selectors'
 import {
@@ -117,7 +119,6 @@ class VmDialog extends React.Component {
   }
 
   getLatestUserMessage () {
-    console.log('actionUniqueId: ', actionUniqueId)
     const { actionUniqueId } = this.state
     const filtered = this.props.userMessages
       .get('records')
@@ -302,24 +303,26 @@ class VmDialog extends React.Component {
   }
 
   initDefaults () {
+    const { clusters, templates, operatingSystems } = this.props
+
     const stateChange = {}
     const defaultClusterName = 'Default'
 
     if (!this.getCluster()) {
-      const clustersList = this.props.clusters.get('clusters').toList()
+      const clustersList = clusters.get('clusters').toList()
       const def = (clustersList.filter(item => item.get('name') === defaultClusterName).first()) || clustersList.first()
       stateChange.clusterId = def ? def.get('id') : undefined
       logDebug(`VmDialog initDefaults(): Setting initial value for clusterId = ${this.state.clusterId} to ${stateChange.clusterId}`)
     }
 
     if (!this.getTemplate()) {
-      const def = this.props.templates.getIn(['templates', zeroUID]) || this.props.templates.get('templates').toList().first()
+      const def = templates.getIn(['templates', zeroUID]) || this.props.templates.get('templates').toList().first()
       stateChange.templateId = def ? def.get('id') : undefined
       logDebug(`VmDialog initDefaults(): Setting initial value for templateId = ${this.state.templateId} to ${stateChange.templateId}`)
     }
 
     if (!this.getOS()) {
-      const osList = this.props.operatingSystems.get('operatingSystems').toList()
+      const osList = operatingSystems.get('operatingSystems').toList()
       const def = osList.sort((a, b) => a.get('id').localeCompare(b.get('id'))).first()
       stateChange.osId = def ? def.get('id') : undefined
       logDebug(`VmDialog initDefaults(): Setting initial value for osId = ${this.state.osId} to ${stateChange.osId}`)
@@ -329,20 +332,23 @@ class VmDialog extends React.Component {
   }
 
   render () {
-    if (this.state.saved && this.props.vmDialog.getIn(['vm', 'id'])) {
-      return (<Redirect to={`/vm/${this.props.vmDialog.getIn(['vm', 'id'])}`} />)
+    const { icons, vmDialog, clusters, templates, operatingSystems } = this.props
+    const vm = this.props.vm
+
+    if (this.state.saved && vmDialog.getIn(['vm', 'id'])) {
+      return (<Redirect to={`/vm/${vmDialog.getIn(['vm', 'id'])}`} />)
     }
 
-    const isEdit = !!this.props.vm
+    const isEdit = !!vm
 
-    const sortedClusters = sortedBy(this.props.clusters.get('clusters'), 'name')
+    const sortedClusters = sortedBy(clusters.get('clusters'), 'name')
 
-    const filteredTemplates = this.props.templates.get('templates')
+    const filteredTemplates = templates.get('templates')
       .toList()
       .filter(template => template.get('clusterId') === this.state.clusterId || !template.get('clusterId'))
     const sortedTemplates = sortedBy(filteredTemplates, 'name')
 
-    const sortedOSs = sortedBy(this.props.operatingSystems.get('operatingSystems'), 'description')
+    const sortedOSs = sortedBy(operatingSystems.get('operatingSystems'), 'description')
 
     const cluster = this.getCluster()
     const template = this.getTemplate()
@@ -350,102 +356,148 @@ class VmDialog extends React.Component {
 
     const submitText = isEdit ? 'Update VM' : 'Create VM'
 
-    const templateNameRenderer = (template) => {
-      const version = template.get('version')
-      const versionName = version.get('name')
-      const templateName = template.get('name')
+    const iconId = vm && vm.getIn(['icons', 'small', 'id'])
+    const icon = iconId && icons.get(iconId)
 
-      return versionName
-        ? (`${templateName} (${versionName})`)
-        : templateName
-    }
+    const title = isEdit ? (
+      <h1 className={style['header']}>
+        <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' className={sharedStyle['vm-detail-icon']} />
+        &nbsp;{vm.get('name')} - Edit
+      </h1>) : (
+        <h1>Create A New Virtual Machine</h1>
+      )
 
     return (
       <DetailContainer>
-        <h1>{isEdit ? 'Edit Virtual Machine' : 'Create A New Virtual Machine'}</h1>
-        <hr />
+        {title}
         <ErrorAlert message={this.getLatestUserMessage()} />
-        <form className='form-horizontal'>
+        <br />
+        <form>
           <Prompt
             when={this.state.isChanged}
             message={location => (
               `Are you sure you want to go to ${location.pathname}`
-            )}
-          />
-          <LabeledTextField
-            selectClass='combobox form-control'
-            id='vmName'
-            label='Name'
-            placeholder='Enter VM Name'
-            value={this.state.name || ''}
-            fieldHelp={<FieldHelp title='Name' content='Unique name of the virtual machine.' />}
-            onChange={this.onChangeVmName} />
+            )} />
 
-          <LabeledTextField
-            selectClass='combobox form-control'
-            id='vmDescription'
-            label='Description'
-            placeholder='Enter VM Description (optional)'
-            value={this.state.description || ''}
-            fieldHelp={<FieldHelp title='Description' content='Optional user description of the virtual machine.' />}
-            onChange={this.onChangeVmDescription} />
+          <div className={style['vm-dialog-container']}>
+            <dl className={sharedStyle['vm-properties']}>
+              <dt>
+                <FieldHelp content='Unique name of the virtual machine.' text='Name' />
+              </dt>
+              <dd>
+                <input
+                  type='text'
+                  className='form-control'
+                  id='vmName'
+                  placeholder='Enter VM Name'
+                  onChange={this.onChangeVmName}
+                  value={this.state.name || ''} />
+              </dd>
 
-          <LabeledSelect
-            id='clusterSelect'
-            label='Cluster'
-            selectClass='combobox form-control'
-            onChange={this.onChangeCluster}
-            value={cluster ? cluster.get('id') : ''}
-            data={sortedClusters}
-            fieldHelp={<FieldHelp title='Cluster' content='Group of hosts the virtual machine can be running on.' />}
-          />
+              <dt>
+                <FieldHelp content='Optional user description of the virtual machine.' text='Description' />
+              </dt>
+              <dd>
+                <input
+                  type='text'
+                  className='form-control'
+                  id='vmDescription'
+                  placeholder='Enter VM Description (optional)'
+                  onChange={this.onChangeVmDescription}
+                  value={this.state.description || ''} />
+              </dd>
 
-          <LabeledSelect
-            id='templateSelect'
-            label='Template'
-            selectClass='combobox form-control'
-            onChange={this.onChangeTemplate}
-            value={template ? template.get('id') : ''}
-            data={sortedTemplates}
-            fieldHelp={<FieldHelp title='Template' content='Contains the configuration and disks which will be used to create this virtual machine. Please customize as needed.' />}
-            renderer={templateNameRenderer} />
+              <dt>
+                <FieldHelp content='Group of hosts the virtual machine can be running on.' text='Cluster' />
+              </dt>
+              <dd>
+                <select
+                  className='combobox form-control'
+                  onChange={this.onChangeCluster}
+                  value={cluster ? cluster.get('id') : ''} >
+                  {sortedClusters.toList().map(item => (
+                    <option value={item.get('id')} key={item.get('id')}>
+                      {item.get('name')}
+                    </option>
+                  ))}
+                </select>
+              </dd>
 
-          <LabeledSelect
-            id='operatingSystemSelect'
-            label='Operating System'
-            selectClass='combobox form-control'
-            onChange={this.onChangeOperatingSystem}
-            value={os ? os.get('id') : ''}
-            data={sortedOSs}
-            fieldHelp={<FieldHelp title='Operating System' content='Operating system installed on the virtual machine.' />}
-            renderer={(item) => item.get('description')} />
+              <dt>
+                <FieldHelp content='Contains the configuration and disks which will be used to create this virtual machine. Please customize as needed.' text='Template' />
+              </dt>
+              <dd>
+                <select
+                  className='combobox form-control'
+                  onChange={this.onChangeTemplate}
+                  value={template ? template.get('id') : ''} >
+                  {sortedTemplates.toList().map(item => (
+                    <option value={item.get('id')} key={item.get('id')}>
+                      {templateNameRenderer(item)}
+                    </option>
+                  ))}
+                </select>
+              </dd>
 
-          <LabeledTextField
-            type='number'
-            id='vmMemory'
-            label='Memory (MB)'
-            placeholder='VM Memory'
-            value={this.state.memory / 1024 / 1024 || 1024}
-            onChange={this.onChangeVmMemory}
-            fieldHelp={<FieldHelp title='Memory' content='Total memory the virtual machine will be equipped with. In megabytes.' />}
-            step={256} />
+              <dt>
+                <FieldHelp content='Operating system installed on the virtual machine.' text='Operating System' />
+              </dt>
+              <dd>
+                <select
+                  className='combobox form-control'
+                  onChange={this.onChangeOperatingSystem}
+                  value={os ? os.get('id') : ''} >
+                  {sortedOSs.toList().map(item => (
+                    <option value={item.get('id')} key={item.get('id')}>
+                      {item.get('description')}
+                    </option>
+                  ))}
+                </select>
+              </dd>
 
-          <LabeledTextField
-            type='number'
-            id='vmCpu'
-            label='Number of CPUs'
-            placeholder='CPUs'
-            value={this.state.cpus || 1}
-            onChange={this.onChangeVmCpu}
-            fieldHelp={<FieldHelp title='Number of CPUs' content='Total count of virtual processors the virtual machine will be equipped with.' />}
-            min={1}
-          />
+              <dt>
+                <span className='pficon pficon-memory' />
+                &nbsp;
+                <FieldHelp content='Total memory the virtual machine will be equipped with. In megabytes.' text='Defined Memory' />
+              </dt>
+              <dd>
+                <input
+                  type='number'
+                  className='form-control'
+                  id='vmMemory'
+                  placeholder='VM Memory'
+                  onChange={this.onChangeVmMemory}
+                  value={this.state.memory / 1024 / 1024 || 1024}
+                  min={0}
+                  step={256} />
+              </dd>
+
+              <dt>
+                <span className='pficon pficon-cpu' />
+                &nbsp;
+                <FieldHelp content='Total count of virtual processors the virtual machine will be equipped with.' text='CPUs' />
+              </dt>
+              <dd>
+                <input
+                  type='number'
+                  className='form-control'
+                  id='vmCpus'
+                  placeholder='CPUs'
+                  onChange={this.onChangeVmCpu}
+                  value={this.state.cpus || 1}
+                  min={1}
+                  step={1} />
+              </dd>
+
+            </dl>
+          </div>
 
           <div className={style['vm-dialog-buttons']}>
-            <Link className='btn btn-default' to={this.props.vm ? `/vm/${this.props.vm.get('id')}` : '/'}>Close</Link>
+            <Link className='btn btn-default' to={vm ? `/vm/${vm.get('id')}` : '/'}>Close</Link>
             <button className='btn btn-primary' type='button' onClick={this.submitHandler}>{submitText}</button>
           </div>
         </form>
+
       </DetailContainer>
     )
   }
@@ -459,6 +511,7 @@ VmDialog.propTypes = {
   operatingSystems: PropTypes.object.isRequired,
   userMessages: PropTypes.object.isRequired,
   vmDialog: PropTypes.object.isRequired,
+  icons: PropTypes.object.isRequired,
 
   onCloseDialog: PropTypes.func.isRequired,
   addVm: PropTypes.func.isRequired,
@@ -473,6 +526,7 @@ export default connect(
     operatingSystems: state.operatingSystems,
     userMessages: state.userMessages,
     vmDialog: state.VmDialog,
+    icons: state.icons,
   }),
   (dispatch) => ({
     onCloseDialog: () => dispatch(closeDialog({ force: false })),

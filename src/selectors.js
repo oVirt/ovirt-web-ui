@@ -27,6 +27,12 @@ Selectors = {
     return getState().operatingSystems.get('operatingSystems').toList().find(os =>
       os.get('name') === name)
   },
+  getClusterById (clusterId) {
+    return getState().clusters.getIn(['clusters', clusterId])
+  },
+  getTemplateById (templateId) {
+    return getState().templates.getIn(['templates', templateId])
+  },
   getFilter () {
     return getState().config.get('filter')
   },

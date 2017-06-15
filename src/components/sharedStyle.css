@@ -9,11 +9,6 @@
     opacity: 0;
 }
 
-.labeled-field {
-    text-align: right !important;
-    padding-right: 2px;
-}
-
 .detail-z-index {
 	z-index: 1050;
 }
@@ -35,4 +30,14 @@
 .navbar-top-offset {
     padding-top: 29px;
     margin-left: 200px;
+}
+
+/* For VmDetail and VmDialog */
+.vm-properties {
+    font-size: large;
+    width: 50%;
+    min-width: 500px;
+}
+
+.vm-detail-icon { /* small VM icon on detail page*/
 }
