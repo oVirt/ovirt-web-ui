@@ -3895,9 +3895,9 @@ os-tmpdir@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/os-tmpdir/-/os-tmpdir-1.0.2.tgz#bbe67406c79aa85c5cfec766fe5734555dfa1274"
 
-ovirt-ui-components@0.2.2:
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/ovirt-ui-components/-/ovirt-ui-components-0.2.2.tgz#33c9d25280e7870794d5d90c2d9202a4ed2f27fe"
+ovirt-ui-components@0.2.4:
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/ovirt-ui-components/-/ovirt-ui-components-0.2.4.tgz#d49201703b24649d49f709c2cd6b09598ebd1842"
 
 p-limit@^1.1.0:
   version "1.1.0"
@@ -4458,6 +4458,10 @@ rc@~1.1.6:
     ini "~1.3.0"
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
+
+react-bootstrap-switch@15.5.0-a:
+  version "15.5.0-a"
+  resolved "https://registry.yarnpkg.com/react-bootstrap-switch/-/react-bootstrap-switch-15.5.0-a.tgz#ad599ddc8aa9c321ab25782dd94ad97475eda84b"
 
 react-bootstrap@0.31.0:
   version "0.31.0"

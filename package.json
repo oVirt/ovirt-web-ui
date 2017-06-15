@@ -67,7 +67,7 @@
     "bootstrap-switch": "3.3.2",
     "immutable": "3.8.1",
     "jquery": "^3.1.1",
-    "ovirt-ui-components": "0.2.2",
+    "ovirt-ui-components": "0.2.4",
     "patternfly": "3.23.3",
     "patternfly-bootstrap-combobox": "1.1.7",
     "prop-types": "15.5.8",
