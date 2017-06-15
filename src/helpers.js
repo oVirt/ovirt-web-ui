@@ -121,3 +121,10 @@ export function templateNameRenderer (template) {
     ? (`${templateName} (${versionName})`)
     : templateName
 }
+
+export function hrefWithoutHistory (handler) {
+  return (e) => {
+    e.preventDefault()
+    handler(e)
+  }
+}

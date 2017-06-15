@@ -15,7 +15,7 @@ import {
   getRDP,
 } from '../../actions/index'
 
-import { isWindows, templateNameRenderer } from '../../helpers'
+import { isWindows, templateNameRenderer, hrefWithoutHistory } from '../../helpers'
 
 import Time from '../Time'
 import FieldHelp from '../FieldHelp/index'
@@ -56,22 +56,30 @@ const VmConsoles = ({ vm, onConsole, onRDP }) => {
     return (
       <dd>
         {
-          vmConsoles.map(c => (
-            <a
-              href='#'
-              data-toggle='tooltip'
-              data-placement='left'
-              title={`Open ${c.get('protocol').toUpperCase()} console`}
-              key={c.get('id')}
-              onClick={() => onConsole({ vmId: vm.get('id'), consoleId: c.get('id') })}
-              className={style['left-delimiter']}>
-              {c.get('protocol').toUpperCase()}
-            </a>))
+          vmConsoles.map(c => {
+            const onClick = (e) => {
+              onConsole({ vmId: vm.get('id'), consoleId: c.get('id') })
+              e.preventDefault()
+            }
+
+            return (
+              <a
+                href='#'
+                data-toggle='tooltip'
+                data-placement='left'
+                title={`Open ${c.get('protocol').toUpperCase()} console`}
+                key={c.get('id')}
+                onClick={onClick}
+                className={style['left-delimiter']}>
+                {c.get('protocol').toUpperCase()}
+              </a>
+            )
+          })
         }
 
         {
           isWindows(vm.getIn(['os', 'type']))
-            ? (<a href='#' key={vm.get('id')} onClick={onRDP} className={style['left-delimiter']}>RDP</a>) : null
+            ? (<a href='#' key={vm.get('id')} onClick={hrefWithoutHistory(onRDP)} className={style['left-delimiter']}>RDP</a>) : null
         }
       </dd>
     )
@@ -111,11 +119,13 @@ class VmDetail extends Component {
     this.consoleSettings = this.consoleSettings.bind(this)
   }
 
-  consoleSettings () {
+  consoleSettings (e) {
     this.props.onConsoleOptionsOpen()
     this.setState({
       openConsoleSettings: !this.state.openConsoleSettings,
     })
+
+    e.preventDefault()
   }
 
   render () {
@@ -139,7 +149,7 @@ class VmDetail extends Component {
     const cluster = Selectors.getClusterById(vm.getIn(['cluster', 'id']))
     const template = Selectors.getTemplateById(vm.getIn(['template', 'id']))
 
-//    const onToggleRenderDisks = () => { this.setState({ renderDisks: !this.state.renderDisks }) }
+//    const onToggleRenderDisks = (e) => { this.setState({ renderDisks: !this.state.renderDisks }); e.preventDefault() }
     const disksElement = (<VmDisks disks={disks} open={this.state.renderDisks} />)
 
     let optionsJS = options.hasIn(['options', 'consoleOptions', vm.get('id')]) ? options.getIn(['options', 'consoleOptions', vm.get('id')]).toJS() : {}

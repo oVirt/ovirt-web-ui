@@ -26,6 +26,7 @@ import {
   removeVm,
 } from '../../actions/index'
 import { checkConsoleInUse, setConsoleInUse } from './actions'
+import { hrefWithoutHistory } from '../../helpers'
 
 import OnClickTopConfirmation from '../Confirmation/index'
 
@@ -91,7 +92,7 @@ class Button extends React.Component {
     }
 
     return (
-      <a href='#' onClick={onClick} className={`${button} ${style['link']}`}>
+      <a href='#' onClick={hrefWithoutHistory(onClick)} className={`${button} ${style['link']}`}>
         <span data-toggle='tooltip' data-placement='left' title={tooltip}>
           {shortTitle}
         </span>
