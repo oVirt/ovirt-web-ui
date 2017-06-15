@@ -24,7 +24,7 @@ const VmDisk = ({ disk }) => {
   const capacityInfo = (<FieldHelp
     title='Disk Capacity'
     content={capacityInfoContent}
-    text={<span className={style['light']}>({actSize.number}/{provSize.str} used)</span>} />)
+    text={<span className={style['light']}>({actSize.rounded}/{provSize.str} used)</span>} />)
 
   return (
     <li>
