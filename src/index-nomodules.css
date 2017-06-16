@@ -56,3 +56,11 @@ div.toolbar-pf {
 .bootstrap-switch-handle-on {
   padding: 5px !important;
 }
+
+.static-confirm {
+  position: relative;
+}
+
+.popover-content {
+  text-align: center;
+}

@@ -24,3 +24,12 @@
 .link {
 	height: 27px;
 }
+
+.disabled-button {
+	line-height: 21px;
+}
+
+.full-button {
+	display: inline-block;
+	margin-left: 5px;
+}
