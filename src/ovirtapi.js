@@ -140,6 +140,7 @@ OvirtApi = {
       memory: {
         total: vm['memory'],
         guaranteed: vm['memory_policy'] ? vm.memory_policy['guaranteed'] : undefined,
+        max: vm['memory_policy'] ? vm.memory_policy['max'] : undefined,
       },
 
       os: {
@@ -191,9 +192,9 @@ OvirtApi = {
   internalVmToOvirt ({ vm }: VmType): Object {
     return {
       name: vm.name,
-      description: vm.description, // TODO: add to VmDialog
+      description: vm.description,
       id: vm.id,
-      type: vm.type, // TODO: add to VmDialog
+      type: vm.type,
 
       memory: vm.memory,
       cpu: {
@@ -277,6 +278,10 @@ OvirtApi = {
     return {
       id: cluster.id,
       name: cluster.name,
+
+      memoryPolicy: {
+        overCommitPercent: cluster['memory_policy'] && cluster['memory_policy']['over_commit'] && cluster['memory_policy']['over_commit']['percent'] ? cluster['memory_policy']['over_commit']['percent'] : 100,
+      },
     }
   },
 
