@@ -57,3 +57,13 @@
     padding-left: 13px;
     border-left: 1px solid #d1d1d1;
 }
+
+.vms-nav-expanded {
+    padding-left: 200px;
+    transition: padding-left .5s;
+}
+
+.vms-nav-collapsed {
+    padding-left: 2em;
+    transition: padding-left .5s;
+}

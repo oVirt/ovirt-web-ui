@@ -6,8 +6,6 @@ import Switch from 'react-bootstrap-switch'
 import style from './style.css'
 import FieldHelp from '../FieldHelp/index'
 
-import { logDebug } from '../../helpers'
-
 class ConsoleOptions extends React.Component {
   constructor (props) {
     super(props)
@@ -24,7 +22,6 @@ class ConsoleOptions extends React.Component {
   }
 
   render () {
-    logDebug('ConsoleOptions from web-ui, props.options: ', this.props.options)
     const { open } = this.props
 
     let classes = style['vm-detail-settings']
