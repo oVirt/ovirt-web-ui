@@ -76,12 +76,12 @@
     "react-bootstrap-switch": "15.5.0-a",
     "react-dom": "15.5.4",
     "react-redux": "5.0.4",
+    "react-router-config": "1.0.0-beta.3",
+    "react-router-dom": "4.1.1",
     "react-test-renderer": "15.5.4",
     "redux": "3.6.0",
     "redux-devtools-extension": "2.13.2",
-    "redux-saga": "0.15.3",
-    "react-router-config": "1.0.0-beta.3",
-    "react-router-dom": "4.1.1"
+    "redux-saga": "0.15.3"
   },
   "scripts": {
     "start": "node scripts/start.js",

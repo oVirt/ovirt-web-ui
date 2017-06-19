@@ -7,8 +7,7 @@
 }
 
 .confirmation-toolbar {
-    margin-top: 10px;
-    paddingBottom: 6px;
+    margin-top: 5px;
     display: flex;
     justify-content: center;
 }
@@ -20,4 +19,8 @@
 .ok-button {
 	margin-right: 2px;
     margin-left: 23px !important;
+}
+
+.confirmation-body {
+    display: inline-block;
 }

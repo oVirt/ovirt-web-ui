@@ -28,12 +28,21 @@ import {
 import { checkConsoleInUse, setConsoleInUse } from './actions'
 import { hrefWithoutHistory } from '../../helpers'
 
-import OnClickTopConfirmation from '../Confirmation/index'
+import Confirmation from '../Confirmation/index'
+import Popover from '../Confirmation/Popover'
 
 class Button extends React.Component {
   constructor (props) {
     super(props)
-    this.state = { toBeConfirmed: false }
+    this.state = { show: false }
+    this.handleClick = e => {
+      this.setState({ show: !this.state.show })
+    }
+    this.closePopover = this.closePopover.bind(this)
+  }
+
+  closePopover () {
+    this.setState({ show: false })
   }
 
   render () {
@@ -43,47 +52,38 @@ class Button extends React.Component {
       actionDisabled = false,
       isOnCard,
       onClick,
-      confirmRequired,
       shortTitle,
       button,
+      popover,
     } = this.props
 
-    const toggleConfirm = () => {
-      this.setState({ toBeConfirmed: !this.state.toBeConfirmed })
-    }
-
-    if (confirmRequired && this.state.toBeConfirmed) {
-      return (
-        <span className={isOnCard ? 'card-pf-item' : style['left-delimiter']}>
-          <button className='btn btn-danger btn-xs' type='button' onClick={() => { toggleConfirm(); onClick() }}>
-            {confirmRequired.confirmText}
-          </button>
-          &nbsp;
-          <button className='btn btn-primary btn-xs' type='button' onClick={toggleConfirm}>
-            {confirmRequired.cancelText}
-          </button>
-        </span>
-      )
-    } else if (confirmRequired) {
-      onClick = toggleConfirm
+    let handleClick = hrefWithoutHistory(onClick)
+    let popoverComponent = null
+    if (popover) {
+      handleClick = this.handleClick
+      const PopoverBody = popover
+      popoverComponent = (<Popover show={this.state.show} width={200} height={80} target={this} placement={isOnCard ? 'top' : 'bottom'}>
+        <PopoverBody close={this.closePopover} />
+      </Popover>)
     }
 
     if (actionDisabled) {
       className = `${className} ${style['action-disabled']}`
-      onClick = undefined
+      handleClick = undefined
     }
 
     if (isOnCard) {
       return (
         <div className='card-pf-item'>
-          <span className={className} data-toggle='tooltip' data-placement='left' title={tooltip} onClick={onClick} />
+          <span className={className} data-toggle='tooltip' data-placement='left' title={tooltip} onClick={handleClick} />
+          {popoverComponent}
         </div>
       )
     }
 
     if (actionDisabled) {
       return (
-        <button className={button} disabled='disabled'>
+        <button className={`${button} ${style['disabled-button']}`} disabled='disabled'>
           <span data-toggle='tooltip' data-placement='left' title={tooltip}>
             {shortTitle}
           </span>
@@ -92,11 +92,14 @@ class Button extends React.Component {
     }
 
     return (
-      <a href='#' onClick={hrefWithoutHistory(onClick)} className={`${button} ${style['link']}`}>
-        <span data-toggle='tooltip' data-placement='left' title={tooltip}>
-          {shortTitle}
-        </span>
-      </a>
+      <span className={style['full-button']}>
+        <a href='#' onClick={handleClick} className={`${button} ${style['link']}`} id={shortTitle}>
+          <span data-toggle='tooltip' data-placement='left' title={tooltip}>
+            {shortTitle}
+          </span>
+        </a>
+        {popoverComponent}
+      </span>
     )
   }
 }
@@ -108,7 +111,7 @@ Button.propTypes = {
   onClick: PropTypes.func,
   actionDisabled: PropTypes.bool,
   isOnCard: PropTypes.bool.isRequired,
-  confirmRequired: PropTypes.object,
+  popover: PropTypes.func,
 }
 
 const LinkButton = ({ className, tooltip, to, actionDisabled, isOnCard, shortTitle, button }) => {
@@ -129,7 +132,7 @@ const LinkButton = ({ className, tooltip, to, actionDisabled, isOnCard, shortTit
 
   if (actionDisabled) {
     return (
-      <button className={button} disabled='disabled'>
+      <button className={`${button} ${style['disabled-button']}`} disabled='disabled'>
         <span data-toggle='tooltip' data-placement='left' title={tooltip}>
           {shortTitle}
         </span>
@@ -138,7 +141,7 @@ const LinkButton = ({ className, tooltip, to, actionDisabled, isOnCard, shortTit
   }
 
   return (
-    <Link to={to} className={`${button} ${style['link']}`}>
+    <Link to={to} className={`${button} ${style['link']} ${style['full-button']}`}>
       <span data-toggle='tooltip' data-placement='left' title={tooltip}>
         {shortTitle}
       </span>
@@ -186,33 +189,25 @@ class RemoveVmAction extends React.Component {
     }
 
     let checkbox = null
-    let height = 80
+    let height = null
 
     if (isDisks) {
-      checkbox = (<Checkbox checked={this.state.preserveDisks}
+      checkbox = (<div style={{ marginTop: '8px' }}><Checkbox checked={this.state.preserveDisks}
         onClick={() => this.setState({ preserveDisks: !this.state.preserveDisks })}
-        label='Preserve disks' />)
-      height = 100
+        label='Preserve disks' /></div>)
+      height = 75
     }
-
-    const confirmRemoveText = (
-      <div>
-        Remove the VM?
-        <br />
-        {checkbox}
-      </div>)
-
-    const confirmRemove = (e) => OnClickTopConfirmation({
-      id: vm.get('id'),
-      target: e.target,
-      confirmationText: confirmRemoveText,
-      cancelLabel: 'Cancel',
-      okLabel: 'Yes',
-      extraButtonLabel: 'Force',
-      onOk: () => onRemove({ force: false, preserveDisks: this.state.preserveDisks }),
-      onExtra: () => onRemove({ force: true, preserveDisks: this.state.preserveDisks }),
-      height: height,
-    })
+    let confirmRemoveText = null
+    if (checkbox) {
+      confirmRemoveText = (
+        <div>
+          Remove the VM?
+          <br />
+          {checkbox}
+        </div>)
+    } else {
+      confirmRemoveText = 'Remove the VM?'
+    }
 
     const status = vm.get('status')
     const isDisabled = isPool || vm.getIn(['actionInProgress', 'remove']) || !canRemove(status)
@@ -223,7 +218,14 @@ class RemoveVmAction extends React.Component {
         tooltip='Remove the VM'
         button='btn btn-danger'
         shortTitle='Remove'
-        onClick={confirmRemove} />
+        popover={({ close }) => <Confirmation
+          height={height}
+          text={confirmRemoveText}
+          okButton={{ label: 'Yes', click: () => onRemove({ force: false, preserveDisks: this.state.preserveDisks }) }}
+          cancelButton={{ label: 'Cancel', click: () => { close() } }}
+          extraButton={{ label: 'force', click: () => onRemove({ force: true, preserveDisks: this.state.preserveDisks }) }}
+        />}
+      />
     )
   }
 }
@@ -233,6 +235,107 @@ RemoveVmAction.propTypes = {
   isPool: PropTypes.bool,
   onRemove: PropTypes.func.isRequired,
   isDisks: PropTypes.bool,
+}
+
+class ConsoleButton extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      openModal: false,
+    }
+    this.consoleConfirmationAboutToOpen = this.consoleConfirmationAboutToOpen.bind(this)
+    this.onConsoleConfirmationClose = this.onConsoleConfirmationClose.bind(this)
+    this.onConsoleDownload = this.onConsoleDownload.bind(this)
+  }
+
+  consoleConfirmationAboutToOpen (e) {
+    this.setState({
+      openModal: true,
+    })
+    this.props.onCheckConsoleSessionInUse()
+  }
+
+  onConsoleConfirmationClose () {
+    this.setState({
+      openModal: false,
+    })
+    this.props.onConsoleSessionConfirmaClose()
+  }
+
+  onConsoleDownload () {
+    this.setState({
+      openModal: false,
+    })
+
+    this.props.onDownloadConsole()
+  }
+
+  render () {
+    let {
+      className,
+      tooltip = '',
+      actionDisabled = false,
+      isOnCard,
+      shortTitle,
+      button,
+      consoleInUse,
+    } = this.props
+
+    let onClick = this.consoleConfirmationAboutToOpen
+    if (actionDisabled) {
+      className = `${className} ${style['action-disabled']}`
+      onClick = undefined
+    }
+    let popoverComponent = null
+    if (consoleInUse && this.state.openModal) {
+      popoverComponent = (<Popover width={200} height={80} target={this} placement={isOnCard ? 'top' : 'bottom'} show>
+        <Confirmation text='Console in use, continue?' okButton={{ label: 'Yes', click: this.onConsoleDownload }} cancelButton={{ label: 'Cancel', click: this.onConsoleConfirmationClose }} />
+      </Popover>)
+    }
+
+    if (isOnCard) {
+      return (
+        <div className='card-pf-item'>
+          <span className={className} data-toggle='tooltip' data-placement='left' title={tooltip} onClick={onClick} />
+          {popoverComponent}
+        </div>
+      )
+    }
+
+    if (actionDisabled) {
+      return (
+        <button className={`${button} ${style['disabled-button']}`} disabled='disabled'>
+          <span data-toggle='tooltip' data-placement='left' title={tooltip}>
+            {shortTitle}
+          </span>
+        </button>
+      )
+    }
+
+    return (
+      <span className={style['full-button']}>
+        <a href='#' onClick={this.consoleConfirmationAboutToOpen} className={`${button} ${style['link']}`} id={shortTitle}>
+          <span data-toggle='tooltip' data-placement='left' title={tooltip}>
+            {shortTitle}
+          </span>
+        </a>
+        {popoverComponent}
+      </span>
+    )
+  }
+}
+
+ConsoleButton.propTypes = {
+  className: PropTypes.string.isRequired,
+  tooltip: PropTypes.string,
+  shortTitle: PropTypes.string.isRequired,
+  button: PropTypes.string.isRequired,
+  actionDisabled: PropTypes.bool,
+  isOnCard: PropTypes.bool,
+  consoleInUse: PropTypes.bool,
+  onDownloadConsole: PropTypes.func.isRequired,
+  onConsoleSessionConfirmaClose: PropTypes.func.isRequired,
+  onCheckConsoleSessionInUse: PropTypes.func.isRequired,
 }
 
 /**
@@ -245,13 +348,11 @@ class VmActions extends React.Component {
     this.state = {
       openModal: false,
       notificationTarget: null,
+      show: false,
     }
     this.consoleConfirmationAboutToOpen = this.consoleConfirmationAboutToOpen.bind(this)
     this.onConsoleConfirmationClose = this.onConsoleConfirmationClose.bind(this)
     this.onConsoleDownload = this.onConsoleDownload.bind(this)
-    this.confirmShutdown = this.confirmShutdown.bind(this)
-    this.confirmRestart = this.confirmRestart.bind(this)
-    this.confirmSuspend = this.confirmSuspend.bind(this)
   }
 
   consoleConfirmationAboutToOpen (e) {
@@ -279,58 +380,6 @@ class VmActions extends React.Component {
     this.props.onDownloadConsole()
   }
 
-  componentDidUpdate (prevProps, prevState) {
-    if (
-        this.props.VmAction.getIn(['vms', this.props.vm.get('id'), 'consoleInUse']) === true &&
-        this.state.openModal === true
-      ) {
-      OnClickTopConfirmation({
-        id: this.props.vm.get('id'),
-        target: this.state.notificationTarget,
-        confirmationText: 'Console in use, continue?',
-        cancelLabel: 'Cancel',
-        okLabel: 'Yes',
-        onOk: this.onConsoleDownload,
-        onCancel: this.onConsoleConfirmationClose,
-      })
-    }
-  }
-
-  confirmShutdown (e) {
-    OnClickTopConfirmation({
-      id: this.props.vm.get('id'),
-      target: e.target,
-      confirmationText: 'Shut down the VM?',
-      cancelLabel: 'Cancel',
-      okLabel: 'Yes',
-      extraButtonLabel: 'Force',
-      onOk: this.props.onShutdown,
-      onExtra: this.props.onForceShutdown,
-    })
-  }
-
-  confirmRestart (e) {
-    return OnClickTopConfirmation({
-      id: this.props.vm.get('id'),
-      target: e.target,
-      confirmationText: 'Restart the VM?',
-      cancelLabel: 'Cancel',
-      okLabel: 'Yes',
-      onOk: this.props.onRestart,
-    })
-  }
-
-  confirmSuspend (e) {
-    return OnClickTopConfirmation({
-      id: this.props.vm.get('id'),
-      target: e.target,
-      confirmationText: 'Suspend the VM?',
-      cancelLabel: 'Cancel',
-      okLabel: 'Yes',
-      onOk: this.props.onSuspend,
-    })
-  }
-
   render () {
     let {
       vm,
@@ -340,6 +389,7 @@ class VmActions extends React.Component {
       onStartPool,
       isPool,
       onRemove,
+      VmAction,
     } = this.props
 
     let onStart = onStartVm
@@ -380,28 +430,31 @@ class VmActions extends React.Component {
           button='btn btn-default'
           className='fa fa-pause'
           tooltip='Suspend the VM'
-          onClick={this.confirmSuspend} />
+          popover={({ close }) => <Confirmation text='Suspend the VM?' okButton={{ label: 'Yes', click: this.props.onSuspend }} cancelButton={{ label: 'Cancel', click: () => { close() } }} />} />
 
         <Button isOnCard={isOnCard} actionDisabled={isPool || !canShutdown(status) || vm.getIn(['actionInProgress', 'shutdown'])}
           className='fa fa-power-off'
           button='btn btn-danger'
           tooltip='Shut down the VM'
           shortTitle='Shut down'
-          onClick={this.confirmShutdown} />
+          popover={({ close }) => <Confirmation text='Shut down the VM?' okButton={{ label: 'Yes', click: this.props.onShutdown }} cancelButton={{ label: 'Cancel', click: () => { close() } }} />} />
 
         <Button isOnCard={isOnCard} actionDisabled={isPool || !canRestart(status) || vm.getIn(['actionInProgress', 'restart'])}
           className='pficon pficon-restart'
           button='btn btn-default'
           tooltip='Reboot the VM'
           shortTitle='Reboot'
-          onClick={this.confirmRestart} />
+          popover={({ close }) => <Confirmation text='Restart the VM?' okButton={{ label: 'Yes', click: this.props.onRestart }} cancelButton={{ label: 'Cancel', click: () => { close() } }} />} />
 
-        <Button isOnCard={isOnCard} actionDisabled={isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole'])}
+        <ConsoleButton isOnCard={isOnCard} actionDisabled={isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole'])}
           button='btn btn-default'
           className='pficon pficon-screen'
           tooltip={consoleProtocol}
           shortTitle='Console'
-          onClick={this.consoleConfirmationAboutToOpen} />
+          onDownloadConsole={this.props.onDownloadConsole}
+          onConsoleSessionConfirmaClose={this.props.onConsoleSessionConfirmaClose}
+          onCheckConsoleSessionInUse={this.props.onCheckConsoleSessionInUse}
+          consoleInUse={VmAction.getIn(['vms', vm.get('id'), 'consoleInUse'])} />
 
         <LinkButton isOnCard={isOnCard}
           shortTitle='Edit'
