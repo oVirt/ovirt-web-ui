@@ -56,6 +56,15 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-engine/engine.conf.d/50-ovirt-web-ui.conf
 
 %changelog
+* Tue Jun 20 Marek Libra <mlibra@redhat.com> - 1.1.0
+- Navigation via list of VMs to see details simplified
+- Component for VM's Disks redesigned
+- Context-based help
+- Support for RDP graphics consoles
+- ESC key used as back-button
+- multiple UI fixes and improvements
+- Configuration of graphics console added
+
 * Fri Jun 2 2017 Marek Libra <mlibra@redhat.com> - 1.0.0
 - "Door effect" removed, replaced by standard patternfly design
 - User Messages are not closed automatically
