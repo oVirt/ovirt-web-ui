@@ -50,3 +50,5 @@ export const UPDATE_VMS = 'UPDATE_VMS'
 export const VM_ACTION_IN_PROGRESS = 'VM_ACTION_IN_PROGRESS'
 export const GET_RDP_VM = 'GET_RDP_VM'
 export const SET_DOMAIN = 'SET_DOMAIN'
+
+export const MAX_VM_MEMORY_FACTOR = 4 // see Edit VM flow; magic constant to stay aligned with Web Admin

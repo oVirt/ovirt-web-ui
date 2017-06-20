@@ -27,6 +27,8 @@ import {
   setSavedVm,
 } from './actions'
 
+import { MAX_VM_MEMORY_FACTOR } from '../../constants/index'
+
 function sortedBy (immutableCollection, sortBy) { // TODO: move to helpers
   return immutableCollection.sort(
     (a, b) => a.get(sortBy).localeCompare(b.get(sortBy))
@@ -60,6 +62,7 @@ class VmDialog extends React.Component {
     this.submitHandler = this.submitHandler.bind(this)
     this.initDefaults = this.initDefaults.bind(this)
     this.onIntegerChanged = this.onIntegerChanged.bind(this)
+    this.getMemoryPolicy = this.getMemoryPolicy.bind(this)
 
     this.getCluster = this.getCluster.bind(this)
     this.getTemplate = this.getTemplate.bind(this)
@@ -128,6 +131,20 @@ class VmDialog extends React.Component {
     return last ? last.message : undefined
   }
 
+  getMemoryPolicy () {
+    const cluster = this.getCluster()
+    const overCommitPercent = cluster && cluster.getIn(['memoryPolicy', 'overCommitPercent'])
+    let guaranteed = overCommitPercent ? (this.state.memory * (100 / overCommitPercent)) : this.state.memory
+
+    const memoryPolicy = {
+      'max': this.state.memory * MAX_VM_MEMORY_FACTOR,
+      'guaranteed': Math.round(guaranteed),
+    }
+    logDebug('getMemoryPolicy() resulting memory_policy: ', memoryPolicy)
+
+    return memoryPolicy
+  }
+
   /**
    * Compose vm object from entered values
    *
@@ -145,6 +162,7 @@ class VmDialog extends React.Component {
       'template': { 'id': this.state.templateId },
       'cluster': { 'id': this.state.clusterId },
       'memory': this.state.memory,
+      'memory_policy': this.getMemoryPolicy(),
       'os': {
         'type': os.get('name'),
       },
@@ -512,6 +530,7 @@ VmDialog.propTypes = {
   userMessages: PropTypes.object.isRequired,
   vmDialog: PropTypes.object.isRequired,
   icons: PropTypes.object.isRequired,
+  vms: PropTypes.object.isRequired,
 
   onCloseDialog: PropTypes.func.isRequired,
   addVm: PropTypes.func.isRequired,
@@ -527,6 +546,7 @@ export default connect(
     userMessages: state.userMessages,
     vmDialog: state.VmDialog,
     icons: state.icons,
+    vms: state.vms,
   }),
   (dispatch) => ({
     onCloseDialog: () => dispatch(closeDialog({ force: false })),
