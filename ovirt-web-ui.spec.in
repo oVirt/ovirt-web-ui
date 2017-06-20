@@ -56,7 +56,7 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-engine/engine.conf.d/50-ovirt-web-ui.conf
 
 %changelog
-* Tue Jun 20 Marek Libra <mlibra@redhat.com> - 1.1.0
+* Tue Jun 20 2017 Marek Libra <mlibra@redhat.com> - 1.1.0
 - Navigation via list of VMs to see details simplified
 - Component for VM's Disks redesigned
 - Context-based help
