@@ -203,6 +203,13 @@ class VmDetail extends Component {
       </div>
     )
 
+    const nextRunTag = vm.get('nextRunExists') && (
+      <div className={style['vm-flag-container']}>
+        <FieldHelp content='The virtual machine has pending configuration. To take effect, please reboot the virtual machine.'>
+          <span className={'label label-info ' + style['vm-flag']}>Pending Changes</span>
+        </FieldHelp>
+      </div>)
+
     return (
       <div>
         <VmsListNavigation selectedVm={vm} expanded={this.state.vmsNavigationExpanded} toggleExpansion={this.toggleVmsNavExpansion} />
@@ -213,6 +220,7 @@ class VmDetail extends Component {
               <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' className={sharedStyle['vm-detail-icon']} />
               &nbsp;{name}
             </h1>
+            {nextRunTag}
             <LastMessage vmId={vm.get('id')} userMessages={userMessages} />
             <div className={style['vm-detail-container']}>
               <dl className={sharedStyle['vm-properties']}>

@@ -14,6 +14,7 @@ const FieldHelp = ({
   content, // help content
   text, // field description
   tooltip = 'Click for help',
+  children,
   }) => {
   const popover = (
     <Popover id='popover-positioned-top' title={title}>
@@ -22,8 +23,9 @@ const FieldHelp = ({
 
   return (
     <OverlayTrigger trigger='click' rootClose placement='top' overlay={popover}>
-      <div role='button' title={tooltip} className={style['field-text']}>
+      <div role='button' title={tooltip} className={text && style['field-text']}>
         {text}
+        {children}
       </div>
     </OverlayTrigger>
   )
@@ -33,6 +35,7 @@ FieldHelp.propTypes = {
   content: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   text: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   tooltip: PropTypes.string,
+  children: PropTypes.any,
 }
 
 export default FieldHelp

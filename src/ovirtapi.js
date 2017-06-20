@@ -111,6 +111,7 @@ OvirtApi = {
       id: vm['id'],
       status: vm['status'] ? vm['status'].toLowerCase() : undefined,
       type: vm['type'],
+      nextRunExists: vm['next_run_configuration_exists'] === 'true',
       lastMessage: '',
 
       // TODO: improve time conversion
