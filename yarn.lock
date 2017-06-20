@@ -4459,9 +4459,9 @@ rc@~1.1.6:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-react-bootstrap-switch@15.5.0-a:
-  version "15.5.0-a"
-  resolved "https://registry.yarnpkg.com/react-bootstrap-switch/-/react-bootstrap-switch-15.5.0-a.tgz#ad599ddc8aa9c321ab25782dd94ad97475eda84b"
+react-bootstrap-switch@15.5.0:
+  version "15.5.0"
+  resolved "https://registry.yarnpkg.com/react-bootstrap-switch/-/react-bootstrap-switch-15.5.0.tgz#225152e339ab586c0991be14e5229c04eaac998b"
 
 react-bootstrap@0.31.0:
   version "0.31.0"
