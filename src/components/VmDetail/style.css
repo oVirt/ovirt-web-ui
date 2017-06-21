@@ -67,3 +67,14 @@
     padding-left: 2em;
     transition: padding-left .5s;
 }
+
+.vm-flag-container {
+    float: right;
+    top: -5em;
+    position: relative;
+}
+
+.vm-flag {
+    font-size: 100%;
+    vertical-align: middle;
+}
