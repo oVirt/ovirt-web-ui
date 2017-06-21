@@ -30,11 +30,10 @@ For most current list of features please refer the [Milestones](https://github.c
 
 The upcoming milestones:
 
-### [v1.1.0](https://github.com/oVirt/ovirt-web-ui/milestone/2)
-The release shall include all features of the Basic User Portal and selected functionality of the Power User Portal, namely:
+### [v1.2.0](https://github.com/oVirt/ovirt-web-ui/milestone/4)
+The upcoming release shall newly support:
 
 - Cockpit integration
-- RDP support
 - Localization
 - Branding
 - Audit Log
