@@ -45,8 +45,8 @@ OvirtApi = {
     }
     return Promise.reject('')
   },
-  getAllVms () {
-    return Promise.resolve(vms)
+  getVmsByCount ({ count }) {
+    return Promise.resolve(vms.slice(0, count))
   },
   shutdown ({ vmId, force }) {
     OvirtApi._assertLogin({ methodName: 'shutdown' })

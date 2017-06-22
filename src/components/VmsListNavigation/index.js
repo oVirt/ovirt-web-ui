@@ -3,12 +3,12 @@ import PropTypes from 'prop-types'
 
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
+import { getByPage, getConsoleOptions } from '../../actions/index'
+import InfiniteScroll from 'react-infinite-scroller'
 
 import style from './style.css'
 
-import { getConsoleOptions } from '../../actions/index'
-
-const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, loadConsoleOptions }) => {
+const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, onUpdate, loadConsoleOptions }) => {
   const toggleExpandButton = (
     <div className={style['toggle-expand-button']}>
       <a href='#' onClick={toggleExpansion}>
@@ -16,6 +16,12 @@ const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, loadCon
       </a>
     </div>
   )
+
+  const loadMore = () => {
+    if (vms.get('changed')) {
+      onUpdate(vms.get('page') + 1)
+    }
+  }
 
   let list = null
   if (expanded) {
@@ -44,10 +50,15 @@ const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, loadCon
   }
 
   return (
-    <div className={`${style['main-container']} ${expanded ? style['expanded'] : ''}`}>
-      {toggleExpandButton}
-      {list}
-    </div>
+    <InfiniteScroll
+      loadMore={loadMore}
+      hasMore={vms.get('changed')}
+      >
+      <div className={`${style['main-container']} ${expanded ? style['expanded'] : ''}`}>
+        {toggleExpandButton}
+        {list}
+      </div>
+    </InfiniteScroll>
   )
 }
 VmsListNavigation.propTypes = {
@@ -57,6 +68,7 @@ VmsListNavigation.propTypes = {
 
   toggleExpansion: PropTypes.func.isRequired,
   loadConsoleOptions: PropTypes.func.isRequired,
+  onUpdate: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -65,5 +77,6 @@ export default connect(
   }),
   (dispatch) => ({
     loadConsoleOptions: (vmId) => dispatch(getConsoleOptions({ vmId })),
+    onUpdate: (page) => dispatch(getByPage({ page })),
   })
 )(VmsListNavigation)

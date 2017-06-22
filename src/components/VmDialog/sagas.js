@@ -1,5 +1,5 @@
 import { put, takeEvery, takeLatest } from 'redux-saga/effects'
-import { getAllVms, getSingleVm } from '../../actions/index'
+import { refresh, getSingleVm } from '../../actions/index'
 import { ADD_NEW_VM, EDIT_VM } from './constants'
 import { setSavedVm } from './actions'
 import Api from '../../ovirtapi'
@@ -7,7 +7,7 @@ import Api from '../../ovirtapi'
 function* createNewVm (sagas, action) {
   const result = yield sagas.callExternalAction('addNewVm', Api.addNewVm, action)
   if (!result.error) {
-    yield put(getAllVms({ shallowFetch: false }))
+    yield put(refresh({ page: action.payload.page }))
     yield put(setSavedVm({ vm: Api.vmToInternal({ vm: result }) }))
   }
 }

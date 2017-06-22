@@ -8,6 +8,7 @@ const AppConfiguration = {
   debug: true,
   applicationContext: '',
   applicationURL: '/',
+  pageLimit: 8,
 
   consoleClientResourcesURL: 'https://www.ovirt.org/documentation/admin-guide/virt/console-client-resources/',
   cockpitPort: '9090',

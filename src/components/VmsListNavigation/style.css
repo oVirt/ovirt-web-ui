@@ -3,13 +3,14 @@
     width: 3em;
     position: fixed;
     z-index: 1000;
-    top: 114px;
+    top: 115px;
     left: 200px;
     background-color: rgba(255, 255, 255, 0.15);
     padding-top: 1em;
     -webkit-transition: 0.5s;
     transition: 0.5s;
     border: 1px solid #cecccc;
+    padding-bottom: 145px;
 }
 
 .expanded {
@@ -29,6 +30,8 @@
     padding: 0;
     width: 100%;
     border-top: thin dashed #ccc;
+    height: 100%;
+    overflow-y: auto;
 }
 
 .item {

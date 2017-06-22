@@ -12,12 +12,13 @@ export function setSavedVm ({ vm }) {
 /**
  * New VM will be created in oVirt (REST API)
  */
-export function createVm (vm, actionUniqueId) {
+export function createVm (vm, actionUniqueId, page) {
   return {
     type: ADD_NEW_VM,
     actionUniqueId,
     payload: {
       vm,
+      page,
     },
   }
 }

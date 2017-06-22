@@ -1,7 +1,7 @@
 import {
   GET_VM,
+  GET_BY_PAGE,
   PERSIST_STATE,
-  SCHEDULER__1_MIN,
   SET_ADMINISTATOR,
   SET_USER_FILTER_PERMISSION,
   CHECK_TOKEN_EXPIRED,
@@ -35,13 +35,6 @@ export function getSingleVm ({ vmId }) {
   }
 }
 
-export function schedulerOneMinute () {
-  return {
-    type: SCHEDULER__1_MIN,
-    payload: {},
-  }
-}
-
 export function setUserFilterPermission (filter) {
   return {
     type: SET_USER_FILTER_PERMISSION,
@@ -71,5 +64,15 @@ export function showTokenExpiredMessage () {
   return {
     type: 'SHOW_TOKEN_EXPIRED_MSG',
     payload: {},
+  }
+}
+
+export function getByPage ({ page, shallowFetch = true }) {
+  return {
+    type: GET_BY_PAGE,
+    payload: {
+      shallowFetch,
+      page,
+    },
   }
 }

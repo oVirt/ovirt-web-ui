@@ -6,13 +6,18 @@ const initialState = Immutable.fromJS({
   vms: {},
   pools: {},
   loadInProgress: true,
+  page: 1,
+  changed: true,
 })
 
 const vms = actionReducer(initialState, {
-  UPDATE_VMS (state, { payload: { vms, copySubResources } }) {
+  UPDATE_VMS (state, { payload: { vms, copySubResources, page } }) {
     const emptyMap = Map()
     const updates = {}
     vms.forEach(vm => {
+      if (!state.getIn(['vms', vm.id])) {
+        state = state.set('changed', true)
+      }
       updates[vm.id] = vm
 
       if (copySubResources) {
@@ -21,7 +26,11 @@ const vms = actionReducer(initialState, {
       }
     })
     const imUpdates = Immutable.fromJS(updates)
-    return state.mergeIn(['vms'], imUpdates)
+    let st = state.mergeIn(['vms'], imUpdates)
+    if (page) {
+      st = st.set('page', page)
+    }
+    return st
   },
   REMOVE_VMS (state, { payload: { vmIds } }) {
     const mutable = state.asMutable()
@@ -65,6 +74,9 @@ const vms = actionReducer(initialState, {
   UPDATE_POOLS (state, { payload: { pools } }) {
     const updates = {}
     pools.forEach(pool => {
+      if (!state.getIn(['pools', pool.id])) {
+        state = state.set('changed', true)
+      }
       updates[pool.id] = pool
     })
     const imUpdates = Immutable.fromJS(updates)
@@ -107,6 +119,9 @@ const vms = actionReducer(initialState, {
   SET_LOAD_IN_PROGRESS (state, { payload: { value } }) {
     return state.set('loadInProgress', value)
   },
+  SET_PAGE (state, { payload: { page } }) {
+    return state.set('page', page)
+  },
   FAILED_EXTERNAL_ACTION (state, { payload }) { // see the userMessages() reducer
     /* Example:
      payload = {
@@ -126,6 +141,9 @@ const vms = actionReducer(initialState, {
       }
     }
     return state
+  },
+  SET_CHANGED (state, { payload: { value } }) {
+    return state.set('changed', value)
   },
 })
 

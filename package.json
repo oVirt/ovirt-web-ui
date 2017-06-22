@@ -75,6 +75,7 @@
     "react-bootstrap": "0.31.0",
     "react-bootstrap-switch": "15.5.0",
     "react-dom": "15.5.4",
+    "react-infinite-scroller": "1.0.12",
     "react-redux": "5.0.4",
     "react-router-config": "1.0.0-beta.3",
     "react-router-dom": "4.1.1",
