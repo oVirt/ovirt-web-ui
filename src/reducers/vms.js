@@ -14,6 +14,7 @@ const vms = actionReducer(initialState, {
     const updates = {}
     vms.forEach(vm => {
       updates[vm.id] = vm
+
       if (copySubResources) {
         updates[vm.id].disks = state.getIn(['vms', vm.id, 'disks'], emptyMap).toJS()
         updates[vm.id].consoles = state.getIn(['vms', vm.id, 'consoles'], emptyMap).toJS()

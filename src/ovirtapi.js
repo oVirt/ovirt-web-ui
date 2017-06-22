@@ -113,6 +113,7 @@ OvirtApi = {
       type: vm['type'],
       nextRunExists: vm['next_run_configuration_exists'] === 'true',
       lastMessage: '',
+      hostId: vm['host'] ? vm['host'].id : undefined,
 
       // TODO: improve time conversion
       startTime: vm['start_time'] ? (new Date(vm['start_time'])).toUTCString() : undefined,
@@ -275,6 +276,7 @@ OvirtApi = {
 
     }
   },
+
   clusterToInternal ({ cluster }: { cluster: Object }): Object {
     return {
       id: cluster.id,
@@ -283,6 +285,16 @@ OvirtApi = {
       memoryPolicy: {
         overCommitPercent: cluster['memory_policy'] && cluster['memory_policy']['over_commit'] && cluster['memory_policy']['over_commit']['percent'] ? cluster['memory_policy']['over_commit']['percent'] : 100,
       },
+    }
+  },
+
+  hostToInternal ({ host }: { host: Object }): Object {
+    return {
+      id: host.id,
+      name: host.name,
+
+      address: host.address,
+      clusterId: host.cluster && host.cluster.id,
     }
   },
 
@@ -385,6 +397,11 @@ OvirtApi = {
   getAllClusters (): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'getAllClusters' })
     const url = `${AppConfiguration.applicationContext}/api/clusters`
+    return OvirtApi._httpGet({ url })
+  },
+  getAllHosts (): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'getAllHosts' })
+    const url = `${AppConfiguration.applicationContext}/api/hosts`
     return OvirtApi._httpGet({ url })
   },
   getAllOperatingSystems (): Promise<Object> {

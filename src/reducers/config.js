@@ -13,6 +13,7 @@ const initialState = Immutable.fromJS({
     passed: undefined,
   },
   filter: true,
+  isFilterChecked: false,
   administrator: false,
 })
 
@@ -30,7 +31,9 @@ const config = actionReducer(initialState, {
     return state.merge({ oVirtApiVersion: oVirtApiVersion })
   },
   SET_USER_FILTER_PERMISSION (state, { payload: { filter } }) {
-    return state.set('filter', filter)
+    return state
+      .set('filter', filter)
+      .set('isFilterChecked', true)
   },
   SET_ADMINISTATOR (state, { payload: { administrator } }) {
     return state.set('administrator', administrator)

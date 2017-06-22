@@ -9,6 +9,7 @@ import options from './options'
 
 import templates from './templates'
 import clusters from './clusters'
+import hosts from './hosts'
 import route from './route'
 import operatingSystems from './operatingSystems'
 import { reducer as VmAction } from '../components/VmActions/reducer'
@@ -32,6 +33,7 @@ export default combineReducers({
   templates,
   clusters,
   operatingSystems,
+  hosts,
   route,
   VmAction,
   VmDialog,

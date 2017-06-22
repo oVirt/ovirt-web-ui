@@ -36,6 +36,9 @@ Selectors = {
   getFilter () {
     return getState().config.get('filter')
   },
+  isFilterChecked () { // Has initialization passed?
+    return getState().config.get('isFilterChecked')
+  },
   getConsoleOptions ({ vmId }) {
     return getState().options.getIn(['options', 'consoleOptions', vmId])
   },
