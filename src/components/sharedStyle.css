@@ -1,16 +1,9 @@
-.move-left-detail { /* VM detail on the right */
-    height: 100%;
-    display: block;
+.detail-container {
     width: 100%;
-    opacity:1;
 }
 
 .move-left-detail-invisible {
     opacity: 0;
-}
-
-.detail-z-index {
-	z-index: 1050;
 }
 
 .usermenu-z-index {
@@ -27,9 +20,16 @@
     margin-bottom: 5px;
 }
 
-.navbar-top-offset {
-    padding-top: 29px;
-    margin-left: 200px;
+.main-column {
+    position: absolute;
+    top: 29px;
+    left: 200px;
+    bottom: 0;
+    right: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
 }
 
 /* For VmDetail and VmDialog */

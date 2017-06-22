@@ -109,13 +109,14 @@ class PageRouter extends React.Component {
     }
 
     const RenderComponent = branch.route.component
-    return (<div className={style['navbar-top-offset']}>
-      <Breadcrumb route={branches} root={{ title: 'Virtual Machines', url: '/' }} />
-      <Toolbar>
-        {tools}
-      </Toolbar>
-      <RenderComponent route={branch.route} match={branch.match} location={location} history={history} />
-    </div>)
+    return (
+      <div className={style['main-column']}>
+        <Breadcrumb route={branches} root={{ title: 'Virtual Machines', url: '/' }} />
+        <Toolbar>
+          {tools}
+        </Toolbar>
+        <RenderComponent route={branch.route} match={branch.match} location={location} history={history} />
+      </div>)
   }
 }
 

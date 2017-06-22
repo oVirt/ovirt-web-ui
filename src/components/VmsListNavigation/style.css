@@ -1,15 +1,13 @@
 .main-container {
-    height: 100%;
-    width: 3em;
-    position: fixed;
-    z-index: 1000;
-    top: 114px;
-    left: 200px;
-    background-color: rgba(255, 255, 255, 0.15);
-    padding-top: 1em;
-    -webkit-transition: 0.5s;
     transition: 0.5s;
-    border: 1px solid #cecccc;
+    border-right: 1px solid #cecccc;
+
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 3em;
+    overflow-y: auto;
 }
 
 .expanded {
@@ -69,6 +67,5 @@
 }
 
 .item-selected {
-    /*border: thin dotted grey;*/
     background-color: #eee;
 }

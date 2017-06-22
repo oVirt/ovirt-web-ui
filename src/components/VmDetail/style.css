@@ -1,5 +1,5 @@
 .vm-detail-container {
-    display: flex;
+    display: inline-flex;
 }
 
 .vm-detail-container dt {
@@ -59,13 +59,13 @@
 }
 
 .vms-nav-expanded {
-    padding-left: 200px;
-    transition: padding-left .5s;
+    margin-left: 200px;
+    transition: margin-left .5s;
 }
 
 .vms-nav-collapsed {
-    padding-left: 2em;
-    transition: padding-left .5s;
+    margin-left: 2em;
+    transition: margin-left .5s;
 }
 
 .vm-flag-container {
@@ -77,4 +77,15 @@
 .vm-flag {
     font-size: 100%;
     vertical-align: middle;
+}
+
+.fixed-box {
+    overflow-y: auto;
+    flex-shrink: 0;
+    flex-grow: 1;
+}
+
+.scrolling-box {
+    position: relative;
+    min-height: 100%;
 }
