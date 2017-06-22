@@ -15,7 +15,7 @@ import {
   getRDP,
 } from '../../actions/index'
 
-import { isWindows, templateNameRenderer, hrefWithoutHistory } from '../../helpers'
+import { templateNameRenderer } from '../../helpers'
 
 import FieldHelp from '../FieldHelp/index'
 import DetailContainer from '../DetailContainer'
@@ -25,66 +25,13 @@ import VmsListNavigation from '../VmsListNavigation/index'
 import VmStatus from './VmStatus'
 import { NextRunLabel, OptimizedForLabel } from './labels'
 import LastMessage from './LastMessage'
+import VmConsoles from './VmConsoles'
 
-import { canConsole, userFormatOfBytes, VmIcon } from 'ovirt-ui-components'
+// import { canConsole, userFormatOfBytes, VmIcon } from 'ovirt-ui-components'
+// import { userFormatOfBytes, VmIcon, VmStatusIcon } from 'ovirt-ui-components'
+import { canCOnsolem, userFormatOfBytes, VmIcon, VmStatusIcon } from 'ovirt-ui-components'
 import Selectors from '../../selectors'
 import ConsoleButton from '../VmActions/ConsoleButton'
-
-const VmConsoles = ({ vm, onConsole, onRDP }) => {
-  const vmConsoles = vm.get('consoles').valueSeq()
-  if (canConsole(vm.get('status'))) {
-    return (
-      <dd className={style['console-box']}>
-        {
-          vmConsoles.map(c => {
-            return (
-              <ConsoleButton
-                vm={vm}
-                consoleId={c.get('id')}
-                key={c.get('id')}
-                button=''
-                className='pficon pficon-screen'
-                tooltip={`Open ${c.get('protocol').toUpperCase()} console`}
-                shortTitle={c.get('protocol').toUpperCase()}
-                />
-            )
-          })
-        }
-
-        {
-          isWindows(vm.getIn(['os', 'type']))
-            ? (<span className={style['full-button']}><a href='#' key={vm.get('id')} onClick={hrefWithoutHistory(onRDP)} className={style['left-delimiter']}>RDP</a></span>) : null
-        }
-      </dd>
-    )
-  }
-
-  return (
-    <dd>
-      <span>
-        {
-          vmConsoles.map(c => (
-            <span
-              className={style['console-vm-not-running']}
-              key={c.get('id')}>
-              {c.get('protocol').toUpperCase()}
-            </span>
-          ))
-        }
-
-        {
-          isWindows(vm.getIn(['os', 'type']))
-            ? (<span onClick={onRDP} className={style['console-vm-not-running']}>RDP</span>) : null
-        }
-      </span>
-    </dd>
-  )
-}
-VmConsoles.propTypes = {
-  vm: PropTypes.object.isRequired,
-  onConsole: PropTypes.func.isRequired,
-  onRDP: PropTypes.func.isRequired,
-}
 
 class VmDetail extends Component {
   constructor (props) {
