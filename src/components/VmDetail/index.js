@@ -24,6 +24,7 @@ import ConsoleOptions from '../ConsoleOptions/index'
 import VmDisks from '../VmDisks/index'
 import VmsListNavigation from '../VmsListNavigation/index'
 import VmStatus from './VmStatus'
+import { NextRunLabel, OptimizedForLabel } from './labels'
 
 import { canConsole, userFormatOfBytes, VmIcon } from 'ovirt-ui-components'
 import Selectors from '../../selectors'
@@ -166,7 +167,6 @@ class VmDetail extends Component {
     const cluster = Selectors.getClusterById(vm.getIn(['cluster', 'id']))
     const template = Selectors.getTemplateById(vm.getIn(['template', 'id']))
 
-//    const onToggleRenderDisks = (e) => { this.setState({ renderDisks: !this.state.renderDisks }); e.preventDefault() }
     const disksElement = (<VmDisks disks={disks} open={this.state.renderDisks} />)
 
     let optionsJS = options.hasIn(['options', 'consoleOptions', vm.get('id')]) ? options.getIn(['options', 'consoleOptions', vm.get('id')]).toJS() : {}
@@ -181,35 +181,12 @@ class VmDetail extends Component {
     const hasDisks = disks.size > 0
     const noDisks = hasDisks || (<small>no disks</small>)
 
-    /* TODO: uncomment following and add {disksShowHide} to rendering bellow to have show/hide working (might be needed e.g. with networks)
-        const onToggleRenderDisks = () => { this.setState({ renderDisks: !this.state.renderDisks }) }
-
-        const disksIconClass = this.state.renderDisks ? 'glyphicon-menu-down' : 'glyphicon-menu-right'
-        const disksShowHide = (
-          <small>
-            {hasDisks
-            ? (<a href='#' onClick={onToggleRenderDisks}>
-              <i className={`glyphicon ${disksIconClass} ${style['show-hide-arrow']}`} />&nbsp;
-              {this.state.renderDisks ? 'hide' : 'show'}
-            </a>)
-            : 'no disks'
-          }
-          </small>
-        )
-    */
     const consolesHelp = (
       <div>
         <p>If the virtual machines is running, click to access it's Graphics Console.</p>
         <p>Please refer to <a href={AppConfiguration.consoleClientResourcesURL} target='_blank'>documentation</a> for more information.</p>
       </div>
     )
-
-    const nextRunTag = vm.get('nextRunExists') && (
-      <div className={style['vm-flag-container']}>
-        <FieldHelp content='The virtual machine has pending configuration. To take effect, please reboot the virtual machine.'>
-          <span className={'label label-info ' + style['vm-flag']}>Pending Changes</span>
-        </FieldHelp>
-      </div>)
 
     return (
       <div>
@@ -221,7 +198,8 @@ class VmDetail extends Component {
               <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' className={sharedStyle['vm-detail-icon']} />
               &nbsp;{name}
             </h1>
-            {nextRunTag}
+            <NextRunLabel vm={vm} />
+            <OptimizedForLabel vm={vm} />
             <LastMessage vmId={vm.get('id')} userMessages={userMessages} />
             <div className={style['vm-detail-container']}>
               <dl className={sharedStyle['vm-properties']}>
