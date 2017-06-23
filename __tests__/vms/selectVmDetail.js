@@ -9,8 +9,4 @@ describe('Get VM detail test: ', () => {
   it2('First we check returned data: ', (result) => {
     expect(result).toEqual(fetchSingleVm(getSingleVm({ vmId: '123' })))
   })
-
-	it2('Then we check setting loadInProgress value to false: ', (result) => {
-		expect(result).toEqual(put(loadInProgress({ value: false })))
-	})
 })

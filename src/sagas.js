@@ -556,7 +556,10 @@ function* downloadVmConsole (action) {
  */
 export function* selectVmDetail (action) {
   yield fetchSingleVm(getSingleVm({ vmId: action.payload.vmId })) // async data refresh
-  yield put(loadInProgress({ value: false }))
+}
+
+function* selectPoolDetail (action) {
+  yield fetchSinglePool(getSinglePool({ poolId: action.payload.poolId }))
 }
 
 function* getConsoleOptions (action) {
@@ -578,11 +581,6 @@ function* autoConnectCheck (action) {
       yield downloadVmConsole(downloadConsole({ vmId }))
     }
   }
-}
-
-function* selectPoolDetail (action) {
-  yield fetchSinglePool(getSinglePool({ poolId: action.payload.poolId }))
-  yield put(loadInProgress({ value: false }))
 }
 
 function* schedulerPerMinute (action) {

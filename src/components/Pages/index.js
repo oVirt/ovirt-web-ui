@@ -18,9 +18,12 @@ class VmDetailPage extends React.Component {
       return (<VmDetail vm={vms.getIn(['vms', match.params.id])} config={config} />)
     } else {
       if (vms.get('loadInProgress')) {
+        console.info('VmDetailPage: VM id can not be found: ', match.params.id, ' . Load is still in progress - wating before redirect')
         return null
       }
     }
+
+    console.info('VmDetailPage: VM id can not be found: ', match.params.id, ' . Redirecting to / ')
     return <Redirect to='/' />
   }
 }
