@@ -110,6 +110,7 @@ OvirtApi = {
       description: vm['description'],
       id: vm['id'],
       status: vm['status'] ? vm['status'].toLowerCase() : undefined,
+      statusDetail: vm['status_detail'],
       type: vm['type'],
       nextRunExists: vm['next_run_configuration_exists'] === 'true',
       lastMessage: '',

@@ -10,32 +10,41 @@ import HostConsole, { hasUserHostConsoleAccess, CockpitAHREF } from '../HostCons
 
 const VmStatus = ({ vm, hosts, config }) => {
   const value = vm.get('status') // TODO: translate
+  let hostContent, detailContent
 
   if (hasUserHostConsoleAccess({ vm, hosts, config })) {
     const host = hosts.getIn(['hosts', vm.get('hostId')])
 
-    const content = (
-      <span>
+    hostContent = (
+      <p>
         Runs on host: <CockpitAHREF host={host} />
-      </span>)
+      </p>)
+  }
 
-    return (
-      <span>
-        <VmStatusIcon state={vm.get('status')} />
-        &nbsp;
-        <FieldHelp content={content} text={value} />
-        &nbsp;
-        <HostConsole vm={vm} />
-      </span>
+  if (vm.get('statusDetail')) {
+    const reason = vm.get('statusDetail') === 'noerr' ? 'No error' : vm.get('statusDetail')
+    detailContent = (
+      <p>
+        Reason: {reason}
+      </p>)
+  }
+
+  let content = null
+  if (hostContent || detailContent) {
+    content = (
+      <div>
+        {hostContent}
+        {detailContent}
+      </div>
     )
   }
 
-  // for non-admin user
   return (
     <span>
       <VmStatusIcon state={vm.get('status')} />
       &nbsp;
-      {value}
+      {content ? <FieldHelp content={content} text={value} /> : value}
+      <HostConsole vm={vm} />
     </span>
   )
 }
