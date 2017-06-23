@@ -23,15 +23,28 @@ import ConsoleOptions from '../ConsoleOptions/index'
 import VmDisks from '../VmDisks/index'
 import VmsListNavigation from '../VmsListNavigation/index'
 import VmStatus from './VmStatus'
-import { NextRunLabel, OptimizedForLabel } from './labels'
+import { NextRunLabel } from './labels'
 import LastMessage from './LastMessage'
 import VmConsoles from './VmConsoles'
 
-// import { canConsole, userFormatOfBytes, VmIcon } from 'ovirt-ui-components'
-// import { userFormatOfBytes, VmIcon, VmStatusIcon } from 'ovirt-ui-components'
-import { canCOnsolem, userFormatOfBytes, VmIcon, VmStatusIcon } from 'ovirt-ui-components'
+import { userFormatOfBytes, VmIcon } from 'ovirt-ui-components'
 import Selectors from '../../selectors'
-import ConsoleButton from '../VmActions/ConsoleButton'
+
+function rephraseVmType (vmType) {
+  const types = {
+    'desktop': 'desktop',
+    'server': 'server',
+    'highperformance': 'high performance',
+  }
+
+  const type = vmType.toLowerCase()
+  if (type in types) {
+    return types[type]
+  }
+
+  console.info('rephraseVmType(): vmType not explicitely defined: ', vmType)
+  return vmType
+}
 
 class VmDetail extends Component {
   constructor (props) {
@@ -121,7 +134,6 @@ class VmDetail extends Component {
               &nbsp;{name}
             </h1>
             <NextRunLabel vm={vm} />
-            <OptimizedForLabel vm={vm} />
             <LastMessage vmId={vm.get('id')} userMessages={userMessages} />
             <div className={style['vm-detail-container']}>
               <dl className={sharedStyle['vm-properties']}>
@@ -151,6 +163,11 @@ class VmDetail extends Component {
                   <FieldHelp content='Operating system installed on the virtual machine.' text='Operating System' />
                 </dt>
                 <dd>{os ? os.get('description') : vm.getIn(['os', 'type'])}</dd>
+
+                <dt>
+                  <FieldHelp content='Type of workload the virtual machine configuration is optimized for.' text='Optimized for' />
+                </dt>
+                <dd>{rephraseVmType(vm.get('type'))}</dd>
 
                 <dt><span className='pficon pficon-memory' />&nbsp;
                   <FieldHelp content='Total memory the virtual machine will be equipped with.' text='Defined Memory' />
