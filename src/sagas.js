@@ -114,7 +114,7 @@ function* callExternalAction (methodName, method, action, canBeMissing = false) 
     const result = yield call(method, action.payload)
     return result
   } catch (e) {
-    if (!canBeMissing || e.status !== 404) {
+    if (!canBeMissing) {
       logDebug(`External action exception: ${JSON.stringify(e)}`)
 
       if (e.status === 401) { // Unauthorized
@@ -673,7 +673,7 @@ function* fetchAllOS (action) {
 }
 
 function* fetchPermissionWithoutFilter (action) {
-  const data = yield callExternalAction('checkFilter', Api.checkFilter, { action: 'CHECK_FILTER' })
+  const data = yield callExternalAction('checkFilter', Api.checkFilter, { action: 'CHECK_FILTER' }, true)
 
   // this must be processed before continuing with next steps
   const isFiltered = data.error !== undefined
