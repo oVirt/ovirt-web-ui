@@ -24,6 +24,7 @@ import {
   setVmConsoles,
   removeMissingVms,
   removeMissingClusters,
+  removeMissingHosts,
   removeMissingTemplates,
   removeMissingOSs,
   setVmSessions,
@@ -35,8 +36,10 @@ import {
   getSingleVm,
   getAllTemplates,
   getAllClusters,
+  getAllHosts,
   getAllOperatingSystems,
   addClusters,
+  addHosts,
   addTemplates,
   addAllOS,
 
@@ -60,6 +63,7 @@ import {
 import {
   CHECK_TOKEN_EXPIRED,
   GET_ALL_CLUSTERS,
+  GET_ALL_HOSTS,
   GET_ALL_OS,
   GET_ALL_POOLS,
   GET_ALL_TEMPLATES,
@@ -131,6 +135,25 @@ function* callExternalAction (methodName, method, action, canBeMissing = false) 
     }
     return { error: e }
   }
+}
+
+function* waitTillEqual (leftArg, rightArg, limit) {
+  let counter = limit
+
+  const left = typeof leftArg === 'function' ? leftArg : () => leftArg
+  const right = typeof rightArg === 'function' ? rightArg : () => rightArg
+
+  while (counter > 0) {
+    if (left() === right()) {
+      return true
+    }
+    yield delay(20) // in ms
+    counter--
+
+    logDebug('waitTillEqual() delay ...')
+  }
+
+  return false
 }
 
 function* persistStateSaga () {
@@ -625,6 +648,18 @@ function* fetchAllClusters (action) {
   }
 }
 
+function* fetchAllHosts (action) {
+  const hosts = yield callExternalAction('getAllHosts', Api.getAllHosts, action)
+
+  if (hosts && hosts['host']) {
+    const hostsInternal = hosts.host.map(host => Api.hostToInternal({ host }))
+    yield put(addHosts({ hosts: hostsInternal }))
+
+    const hostIdsToPreserve = hostsInternal.map(item => item.id)
+    yield put(removeMissingHosts({ hostIdsToPreserve }))
+  }
+}
+
 function* fetchAllOS (action) {
   const operatingSystems = yield callExternalAction('getAllOperatingSystems', Api.getAllOperatingSystems, action)
 
@@ -639,9 +674,15 @@ function* fetchAllOS (action) {
 
 function* fetchPermissionWithoutFilter (action) {
   const data = yield callExternalAction('checkFilter', Api.checkFilter, { action: 'CHECK_FILTER' })
-  yield put(setUserFilterPermission(data.error !== undefined))
+
+  // this must be processed before continuing with next steps
+  const isFiltered = data.error !== undefined
+  yield put(setUserFilterPermission(isFiltered))
+  yield waitTillEqual(Selectors.getFilter, isFiltered, 50)
+
   yield put(refresh({ quiet: false, shallowFetch: false }))
   yield put(getAllClusters()) // no shallow
+  yield put(getAllHosts())
   yield put(getAllOperatingSystems())
   yield put(getAllTemplates({ shallowFetch: false }))
   yield put(setAdministrator(data.error === undefined))
@@ -683,6 +724,7 @@ export function *rootSaga () {
     takeLatest(GET_ALL_CLUSTERS, fetchAllClusters),
     takeLatest(GET_ALL_TEMPLATES, fetchAllTemplates),
     takeLatest(GET_ALL_OS, fetchAllOS),
+    takeLatest(GET_ALL_HOSTS, fetchAllHosts),
 
     takeEvery(SELECT_VM_DETAIL, selectVmDetail),
     takeEvery(GET_CONSOLE_OPTIONS, getConsoleOptions),

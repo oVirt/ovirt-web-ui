@@ -7,9 +7,13 @@ import VmDetail from '../VmDetail'
 import VmDialog from '../VmDialog/index'
 import { selectVmDetail, selectPoolDetail } from '../../actions/index'
 
+import Selectors from '../../selectors'
+
 class VmDetailPage extends React.Component {
   componentWillMount () {
-    this.props.getVms({ vmId: this.props.match.params.id })
+    if (Selectors.isFilterChecked()) {
+      this.props.getVms({ vmId: this.props.match.params.id })
+    }
   }
 
   render () {
@@ -40,7 +44,9 @@ VmDetailPage.propTypes = {
 
 class PoolDetailPage extends React.Component {
   componentWillMount () {
-    this.props.getPools({ poolId: this.props.match.params.id })
+    if (Selectors.isFilterChecked()) {
+      this.props.getPools({ poolId: this.props.match.params.id })
+    }
   }
   render () {
     let { match, vms, config } = this.props
@@ -68,7 +74,9 @@ PoolDetailPage.propTypes = {
 class VmDialogPage extends React.Component {
   componentWillMount () {
     if (this.props.match.params.id) {
-      this.props.getVms({ vmId: this.props.match.params.id })
+      this.props.getVms({ vmId: this.props.match.params.id }) // refresh data
+
+      // in case the location is entered from outside
     }
   }
 

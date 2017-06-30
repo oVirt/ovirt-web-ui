@@ -23,8 +23,9 @@ import DetailContainer from '../DetailContainer'
 import ConsoleOptions from '../ConsoleOptions/index'
 import VmDisks from '../VmDisks/index'
 import VmsListNavigation from '../VmsListNavigation/index'
+import VmStatus from './VmStatus'
 
-import { canConsole, userFormatOfBytes, VmIcon, VmStatusIcon } from 'ovirt-ui-components'
+import { canConsole, userFormatOfBytes, VmIcon } from 'ovirt-ui-components'
 import Selectors from '../../selectors'
 
 const LastMessage = ({ vmId, userMessages }) => {
@@ -227,7 +228,8 @@ class VmDetail extends Component {
                 <dt>
                   <FieldHelp content='The actual state the virtual machine is in.' text='State' />
                 </dt>
-                <dd><VmStatusIcon state={vm.get('status')} />&nbsp;{vm.get('status')}
+                <dd>
+                  <VmStatus vm={vm} />
                 </dd>
 
                 <dt>

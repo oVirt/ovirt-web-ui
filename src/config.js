@@ -10,6 +10,7 @@ const AppConfiguration = {
   applicationURL: '/',
 
   consoleClientResourcesURL: 'https://www.ovirt.org/documentation/admin-guide/virt/console-client-resources/',
+  cockpitPort: '9090',
 }
 
 export function readConfiguration () {
