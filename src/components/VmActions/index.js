@@ -428,7 +428,7 @@ class VmActions extends React.Component {
         <Button isOnCard={isOnCard} actionDisabled={isPool || !canSuspend(status) || vm.getIn(['actionInProgress', 'suspend'])}
           shortTitle='Suspend'
           button='btn btn-default'
-          className='fa fa-pause'
+          className='fa fa-moon-o'
           tooltip='Suspend the VM'
           popover={({ close }) => <Confirmation text='Suspend the VM?' okButton={{ label: 'Yes', click: this.props.onSuspend }} cancelButton={{ label: 'Cancel', click: () => { close() } }} />} />
 
