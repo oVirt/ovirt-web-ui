@@ -30,6 +30,7 @@ export default {
         saveToLocalStorage('autoConnect', '')
       }
     }
+    options.autoConnect = undefined
 
     saveToLocalStorage(`consoleOptions.${vmId}`, JSON.stringify(options))
   },
