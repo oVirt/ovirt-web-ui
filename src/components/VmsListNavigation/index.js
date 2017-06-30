@@ -6,7 +6,9 @@ import { connect } from 'react-redux'
 
 import style from './style.css'
 
-const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion }) => {
+import { getConsoleOptions } from '../../actions/index'
+
+const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, loadConsoleOptions }) => {
   const toggleExpandButton = (
     <div className={style['toggle-expand-button']}>
       <a href='#' onClick={toggleExpansion}>
@@ -31,7 +33,7 @@ const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion }) => {
 
           return (
             <li role='presentation' className={style['item']} key={vm.get('id')}>
-              <Link to={`/vm/${vm.get('id')}`} className={style['item-link']}>
+              <Link to={`/vm/${vm.get('id')}`} className={style['item-link']} onClick={() => loadConsoleOptions(vm.get('id'))}>
                 <span className={style['item-text']}>{vm.get('name')}</span>
               </Link>
             </li>
@@ -54,10 +56,14 @@ VmsListNavigation.propTypes = {
   expanded: PropTypes.bool,
 
   toggleExpansion: PropTypes.func.isRequired,
+  loadConsoleOptions: PropTypes.func.isRequired,
 }
 
 export default connect(
   (state) => ({
     vms: state.vms,
+  }),
+  (dispatch) => ({
+    loadConsoleOptions: (vmId) => dispatch(getConsoleOptions({ vmId })),
   })
 )(VmsListNavigation)
