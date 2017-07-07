@@ -14,7 +14,6 @@
 
 .left-padding {
     text-align: left;
-    /*padding-left: 5em;*/
 }
 
 .action-link {
@@ -32,4 +31,8 @@
 .full-button {
 	display: inline-block;
 	margin-left: 5px;
+}
+
+.full-button:first-child {
+    margin-left: 0!important;
 }
