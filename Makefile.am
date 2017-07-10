@@ -89,7 +89,7 @@ ovirt-web-ui:
 	$(YARN) run build
 	cp -rpv packaging/* build/
 	cp index.jsp build/
-	awk 'BEGIN{getline l < "index.jsp.template"}/<div id="replace_with_index_jsp_template"\/>/{gsub("<div id=\"replace_with_index_jsp_template\"/>",l)}1' build/index.html >> build/index.jsp
+	awk 'BEGIN{getline l < "index.jsp.template"}/<div id="replace_with_index_jsp_template"><\/div>/{gsub("<div id=\"replace_with_index_jsp_template\"></div>",l)}1' build/index.html >> build/index.jsp
 	rm build/index.html
 	mv build/static build/index.jsp build/favicon.ico build/ovirt-web-ui.config build/ovirt-web-ui.war/
 
