@@ -78,3 +78,12 @@
     font-size: 100%;
     vertical-align: middle;
 }
+
+dd.console-box {
+    overflow: visible;
+}
+
+.full-button {
+    display: inline-block;
+    margin-left: 5px;
+}

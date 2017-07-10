@@ -27,6 +27,7 @@ import VmStatus from './VmStatus'
 
 import { canConsole, userFormatOfBytes, VmIcon } from 'ovirt-ui-components'
 import Selectors from '../../selectors'
+import ConsoleButton from '../VmActions/ConsoleButton'
 
 const LastMessage = ({ vmId, userMessages }) => {
   const vmMessages = userMessages.get('records')
@@ -57,32 +58,26 @@ const VmConsoles = ({ vm, onConsole, onRDP }) => {
   const vmConsoles = vm.get('consoles').valueSeq()
   if (canConsole(vm.get('status'))) {
     return (
-      <dd>
+      <dd className={style['console-box']}>
         {
           vmConsoles.map(c => {
-            const onClick = (e) => {
-              onConsole({ vmId: vm.get('id'), consoleId: c.get('id') })
-              e.preventDefault()
-            }
-
             return (
-              <a
-                href='#'
-                data-toggle='tooltip'
-                data-placement='left'
-                title={`Open ${c.get('protocol').toUpperCase()} console`}
+              <ConsoleButton
+                vm={vm}
+                consoleId={c.get('id')}
                 key={c.get('id')}
-                onClick={onClick}
-                className={style['left-delimiter']}>
-                {c.get('protocol').toUpperCase()}
-              </a>
+                button=''
+                className='pficon pficon-screen'
+                tooltip={`Open ${c.get('protocol').toUpperCase()} console`}
+                shortTitle={c.get('protocol').toUpperCase()}
+                />
             )
           })
         }
 
         {
           isWindows(vm.getIn(['os', 'type']))
-            ? (<a href='#' key={vm.get('id')} onClick={hrefWithoutHistory(onRDP)} className={style['left-delimiter']}>RDP</a>) : null
+            ? (<span className={style['full-button']}><a href='#' key={vm.get('id')} onClick={hrefWithoutHistory(onRDP)} className={style['left-delimiter']}>RDP</a></span>) : null
         }
       </dd>
     )

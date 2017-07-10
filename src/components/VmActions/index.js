@@ -17,7 +17,6 @@ import {
 } from 'ovirt-ui-components'
 
 import {
-  downloadConsole,
   shutdownVm,
   restartVm,
   suspendVm,
@@ -25,11 +24,11 @@ import {
   startVm,
   removeVm,
 } from '../../actions/index'
-import { checkConsoleInUse, setConsoleInUse } from './actions'
 import { hrefWithoutHistory } from '../../helpers'
 
 import Confirmation from '../Confirmation/index'
 import Popover from '../Confirmation/Popover'
+import ConsoleButton from './ConsoleButton'
 
 class Button extends React.Component {
   constructor (props) {
@@ -237,149 +236,11 @@ RemoveVmAction.propTypes = {
   isDisks: PropTypes.bool,
 }
 
-class ConsoleButton extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      openModal: false,
-    }
-    this.consoleConfirmationAboutToOpen = this.consoleConfirmationAboutToOpen.bind(this)
-    this.onConsoleConfirmationClose = this.onConsoleConfirmationClose.bind(this)
-    this.onConsoleDownload = this.onConsoleDownload.bind(this)
-  }
-
-  consoleConfirmationAboutToOpen (e) {
-    this.setState({
-      openModal: true,
-    })
-    this.props.onCheckConsoleSessionInUse()
-  }
-
-  onConsoleConfirmationClose () {
-    this.setState({
-      openModal: false,
-    })
-    this.props.onConsoleSessionConfirmaClose()
-  }
-
-  onConsoleDownload () {
-    this.setState({
-      openModal: false,
-    })
-
-    this.props.onDownloadConsole()
-  }
-
-  render () {
-    let {
-      className,
-      tooltip = '',
-      actionDisabled = false,
-      isOnCard,
-      shortTitle,
-      button,
-      consoleInUse,
-    } = this.props
-
-    let onClick = this.consoleConfirmationAboutToOpen
-    if (actionDisabled) {
-      className = `${className} ${style['action-disabled']}`
-      onClick = undefined
-    }
-    let popoverComponent = null
-    if (consoleInUse && this.state.openModal) {
-      popoverComponent = (<Popover width={200} height={80} target={this} placement={isOnCard ? 'top' : 'bottom'} show>
-        <Confirmation text='Console in use, continue?' okButton={{ label: 'Yes', click: this.onConsoleDownload }} cancelButton={{ label: 'Cancel', click: this.onConsoleConfirmationClose }} />
-      </Popover>)
-    }
-
-    if (isOnCard) {
-      return (
-        <div className='card-pf-item'>
-          <span className={className} data-toggle='tooltip' data-placement='left' title={tooltip} onClick={onClick} />
-          {popoverComponent}
-        </div>
-      )
-    }
-
-    if (actionDisabled) {
-      return (
-        <button className={`${button} ${style['disabled-button']}`} disabled='disabled'>
-          <span data-toggle='tooltip' data-placement='left' title={tooltip}>
-            {shortTitle}
-          </span>
-        </button>
-      )
-    }
-
-    return (
-      <span className={style['full-button']}>
-        <a href='#' onClick={this.consoleConfirmationAboutToOpen} className={`${button} ${style['link']}`} id={shortTitle}>
-          <span data-toggle='tooltip' data-placement='left' title={tooltip}>
-            {shortTitle}
-          </span>
-        </a>
-        {popoverComponent}
-      </span>
-    )
-  }
-}
-
-ConsoleButton.propTypes = {
-  className: PropTypes.string.isRequired,
-  tooltip: PropTypes.string,
-  shortTitle: PropTypes.string.isRequired,
-  button: PropTypes.string.isRequired,
-  actionDisabled: PropTypes.bool,
-  isOnCard: PropTypes.bool,
-  consoleInUse: PropTypes.bool,
-  onDownloadConsole: PropTypes.func.isRequired,
-  onConsoleSessionConfirmaClose: PropTypes.func.isRequired,
-  onCheckConsoleSessionInUse: PropTypes.func.isRequired,
-}
-
 /**
  * Active actions on a single VM-card.
  * List of actions depends on the VM state.
  */
 class VmActions extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      openModal: false,
-      notificationTarget: null,
-      show: false,
-    }
-    this.consoleConfirmationAboutToOpen = this.consoleConfirmationAboutToOpen.bind(this)
-    this.onConsoleConfirmationClose = this.onConsoleConfirmationClose.bind(this)
-    this.onConsoleDownload = this.onConsoleDownload.bind(this)
-  }
-
-  consoleConfirmationAboutToOpen (e) {
-    this.setState({
-      openModal: true,
-      notificationTarget: e.target,
-    })
-    this.props.onCheckConsoleSessionInUse()
-  }
-
-  onConsoleConfirmationClose () {
-    this.setState({
-      openModal: false,
-      notificationTarget: null,
-    })
-    this.props.onConsoleSessionConfirmaClose()
-  }
-
-  onConsoleDownload () {
-    this.setState({
-      openModal: false,
-      notificationTarget: null,
-    })
-
-    this.props.onDownloadConsole()
-  }
-
   render () {
     let {
       vm,
@@ -389,7 +250,6 @@ class VmActions extends React.Component {
       onStartPool,
       isPool,
       onRemove,
-      VmAction,
     } = this.props
 
     let onStart = onStartVm
@@ -451,10 +311,7 @@ class VmActions extends React.Component {
           className='pficon pficon-screen'
           tooltip={consoleProtocol}
           shortTitle='Console'
-          onDownloadConsole={this.props.onDownloadConsole}
-          onConsoleSessionConfirmaClose={this.props.onConsoleSessionConfirmaClose}
-          onCheckConsoleSessionInUse={this.props.onCheckConsoleSessionInUse}
-          consoleInUse={VmAction.getIn(['vms', vm.get('id'), 'consoleInUse'])} />
+          vm={vm} />
 
         <LinkButton isOnCard={isOnCard}
           shortTitle='Edit'
@@ -470,13 +327,9 @@ class VmActions extends React.Component {
 
 VmActions.propTypes = {
   vm: PropTypes.object.isRequired,
-  VmAction: PropTypes.object.isRequired,
   isOnCard: PropTypes.bool,
   isPool: PropTypes.bool,
   pool: PropTypes.object,
-  onDownloadConsole: PropTypes.func.isRequired,
-  onConsoleSessionConfirmaClose: PropTypes.func.isRequired,
-  onCheckConsoleSessionInUse: PropTypes.func.isRequired,
   onShutdown: PropTypes.func.isRequired,
   onRestart: PropTypes.func.isRequired,
   onForceShutdown: PropTypes.func.isRequired,
@@ -489,12 +342,8 @@ VmActions.propTypes = {
 export default connect(
   (state) => ({
     icons: state.icons,
-    VmAction: state.VmAction,
   }),
   (dispatch, { vm, pool }) => ({
-    onCheckConsoleSessionInUse: () => dispatch(checkConsoleInUse({ vmId: vm.get('id') })),
-    onConsoleSessionConfirmaClose: () => dispatch(setConsoleInUse({ vmId: vm.get('id'), consoleInUse: false })),
-    onDownloadConsole: () => dispatch(downloadConsole({ vmId: vm.get('id') })),
     onShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: false })),
     onRestart: () => dispatch(restartVm({ vmId: vm.get('id'), force: false })),
     onForceShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: true })),
