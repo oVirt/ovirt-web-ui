@@ -275,16 +275,24 @@ function* logout () {
   window.location.href = `${AppConfiguration.applicationURL}/sso/logout`
 }
 
-function* fetchUnknwonIconsForVms ({ vms }) {
-  // unique iconIds from all vms
-  const vmIconIds = new Set(vms.map(vm => vm.icons.small.id))
-  vms.map(vm => vm.icons.large.id).forEach(id => vmIconIds.add(id))
+function* fetchUnknwonIconsForVms ({ vms, os }) {
+  // unique iconIds from all vms or os (if available)
+  const iconsIds = new Set()
+  if (vms) {
+    vms.map(vm => vm.icons.small.id).forEach(id => iconsIds.add(id))
+    vms.map(vm => vm.icons.large.id).forEach(id => iconsIds.add(id))
+  }
+
+  if (os) {
+    os.map(os => os.icons.small.id).forEach(id => iconsIds.add(id))
+    os.map(os => os.icons.large.id).forEach(id => iconsIds.add(id))
+  }
 
   // reduce to just unknown
   const allKnownIcons = Selectors.getAllIcons()
-  const iconIds = [...vmIconIds].filter(id => !allKnownIcons.get(id))
+  const notLoadedIconIds = [...iconsIds].filter(id => !allKnownIcons.get(id))
 
-  yield * foreach(iconIds, function* (iconId) {
+  yield * foreach(notLoadedIconIds, function* (iconId) {
     yield fetchIcon({ iconId })
   })
 }
@@ -668,6 +676,8 @@ function* fetchAllOS (action) {
     yield put(addAllOS({ os: operatingSystemsInternal }))
 
     const osIdsToPreserve = operatingSystemsInternal.map(item => item.id)
+    // load icons for OS
+    yield fetchUnknwonIconsForVms({ os: operatingSystemsInternal })
     yield put(removeMissingOSs({ osIdsToPreserve }))
   }
 }
