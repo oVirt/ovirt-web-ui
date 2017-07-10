@@ -12,7 +12,7 @@ export function failedExternalAction ({ message, shortMessage, exception, action
         ? (exception.responseJSON.detail || exception.responseJSON.fault.detail)
         : (exception['statusText'] || 'UNKNOWN')
       )
-    message = customizeErrorMessage(message)
+    message = shortMessage + '\n' + customizeErrorMessage(message)
 
     const type = exception['status'] ? exception['status'] : 'ERROR'
 
