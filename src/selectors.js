@@ -42,6 +42,9 @@ Selectors = {
   getConsoleOptions ({ vmId }) {
     return getState().options.getIn(['options', 'consoleOptions', vmId])
   },
+  getCurrentPage () {
+    return getState().vms.get('page')
+  },
 }
 
 function getState () {

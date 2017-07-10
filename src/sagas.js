@@ -54,6 +54,7 @@ import {
 
   setConsoleOptions,
   redirectRoute,
+  refresh,
   downloadConsole,
   getConsoleOptions as getConsoleOptionsAction,
   getVmsByPage,
@@ -85,6 +86,7 @@ import {
   SAVE_CONSOLE_OPTIONS,
   SELECT_POOL_DETAIL,
   SELECT_VM_DETAIL,
+  SCHEDULER__1_MIN,
   SHUTDOWN_VM,
   START_POOL,
   START_VM,
@@ -720,6 +722,24 @@ function* fetchPermissionWithoutFilter (action) {
   yield put(setAdministrator(data.error === undefined))
 }
 
+function* schedulerPerMinute (action) {
+  logDebug('Starting schedulerPerMinute() scheduler')
+
+  // TODO: do we need to stop the loop? Consider takeLatest in the rootSaga 'restarts' the loop if needed
+  while (true) {
+    yield delay(60 * 1000) // 1 minute
+    logDebug('schedulerPerMinute() event')
+
+    const oVirtVersion = Selectors.getOvirtVersion()
+    if (oVirtVersion.get('passed')) {
+      // Actions to be executed no more than once per minute:
+      yield put(refresh({ quiet: true, shallowFetch: true, page: Selectors.getCurrentPage() }))
+    } else {
+      logDebug('schedulerPerMinute() event skipped since oVirt API version does not match')
+    }
+  }
+}
+
 // Sagas workers for using in different sagas modules
 let sagasFunctions = {
   foreach,
@@ -767,6 +787,7 @@ export function *rootSaga () {
     takeEvery(SAVE_CONSOLE_OPTIONS, saveConsoleOptions),
 
     takeEvery(SELECT_POOL_DETAIL, selectPoolDetail),
+    takeLatest(SCHEDULER__1_MIN, schedulerPerMinute),
     ...SagasWorkers(sagasFunctions),
   ]
 }

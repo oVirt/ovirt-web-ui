@@ -5,6 +5,7 @@ import {
   SET_ADMINISTATOR,
   SET_USER_FILTER_PERMISSION,
   CHECK_TOKEN_EXPIRED,
+  SCHEDULER__1_MIN,
 } from '../constants/index'
 
 export * from './error'
@@ -17,6 +18,13 @@ export * from './templates'
 export * from './options'
 export * from './pool'
 export * from './route'
+
+export function schedulerOneMinute () {
+  return {
+    type: SCHEDULER__1_MIN,
+    payload: {},
+  }
+}
 
 export function persistState () {
   return {

@@ -28,7 +28,7 @@ import AppConfiguration, { readConfiguration } from './config'
 import { loadStateFromLocalStorage } from './storage'
 import { logDebug, logError, valuesOfObject } from './helpers'
 import { rootSaga } from './sagas'
-import { login, updateIcons, setDomain, refresh } from './actions'
+import { login, updateIcons, setDomain, schedulerOneMinute } from './actions'
 
 import App from './App'
 
@@ -102,17 +102,7 @@ function start () {
     logError('Missing SSO Token!')
   }
 
-  setInterval(() => {
-    logDebug('schedulerPerMinute() event')
-
-    const oVirtVersion = Selectors.getOvirtVersion()
-    if (oVirtVersion.get('passed')) {
-      // Actions to be executed no more than once per minute:
-      store.dispatch(refresh({ quiet: true, shallowFetch: true, page: store.getState().vms.get('page') }))
-    } else {
-      logDebug('schedulerPerMinute() event skipped since oVirt API version does not match')
-    }
-  }, 60 * 1000)
+  store.dispatch(schedulerOneMinute())
 }
 
 start()

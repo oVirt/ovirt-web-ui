@@ -18,7 +18,7 @@ const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, onUpdat
   )
 
   const loadMore = () => {
-    if (vms.get('changed')) {
+    if (vms.get('areAllPagesLoaded')) {
       onUpdate(vms.get('page') + 1)
     }
   }
@@ -52,7 +52,7 @@ const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, onUpdat
   return (
     <InfiniteScroll
       loadMore={loadMore}
-      hasMore={vms.get('changed')}
+      hasMore={vms.get('areAllPagesLoaded')}
       >
       <div className={`${style['main-container']} ${expanded ? style['expanded'] : ''}`}>
         {toggleExpandButton}
