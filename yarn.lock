@@ -4487,6 +4487,12 @@ react-dom@15.5.4:
     object-assign "^4.1.0"
     prop-types "~15.5.7"
 
+react-infinite-scroller@1.0.12:
+  version "1.0.12"
+  resolved "https://registry.yarnpkg.com/react-infinite-scroller/-/react-infinite-scroller-1.0.12.tgz#a51fcb5dd82bc1b6207f69be747bd7b872917fa4"
+  dependencies:
+    prop-types "^15.5.8"
+
 react-overlays@^0.7.0:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/react-overlays/-/react-overlays-0.7.0.tgz#531898ff566c7e5c7226ead2863b8cf9fbb5a981"
