@@ -28,7 +28,7 @@ import AppConfiguration, { readConfiguration } from './config'
 import { loadStateFromLocalStorage } from './storage'
 import { logDebug, logError, valuesOfObject } from './helpers'
 import { rootSaga } from './sagas'
-import { schedulerOneMinute, login, updateIcons, setDomain } from './actions'
+import { login, updateIcons, setDomain, schedulerOneMinute } from './actions'
 
 import App from './App'
 
@@ -102,7 +102,6 @@ function start () {
     logError('Missing SSO Token!')
   }
 
-  // start cron-jobs
   store.dispatch(schedulerOneMinute())
 }
 

@@ -1,10 +1,11 @@
 import {
   GET_VM,
+  GET_BY_PAGE,
   PERSIST_STATE,
-  SCHEDULER__1_MIN,
   SET_ADMINISTATOR,
   SET_USER_FILTER_PERMISSION,
   CHECK_TOKEN_EXPIRED,
+  SCHEDULER__1_MIN,
 } from '../constants/index'
 
 export * from './error'
@@ -17,6 +18,13 @@ export * from './templates'
 export * from './options'
 export * from './pool'
 export * from './route'
+
+export function schedulerOneMinute () {
+  return {
+    type: SCHEDULER__1_MIN,
+    payload: {},
+  }
+}
 
 export function persistState () {
   return {
@@ -32,13 +40,6 @@ export function getSingleVm ({ vmId }) {
     payload: {
       vmId,
     },
-  }
-}
-
-export function schedulerOneMinute () {
-  return {
-    type: SCHEDULER__1_MIN,
-    payload: {},
   }
 }
 
@@ -71,5 +72,15 @@ export function showTokenExpiredMessage () {
   return {
     type: 'SHOW_TOKEN_EXPIRED_MSG',
     payload: {},
+  }
+}
+
+export function getByPage ({ page, shallowFetch = true }) {
+  return {
+    type: GET_BY_PAGE,
+    payload: {
+      shallowFetch,
+      page,
+    },
   }
 }

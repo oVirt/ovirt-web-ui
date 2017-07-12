@@ -1,6 +1,7 @@
 import {
-  GET_ALL_POOLS,
   GET_POOL,
+  GET_POOLS_BY_COUNT,
+  GET_POOLS_BY_PAGE,
   POOL_ACTION_IN_PROGRESS,
   REMOVE_MISSING_POOLS,
   REMOVE_POOL,
@@ -9,18 +10,20 @@ import {
   UPDATE_VMPOOLS_COUNT,
 } from '../constants/index'
 
-/**
- * Read all Pools data and related subresources
- *
- * @param shallowFetch If true, only Pools and their (missing) icons are read,
- * otherwise full read/refresh
- *
- * @returns {{type: string, payload: {shallowFetch}}}
- */
-export function getAllPools () {
+export function getPoolsByPage ({ page }) {
   return {
-    type: GET_ALL_POOLS,
+    type: GET_POOLS_BY_PAGE,
     payload: {
+      page,
+    },
+  }
+}
+
+export function getPoolsByCount ({ count }) {
+  return {
+    type: GET_POOLS_BY_COUNT,
+    payload: {
+      count,
     },
   }
 }

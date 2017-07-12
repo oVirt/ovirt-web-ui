@@ -360,9 +360,14 @@ OvirtApi = {
     const url = `${AppConfiguration.applicationContext}/api/vms/${vmId}`
     return OvirtApi._httpGet({ url })
   },
-  getAllVms (): Promise<Object> {
-    OvirtApi._assertLogin({ methodName: 'getAllVms' })
-    const url = `${AppConfiguration.applicationContext}/api/vms`
+  getVmsByPage ({ page }: { page: number }): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'getVmsByPage' })
+    const url = `${AppConfiguration.applicationContext}/api/vms/;max=${AppConfiguration.pageLimit}?search=SORTBY NAME ASC page ${page}`
+    return OvirtApi._httpGet({ url })
+  },
+  getVmsByCount ({ count }: { count: number }): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'getVmsByCount' })
+    const url = `${AppConfiguration.applicationContext}/api/vms/;max=${count}?search=SORTBY NAME ASC`
     return OvirtApi._httpGet({ url })
   },
   shutdown ({ vmId, force }: { vmId: string, force: boolean }): Promise<Object> {
@@ -481,9 +486,15 @@ OvirtApi = {
     return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/permissions`, custHeaders: { Filter: false } })
   },
 
-  getAllPools (): Promise<Object> {
-    OvirtApi._assertLogin({ methodName: 'getAllPools' })
-    const url = `${AppConfiguration.applicationContext}/api/vmpools`
+  getPoolsByPage ({ page }: { page: number }): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'getPoolsByPage' })
+    const url = `${AppConfiguration.applicationContext}/api/vmpools/;max=${AppConfiguration.pageLimit}?search=SORTBY NAME ASC page ${page}`
+    return OvirtApi._httpGet({ url })
+  },
+
+  getPoolsByCount ({ count }: { count: number }): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'getPoolsByCount' })
+    const url = `${AppConfiguration.applicationContext}/api/vmpools/;max=${count}`
     return OvirtApi._httpGet({ url })
   },
 

@@ -13,9 +13,9 @@ import {
   loginFailed,
   failedExternalAction,
   showTokenExpiredMessage,
-  refresh,
 
   loadInProgress,
+  setChanged,
   updateIcons,
   setVmDisks,
   updateVms,
@@ -31,8 +31,6 @@ import {
   persistState,
   setOvirtApiVersion,
 
-  getAllVms,
-  getAllPools,
   getSingleVm,
   getAllTemplates,
   getAllClusters,
@@ -56,8 +54,13 @@ import {
 
   setConsoleOptions,
   redirectRoute,
+  refresh,
   downloadConsole,
   getConsoleOptions as getConsoleOptionsAction,
+  getVmsByPage,
+  getVmsByCount,
+  getPoolsByCount,
+  getPoolsByPage,
 } from './actions/index'
 
 import {
@@ -65,10 +68,14 @@ import {
   GET_ALL_CLUSTERS,
   GET_ALL_HOSTS,
   GET_ALL_OS,
-  GET_ALL_POOLS,
   GET_ALL_TEMPLATES,
-  GET_ALL_VMS,
+  GET_BY_PAGE,
   GET_CONSOLE_OPTIONS,
+  GET_POOLS_BY_COUNT,
+  GET_POOLS_BY_PAGE,
+  GET_RDP_VM,
+  GET_VMS_BY_COUNT,
+  GET_VMS_BY_PAGE,
   DOWNLOAD_CONSOLE_VM,
   LOGIN,
   LOGOUT,
@@ -77,14 +84,13 @@ import {
   REMOVE_VM,
   RESTART_VM,
   SAVE_CONSOLE_OPTIONS,
-  SCHEDULER__1_MIN,
   SELECT_POOL_DETAIL,
   SELECT_VM_DETAIL,
+  SCHEDULER__1_MIN,
   SHUTDOWN_VM,
   START_POOL,
   START_VM,
   SUSPEND_VM,
-  GET_RDP_VM,
 } from './constants/index'
 
 import Api from 'ovirtapi'
@@ -154,6 +160,14 @@ function* waitTillEqual (leftArg, rightArg, limit) {
   }
 
   return false
+}
+
+function* fetchByPage (action) {
+  yield put(loadInProgress({ value: true }))
+  yield put(setChanged({ value: false }))
+  yield fetchVmsByPage(action)
+  yield fetchPoolsByPage(action)
+  yield put(loadInProgress({ value: false }))
 }
 
 function* persistStateSaga () {
@@ -304,15 +318,39 @@ function* refreshData (action) {
     console.log('refreshData(): not quiet')
     yield put(loadInProgress({ value: true }))
   }
-  yield put(getAllVms({ shallowFetch: !!action.payload.shallowFetch }))
-  yield put(getAllPools())
+  yield put(getVmsByCount({ count: action.payload.page * AppConfiguration.pageLimit, shallowFetch: !!action.payload.shallowFetch }))
+  yield put(getPoolsByCount({ count: action.payload.page * AppConfiguration.pageLimit }))
+  yield put(loadInProgress({ value: false }))
 }
 
-function* fetchAllVms (action) {
+function* fetchVmsByPage (action) {
+  const { shallowFetch, page } = action.payload
+
+  // TODO: paging: split this call to a loop per up to 25 vms
+  const allVms = yield callExternalAction('getVmsByPage', Api.getVmsByPage, action)
+
+  if (allVms && allVms['vm']) { // array
+    const internalVms = allVms.vm.map(vm => Api.vmToInternal({ vm }))
+
+    yield put(updateVms({ vms: internalVms, copySubResources: true, page: page }))
+
+    if (!shallowFetch) {
+      yield fetchConsoleMetadatas({ vms: internalVms })
+      yield fetchDisks({ vms: internalVms })
+      yield fetchVmsSessions({ vms: internalVms })
+    } else {
+      logDebug('getVmsByPage() shallow fetch requested - skipping other resources')
+    }
+  }
+
+  yield put(persistState())
+}
+
+function* fetchVmsByCount (action) {
   const { shallowFetch } = action.payload
 
   // TODO: paging: split this call to a loop per up to 25 vms
-  const allVms = yield callExternalAction('getAllVms', Api.getAllVms, action)
+  const allVms = yield callExternalAction('getVmsByCount', Api.getVmsByCount, action)
 
   if (allVms && allVms['vm']) { // array
     const internalVms = allVms.vm.map(vm => Api.vmToInternal({ vm }))
@@ -322,30 +360,39 @@ function* fetchAllVms (action) {
 
     yield put(updateVms({ vms: internalVms, copySubResources: true }))
 
-    // TODO: is removing of icons needed? I.e. when icon is removed or changed on the server
-    yield fetchUnknwonIconsForVms({ vms: internalVms })
-
     if (!shallowFetch) {
       yield fetchConsoleMetadatas({ vms: internalVms })
       yield fetchDisks({ vms: internalVms })
       yield fetchVmsSessions({ vms: internalVms })
     } else {
-      logDebug('fetchAllVms() shallow fetch requested - skipping other resources')
+      logDebug('fetchVmsByCount() shallow fetch requested - skipping other resources')
     }
   }
 
-  yield put(loadInProgress({ value: false }))
   yield put(persistState())
 }
 
-function* fetchAllPools (action) {
-  const allPools = yield callExternalAction('getAllPools', Api.getAllPools, action)
+function* fetchPoolsByCount (action) {
+  const allPools = yield callExternalAction('getPoolsByCount', Api.getPoolsByCount, action)
 
   if (allPools && allPools['vm_pool']) { // array
     const internalPools = allPools.vm_pool.map(pool => Api.poolToInternal({ pool }))
 
     const poolIdsToPreserve = internalPools.map(pool => pool.id)
     yield put(removeMissingPools({ poolIdsToPreserve }))
+
+    yield put(updatePools({ pools: internalPools }))
+    yield put(updateVmsPoolsCount())
+  }
+
+  yield put(persistState())
+}
+
+function* fetchPoolsByPage (action) {
+  const allPools = yield callExternalAction('getPoolsByPage', Api.getPoolsByPage, action)
+
+  if (allPools && allPools['vm_pool']) { // array
+    const internalPools = allPools.vm_pool.map(pool => Api.poolToInternal({ pool }))
 
     yield put(updatePools({ pools: internalPools }))
     yield put(updateVmsPoolsCount())
@@ -601,25 +648,10 @@ function* autoConnectCheck (action) {
   if (vmId && vmId.length > 0) {
     const vm = yield callExternalAction('getVm', Api.getVm, getSingleVm({ vmId }), true)
     if (vm && vm.id && vm.status !== 'down') {
+      const internalVm = Api.vmToInternal({ vm })
+      yield put(updateVms({ vms: [internalVm] }))
+
       yield downloadVmConsole(downloadConsole({ vmId }))
-    }
-  }
-}
-
-function* schedulerPerMinute (action) {
-  logDebug('Starting schedulerPerMinute() scheduler')
-
-  // TODO: do we need to stop the loop? Consider takeLatest in the rootSaga 'restarts' the loop if needed
-  while (true) {
-    yield delay(60 * 1000) // 1 minute
-    logDebug('schedulerPerMinute() event')
-
-    const oVirtVersion = Selectors.getOvirtVersion()
-    if (oVirtVersion.get('passed')) {
-      // Actions to be executed no more than once per minute:
-      yield put(refresh({ quiet: true, shallowFetch: true }))
-    } else {
-      logDebug('schedulerPerMinute() event skipped since oVirt API version does not match')
     }
   }
 }
@@ -680,13 +712,34 @@ function* fetchPermissionWithoutFilter (action) {
   yield put(setUserFilterPermission(isFiltered))
   yield waitTillEqual(Selectors.getFilter, isFiltered, 50)
 
-  yield put(refresh({ quiet: false, shallowFetch: false }))
+  yield put(setUserFilterPermission(data.error !== undefined))
   yield put(getAllClusters()) // no shallow
   yield put(getAllHosts())
   yield put(getAllOperatingSystems())
   yield put(getAllTemplates({ shallowFetch: false }))
+  yield put(getVmsByPage({ page: 1 }))
+  yield put(getPoolsByPage({ page: 1 }))
   yield put(setAdministrator(data.error === undefined))
 }
+
+function* schedulerPerMinute (action) {
+  logDebug('Starting schedulerPerMinute() scheduler')
+
+  // TODO: do we need to stop the loop? Consider takeLatest in the rootSaga 'restarts' the loop if needed
+  while (true) {
+    yield delay(60 * 1000) // 1 minute
+    logDebug('schedulerPerMinute() event')
+
+    const oVirtVersion = Selectors.getOvirtVersion()
+    if (oVirtVersion.get('passed')) {
+      // Actions to be executed no more than once per minute:
+      yield put(refresh({ quiet: true, shallowFetch: true, page: Selectors.getCurrentPage() }))
+    } else {
+      logDebug('schedulerPerMinute() event skipped since oVirt API version does not match')
+    }
+  }
+}
+
 // Sagas workers for using in different sagas modules
 let sagasFunctions = {
   foreach,
@@ -708,8 +761,11 @@ export function *rootSaga () {
     takeLatest(CHECK_TOKEN_EXPIRED, doCheckTokenExpired),
 
     takeLatest(REFRESH_DATA, refreshData),
-    takeLatest(GET_ALL_VMS, fetchAllVms),
-    takeLatest(GET_ALL_POOLS, fetchAllPools),
+    takeLatest(GET_BY_PAGE, fetchByPage),
+    takeLatest(GET_VMS_BY_PAGE, fetchVmsByPage),
+    takeLatest(GET_VMS_BY_COUNT, fetchVmsByCount),
+    takeLatest(GET_POOLS_BY_COUNT, fetchPoolsByCount),
+    takeLatest(GET_POOLS_BY_PAGE, fetchPoolsByPage),
     takeLatest(PERSIST_STATE, persistStateSaga),
 
     takeEvery(SHUTDOWN_VM, shutdownVm),

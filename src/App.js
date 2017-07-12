@@ -73,7 +73,7 @@ const App = ({ vms, visibility, config }) => {
   return (
     <Router getUserConfirmation={openConfirmation} basename={AppConfiguration.applicationURL}>
       <div>
-        <VmsPageHeader title='oVirt VM Portal' />
+        <VmsPageHeader page={vms.get('page')} title='oVirt VM Portal' />
         <VerticalMenu menuItems={menu} />
         <TokenExpired />
         <LoadingData />

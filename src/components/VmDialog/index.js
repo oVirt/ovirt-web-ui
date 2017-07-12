@@ -115,7 +115,7 @@ class VmDialog extends React.Component {
     e.preventDefault()
     this.props.vm
       ? this.props.updateVm(this.composeVm(), actionUniqueId)
-      : this.props.addVm(this.composeVm(), actionUniqueId)
+      : this.props.addVm(this.composeVm(), actionUniqueId, this.props.vms.get('page'))
     this.setState({
       saved: true,
     })
@@ -550,7 +550,7 @@ export default connect(
   }),
   (dispatch) => ({
     onCloseDialog: () => dispatch(closeDialog({ force: false })),
-    addVm: (vm, actionUniqueId) => dispatch(createVm(vm, actionUniqueId)),
+    addVm: (vm, actionUniqueId, page) => dispatch(createVm(vm, actionUniqueId, page)),
     updateVm: (vm, actionUniqueId) => dispatch(editVm(vm, actionUniqueId)),
     onInit: () => dispatch(setSavedVm({ vm: null })),
   })

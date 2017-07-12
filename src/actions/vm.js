@@ -1,7 +1,9 @@
 import {
   CLEAR_USER_MSGS,
   DOWNLOAD_CONSOLE_VM,
-  GET_ALL_VMS,
+  GET_RDP_VM,
+  GET_VMS_BY_COUNT,
+  GET_VMS_BY_PAGE,
   LOGIN,
   LOGIN_SUCCESSFUL,
   LOGOUT,
@@ -10,6 +12,7 @@ import {
   REMOVE_VM,
   REMOVE_VMS,
   RESTART_VM,
+  SET_DOMAIN,
   SET_LOAD_IN_PROGRESS,
   SET_OVIRT_API_VERSION,
   SET_VM_CONSOLES,
@@ -21,8 +24,6 @@ import {
   UPDATE_ICONS,
   UPDATE_VMS,
   VM_ACTION_IN_PROGRESS,
-  GET_RDP_VM,
-  SET_DOMAIN,
 } from '../constants/index'
 
 export function login ({ username, password, token }) {
@@ -50,29 +51,33 @@ export function setDomain ({ domain }) {
 /**
  * I.e. the Refresh button is clicked or scheduler event occurred (polling)
  */
-export function refresh ({ quiet = false, shallowFetch = false }) {
+export function refresh ({ page, quiet = false, shallowFetch = false }) {
   return {
     type: REFRESH_DATA,
     payload: {
       quiet,
       shallowFetch,
+      page,
     },
   }
 }
 
-/**
- * Read all VMs data and related subresources
- *
- * @param shallowFetch If true, only VMs and their (missing) icons are read,
- * otherwise full read/refresh
- *
- * @returns {{type: string, payload: {shallowFetch}}}
- */
-export function getAllVms ({ shallowFetch = false }) {
+export function getVmsByPage ({ page, shallowFetch = true }) {
   return {
-    type: GET_ALL_VMS,
+    type: GET_VMS_BY_PAGE,
     payload: {
       shallowFetch,
+      page,
+    },
+  }
+}
+
+export function getVmsByCount ({ count, shallowFetch = true }) {
+  return {
+    type: GET_VMS_BY_COUNT,
+    payload: {
+      shallowFetch,
+      count,
     },
   }
 }
@@ -185,12 +190,13 @@ export function loadInProgress ({ value }) {
  * @param vms - array of vms
  * @returns {{type: string, payload: {vms: *}}}
  */
-export function updateVms ({ vms, copySubResources = false }) {
+export function updateVms ({ vms, copySubResources = false, page = null }) {
   return {
     type: UPDATE_VMS,
     payload: {
       vms,
       copySubResources,
+      page,
     },
   }
 }
@@ -282,6 +288,24 @@ export function getRDP ({ vmName, username, domain, fqdn }) {
       username,
       domain,
       fqdn,
+    },
+  }
+}
+
+export function setPage ({ page }) {
+  return {
+    type: 'SET_PAGE',
+    payload: {
+      page,
+    },
+  }
+}
+
+export function setChanged ({ value }) {
+  return {
+    type: 'SET_CHANGED',
+    payload: {
+      value,
     },
   }
 }
