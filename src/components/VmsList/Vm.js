@@ -21,10 +21,14 @@ import { startVm } from '../../actions/index'
  */
 class Vm extends React.Component {
   render () {
-    let { vm, icons, visibility, onStart } = this.props
+    let { vm, icons, visibility, onStart, os } = this.props
     const state = vm.get('status')
 
-    const iconId = vm.getIn(['icons', 'large', 'id'])
+    let iconId = vm.getIn(['icons', 'large', 'id'])
+    const vmOs = os.get('operatingSystems').find((v, k) => v.get('name') === vm.getIn(['os', 'type']))
+    if (vmOs) {
+      iconId = vmOs.getIn(['icons', 'large', 'id'])
+    }
     const icon = icons.get(iconId)
     const isSelected = vm.get('id') === visibility.get('selectedVmDetail')
 
@@ -59,6 +63,7 @@ class Vm extends React.Component {
 Vm.propTypes = {
   vm: PropTypes.object.isRequired,
   icons: PropTypes.object.isRequired,
+  os: PropTypes.object.isRequired,
   onStart: PropTypes.func.isRequired,
   visibility: PropTypes.object.isRequired,
 }
@@ -67,6 +72,7 @@ export default withRouter(connect(
   (state) => ({
     icons: state.icons,
     visibility: state.visibility,
+    os: state.operatingSystems,
   }),
   (dispatch, { vm }) => ({
     onStart: () => dispatch(startVm({ vmId: vm.get('id') })),

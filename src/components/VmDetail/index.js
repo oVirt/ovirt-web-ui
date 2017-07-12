@@ -151,10 +151,15 @@ class VmDetail extends Component {
       options,
       pool,
       onRDP,
+      operatingSystems,
     } = this.props
 
     const name = isPool ? pool.get('name') : vm.get('name')
-    const iconId = vm.getIn(['icons', 'small', 'id'])
+    let iconId = vm.getIn(['icons', 'small', 'id'])
+    const vmOs = operatingSystems.get('operatingSystems').find((v, k) => v.get('name') === vm.getIn(['os', 'type']))
+    if (vmOs) {
+      iconId = vmOs.getIn(['icons', 'large', 'id'])
+    }
     const icon = icons.get(iconId)
     const disks = vm.get('disks')
     const os = Selectors.getOperatingSystemByName(vm.getIn(['os', 'type']))
@@ -292,6 +297,7 @@ VmDetail.propTypes = {
   vm: PropTypes.object,
   pool: PropTypes.object,
   icons: PropTypes.object.isRequired,
+  operatingSystems: PropTypes.object.isRequired,
   userMessages: PropTypes.object.isRequired,
   onConsole: PropTypes.func.isRequired,
   onConsoleOptionsSave: PropTypes.func.isRequired,
@@ -307,6 +313,7 @@ export default connect(
     icons: state.icons,
     userMessages: state.userMessages,
     options: state.options,
+    operatingSystems: state.operatingSystems,
   }),
 
   (dispatch, { vm, config }) => ({

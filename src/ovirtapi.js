@@ -304,6 +304,14 @@ OvirtApi = {
       id: os.id,
       name: os.name,
       description: os.description,
+      icons: {
+        small: {
+          id: os['small_icon'] ? os.small_icon['id'] : undefined,
+        },
+        large: {
+          id: os['large_icon'] ? os.large_icon['id'] : undefined,
+        },
+      },
     }
   },
 
