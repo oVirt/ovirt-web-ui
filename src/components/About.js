@@ -37,7 +37,7 @@ const AboutDialog = ({ oVirtApiVersion }) => {
             </div>
 
             <div className='trademark-pf'>
-              Relesed under <a href='https://github.com/oVirt/ovirt-web-ui/blob/master/LICENSE' target='_blank'>Apache License 2.0</a>
+              Released under <a href='https://github.com/oVirt/ovirt-web-ui/blob/master/LICENSE' target='_blank'>Apache License 2.0</a>
             </div>
 
           </div>
