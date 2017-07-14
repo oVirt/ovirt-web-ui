@@ -12,6 +12,8 @@ type PoolIdType = { poolId: string };
 type InputRequestType = { url: string, input: string, contentType?: string };
 type VmType = { vm: Object };
 
+const zeroUUID: string = '00000000-0000-0000-0000-000000000000'
+
 let OvirtApi = {}
 OvirtApi = {
   _getLoginToken (): string { // redux store selector
@@ -222,6 +224,14 @@ OvirtApi = {
     }
   },
 
+  internalCDRomToOvirt ({ cdrom }: { cdrom: Object }): Object {
+    return {
+      file: {
+        id: cdrom.file.id,
+      },
+    }
+  },
+
   /**
    *
    * @param attachment - single entry from vms/[VM_ID]/diskattachments
@@ -315,6 +325,21 @@ OvirtApi = {
     }
   },
 
+  storageToInternal ({ storage }: { storage: Object }): Object {
+    return {
+      id: storage.id,
+      name: storage.name,
+      type: storage.type,
+    }
+  },
+
+  fileToInternal ({ file }: { file: Object }): Object {
+    return {
+      id: file.id,
+      name: file.name,
+    }
+  },
+
   sessionsToInternal ({ sessions }: { sessions: Object }): Object {
     return sessions['session'].map((c: Object): Object => {
       return {
@@ -329,6 +354,15 @@ OvirtApi = {
       id: icon.id,
       type: icon['media_type'],
       data: icon.data,
+    }
+  },
+
+  CDRomToInternal ({ cdrom }: { cdrom: Object }): Object {
+    return {
+      id: cdrom.id,
+      file: {
+        id: cdrom.file ? cdrom.file.id : '',
+      },
     }
   },
 
@@ -436,7 +470,7 @@ OvirtApi = {
     OvirtApi._assertLogin({ methodName: 'editVm' })
     return OvirtApi._httpPut({
       url: `${AppConfiguration.applicationContext}/api/vms/${vm.id}`,
-      input: JSON.stringify(vm),
+      input: JSON.stringify(OvirtApi.internalVmToOvirt({ vm })),
     })
   },
   start ({ vmId }: VmIdType): Promise<Object> {
@@ -514,6 +548,29 @@ OvirtApi = {
   sessions ({ vmId }: VmIdType): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'sessions' })
     return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/sessions` })
+  },
+  getStorages (): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'getStorages' })
+    return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/storagedomains` })
+  },
+  getStorageFiles ({ storageId }: { storageId: string }): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'getStorageFiles' })
+    return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/storagedomains/${storageId}/files` })
+  },
+
+  getCDRom ({ vmId, running }: { vmId: string, running: boolean }): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'getCDRom' })
+    return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/cdroms/${zeroUUID}?current=${running ? 'true' : 'false'}` })
+  },
+
+  changeCD ({ cdrom, vmId, running }: { cdrom: Object, vmId: string, running: boolean }): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'changeCD' })
+    const input = JSON.stringify(OvirtApi.internalCDRomToOvirt({ cdrom }))
+    logDebug(`OvirtApi.changeCD(): ${input}`)
+    return OvirtApi._httpPut({
+      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/cdroms/${zeroUUID}?current=${running ? 'true' : 'false'}`,
+      input,
+    })
   },
 }
 

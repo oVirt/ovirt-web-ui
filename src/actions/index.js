@@ -18,6 +18,7 @@ export * from './templates'
 export * from './options'
 export * from './pool'
 export * from './route'
+export * from './storage'
 
 export function schedulerOneMinute () {
   return {

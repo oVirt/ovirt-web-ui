@@ -309,3 +309,13 @@ export function setChanged ({ value }) {
     },
   }
 }
+
+export function setVmCDRom ({ cdrom, vmId }) {
+  return {
+    type: 'SET_VM_CDROM',
+    payload: {
+      cdrom,
+      vmId,
+    },
+  }
+}

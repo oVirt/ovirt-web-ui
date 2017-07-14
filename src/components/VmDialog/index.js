@@ -50,6 +50,11 @@ class VmDialog extends React.Component {
       description: '',
       cpus: 1,
       memory: 1024 * 1024 * 1024,
+      cdrom: {
+        file: {
+          id: '',
+        },
+      },
 
       clusterId: undefined,
       templateId: undefined,
@@ -78,6 +83,7 @@ class VmDialog extends React.Component {
     this.onChangeVmDescription = this.onChangeVmDescription.bind(this)
     this.onChangeVmMemory = this.onChangeVmMemory.bind(this)
     this.onChangeVmCpu = this.onChangeVmCpu.bind(this)
+    this.onChangeCD = this.onChangeCD.bind(this)
   }
 
   componentWillMount () {
@@ -97,6 +103,11 @@ class VmDialog extends React.Component {
         clusterId: vm.getIn(['cluster', 'id']),
         templateId: vm.getIn(['template', 'id']),
         osId: this.getOsIdFromType(vm.getIn(['os', 'type'])),
+        cdrom: {
+          file: {
+            id: null,
+          },
+        },
       })
     }
     setTimeout(() => this.initDefaults(), 0)
@@ -163,6 +174,11 @@ class VmDialog extends React.Component {
       'cluster': { 'id': this.state.clusterId },
       'memory': this.state.memory,
       'memory_policy': this.getMemoryPolicy(),
+      'cdrom': {
+        'file': {
+          'id': this.state.cdrom.file.id === null ? '' : this.state.cdrom.file.id,
+        },
+      },
       'os': {
         'type': os.get('name'),
       },
@@ -173,6 +189,7 @@ class VmDialog extends React.Component {
           'threads': '1',
         },
       },
+      'status': this.props.vm ? this.props.vm.get('status') : '',
     }
   }
 
@@ -194,6 +211,10 @@ class VmDialog extends React.Component {
 
   onChangeVmCpu (event) {
     this.onIntegerChanged({ stateProp: 'cpus', value: event.target.value })
+  }
+
+  onChangeCD (event) {
+    this.setState({ cdrom: { file: { id: event.target.value } }, isChanged: true })
   }
 
   onIntegerChanged ({ value, stateProp, factor = 1 }) {
@@ -320,6 +341,14 @@ class VmDialog extends React.Component {
     return undefined
   }
 
+  getCDRomFileId () {
+    if (this.state.cdrom.file.id !== null) {
+      return this.state.cdrom.file.id
+    } else {
+      return this.props.vm.get('cdrom') ? this.props.vm.getIn(['cdrom', 'file', 'id']) : ''
+    }
+  }
+
   initDefaults () {
     const { clusters, templates, operatingSystems } = this.props
 
@@ -350,8 +379,17 @@ class VmDialog extends React.Component {
   }
 
   render () {
-    const { icons, vmDialog, clusters, templates, operatingSystems } = this.props
+    const { icons, vmDialog, clusters, templates, operatingSystems, storages } = this.props
     const vm = this.props.vm
+    const isoStorages = storages.get('storages').filter(v => v.get('type') === 'iso')
+
+    let files = []
+
+    isoStorages.toList().forEach(v => {
+      if (v.get('files')) {
+        files = files.concat(v.get('files'))
+      }
+    })
 
     if (this.state.saved && vmDialog.getIn(['vm', 'id'])) {
       return (<Redirect to={`/vm/${vmDialog.getIn(['vm', 'id'])}`} />)
@@ -371,6 +409,7 @@ class VmDialog extends React.Component {
     const cluster = this.getCluster()
     const template = this.getTemplate()
     const os = this.getOS()
+    const cdromFileId = this.getCDRomFileId()
 
     const submitText = isEdit ? 'Update VM' : 'Create VM'
 
@@ -506,6 +545,24 @@ class VmDialog extends React.Component {
                   min={1}
                   step={1} />
               </dd>
+              <dt>
+                <span className='pficon pficon-storage-domain' />
+                &nbsp;
+                <FieldHelp content='Change CD.' text='CDRom' />
+              </dt>
+              <dd>
+                <select
+                  className='combobox form-control'
+                  onChange={this.onChangeCD}
+                  value={cdromFileId} >
+                  <option value='' key='eject'>[Eject]</option>
+                  {files.length ? files.map(item => (
+                    <option value={item['id']} key={item['id']}>
+                      {item['name']}
+                    </option>
+                  )) : null}
+                </select>
+              </dd>
 
             </dl>
           </div>
@@ -531,6 +588,7 @@ VmDialog.propTypes = {
   vmDialog: PropTypes.object.isRequired,
   icons: PropTypes.object.isRequired,
   vms: PropTypes.object.isRequired,
+  storages: PropTypes.object.isRequired,
 
   onCloseDialog: PropTypes.func.isRequired,
   addVm: PropTypes.func.isRequired,
@@ -547,6 +605,7 @@ export default connect(
     vmDialog: state.VmDialog,
     icons: state.icons,
     vms: state.vms,
+    storages: state.storages,
   }),
   (dispatch) => ({
     onCloseDialog: () => dispatch(closeDialog({ force: false })),
