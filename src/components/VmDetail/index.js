@@ -253,7 +253,7 @@ class VmDetail extends Component {
                 <dd>{os ? os.get('description') : vm.getIn(['os', 'type'])}</dd>
 
                 <dt><span className='pficon pficon-memory' />&nbsp;
-                  <FieldHelp content='Total memory the virtual machine will be equipped with. In megabytes.' text='Defined Memory' />
+                  <FieldHelp content='Total memory the virtual machine will be equipped with.' text='Defined Memory' />
                 </dt>
                 <dd>{userFormatOfBytes(vm.getIn(['memory', 'total'])).str}</dd>
 
