@@ -26,5 +26,6 @@ install-sh
 missing
 ovirt-web-ui.spec
 tmp.repos/
+/ovirt-web-ui-*.tar.gz
 
 
