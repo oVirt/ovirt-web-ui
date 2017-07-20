@@ -111,6 +111,13 @@ After `git clone` and meeting all **Prerequisities** above, you can build from s
     # or
     make rpm    # to create (s)rpms under 'tmp.repos'
 
+### Build to engine development prefix
+
+This allows to run web-ui deployed in ovirt-engine development installation.
+
+    ./autogen.sh --prefix=/usr --datarootdir=/share
+    make all install-data-local DESTDIR=<path_to_engine_development_prefix>
+
 ### Development mode
 
 Please check, you can **build** the application (see above).
