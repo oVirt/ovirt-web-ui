@@ -121,6 +121,15 @@
         <url-pattern>/405.html</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>BrandingJsp</servlet-name>
+        <jsp-file>/WEB-INF/branding.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BrandingJsp</servlet-name>
+        <url-pattern>/branding/*</url-pattern>
+    </servlet-mapping>
+
     <!-- Default page to serve -->
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>

@@ -22,6 +22,7 @@ import VerticalMenu from './components/VerticalMenu'
 import { getRoutes, getMenu } from './routes'
 import rednerModal from './components/VmModals/rednerModal'
 import AppConfiguration from './config'
+import { fixedStrings } from './branding'
 
 /**
  * Login (token) to Engine is missing.
@@ -73,7 +74,7 @@ const App = ({ vms, visibility, config }) => {
   return (
     <Router getUserConfirmation={openConfirmation} basename={AppConfiguration.applicationURL}>
       <div>
-        <VmsPageHeader page={vms.get('page')} title='oVirt VM Portal' />
+        <VmsPageHeader page={vms.get('page')} title={fixedStrings.BRAND_NAME + ' VM Portal'} />
         <VerticalMenu menuItems={menu} />
         <TokenExpired />
         <LoadingData />

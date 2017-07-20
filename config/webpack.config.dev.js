@@ -198,6 +198,10 @@ module.exports = {
   plugins: [
     new CopyWebpackPlugin([{
       from: 'src/ovirt-web-ui.config',
+    }, {
+      from: 'branding',
+      to: 'branding',
+      toType: 'dir'
     }]),
     // Generates an `index.html` file with the <script> injected.
     new HtmlWebpackPlugin({

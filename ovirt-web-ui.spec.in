@@ -53,6 +53,7 @@ make install DESTDIR=%{buildroot}
 %{_ovirtwebuidir}
 %{_datarootdir}/ovirt-engine/ovirt-web-ui.war
 %{_sysconfdir}/ovirt-engine/engine.conf.d/50-ovirt-web-ui.conf
+%{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
 * Tue Jun 20 2017 Marek Libra <mlibra@redhat.com> - 1.1.0

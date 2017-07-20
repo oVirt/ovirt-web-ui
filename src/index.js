@@ -12,6 +12,7 @@ import { Provider } from 'react-redux'
 import './index-nomodules.css'
 import 'patternfly/dist/css/patternfly.css'
 import 'patternfly/dist/css/patternfly-additions.css'
+import * as branding from './branding'
 
 // Patternfly dependencies
 // jQuery needs to be globally available (webpack.ProvidePlugin can be also used for this)
@@ -78,9 +79,28 @@ function loadPersistedState () {
   }
 }
 
+function addBrandedResources () {
+  addLinkElement('shortcut icon', branding.resourcesUrls.favicon)
+  addLinkElement('stylesheet', branding.resourcesUrls.stylesheet)
+}
+
+function addLinkElement (rel: string, href: string) {
+  const linkElement = window.document.createElement('link')
+  linkElement.rel = rel
+  linkElement.href = href
+  window.document.head.appendChild(linkElement)
+}
+
 function start () {
   readConfiguration()
+    .then(branding.loadOnce)
+    .then(onResourcesLoaded)
+}
+
+function onResourcesLoaded () {
   console.log(`Current configuration: ${JSON.stringify(AppConfiguration)}`)
+
+  addBrandedResources()
 
   const { token, username, domain }: { token: string, username: string, domain: string } = fetchToken()
 

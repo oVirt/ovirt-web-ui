@@ -15,18 +15,21 @@ const AppConfiguration = {
 }
 
 export function readConfiguration () {
-  $.ajax({
-    url: CONFIG_URL,
-    success: (result) => {
-      Object.assign(AppConfiguration, JSON.parse(result))
-    },
-    error: (result) => {
-      console.log(`Failed to load production configuration, assuming development mode.`)
-    },
-    complete: () => {
-      setLogDebug(AppConfiguration.debug)
-    },
-    async: false,
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      url: CONFIG_URL,
+      success: (result) => {
+        Object.assign(AppConfiguration, JSON.parse(result))
+      },
+      error: (result) => {
+        console.log(`Failed to load production configuration, assuming development mode.`)
+      },
+      complete: () => {
+        setLogDebug(AppConfiguration.debug)
+        resolve()
+      },
+      async: true,
+    })
   })
 }
 

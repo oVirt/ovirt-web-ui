@@ -4,7 +4,23 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import Product from '../version'
-import logo from '../ovirt_top_right_logo.png'
+import { fixedStrings, resourcesUrls as brandedResourcesUrls } from '../branding'
+
+const LegalInfo = () => {
+  if (fixedStrings.LEGAL_INFO_LINK_TEXT && fixedStrings.LEGAL_INFO_LINK_URL) {
+    return (
+      <div className='trademark-pf'>
+        {fixedStrings.LEGAL_INFO} &nbsp;
+        <a href={fixedStrings.LEGAL_INFO_LINK_URL} target='_blank'>{fixedStrings.LEGAL_INFO_LINK_TEXT}</a>
+      </div>
+    )
+  }
+  return (
+    <div className='trademark-pf'>
+      {fixedStrings.LEGAL_INFO}
+    </div>
+  )
+}
 
 const AboutDialog = ({ oVirtApiVersion }) => {
   // TODO: link documentation: https://github.com/oVirt/ovirt-web-ui/issues/134
@@ -26,23 +42,21 @@ const AboutDialog = ({ oVirtApiVersion }) => {
             </button>
           </div>
           <div className='modal-body'>
-            <h1>oVirt VM Portal</h1>
+            <h1>{fixedStrings.BRAND_NAME} VM Portal</h1>
 
             <div className='product-versions-pf'>
               <ul className='list-unstyled'>
                 <li>Version <strong>{Product.version}-{Product.release}</strong></li>
-                <li>oVirt API Version <strong>{apiVersion}</strong></li>
+                <li>{fixedStrings.BRAND_NAME} API Version <strong>{apiVersion}</strong></li>
                 <li>Please report issues on <strong><a href='https://github.com/oVirt/ovirt-web-ui/issues' target='_blank'>GitHub Issue Tracker</a></strong></li>
               </ul>
             </div>
 
-            <div className='trademark-pf'>
-              Released under <a href='https://github.com/oVirt/ovirt-web-ui/blob/master/LICENSE' target='_blank'>Apache License 2.0</a>
-            </div>
+            <LegalInfo />
 
           </div>
           <div className='modal-footer'>
-            <img src={logo} alt='oVirt logo' />
+            <img src={brandedResourcesUrls.aboutDialogLogo} alt={`${fixedStrings.BRAND_NAME} logo`} />
           </div>
         </div>
       </div>
