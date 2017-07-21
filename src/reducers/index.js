@@ -15,6 +15,7 @@ import operatingSystems from './operatingSystems'
 import storages from './storages'
 import { reducer as VmAction } from '../components/VmActions/reducer'
 import { reducer as VmDialog } from '../components/VmDialog/reducer'
+import { reducer as OptionsDialog } from '../components/OptionsDialog/reducer'
 
 function router (redirectUrl = '/', action) {
   switch (action.type) {
@@ -39,4 +40,5 @@ export default combineReducers({
   storages,
   VmAction,
   VmDialog,
+  OptionsDialog,
 })

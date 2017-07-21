@@ -6,6 +6,7 @@ const initialState = Immutable.fromJS({
   isTokenExpired: false,
   user: {
     name: undefined,
+    id: undefined,
   },
   oVirtApiVersion: {
     major: undefined,
@@ -19,8 +20,8 @@ const initialState = Immutable.fromJS({
 })
 
 const config = actionReducer(initialState, {
-  LOGIN_SUCCESSFUL (state, { payload: { token, username } }) {
-    return state.merge({ loginToken: token, user: { name: username } })
+  LOGIN_SUCCESSFUL (state, { payload: { token, username, userId } }) {
+    return state.merge({ loginToken: token, user: { name: username, id: userId } })
   },
   LOGIN_FAILED (state) {
     return state.delete('loginToken').deleteIn(['user', 'name'])

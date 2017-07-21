@@ -26,7 +26,7 @@ import {
   VM_ACTION_IN_PROGRESS,
 } from '../constants/index'
 
-export function login ({ username, password, token }) {
+export function login ({ username, password, token, userId }) {
   return {
     type: LOGIN,
     payload: {
@@ -35,6 +35,7 @@ export function login ({ username, password, token }) {
         password,
       },
       token,
+      userId,
     },
   }
 }
@@ -143,12 +144,13 @@ export function removeVm ({ vmId, force = false, preserveDisks = false }) {
 }
 
 // --- Internal State -------------------------
-export function loginSuccessful ({ token, username }) {
+export function loginSuccessful ({ token, username, userId }) {
   return {
     type: LOGIN_SUCCESSFUL,
     payload: {
       token,
       username,
+      userId,
     },
   }
 }

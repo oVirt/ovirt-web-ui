@@ -202,7 +202,7 @@ function* login (action) {
   if (token) {
     const username = action.payload.credentials.username
     // persistTokenToSessionStorage({ token, username })
-    yield put(loginSuccessful({ token, username }))
+    yield put(loginSuccessful({ token, username, userId: action.payload.userId }))
     const oVirtMeta = yield callExternalAction('getOvirtApiMeta', Api.getOvirtApiMeta, action)
     if (!oVirtMeta['product_info']) { // REST API call failed
       yield put(yield put(loadInProgress({ value: false })))

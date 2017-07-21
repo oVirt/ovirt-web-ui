@@ -366,6 +366,13 @@ OvirtApi = {
     }
   },
 
+  SSHKeyToInternal ({ sshKey }: { sshKey: Object }): Object {
+    return {
+      id: sshKey.id,
+      key: sshKey.content,
+    }
+  },
+
   consolesToInternal ({ consoles }: { consoles: Object }): Array<Object> {
     return consoles['graphics_console'].map((c: Object): Object => {
       return {
@@ -374,6 +381,7 @@ OvirtApi = {
       }
     }).sort((a: Object, b: Object): number => b.protocol.length - a.protocol.length) // Hack: 'VNC' is shorter then 'SPICE'
   },
+
   // ----
   login ({ credentials }: { credentials: { username: string, password: string }}): Promise<Object> {
     const url = `${AppConfiguration.applicationContext}/sso/oauth/token?grant_type=urn:ovirt:params:oauth:grant-type:http&scope=ovirt-app-api`
@@ -580,6 +588,25 @@ OvirtApi = {
         'Accept': 'text/plain',
       },
     })
+  },
+  saveSSHKey ({ key, userId, sshId }: { key: string, userId: string, sshId: string }): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'saveSSHKey' })
+    const input = JSON.stringify({ content: key })
+    if (sshId !== undefined) {
+      return OvirtApi._httpPut({
+        url: `${AppConfiguration.applicationContext}/api/users/${userId}/sshpublickeys/${sshId}`,
+        input,
+      })
+    } else {
+      return OvirtApi._httpPost({
+        url: `${AppConfiguration.applicationContext}/api/users/${userId}/sshpublickeys`,
+        input,
+      })
+    }
+  },
+  getSSHKey ({ userId }: { userId: string }): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'getSSHKey' })
+    return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/users/${userId}/sshpublickeys` })
   },
 }
 

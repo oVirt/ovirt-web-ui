@@ -299,7 +299,7 @@ function runDevServer(port, protocol) {
 function run(port) {
   var protocol = process.env.HTTPS === 'true' ? "https" : "http";
   checkRequiredFiles();
-  getUserInfo().then(userInfo => {
+  getUserInfo(protocol, port).then(userInfo => {
     injectUserInfo(userInfo);
     setupCompiler(port, protocol);
     runDevServer(port, protocol);
@@ -330,7 +330,7 @@ detect(DEFAULT_PORT).then(port => {
     console.error(err);
 });
 
-function getUserInfo () {
+function getUserInfo (protocol, port) {
   var engineUrl = process.env.ENGINE_URL;
   if (!engineUrl) {
     throw new Error('Please run script with the `ENGINE_URL` environment variable set.')
@@ -339,6 +339,15 @@ function getUserInfo () {
 
   var DEFAULT_USER = 'admin@internal';
   var DEFAULT_DOMAIN = 'internal-authz';
+  /**
+   * This is value of user ID, please change it according to your system.
+   * It can be found by `protocol://[FQDN]/api/users/`, where
+   * FQDN - is oVirt engine URL.
+   *
+   * If userId will be null, then feature `Options` and SSH Public Key will
+   * be disabled and hidden. 
+   * @type {String}
+   */
   var username = readlineSync.question(`oVirt user (${DEFAULT_USER}): `, {
     defaultInput: DEFAULT_USER
   });
@@ -350,6 +359,7 @@ function getUserInfo () {
   var domain = readlineSync.question(`oVirt domain (${DEFAULT_DOMAIN}): `, {
     defaultInput: DEFAULT_DOMAIN
   });
+
 
   return new Promise((resolve, reject) => {
     request(`${engineUrl}/sso/oauth/token?` +
@@ -365,10 +375,29 @@ function getUserInfo () {
         return reject(err)
       }
       if (body['access_token']) {
-        resolve({
-          userName: username.slice(0, username.indexOf('@')),
-          ssoToken: body.access_token,
-          domain: domain
+        request(`${engineUrl}api/users`, { json: true, strictSSL: false, headers: { Authorization: `Bearer ${body['access_token']}` } }, (userErr, userResponse, userBody) => {
+          if (!userErr && userBody.user && userBody.user.length > 0 ) {
+            for (let i in userBody.user) {
+              if (userBody.user[i]['user_name'] === (username.slice(0, username.indexOf('@')) + '@' + domain)) {
+                resolve({
+                  userName: username.slice(0, username.indexOf('@')),
+                  ssoToken: body.access_token,
+                  domain: domain,
+                  userId: userBody.user[i].id,
+                })
+                return
+              }
+            }
+          }
+          var userId = readlineSync.question(`oVirt user id can be found there ${engineUrl}api/users/ : `, {
+            defaultInput: null,
+          });            
+          resolve({
+            userName: username.slice(0, username.indexOf('@')),
+            ssoToken: body.access_token,
+            domain: domain,
+            userId: userId,
+          })
         })
       } else {
         reject(JSON.stringify(body))
