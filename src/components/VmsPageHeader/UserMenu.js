@@ -12,12 +12,6 @@ import {
 import { msg } from '../../intl'
 
 const UserMenu = ({ config, onLogout }) => {
-/* TODO: allow 'Options' in the menu
- <li>
- <a href='#' onClick={onOptions}>Options</a>
- </li>
- <li className='divider' />
- */
   if (!config.get('loginToken')) { // this shall really not happen!
     console.error('Missing login token!')
     return (
@@ -34,6 +28,9 @@ const UserMenu = ({ config, onLogout }) => {
           <b className='caret' />
         </a>
         <ul className='dropdown-menu'>
+          <li>
+            <a href='#' data-toggle='modal' data-target='#options-modal'>{msg.options()}</a>
+          </li>
           <li>
             <a href='#' data-toggle='modal' data-target='#about-modal'>{msg.about()}</a>
           </li>
