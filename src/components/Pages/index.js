@@ -5,7 +5,7 @@ import { Redirect } from 'react-router-dom'
 
 import VmDetail from '../VmDetail'
 import VmDialog from '../VmDialog/index'
-import { selectVmDetail, selectPoolDetail } from '../../actions/index'
+import { selectVmDetail, selectPoolDetail, getISOStorages } from '../../actions/index'
 
 import Selectors from '../../selectors'
 
@@ -73,6 +73,7 @@ PoolDetailPage.propTypes = {
 
 class VmDialogPage extends React.Component {
   componentWillMount () {
+    this.props.getCDRom() // refresh data
     if (this.props.match.params.id) {
       this.props.getVms({ vmId: this.props.match.params.id }) // refresh data
 
@@ -92,6 +93,7 @@ class VmDialogPage extends React.Component {
 VmDialogPage.propTypes = {
   vms: PropTypes.object.isRequired,
   getVms: PropTypes.func.isRequired,
+  getCDRom: PropTypes.func.isRequired,
   route: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
   location: PropTypes.object.isRequired,
@@ -124,6 +126,7 @@ const VmDialogPageConnected = connect(
   }),
   (dispatch) => ({
     getVms: ({ vmId }) => dispatch(selectVmDetail({ vmId })),
+    getCDRom: () => dispatch(getISOStorages()),
   })
 )(VmDialogPage)
 

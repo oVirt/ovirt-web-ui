@@ -23,6 +23,7 @@ const vms = actionReducer(initialState, {
       if (copySubResources) {
         updates[vm.id].disks = state.getIn(['vms', vm.id, 'disks'], emptyMap).toJS()
         updates[vm.id].consoles = state.getIn(['vms', vm.id, 'consoles'], emptyMap).toJS()
+        updates[vm.id].cdrom = state.getIn(['vms', vm.id, 'cdrom'], Immutable.fromJS({ file: { id: '' } })).toJS()
       }
     })
     const imUpdates = Immutable.fromJS(updates)
@@ -45,6 +46,14 @@ const vms = actionReducer(initialState, {
       return state.setIn(['vms', vmId, 'disks'], Immutable.fromJS(disks)) // deep immutable
     } else { // fail, if VM not found
       logError(`vms.setVmDisks() reducer: vmId ${vmId} not found`)
+    }
+    return state
+  },
+  SET_VM_CDROM (state, { payload: { vmId, cdrom } }) {
+    if (state.getIn(['vms', vmId])) {
+      return state.setIn(['vms', vmId, 'cdrom'], Immutable.fromJS(cdrom)) // deep immutable
+    } else { // fail, if VM not found
+      logError(`vms.setVmCdrom() reducer: vmId ${vmId} not found`)
     }
     return state
   },

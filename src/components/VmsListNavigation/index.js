@@ -3,12 +3,17 @@ import PropTypes from 'prop-types'
 
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { getByPage, getConsoleOptions } from '../../actions/index'
+import { getByPage, getConsoleOptions, selectVmDetail } from '../../actions/index'
 import InfiniteScroll from 'react-infinite-scroller'
 
 import style from './style.css'
 
-const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, onUpdate, loadConsoleOptions }) => {
+const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, onUpdate, loadConsoleOptions, getVms }) => {
+  const linkClick = (vmId) => {
+    loadConsoleOptions(vmId)
+    getVms(vmId)
+  }
+
   const toggleExpandButton = (
     <div className={style['toggle-expand-button']}>
       <a href='#' onClick={toggleExpansion}>
@@ -39,7 +44,7 @@ const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, onUpdat
 
           return (
             <li role='presentation' className={style['item']} key={vm.get('id')}>
-              <Link to={`/vm/${vm.get('id')}`} className={style['item-link']} onClick={() => loadConsoleOptions(vm.get('id'))}>
+              <Link to={`/vm/${vm.get('id')}`} className={style['item-link']} onClick={() => { linkClick(vm.get('id')) }}>
                 <span className={style['item-text']}>{vm.get('name')}</span>
               </Link>
             </li>
@@ -66,6 +71,7 @@ VmsListNavigation.propTypes = {
   vms: PropTypes.object.isRequired,
   expanded: PropTypes.bool,
 
+  getVms: PropTypes.func.isRequired,
   toggleExpansion: PropTypes.func.isRequired,
   loadConsoleOptions: PropTypes.func.isRequired,
   onUpdate: PropTypes.func.isRequired,
@@ -78,5 +84,6 @@ export default connect(
   (dispatch) => ({
     loadConsoleOptions: (vmId) => dispatch(getConsoleOptions({ vmId })),
     onUpdate: (page) => dispatch(getByPage({ page })),
+    getVms: (vmId) => dispatch(selectVmDetail({ vmId })),
   })
 )(VmsListNavigation)

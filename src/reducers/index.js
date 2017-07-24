@@ -12,6 +12,7 @@ import clusters from './clusters'
 import hosts from './hosts'
 import route from './route'
 import operatingSystems from './operatingSystems'
+import storages from './storages'
 import { reducer as VmAction } from '../components/VmActions/reducer'
 import { reducer as VmDialog } from '../components/VmDialog/reducer'
 
@@ -35,6 +36,7 @@ export default combineReducers({
   operatingSystems,
   hosts,
   route,
+  storages,
   VmAction,
   VmDialog,
 })

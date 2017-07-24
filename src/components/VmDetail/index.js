@@ -266,6 +266,10 @@ class VmDetail extends Component {
                   <FieldHelp content='Fully Qualified Domain Name (FQDN) of the virtual machine. Please note, guest agent must be installed within the virtual machine to collect this value.' text='Address' />
                 </dt>
                 <dd>{vm.get('fqdn')}</dd>
+                <dt><span className='pficon pficon-storage-domain' />&nbsp;
+                  <FieldHelp content='Currently inserted ISO in CDRom' text='CDRom' />
+                </dt>
+                <dd>{vm.getIn(['cdrom', 'file', 'id']) ? vm.getIn(['cdrom', 'file', 'id']) : 'Empty' }</dd>
               </dl>
 
               <dl className={sharedStyle['vm-properties']}>

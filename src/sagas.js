@@ -61,16 +61,22 @@ import {
   getVmsByCount,
   getPoolsByCount,
   getPoolsByPage,
+  setStorages,
+  removeMissingStorages,
+  setFiles,
+  setVmCDRom,
 } from './actions/index'
 
 import {
   CHECK_TOKEN_EXPIRED,
   GET_ALL_CLUSTERS,
+  GET_ALL_FILES_FOR_ISO,
   GET_ALL_HOSTS,
   GET_ALL_OS,
   GET_ALL_TEMPLATES,
   GET_BY_PAGE,
   GET_CONSOLE_OPTIONS,
+  GET_ISO_STORAGES,
   GET_POOLS_BY_COUNT,
   GET_POOLS_BY_PAGE,
   GET_RDP_VM,
@@ -346,6 +352,7 @@ function* fetchVmsByPage (action) {
       yield fetchConsoleMetadatas({ vms: internalVms })
       yield fetchDisks({ vms: internalVms })
       yield fetchVmsSessions({ vms: internalVms })
+      yield fetchVmsCDRom({ vms: internalVms })
     } else {
       logDebug('getVmsByPage() shallow fetch requested - skipping other resources')
     }
@@ -372,6 +379,7 @@ function* fetchVmsByCount (action) {
       yield fetchConsoleMetadatas({ vms: internalVms })
       yield fetchDisks({ vms: internalVms })
       yield fetchVmsSessions({ vms: internalVms })
+      yield fetchVmsCDRom({ vms: internalVms })
     } else {
       logDebug('fetchVmsByCount() shallow fetch requested - skipping other resources')
     }
@@ -442,6 +450,7 @@ export function* fetchSingleVm (action) {
     internalVm.disks = yield fetchVmDisks({ vmId: internalVm.id })
     internalVm.consoles = yield fetchConsoleVmMeta({ vmId: internalVm.id })
     internalVm.sessions = yield fetchVmSessions({ vmId: internalVm.id })
+    internalVm.cdrom = yield fetchVmCDRom({ vmId: internalVm.id, running: internalVm.status === 'up' })
 
     yield put(updateVms({ vms: [internalVm] }))
     yield fetchUnknwonIconsForVms({ vms: [internalVm] })
@@ -462,6 +471,22 @@ function* fetchDisks ({ vms }) {
     if (disks && disks.length > 0) {
       yield put(setVmDisks({ vmId, disks }))
     }
+  })
+}
+
+function* fetchVmCDRom ({ vmId, running }) {
+  const cdrom = yield callExternalAction('getCDRom', Api.getCDRom, { type: 'GET_VM_CDROM', payload: { vmId, running } })
+  if (cdrom) {
+    const cdromInternal = Api.CDRomToInternal({ cdrom })
+    return cdromInternal
+  }
+  return null
+}
+
+function* fetchVmsCDRom ({ vms }) {
+  yield * foreach(vms, function* (vm) {
+    const cdromInternal = yield fetchVmCDRom({ vmId: vm.id, running: vm.status === 'up' })
+    yield put(setVmCDRom({ vmId: vm.id, cdrom: cdromInternal }))
   })
 }
 
@@ -714,6 +739,28 @@ function* fetchAllOS (action) {
   }
 }
 
+function* fetchISOStorages (action) {
+  const storages = yield callExternalAction('getStorages', Api.getStorages, action)
+  if (storages && storages['storage_domain']) {
+    const storagesInternal = storages.storage_domain.map(storage => Api.storageToInternal({ storage })).filter(v => v.type === 'iso')
+    yield put(setStorages({ storages: storagesInternal }))
+    for (let i in storagesInternal) {
+      yield fetchAllFilesForISO({ payload: { storageId: storagesInternal[i].id } })
+    }
+    const storageIdsToPreserve = storagesInternal.map(item => item.id)
+    yield put(removeMissingStorages({ storageIdsToPreserve }))
+  }
+}
+
+function* fetchAllFilesForISO (action) {
+  const files = yield callExternalAction('getStorageFiles', Api.getStorageFiles, action)
+
+  if (files && files['file']) {
+    const filesInternal = files.file.map(file => Api.fileToInternal({ file }))
+    yield put(setFiles({ storageId: action.payload.storageId, files: filesInternal }))
+  }
+}
+
 function* fetchPermissionWithoutFilter (action) {
   const data = yield callExternalAction('checkFilter', Api.checkFilter, { action: 'CHECK_FILTER' }, true)
 
@@ -791,6 +838,8 @@ export function *rootSaga () {
     takeLatest(GET_ALL_TEMPLATES, fetchAllTemplates),
     takeLatest(GET_ALL_OS, fetchAllOS),
     takeLatest(GET_ALL_HOSTS, fetchAllHosts),
+    takeLatest(GET_ISO_STORAGES, fetchISOStorages),
+    takeLatest(GET_ALL_FILES_FOR_ISO, fetchAllFilesForISO),
 
     takeEvery(SELECT_VM_DETAIL, selectVmDetail),
     takeEvery(GET_CONSOLE_OPTIONS, getConsoleOptions),
@@ -816,6 +865,8 @@ const shortMessages = {
   'INTERNAL_CONSOLES': 'Failed to retrieve list of VM consoles',
   'GET_DISK_DETAILS': 'Failed to retrieve disk details',
   'GET_DISK_ATTACHMENTS': 'Failed to retrieve VM disk attachments',
+  'GET_ISO_STORAGES': 'Failed to retrieve ISO storages',
+  'GET_ALL_FILES_FOR_ISO': 'Failed to retrieve files from storage',
 
   'GET_VM': 'Failed to retireve VM details',
 }
