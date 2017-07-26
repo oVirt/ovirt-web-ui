@@ -33,7 +33,7 @@ const NoLogin = () => {
         <span className='pficon pficon pficon-user' />
       </div>
       <h1>
-        Please log in ...
+        Please log in ... <br /><a href={AppConfiguration.applicationURL}>Log in</a>
       </h1>
     </div>
   )
