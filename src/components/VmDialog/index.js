@@ -27,6 +27,8 @@ import {
   setSavedVm,
 } from './actions'
 
+import SelectBox from '../SelectBox'
+
 import { MAX_VM_MEMORY_FACTOR } from '../../constants/index'
 
 function sortedBy (immutableCollection, sortBy) { // TODO: move to helpers
@@ -92,7 +94,7 @@ class VmDialog extends React.Component {
 
   componentDidMount () {
     const vm = this.props.vm
-    if (vm) { // "edit" mode
+    if (vm) { // 'edit' mode
       this.setState({
         id: vm.get('id'),
         name: vm.get('name'),
@@ -213,8 +215,8 @@ class VmDialog extends React.Component {
     this.onIntegerChanged({ stateProp: 'cpus', value: event.target.value })
   }
 
-  onChangeCD (event) {
-    this.setState({ cdrom: { file: { id: event.target.value } }, isChanged: true })
+  onChangeCD (fileId) {
+    this.setState({ cdrom: { file: { id: fileId } }, isChanged: true })
   }
 
   onIntegerChanged ({ value, stateProp, factor = 1 }) {
@@ -230,8 +232,8 @@ class VmDialog extends React.Component {
     }
   }
 
-  onChangeOperatingSystem (event) {
-    this.doChangeOsIdTo(event.target.value)
+  onChangeOperatingSystem (osId) {
+    this.doChangeOsIdTo(osId)
   }
 
   doChangeOsIdTo (osId) {
@@ -265,8 +267,7 @@ class VmDialog extends React.Component {
   /**
    * User selected different template.
    */
-  onChangeTemplate (event) {
-    const templateId = event.target.value
+  onChangeTemplate (templateId) {
     this.doChangeTemplateIdTo(templateId)
   }
 
@@ -312,8 +313,7 @@ class VmDialog extends React.Component {
   /**
    * User selected different cluster.
    */
-  onChangeCluster (event) {
-    const clusterId = event.target.value
+  onChangeCluster (clusterId) {
     this.setState({
       clusterId,
     })
@@ -383,11 +383,13 @@ class VmDialog extends React.Component {
     const vm = this.props.vm
     const isoStorages = storages.get('storages').filter(v => v.get('type') === 'iso')
 
-    let files = []
+    let files = { '': { id: '', value: '[Eject]' } }
 
     isoStorages.toList().forEach(v => {
       if (v.get('files')) {
-        files = files.concat(v.get('files'))
+        v.get('files').forEach(item => {
+          files[item['id']] = { id: item['id'], value: item['name'] }
+        })
       }
     })
 
@@ -400,7 +402,6 @@ class VmDialog extends React.Component {
     const sortedClusters = sortedBy(clusters.get('clusters'), 'name')
 
     const filteredTemplates = templates.get('templates')
-      .toList()
       .filter(template => template.get('clusterId') === this.state.clusterId || !template.get('clusterId'))
     const sortedTemplates = sortedBy(filteredTemplates, 'name')
 
@@ -467,49 +468,40 @@ class VmDialog extends React.Component {
               <dt>
                 <FieldHelp content='Group of hosts the virtual machine can be running on.' text='Cluster' />
               </dt>
-              <dd>
-                <select
-                  className='combobox form-control'
+              <dd className={style['field-overflow-visible']}>
+                <SelectBox
                   onChange={this.onChangeCluster}
-                  value={cluster ? cluster.get('id') : ''} >
-                  {sortedClusters.toList().map(item => (
-                    <option value={item.get('id')} key={item.get('id')}>
-                      {item.get('name')}
-                    </option>
-                  ))}
-                </select>
+                  selected={cluster ? cluster.get('id') : ''}
+                  items={sortedClusters.map(item => (
+                    { id: item.get('id'), value: item.get('name') }
+                  )).toJS()}
+                  />
               </dd>
 
               <dt>
                 <FieldHelp content='Contains the configuration and disks which will be used to create this virtual machine. Please customize as needed.' text='Template' />
               </dt>
-              <dd>
-                <select
-                  className='combobox form-control'
+              <dd className={style['field-overflow-visible']}>
+                <SelectBox
                   onChange={this.onChangeTemplate}
-                  value={template ? template.get('id') : ''} >
-                  {sortedTemplates.toList().map(item => (
-                    <option value={item.get('id')} key={item.get('id')}>
-                      {templateNameRenderer(item)}
-                    </option>
-                  ))}
-                </select>
+                  selected={template ? template.get('id') : ''}
+                  items={sortedTemplates.map(item => (
+                    { id: item.get('id'), value: templateNameRenderer(item) }
+                  )).toJS()}
+                  />
               </dd>
 
               <dt>
                 <FieldHelp content='Operating system installed on the virtual machine.' text='Operating System' />
               </dt>
-              <dd>
-                <select
-                  className='combobox form-control'
+              <dd className={style['field-overflow-visible']}>
+                <SelectBox
                   onChange={this.onChangeOperatingSystem}
-                  value={os ? os.get('id') : ''} >
-                  {sortedOSs.toList().map(item => (
-                    <option value={item.get('id')} key={item.get('id')}>
-                      {item.get('description')}
-                    </option>
-                  ))}
-                </select>
+                  selected={os ? os.get('id') : ''}
+                  items={sortedOSs.map(item => (
+                    { id: item.get('id'), value: item.get('description') }
+                  )).toJS()}
+                  />
               </dd>
 
               <dt>
@@ -550,18 +542,12 @@ class VmDialog extends React.Component {
                 &nbsp;
                 <FieldHelp content='Change CD.' text='CDRom' />
               </dt>
-              <dd>
-                <select
-                  className='combobox form-control'
+              <dd className={style['field-overflow-visible']}>
+                <SelectBox
                   onChange={this.onChangeCD}
-                  value={cdromFileId} >
-                  <option value='' key='eject'>[Eject]</option>
-                  {files.length ? files.map(item => (
-                    <option value={item['id']} key={item['id']}>
-                      {item['name']}
-                    </option>
-                  )) : null}
-                </select>
+                  selected={cdromFileId}
+                  items={files}
+                  />
               </dd>
 
             </dl>
