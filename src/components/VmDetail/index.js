@@ -15,99 +15,35 @@ import {
   getRDP,
 } from '../../actions/index'
 
-import { isWindows, templateNameRenderer, hrefWithoutHistory } from '../../helpers'
+import { templateNameRenderer } from '../../helpers'
 
-import Time from '../Time'
 import FieldHelp from '../FieldHelp/index'
 import DetailContainer from '../DetailContainer'
 import ConsoleOptions from '../ConsoleOptions/index'
 import VmDisks from '../VmDisks/index'
 import VmsListNavigation from '../VmsListNavigation/index'
 import VmStatus from './VmStatus'
+import { NextRunLabel } from './labels'
+import LastMessage from './LastMessage'
+import VmConsoles from './VmConsoles'
 
-import { canConsole, userFormatOfBytes, VmIcon } from 'ovirt-ui-components'
+import { userFormatOfBytes, VmIcon } from 'ovirt-ui-components'
 import Selectors from '../../selectors'
-import ConsoleButton from '../VmActions/ConsoleButton'
 
-const LastMessage = ({ vmId, userMessages }) => {
-  const vmMessages = userMessages.get('records')
-    .filter(msg => (msg.failedAction && msg.failedAction.payload && msg.failedAction.payload.vmId === vmId))
-    .sort((msg1, msg2) => (msg1.time - msg2.time))
-
-  const lastMessage = vmMessages.last()
-
-  if (!lastMessage) {
-    return null
+function rephraseVmType (vmType) {
+  const types = {
+    'desktop': 'Desktop',
+    'server': 'Server',
+    'highperformance': 'High Performance',
   }
 
-  return (
-    <span>
-      <Time time={lastMessage.time} />
-      <pre>
-        {lastMessage.message}
-      </pre>
-    </span>
-  )
-}
-LastMessage.propTypes = {
-  vmId: PropTypes.string.isRequired,
-  userMessages: PropTypes.object.isRequired,
-}
-
-const VmConsoles = ({ vm, onConsole, onRDP }) => {
-  const vmConsoles = vm.get('consoles').valueSeq()
-  if (canConsole(vm.get('status'))) {
-    return (
-      <dd className={style['console-box']}>
-        {
-          vmConsoles.map(c => {
-            return (
-              <ConsoleButton
-                vm={vm}
-                consoleId={c.get('id')}
-                key={c.get('id')}
-                button=''
-                className='pficon pficon-screen'
-                tooltip={`Open ${c.get('protocol').toUpperCase()} console`}
-                shortTitle={c.get('protocol').toUpperCase()}
-                />
-            )
-          })
-        }
-
-        {
-          isWindows(vm.getIn(['os', 'type']))
-            ? (<span className={style['full-button']}><a href='#' key={vm.get('id')} onClick={hrefWithoutHistory(onRDP)} className={style['left-delimiter']}>RDP</a></span>) : null
-        }
-      </dd>
-    )
+  const type = vmType.toLowerCase()
+  if (type in types) {
+    return types[type]
   }
 
-  return (
-    <dd>
-      <span>
-        {
-          vmConsoles.map(c => (
-            <span
-              className={style['console-vm-not-running']}
-              key={c.get('id')}>
-              {c.get('protocol').toUpperCase()}
-            </span>
-          ))
-        }
-
-        {
-          isWindows(vm.getIn(['os', 'type']))
-            ? (<span onClick={onRDP} className={style['console-vm-not-running']}>RDP</span>) : null
-        }
-      </span>
-    </dd>
-  )
-}
-VmConsoles.propTypes = {
-  vm: PropTypes.object.isRequired,
-  onConsole: PropTypes.func.isRequired,
-  onRDP: PropTypes.func.isRequired,
+  console.info('rephraseVmType(): vmType not explicitely defined: ', vmType)
+  return vmType
 }
 
 class VmDetail extends Component {
@@ -166,7 +102,6 @@ class VmDetail extends Component {
     const cluster = Selectors.getClusterById(vm.getIn(['cluster', 'id']))
     const template = Selectors.getTemplateById(vm.getIn(['template', 'id']))
 
-//    const onToggleRenderDisks = (e) => { this.setState({ renderDisks: !this.state.renderDisks }); e.preventDefault() }
     const disksElement = (<VmDisks disks={disks} open={this.state.renderDisks} />)
 
     let optionsJS = options.hasIn(['options', 'consoleOptions', vm.get('id')]) ? options.getIn(['options', 'consoleOptions', vm.get('id')]).toJS() : {}
@@ -181,35 +116,12 @@ class VmDetail extends Component {
     const hasDisks = disks.size > 0
     const noDisks = hasDisks || (<small>no disks</small>)
 
-    /* TODO: uncomment following and add {disksShowHide} to rendering bellow to have show/hide working (might be needed e.g. with networks)
-        const onToggleRenderDisks = () => { this.setState({ renderDisks: !this.state.renderDisks }) }
-
-        const disksIconClass = this.state.renderDisks ? 'glyphicon-menu-down' : 'glyphicon-menu-right'
-        const disksShowHide = (
-          <small>
-            {hasDisks
-            ? (<a href='#' onClick={onToggleRenderDisks}>
-              <i className={`glyphicon ${disksIconClass} ${style['show-hide-arrow']}`} />&nbsp;
-              {this.state.renderDisks ? 'hide' : 'show'}
-            </a>)
-            : 'no disks'
-          }
-          </small>
-        )
-    */
     const consolesHelp = (
       <div>
         <p>If the virtual machines is running, click to access it's Graphics Console.</p>
         <p>Please refer to <a href={AppConfiguration.consoleClientResourcesURL} target='_blank'>documentation</a> for more information.</p>
       </div>
     )
-
-    const nextRunTag = vm.get('nextRunExists') && (
-      <div className={style['vm-flag-container']}>
-        <FieldHelp content='The virtual machine has pending configuration. To take effect, please reboot the virtual machine.'>
-          <span className={'label label-info ' + style['vm-flag']}>Pending Changes</span>
-        </FieldHelp>
-      </div>)
 
     return (
       <div>
@@ -221,7 +133,7 @@ class VmDetail extends Component {
               <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' className={sharedStyle['vm-detail-icon']} />
               &nbsp;{name}
             </h1>
-            {nextRunTag}
+            <NextRunLabel vm={vm} />
             <LastMessage vmId={vm.get('id')} userMessages={userMessages} />
             <div className={style['vm-detail-container']}>
               <dl className={sharedStyle['vm-properties']}>
@@ -251,6 +163,11 @@ class VmDetail extends Component {
                   <FieldHelp content='Operating system installed on the virtual machine.' text='Operating System' />
                 </dt>
                 <dd>{os ? os.get('description') : vm.getIn(['os', 'type'])}</dd>
+
+                <dt>
+                  <FieldHelp content='Type of workload the virtual machine configuration is optimized for.' text='Optimized for' />
+                </dt>
+                <dd>{rephraseVmType(vm.get('type'))}</dd>
 
                 <dt><span className='pficon pficon-memory' />&nbsp;
                   <FieldHelp content='Total memory the virtual machine will be equipped with.' text='Defined Memory' />

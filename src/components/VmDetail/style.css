@@ -72,6 +72,7 @@
     float: right;
     top: -5em;
     position: relative;
+    margin: 2px;
 }
 
 .vm-flag {
