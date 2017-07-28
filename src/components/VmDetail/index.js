@@ -32,9 +32,9 @@ import Selectors from '../../selectors'
 
 function rephraseVmType (vmType) {
   const types = {
-    'desktop': 'desktop',
-    'server': 'server',
-    'highperformance': 'high performance',
+    'desktop': 'Desktop',
+    'server': 'Server',
+    'highperformance': 'High Performance',
   }
 
   const type = vmType.toLowerCase()
