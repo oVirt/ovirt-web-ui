@@ -237,7 +237,8 @@ function* doCheckTokenExpired (action) {
       // No matter saga is canceled for whatever reason, the reload must happen, so here comes the ugly setTimeout()
       setTimeout(() => {
         console.info('======= doCheckTokenExpired() issuing page reload')
-        window.top.location.reload(true)
+        // window.top.location.reload(true)
+        window.location.href = AppConfiguration.applicationURL
       }, 5 * 1000)
       return
     }
