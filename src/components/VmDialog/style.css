@@ -36,3 +36,8 @@
 .vm-dialog-buttons button {
     margin: 5px;
 }
+
+.field-overflow-visible {
+    overflow: visible !important;
+    display: flex;
+}
