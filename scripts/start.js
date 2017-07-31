@@ -269,6 +269,10 @@ function runDevServer(port, protocol) {
     watchOptions: {
       ignored: /node_modules/
     },
+    //This is for redirecting to root path if path doesn't exists
+    historyApiFallback: {
+      index: config.output.publicPath
+    },
 
     stats: 'errors-only',
 
