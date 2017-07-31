@@ -25,6 +25,7 @@ EXTRA_DIST = \
 	ovirt-web-ui.spec.in \
 	README.md \
 	LICENSE \
+	branding \
 	src \
 	config \
 	doc \
@@ -81,7 +82,7 @@ publish:
 distclean-local:
 	rm -rf ${DISTCLEANDIRS}
 
-.PHONY: rpms publish srpms
+.PHONY: rpms publish srpms all ovirt-web-ui
 
 all: ovirt-web-ui
 
@@ -91,15 +92,18 @@ ovirt-web-ui:
 	cp index.jsp build/
 	awk 'BEGIN{getline l < "index.jsp.template"}/<div id="replace_with_index_jsp_template"><\/div>/{gsub("<div id=\"replace_with_index_jsp_template\"></div>",l)}1' build/index.html >> build/index.jsp
 	rm build/index.html
-	mv build/static build/index.jsp build/favicon.ico build/ovirt-web-ui.config build/ovirt-web-ui.war/
+	mv build/static build/index.jsp build/ovirt-web-ui.config build/ovirt-web-ui.war/
 
 install-data-local:
-	$(MKDIR_P) $(DESTDIR)$(USER_PORTAL_DIR)
+	$(MKDIR_P) $(DESTDIR)$(USER_PORTAL_DIR)/branding/ovirt
 	$(MKDIR_P) $(DESTDIR)$(OVIRT_ENGINE_DIR)
+	$(MKDIR_P) $(DESTDIR)$(sysconfdir)/ovirt-web-ui/branding
 	cp -rpv build/ovirt-web-ui.war $(DESTDIR)$(USER_PORTAL_DIR)
-	cp -rpv build/etc $(DESTDIR)/$(sysconfdir)
+	cp -rpvT build/branding $(DESTDIR)$(USER_PORTAL_DIR)/branding/ovirt
+	cp -rpv build/etc/* $(DESTDIR)$(sysconfdir)
 	echo "ln -s" $(DESTDIR)$(USER_PORTAL_DIR)/ovirt-web-ui.war $(DESTDIR)$(OVIRT_ENGINE_DIR)/ovirt-web-ui.war
-	ln -s ../ovirt-web-ui/ovirt-web-ui.war $(DESTDIR)$(OVIRT_ENGINE_DIR)/ovirt-web-ui.war
+	ln -sf ../ovirt-web-ui/ovirt-web-ui.war $(DESTDIR)$(OVIRT_ENGINE_DIR)/ovirt-web-ui.war
+	ln -sfr $(DESTDIR)$(USER_PORTAL_DIR)/branding/ovirt $(DESTDIR)$(sysconfdir)/ovirt-web-ui/branding/00-ovirt.brand
 
 check-local: 
 	$(YARN) test

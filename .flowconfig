@@ -8,3 +8,4 @@
 module.name_mapper.extension='css' -> '<PROJECT_ROOT>/config/flow/css.js.flow'
 suppress_comment=\\(.\\|\n\\)*\\$FlowFixMe
 suppress_comment=\\(.\\|\n\\)*\\$FlowIssue
+unsafe.enable_getters_and_setters=true
