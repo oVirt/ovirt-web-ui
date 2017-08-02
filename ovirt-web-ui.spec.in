@@ -56,6 +56,10 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Wed Aug 2 2017 Marek Libra <mlibra@redhat.com> - 1.2.0
+- change log TBD
+- so far just pre-release
+
 * Tue Jun 20 2017 Marek Libra <mlibra@redhat.com> - 1.1.0
 - Navigation via list of VMs to see details simplified
 - Component for VM's Disks redesigned
