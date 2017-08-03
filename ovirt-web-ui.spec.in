@@ -57,8 +57,16 @@ make install DESTDIR=%{buildroot}
 
 %changelog
 * Wed Aug 2 2017 Marek Libra <mlibra@redhat.com> - 1.2.0
-- change log TBD
-- so far just pre-release
+- branding
+- infinite scroller for VMS list
+- Change CD function
+- "Runs on Host" - hyperlink to the host running particular VM
+- "Loading ..." indicator of background activity
+- "Pending Changes" tag rendered when NEXT_RUN configuration exists
+- VM Type
+- error messages improved
+- fixed setting of VM icon
+- multiple additional functional & UI fixes
 
 * Tue Jun 20 2017 Marek Libra <mlibra@redhat.com> - 1.1.0
 - Navigation via list of VMs to see details simplified
