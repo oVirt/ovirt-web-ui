@@ -15,6 +15,7 @@ const initialState = Immutable.fromJS({
   filter: true,
   isFilterChecked: false,
   administrator: false,
+  usbFilter: null,
 })
 
 const config = actionReducer(initialState, {
@@ -44,6 +45,9 @@ const config = actionReducer(initialState, {
   },
   SET_DOMAIN (state, { payload: { domain } }) {
     return state.set('domain', domain)
+  },
+  SET_USB_FILTER (state, { payload: { usbFilter } }) {
+    return state.set('usbFilter', usbFilter)
   },
 })
 

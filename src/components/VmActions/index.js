@@ -250,6 +250,7 @@ class VmActions extends React.Component {
       onStartPool,
       isPool,
       onRemove,
+      config,
     } = this.props
 
     let onStart = onStartVm
@@ -311,6 +312,7 @@ class VmActions extends React.Component {
           className='pficon pficon-screen'
           tooltip={consoleProtocol}
           shortTitle='Console'
+          usbFilter={config.get('usbFilter')}
           vm={vm} />
 
         <LinkButton isOnCard={isOnCard}
@@ -327,6 +329,7 @@ class VmActions extends React.Component {
 
 VmActions.propTypes = {
   vm: PropTypes.object.isRequired,
+  config: PropTypes.object.isRequired,
   isOnCard: PropTypes.bool,
   isPool: PropTypes.bool,
   pool: PropTypes.object,
@@ -342,6 +345,7 @@ VmActions.propTypes = {
 export default connect(
   (state) => ({
     icons: state.icons,
+    config: state.config,
   }),
   (dispatch, { vm, pool }) => ({
     onShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: false })),

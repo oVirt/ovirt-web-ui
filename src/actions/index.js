@@ -1,6 +1,7 @@
 import {
   GET_VM,
   GET_BY_PAGE,
+  GET_USB_FILTER,
   PERSIST_STATE,
   SET_ADMINISTATOR,
   SET_USER_FILTER_PERMISSION,
@@ -83,5 +84,21 @@ export function getByPage ({ page, shallowFetch = true }) {
       shallowFetch,
       page,
     },
+  }
+}
+
+export function setUSBFilter ({ usbFilter }) {
+  return {
+    type: 'SET_USB_FILTER',
+    payload: {
+      usbFilter,
+    },
+  }
+}
+
+export function getUSBFilter () {
+  return {
+    type: GET_USB_FILTER,
+    payload: {},
   }
 }

@@ -65,6 +65,8 @@ import {
   removeMissingStorages,
   setFiles,
   setVmCDRom,
+  setUSBFilter,
+  getUSBFilter,
 } from './actions/index'
 
 import {
@@ -80,6 +82,7 @@ import {
   GET_POOLS_BY_COUNT,
   GET_POOLS_BY_PAGE,
   GET_RDP_VM,
+  GET_USB_FILTER,
   GET_VMS_BY_COUNT,
   GET_VMS_BY_PAGE,
   DOWNLOAD_CONSOLE_VM,
@@ -204,6 +207,7 @@ function* login (action) {
       yield put(yield put(loadInProgress({ value: false })))
     } else {
       if (yield checkOvirtApiVersion(oVirtMeta)) {
+        yield put(getUSBFilter())
         yield fetchPermissionWithoutFilter({})
         yield autoConnectCheck({})
       } else { // oVirt API of incompatible version
@@ -597,7 +601,7 @@ function* fetchVmSessions ({ vmId }) {
   return []
 }
 
-function adjustVVFile ({ data, options }) {
+function adjustVVFile ({ data, options, usbFilter }) {
   // to simplify other flow, let's handle both 'options' from redux (immutableJs) or plain JS object from getConsoleOptions()
   // logDebug('adjustVVFile data before: ', data)
   logDebug('adjustVVFile options: ', options)
@@ -618,13 +622,15 @@ function adjustVVFile ({ data, options }) {
     logDebug('secure-attention was not found, inserting ', text)
     data = data.replace(/^\[virt-viewer\]$/mg, `[virt-viewer]\n${text}`) // ending \n is already there
   }
-
+  if (usbFilter) {
+    data = data.replace(/^\[virt-viewer\]$/mg, `[virt-viewer]\nusb-filter=${usbFilter}`)
+  }
   logDebug('adjustVVFile data after adjustment: ', data)
   return data
 }
 
 function* downloadVmConsole (action) {
-  let { vmId, consoleId } = action.payload
+  let { vmId, consoleId, usbFilter } = action.payload
 
   if (!consoleId) {
     yield put(vmActionInProgress({ vmId, name: 'getConsole', started: true }))
@@ -649,7 +655,7 @@ function* downloadVmConsole (action) {
         options = yield getConsoleOptions(getConsoleOptionsAction({ vmId }))
       }
 
-      data = adjustVVFile({ data, options })
+      data = adjustVVFile({ data, options, usbFilter })
       fileDownload({ data, fileName: 'console.vv', mimeType: 'application/x-virt-viewer' })
     }
   }
@@ -762,6 +768,13 @@ function* fetchAllFilesForISO (action) {
   }
 }
 
+function* fetchUSBFilter (action) {
+  const usbFilter = yield callExternalAction('getUSBFilter', Api.getUSBFilter, action)
+  if (usbFilter) {
+    yield put(setUSBFilter({ usbFilter }))
+  }
+}
+
 function* fetchPermissionWithoutFilter (action) {
   const data = yield callExternalAction('checkFilter', Api.checkFilter, { action: 'CHECK_FILTER' }, true)
 
@@ -847,6 +860,7 @@ export function *rootSaga () {
     takeEvery(SAVE_CONSOLE_OPTIONS, saveConsoleOptions),
 
     takeEvery(SELECT_POOL_DETAIL, selectPoolDetail),
+    takeEvery(GET_USB_FILTER, fetchUSBFilter),
     takeLatest(SCHEDULER__1_MIN, schedulerPerMinute),
     ...SagasWorkers(sagasFunctions),
   ]

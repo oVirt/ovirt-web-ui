@@ -111,12 +111,13 @@ export function startVm ({ vmId }) {
   }
 }
 
-export function downloadConsole ({ vmId, consoleId }) {
+export function downloadConsole ({ vmId, consoleId, usbFilter }) {
   return {
     type: DOWNLOAD_CONSOLE_VM,
     payload: {
       vmId,
       consoleId,
+      usbFilter,
     },
   }
 }
