@@ -7,10 +7,10 @@ import { Exception } from './exceptions'
 import Selectors from './selectors'
 import AppConfiguration from './config'
 
-type VmIdType = { vmId: string };
-type PoolIdType = { poolId: string };
-type InputRequestType = { url: string, input: string, contentType?: string };
-type VmType = { vm: Object };
+type VmIdType = { vmId: string }
+type PoolIdType = { poolId: string }
+type InputRequestType = { url: string, input: string, contentType?: string }
+type VmType = { vm: Object }
 
 const zeroUUID: string = '00000000-0000-0000-0000-000000000000'
 

@@ -89,7 +89,7 @@ module.exports = {
     'flowtype/require-valid-file-annotation': 2,
     'flowtype/semi': [
       2,
-      'always'
+      'never'
     ],
     'flowtype/space-after-type-colon': [
       2,
