@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { msg } from '../../intl'
 
 import style from './style.css'
 
@@ -279,7 +280,7 @@ class VmActions extends React.Component {
         <EmptyAction state={status} isOnCard={isOnCard} />
 
         <Button isOnCard={isOnCard} actionDisabled={(!isPool && !canStart(status)) || vm.getIn(['actionInProgress', 'start'])}
-          shortTitle='Start'
+          shortTitle={msg.start()}
           button='btn btn-success'
           className='fa fa-play'
           tooltip='Start the VM'
