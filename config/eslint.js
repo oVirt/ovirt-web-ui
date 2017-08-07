@@ -23,7 +23,8 @@ module.exports = {
   },
 
   plugins: [
-    'flowtype'
+    'flowtype',
+    'import'
   ],
 
   parserOptions: {
@@ -53,8 +54,10 @@ module.exports = {
   },
 
   rules: {
+    'no-duplicate-imports': 0,
     'comma-dangle': [2, 'always-multiline'],
     'object-curly-spacing': [2, 'always'],
+    'import/no-duplicates': 2,
     'flowtype/boolean-style': [
       2,
       'boolean'

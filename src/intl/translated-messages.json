@@ -1,0 +1,14 @@
+{
+  "fr": {
+    "reboot": "Reboot [fr]",
+    "start": "Start [fr]"
+  },
+  "pt-BR": {
+    "reboot": "Reboot [pt-BR]",
+    "start": "Start [pt-BR]"
+  },
+  "zh-CN": {
+    "reboot": "Reboot [zh]",
+    "start": "Start [zh]"
+  }
+}

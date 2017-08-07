@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<config xmlns="http://zanata.org/namespace/config/">
+    <url>https://translate.zanata.org/</url>
+    <project>ovirt-web-ui</project>
+    <project-version>1.2.0</project-version>
+    <project-type>gettext</project-type>
+
+    <src-dir>extra/to-zanata</src-dir>
+    <trans-dir>extra/from-zanata</trans-dir>
+</config>

@@ -8,11 +8,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
+import { IntlProvider } from 'react-intl'
 
 import './index-nomodules.css'
 import 'patternfly/dist/css/patternfly.css'
 import 'patternfly/dist/css/patternfly-additions.css'
 import * as branding from './branding'
+import { getSelectedMessages, locale } from './intl/index'
 
 // Patternfly dependencies
 // jQuery needs to be globally available (webpack.ProvidePlugin can be also used for this)
@@ -36,7 +38,9 @@ import App from './App'
 function renderApp () {
   ReactDOM.render(
     <Provider store={store}>
-      <App />
+      <IntlProvider locale={locale} messages={getSelectedMessages()}>
+        <App />
+      </IntlProvider>
     </Provider>,
     document.getElementById('root')
   )
