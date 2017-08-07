@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
 import Product from '../version'
+import { msg } from '../intl'
+import { fixedStrings } from '../branding'
 
 const OvirtApiCheckFailed = ({ config }) => {
   const oVirtApiVersion = config.get('oVirtApiVersion')
@@ -13,7 +15,7 @@ const OvirtApiCheckFailed = ({ config }) => {
     return null
   }
 
-  let found = '"unknown"'
+  let found = msg.quotedUnknown()
   const major = oVirtApiVersion.get('major')
   const minor = oVirtApiVersion.get('minor')
   if (major) {
@@ -25,7 +27,8 @@ const OvirtApiCheckFailed = ({ config }) => {
   return (
     <div className='alert alert-danger'>
       <span className='pficon pficon-error-circle-o' />
-      <strong>Unsupported {found} oVirt version found</strong>, but version at least {required} is required .
+      <strong>{msg.unsupportedOvirtVersionFound({ version: found, productName: fixedStrings.BRAND_NAME })}</strong>,&nbsp;
+      {msg.butVersionAtLeastRequired({ requiredVersion: required })}.
     </div>
   )
 }

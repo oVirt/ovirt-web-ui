@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 
 import { VmStatusIcon } from 'ovirt-ui-components'
 import FieldHelp from '../FieldHelp/index'
+import { msg } from '../../intl'
 
 import HostConsole, { hasUserHostConsoleAccess, CockpitAHREF } from '../HostConsole/index'
 
@@ -22,7 +23,7 @@ const VmStatus = ({ vm, hosts, config }) => {
   }
 
   if (vm.get('statusDetail')) {
-    const reason = vm.get('statusDetail') === 'noerr' ? 'No error' : vm.get('statusDetail')
+    const reason = vm.get('statusDetail') === 'noerr' ? msg.noError() : vm.get('statusDetail')
     detailContent = (
       <p>
         Reason: {reason}

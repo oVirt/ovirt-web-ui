@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import AppConfiguration from '../../config'
+import { msg } from '../../intl'
 
 import style from './style.css'
 import sharedStyle from '../sharedStyle.css'
@@ -32,9 +33,9 @@ import Selectors from '../../selectors'
 
 function rephraseVmType (vmType) {
   const types = {
-    'desktop': 'Desktop',
-    'server': 'Server',
-    'highperformance': 'High Performance',
+    'desktop': msg.vmType_desktop(),
+    'server': msg.vmType_server(),
+    'highperformance': msg.vmType_highPerformance(),
   }
 
   const type = vmType.toLowerCase()
@@ -114,12 +115,16 @@ class VmDetail extends Component {
       </small>)
 
     const hasDisks = disks.size > 0
-    const noDisks = hasDisks || (<small>no disks</small>)
+    const noDisks = hasDisks || (<small>{msg.noDisks()}</small>)
 
     const consolesHelp = (
       <div>
-        <p>If the virtual machines is running, click to access it's Graphics Console.</p>
-        <p>Please refer to <a href={AppConfiguration.consoleClientResourcesURL} target='_blank'>documentation</a> for more information.</p>
+        <p>{msg.ifVmIsRunningClickToAccessItsGraphicsConsole()}</p>
+        <p>
+          {msg.pleaseReferToDocumentationForMoreInformationPart1()}&nbsp;
+          <a href={AppConfiguration.consoleClientResourcesURL} target='_blank'>{msg.pleaseReferToDocumentationForMoreInformationPart2()}</a>&nbsp;
+          {msg.pleaseReferToDocumentationForMoreInformationPart3()}
+        </p>
       </div>
     )
 
@@ -138,61 +143,61 @@ class VmDetail extends Component {
             <div className={style['vm-detail-container']}>
               <dl className={sharedStyle['vm-properties']}>
                 <dt>
-                  <FieldHelp content='The actual state the virtual machine is in.' text='State' />
+                  <FieldHelp content={msg.actualStateVmIsIn()} text={msg.state()} />
                 </dt>
                 <dd>
                   <VmStatus vm={vm} />
                 </dd>
 
                 <dt>
-                  <FieldHelp content='Optional user description of the virtual machine.' text='Description' />
+                  <FieldHelp content={msg.optionalUserDescriptionOfVm()} text={msg.description()} />
                 </dt>
                 <dd>{vm.get('description')}</dd>
 
                 <dt>
-                  <FieldHelp content='Group of hosts the virtual machine can be running on.' text='Cluster' />
+                  <FieldHelp content={msg.groupOfHostsVmCanBeRunningOn()} text={msg.cluster()} />
                 </dt>
                 <dd>{cluster ? cluster.get('name') : ''}</dd>
 
                 <dt>
-                  <FieldHelp content='Contains the configuration and disks which will be used to create this virtual machine. Please customize as needed.' text='Template' />
+                  <FieldHelp content={msg.containsConfigurationAndDisksWhichWillBeUsedToCreateThisVm()} text={msg.template()} />
                 </dt>
                 <dd>{template ? templateNameRenderer(template) : ''}</dd>
 
                 <dt>
-                  <FieldHelp content='Operating system installed on the virtual machine.' text='Operating System' />
+                  <FieldHelp content={msg.operatingSystemInstalledOnVm()} text={msg.operatingSystem()} />
                 </dt>
                 <dd>{os ? os.get('description') : vm.getIn(['os', 'type'])}</dd>
 
                 <dt>
-                  <FieldHelp content='Type of workload the virtual machine configuration is optimized for.' text='Optimized for' />
+                  <FieldHelp content={msg.typeOfWorkloadVmConfigurationIsOptimizedFor()} text={msg.optimizedFor()} />
                 </dt>
                 <dd>{rephraseVmType(vm.get('type'))}</dd>
 
                 <dt><span className='pficon pficon-memory' />&nbsp;
-                  <FieldHelp content='Total memory the virtual machine will be equipped with.' text='Defined Memory' />
+                  <FieldHelp content={msg.totalMemoryVmWillBeEquippedWith()} text={msg.definedMemory()} />
                 </dt>
                 <dd>{userFormatOfBytes(vm.getIn(['memory', 'total'])).str}</dd>
 
                 <dt><span className='pficon pficon-cpu' />&nbsp;
-                  <FieldHelp content='Total count of virtual processors the virtual machine will be equipped with.' text='CPUs' />
+                  <FieldHelp content={msg.totalCountOfVirtualProcessorsVmWillBeEquippedWith()} text={msg.cpus()} />
                 </dt>
                 <dd>{vm.getIn(['cpu', 'vCPUs'])}</dd>
 
                 <dt><span className='pficon pficon-network' />&nbsp;
-                  <FieldHelp content='Fully Qualified Domain Name (FQDN) of the virtual machine. Please note, guest agent must be installed within the virtual machine to collect this value.' text='Address' />
+                  <FieldHelp content={msg.fullyQualifiedDomainName()} text={msg.address()} />
                 </dt>
                 <dd>{vm.get('fqdn')}</dd>
                 <dt><span className='pficon pficon-storage-domain' />&nbsp;
-                  <FieldHelp content='Currently inserted ISO in CDRom' text='CDRom' />
+                  <FieldHelp content={msg.currentlyInsertedIsoInCdRom()} text={msg.cdRom()} />
                 </dt>
-                <dd>{vm.getIn(['cdrom', 'file', 'id']) ? vm.getIn(['cdrom', 'file', 'id']) : 'Empty' }</dd>
+                <dd>{vm.getIn(['cdrom', 'file', 'id']) ? vm.getIn(['cdrom', 'file', 'id']) : msg.empty() }</dd>
               </dl>
 
               <dl className={sharedStyle['vm-properties']}>
                 <dt><span className='pficon pficon-screen' />
                   &nbsp;
-                  <FieldHelp content={consolesHelp} text='Consoles' />
+                  <FieldHelp content={consolesHelp} text={msg.consoles()} />
                   &nbsp;
                   {consoleOptionsShowHide}
                 </dt>
@@ -201,7 +206,7 @@ class VmDetail extends Component {
 
                 <dt><span className='fa fa-database' />
                   &nbsp;
-                  <FieldHelp content='Storage connected to the virtual machines.' text='Disks' />
+                  <FieldHelp content={msg.storageConnectedToVm()} text={msg.disks()} />
                   &nbsp;
                 </dt>
                 {noDisks}

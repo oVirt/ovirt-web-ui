@@ -6,6 +6,7 @@ import { withRouter } from 'react-router-dom'
 
 import ContainerFluid from '../ContainerFluid'
 import Vms from './Vms'
+import { msg } from '../../intl'
 
 /**
  * Data are fetched but no VM is available to display
@@ -17,10 +18,10 @@ const NoVm = () => {
         <span className='pficon pficon pficon-add-circle-o' />
       </div>
       <h1>
-        No VM available
+        {msg.noVmAvailable()}
       </h1>
       <p>
-        No VM is available for the logged user.
+        {msg.noVmAvailableForLoggedUser()}
       </p>
     </div>
   )

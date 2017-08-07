@@ -5,6 +5,7 @@ import PageRouter from './components/PageRouter'
 import { VmDetailToolbar, PoolDetailToolbar } from './components/Toolbar/index'
 import VmsPage from './components/Pages/VmsPage'
 import { VmDetailPage, PoolDetailPage, VmDialogPage } from './components/Pages/index'
+import { msg } from './intl'
 
 /**
  * Function get vms object, and return routes object
@@ -28,7 +29,7 @@ const getRoutes = (vms) => ([
       {
         path: '/vm/add',
         exact: true,
-        title: (match) => 'Add new VM',
+        title: (match) => msg.addNewVm(),
         component: VmDialogPage,
         toolbars: [], // Recently not used. When needed, see VmDialog/style.css - .vm-dialog-buttons
       },
@@ -67,7 +68,7 @@ const getRoutes = (vms) => ([
 const getMenu = () => ([
   {
     icon: 'pficon pficon-virtual-machine',
-    title: 'Virtual Machines',
+    title: msg.virtualMachines(),
     to: '/',
   },
 ])
