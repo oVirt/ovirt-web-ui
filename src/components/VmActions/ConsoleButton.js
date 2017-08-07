@@ -103,6 +103,7 @@ class ConsoleButton extends React.Component {
 ConsoleButton.propTypes = {
   vm: PropTypes.object.isRequired,
   VmAction: PropTypes.object.isRequired,
+  usbFilter: PropTypes.string.isRequired,
   consoleId: PropTypes.string,
   className: PropTypes.string.isRequired,
   tooltip: PropTypes.string,
@@ -119,9 +120,9 @@ export default connect(
   (state) => ({
     VmAction: state.VmAction,
   }),
-  (dispatch, { vm, consoleId }) => ({
-    onCheckConsoleSessionInUse: () => dispatch(checkConsoleInUse({ vmId: vm.get('id') })),
+  (dispatch, { vm, consoleId, usbFilter }) => ({
+    onCheckConsoleSessionInUse: () => dispatch(checkConsoleInUse({ vmId: vm.get('id'), usbFilter })),
     onConsoleSessionConfirmaClose: () => dispatch(setConsoleInUse({ vmId: vm.get('id'), consoleInUse: false })),
-    onDownloadConsole: () => dispatch(downloadConsole({ vmId: vm.get('id'), consoleId })),
+    onDownloadConsole: () => dispatch(downloadConsole({ vmId: vm.get('id'), consoleId, usbFilter })),
   })
 )(ConsoleButton)

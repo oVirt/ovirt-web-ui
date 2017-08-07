@@ -238,7 +238,7 @@ export default connect(
   }),
 
   (dispatch, { vm, config }) => ({
-    onConsole: ({ vmId, consoleId }) => dispatch(downloadConsole({ vmId, consoleId })),
+    onConsole: ({ vmId, consoleId }) => dispatch(downloadConsole({ vmId, consoleId, usbFilter: config.get('usbFilter') })),
     onConsoleOptionsSave: ({ options }) => dispatch(saveConsoleOptions({ vmId: vm.get('id'), options })),
     onConsoleOptionsOpen: () => dispatch(getConsoleOptions({ vmId: vm.get('id') })),
     onRDP: () => dispatch(getRDP({ vmName: vm.get('name'), username: config.getIn([ 'user', 'name' ]), domain: config.get('domain'), fqdn: vm.get('fqdn') })),

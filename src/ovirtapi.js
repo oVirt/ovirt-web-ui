@@ -572,6 +572,15 @@ OvirtApi = {
       input,
     })
   },
+  getUSBFilter (): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'getUSBFilter' })
+    return OvirtApi._httpGet({
+      url: `${AppConfiguration.applicationContext}/services/files/usbfilter.txt`,
+      custHeaders: {
+        'Accept': 'text/plain',
+      },
+    })
+  },
 }
 
 const Api = OvirtApi

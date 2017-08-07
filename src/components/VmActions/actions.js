@@ -10,11 +10,12 @@ export function setConsoleInUse ({ vmId, consoleInUse }) {
   }
 }
 
-export function checkConsoleInUse ({ vmId }) {
+export function checkConsoleInUse ({ vmId, usbFilter }) {
   return {
     type: CONSOLE_IN_USE,
     payload: {
       vmId,
+      usbFilter,
     },
   }
 }

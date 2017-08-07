@@ -4,13 +4,13 @@ import { CONSOLE_IN_USE } from './constants'
 import { setConsoleInUse } from './actions'
 
 function* getConsoleInUseModal (sagas, action) {
-  let { vmId } = action.payload
+  let { vmId, usbFilter } = action.payload
   const sessionsInternal = yield sagas.fetchVmSessions({ vmId })
   if (sessionsInternal &&
     sessionsInternal.find((x) => x.consoleUser) !== undefined) {
     yield put(setConsoleInUse({ vmId, consoleInUse: true }))
   } else {
-    yield put(downloadConsole({ vmId }))
+    yield put(downloadConsole({ vmId, usbFilter }))
     yield put(setConsoleInUse({ vmId, consoleInUse: false }))
   }
 }
