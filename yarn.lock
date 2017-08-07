@@ -3900,9 +3900,9 @@ os-tmpdir@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/os-tmpdir/-/os-tmpdir-1.0.2.tgz#bbe67406c79aa85c5cfec766fe5734555dfa1274"
 
-ovirt-ui-components@0.2.4:
-  version "0.2.4"
-  resolved "https://registry.yarnpkg.com/ovirt-ui-components/-/ovirt-ui-components-0.2.4.tgz#d49201703b24649d49f709c2cd6b09598ebd1842"
+ovirt-ui-components@0.2.5:
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/ovirt-ui-components/-/ovirt-ui-components-0.2.5.tgz#835ba5a0902e2a5ad081f2debf2ef393e5b1693c"
 
 p-limit@^1.1.0:
   version "1.1.0"
