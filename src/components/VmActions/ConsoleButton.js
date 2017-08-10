@@ -6,6 +6,7 @@ import { downloadConsole } from '../../actions/index'
 
 import Confirmation from '../Confirmation/index'
 import Popover from '../Confirmation/Popover'
+import { msg } from '../../intl'
 
 import style from './style.css'
 
@@ -64,7 +65,7 @@ class ConsoleButton extends React.Component {
     let popoverComponent = null
     if (VmAction.getIn(['vms', vm.get('id'), 'consoleInUse']) && this.state.openModal) {
       popoverComponent = (<Popover width={200} height={80} target={this} placement={isOnCard ? 'top' : 'bottom'} show>
-        <Confirmation text='Console in use, continue?' okButton={{ label: 'Yes', click: this.onConsoleDownload }} cancelButton={{ label: 'Cancel', click: this.onConsoleConfirmationClose }} />
+        <Confirmation text={msg.consoleInUseContinue()} okButton={{ label: msg.yes(), click: this.onConsoleDownload }} cancelButton={{ label: msg.cancel(), click: this.onConsoleConfirmationClose }} />
       </Popover>)
     }
 

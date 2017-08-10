@@ -194,19 +194,19 @@ class RemoveVmAction extends React.Component {
     if (isDisks) {
       checkbox = (<div style={{ marginTop: '8px' }}><Checkbox checked={this.state.preserveDisks}
         onClick={() => this.setState({ preserveDisks: !this.state.preserveDisks })}
-        label='Preserve disks' /></div>)
+        label={msg.preserveDisks()} /></div>)
       height = 75
     }
     let confirmRemoveText = null
     if (checkbox) {
       confirmRemoveText = (
         <div>
-          Remove the VM?
+          {msg.removeVmQustion()}
           <br />
           {checkbox}
         </div>)
     } else {
-      confirmRemoveText = 'Remove the VM?'
+      confirmRemoveText = msg.removeVmQustion()
     }
 
     const status = vm.get('status')
@@ -215,15 +215,15 @@ class RemoveVmAction extends React.Component {
     return (
       <Button isOnCard={false} actionDisabled={isDisabled}
         className='pficon pficon-remove'
-        tooltip='Remove the VM'
+        tooltip={msg.removeVm()}
         button='btn btn-danger'
-        shortTitle='Remove'
+        shortTitle={msg.remove()}
         popover={({ close }) => <Confirmation
           height={height}
           text={confirmRemoveText}
-          okButton={{ label: 'Yes', click: () => onRemove({ force: false, preserveDisks: this.state.preserveDisks }) }}
-          cancelButton={{ label: 'Cancel', click: () => { close() } }}
-          extraButton={{ label: 'force', click: () => onRemove({ force: true, preserveDisks: this.state.preserveDisks }) }}
+          okButton={{ label: msg.yes(), click: () => onRemove({ force: false, preserveDisks: this.state.preserveDisks }) }}
+          cancelButton={{ label: msg.cancel(), click: () => { close() } }}
+          extraButton={{ label: msg.force(), click: () => onRemove({ force: true, preserveDisks: this.state.preserveDisks }) }}
         />}
       />
     )
@@ -269,7 +269,7 @@ class VmActions extends React.Component {
       const vConsole = vm.get('consoles').find(c => c.get('protocol') === 'spice') ||
         vm.getIn(['consoles', 0])
       const protocol = vConsole.get('protocol').toUpperCase()
-      consoleProtocol = `Open ${protocol} Console`
+      consoleProtocol = msg.openProtocolConsole({ protocol })
     }
 
     if (vm.get('consoleInUse')) {
@@ -284,43 +284,43 @@ class VmActions extends React.Component {
           shortTitle={msg.start()}
           button='btn btn-success'
           className='fa fa-play'
-          tooltip='Start the VM'
+          tooltip={msg.startVm()}
           onClick={onStart} />
 
         <Button isOnCard={isOnCard} actionDisabled={isPool || !canSuspend(status) || vm.getIn(['actionInProgress', 'suspend'])}
-          shortTitle='Suspend'
+          shortTitle={msg.suspend()}
           button='btn btn-default'
           className='fa fa-moon-o'
-          tooltip='Suspend the VM'
-          popover={({ close }) => <Confirmation text='Suspend the VM?' okButton={{ label: 'Yes', click: this.props.onSuspend }} cancelButton={{ label: 'Cancel', click: () => { close() } }} />} />
+          tooltip={msg.suspendVm()}
+          popover={({ close }) => <Confirmation text={msg.suspendVmQuestion()} okButton={{ label: msg.yes(), click: this.props.onSuspend }} cancelButton={{ label: msg.cancel(), click: () => { close() } }} />} />
 
         <Button isOnCard={isOnCard} actionDisabled={isPool || !canShutdown(status) || vm.getIn(['actionInProgress', 'shutdown'])}
           className='fa fa-power-off'
           button='btn btn-danger'
-          tooltip='Shut down the VM'
-          shortTitle='Shut down'
-          popover={({ close }) => <Confirmation text='Shut down the VM?' okButton={{ label: 'Yes', click: this.props.onShutdown }} cancelButton={{ label: 'Cancel', click: () => { close() } }} />} />
+          tooltip={msg.shutdownVm()}
+          shortTitle={msg.shutdown()}
+          popover={({ close }) => <Confirmation text={msg.shutdownVmQuestion()} okButton={{ label: msg.yes(), click: this.props.onShutdown }} cancelButton={{ label: msg.cancel(), click: () => { close() } }} />} />
 
         <Button isOnCard={isOnCard} actionDisabled={isPool || !canRestart(status) || vm.getIn(['actionInProgress', 'restart'])}
           className='pficon pficon-restart'
           button='btn btn-default'
-          tooltip='Reboot the VM'
-          shortTitle='Reboot'
-          popover={({ close }) => <Confirmation text='Restart the VM?' okButton={{ label: 'Yes', click: this.props.onRestart }} cancelButton={{ label: 'Cancel', click: () => { close() } }} />} />
+          tooltip={msg.rebootVm()}
+          shortTitle={msg.reboot()}
+          popover={({ close }) => <Confirmation text={msg.rebootVmQuestion()} okButton={{ label: msg.yes(), click: this.props.onRestart }} cancelButton={{ label: msg.cancel(), click: () => { close() } }} />} />
 
         <ConsoleButton isOnCard={isOnCard} actionDisabled={isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole'])}
           button='btn btn-default'
           className='pficon pficon-screen'
           tooltip={consoleProtocol}
-          shortTitle='Console'
+          shortTitle={msg.console()}
           usbFilter={config.get('usbFilter')}
           vm={vm} />
 
         <LinkButton isOnCard={isOnCard}
-          shortTitle='Edit'
+          shortTitle={msg.edit()}
           button='btn btn-primary'
           className={`pficon pficon-edit ${style['action-link']}`}
-          tooltip='Edit the VM' to={`/vm/${vm.get('id')}/edit`} />
+          tooltip={msg.editVm()} to={`/vm/${vm.get('id')}/edit`} />
 
         <RemoveVmAction isOnCard={isOnCard} isPool={isPool} vm={vm} isDisks={vm.get('disks').size > 0} onRemove={onRemove} />
       </div>

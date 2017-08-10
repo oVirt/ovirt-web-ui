@@ -134,7 +134,7 @@ function createIdsMap (messages: typeof messages): { [MessageIdType]: MessageIdT
  * @see https://github.com/yahoo/react-intl/wiki/API#formatmessage
  * @see https://github.com/yahoo/react-intl/wiki/Components#formattedmessage
  */
-export const id: {[MessageIdType]: MessageIdType} = createIdsMap(messages)
+export const msgId: {[MessageIdType]: MessageIdType} = createIdsMap(messages)
 
 function createFormattingFunctionsMap (messages: typeof messages): {[MessageIdType]: ((?Object) => string)} {
   return Object.keys(messages)

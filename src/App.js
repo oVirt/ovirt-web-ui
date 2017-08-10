@@ -23,6 +23,7 @@ import { getRoutes, getMenu } from './routes'
 import rednerModal from './components/VmModals/rednerModal'
 import AppConfiguration from './config'
 import { fixedStrings } from './branding'
+import { msg } from './intl'
 
 /**
  * Login (token) to Engine is missing.
@@ -34,7 +35,7 @@ const NoLogin = () => {
         <span className='pficon pficon pficon-user' />
       </div>
       <h1>
-        Please log in ... <br /><a href={AppConfiguration.applicationURL}>Log in</a>
+        {msg.pleaseLogIn()} <br /><a href={AppConfiguration.applicationURL}>Log in</a>
       </h1>
     </div>
   )
@@ -74,7 +75,7 @@ const App = ({ vms, visibility, config }) => {
   return (
     <Router getUserConfirmation={openConfirmation} basename={AppConfiguration.applicationURL}>
       <div>
-        <VmsPageHeader page={vms.get('page')} title={fixedStrings.BRAND_NAME + ' VM Portal'} />
+        <VmsPageHeader page={vms.get('page')} title={fixedStrings.BRAND_NAME + ' ' + msg.vmPortal()} />
         <VerticalMenu menuItems={menu} />
         <TokenExpired />
         <LoadingData />

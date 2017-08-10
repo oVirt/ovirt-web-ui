@@ -5,6 +5,7 @@ import Switch from 'react-bootstrap-switch'
 
 import style from './style.css'
 import FieldHelp from '../FieldHelp/index'
+import { msg } from '../../intl'
 
 class ConsoleOptions extends React.Component {
   constructor (props) {
@@ -54,7 +55,7 @@ class ConsoleOptions extends React.Component {
           </dd>
 
           <dt className={style['console-option-description']}>
-            <FieldHelp content='Map Ctrl + Alt + Del keyboard shortcut to Ctrl + Alt + End' text='Use Ctrl+Alt+Del' />
+            <FieldHelp content={msg.mapCtrlAltDelKeyboardShortcutToCtrlAltEnd()} text={msg.useCtrlAltDel()} />
           </dt>
           <dd>
             <Switch

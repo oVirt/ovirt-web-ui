@@ -109,6 +109,7 @@ import AppConfiguration from './config'
 import OptionsManager from './optionsManager'
 import SagasWorkers from './sagasBuilder'
 import RDPBuilder from './rdp-builder'
+import { msg } from './intl'
 
 function * foreach (array, fn, context) {
   var i = 0
@@ -866,26 +867,25 @@ export function *rootSaga () {
   ]
 }
 
-// TODO: translate
 const shortMessages = {
-  'START_VM': 'Failed to start the VM',
-  'RESTART_VM': 'Failed to restart the VM',
-  'SHUTDOWN_VM': 'Failed to shutdown the VM',
-  'DOWNLOAD_CONSOLE_VM': 'Failed to get the VM console',
-  'SUSPEND_VM': 'Failed to suspend the VM',
-  'REMOVE_VM': 'Failed to remove the VM',
+  'START_VM': msg.failedToStartVm(),
+  'RESTART_VM': msg.failedToRestartVm(),
+  'SHUTDOWN_VM': msg.failedToShutdownVm(),
+  'DOWNLOAD_CONSOLE_VM': msg.failedToGetVmConsole(),
+  'SUSPEND_VM': msg.failedToSuspendVm(),
+  'REMOVE_VM': msg.failedToRemoveVm(),
 
-  'GET_ICON': 'Failed to retrieve VM icon',
-  'INTERNAL_CONSOLE': 'Failed to retrieve VM console details',
-  'INTERNAL_CONSOLES': 'Failed to retrieve list of VM consoles',
-  'GET_DISK_DETAILS': 'Failed to retrieve disk details',
-  'GET_DISK_ATTACHMENTS': 'Failed to retrieve VM disk attachments',
-  'GET_ISO_STORAGES': 'Failed to retrieve ISO storages',
-  'GET_ALL_FILES_FOR_ISO': 'Failed to retrieve files from storage',
+  'GET_ICON': msg.failedToRetrieveVmIcon(),
+  'INTERNAL_CONSOLE': msg.failedToRetrieveVmConsoleDetails(),
+  'INTERNAL_CONSOLES': msg.failedToRetrieveListOfVmConsoles(),
+  'GET_DISK_DETAILS': msg.failedToRetrieveDiskDetails(),
+  'GET_DISK_ATTACHMENTS': msg.failedToRetrieveVmDiskAttachments(),
+  'GET_ISO_STORAGES': msg.failedToRetrieveIsoStorages(),
+  'GET_ALL_FILES_FOR_ISO': msg.failedToRetrieveFilesFromStorage(),
 
-  'GET_VM': 'Failed to retireve VM details',
+  'GET_VM': msg.failedToRetrieveVmDetails(),
 }
 
 function shortErrorMessage ({ action }) {
-  return shortMessages[action.type] ? shortMessages[action.type] : `${action.type} failed` // TODO: translate
+  return shortMessages[action.type] ? shortMessages[action.type] : msg.actionFailed(action.type)
 }

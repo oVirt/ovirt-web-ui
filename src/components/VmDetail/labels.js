@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import FieldHelp from '../FieldHelp/index'
+import { msg } from '../../intl'
 
 import style from './style.css'
 
@@ -11,8 +12,8 @@ export const NextRunLabel = ({ vm }) => {
   }
 
   return (<div className={style['vm-flag-container']}>
-    <FieldHelp content='The virtual machine has pending configuration. To take effect, please reboot the virtual machine.'>
-      <span className={'label label-info ' + style['vm-flag']}>Pending Changes</span>
+    <FieldHelp content={msg.vmHasPendingConfigurationChanges()}>
+      <span className={'label label-info ' + style['vm-flag']}>{msg.pendingChanges()}</span>
     </FieldHelp>
   </div>)
 }
