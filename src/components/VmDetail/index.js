@@ -120,11 +120,7 @@ class VmDetail extends Component {
     const consolesHelp = (
       <div>
         <p>{msg.ifVmIsRunningClickToAccessItsGraphicsConsole()}</p>
-        <p>
-          {msg.pleaseReferToDocumentationForMoreInformationPart1()}&nbsp;
-          <a href={AppConfiguration.consoleClientResourcesURL} target='_blank'>{msg.pleaseReferToDocumentationForMoreInformationPart2()}</a>&nbsp;
-          {msg.pleaseReferToDocumentationForMoreInformationPart3()}
-        </p>
+        <p dangerouslySetInnerHTML={{ __html: msg.htmlPleaseReferToDocumentationForMoreInformation({ documentationUrl: AppConfiguration.consoleClientResourcesURL }) }} />
       </div>
     )
 

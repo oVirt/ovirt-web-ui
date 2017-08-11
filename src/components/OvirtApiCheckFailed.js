@@ -27,8 +27,7 @@ const OvirtApiCheckFailed = ({ config }) => {
   return (
     <div className='alert alert-danger'>
       <span className='pficon pficon-error-circle-o' />
-      <strong>{msg.unsupportedOvirtVersionFound({ version: found, productName: fixedStrings.BRAND_NAME })}</strong>,&nbsp;
-      {msg.butVersionAtLeastRequired({ requiredVersion: required })}.
+      <span dangerouslySetInnerHTML={{ __html: msg.htmlUnsupportedOvirtVersionFoundButVersionAtLeastRequired({ version: found, productName: fixedStrings.BRAND_NAME, requiredVersion: required }) }} />
     </div>
   )
 }
