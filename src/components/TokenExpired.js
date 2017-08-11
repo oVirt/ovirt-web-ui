@@ -12,7 +12,7 @@ const TokenExpired = ({ config }) => {
     return null
   }
 
-  return <ErrorAlert message={msg.authorizationLost()} />
+  return <ErrorAlert message={msg.authorizationExpired()} />
 }
 TokenExpired.propTypes = {
   config: PropTypes.object.isRequired,
