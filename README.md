@@ -30,12 +30,11 @@ For most current list of features please refer the [Milestones](https://github.c
 
 The upcoming milestones:
 
-### [v1.2.0](https://github.com/oVirt/ovirt-web-ui/milestone/4)
-The upcoming release shall newly support:
+### [v1.3.0](https://github.com/oVirt/ovirt-web-ui/milestone/5)
+The upcoming release shall newly support (among others):
 
-- Cockpit integration
-- Localization
-- Branding
+- Edit SSH public keys
+- Translation to other languages
 - Audit Log
 
 ## Goals
