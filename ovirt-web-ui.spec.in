@@ -24,8 +24,8 @@ ExclusiveArch:  x86_64
 BuildRequires: ovirt-engine-nodejs = 8.0.0
 BuildRequires: ovirt-engine-yarn = 0.24.4
 
-# contains ovirt-ui-components-0.2.4
-BuildRequires: ovirt-engine-nodejs-modules = 1.0.18
+# contains ovirt-ui-components-0.2.5
+BuildRequires: ovirt-engine-nodejs-modules = 1.0.19
 
 %description
 This package provides new VM Portal for %{product}, so far as technical preview.
