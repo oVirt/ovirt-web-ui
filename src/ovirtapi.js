@@ -95,7 +95,7 @@ OvirtApi = {
    * @param vm - Single entry from oVirt REST /api/vms
    * @returns {} - Internal representation of a VM
    */
-  vmToInternal ({ vm }: VmType): Object {
+  vmToInternal ({ vm, getSubResources }: { vm: Object, getSubResources: boolean }): Object {
     function vCpusCount ({ cpu }: { cpu: Object }): number {
       if (cpu && cpu.topology) {
         const top = cpu.topology
@@ -107,7 +107,7 @@ OvirtApi = {
       return 0
     }
 
-    return {
+    const parsedVm = {
       name: vm['name'],
       description: vm['description'],
       id: vm['id'],
@@ -170,7 +170,27 @@ OvirtApi = {
       pool: {
         id: vm['vm_pool'] ? vm.vm_pool['id'] : undefined,
       },
+      cdrom: {},
+      sessions: [],
     }
+    if (getSubResources) {
+      if (vm.disk_attachments && vm.disk_attachments.disk_attachment) {
+        for (let i in vm.disk_attachments.disk_attachment) {
+          parsedVm.disks[vm.disk_attachments.disk_attachment[i].id] = this.diskToInternal({ attachment: vm.disk_attachments.disk_attachment[i], disk: vm.disk_attachments.disk_attachment[i].disk })
+        }
+      }
+
+      if (vm.cdroms && vm.cdroms.cdrom) {
+        parsedVm.cdrom = this.CDRomToInternal({ cdrom: vm.cdroms.cdrom[0] })
+      }
+      if (vm.graphics_consoles && vm.graphics_consoles.graphics_console) {
+        parsedVm.consoles = this.consolesToInternal({ consoles: vm.graphics_consoles })
+      }
+      if (vm.sessions && vm.sessions.session) {
+        parsedVm.sessions = this.sessionsToInternal({ sessions: vm.sessions })
+      }
+    }
+    return parsedVm
   },
   // ----
   /**
@@ -402,14 +422,20 @@ OvirtApi = {
     const url = `${AppConfiguration.applicationContext}/api/vms/${vmId}`
     return OvirtApi._httpGet({ url })
   },
-  getVmsByPage ({ page }: { page: number }): Promise<Object> {
+  getVmsByPage ({ page, additional }: { page: number, additional: Array<string> }): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'getVmsByPage' })
-    const url = `${AppConfiguration.applicationContext}/api/vms/;max=${AppConfiguration.pageLimit}?search=SORTBY NAME ASC page ${page}`
+    let url = `${AppConfiguration.applicationContext}/api/vms/;max=${AppConfiguration.pageLimit}?search=SORTBY NAME ASC page ${page}`
+    if (additional && additional.length > 0) {
+      url += `&follow=${additional.join(',')}`
+    }
     return OvirtApi._httpGet({ url })
   },
-  getVmsByCount ({ count }: { count: number }): Promise<Object> {
+  getVmsByCount ({ count, additional }: { count: number, additional: Array<string> }): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'getVmsByCount' })
-    const url = `${AppConfiguration.applicationContext}/api/vms/;max=${count}?search=SORTBY NAME ASC`
+    let url = `${AppConfiguration.applicationContext}/api/vms/;max=${count}?search=SORTBY NAME ASC`
+    if (additional && additional.length > 0) {
+      url += `&follow=${additional.join(',')}`
+    }
     return OvirtApi._httpGet({ url })
   },
   shutdown ({ vmId, force }: { vmId: string, force: boolean }): Promise<Object> {
