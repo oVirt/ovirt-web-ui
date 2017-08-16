@@ -12,6 +12,9 @@ import jaLocalData from 'react-intl/locale-data/ja'
 import ptLocalData from 'react-intl/locale-data/pt'
 import ruLocalData from 'react-intl/locale-data/ru'
 import zhLocalData from 'react-intl/locale-data/zh'
+import csLocalData from 'react-intl/locale-data/cs'
+import huLocalData from 'react-intl/locale-data/hu'
+import heLocalData from 'react-intl/locale-data/he'
 
 import { messages } from './messages'
 import type { MessageIdType } from './messages'
@@ -162,7 +165,9 @@ export const localeDataMap = {
   'pt-BR': ptLocalData,
   ru: ruLocalData,
   'zh-CN': zhLocalData,
-
+  cs: csLocalData,
+  hu: huLocalData,
+  he: heLocalData,
 }
 
 function initializeReactIntl () {
