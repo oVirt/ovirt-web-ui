@@ -101,8 +101,7 @@
     "intl:extract": "babel-node scripts/intl/extract-messages.js --presets env,flow && rip json2pot -o extra/to-zanata/messages.pot extra/to-zanata/messages.json",
     "intl:push": "zanata-cli push",
     "intl:pull": "zanata-cli pull",
-    "_comment of intl:apply": "underscore2dash.js is a workaround of https://zanata.atlassian.net/browse/ZNTA-2160",
-    "intl:apply": "babel-node scripts/intl/underscore2dash.js --presets env,flow && rip po2json -o extra/from-zanata/translated-messages.json -m extra/to-zanata/messages.json 'extra/from-zanata/*.po' && babel-node scripts/intl/normalize-messages.js --presets env,flow"
+    "intl:apply": "rip po2json -o extra/from-zanata/translated-messages.json -m extra/to-zanata/messages.json 'extra/from-zanata/*.po' && babel-node scripts/intl/normalize-messages.js --presets env,flow"
   },
   "jest": {
     "moduleFileExtensions": [

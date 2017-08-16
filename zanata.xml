@@ -7,4 +7,8 @@
 
     <src-dir>extra/to-zanata</src-dir>
     <trans-dir>extra/from-zanata</trans-dir>
+
+    <rules>
+        <rule pattern="**/*.pot">{path}/{locale}.po</rule>
+    </rules>
 </config>
