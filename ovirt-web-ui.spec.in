@@ -56,6 +56,12 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Wed Aug 16 2017 Marek Libra <mlibra@redhat.com> - 1.2.1
+- noarch rpm
+- minor fixes, runtime dependencies generally updated
+- usb-filter in .vv file
+- basics for internationalization, but translation missing
+
 * Wed Aug 2 2017 Marek Libra <mlibra@redhat.com> - 1.2.0
 - branding
 - infinite scroller for VMS list
