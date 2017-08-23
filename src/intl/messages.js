@@ -33,7 +33,10 @@ export const messages = {
   actionFailed: '{action} failed',
   pleaseLogIn: 'Please log in ...',
   vmPortal: 'VM Portal',
-  quotedUnknown: '"unknown"',
+  unknown: {
+    message: 'unknown',
+    description: 'followed by "version" to create "unknown version"',
+  },
   htmlUnsupportedOvirtVersionFoundButVersionAtLeastRequired: '<strong>Unsupported {version} {productName} version,</strong> found but version at least {requiredVersion} is required.',
   authorizationExpired: 'Authorization expired. The page is going to be reloaded to re-login.',
   useCtrlAltDel: 'Use Ctrl+Alt+Del',

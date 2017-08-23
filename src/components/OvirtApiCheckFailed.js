@@ -17,7 +17,7 @@ const OvirtApiCheckFailed = ({ config }) => {
 
   const major = oVirtApiVersion.get('major')
   const minor = oVirtApiVersion.get('minor')
-  const version = major ? `${major}.${minor}` : msg.quotedUnknown()
+  const version = major ? `${major}.${minor}` : `"${msg.unknown()}"`
 
   const required = `${Product.ovirtApiVersionRequired.major}.${Product.ovirtApiVersionRequired.minor}`
 
