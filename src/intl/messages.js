@@ -89,7 +89,7 @@ export const messages = {
   totalMemoryVmWillBeEquippedWith: 'Total memory the virtual machine will be equipped with.',
   cpus: 'CPUs',
   totalCountOfVirtualProcessorsVmWillBeEquippedWith: 'Total count of virtual processors the virtual machine will be equipped with.',
-  fullyQualifiedDomainName: 'Fully Qualified Domain Name (FQDN) of the virtual machine. Please note, guest agent must be installed within the virtual machine to collect this value.',
+  fullyQualifiedDomainName: 'Fully Qualified Domain Name (FQDN) of the virtual machine. Please note, guest agent must be installed within the virtual machine to retrieve this value.',
   address: 'Address',
   currentlyInsertedIsoInCdRom: 'Currently inserted ISO in CD-ROM',
   cdRom: 'CDRom',
