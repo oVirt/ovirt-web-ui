@@ -15,19 +15,16 @@ const OvirtApiCheckFailed = ({ config }) => {
     return null
   }
 
-  let found = msg.quotedUnknown()
   const major = oVirtApiVersion.get('major')
   const minor = oVirtApiVersion.get('minor')
-  if (major) {
-    found = `${major}.${minor}`
-  }
+  const version = major ? `${major}.${minor}` : msg.quotedUnknown()
 
   const required = `${Product.ovirtApiVersionRequired.major}.${Product.ovirtApiVersionRequired.minor}`
 
   return (
     <div className='alert alert-danger'>
       <span className='pficon pficon-error-circle-o' />
-      <span dangerouslySetInnerHTML={{ __html: msg.htmlUnsupportedOvirtVersionFoundButVersionAtLeastRequired({ version: found, productName: fixedStrings.BRAND_NAME, requiredVersion: required }) }} />
+      <span dangerouslySetInnerHTML={{ __html: msg.htmlUnsupportedOvirtVersionFoundButVersionAtLeastRequired({ version, productName: fixedStrings.BRAND_NAME, requiredVersion: required }) }} />
     </div>
   )
 }
