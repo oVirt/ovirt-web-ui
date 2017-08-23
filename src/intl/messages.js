@@ -70,7 +70,7 @@ export const messages = {
   vmType_desktop: 'Desktop',
   vmType_server: 'Server',
   vmType_highPerformance: 'High Performance',
-  ifVmIsRunningClickToAccessItsGraphicsConsole: 'If the virtual machines is running, click to access it\'s Graphical Console.',
+  ifVmIsRunningClickToAccessItsGraphicsConsole: 'If the virtual machines is running, click to access its Graphical Console.',
   noDisks: 'no disks',
   htmlPleaseReferToDocumentationForMoreInformation: 'Please refer to <a href="{documentationUrl}" target="_blank">documentation</a> for more information.',
   actualStateVmIsIn: 'The actual state the virtual machine is in.',
