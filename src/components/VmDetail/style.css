@@ -41,6 +41,7 @@
 
 .header {
     padding-bottom: 15px;
+    display: flex;
 }
 
 .show-hide-arrow {
@@ -87,4 +88,9 @@ dd.console-box {
 .full-button {
     display: inline-block;
     margin-left: 5px;
+}
+
+.vm-name {
+    align-self: center;
+    margin-left: 20px;
 }

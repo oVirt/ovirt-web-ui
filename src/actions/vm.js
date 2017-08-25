@@ -1,4 +1,6 @@
 import {
+  CHANGE_VM_ICON,
+  CHANGE_VM_ICON_BY_ID,
   CLEAR_USER_MSGS,
   DOWNLOAD_CONSOLE_VM,
   GET_RDP_VM,
@@ -316,6 +318,27 @@ export function setVmCDRom ({ cdrom, vmId }) {
     type: 'SET_VM_CDROM',
     payload: {
       cdrom,
+      vmId,
+    },
+  }
+}
+
+export function changeVmIcon ({ vmId, iconBase64, mimeType }) {
+  return {
+    type: CHANGE_VM_ICON,
+    payload: {
+      iconBase64,
+      mimeType,
+      vmId,
+    },
+  }
+}
+
+export function changeVmIconById ({ vmId, iconId }) {
+  return {
+    type: CHANGE_VM_ICON_BY_ID,
+    payload: {
+      iconId,
       vmId,
     },
   }
