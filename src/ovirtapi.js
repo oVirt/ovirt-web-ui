@@ -172,6 +172,9 @@ OvirtApi = {
       },
       cdrom: {},
       sessions: [],
+      display: {
+        smartcardEnabled: vm['display']['smartcard_enabled'] ? vm['display']['smartcard_enabled'] === 'true' : false,
+      },
     }
     if (getSubResources) {
       if (vm.disk_attachments && vm.disk_attachments.disk_attachment) {

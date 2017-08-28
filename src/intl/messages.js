@@ -62,6 +62,7 @@ export const messages = {
   shutdown: 'Shutdown',
   shutdownVm: 'Shutdown the VM',
   shutdownVmQuestion: 'Shutdown the VM?',
+  smartcardEnabled: 'Smartcard enabled:',
   rebootVm: 'Reboot the VM',
   rebootVmQuestion: 'Restart the VM?',
   console: 'Console',
