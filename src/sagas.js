@@ -344,6 +344,34 @@ function* refreshData (action) {
 }
 
 function* fetchVmsByPage (action) {
+  const actual = Selectors.getOvirtVersion().toJS()
+  if (compareVersion({ major: parseInt(actual.major), minor: parseInt(actual.minor) }, { major: 4, minor: 2 })) {
+    yield fetchVmsByPageV42(action)
+  } else {
+    yield fetchVmsByPageVLower(action)
+  }
+}
+
+function* fetchVmsByPageV42 (action) {
+  const { shallowFetch, page } = action.payload
+  let additional = []
+  if (!shallowFetch) {
+    additional = ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles']
+  }
+  action.payload.additional = additional
+  // TODO: paging: split this call to a loop per up to 25 vms
+  const allVms = yield callExternalAction('getVmsByPage', Api.getVmsByPage, action)
+
+  if (allVms && allVms['vm']) { // array
+    const internalVms = allVms.vm.map(vm => Api.vmToInternal({ vm, getSubResources: true }))
+
+    yield put(updateVms({ vms: internalVms, copySubResources: true, page: page }))
+  }
+
+  yield put(persistState())
+}
+
+function* fetchVmsByPageVLower (action) {
   const { shallowFetch, page } = action.payload
 
   // TODO: paging: split this call to a loop per up to 25 vms
@@ -368,6 +396,33 @@ function* fetchVmsByPage (action) {
 }
 
 function* fetchVmsByCount (action) {
+  const actual = Selectors.getOvirtVersion().toJS()
+  if (compareVersion({ major: parseInt(actual.major), minor: parseInt(actual.minor) }, { major: 4, minor: 2 })) {
+    yield fetchVmsByCountV42(action)
+  } else {
+    yield fetchVmsByCountVLower(action)
+  }
+}
+
+function* fetchVmsByCountV42 (action) {
+  const { shallowFetch, page } = action.payload
+  let additional = []
+  if (!shallowFetch) {
+    additional = ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles']
+  }
+  action.payload.additional = additional
+  const allVms = yield callExternalAction('getVmsByCount', Api.getVmsByCount, action)
+
+  if (allVms && allVms['vm']) { // array
+    const internalVms = allVms.vm.map(vm => Api.vmToInternal({ vm, getSubResources: true }))
+
+    yield put(updateVms({ vms: internalVms, copySubResources: true, page: page }))
+  }
+
+  yield put(persistState())
+}
+
+function* fetchVmsByCountVLower (action) {
   const { shallowFetch } = action.payload
 
   // TODO: paging: split this call to a loop per up to 25 vms
