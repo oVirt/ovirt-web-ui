@@ -32,7 +32,7 @@ class Pool extends React.Component {
       <div className={`col-xs-12 col-sm-6 col-md-4 col-lg-3 ${isSelected ? style['selectedPool'] : ''}`}>
         <div className='card-pf card-pf-view card-pf-view-select card-pf-view-single-select'>
           <div className='card-pf-body'>
-            <div className='card-pf-top-element'>
+            <div className={`card-pf-top-element ${style['card-icon']}`}>
               <Link to={`/pool/${pool.get('id')}`}>
                 <VmIcon icon={icon} className={style['card-pf-icon']}
                   missingIconClassName='fa fa-birthday-cake card-pf-icon-circle' />

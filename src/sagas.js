@@ -71,6 +71,8 @@ import {
 
 import {
   CHECK_TOKEN_EXPIRED,
+  CHANGE_VM_ICON,
+  CHANGE_VM_ICON_BY_ID,
   GET_ALL_CLUSTERS,
   GET_ALL_FILES_FOR_ISO,
   GET_ALL_HOSTS,
@@ -573,6 +575,21 @@ function* fetchVmDisks ({ vmId }) {
   return []
 }
 
+function* changeVmIcon (action) {
+  let vm = null
+  if (action.payload.iconId) {
+    vm = yield callExternalAction('changeIconById', Api.changeIconById, action)
+  } else {
+    vm = yield callExternalAction('changeIcon', Api.changeIcon, action)
+  }
+
+  if (vm && vm.id) {
+    const internalVm = Api.vmToInternal({ vm })
+    yield put(updateVms({ vms: [internalVm] }))
+    yield fetchUnknwonIconsForVms({ vms: [internalVm] })
+  }
+}
+
 function* startProgress ({ vmId, poolId, name }) {
   if (vmId) {
     yield put(vmActionInProgress({ vmId, name, started: true }))
@@ -912,6 +929,8 @@ export function *rootSaga () {
     takeLatest(GET_ALL_FILES_FOR_ISO, fetchAllFilesForISO),
 
     takeEvery(SELECT_VM_DETAIL, selectVmDetail),
+    takeEvery(CHANGE_VM_ICON, changeVmIcon),
+    takeEvery(CHANGE_VM_ICON_BY_ID, changeVmIcon),
     takeEvery(GET_CONSOLE_OPTIONS, getConsoleOptions),
     takeEvery(SAVE_CONSOLE_OPTIONS, saveConsoleOptions),
 
@@ -939,6 +958,8 @@ const shortMessages = {
   'GET_ALL_FILES_FOR_ISO': msg.failedToRetrieveFilesFromStorage(),
 
   'GET_VM': msg.failedToRetrieveVmDetails(),
+  'CHANGE_VM_ICON': msg.failedToChangeVmIcon(),
+  'CHANGE_VM_ICON_BY_ID': msg.failedToChangeVmIconToDefault(),
 }
 
 function shortErrorMessage ({ action }) {

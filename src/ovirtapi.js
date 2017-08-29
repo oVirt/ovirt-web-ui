@@ -607,6 +607,22 @@ OvirtApi = {
       },
     })
   },
+  changeIcon ({ vmId, iconBase64, mimeType }: { vmId: string, iconBase64: string, mimeType: string }): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'changeIcon' })
+    const input = JSON.stringify({ large_icon: { data: iconBase64, media_type: mimeType } })
+    return OvirtApi._httpPut({
+      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}`,
+      input,
+    })
+  },
+  changeIconById ({ vmId, iconId }: { vmId: string, iconId: string }): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'changeIconById' })
+    const input = JSON.stringify({ large_icon: { id: iconId } })
+    return OvirtApi._httpPut({
+      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}`,
+      input,
+    })
+  },
 }
 
 const Api = OvirtApi

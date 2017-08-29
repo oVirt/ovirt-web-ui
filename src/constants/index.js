@@ -1,6 +1,8 @@
 // Keep alphabetically sorted
 // TODO: sort alphabetically
 // TODO: remove all constants except those used within sagas
+export const CHANGE_VM_ICON = 'CHANGE_VM_ICON'
+export const CHANGE_VM_ICON_BY_ID = 'CHANGE_VM_ICON_BY_ID'
 export const CHECK_TOKEN_EXPIRED = 'CHECK_TOKEN_EXPIRED'
 export const CLEAR_USER_MSGS = 'CLEAR_USER_MSGS'
 export const DOWNLOAD_CONSOLE_VM = 'DOWNLOAD_CONSOLE_VM'
