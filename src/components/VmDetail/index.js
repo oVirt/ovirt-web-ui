@@ -89,6 +89,7 @@ class VmDetail extends Component {
       pool,
       onRDP,
       operatingSystems,
+      config,
     } = this.props
 
     const name = isPool ? pool.get('name') : vm.get('name')
@@ -197,7 +198,7 @@ class VmDetail extends Component {
                   &nbsp;
                   {consoleOptionsShowHide}
                 </dt>
-                <VmConsoles vm={vm} onConsole={onConsole} onRDP={onRDP} />
+                <VmConsoles vm={vm} onConsole={onConsole} onRDP={onRDP} usbFilter={config.get('usbFilter')} />
                 <ConsoleOptions options={optionsJS} onSave={onConsoleOptionsSave} open={this.state.openConsoleSettings} />
 
                 <dt><span className='fa fa-database' />
