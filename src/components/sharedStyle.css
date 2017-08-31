@@ -25,11 +25,24 @@
     border-bottom: solid gray;
     padding-left: 15px;
     margin-bottom: 5px;
+
+    flex-shrink: 0;
 }
 
-.navbar-top-offset {
-    padding-top: 29px;
-    margin-left: 200px;
+.page-router {
+    position: absolute;
+    top: 29px;
+    left: 200px;
+    bottom: 0;
+    right: 0;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.page-router-render-component {
+    flex-grow: 1;
+    overflow: hidden;
 }
 
 /* For VmDetail and VmDialog */

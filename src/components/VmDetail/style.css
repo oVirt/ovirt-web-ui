@@ -60,13 +60,11 @@
 }
 
 .vms-nav-expanded {
-    padding-left: 200px;
-    transition: padding-left .5s;
+    padding-left: 0;
 }
 
 .vms-nav-collapsed {
-    padding-left: 2em;
-    transition: padding-left .5s;
+    padding-left: 30px;
 }
 
 .vm-flag-container {
@@ -93,4 +91,17 @@ dd.console-box {
 .vm-name {
     align-self: center;
     margin-left: 20px;
+}
+
+.main-container {
+    display: flex;
+    align-items: stretch;
+    height: 100%;
+}
+
+.vm-detail-main {
+    flex-grow: 1;
+    flex-shrink: 1;
+    transition: padding-left .5s;
+    overflow: auto;
 }

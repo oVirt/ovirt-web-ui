@@ -175,91 +175,93 @@ class VmDetail extends Component {
     }
 
     return (
-      <div>
+      <div className={style['main-container']}>
         <VmsListNavigation selectedVm={vm} expanded={this.state.vmsNavigationExpanded} toggleExpansion={this.toggleVmsNavExpansion} />
 
-        <div className={this.state.vmsNavigationExpanded ? style['vms-nav-expanded'] : style['vms-nav-collapsed']}>
-          <DetailContainer>
-            <h1 className={style['header']}>
-              {vmIcon}
-              &nbsp;<span className={style['vm-name']}>{name}</span>
-            </h1>
-            <NextRunLabel vm={vm} />
-            <LastMessage vmId={vm.get('id')} userMessages={userMessages} />
-            <div className={style['vm-detail-container']}>
-              <dl className={sharedStyle['vm-properties']}>
-                <dt>
-                  <FieldHelp content={msg.actualStateVmIsIn()} text={msg.state()} />
-                </dt>
-                <dd>
-                  <VmStatus vm={vm} />
-                </dd>
+        <div className={style['vm-detail-main']}>
+          <div className={this.state.vmsNavigationExpanded ? style['vms-nav-expanded'] : style['vms-nav-collapsed']}>
+            <DetailContainer>
+              <h1 className={style['header']}>
+                {vmIcon}
+                &nbsp;<span className={style['vm-name']}>{name}</span>
+              </h1>
+              <NextRunLabel vm={vm} />
+              <LastMessage vmId={vm.get('id')} userMessages={userMessages} />
+              <div className={style['vm-detail-container']}>
+                <dl className={sharedStyle['vm-properties']}>
+                  <dt>
+                    <FieldHelp content={msg.actualStateVmIsIn()} text={msg.state()} />
+                  </dt>
+                  <dd>
+                    <VmStatus vm={vm} />
+                  </dd>
 
-                <dt>
-                  <FieldHelp content={msg.optionalUserDescriptionOfVm()} text={msg.description()} />
-                </dt>
-                <dd>{vm.get('description')}</dd>
+                  <dt>
+                    <FieldHelp content={msg.optionalUserDescriptionOfVm()} text={msg.description()} />
+                  </dt>
+                  <dd>{vm.get('description')}</dd>
 
-                <dt>
-                  <FieldHelp content={msg.groupOfHostsVmCanBeRunningOn()} text={msg.cluster()} />
-                </dt>
-                <dd>{cluster ? cluster.get('name') : ''}</dd>
+                  <dt>
+                    <FieldHelp content={msg.groupOfHostsVmCanBeRunningOn()} text={msg.cluster()} />
+                  </dt>
+                  <dd>{cluster ? cluster.get('name') : ''}</dd>
 
-                <dt>
-                  <FieldHelp content={msg.containsConfigurationAndDisksWhichWillBeUsedToCreateThisVm()} text={msg.template()} />
-                </dt>
-                <dd>{template ? templateNameRenderer(template) : ''}</dd>
+                  <dt>
+                    <FieldHelp content={msg.containsConfigurationAndDisksWhichWillBeUsedToCreateThisVm()} text={msg.template()} />
+                  </dt>
+                  <dd>{template ? templateNameRenderer(template) : ''}</dd>
 
-                <dt>
-                  <FieldHelp content={msg.operatingSystemInstalledOnVm()} text={msg.operatingSystem()} />
-                </dt>
-                <dd>{os ? os.get('description') : vm.getIn(['os', 'type'])}</dd>
+                  <dt>
+                    <FieldHelp content={msg.operatingSystemInstalledOnVm()} text={msg.operatingSystem()} />
+                  </dt>
+                  <dd>{os ? os.get('description') : vm.getIn(['os', 'type'])}</dd>
 
-                <dt>
-                  <FieldHelp content={msg.typeOfWorkloadVmConfigurationIsOptimizedFor()} text={msg.optimizedFor()} />
-                </dt>
-                <dd>{rephraseVmType(vm.get('type'))}</dd>
+                  <dt>
+                    <FieldHelp content={msg.typeOfWorkloadVmConfigurationIsOptimizedFor()} text={msg.optimizedFor()} />
+                  </dt>
+                  <dd>{rephraseVmType(vm.get('type'))}</dd>
 
-                <dt><span className='pficon pficon-memory' />&nbsp;
-                  <FieldHelp content={msg.totalMemoryVmWillBeEquippedWith()} text={msg.definedMemory()} />
-                </dt>
-                <dd>{userFormatOfBytes(vm.getIn(['memory', 'total'])).str}</dd>
+                  <dt><span className='pficon pficon-memory' />&nbsp;
+                    <FieldHelp content={msg.totalMemoryVmWillBeEquippedWith()} text={msg.definedMemory()} />
+                  </dt>
+                  <dd>{userFormatOfBytes(vm.getIn(['memory', 'total'])).str}</dd>
 
-                <dt><span className='pficon pficon-cpu' />&nbsp;
-                  <FieldHelp content={msg.totalCountOfVirtualProcessorsVmWillBeEquippedWith()} text={msg.cpus()} />
-                </dt>
-                <dd>{vm.getIn(['cpu', 'vCPUs'])}</dd>
+                  <dt><span className='pficon pficon-cpu' />&nbsp;
+                    <FieldHelp content={msg.totalCountOfVirtualProcessorsVmWillBeEquippedWith()} text={msg.cpus()} />
+                  </dt>
+                  <dd>{vm.getIn(['cpu', 'vCPUs'])}</dd>
 
-                <dt><span className='pficon pficon-network' />&nbsp;
-                  <FieldHelp content={msg.fullyQualifiedDomainName()} text={msg.address()} />
-                </dt>
-                <dd>{vm.get('fqdn')}</dd>
-                <dt><span className='pficon pficon-storage-domain' />&nbsp;
-                  <FieldHelp content={msg.currentlyInsertedIsoInCdRom()} text={msg.cdRom()} />
-                </dt>
-                <dd>{vm.getIn(['cdrom', 'file', 'id']) ? vm.getIn(['cdrom', 'file', 'id']) : msg.empty() }</dd>
-              </dl>
+                  <dt><span className='pficon pficon-network' />&nbsp;
+                    <FieldHelp content={msg.fullyQualifiedDomainName()} text={msg.address()} />
+                  </dt>
+                  <dd>{vm.get('fqdn')}</dd>
+                  <dt><span className='pficon pficon-storage-domain' />&nbsp;
+                    <FieldHelp content={msg.currentlyInsertedIsoInCdRom()} text={msg.cdRom()} />
+                  </dt>
+                  <dd>{vm.getIn(['cdrom', 'file', 'id']) ? vm.getIn(['cdrom', 'file', 'id']) : msg.empty() }</dd>
+                </dl>
 
-              <dl className={sharedStyle['vm-properties']}>
-                <dt><span className='pficon pficon-screen' />
-                  &nbsp;
-                  <FieldHelp content={consolesHelp} text={msg.consoles()} />
-                  &nbsp;
-                  {consoleOptionsShowHide}
-                </dt>
-                <VmConsoles vm={vm} onConsole={onConsole} onRDP={onRDP} usbFilter={config.get('usbFilter')} />
-                <ConsoleOptions options={optionsJS} onSave={onConsoleOptionsSave} open={this.state.openConsoleSettings} />
+                <dl className={sharedStyle['vm-properties']}>
+                  <dt><span className='pficon pficon-screen' />
+                    &nbsp;
+                    <FieldHelp content={consolesHelp} text={msg.consoles()} />
+                    &nbsp;
+                    {consoleOptionsShowHide}
+                  </dt>
+                  <VmConsoles vm={vm} onConsole={onConsole} onRDP={onRDP} usbFilter={config.get('usbFilter')} />
+                  <ConsoleOptions options={optionsJS} onSave={onConsoleOptionsSave} open={this.state.openConsoleSettings} />
 
-                <dt><span className='fa fa-database' />
-                  &nbsp;
-                  <FieldHelp content={msg.storageConnectedToVm()} text={msg.disks()} />
-                  &nbsp;
-                </dt>
-                {noDisks}
-                {disksElement}
-              </dl>
-            </div>
-          </DetailContainer>
+                  <dt><span className='fa fa-database' />
+                    &nbsp;
+                    <FieldHelp content={msg.storageConnectedToVm()} text={msg.disks()} />
+                    &nbsp;
+                  </dt>
+                  {noDisks}
+                  {disksElement}
+                </dl>
+              </div>
+            </DetailContainer>
+          </div>
         </div>
       </div>
     )
