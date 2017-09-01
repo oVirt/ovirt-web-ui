@@ -15,6 +15,8 @@ import style from './sharedStyle.css'
 
 import Toolbar from './Toolbar/Toolbar'
 
+import { msg } from '../intl'
+
 const buildPath = (route) => {
   let res = []
   for (let i in route) {
@@ -110,7 +112,7 @@ class PageRouter extends React.Component {
 
     const RenderComponent = branch.route.component
     return (<div className={style['navbar-top-offset']}>
-      <Breadcrumb route={branches} root={{ title: 'Virtual Machines', url: '/' }} />
+      <Breadcrumb route={branches} root={{ title: msg.virtualMachines(), url: '/' }} />
       <Toolbar>
         {tools}
       </Toolbar>
