@@ -2,35 +2,29 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { isWindows, hrefWithoutHistory } from '../../helpers'
+import ConsoleButton from '../VmActions/ConsoleButton'
 import { canConsole } from 'ovirt-ui-components'
 
 import style from './style.css'
 
-const VmConsoles = ({ vm, onConsole, onRDP }) => {
+const VmConsoles = ({ vm, onConsole, onRDP, usbFilter }) => {
   const vmConsoles = vm.get('consoles').valueSeq()
   if (canConsole(vm.get('status'))) {
     return (
-      <dd>
+      <dd className={style['console-box']}>
         {
-          vmConsoles.map(c => {
-            const onClick = (e) => {
-              onConsole({ vmId: vm.get('id'), consoleId: c.get('id') })
-              e.preventDefault()
-            }
-
-            return (
-              <a
-                href='#'
-                data-toggle='tooltip'
-                data-placement='left'
-                title={`Open ${c.get('protocol').toUpperCase()} console`}
-                key={c.get('id')}
-                onClick={onClick}
-                className={style['left-delimiter']}>
-                {c.get('protocol').toUpperCase()}
-              </a>
-            )
-          })
+          vmConsoles.map(c => (
+            <ConsoleButton
+              vm={vm}
+              consoleId={c.get('id')}
+              key={c.get('id')}
+              button=''
+              className='pficon pficon-screen'
+              tooltip={`Open ${c.get('protocol').toUpperCase()} console`}
+              shortTitle={c.get('protocol').toUpperCase()}
+              usbFilter={usbFilter}
+              />
+          ))
         }
 
         {
@@ -64,6 +58,7 @@ const VmConsoles = ({ vm, onConsole, onRDP }) => {
 }
 VmConsoles.propTypes = {
   vm: PropTypes.object.isRequired,
+  usbFilter: PropTypes.string.isRequired,
   onConsole: PropTypes.func.isRequired,
   onRDP: PropTypes.func.isRequired,
 }
