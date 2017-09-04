@@ -8,7 +8,7 @@ const Toolbar = ({ children }) => {
     i++
     return (<div key={'toolbar' + i} className={`form-group toolbar-pf-view-selector ${style['actions-padding']}`}>{c}</div>)
   })
-  return (<div className='container-fluid'>
+  return (<div className={`container-fluid ${style['toolbar']}`}>
     <div className='row toolbar-pf'>
       <div className='col-sm-12'>
         <div className='toolbar-pf-actions'>

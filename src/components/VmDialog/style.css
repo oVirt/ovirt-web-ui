@@ -30,7 +30,7 @@
     /* Ugly hack, but so far better than increase complexity via Toolbar component since buttons relies on VmDialog's state*/
     position: absolute;
     right: 10px;
-    top: 6em;
+    top: 45px;
 }
 
 .vm-dialog-buttons button {

@@ -1,28 +1,46 @@
 .main-container {
-    height: 100%;
-    width: 3em;
-    position: fixed;
-    z-index: 1000;
-    top: 115px;
-    left: 200px;
-    background-color: rgba(255, 255, 255, 0.15);
-    padding-top: 1em;
-    -webkit-transition: 0.5s;
-    transition: 0.5s;
-    border: 1px solid #cecccc;
-    padding-bottom: 145px;
+    flex-shrink: 0;
+    flex-basis: 0;
+    transition: flex-basis 0.5s;
+    position: relative;
+    border-right: solid thin #ccc;
 }
 
 .expanded {
-    width: 200px;
+    flex-basis: 200px;
 }
 
 .toggle-expand-button {
-    text-align: right;
-    padding-right: 1em;
-    padding-left: 0.4em;
-    margin-top: -0.5em;
-    font-size: x-large;
+    position: absolute;
+    left: 100%;
+    top: 0;
+    background-color: #bbb;
+    border-radius: 0 0 4px 0;
+    font-size: large;
+}
+
+.toggle-expand-button-expanded {
+    left: auto;
+    right: 0;
+    border-radius: 0 0 0 4px;
+}
+
+.toggle-expand-button a {
+    padding: 0 .5em;
+    text-align: center;
+    display: inline-block;
+}
+
+.toggle-expand-button a {
+    color: #363636;
+}
+
+.scrolling-viewport {
+    overflow: auto;
+    position: relative;
+    margin-top: 30px;
+    height: calc(100% - 30px)
+
 }
 
 .ul-menu-cust {

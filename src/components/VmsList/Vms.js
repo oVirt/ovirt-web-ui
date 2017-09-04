@@ -36,6 +36,7 @@ class Vms extends React.Component {
         loadMore={this.loadMore}
         hasMore={vms.get('areAllPagesLoaded')}
         loader={<div className={style['loaderBox']}><div className={style['loader']} /></div>}
+        useWindow={false}
       >
         <div>
           <ScrollPositionHistory uniquePrefix='vms-list'>

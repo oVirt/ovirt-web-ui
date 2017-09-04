@@ -15,7 +15,7 @@ const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, onUpdat
   }
 
   const toggleExpandButton = (
-    <div className={style['toggle-expand-button']}>
+    <div className={`${style['toggle-expand-button']} ${expanded ? style['toggle-expand-button-expanded'] : ''}`}>
       <a href='#' onClick={toggleExpansion}>
         <span className={`fa ${expanded ? 'fa-angle-double-left' : 'fa-angle-double-right'}`} />
       </a>
@@ -55,15 +55,18 @@ const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, onUpdat
   }
 
   return (
-    <InfiniteScroll
-      loadMore={loadMore}
-      hasMore={vms.get('areAllPagesLoaded')}
-      >
-      <div className={`${style['main-container']} ${expanded ? style['expanded'] : ''}`}>
-        {toggleExpandButton}
-        {list}
+    <div className={`${style['main-container']} ${expanded ? style['expanded'] : ''}`}>
+      {toggleExpandButton}
+      <div className={style['scrolling-viewport']}>
+        <InfiniteScroll
+          loadMore={loadMore}
+          hasMore={vms.get('areAllPagesLoaded')}
+          useWindow={false}
+          >
+          {list}
+        </InfiniteScroll>
       </div>
-    </InfiniteScroll>
+    </div>
   )
 }
 VmsListNavigation.propTypes = {
