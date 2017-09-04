@@ -9,6 +9,8 @@ import {
   clearUserMessages,
 } from '../../actions/index'
 
+import { msg } from '../../intl'
+
 const UserMenu = ({ config, onLogout }) => {
 /* TODO: allow 'Options' in the menu
  <li>
@@ -20,7 +22,7 @@ const UserMenu = ({ config, onLogout }) => {
     console.error('Missing login token!')
     return (
       <li>
-        Please log in
+        {msg.pleaseLogIn()}
       </li>
     )
   } else {
@@ -33,11 +35,11 @@ const UserMenu = ({ config, onLogout }) => {
         </a>
         <ul className='dropdown-menu'>
           <li>
-            <a href='#' data-toggle='modal' data-target='#about-modal'>About</a>
+            <a href='#' data-toggle='modal' data-target='#about-modal'>{msg.about()}</a>
           </li>
 
           <li>
-            <a href='#' onClick={onLogout}>Log out</a>
+            <a href='#' onClick={onLogout}>{msg.logOut()}</a>
           </li>
         </ul>
       </li>

@@ -33,7 +33,8 @@ export const messages = {
   failedToChangeVmIcon: 'Failed to change VM icon',
   failedToChangeVmIconToDefault: 'Failed to change VM icon to default',
   actionFailed: '{action} failed',
-  pleaseLogIn: 'Please log in ...',
+  pleaseLogIn: 'Please log in',
+  pleaseLogInTripleDot: 'Please log in ...',
   vmPortal: 'VM Portal',
   unknown: {
     message: 'unknown',
@@ -102,6 +103,15 @@ export const messages = {
   clearMessages: 'Clear Messages',
   messages: 'Messages',
   empty: 'Empty',
+  refresh: {
+    message: 'Refresh',
+    description: 'Reload data from server',
+  },
+  about: {
+    message: 'About',
+    description: 'About application',
+  },
+  logOut: 'Log out',
 }
 
 export type MessageIdType = $Keys<typeof messages>

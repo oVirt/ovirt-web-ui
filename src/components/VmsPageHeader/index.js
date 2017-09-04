@@ -10,6 +10,8 @@ import { hrefWithoutHistory } from '../../helpers'
 
 import { refresh } from '../../actions/vm'
 
+import { msg } from '../../intl'
+
 /**
  * Main application header on top of the page
  */
@@ -26,7 +28,7 @@ const VmsPageHeader = ({ title, onRefresh }) => {
         <ul className='nav navbar-nav navbar-utility'>
           <li>
             <a href='#' onClick={hrefWithoutHistory(onRefresh)}>
-              <span className='fa fa-refresh' />&nbsp;Refresh
+              <span className='fa fa-refresh' />&nbsp;{msg.refresh()}
             </a>
           </li>
 
