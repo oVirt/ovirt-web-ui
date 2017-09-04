@@ -21,10 +21,12 @@ import type { MessageIdType } from './messages'
 // expected translations ['de', 'fr', 'es', 'ko', 'it', 'ja', 'pt-BR', 'ru', 'zh-CN']
 import translatedMessages from './translated-messages.json'
 
+const DEFAULT_LOCALE = 'en'
+
 /**
  * Currently selected locale
  */
-export const locale: string = getLocaleFromUrl() || getBrowserLocale() || 'en'
+export const locale: string = getLocaleFromUrl() || getBrowserLocale() || DEFAULT_LOCALE
 
 function getBrowserLocale (): ?string {
   if (window.navigator.language) {
@@ -80,17 +82,35 @@ function getLocaleLanguage (locale: string): string {
   return locale.split('-')[0]
 }
 
+/**
+ * For React Intl purposes
+ */
 export function getSelectedMessages (): { [MessageIdType]: string } {
-  return translatedMessages[locale] || defaultMessages
+  return Object.assign({}, defaultMessages, translatedMessages[locale])
 }
 
 function getMessage (id: MessageIdType): string {
-  const message = getSelectedMessages()[id]
+  const message = getMessageForLocale(id, locale)
+  if (message) {
+    return message
+  }
+  if (locale !== DEFAULT_LOCALE) {
+    const enMessage = getMessageForLocale(id, DEFAULT_LOCALE)
+    if (enMessage) {
+      return enMessage
+    }
+  }
+  return id
+}
+
+function getMessageForLocale (id: MessageIdType, locale: string): ?string {
+  const messages = locale === DEFAULT_LOCALE ? defaultMessages : translatedMessages[locale]
+  const message = messages[id]
   if (message) {
     return message
   }
   console.warn(`Message for id '${id}' and locale '${locale}' not found.`)
-  return id
+  return null
 }
 
 const messageFormatCache: {[MessageIdType]: IntlMessageFormat} = {}
