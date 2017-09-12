@@ -7,7 +7,7 @@ var WatchMissingNodeModulesPlugin = require('../scripts/utils/WatchMissingNodeMo
 var CopyWebpackPlugin = require('copy-webpack-plugin')
 var paths = require('./paths')
 var env = require('./env')
-var FlowBabelWebpackPlugin = require('flow-babel-webpack-plugin');
+var webpackConfigCommons = require('./webpack.config.commons')
 
 // This is the development configuration.
 // It is focused on developer experience and fast rebuilds.
@@ -223,7 +223,6 @@ module.exports = {
     // See https://github.com/facebookincubator/create-react-app/issues/186
     new WatchMissingNodeModulesPlugin(paths.appNodeModules),
 
-    new FlowBabelWebpackPlugin(),
     //global jquery is provided to any webpack modules
     /*new webpack.ProvidePlugin({
       $: "jquery",
@@ -239,3 +238,5 @@ module.exports = {
     tls: 'empty',
   },
 }
+
+webpackConfigCommons.addFlowBabelWebpackPlugin(module.exports)
