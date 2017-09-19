@@ -9,7 +9,7 @@
  * @type {Object.<string, (string | {message: string, description: string})>}
  */
 export const messages = {
-  start: 'Start',
+  run: 'Run',
   reboot: {
     message: 'Reboot',
     description: 'Toolbar button to reboot a VM',
@@ -59,9 +59,9 @@ export const messages = {
   suspendVm: 'Suspend the VM',
   suspend: 'Suspend',
   suspendVmQuestion: 'Suspend the VM?',
-  shutdown: 'Shut down',
-  shutdownVm: 'Shut down the VM',
-  shutdownVmQuestion: 'Shut down the VM?',
+  shutdown: 'Shutdown',
+  shutdownVm: 'Shutdown the VM',
+  shutdownVmQuestion: 'Shutdown the VM?',
   rebootVm: 'Reboot the VM',
   rebootVmQuestion: 'Restart the VM?',
   console: 'Console',
@@ -95,8 +95,7 @@ export const messages = {
   fullyQualifiedDomainName: 'Fully Qualified Domain Name (FQDN) of the virtual machine. Please note, guest agent must be installed within the virtual machine to retrieve this value.',
   address: 'Address',
   currentlyInsertedIsoInCdRom: 'Currently inserted ISO in CD-ROM',
-  cdRom: 'CD-ROM',
-  consoles: 'Consoles',
+  cd: 'CD',
   storageConnectedToVm: 'Storage connected to the virtual machine.',
   disks: 'Disks',
   close: 'Close',
