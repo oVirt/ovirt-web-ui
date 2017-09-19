@@ -76,7 +76,7 @@ const App = ({ vms, visibility, config }) => {
     <Router getUserConfirmation={openConfirmation} basename={AppConfiguration.applicationURL}>
       <div>
         <VmsPageHeader page={vms.get('page')} title={fixedStrings.BRAND_NAME + ' ' + msg.vmPortal()} />
-        <VerticalMenu menuItems={menu} />
+        <VerticalMenu menuItems={menu} /> { /* Disabled, to enable search for left sidebar menu */ }
         <TokenExpired />
         <LoadingData />
         {renderRoutes(routes)}
