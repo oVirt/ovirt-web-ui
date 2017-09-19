@@ -19,6 +19,7 @@
 
 .vertical-menu {
 	top: 29px !important;
+    display: none; /* remove to enable left sidebar menu */
 }
 
 .breadcrumb {
@@ -32,7 +33,7 @@
 .page-router {
     position: absolute;
     top: 29px;
-    left: 200px;
+    left: 0px; /* set to 200 to enable left sidebar menu */
     bottom: 0;
     right: 0;
 
