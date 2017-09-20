@@ -57,10 +57,9 @@ import {
   refresh,
   downloadConsole,
   getConsoleOptions as getConsoleOptionsAction,
-  getVmsByPage,
+  getByPage,
   getVmsByCount,
   getPoolsByCount,
-  getPoolsByPage,
   setStorages,
   removeMissingStorages,
   setFiles,
@@ -211,7 +210,7 @@ function* login (action) {
     } else {
       if (yield checkOvirtApiVersion(oVirtMeta)) {
         yield put(getUSBFilter())
-        yield fetchPermissionWithoutFilter({})
+        yield fetchPermissionWithoutFilter({}) // progress loader disabled in here
         yield autoConnectCheck({})
       } else { // oVirt API of incompatible version
         console.error('oVirt api version check failed')
@@ -861,8 +860,7 @@ function* fetchPermissionWithoutFilter (action) {
   yield put(getAllHosts())
   yield put(getAllOperatingSystems())
   yield put(getAllTemplates({ shallowFetch: false }))
-  yield put(getVmsByPage({ page: 1 }))
-  yield put(getPoolsByPage({ page: 1 }))
+  yield put(getByPage({ page: 1 }))
   yield put(setAdministrator(data.error === undefined))
 }
 

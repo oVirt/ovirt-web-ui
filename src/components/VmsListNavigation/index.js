@@ -23,7 +23,7 @@ const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, onUpdat
   )
 
   const loadMore = () => {
-    if (vms.get('areAllPagesLoaded')) {
+    if (vms.get('notAllPagesLoaded')) {
       onUpdate(vms.get('page') + 1)
     }
   }
@@ -60,7 +60,7 @@ const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, onUpdat
       <div className={style['scrolling-viewport']}>
         <InfiniteScroll
           loadMore={loadMore}
-          hasMore={vms.get('areAllPagesLoaded')}
+          hasMore={vms.get('notAllPagesLoaded')}
           useWindow={false}
           >
           {list}
