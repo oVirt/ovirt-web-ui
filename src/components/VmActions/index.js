@@ -281,7 +281,7 @@ class VmActions extends React.Component {
         <EmptyAction state={status} isOnCard={isOnCard} />
 
         <Button isOnCard={isOnCard} actionDisabled={(!isPool && !canStart(status)) || vm.getIn(['actionInProgress', 'start'])}
-          shortTitle={msg.start()}
+          shortTitle={msg.run()}
           button='btn btn-success'
           className='fa fa-play'
           tooltip={msg.startVm()}

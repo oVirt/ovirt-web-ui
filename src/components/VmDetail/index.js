@@ -49,6 +49,10 @@ function rephraseVmType (vmType) {
   return vmType
 }
 
+function memoryToShorterFormat (memory) {
+  return memory.rounded % 1 === 0 ? memory.number.toFixed(0) + ' ' + memory.suffix : memory.str
+}
+
 class VmDetail extends Component {
   constructor (props) {
     super(props)
@@ -224,7 +228,7 @@ class VmDetail extends Component {
                   <dt><span className='pficon pficon-memory' />&nbsp;
                     <FieldHelp content={msg.totalMemoryVmWillBeEquippedWith()} text={msg.definedMemory()} />
                   </dt>
-                  <dd>{userFormatOfBytes(vm.getIn(['memory', 'total'])).str}</dd>
+                  <dd>{memoryToShorterFormat(userFormatOfBytes(vm.getIn(['memory', 'total'])))}</dd>
 
                   <dt><span className='pficon pficon-cpu' />&nbsp;
                     <FieldHelp content={msg.totalCountOfVirtualProcessorsVmWillBeEquippedWith()} text={msg.cpus()} />
@@ -236,7 +240,7 @@ class VmDetail extends Component {
                   </dt>
                   <dd>{vm.get('fqdn')}</dd>
                   <dt><span className='pficon pficon-storage-domain' />&nbsp;
-                    <FieldHelp content={msg.currentlyInsertedIsoInCdRom()} text={msg.cdRom()} />
+                    <FieldHelp content={msg.currentlyInsertedIsoInCdRom()} text={msg.cd()} />
                   </dt>
                   <dd>{vm.getIn(['cdrom', 'file', 'id']) ? vm.getIn(['cdrom', 'file', 'id']) : msg.empty() }</dd>
                 </dl>
@@ -244,7 +248,7 @@ class VmDetail extends Component {
                 <dl className={sharedStyle['vm-properties']}>
                   <dt><span className='pficon pficon-screen' />
                     &nbsp;
-                    <FieldHelp content={consolesHelp} text={msg.consoles()} />
+                    <FieldHelp content={consolesHelp} text={msg.console()} />
                     &nbsp;
                     {consoleOptionsShowHide}
                   </dt>
