@@ -17,7 +17,7 @@ class Vms extends React.Component {
   }
 
   loadMore () {
-    if (this.props.vms.get('areAllPagesLoaded')) {
+    if (this.props.vms.get('notAllPagesLoaded')) {
       this.props.onUpdate(this.props.vms.get('page') + 1)
     }
   }
@@ -34,7 +34,7 @@ class Vms extends React.Component {
     return (
       <InfiniteScroll
         loadMore={this.loadMore}
-        hasMore={vms.get('areAllPagesLoaded')}
+        hasMore={vms.get('notAllPagesLoaded')}
         loader={<div className={style['loaderBox']}><div className={style['loader']} /></div>}
         useWindow={false}
       >

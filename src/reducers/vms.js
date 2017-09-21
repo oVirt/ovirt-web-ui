@@ -7,7 +7,11 @@ const initialState = Immutable.fromJS({
   pools: {},
   loadInProgress: true,
   page: 1,
-  areAllPagesLoaded: true,
+  /**
+   * true ~ we need to fetch further vms and pools
+   * false ~ all visible entities already fetched
+   */
+  notAllPagesLoaded: true,
 })
 
 const vms = actionReducer(initialState, {
@@ -16,7 +20,7 @@ const vms = actionReducer(initialState, {
     const updates = {}
     vms.forEach(vm => {
       if (!state.getIn(['vms', vm.id])) {
-        state = state.set('areAllPagesLoaded', true)
+        state = state.set('notAllPagesLoaded', true)
       }
       updates[vm.id] = vm
 
@@ -84,7 +88,7 @@ const vms = actionReducer(initialState, {
     const updates = {}
     pools.forEach(pool => {
       if (!state.getIn(['pools', pool.id])) {
-        state = state.set('areAllPagesLoaded', true)
+        state = state.set('notAllPagesLoaded', true)
       }
       updates[pool.id] = pool
     })
@@ -152,7 +156,7 @@ const vms = actionReducer(initialState, {
     return state
   },
   SET_CHANGED (state, { payload: { value } }) {
-    return state.set('areAllPagesLoaded', value)
+    return state.set('notAllPagesLoaded', value)
   },
 })
 
