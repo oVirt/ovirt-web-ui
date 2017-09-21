@@ -760,7 +760,9 @@ function* autoConnectCheck (action) {
   const vmId = OptionsManager.loadAutoConnectOption()
   if (vmId && vmId.length > 0) {
     const vm = yield callExternalAction('getVm', Api.getVm, getSingleVm({ vmId }), true)
-    if (vm && vm.id && vm.status !== 'down') {
+    if (vm && vm.error && vm.error.status === 404) {
+      OptionsManager.clearAutoConnect()
+    } else if (vm && vm.id && vm.status !== 'down') {
       const internalVm = Api.vmToInternal({ vm })
       yield put(updateVms({ vms: [internalVm] }))
 
