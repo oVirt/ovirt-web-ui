@@ -12,6 +12,10 @@ export function loadFromLocalStorage (key) {
   return window.localStorage.getItem(key)
 }
 
+export function removeFromLocalStorage (key) {
+  return window.localStorage.removeItem(key)
+}
+
 export function persistStateToLocalStorage ({ icons }) {
   logDebug(`persistStateToLocalStorage() called`)
   saveToLocalStorage('icons', JSON.stringify(icons))

@@ -1,5 +1,4 @@
-import { saveToLocalStorage, loadFromLocalStorage } from './storage'
-
+import { saveToLocalStorage, loadFromLocalStorage, removeFromLocalStorage } from './storage'
 import { logDebug } from './helpers'
 
 export default {
@@ -33,6 +32,14 @@ export default {
     options.autoConnect = undefined
 
     saveToLocalStorage(`consoleOptions.${vmId}`, JSON.stringify(options))
+  },
+
+  clearAutoConnect () {
+    let vmId = loadFromLocalStorage('autoConnect')
+    if (vmId) {
+      saveToLocalStorage('autoConnect', '')
+      removeFromLocalStorage(`consoleOptions.${vmId}`)
+    }
   },
 
   loadAutoConnectOption () {
