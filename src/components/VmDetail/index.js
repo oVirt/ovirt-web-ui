@@ -32,6 +32,7 @@ import VmConsoles from './VmConsoles'
 
 import { userFormatOfBytes, VmIcon } from 'ovirt-ui-components'
 import Selectors from '../../selectors'
+import { getOsHumanName } from '../utils'
 
 function rephraseVmType (vmType) {
   const types = {
@@ -132,7 +133,7 @@ class VmDetail extends Component {
     }
     const icon = icons.get(iconId)
     const disks = vm.get('disks')
-    const os = Selectors.getOperatingSystemByName(vm.getIn(['os', 'type']))
+    const osName = getOsHumanName(vm.getIn(['os', 'type']))
     const cluster = Selectors.getClusterById(vm.getIn(['cluster', 'id']))
     const template = Selectors.getTemplateById(vm.getIn(['template', 'id']))
 
@@ -213,7 +214,7 @@ class VmDetail extends Component {
                   <dt>
                     <FieldHelp content={msg.operatingSystemInstalledOnVm()} text={msg.operatingSystem()} />
                   </dt>
-                  <dd>{os ? os.get('description') : vm.getIn(['os', 'type'])}</dd>
+                  <dd>{osName}</dd>
 
                   <dt>
                     <FieldHelp content={msg.typeOfWorkloadVmConfigurationIsOptimizedFor()} text={msg.optimizedFor()} />
