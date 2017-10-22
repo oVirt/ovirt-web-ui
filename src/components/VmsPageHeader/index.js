@@ -9,8 +9,6 @@ import { hrefWithoutHistory } from '../../helpers'
 
 import { refresh } from '../../actions/vm'
 
-import { msg } from '../../intl'
-
 /**
  * Main application header on top of the page
  */
@@ -28,16 +26,18 @@ const VmsPageHeader = ({ onRefresh }) => {
         </a>
       </div>
 
-      <ul className='nav navbar-nav navbar-utility'>
-        <li>
-          <a href='#' onClick={hrefWithoutHistory(onRefresh)}>
-            <span className='fa fa-refresh' />&nbsp;{msg.refresh()}
-          </a>
-        </li>
+      <div className='collapse navbar-collapse'>
+        <ul className='nav navbar-nav navbar-right navbar-iconic'>
+          <li>
+            <a href='#' className='nav-item-iconic' onClick={hrefWithoutHistory(onRefresh)}>
+              <i className='fa fa-refresh' />
+            </a>
+          </li>
 
-        <UserMenu />
-        <VmUserMessages />
-      </ul>
+          <UserMenu />
+          <VmUserMessages />
+        </ul>
+      </div>
 
     </nav>
   )
