@@ -19,7 +19,18 @@ const VmsPageHeader = ({ title, onRefresh }) => {
   const titleStyle = { padding: '0px 0 5px' }
 
   return (
-    <nav className='navbar navbar-default navbar-pf navbar-fixed-top'>
+    <nav className='navbar obrand_mastheadBackground obrand_topBorder navbar-pf-vertical'>
+      <div className='navbar-header'>
+        <button type='button' className='navbar-toggle' data-toggle='collapse'>
+          <span className='icon-bar' />
+          <span className='icon-bar' />
+          <span className='icon-bar' />
+        </button>
+        <a href='#' className='navbar-brand obrand_headerLogoLink'>
+          <img className='obrand_mastheadLogo' src='../branding/images/clear.cache.gif' />
+        </a>
+      </div>
+
       <ContainerFluid>
         <div className='navbar-header'>
           <a className='navbar-brand' style={titleStyle} href='/'>{title}</a>
