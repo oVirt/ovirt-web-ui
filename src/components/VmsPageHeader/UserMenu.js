@@ -28,16 +28,13 @@ const UserMenu = ({ config, onLogout }) => {
   } else {
     return (
       <li className='dropdown'>
-        <a className={`dropdown-toggle`} data-toggle='dropdown' href='#'>
-          <i className='fa fa-sign-out' aria-hidden='true' />&nbsp;
-          {config.getIn(['user', 'name'])}
-          <b className='caret' />
+        <a className='dropdown-toggle nav-item-iconic' href='#' data-toggle='dropdown' title={config.getIn(['user', 'name'])}>
+          <i className='pficon pficon-user' /><span className='caret' />
         </a>
         <ul className='dropdown-menu'>
           <li>
             <a href='#' data-toggle='modal' data-target='#about-modal'>{msg.about()}</a>
           </li>
-
           <li>
             <a href='#' onClick={onLogout}>{msg.logOut()}</a>
           </li>

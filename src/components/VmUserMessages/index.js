@@ -28,10 +28,6 @@ UserMessage.propTypes = {
   record: PropTypes.object.isRequired,
 }
 
-function isUnread (userMessages) {
-  return userMessages.get('unread')
-}
-
 const ContactAdminInfo = ({ userMessages }) => {
   if (userMessages.get('records').size === 0) {
     return null
@@ -69,10 +65,10 @@ class VmUserMessages extends React.Component {
 
     return (
       <li className='dropdown'>
-        <a href='#' onClick={hrefWithoutHistory(onToggle)}>
-          <div className={isUnread(userMessages) ? style['usermsgs-unread'] : style['usermsgs-allread']}>
-            <span className='pficon pficon-info' />&nbsp;{msg.messages()}
-          </div>
+        <a className='dropdown-toggle nav-item-iconic' href='#' title={msg.messages()} onClick={hrefWithoutHistory(onToggle)}>
+          <i className='fa fa-bell' />
+          <span className='badge'>{userMessages.get('records').size}</span>
+          <span className='caret' />
         </a>
 
         <div className={`dropdown-menu dropdown-menu-right infotip bottom-right ${show}`}>
