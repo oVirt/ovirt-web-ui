@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import Product from '../version'
-import { fixedStrings, resourcesUrls as brandedResourcesUrls } from '../branding'
+import { fixedStrings } from '../branding'
 
 const LegalInfo = () => {
   if (fixedStrings.LEGAL_INFO_LINK_TEXT && fixedStrings.LEGAL_INFO_LINK_URL) {
@@ -35,7 +35,7 @@ const AboutDialog = ({ oVirtApiVersion }) => {
   return (
     <div className='modal fade' id='about-modal' tabIndex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
       <div className='modal-dialog'>
-        <div className='modal-content about-modal-pf'>
+        <div className='modal-content about-modal-pf obrand_aboutBackground'>
           <div className='modal-header'>
             <button type='button' className='close' data-dismiss='modal' aria-hidden='true'>
               <span className='pficon pficon-close' />
@@ -43,7 +43,6 @@ const AboutDialog = ({ oVirtApiVersion }) => {
           </div>
           <div className='modal-body'>
             <h1>{fixedStrings.BRAND_NAME} VM Portal</h1>
-
             <div className='product-versions-pf'>
               <ul className='list-unstyled'>
                 <li>Version <strong>{Product.version}-{Product.release}</strong></li>
@@ -56,7 +55,7 @@ const AboutDialog = ({ oVirtApiVersion }) => {
 
           </div>
           <div className='modal-footer'>
-            <img src={brandedResourcesUrls.aboutDialogLogo} alt={`${fixedStrings.BRAND_NAME} logo`} />
+            <div className='obrand_aboutApplicationLogo' />
           </div>
         </div>
       </div>

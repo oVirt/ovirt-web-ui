@@ -22,7 +22,7 @@ body {
   line-height: 15px;
 }
 
-.styled-checkbox.checked:before 
+.styled-checkbox.checked:before
 {
   content: '\e013';
 }
@@ -63,4 +63,9 @@ div.toolbar-pf {
 
 .popover-content {
   text-align: center;
+}
+
+.navbar-pf-vertical .nav .nav-item-iconic .badge {
+  margin-left: -2px !important;
+  margin-right: 0;
 }

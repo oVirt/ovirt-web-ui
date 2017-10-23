@@ -12,9 +12,9 @@ function getBrandedResourceUrl (resourceId: string): string {
 }
 
 export const resourcesUrls = {
-  get favicon (): string { return getBrandedResourceUrl('favicon.ico') },
-  get aboutDialogLogo (): string { return getBrandedResourceUrl('about-dialog-logo.png') },
-  get stylesheet (): string { return getBrandedResourceUrl('style.css') },
+  get favicon (): string { return getBrandedResourceUrl('favicon.ico?v=2') },
+  get baseStylesheet (): string { return getBrandedResourceUrl('style.css') },
+  get ovirtBrandStylesheet (): string { return getBrandedResourceUrl('ovirt-brand.css') },
   get fixedStrings (): string { return getBrandedResourceUrl('fixed-strings.json') },
 }
 
