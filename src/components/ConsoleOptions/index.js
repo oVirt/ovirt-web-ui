@@ -22,8 +22,14 @@ class ConsoleOptions extends React.Component {
     }.bind(this)
   }
 
+  componentWillMount () {
+    if (!this.props.smartcardOptionEnable) {
+      (this.onChangeOptions('smartcardEnabled'))(null, false)
+    }
+  }
+
   render () {
-    const { open } = this.props
+    const { open, smartcardOptionEnable } = this.props
 
     let classes = style['vm-detail-settings']
     if (open) {
@@ -66,6 +72,17 @@ class ConsoleOptions extends React.Component {
             />
           </dd>
 
+          <dt className={style['console-option-description']}>{msg.smartcardEnabled()}</dt>
+          <dd>
+            <Switch
+              animate
+              bsSize='mini'
+              disabled={!smartcardOptionEnable}
+              value={!!this.props.options.smartcardEnabled}
+              onChange={this.onChangeOptions('smartcardEnabled')}
+            />
+          </dd>
+
         </dl>
       </div>
     )
@@ -76,6 +93,7 @@ ConsoleOptions.propTypes = {
   options: PropTypes.object.isRequired,
   onSave: PropTypes.func.isRequired,
   open: PropTypes.bool,
+  smartcardOptionEnable: PropTypes.bool,
 }
 
 export default ConsoleOptions

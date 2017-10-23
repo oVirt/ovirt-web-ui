@@ -1,13 +1,13 @@
 .vm-detail-settings {
-    transition: height 1s;
-    height: 0px;
+    transition: max-height 1s;
+    max-height: 0px;
     overflow: hidden;
     width: 100%;
     margin-left: 2em;
 }
 
 .open-settings {
-    height: 110px;
+    max-height: 500px;
     margin-left: 2em;
 }
 

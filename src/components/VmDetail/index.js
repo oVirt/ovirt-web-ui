@@ -49,10 +49,6 @@ function rephraseVmType (vmType) {
   return vmType
 }
 
-function memoryToShorterFormat (memory) {
-  return memory.rounded % 1 === 0 ? memory.number.toFixed(0) + ' ' + memory.suffix : memory.str
-}
-
 class VmDetail extends Component {
   constructor (props) {
     super(props)
@@ -181,7 +177,6 @@ class VmDetail extends Component {
     return (
       <div className={style['main-container']}>
         <VmsListNavigation selectedVm={vm} expanded={this.state.vmsNavigationExpanded} toggleExpansion={this.toggleVmsNavExpansion} />
-
         <div className={style['vm-detail-main']}>
           <div className={this.state.vmsNavigationExpanded ? style['vms-nav-expanded'] : style['vms-nav-collapsed']}>
             <DetailContainer>
@@ -228,7 +223,7 @@ class VmDetail extends Component {
                   <dt><span className='pficon pficon-memory' />&nbsp;
                     <FieldHelp content={msg.totalMemoryVmWillBeEquippedWith()} text={msg.definedMemory()} />
                   </dt>
-                  <dd>{memoryToShorterFormat(userFormatOfBytes(vm.getIn(['memory', 'total'])))}</dd>
+                  <dd>{userFormatOfBytes(vm.getIn(['memory', 'total'])).str}</dd>
 
                   <dt><span className='pficon pficon-cpu' />&nbsp;
                     <FieldHelp content={msg.totalCountOfVirtualProcessorsVmWillBeEquippedWith()} text={msg.cpus()} />
@@ -253,7 +248,7 @@ class VmDetail extends Component {
                     {consoleOptionsShowHide}
                   </dt>
                   <VmConsoles vm={vm} onConsole={onConsole} onRDP={onRDP} usbFilter={config.get('usbFilter')} />
-                  <ConsoleOptions options={optionsJS} onSave={onConsoleOptionsSave} open={this.state.openConsoleSettings} />
+                  <ConsoleOptions smartcardOptionEnable={vm.getIn(['display', 'smartcardEnabled'])} options={optionsJS} onSave={onConsoleOptionsSave} open={this.state.openConsoleSettings} />
 
                   <dt><span className='fa fa-database' />
                     &nbsp;

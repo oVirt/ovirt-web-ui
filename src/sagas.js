@@ -673,7 +673,7 @@ function* fetchVmSessions ({ vmId }) {
   return []
 }
 
-function adjustVVFile ({ data, options, usbFilter }) {
+function adjustVVFile ({ data, options, usbFilter, isSpice }) {
   // to simplify other flow, let's handle both 'options' from redux (immutableJs) or plain JS object from getConsoleOptions()
   // logDebug('adjustVVFile data before: ', data)
   logDebug('adjustVVFile options: ', options)
@@ -697,12 +697,18 @@ function adjustVVFile ({ data, options, usbFilter }) {
   if (usbFilter) {
     data = data.replace(/^\[virt-viewer\]$/mg, `[virt-viewer]\nusb-filter=${usbFilter}`)
   }
+  if (options && isSpice) {
+    const smartcardEnabled = options.get ? options.get('smartcardEnabled') : options.smartcardEnabled
+    data = data.replace(/^enable-smartcard=[01]$/mg, `enable-smartcard=${smartcardEnabled ? 1 : 0}`)
+  }
   logDebug('adjustVVFile data after adjustment: ', data)
   return data
 }
 
 function* downloadVmConsole (action) {
   let { vmId, consoleId, usbFilter } = action.payload
+
+  let isSpice = false
 
   if (!consoleId) {
     yield put(vmActionInProgress({ vmId, name: 'getConsole', started: true }))
@@ -714,6 +720,9 @@ function* downloadVmConsole (action) {
     if (consolesInternal && consolesInternal.length > 0) {
       let console = consolesInternal.find(c => c.protocol === 'spice') || consolesInternal[0]
       consoleId = console.id
+      if (console.protocol === 'spice') {
+        isSpice = true
+      }
     }
   }
 
@@ -727,7 +736,7 @@ function* downloadVmConsole (action) {
         options = yield getConsoleOptions(getConsoleOptionsAction({ vmId }))
       }
 
-      data = adjustVVFile({ data, options, usbFilter })
+      data = adjustVVFile({ data, options, usbFilter, isSpice })
       fileDownload({ data, fileName: 'console.vv', mimeType: 'application/x-virt-viewer' })
     }
   }
