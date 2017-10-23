@@ -54,7 +54,7 @@ function renderApp () {
  *
  * See web.xml.
  */
-function fetchToken (): { token: string, username: string, domain: string } {
+function fetchToken (): { token: string, username: string, domain: string, userId: string } {
   const userInfo = window.userInfo
   logDebug(`SSO userInfo: ${JSON.stringify(userInfo)}`)
 
@@ -63,12 +63,14 @@ function fetchToken (): { token: string, username: string, domain: string } {
       token: userInfo.ssoToken,
       username: userInfo.userName,
       domain: userInfo.domain,
+      userId: userInfo.userId,
     }
   }
   return {
     token: '',
     username: '',
     domain: '',
+    userId: '',
   }
 }
 
@@ -106,7 +108,7 @@ function onResourcesLoaded () {
 
   addBrandedResources()
 
-  const { token, username, domain }: { token: string, username: string, domain: string } = fetchToken()
+  const { token, username, domain, userId }: { token: string, username: string, domain: string, userId: string } = fetchToken()
 
   // do initial render
   renderApp()
@@ -121,7 +123,7 @@ function onResourcesLoaded () {
 
   store.dispatch(setDomain({ domain }))
   if (token) {
-    store.dispatch(login({ username, token }))
+    store.dispatch(login({ username, token, userId }))
   } else {
     logError('Missing SSO Token!')
   }

@@ -2,7 +2,7 @@
 
 import AppConfiguration from './config'
 
-let loaded: ?Promise<>
+let loaded: ?Promise<void>
 
 function getBrandedResourceUrl (resourceId: string): string {
   const separator = AppConfiguration.applicationURL.endsWith('/')
@@ -18,7 +18,7 @@ export const resourcesUrls = {
   get fixedStrings (): string { return getBrandedResourceUrl('fixed-strings.json') },
 }
 
-export function loadOnce (): Promise<> {
+export function loadOnce (): Promise<void> {
   if (!loaded) {
     loaded = fetch(resourcesUrls.fixedStrings)
       .then(body => body.json())

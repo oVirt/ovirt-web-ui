@@ -11,6 +11,7 @@ import VmsPageHeader from './components/VmsPageHeader/index'
 
 import Options from './components/Options'
 import AboutDialog from './components/About'
+import OptionsDialog from './components/OptionsDialog'
 import OvirtApiCheckFailed from './components/OvirtApiCheckFailed'
 import CloseDialogConfirmation from './components/CloseDialogConfirmation/index'
 import TokenExpired from './components/TokenExpired'
@@ -82,6 +83,7 @@ const App = ({ vms, visibility, config }) => {
         {renderRoutes(routes)}
         {detailToRender}
         <AboutDialog />
+        <OptionsDialog userId={config.getIn(['user', 'id'])} />
         <OvirtApiCheckFailed />
       </div>
     </Router>
