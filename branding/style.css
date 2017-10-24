@@ -1,3 +1,14 @@
-.navbar-pf {
-    border-top-color: #42A500
+/********************************************
+branding overrides
+
+put anything here that should override styles
+from ovirt-common.
+*********************************************/
+
+.obrand_aboutApplicationLogo {
+    position: unset;
+}
+
+#about-modal a {
+    color: #ffffff;
 }
