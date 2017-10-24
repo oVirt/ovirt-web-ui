@@ -1,7 +1,7 @@
 .move-left-detail { /* VM detail on the right */
     height: 100%;
     display: block;
-    width: 100%;
+    max-width: 95%;
     opacity:1;
 }
 
