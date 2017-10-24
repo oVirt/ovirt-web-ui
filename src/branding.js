@@ -12,7 +12,7 @@ function getBrandedResourceUrl (resourceId: string): string {
 }
 
 export const resourcesUrls = {
-  get favicon (): string { return getBrandedResourceUrl('favicon.ico') },
+  get favicon (): string { return getBrandedResourceUrl('images/favicon.ico') },
   get baseStylesheet (): string { return getBrandedResourceUrl('style.css') },
   get ovirtBrandStylesheet (): string { return getBrandedResourceUrl('ovirt-brand.css') },
   get fixedStrings (): string { return getBrandedResourceUrl('fixed-strings.json') },
