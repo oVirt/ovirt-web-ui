@@ -89,3 +89,16 @@
 .card-icon {
     text-align: center;
 }
+
+.operating-system-label {
+    display: inline-block;
+    font-size: 10px;
+    height: 18px;
+    padding: 0 6px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #363636;
+    background-color: #ededed;
+    min-width: 100px;
+    margin: 2px auto;
+}

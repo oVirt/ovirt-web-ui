@@ -16,6 +16,8 @@ import { VmIcon, VmStatusIcon } from 'ovirt-ui-components'
 
 import { startVm } from '../../actions/index'
 
+import { getOsHumanName } from '../utils'
+
 /**
  * Single icon-card in the list
  */
@@ -34,6 +36,7 @@ class Vm extends React.Component {
     }
     const icon = icons.get(iconId)
     const isSelected = vm.get('id') === visibility.get('selectedVmDetail')
+    const osName = getOsHumanName(vm.getIn(['os', 'type']))
 
     return (
       <div className={`col-xs-12 col-sm-6 col-md-4 col-lg-3 ${isSelected ? style['selectedVm'] : ''}`}>
@@ -44,6 +47,9 @@ class Vm extends React.Component {
                 <VmIcon icon={icon} className={style['card-pf-icon']}
                   missingIconClassName='fa fa-birthday-cake card-pf-icon-circle' />
               </Link>
+              <div>
+                <span className={style['operating-system-label']}>{osName}</span>
+              </div>
             </div>
             <h2 className='card-pf-title text-center'>
               <NavLink to={`/vm/${vm.get('id')}`} className={style['vm-detail-link']}>
