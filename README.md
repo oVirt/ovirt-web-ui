@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/oVirt/ovirt-web-ui.svg?branch=master)](https://travis-ci.org/oVirt/ovirt-web-ui)
 
+Ok, fixed. But still do not merge this.
+
 # VM Portal for oVirt
 ![Alt text](https://raw.githubusercontent.com/oVirt/ovirt-web-ui/master/doc/screenshots/v1.0.0_2017-Jun/01_vmsList.png "Screenshot")
 
