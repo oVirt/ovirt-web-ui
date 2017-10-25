@@ -375,7 +375,8 @@ function getUserInfo (protocol, port) {
         return reject(err)
       }
       if (body['access_token']) {
-        request(`${engineUrl}api/users`, { json: true, strictSSL: false, headers: { Authorization: `Bearer ${body['access_token']}` } }, (userErr, userResponse, userBody) => {
+        const usersApiUrl = `${engineUrl}/api/users`
+        request(usersApiUrl, { json: true, strictSSL: false, headers: { Authorization: `Bearer ${body['access_token']}` } }, (userErr, userResponse, userBody) => {
           // This request not always return current user data, it may be caused by server error, or current user isn't administrator and have no permissions for that
           if (!userErr && userBody.user && userBody.user.length > 0 ) {
             for (let i in userBody.user) {
@@ -390,7 +391,7 @@ function getUserInfo (protocol, port) {
               }
             }
           }
-          var userId = readlineSync.question(`oVirt user id can be found there ${engineUrl}api/users/ : `, {
+          var userId = readlineSync.question(`oVirt user id (optional, it can be found at ${usersApiUrl}) : `, {
             defaultInput: null,
           });            
           resolve({
