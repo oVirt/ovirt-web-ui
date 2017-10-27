@@ -87,7 +87,7 @@ function loadPersistedState () {
 
 function addBrandedResources () {
   addLinkElement('shortcut icon', branding.resourcesUrls.favicon)
-  addLinkElement('stylesheet', branding.resourcesUrls.ovirtBrandStylesheet)
+  addLinkElement('stylesheet', branding.resourcesUrls.brandStylesheet)
   addLinkElement('stylesheet', branding.resourcesUrls.baseStylesheet)
 }
 
