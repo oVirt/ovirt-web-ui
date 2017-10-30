@@ -8,6 +8,7 @@ import UserMenu from './UserMenu'
 import { hrefWithoutHistory } from '../../helpers'
 
 import { refresh } from '../../actions/vm'
+import * as branding from '../../branding'
 
 /**
  * Main application header on top of the page
@@ -22,7 +23,7 @@ const VmsPageHeader = ({ onRefresh }) => {
           <span className='icon-bar' />
         </button>
         <a href='#' className='navbar-brand obrand_headerLogoLink'>
-          <img className='obrand_mastheadLogo' src='../branding/images/clear.cache.gif' />
+          <img className='obrand_mastheadLogo' src={branding.resourcesUrls.clearGif} />
         </a>
       </div>
 

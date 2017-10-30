@@ -2,11 +2,12 @@
 branding overrides
 
 put anything here that should override styles
-from ovirt-common.
+from brand.css.
 *********************************************/
 
 .obrand_aboutApplicationLogo {
     position: unset;
+    float: right;
 }
 
 #about-modal a {

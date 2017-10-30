@@ -13,8 +13,9 @@ function getBrandedResourceUrl (resourceId: string): string {
 
 export const resourcesUrls = {
   get favicon (): string { return getBrandedResourceUrl('images/favicon.ico') },
+  get clearGif (): string { return getBrandedResourceUrl('images/clear.cache.gif') },
   get baseStylesheet (): string { return getBrandedResourceUrl('style.css') },
-  get ovirtBrandStylesheet (): string { return getBrandedResourceUrl('ovirt-brand.css') },
+  get brandStylesheet (): string { return getBrandedResourceUrl('brand.css') },
   get fixedStrings (): string { return getBrandedResourceUrl('fixed-strings.json') },
 }
 
