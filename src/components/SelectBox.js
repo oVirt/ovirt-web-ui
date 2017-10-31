@@ -33,7 +33,11 @@ class SelectBox extends React.Component {
           </button>
           <ul className={`dropdown-menu ${style['dropdown']}`} role='menu'>
             {Object.values(items).map(item => (
-              <li role='presentation' className={item.id === this.state.selected ? 'selected' : ''} key={item.id}><a role='menuitem' tabIndex='-1' onClick={this.handleChange(item.id)}>{item.value}</a></li>
+              <li role='presentation' className={item.id === this.state.selected ? 'selected' : ''} key={item.id}>
+                <a role='menuitem' tabIndex='-1' onClick={this.handleChange(item.id)}>
+                  {item.value}
+                </a>
+              </li>
             ))}
           </ul>
         </div>
