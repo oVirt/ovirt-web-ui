@@ -174,7 +174,7 @@ class VmDialog extends React.Component {
       'description': this.state.description,
       'template': { 'id': this.state.templateId },
       'cluster': { 'id': this.state.clusterId },
-      'memory': this.state.memory,
+      'memory': this.state.memory || 0,
       'memory_policy': this.getMemoryPolicy(),
       'cdrom': {
         'file': {
@@ -187,7 +187,7 @@ class VmDialog extends React.Component {
       'cpu': {
         'topology': {
           'cores': '1', // TODO: fix to conform topology in template!
-          'sockets': this.state.cpus,
+          'sockets': this.state.cpus || 1,
           'threads': '1',
         },
       },
@@ -220,16 +220,18 @@ class VmDialog extends React.Component {
   }
 
   onIntegerChanged ({ value, stateProp, factor = 1 }) {
-    const intVal = parseInt(value)
+    let intVal = parseInt(value)
     if (!isNaN(intVal)) {
-      const stateChange = {}
-      stateChange[stateProp] = intVal * factor
-      stateChange['isChanged'] = true
-      this.setState(stateChange)
+      value = intVal * factor
     } else {
       console.log('not an integer: ', value)
-      this.forceUpdate()
+      value = ''
     }
+
+    const stateChange = {}
+    stateChange[stateProp] = value
+    stateChange['isChanged'] = true
+    this.setState(stateChange)
   }
 
   onChangeOperatingSystem (osId) {
@@ -516,7 +518,7 @@ class VmDialog extends React.Component {
                   id='vmMemory'
                   placeholder='VM Memory'
                   onChange={this.onChangeVmMemory}
-                  value={this.state.memory / 1024 / 1024 || 1024}
+                  value={this.state.memory / 1024 / 1024 || ''}
                   min={0}
                   step={256} />
               </dd>
@@ -533,7 +535,7 @@ class VmDialog extends React.Component {
                   id='vmCpus'
                   placeholder='CPUs'
                   onChange={this.onChangeVmCpu}
-                  value={this.state.cpus || 1}
+                  value={this.state.cpus || ''}
                   min={1}
                   step={1} />
               </dd>
