@@ -972,5 +972,5 @@ const shortMessages = {
 }
 
 function shortErrorMessage ({ action }) {
-  return shortMessages[action.type] ? shortMessages[action.type] : msg.actionFailed(action.type)
+  return shortMessages[action.type] ? shortMessages[action.type] : msg.actionFailed({ action: action.type })
 }
