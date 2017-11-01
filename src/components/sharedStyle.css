@@ -65,13 +65,14 @@
 
 .dropdown-button-text {
     flex-grow: 1;
-    text-align: center;
+    text-align: left;
 }
 
 .dropdown {
     width: 100%;
     max-height: 300px;
     overflow: auto;
+    text-align: left;
 }
 
 .dropdown li {
