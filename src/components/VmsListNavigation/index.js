@@ -28,6 +28,7 @@ const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, onUpdat
     }
   }
 
+  const emptyList = (<div />)
   let list = null
   if (expanded) {
     const sortFunction = (vmA, vmB) => vmA.get('name').localeCompare(vmB.get('name'))
@@ -63,7 +64,7 @@ const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, onUpdat
           hasMore={vms.get('notAllPagesLoaded')}
           useWindow={false}
           >
-          {list}
+          {list || emptyList}
         </InfiniteScroll>
       </div>
     </div>
