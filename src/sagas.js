@@ -50,7 +50,6 @@ import {
   poolActionInProgress,
 
   redirectRoute,
-//  refresh,
   getVmsByCount,
   getPoolsByCount,
   setStorages,
@@ -116,7 +115,6 @@ import {
   SAVE_CONSOLE_OPTIONS,
   SELECT_POOL_DETAIL,
   SELECT_VM_DETAIL,
-  // SCHEDULER__1_MIN,
   SHUTDOWN_VM,
   START_POOL,
   START_VM,
@@ -263,7 +261,7 @@ function* fetchVmsByCountVLower (action) {
   const allVms = yield callExternalAction('getVmsByCount', Api.getVmsByCount, action)
 
   if (allVms && allVms['vm']) { // array
-    const internalVms = allVms.vm.map(vm => Api.vmToInternal({ vm }))
+    const internalVms = allVms.vm.map(vm => Api.vmToInternal({ vm, getSubResources: true }))
 
     const vmIdsToPreserve = internalVms.map(vm => vm.id)
     yield put(removeMissingVms({ vmIdsToPreserve }))
@@ -438,24 +436,6 @@ function* stopProgress ({ vmId, poolId, name, result }) {
   } else {
     yield put(poolActionInProgress({ poolId, name, started: false }))
   }
-  /*
-  // No need for that since events will be received
-  const fetchSingle = vmId ? fetchSingleVm : fetchSinglePool
-  const getSingle = vmId ? getSingleVm : getSinglePool
-  const actionInProgress = vmId ? vmActionInProgress : poolActionInProgress
-
-  const params = vmId ? { vmId } : { poolId }
-  if (result && result.status === 'complete') {
-    // do not call 'end of in progress' if successful,
-    // since UI will be updated by refresh
-    yield delay(5 * 1000)
-    yield fetchSingle(getSingle(params))
-    yield delay(30 * 1000)
-    yield fetchSingle(getSingle(params))
-  }
-
-  yield put(actionInProgress(Object.assign(params, { name, started: false })))
-  */
 }
 
 function* shutdownVm (action) {
@@ -630,26 +610,7 @@ function* fetchUSBFilter (action) {
     yield put(setUSBFilter({ usbFilter }))
   }
 }
-/*
-function* schedulerPerMinute (action) {
-  logDebug('Starting schedulerPerMinute() scheduler')
 
-  // TODO: do we need to stop the loop? Consider takeLatest in the rootSaga 'restarts' the loop if needed
-  while (true) {
-    yield delay(60 * 1000) // 1 minute
-    logDebug('schedulerPerMinute() event')
-
-    const oVirtVersion = Selectors.getOvirtVersion()
-    if (oVirtVersion.get('passed')) {
-      // Actions to be executed no more than once per minute:
-      // None
-      // yield put(refresh({ quiet: true, shallowFetch: true, page: Selectors.getCurrentPage() }))
-    } else {
-      logDebug('schedulerPerMinute() event skipped since oVirt API version does not match')
-    }
-  }
-}
-*/
 // Sagas workers for using in different sagas modules
 let sagasFunctions = {
   foreach,
@@ -701,7 +662,6 @@ export function *rootSaga () {
     takeEvery(SELECT_POOL_DETAIL, selectPoolDetail),
     takeEvery(GET_USB_FILTER, fetchUSBFilter),
 
-    // takeLatest(SCHEDULER__1_MIN, schedulerPerMinute),
     takeLatest(EVENT_LISTENER, eventListener),
 
     ...SagasWorkers(sagasFunctions),
