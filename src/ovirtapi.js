@@ -8,6 +8,7 @@ import Selectors from './selectors'
 import AppConfiguration from './config'
 
 type VmIdType = { vmId: string }
+type IdType = { id: string }
 type PoolIdType = { poolId: string }
 type InputRequestType = { url: string, input: string, contentType?: string }
 type VmType = { vm: Object }
@@ -297,9 +298,9 @@ OvirtApi = {
 
       cpu: {
         topology: {
-          cores: template.cpu.topology.cores,
-          sockets: template.cpu.topology.sockets,
-          threads: template.cpu.topology.threads,
+          cores: template.cpu && template.cpu.topology ? template.cpu.topology.cores : undefined,
+          sockets: template.cpu && template.cpu.topology ? template.cpu.topology.sockets : undefined,
+          threads: template.cpu && template.cpu.topology ? template.cpu.topology.threads : undefined,
         },
       },
 
@@ -406,7 +407,15 @@ OvirtApi = {
   },
 
   // ----
-
+  getEvents ({ lastEventIndexReceived }: { lastEventIndexReceived: ?number }): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'getEvents' })
+    let params = 'max=1&search=sortby%20time%20desc' // just the last one for first run
+    if (lastEventIndexReceived && lastEventIndexReceived >= 0) { // any subsequent call
+      params = `from=${lastEventIndexReceived}`
+    }
+    const url = `${AppConfiguration.applicationContext}/api/events?${params}`
+    return OvirtApi._httpGet({ url })
+  },
   getOvirtApiMeta (): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'checkOvirtApiVersion' })
     const url = `${AppConfiguration.applicationContext}/api/`
@@ -458,14 +467,29 @@ OvirtApi = {
       },
     })
   },
+  getSingleTemplate ({ id }: IdType): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'getSingleTemplate' })
+    const url = `${AppConfiguration.applicationContext}/api/templates/${id}`
+    return OvirtApi._httpGet({ url })
+  },
   getAllTemplates (): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'getAllTemplates' })
     const url = `${AppConfiguration.applicationContext}/api/templates`
     return OvirtApi._httpGet({ url })
   },
+  getSingleCluster ({ id }: IdType): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'getSingleCluster' })
+    const url = `${AppConfiguration.applicationContext}/api/clusters/${id}`
+    return OvirtApi._httpGet({ url })
+  },
   getAllClusters (): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'getAllClusters' })
     const url = `${AppConfiguration.applicationContext}/api/clusters`
+    return OvirtApi._httpGet({ url })
+  },
+  getSingleHost ({ id }: IdType): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'getSingleHost' })
+    const url = `${AppConfiguration.applicationContext}/api/hosts/${id}`
     return OvirtApi._httpGet({ url })
   },
   getAllHosts (): Promise<Object> {
@@ -522,7 +546,7 @@ OvirtApi = {
       contentType: 'application/xml',
     })
   },
-  icon ({ id }: { id: string }): Promise<Object> {
+  icon ({ id }: IdType): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'icon' })
     return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/icons/${id}` })
   },

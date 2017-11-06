@@ -91,8 +91,12 @@ export function shortErrorMessage ({ action }) {
 }
 
 export function * foreach (array, fn, context) {
-  var i = 0
-  var length = array.length
+  if (!array) {
+    return
+  }
+
+  let i = 0
+  const length = array.length
 
   for (;i < length; i++) {
     yield * fn.call(context, array[i], i, array)

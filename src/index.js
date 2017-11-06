@@ -28,10 +28,16 @@ window.combobox = require('patternfly-bootstrap-combobox/js/bootstrap-combobox.j
 import store, { sagaMiddleware } from './store'
 import Selectors from './selectors'
 import AppConfiguration, { readConfiguration } from './config'
+
 import { loadStateFromLocalStorage } from './storage'
 import { logDebug, logError, valuesOfObject } from './helpers'
 import { rootSaga } from './sagas'
-import { login, updateIcons, setDomain, schedulerOneMinute } from './actions'
+import {
+  login,
+  updateIcons,
+  setDomain,
+  eventListener,
+} from './actions'
 
 import App from './App'
 
@@ -129,7 +135,7 @@ function onResourcesLoaded () {
     logError('Missing SSO Token!')
   }
 
-  store.dispatch(schedulerOneMinute())
+  store.dispatch(eventListener())
 }
 
 start()

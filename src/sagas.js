@@ -30,9 +30,16 @@ import {
   persistState,
 
   getSingleVm,
+
   addClusters,
+  removeCluster,
+
   addHosts,
+  removeHost,
+
   addTemplates,
+  removeTemplate,
+
   addAllOS,
 
   getSinglePool,
@@ -43,7 +50,7 @@ import {
   poolActionInProgress,
 
   redirectRoute,
-  refresh,
+//  refresh,
   getVmsByCount,
   getPoolsByCount,
   setStorages,
@@ -74,14 +81,19 @@ import {
   fetchConsoleVmMeta,
 } from './saga/consoles'
 
+import { eventListener } from './saga/events'
+
 import {
   CHECK_TOKEN_EXPIRED,
   CHANGE_VM_ICON,
   CHANGE_VM_ICON_BY_ID,
+  GET_SINGLE_CLUSTER,
   GET_ALL_CLUSTERS,
   GET_ALL_FILES_FOR_ISO,
+  GET_SINGLE_HOST,
   GET_ALL_HOSTS,
   GET_ALL_OS,
+  GET_SINGLE_TEMPLATE,
   GET_ALL_TEMPLATES,
   GET_BY_PAGE,
   GET_CONSOLE_OPTIONS,
@@ -90,9 +102,11 @@ import {
   GET_POOLS_BY_PAGE,
   GET_RDP_VM,
   GET_USB_FILTER,
+  GET_SINGLE_VM,
   GET_VMS_BY_COUNT,
   GET_VMS_BY_PAGE,
   DOWNLOAD_CONSOLE_VM,
+  EVENT_LISTENER,
   LOGIN,
   LOGOUT,
   PERSIST_STATE,
@@ -102,7 +116,7 @@ import {
   SAVE_CONSOLE_OPTIONS,
   SELECT_POOL_DETAIL,
   SELECT_VM_DETAIL,
-  SCHEDULER__1_MIN,
+  // SCHEDULER__1_MIN,
   SHUTDOWN_VM,
   START_POOL,
   START_VM,
@@ -326,7 +340,7 @@ export function* fetchSingleVm (action) {
   const vm = yield callExternalAction('getVm', Api.getVm, action, true)
 
   if (vm && vm.id) {
-    const internalVm = Api.vmToInternal({ vm })
+    const internalVm = Api.vmToInternal({ vm, getSubResources: false })
 
     internalVm.disks = yield fetchVmDisks({ vmId: internalVm.id })
     internalVm.consoles = yield fetchConsoleVmMeta({ vmId: internalVm.id })
@@ -417,6 +431,15 @@ function* startProgress ({ vmId, poolId, name }) {
 }
 
 function* stopProgress ({ vmId, poolId, name, result }) {
+  yield delay(10 * 1000) // allow events to be processed before enabling actions in UI
+
+  if (vmId) {
+    yield put(vmActionInProgress({ vmId, name, started: false }))
+  } else {
+    yield put(poolActionInProgress({ poolId, name, started: false }))
+  }
+  /*
+  // No need for that since events will be received
   const fetchSingle = vmId ? fetchSingleVm : fetchSinglePool
   const getSingle = vmId ? getSingleVm : getSinglePool
   const actionInProgress = vmId ? vmActionInProgress : poolActionInProgress
@@ -432,6 +455,7 @@ function* stopProgress ({ vmId, poolId, name, result }) {
   }
 
   yield put(actionInProgress(Object.assign(params, { name, started: false })))
+  */
 }
 
 function* shutdownVm (action) {
@@ -494,6 +518,24 @@ function* selectPoolDetail (action) {
   yield fetchSinglePool(getSinglePool({ poolId: action.payload.poolId }))
 }
 
+function* fetchSingleResource (action, apiMethod, toInternalConvertor, addAction, removeAction) {
+  const res = yield callExternalAction(apiMethod, Api[apiMethod], action)
+  if (res) {
+    const internal = toInternalConvertor(res)
+    yield put(addAction(internal))
+  } else {
+    yield put(removeAction(action.payload.id))
+  }
+}
+
+function* fetchSingleTemplate (action) {
+  yield * fetchSingleResource(action, 'getSingleTemplate',
+    (template) => Api.templateToInternal({ template }),
+    (templateInternal) => addTemplates({ templates: [ templateInternal ] }),
+    (id) => removeTemplate({ id })
+  )
+}
+
 function* fetchAllTemplates (action) {
   const templates = yield callExternalAction('getAllTemplates', Api.getAllTemplates, action)
 
@@ -506,6 +548,14 @@ function* fetchAllTemplates (action) {
   }
 }
 
+function* fetchSingleCluster (action) {
+  yield * fetchSingleResource(action, 'getSingleCluster',
+    (cluster) => Api.clusterToInternal({ cluster }),
+    (clusterInternal) => addClusters({ clusters: [ clusterInternal ] }),
+    (id) => removeCluster({ id })
+  )
+}
+
 function* fetchAllClusters (action) {
   const clusters = yield callExternalAction('getAllClusters', Api.getAllClusters, action)
 
@@ -516,6 +566,14 @@ function* fetchAllClusters (action) {
     const clusterIdsToPreserve = clustersInternal.map(item => item.id)
     yield put(removeMissingClusters({ clusterIdsToPreserve }))
   }
+}
+
+function* fetchSingleHost (action) {
+  yield * fetchSingleResource(action, 'getSingleHost',
+    (host) => Api.hostToInternal({ host }),
+    (hostInternal) => addHosts({ hosts: [ hostInternal ] }),
+    (id) => removeHost({ id })
+  )
 }
 
 function* fetchAllHosts (action) {
@@ -572,7 +630,7 @@ function* fetchUSBFilter (action) {
     yield put(setUSBFilter({ usbFilter }))
   }
 }
-
+/*
 function* schedulerPerMinute (action) {
   logDebug('Starting schedulerPerMinute() scheduler')
 
@@ -584,13 +642,14 @@ function* schedulerPerMinute (action) {
     const oVirtVersion = Selectors.getOvirtVersion()
     if (oVirtVersion.get('passed')) {
       // Actions to be executed no more than once per minute:
-      yield put(refresh({ quiet: true, shallowFetch: true, page: Selectors.getCurrentPage() }))
+      // None
+      // yield put(refresh({ quiet: true, shallowFetch: true, page: Selectors.getCurrentPage() }))
     } else {
       logDebug('schedulerPerMinute() event skipped since oVirt API version does not match')
     }
   }
 }
-
+*/
 // Sagas workers for using in different sagas modules
 let sagasFunctions = {
   foreach,
@@ -606,6 +665,7 @@ export function *rootSaga () {
     takeLatest(CHECK_TOKEN_EXPIRED, doCheckTokenExpired),
 
     takeLatest(REFRESH_DATA, refreshData),
+    takeEvery(GET_SINGLE_VM, fetchSingleVm),
     takeLatest(GET_BY_PAGE, fetchByPage),
     takeLatest(GET_VMS_BY_PAGE, fetchVmsByPage),
     takeLatest(GET_VMS_BY_COUNT, fetchVmsByCount),
@@ -622,9 +682,12 @@ export function *rootSaga () {
     takeEvery(START_POOL, startPool),
     takeEvery(REMOVE_VM, removeVm),
 
+    takeEvery(GET_SINGLE_CLUSTER, fetchSingleCluster),
     takeLatest(GET_ALL_CLUSTERS, fetchAllClusters),
+    takeEvery(GET_SINGLE_TEMPLATE, fetchSingleTemplate),
     takeLatest(GET_ALL_TEMPLATES, fetchAllTemplates),
     takeLatest(GET_ALL_OS, fetchAllOS),
+    takeEvery(GET_SINGLE_HOST, fetchSingleHost),
     takeLatest(GET_ALL_HOSTS, fetchAllHosts),
     takeLatest(GET_ISO_STORAGES, fetchISOStorages),
     takeLatest(GET_ALL_FILES_FOR_ISO, fetchAllFilesForISO),
@@ -637,7 +700,10 @@ export function *rootSaga () {
 
     takeEvery(SELECT_POOL_DETAIL, selectPoolDetail),
     takeEvery(GET_USB_FILTER, fetchUSBFilter),
-    takeLatest(SCHEDULER__1_MIN, schedulerPerMinute),
+
+    // takeLatest(SCHEDULER__1_MIN, schedulerPerMinute),
+    takeLatest(EVENT_LISTENER, eventListener),
+
     ...SagasWorkers(sagasFunctions),
   ]
 }

@@ -1,5 +1,5 @@
 import Immutable, { Map } from 'immutable'
-import { logError } from '../helpers'
+import { logError, logDebug } from '../helpers'
 import { actionReducer, removeMissingItems } from './utils'
 
 const initialState = Immutable.fromJS({
@@ -22,6 +22,7 @@ const vms = actionReducer(initialState, {
       if (!state.getIn(['vms', vm.id])) {
         state = state.set('notAllPagesLoaded', true)
       }
+      logDebug('UPDATE_VMS vmId=', vm.id)
       updates[vm.id] = vm
 
       if (copySubResources) {

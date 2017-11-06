@@ -1,12 +1,12 @@
 import {
-  GET_VM,
+  GET_SINGLE_VM,
   GET_BY_PAGE,
   GET_USB_FILTER,
   PERSIST_STATE,
   SET_ADMINISTATOR,
   SET_USER_FILTER_PERMISSION,
   CHECK_TOKEN_EXPIRED,
-  SCHEDULER__1_MIN,
+  // SCHEDULER__1_MIN,
 } from '../constants/index'
 
 export * from './error'
@@ -20,13 +20,16 @@ export * from './options'
 export * from './pool'
 export * from './route'
 export * from './storage'
+export * from './events'
 
+/*
 export function schedulerOneMinute () {
   return {
     type: SCHEDULER__1_MIN,
     payload: {},
   }
 }
+*/
 
 export function persistState () {
   return {
@@ -38,7 +41,7 @@ export function persistState () {
 
 export function getSingleVm ({ vmId }) {
   return {
-    type: GET_VM,
+    type: GET_SINGLE_VM,
     payload: {
       vmId,
     },

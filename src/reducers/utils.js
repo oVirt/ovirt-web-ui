@@ -43,7 +43,7 @@ export const actionReducer = (initialState, handlers) => (state = initialState, 
 export function removeMissingItems ({ state, subStateName, idsToPreserve }) {
   const newItems = idsToPreserve
     .reduce((items, id) => {
-      const item = state.getIn([subStateName, id])
+      const item = state.getIn([ subStateName, id ])
       if (item) {
         items.set(id, item)
       }
@@ -51,4 +51,8 @@ export function removeMissingItems ({ state, subStateName, idsToPreserve }) {
     }, Map().asMutable())
     .asImmutable()
   return state.set(subStateName, newItems)
+}
+
+export function removeItem({ state, subStateName, idToRemove }) {
+  return state.deleteIn([ subStateName, idToRemove ])
 }

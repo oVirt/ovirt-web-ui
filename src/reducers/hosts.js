@@ -1,5 +1,5 @@
 import { fromJS } from 'immutable'
-import { actionReducer, removeMissingItems } from './utils'
+import { actionReducer, removeMissingItems, removeItem } from './utils'
 
 const initialState = fromJS({
   hosts: {},
@@ -14,6 +14,10 @@ const hosts = actionReducer(initialState, {
     })
     const imUpdates = fromJS(updates)
     return state.mergeIn(['hosts'], imUpdates)
+  },
+
+  REMOVE_HOST (state, { payload: { id } }) {
+    return removeItem({ state, subStateName: 'hosts', idToRemove: id })
   },
 
   REMOVE_MISSING_HOSTS (state, { payload: { hostIdsToPreserve } }) {

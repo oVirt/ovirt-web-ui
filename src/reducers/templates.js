@@ -1,5 +1,5 @@
 import { fromJS } from 'immutable'
-import { actionReducer, removeMissingItems } from './utils'
+import { actionReducer, removeMissingItems, removeItem } from './utils'
 
 const initialState = fromJS({
   templates: {},
@@ -14,6 +14,10 @@ const templates = actionReducer(initialState, {
     })
     const imUpdates = fromJS(updates)
     return state.mergeIn(['templates'], imUpdates)
+  },
+
+  REMOVE_TEMPLATE (state, { payload: { id } }) {
+    return removeItem({ state, subStateName: 'templates', idToRemove: id })
   },
 
   REMOVE_MISSING_TEMPLATES (state, { payload: { templateIdsToPreserve } }) {
