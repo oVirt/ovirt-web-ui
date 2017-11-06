@@ -185,24 +185,14 @@ function* persistStateSaga () {
   yield persistStateToLocalStorage({ icons: Selectors.getAllIcons().toJS() })
 }
 
-// TODO: implement 'renew the token'
 function* login (action) {
   yield put(loadInProgress({ value: true }))
 
-  let token
+  let token = action.payload.token // the user is already logged in via oVirt SSO
   let result = {}
-  if (action.payload.token) {
-    token = action.payload.token
-  } else { // recently not used since SSO, TODO: remove
-    result = yield callExternalAction('login', Api.login, action)
-    if (result && result['access_token']) {
-      token = result['access_token']
-    }
-  }
 
   if (token) {
     const username = action.payload.credentials.username
-    // persistTokenToSessionStorage({ token, username })
     yield put(loginSuccessful({ token, username, userId: action.payload.userId }))
     const oVirtMeta = yield callExternalAction('getOvirtApiMeta', Api.getOvirtApiMeta, action)
     if (!oVirtMeta['product_info']) { // REST API call failed
@@ -243,7 +233,6 @@ function* doCheckTokenExpired (action) {
       // No matter saga is canceled for whatever reason, the reload must happen, so here comes the ugly setTimeout()
       setTimeout(() => {
         console.info('======= doCheckTokenExpired() issuing page reload')
-        // window.top.location.reload(true)
         window.location.href = AppConfiguration.applicationURL
       }, 5 * 1000)
       return

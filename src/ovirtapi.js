@@ -406,23 +406,7 @@ OvirtApi = {
   },
 
   // ----
-  login ({ credentials }: { credentials: { username: string, password: string }}): Promise<Object> {
-    const url = `${AppConfiguration.applicationContext}/sso/oauth/token?grant_type=urn:ovirt:params:oauth:grant-type:http&scope=ovirt-app-api`
-    const user = credentials.username
-    const pwd = credentials.password
 
-    return $.ajax(url, {
-      type: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': 'Basic ' + new Buffer(`${user}:${pwd}`, 'utf8').toString('base64'),
-      },
-    }).then((data: Object): Promise<Object> => Promise.resolve(data))
-      .catch((data: Object): Promise<Object> => {
-        logDebug(`Ajax failed: ${JSON.stringify(data)}`)
-        return Promise.reject(data)
-      })
-  },
   getOvirtApiMeta (): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'checkOvirtApiVersion' })
     const url = `${AppConfiguration.applicationContext}/api/`
