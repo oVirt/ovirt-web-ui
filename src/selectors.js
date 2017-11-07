@@ -15,6 +15,9 @@ Selectors = {
   getOvirtVersion () {
     return getState().config.get('oVirtApiVersion')
   },
+  isOvirtVersionCheckPassed () {
+    return getState().config.getIn(['oVirtApiVersion', 'passed'])
+  },
   // --- icons --
   getAllIcons () {
     return getState().icons

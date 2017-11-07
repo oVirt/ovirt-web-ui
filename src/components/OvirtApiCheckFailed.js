@@ -5,10 +5,11 @@ import { connect } from 'react-redux'
 import Product from '../version'
 import { msg } from '../intl'
 import { fixedStrings } from '../branding'
+import { logDebug } from '../helpers'
 
 const OvirtApiCheckFailed = ({ config }) => {
   const oVirtApiVersion = config.get('oVirtApiVersion')
-  console.log(`OvirtApiCheckFailed(): ${JSON.stringify(oVirtApiVersion.toJS())}`)
+  logDebug(`Check in OvirtApiCheckFailed(): connected to ${JSON.stringify(oVirtApiVersion.toJS())}`)
 
   const passed = oVirtApiVersion.get('passed')
   if (passed !== false) { // if unknown, the test has not finished yet

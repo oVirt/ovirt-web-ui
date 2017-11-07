@@ -1,3 +1,5 @@
+import Selectors from '../selectors'
+
 import {
   call,
   put,
@@ -101,4 +103,50 @@ export function * foreach (array, fn, context) {
   for (;i < length; i++) {
     yield * fn.call(context, array[i], i, array)
   }
+}
+
+export function isOvirt42OrHigher () {
+  const actual = Selectors.getOvirtVersion().toJS()
+  return compareVersion({
+    major: parseInt(actual.major),
+    minor: parseInt(actual.minor),
+  }, {
+    major: 4,
+    minor: 2,
+  })
+}
+
+export function compareVersion (actual, required) {
+  logDebug(`compareVersion(), actual=${JSON.stringify(actual)}, required=${JSON.stringify(required)}`)
+
+  // assuming backward compatibility of oVirt API
+  if (actual.major >= required.major) {
+    if (actual.major === required.major) {
+      if (actual.minor < required.minor) {
+        return false
+      }
+    }
+    return true
+  }
+  return false
+}
+
+/**
+ * Wait for predicate() to become true.
+ */
+export function * waitForIt (predicate) {
+  let counter = 100
+  while (counter > 0) {
+    if (predicate()) {
+      return true
+    }
+
+    logDebug('waitForIt(): predicate is false, keep waiting ...')
+    yield delay(50)
+
+    counter--
+  }
+
+  logDebug('waitForIt(): timeout reached')
+  return false
 }

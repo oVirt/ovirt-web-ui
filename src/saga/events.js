@@ -11,10 +11,13 @@ import {
   callExternalAction,
   delay,
   foreach,
+  isOvirt42OrHigher,
+  waitForIt,
 } from './utils'
 
 import {
   getEvents,
+  refresh,
 
   getSingleHost,
   getSingleVm,
@@ -23,8 +26,33 @@ import {
 } from '../actions'
 
 export function* eventListener () {
-  logDebug('Starting oVirt event listener')
+  console.info('Starting oVirt event listener')
 
+  const passed = yield * waitForIt(() => Selectors.isOvirtVersionCheckPassed())
+  if (passed && isOvirt42OrHigher()) {
+    yield eventListenerV42()
+  } else {
+    yield eventListenerVLower()
+  }
+}
+
+/**
+ * oVirt < 4.1 events are hard to parse for changes, so let's keep polling
+ */
+export function * eventListenerVLower () {
+  console.info('--- Starting oVirt event listener, eventListenerVLower()')
+  while (true) {
+    yield delay(60 * 1000) // 60 seconds
+    console.info('Refreshing data')
+    yield put(refresh({ page: Selectors.getCurrentPage(), quiet: true, shallowFetch: false }))
+  }
+}
+
+/**
+ * oVirt >= 4.2 events contain affected subresources.
+ */
+export function * eventListenerV42 () {
+  console.info('--- Starting oVirt event listener, eventListenerV42()')
   let lastEventIndexReceived = -1
   while (true) {
     yield delay(5 * 1000) // 5 seconds
@@ -53,7 +81,6 @@ export function* eventListener () {
   }
 }
 
-// TODO: requires oVirt >= 4.2
 function * parseEvent (event, resources) {
   // TODO: improve refresh decision based on event type and not just on presence of related resource
   if (event.host && event.host.id) {

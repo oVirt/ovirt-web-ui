@@ -4,8 +4,6 @@ import AppConfiguration from '../config'
 import OptionsManager from '../optionsManager'
 import Selectors from '../selectors'
 
-import { logDebug } from '../helpers'
-
 import {
   call,
   put,
@@ -39,6 +37,7 @@ import {
 import {
   callExternalAction,
   waitTillEqual,
+  compareVersion,
 } from './utils'
 
 import {
@@ -118,21 +117,6 @@ function composeIncompatibleOVirtApiVersionMessage (oVirtMeta) {
     found = `${version.major}.${version.minor}`
   }
   return `oVirt API version requested >= ${requested}, but ${found} found`
-}
-
-export function compareVersion (actual, required) {
-  logDebug(`compareVersion(), actual=${JSON.stringify(actual)}, required=${JSON.stringify(required)}`)
-
-  // assuming backward compatibility of oVirt API
-  if (actual.major >= required.major) {
-    if (actual.major === required.major) {
-      if (actual.minor < required.minor) {
-        return false
-      }
-    }
-    return true
-  }
-  return false
 }
 
 function* checkOvirtApiVersion (oVirtMeta) {

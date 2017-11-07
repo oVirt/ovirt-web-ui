@@ -63,13 +63,13 @@ import {
   callExternalAction,
   delay,
   foreach,
+  isOvirt42OrHigher,
 } from './saga/utils'
 
 import {
   doCheckTokenExpired,
   login,
   logout,
-  compareVersion,
 } from './saga/login'
 
 import {
@@ -176,8 +176,7 @@ function* refreshData (action) {
 }
 
 function* fetchVmsByPage (action) {
-  const actual = Selectors.getOvirtVersion().toJS()
-  if (compareVersion({ major: parseInt(actual.major), minor: parseInt(actual.minor) }, { major: 4, minor: 2 })) {
+  if (isOvirt42OrHigher()) {
     yield fetchVmsByPageV42(action)
   } else {
     yield fetchVmsByPageVLower(action)
@@ -228,8 +227,7 @@ function* fetchVmsByPageVLower (action) {
 }
 
 function* fetchVmsByCount (action) {
-  const actual = Selectors.getOvirtVersion().toJS()
-  if (compareVersion({ major: parseInt(actual.major), minor: parseInt(actual.minor) }, { major: 4, minor: 2 })) {
+  if (isOvirt42OrHigher()) {
     yield fetchVmsByCountV42(action)
   } else {
     yield fetchVmsByCountVLower(action)
