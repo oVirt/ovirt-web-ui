@@ -111,7 +111,7 @@ module.exports = {
       {
         test: /\.css$/,
         exclude: /(node_modules)|(-nomodules\.css$)/,
-        loader: 'style!css?modules!postcss',
+        loader: 'style!css?modules&localIdentName=[path][name]__[local]--[hash:base64:10]!postcss',
       },
 
       // plain css for stylesheets of dependencies and local with '-nomodules.css' suffix
