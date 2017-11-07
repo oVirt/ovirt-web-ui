@@ -1,19 +1,18 @@
+import Api from 'ovirtapi'
+import { persistStateToLocalStorage } from './storage'
+import Selectors from './selectors'
+import AppConfiguration from './config'
+import SagasWorkers from './saga/builder'
+
 import {
-  call,
   put,
   takeEvery,
   takeLatest,
 } from 'redux-saga/effects'
 
-import Product from './version'
-import { logDebug, hidePassword, fileDownload } from './helpers'
+import { logDebug } from './helpers'
 
 import {
-  loginSuccessful,
-  loginFailed,
-  failedExternalAction,
-  showTokenExpiredMessage,
-
   loadInProgress,
   setChanged,
   updateIcons,
@@ -29,13 +28,8 @@ import {
   removeMissingOSs,
   setVmSessions,
   persistState,
-  setOvirtApiVersion,
 
   getSingleVm,
-  getAllTemplates,
-  getAllClusters,
-  getAllHosts,
-  getAllOperatingSystems,
   addClusters,
   addHosts,
   addTemplates,
@@ -48,16 +42,8 @@ import {
   updateVmsPoolsCount,
   poolActionInProgress,
 
-  setUserFilterPermission,
-  setAdministrator,
-  checkTokenExpired,
-
-  setConsoleOptions,
   redirectRoute,
   refresh,
-  downloadConsole,
-  getConsoleOptions as getConsoleOptionsAction,
-  getByPage,
   getVmsByCount,
   getPoolsByCount,
   setStorages,
@@ -65,8 +51,28 @@ import {
   setFiles,
   setVmCDRom,
   setUSBFilter,
-  getUSBFilter,
 } from './actions/index'
+
+import {
+  callExternalAction,
+  delay,
+  foreach,
+} from './saga/utils'
+
+import {
+  doCheckTokenExpired,
+  login,
+  logout,
+  compareVersion,
+} from './saga/login'
+
+import {
+  downloadVmConsole,
+  getConsoleOptions,
+  saveConsoleOptions,
+  getRDPVm,
+  fetchConsoleVmMeta,
+} from './saga/consoles'
 
 import {
   CHECK_TOKEN_EXPIRED,
@@ -103,76 +109,6 @@ import {
   SUSPEND_VM,
 } from './constants/index'
 
-import Api from 'ovirtapi'
-import { persistStateToLocalStorage } from './storage'
-import Selectors from './selectors'
-import AppConfiguration from './config'
-import OptionsManager from './optionsManager'
-import SagasWorkers from './sagasBuilder'
-import RDPBuilder from './rdp-builder'
-import { msg } from './intl'
-
-function * foreach (array, fn, context) {
-  var i = 0
-  var length = array.length
-
-  for (;i < length; i++) {
-    yield * fn.call(context, array[i], i, array)
-  }
-}
-
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
-
-// TODO: following generators should be better part of the Api -- Revise
-
-function* callExternalAction (methodName, method, action, canBeMissing = false) {
-  try {
-    logDebug(`External action ${methodName}() starts on ${JSON.stringify(hidePassword({ action }))}`)
-    const result = yield call(method, action.payload)
-    return result
-  } catch (e) {
-    if (!canBeMissing) {
-      logDebug(`External action exception: ${JSON.stringify(e)}`)
-
-      if (e.status === 401) { // Unauthorized
-        yield put(checkTokenExpired())
-      }
-
-      let shortMessage = shortErrorMessage({ action })
-      if (e.status === 0 && e.statusText === 'error') { // special case, mixing https and http
-        shortMessage = 'oVirt API connection failed'
-        e.statusText = 'Unable to connect to oVirt REST API. Please check URL and protocol (https).'
-      }
-
-      yield put(failedExternalAction({
-        exception: e,
-        shortMessage,
-        action,
-      }))
-    }
-    return { error: e }
-  }
-}
-
-function* waitTillEqual (leftArg, rightArg, limit) {
-  let counter = limit
-
-  const left = typeof leftArg === 'function' ? leftArg : () => leftArg
-  const right = typeof rightArg === 'function' ? rightArg : () => rightArg
-
-  while (counter > 0) {
-    if (left() === right()) {
-      return true
-    }
-    yield delay(20) // in ms
-    counter--
-
-    logDebug('waitTillEqual() delay ...')
-  }
-
-  return false
-}
-
 function* fetchByPage (action) {
   yield put(loadInProgress({ value: true }))
   yield put(setChanged({ value: false }))
@@ -183,123 +119,6 @@ function* fetchByPage (action) {
 
 function* persistStateSaga () {
   yield persistStateToLocalStorage({ icons: Selectors.getAllIcons().toJS() })
-}
-
-// TODO: implement 'renew the token'
-function* login (action) {
-  yield put(loadInProgress({ value: true }))
-
-  let token
-  let result = {}
-  if (action.payload.token) {
-    token = action.payload.token
-  } else { // recently not used since SSO, TODO: remove
-    result = yield callExternalAction('login', Api.login, action)
-    if (result && result['access_token']) {
-      token = result['access_token']
-    }
-  }
-
-  if (token) {
-    const username = action.payload.credentials.username
-    // persistTokenToSessionStorage({ token, username })
-    yield put(loginSuccessful({ token, username, userId: action.payload.userId }))
-    const oVirtMeta = yield callExternalAction('getOvirtApiMeta', Api.getOvirtApiMeta, action)
-    if (!oVirtMeta['product_info']) { // REST API call failed
-      yield put(yield put(loadInProgress({ value: false })))
-    } else {
-      if (yield checkOvirtApiVersion(oVirtMeta)) {
-        yield put(getUSBFilter())
-        yield fetchPermissionWithoutFilter({}) // progress loader disabled in here
-        yield autoConnectCheck({})
-      } else { // oVirt API of incompatible version
-        console.error('oVirt api version check failed')
-        yield put(failedExternalAction({
-          message: composeIncompatibleOVirtApiVersionMessage(oVirtMeta),
-          shortMessage: 'oVirt API version check failed' }))
-        yield put(yield put(loadInProgress({ value: false })))
-      }
-    }
-  } else {
-    yield put(loginFailed({
-      errorCode: result['error_code'] ? result['error_code'] : 'no_access',
-      message: result['error'] ? (result.error['statusText'] ? result.error['statusText'] : JSON.stringify(result['error'])) : 'Login Failed',
-    }))
-    yield put(yield put(loadInProgress({ value: false })))
-  }
-}
-
-function* doCheckTokenExpired (action) {
-  try {
-    yield call(Api.getOvirtApiMeta, action.payload)
-    console.info('doCheckTokenExpired(): token is still valid') // info level: to pair former HTTP 401 error message with updated information
-    return
-  } catch (error) {
-    if (error.status === 401) {
-      console.info('Token expired, going to reload the page')
-      yield put(showTokenExpiredMessage())
-
-      // Reload the page after a delay
-      // No matter saga is canceled for whatever reason, the reload must happen, so here comes the ugly setTimeout()
-      setTimeout(() => {
-        console.info('======= doCheckTokenExpired() issuing page reload')
-        // window.top.location.reload(true)
-        window.location.href = AppConfiguration.applicationURL
-      }, 5 * 1000)
-      return
-    }
-    console.error('doCheckTokenExpired(): unexpected oVirt API error: ', error)
-  }
-}
-
-function composeIncompatibleOVirtApiVersionMessage (oVirtMeta) {
-  const requested = `${Product.ovirtApiVersionRequired.major}.${Product.ovirtApiVersionRequired.minor}`
-  let found
-  if (!(oVirtMeta && oVirtMeta['product_info'] && oVirtMeta['product_info']['version'] &&
-    oVirtMeta['product_info']['version']['major'] && oVirtMeta['product_info']['version']['minor'])) {
-    found = JSON.stringify(oVirtMeta)
-  } else {
-    const version = oVirtMeta['product_info']['version']
-    found = `${version.major}.${version.minor}`
-  }
-  return `oVirt API version requested >= ${requested}, but ${found} found`
-}
-
-function compareVersion (actual, required) {
-  logDebug(`compareVersion(), actual=${JSON.stringify(actual)}, required=${JSON.stringify(required)}`)
-
-  // assuming backward compatibility of oVirt API
-  if (actual.major >= required.major) {
-    if (actual.major === required.major) {
-      if (actual.minor < required.minor) {
-        return false
-      }
-    }
-    return true
-  }
-  return false
-}
-
-function* checkOvirtApiVersion (oVirtMeta) {
-  if (!(oVirtMeta && oVirtMeta['product_info'] && oVirtMeta['product_info']['version'] &&
-    oVirtMeta['product_info']['version']['major'] && oVirtMeta['product_info']['version']['minor'])) {
-    console.error('Incompatible oVirt API version: ', oVirtMeta)
-    yield put(setOvirtApiVersion({ passed: false, ...oVirtMeta }))
-    return false
-  }
-
-  const actual = oVirtMeta['product_info']['version']
-
-  const required = Product.ovirtApiVersionRequired
-  const passed = compareVersion({ major: parseInt(actual.major), minor: parseInt(actual.minor) }, required)
-
-  yield put(setOvirtApiVersion({ passed, ...actual }))
-
-  return passed
-}
-
-function* logout () {
-  window.location.href = `${AppConfiguration.applicationURL}/sso/logout`
 }
 
 function* fetchUnknwonIconsForVms ({ vms, os }) {
@@ -655,15 +474,6 @@ function* removeVm (action) {
   yield stopProgress({ vmId: action.payload.vmId, name: 'remove', result })
 }
 
-function* fetchConsoleVmMeta ({ vmId }) {
-  const consoles = yield callExternalAction('consoles', Api.consoles, { type: 'INTERNAL_CONSOLES', payload: { vmId } })
-
-  if (consoles && consoles['graphics_console']) { // && consoles['graphics_console'].length > 0) {
-    return Api.consolesToInternal({ consoles })
-  }
-  return []
-}
-
 function* fetchVmSessions ({ vmId }) {
   const sessions = yield callExternalAction('sessions', Api.sessions, { payload: { vmId } })
 
@@ -671,75 +481,6 @@ function* fetchVmSessions ({ vmId }) {
     return Api.sessionsToInternal({ sessions })
   }
   return []
-}
-
-function adjustVVFile ({ data, options, usbFilter, isSpice }) {
-  // to simplify other flow, let's handle both 'options' from redux (immutableJs) or plain JS object from getConsoleOptions()
-  // logDebug('adjustVVFile data before: ', data)
-  logDebug('adjustVVFile options: ', options)
-
-  if (options && (options.get && options.get('fullscreen') || options.fullscreen)) {
-    data = data.replace(/^fullscreen=0/mg, 'fullscreen=1')
-  }
-
-  const pattern = /^secure-attention=.*$/mg
-  let text = 'secure-attention=ctrl+alt+del'
-  if (options && (options.get && options.get('ctrlAltDelToEnd') || options.ctrlAltDelToEnd)) {
-    text = 'secure-attention=ctrl+alt+end'
-  }
-  if (data.match(pattern)) {
-    logDebug('secure-attention found, replacing by ', text)
-    data = data.replace(pattern, text)
-  } else {
-    logDebug('secure-attention was not found, inserting ', text)
-    data = data.replace(/^\[virt-viewer\]$/mg, `[virt-viewer]\n${text}`) // ending \n is already there
-  }
-  if (usbFilter) {
-    data = data.replace(/^\[virt-viewer\]$/mg, `[virt-viewer]\nusb-filter=${usbFilter}`)
-  }
-  if (options && isSpice) {
-    const smartcardEnabled = options.get ? options.get('smartcardEnabled') : options.smartcardEnabled
-    data = data.replace(/^enable-smartcard=[01]$/mg, `enable-smartcard=${smartcardEnabled ? 1 : 0}`)
-  }
-  logDebug('adjustVVFile data after adjustment: ', data)
-  return data
-}
-
-function* downloadVmConsole (action) {
-  let { vmId, consoleId, usbFilter } = action.payload
-
-  let isSpice = false
-
-  if (!consoleId) {
-    yield put(vmActionInProgress({ vmId, name: 'getConsole', started: true }))
-    const consolesInternal = yield fetchConsoleVmMeta({ vmId }) // refresh metadata
-    yield put(setVmConsoles({ vmId, consoles: consolesInternal }))
-    yield put(vmActionInProgress({ vmId, name: 'getConsole', started: false }))
-
-    // TODO: choose user default over just 'SPICE'
-    if (consolesInternal && consolesInternal.length > 0) {
-      let console = consolesInternal.find(c => c.protocol === 'spice') || consolesInternal[0]
-      consoleId = console.id
-      if (console.protocol === 'spice') {
-        isSpice = true
-      }
-    }
-  }
-
-  if (consoleId) {
-    let data = yield callExternalAction('console', Api.console, { type: 'INTERNAL_CONSOLE', payload: { vmId, consoleId } })
-
-    if (data.error === undefined) {
-      let options = Selectors.getConsoleOptions({ vmId })
-      if (!options) {
-        logDebug('downloadVmConsole() console options not yet present, trying to load from local storage')
-        options = yield getConsoleOptions(getConsoleOptionsAction({ vmId }))
-      }
-
-      data = adjustVVFile({ data, options, usbFilter, isSpice })
-      fileDownload({ data, fileName: 'console.vv', mimeType: 'application/x-virt-viewer' })
-    }
-  }
 }
 
 /**
@@ -751,32 +492,6 @@ export function* selectVmDetail (action) {
 
 function* selectPoolDetail (action) {
   yield fetchSinglePool(getSinglePool({ poolId: action.payload.poolId }))
-}
-
-function* getConsoleOptions (action) {
-  const options = OptionsManager.loadConsoleOptions(action.payload)
-  yield put(setConsoleOptions({ vmId: action.payload.vmId, options }))
-  return options
-}
-
-function* saveConsoleOptions (action) {
-  OptionsManager.saveConsoleOptions(action.payload)
-  yield getConsoleOptions(getConsoleOptionsAction({ vmId: action.payload.vmId }))
-}
-
-function* autoConnectCheck (action) {
-  const vmId = OptionsManager.loadAutoConnectOption()
-  if (vmId && vmId.length > 0) {
-    const vm = yield callExternalAction('getVm', Api.getVm, getSingleVm({ vmId }), true)
-    if (vm && vm.error && vm.error.status === 404) {
-      OptionsManager.clearAutoConnect()
-    } else if (vm && vm.id && vm.status !== 'down') {
-      const internalVm = Api.vmToInternal({ vm })
-      yield put(updateVms({ vms: [internalVm] }))
-
-      yield downloadVmConsole(downloadConsole({ vmId }))
-    }
-  }
 }
 
 function* fetchAllTemplates (action) {
@@ -858,23 +573,6 @@ function* fetchUSBFilter (action) {
   }
 }
 
-function* fetchPermissionWithoutFilter (action) {
-  const data = yield callExternalAction('checkFilter', Api.checkFilter, { action: 'CHECK_FILTER' }, true)
-
-  // this must be processed before continuing with next steps
-  const isFiltered = data.error !== undefined
-  yield put(setUserFilterPermission(isFiltered))
-  yield waitTillEqual(Selectors.getFilter, isFiltered, 50)
-
-  yield put(setUserFilterPermission(data.error !== undefined))
-  yield put(getAllClusters()) // no shallow
-  yield put(getAllHosts())
-  yield put(getAllOperatingSystems())
-  yield put(getAllTemplates({ shallowFetch: false }))
-  yield put(getByPage({ page: 1 }))
-  yield put(setAdministrator(data.error === undefined))
-}
-
 function* schedulerPerMinute (action) {
   logDebug('Starting schedulerPerMinute() scheduler')
 
@@ -899,12 +597,6 @@ let sagasFunctions = {
   callExternalAction,
   fetchVmSessions,
   fetchSingleVm,
-}
-
-function* getRDPVm (action) {
-  const rdpBuilder = new RDPBuilder(action.payload)
-  const data = rdpBuilder.buildRDP()
-  fileDownload({ data, fileName: 'console.rdp', mimeType: 'application/rdp' })
 }
 
 export function *rootSaga () {
@@ -948,29 +640,4 @@ export function *rootSaga () {
     takeLatest(SCHEDULER__1_MIN, schedulerPerMinute),
     ...SagasWorkers(sagasFunctions),
   ]
-}
-
-const shortMessages = {
-  'START_VM': msg.failedToStartVm(),
-  'RESTART_VM': msg.failedToRestartVm(),
-  'SHUTDOWN_VM': msg.failedToShutdownVm(),
-  'DOWNLOAD_CONSOLE_VM': msg.failedToGetVmConsole(),
-  'SUSPEND_VM': msg.failedToSuspendVm(),
-  'REMOVE_VM': msg.failedToRemoveVm(),
-
-  'GET_ICON': msg.failedToRetrieveVmIcon(),
-  'INTERNAL_CONSOLE': msg.failedToRetrieveVmConsoleDetails(),
-  'INTERNAL_CONSOLES': msg.failedToRetrieveListOfVmConsoles(),
-  'GET_DISK_DETAILS': msg.failedToRetrieveDiskDetails(),
-  'GET_DISK_ATTACHMENTS': msg.failedToRetrieveVmDisks(),
-  'GET_ISO_STORAGES': msg.failedToRetrieveIsoStorages(),
-  'GET_ALL_FILES_FOR_ISO': msg.failedToRetrieveFilesFromStorage(),
-
-  'GET_VM': msg.failedToRetrieveVmDetails(),
-  'CHANGE_VM_ICON': msg.failedToChangeVmIcon(),
-  'CHANGE_VM_ICON_BY_ID': msg.failedToChangeVmIconToDefault(),
-}
-
-function shortErrorMessage ({ action }) {
-  return shortMessages[action.type] ? shortMessages[action.type] : msg.actionFailed({ action: action.type })
 }

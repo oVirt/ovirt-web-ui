@@ -1,6 +1,6 @@
-import { buildSagas as VmActionsSagas } from './components/VmActions/sagas'
-import { buildSagas as VmDialogSagas } from './components/VmDialog/sagas'
-import { buildSagas as OptionsDialogSagas } from './components/OptionsDialog/sagas'
+import { buildSagas as VmActionsSagas } from '../components/VmActions/sagas'
+import { buildSagas as VmDialogSagas } from '../components/VmDialog/sagas'
+import { buildSagas as OptionsDialogSagas } from '../components/OptionsDialog/sagas'
 
 /**
   SagasBuiler takes sagas workers from modules, and merge it to one array.
