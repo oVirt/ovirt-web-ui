@@ -53,6 +53,6 @@ export function removeMissingItems ({ state, subStateName, idsToPreserve }) {
   return state.set(subStateName, newItems)
 }
 
-export function removeItem({ state, subStateName, idToRemove }) {
+export function removeItem ({ state, subStateName, idToRemove }) {
   return state.deleteIn([ subStateName, idToRemove ])
 }

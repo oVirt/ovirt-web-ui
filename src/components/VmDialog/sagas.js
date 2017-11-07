@@ -7,7 +7,7 @@ import Api from '../../ovirtapi'
 function* createNewVm (sagas, action) {
   const result = yield sagas.callExternalAction('addNewVm', Api.addNewVm, action)
   if (!result.error) {
-    const vm = Api.vmToInternal({ vm: result })
+    const vm = Api.vmToInternal({ vm: result, getSubResources: false })
     const result2 = yield sagas.callExternalAction('changeCD', Api.changeCD, {
       type: 'CHANGE_CD',
       payload: {
@@ -18,7 +18,7 @@ function* createNewVm (sagas, action) {
     })
     if (!result2.error) {
       yield put(refresh({ page: action.payload.page }))
-      yield put(setSavedVm({ vm: Api.vmToInternal({ vm: result }) }))
+      yield put(setSavedVm({ vm: Api.vmToInternal({ vm: result, getSubResources: false }) }))
     }
   }
 }
@@ -36,7 +36,7 @@ function* editVm (sagas, action) {
     })
     if (!result2.error) {
       yield sagas.fetchSingleVm(getSingleVm({ vmId: action.payload.vm.id }))
-      yield put(setSavedVm({ vm: Api.vmToInternal({ vm: result }) }))
+      yield put(setSavedVm({ vm: Api.vmToInternal({ vm: result, getSubResources: false }) }))
     }
   }
 }
