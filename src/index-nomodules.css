@@ -69,3 +69,7 @@ div.toolbar-pf {
   margin-left: -2px !important;
   margin-right: 0;
 }
+
+.popover {
+  min-width: 120px;
+}

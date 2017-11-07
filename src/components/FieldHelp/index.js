@@ -6,35 +6,37 @@ import { OverlayTrigger, Popover } from 'react-bootstrap'
 import style from './style.css'
 
 /**
- * Renders small blue info icon.
- * Text (help) is displayed on click.
+ * Renders underlined `text` with `tooltip`.
+ * A popover is shown consisting of `title` and `content` on click.
  */
-const FieldHelp = ({
-  title, // help title
-  content, // help content
-  text, // field description
-  tooltip = 'Click for help',
-  children,
-  }) => {
-  const popover = (
-    <Popover id='popover-positioned-top' title={title}>
-      {content}
-    </Popover>)
+class FieldHelp extends React.Component {
 
-  return (
-    <OverlayTrigger trigger='click' rootClose placement='top' overlay={popover}>
-      <div role='button' title={tooltip} className={text && style['field-text']}>
-        {text}
-        {children}
-      </div>
-    </OverlayTrigger>
-  )
+  render () {
+    console.log('help component', this)
+
+    const tooltip = this.props.tooltip || 'Click for help'
+
+    const popover = (
+      <Popover id='popover-positioned-top' title={this.props.title}>
+        {this.props.content}
+      </Popover>)
+
+    return (
+      <OverlayTrigger trigger='click' rootClose placement='top' overlay={popover} container={this}>
+        <div role='button' title={tooltip} className={this.props.text && style['field-text']} style={{ position: 'relative' }}>
+          {this.props.text}
+          {this.props.children}
+        </div>
+      </OverlayTrigger>
+    )
+  }
 }
+
 FieldHelp.propTypes = {
-  title: PropTypes.string,
-  content: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-  text: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-  tooltip: PropTypes.string,
+  title: PropTypes.string,                                            // popover title
+  content: PropTypes.oneOfType([PropTypes.string, PropTypes.object]), // popover content
+  text: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),    // decorated text
+  tooltip: PropTypes.string,                                          // tooltip shown when hovering the text
   children: PropTypes.any,
 }
 
