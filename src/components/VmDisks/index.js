@@ -8,14 +8,15 @@ import FieldHelp from '../FieldHelp/index'
 import style from './style.css'
 
 const VmDisk = ({ disk }) => {
-  const bootable = disk.get('bootable') ? (<span className={'label label-info ' + style['smaller']}>Bootable</span>) : ''
-  const inactive = disk.get('active') ? '' : (<span className={'label label-default' + style['smaller']}>Inactive</span>)
+  const idPrefix = `vmdisk-${disk.get('name')}`
+  const bootable = disk.get('bootable') ? (<span className={'label label-info ' + style['smaller']} id={`${idPrefix}-bootable`}>Bootable</span>) : ''
+  const inactive = disk.get('active') ? '' : (<span className={'label label-default' + style['smaller']} id={`${idPrefix}-inactive`}>Inactive</span>)
 
   const provSize = userFormatOfBytes(disk.get('provisionedSize'))
   const actSize = userFormatOfBytes(disk.get('actualSize'), provSize.suffix)
 
   const capacityInfoContent = (
-    <div>
+    <div id={`${idPrefix}-capacity-info`}>
       Used: {actSize.str}
       <br />
       Total: {provSize.str}
@@ -24,11 +25,11 @@ const VmDisk = ({ disk }) => {
   const capacityInfo = (<FieldHelp
     title='Disk Capacity'
     content={capacityInfoContent}
-    text={<span className={style['light']}>({actSize.rounded}/{provSize.str} used)</span>} />)
+    text={<span className={style['light']} id={`${idPrefix}-capacity`}>({actSize.rounded}/{provSize.str} used)</span>} />)
 
   return (
     <li>
-      <span>
+      <span id={`${idPrefix}`}>
         {disk.get('name')}&nbsp;
         {capacityInfo}
         {bootable}
@@ -69,10 +70,12 @@ class VmDisks extends Component {
       disksToRender = disksToRender.slice(0, 2)
     }
 
+    const idPrefix = `vmdisks-`
+
     let moreButton = null
     if (this.state.renderMore) {
       moreButton = (
-        <div className={style['button-more']} onClick={() => this.setState({ renderMore: false })}>
+        <div className={style['button-more']} onClick={() => this.setState({ renderMore: false })} id={`${idPrefix}-button-less`}>
           less
         </div>
       )
@@ -80,7 +83,7 @@ class VmDisks extends Component {
       const hiddenCount = disks.size - 2
       if (hiddenCount > 0) {
         moreButton = (
-          <div className={style['button-more']} onClick={() => this.setState({ renderMore: true })}>
+          <div className={style['button-more']} onClick={() => this.setState({ renderMore: true })} id={`${idPrefix}-button-more`}>
             more ({hiddenCount})
           </div>
         )
