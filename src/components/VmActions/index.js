@@ -114,7 +114,7 @@ Button.propTypes = {
   popover: PropTypes.func,
 }
 
-const LinkButton = ({ className, tooltip, to, actionDisabled, isOnCard, shortTitle, button }) => {
+const LinkButton = ({ className, tooltip, to, actionDisabled, isOnCard, shortTitle, button, id }) => {
   if (actionDisabled) {
     className = `${className} ${style['action-disabled']}`
     to = undefined
@@ -124,7 +124,7 @@ const LinkButton = ({ className, tooltip, to, actionDisabled, isOnCard, shortTit
     return (
       <div className='card-pf-item'>
         <Link to={to}>
-          <span className={className} data-toggle='tooltip' data-placement='left' title={tooltip} />
+          <span className={className} data-toggle='tooltip' data-placement='left' title={tooltip} id={id} />
         </Link>
       </div>
     )
@@ -132,7 +132,7 @@ const LinkButton = ({ className, tooltip, to, actionDisabled, isOnCard, shortTit
 
   if (actionDisabled) {
     return (
-      <button className={`${button} ${style['disabled-button']}`} disabled='disabled'>
+      <button className={`${button} ${style['disabled-button']}`} disabled='disabled' id={id}>
         <span data-toggle='tooltip' data-placement='left' title={tooltip}>
           {shortTitle}
         </span>
@@ -142,7 +142,7 @@ const LinkButton = ({ className, tooltip, to, actionDisabled, isOnCard, shortTit
 
   return (
     <Link to={to} className={`${button} ${style['link']} ${style['full-button']}`}>
-      <span data-toggle='tooltip' data-placement='left' title={tooltip}>
+      <span data-toggle='tooltip' data-placement='left' title={tooltip} id={id}>
         {shortTitle}
       </span>
     </Link>
@@ -157,6 +157,7 @@ LinkButton.propTypes = {
   to: PropTypes.string.isRequired,
   actionDisabled: PropTypes.bool,
   isOnCard: PropTypes.bool.isRequired,
+  id: PropTypes.string,
 }
 
 const EmptyAction = ({ state, isOnCard }) => {
@@ -183,6 +184,7 @@ class RemoveVmAction extends React.Component {
 
   render () {
     const { isOnCard, isPool, vm, onRemove, isDisks } = this.props
+    const idPrefix = `removeaction-${vm.get('name')}`
 
     if (isOnCard) {
       return null
@@ -192,15 +194,19 @@ class RemoveVmAction extends React.Component {
     let height = null
 
     if (isDisks) {
-      checkbox = (<div style={{ marginTop: '8px' }}><Checkbox checked={this.state.preserveDisks}
-        onClick={() => this.setState({ preserveDisks: !this.state.preserveDisks })}
-        label={msg.preserveDisks()} /></div>)
+      checkbox = (
+        <div style={{ marginTop: '8px' }} id={`${idPrefix}-preservedisks`}>
+          <Checkbox
+            checked={this.state.preserveDisks}
+            onClick={() => this.setState({ preserveDisks: !this.state.preserveDisks })}
+            label={msg.preserveDisks()} />
+        </div>)
       height = 75
     }
     let confirmRemoveText = null
     if (checkbox) {
       confirmRemoveText = (
-        <div>
+        <div id={`${idPrefix}-question`}>
           {msg.removeVmQustion()}
           <br />
           {checkbox}
@@ -330,7 +336,8 @@ class VmActions extends React.Component {
           shortTitle={msg.edit()}
           button='btn btn-primary'
           className={`pficon pficon-edit ${style['action-link']}`}
-          tooltip={msg.editVm()} to={`/vm/${vm.get('id')}/edit`} />
+          tooltip={msg.editVm()} to={`/vm/${vm.get('id')}/edit`}
+          id={`action-${vm.get('name')}-edit`} />
 
         <RemoveVmAction isOnCard={isOnCard} isPool={isPool} vm={vm} isDisks={vm.get('disks').size > 0} onRemove={onRemove} />
       </div>

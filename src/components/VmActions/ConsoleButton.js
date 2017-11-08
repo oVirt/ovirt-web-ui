@@ -57,6 +57,8 @@ class ConsoleButton extends React.Component {
       VmAction,
     } = this.props
 
+    const idPrefix = `consoleaction-${vm.get('name')}`
+
     let onClick = this.consoleConfirmationAboutToOpen
     if (actionDisabled) {
       className = `${className} ${style['action-disabled']}`
@@ -68,7 +70,8 @@ class ConsoleButton extends React.Component {
         <Confirmation
           text={msg.consoleInUseContinue()}
           okButton={{ label: msg.yes(), click: this.onConsoleDownload }}
-          cancelButton={{ label: msg.cancel(), click: this.onConsoleConfirmationClose }} uniqueId={vm.get('name')} />
+          cancelButton={{ label: msg.cancel(), click: this.onConsoleConfirmationClose }}
+          uniqueId={vm.get('name')} />
       </Popover>)
     }
 
@@ -83,7 +86,7 @@ class ConsoleButton extends React.Component {
 
     if (actionDisabled) {
       return (
-        <button className={`${button} ${style['disabled-button']}`} disabled='disabled'>
+        <button className={`${button} ${style['disabled-button']}`} disabled='disabled' id={`${idPrefix}-disabled`}>
           <span data-toggle='tooltip' data-placement='left' title={tooltip}>
             {shortTitle}
           </span>
