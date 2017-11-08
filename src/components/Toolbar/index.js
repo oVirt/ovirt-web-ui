@@ -22,8 +22,6 @@ const VmDetailToolbarConnected = connect(
   })
 )(VmDetailToolbar)
 
-// --------------------------
-
 const PoolDetailToolbar = ({ match, vms }) => {
   if (vms.getIn(['pools', match.params.id])) {
     return (<VmActions vm={vms.getIn(['pools', match.params.id, 'vm'])} key='vmaction' pool={vms.getIn(['pools', match.params.id])} isPool />)
@@ -40,8 +38,6 @@ const PoolDetailToolbarConnected = connect(
     vms: state.vms,
   })
 )(PoolDetailToolbar)
-
-// --------------------------
 
 export {
   VmDetailToolbarConnected as VmDetailToolbar,
