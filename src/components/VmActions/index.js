@@ -224,6 +224,7 @@ class RemoveVmAction extends React.Component {
           okButton={{ label: msg.yes(), click: () => onRemove({ force: false, preserveDisks: this.state.preserveDisks }) }}
           cancelButton={{ label: msg.cancel(), click: () => { close() } }}
           extraButton={{ label: msg.force(), click: () => onRemove({ force: true, preserveDisks: this.state.preserveDisks }) }}
+          uniqueId={vm.get('name')}
         />}
       />
     )
@@ -292,21 +293,30 @@ class VmActions extends React.Component {
           button='btn btn-default'
           className='fa fa-moon-o'
           tooltip={msg.suspendVm()}
-          popover={({ close }) => <Confirmation text={msg.suspendVmQuestion()} okButton={{ label: msg.yes(), click: this.props.onSuspend }} cancelButton={{ label: msg.cancel(), click: () => { close() } }} />} />
+          popover={({ close }) => <Confirmation text={msg.suspendVmQuestion()}
+            okButton={{ label: msg.yes(), click: this.props.onSuspend }}
+            cancelButton={{ label: msg.cancel(), click: () => { close() } }}
+            uniqueId={vm.get('name')} />} />
 
         <Button isOnCard={isOnCard} actionDisabled={isPool || !canShutdown(status) || vm.getIn(['actionInProgress', 'shutdown'])}
           className='fa fa-power-off'
           button='btn btn-danger'
           tooltip={msg.shutdownVm()}
           shortTitle={msg.shutdown()}
-          popover={({ close }) => <Confirmation text={msg.shutdownVmQuestion()} okButton={{ label: msg.yes(), click: this.props.onShutdown }} cancelButton={{ label: msg.cancel(), click: () => { close() } }} />} />
+          popover={({ close }) => <Confirmation text={msg.shutdownVmQuestion()}
+            okButton={{ label: msg.yes(), click: this.props.onShutdown }}
+            cancelButton={{ label: msg.cancel(), click: () => { close() } }}
+            uniqueId={vm.get('name')} />} />
 
         <Button isOnCard={isOnCard} actionDisabled={isPool || !canRestart(status) || vm.getIn(['actionInProgress', 'restart'])}
           className='pficon pficon-restart'
           button='btn btn-default'
           tooltip={msg.rebootVm()}
           shortTitle={msg.reboot()}
-          popover={({ close }) => <Confirmation text={msg.rebootVmQuestion()} okButton={{ label: msg.yes(), click: this.props.onRestart }} cancelButton={{ label: msg.cancel(), click: () => { close() } }} />} />
+          popover={({ close }) => <Confirmation text={msg.rebootVmQuestion()}
+            okButton={{ label: msg.yes(), click: this.props.onRestart }}
+            cancelButton={{ label: msg.cancel(), click: () => { close() } }}
+            uniqueId={vm.get('name')} />} />
 
         <ConsoleButton isOnCard={isOnCard} actionDisabled={isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole'])}
           button='btn btn-default'

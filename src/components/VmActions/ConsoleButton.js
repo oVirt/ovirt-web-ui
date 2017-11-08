@@ -65,7 +65,10 @@ class ConsoleButton extends React.Component {
     let popoverComponent = null
     if (VmAction.getIn(['vms', vm.get('id'), 'consoleInUse']) && this.state.openModal) {
       popoverComponent = (<Popover width={200} height={80} target={this} placement={isOnCard ? 'top' : 'bottom'} show>
-        <Confirmation text={msg.consoleInUseContinue()} okButton={{ label: msg.yes(), click: this.onConsoleDownload }} cancelButton={{ label: msg.cancel(), click: this.onConsoleConfirmationClose }} />
+        <Confirmation
+          text={msg.consoleInUseContinue()}
+          okButton={{ label: msg.yes(), click: this.onConsoleDownload }}
+          cancelButton={{ label: msg.cancel(), click: this.onConsoleConfirmationClose }} uniqueId={vm.get('name')} />
       </Popover>)
     }
 
