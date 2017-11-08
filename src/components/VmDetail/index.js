@@ -123,6 +123,7 @@ class VmDetail extends Component {
     } = this.props
 
     const name = isPool ? pool.get('name') : vm.get('name')
+    const idPrefix = `vmdetail-${name}`
     let iconId = vm.getIn(['icons', 'large', 'id'])
     const vmsIcons = operatingSystems.get('operatingSystems').find((v, k) => v.getIn(['icons', 'large', 'id']) === iconId)
     if (vmsIcons) {
@@ -143,7 +144,7 @@ class VmDetail extends Component {
 
     const consoleOptionsShowHide = (
       <small>
-        <a href='#' onClick={this.consoleSettings}>
+        <a href='#' onClick={this.consoleSettings} id={`${idPrefix}-consoleoptions-showhide`}>
           <i className={`pficon pficon-edit`} />&nbsp;
         </a>
       </small>)
@@ -153,8 +154,8 @@ class VmDetail extends Component {
 
     const consolesHelp = (
       <div>
-        <p>{msg.ifVmIsRunningClickToAccessItsGraphicsConsole()}</p>
-        <p dangerouslySetInnerHTML={{ __html: msg.htmlPleaseReferToDocumentationForMoreInformation({ documentationUrl: AppConfiguration.consoleClientResourcesURL }) }} />
+        <p id={`${idPrefix}-consolehelp-one`}>{msg.ifVmIsRunningClickToAccessItsGraphicsConsole()}</p>
+        <p id={`${idPrefix}-consolehelp-two`} dangerouslySetInnerHTML={{ __html: msg.htmlPleaseReferToDocumentationForMoreInformation({ documentationUrl: AppConfiguration.consoleClientResourcesURL }) }} />
       </div>
     )
 
@@ -183,10 +184,10 @@ class VmDetail extends Component {
             <DetailContainer>
               <h1 className={style['header']}>
                 {vmIcon}
-                &nbsp;<span className={style['vm-name']}>{name}</span>
+                &nbsp;<span className={style['vm-name']} id={`${idPrefix}-name`}>{name}</span>
               </h1>
               <NextRunLabel vm={vm} />
-              <LastMessage vmId={vm.get('id')} userMessages={userMessages} />
+              <LastMessage vm={vm} userMessages={userMessages} />
               <div className={style['vm-detail-container']}>
                 <dl className={sharedStyle['vm-properties']}>
                   <dt>
@@ -199,46 +200,47 @@ class VmDetail extends Component {
                   <dt>
                     <FieldHelp content={msg.optionalUserDescriptionOfVm()} text={msg.description()} />
                   </dt>
-                  <dd>{vm.get('description')}</dd>
+                  <dd id={`${idPrefix}-description`}>{vm.get('description')}</dd>
 
                   <dt>
                     <FieldHelp content={msg.groupOfHostsVmCanBeRunningOn()} text={msg.cluster()} />
                   </dt>
-                  <dd>{cluster ? cluster.get('name') : ''}</dd>
+                  <dd id={`${idPrefix}-cluster`}>{cluster ? cluster.get('name') : ''}</dd>
 
                   <dt>
                     <FieldHelp content={msg.containsConfigurationAndDisksWhichWillBeUsedToCreateThisVm()} text={msg.template()} />
                   </dt>
-                  <dd>{template ? templateNameRenderer(template) : ''}</dd>
+                  <dd id={`${idPrefix}-template`}>{template ? templateNameRenderer(template) : ''}</dd>
 
                   <dt>
                     <FieldHelp content={msg.operatingSystemInstalledOnVm()} text={msg.operatingSystem()} />
                   </dt>
-                  <dd>{osName}</dd>
+                  <dd id={`${idPrefix}-osname`}>{osName}</dd>
 
                   <dt>
                     <FieldHelp content={msg.typeOfWorkloadVmConfigurationIsOptimizedFor()} text={msg.optimizedFor()} />
                   </dt>
-                  <dd>{rephraseVmType(vm.get('type'))}</dd>
+                  <dd id={`${idPrefix}-type`}>{rephraseVmType(vm.get('type'))}</dd>
 
                   <dt><span className='pficon pficon-memory' />&nbsp;
                     <FieldHelp content={msg.totalMemoryVmWillBeEquippedWith()} text={msg.definedMemory()} />
                   </dt>
-                  <dd>{userFormatOfBytes(vm.getIn(['memory', 'total'])).str}</dd>
+                  <dd id={`${idPrefix}-memory`}>{userFormatOfBytes(vm.getIn(['memory', 'total'])).str}</dd>
 
                   <dt><span className='pficon pficon-cpu' />&nbsp;
                     <FieldHelp content={msg.totalCountOfVirtualProcessorsVmWillBeEquippedWith()} text={msg.cpus()} />
                   </dt>
-                  <dd>{vm.getIn(['cpu', 'vCPUs'])}</dd>
+                  <dd id={`${idPrefix}-cpu`}>{vm.getIn(['cpu', 'vCPUs'])}</dd>
 
                   <dt><span className='pficon pficon-network' />&nbsp;
                     <FieldHelp content={msg.fullyQualifiedDomainName()} text={msg.address()} />
                   </dt>
-                  <dd>{vm.get('fqdn')}</dd>
+                  <dd id={`${idPrefix}-fqdn`}>{vm.get('fqdn')}</dd>
+
                   <dt><span className='pficon pficon-storage-domain' />&nbsp;
                     <FieldHelp content={msg.currentlyInsertedIsoInCdRom()} text={msg.cd()} />
                   </dt>
-                  <dd>{vm.getIn(['cdrom', 'file', 'id']) ? vm.getIn(['cdrom', 'file', 'id']) : msg.empty() }</dd>
+                  <dd id={`${idPrefix}-cdrom`}>{vm.getIn(['cdrom', 'file', 'id']) ? vm.getIn(['cdrom', 'file', 'id']) : msg.empty() }</dd>
                 </dl>
 
                 <dl className={sharedStyle['vm-properties']}>
