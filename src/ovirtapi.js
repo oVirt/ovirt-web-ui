@@ -213,7 +213,7 @@ OvirtApi = {
       size: pool['size'],
       maxUserVms: pool['max_user_vms'],
       preStartedVms: pool['prestarted_vms'],
-      vm: this.vmToInternal({ vm: pool.vm }),
+      vm: this.vmToInternal({ vm: pool.vm, getSubResources: false }),
       vmsCount: 0,
     }
   },
@@ -293,7 +293,7 @@ OvirtApi = {
       id: template.id,
       name: template.name,
       description: template.description,
-      clusterId: template.cluster ? template.cluster.id : null,
+      clusterId: template.cluster && template.cluster.id || null,
       memory: template.memory,
 
       cpu: {
@@ -407,11 +407,11 @@ OvirtApi = {
   },
 
   // ----
-  getEvents ({ lastEventIndexReceived }: { lastEventIndexReceived: ?number }): Promise<Object> {
+  getEvents ({ lastReceivedEventIndex }: { lastReceivedEventIndex: ?number }): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'getEvents' })
     let params = 'max=1&search=sortby%20time%20desc' // just the last one for first run
-    if (lastEventIndexReceived && lastEventIndexReceived >= 0) { // any subsequent call
-      params = `from=${lastEventIndexReceived}`
+    if (lastReceivedEventIndex && lastReceivedEventIndex >= 0) { // any subsequent call
+      params = `from=${lastReceivedEventIndex}`
     }
     const url = `${AppConfiguration.applicationContext}/api/events?${params}`
     return OvirtApi._httpGet({ url })

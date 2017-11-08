@@ -93,10 +93,6 @@ export function shortErrorMessage ({ action }) {
 }
 
 export function * foreach (array, fn, context) {
-  if (!array) {
-    return
-  }
-
   let i = 0
   const length = array.length
 
@@ -120,15 +116,10 @@ export function compareVersion (actual, required) {
   logDebug(`compareVersion(), actual=${JSON.stringify(actual)}, required=${JSON.stringify(required)}`)
 
   // assuming backward compatibility of oVirt API
-  if (actual.major >= required.major) {
-    if (actual.major === required.major) {
-      if (actual.minor < required.minor) {
-        return false
-      }
-    }
-    return true
+  if (actual.major === required.major && actual.minor < required.minor) {
+    return false
   }
-  return false
+  return actual.major >= required.major
 }
 
 /**

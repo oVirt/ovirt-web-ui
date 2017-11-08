@@ -10,11 +10,11 @@ export function eventListener () {
   }
 }
 
-export function getEvents ({ lastEventIndexReceived }) {
+export function getEvents ({ lastReceivedEventIndex }) {
   return {
     type: GET_EVENTS,
     payload: {
-      lastEventIndexReceived,
+      lastReceivedEventIndex,
     },
   }
 }

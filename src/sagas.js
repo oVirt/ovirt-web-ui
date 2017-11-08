@@ -164,14 +164,17 @@ function* fetchIcon ({ iconId }) {
   }
 }
 
-function* refreshData (action) {
+export function* refreshData (action) {
   console.log('refreshData(): ', action.payload)
   if (!action.payload.quiet) {
     console.log('refreshData(): not quiet')
     yield put(loadInProgress({ value: true }))
   }
-  yield put(getVmsByCount({ count: action.payload.page * AppConfiguration.pageLimit, shallowFetch: !!action.payload.shallowFetch }))
-  yield put(getPoolsByCount({ count: action.payload.page * AppConfiguration.pageLimit }))
+
+  // do refresh sequentially
+  yield fetchVmsByCount(getVmsByCount({ count: action.payload.page * AppConfiguration.pageLimit, shallowFetch: !!action.payload.shallowFetch }))
+  yield fetchPoolsByCount(getPoolsByCount({ count: action.payload.page * AppConfiguration.pageLimit }))
+
   yield put(loadInProgress({ value: false }))
 }
 
@@ -496,10 +499,10 @@ function* selectPoolDetail (action) {
   yield fetchSinglePool(getSinglePool({ poolId: action.payload.poolId }))
 }
 
-function* fetchSingleResource (action, apiMethod, toInternalConvertor, addAction, removeAction) {
+function* fetchSingleResource (action, apiMethod, toInternalConverter, addAction, removeAction) {
   const res = yield callExternalAction(apiMethod, Api[apiMethod], action)
   if (res) {
-    const internal = toInternalConvertor(res)
+    const internal = toInternalConverter(res)
     yield put(addAction(internal))
   } else {
     yield put(removeAction(action.payload.id))
