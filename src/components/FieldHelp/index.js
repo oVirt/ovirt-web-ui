@@ -12,8 +12,6 @@ import style from './style.css'
 class FieldHelp extends React.Component {
 
   render () {
-    console.log('help component', this)
-
     const tooltip = this.props.tooltip || 'Click for help'
 
     const popover = (
