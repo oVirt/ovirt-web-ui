@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import { closeDialog } from '../actions'
-import { closeAllConfirmationComponents } from './Confirmation'
+// import { closeAllConfirmationComponents } from './Confirmation'
 
 import sharedStyle from './sharedStyle.css'
 
@@ -12,7 +12,7 @@ class DetailContainer extends Component {
   componentDidMount () {
     this.onKeyDown = (event) => {
       if (event.keyCode === 27) { // ESC
-        closeAllConfirmationComponents()
+//        closeAllConfirmationComponents()
         this.props.onCloseDetail()
       }
     }
