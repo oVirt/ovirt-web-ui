@@ -475,6 +475,7 @@ class VmDialog extends React.Component {
                 <SelectBox
                   onChange={this.onChangeCluster}
                   selected={cluster ? cluster.get('id') : ''}
+                  idPrefix='select-cluster'
                   items={sortedClusters.map(item => (
                     { id: item.get('id'), value: item.get('name') }
                   )).toJS()}
@@ -488,6 +489,7 @@ class VmDialog extends React.Component {
                 <SelectBox
                   onChange={this.onChangeTemplate}
                   selected={template ? template.get('id') : ''}
+                  idPrefix='select-template'
                   items={sortedTemplates.map(item => (
                     { id: item.get('id'), value: templateNameRenderer(item) }
                   )).toJS()}
@@ -501,6 +503,7 @@ class VmDialog extends React.Component {
                 <SelectBox
                   onChange={this.onChangeOperatingSystem}
                   selected={os ? os.get('id') : ''}
+                  idPrefix='select-os'
                   items={sortedOSs.map(item => (
                     { id: item.get('id'), value: item.get('description') }
                   )).toJS()}
@@ -550,6 +553,7 @@ class VmDialog extends React.Component {
                   onChange={this.onChangeCD}
                   selected={cdromFileId}
                   items={files}
+                  idPrefix='select-changecd'
                   />
               </dd>
 
