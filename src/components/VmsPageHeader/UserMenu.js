@@ -20,20 +20,21 @@ const UserMenu = ({ config, onLogout }) => {
       </li>
     )
   } else {
+    const idPrefix = `usermenu`
     return (
       <li className='dropdown'>
-        <a className='dropdown-toggle nav-item-iconic' href='#' data-toggle='dropdown' title={config.getIn(['user', 'name'])}>
+        <a className='dropdown-toggle nav-item-iconic' href='#' data-toggle='dropdown' title={config.getIn(['user', 'name'])} id={`${idPrefix}-user`}>
           <i className='pficon pficon-user' /><span className='caret' />
         </a>
         <ul className='dropdown-menu'>
           <li>
-            <a href='#' data-toggle='modal' data-target='#options-modal'>{msg.options()}</a>
+            <a href='#' data-toggle='modal' data-target='#options-modal' id={`${idPrefix}-options`}>{msg.options()}</a>
           </li>
           <li>
-            <a href='#' data-toggle='modal' data-target='#about-modal'>{msg.about()}</a>
+            <a href='#' data-toggle='modal' data-target='#about-modal' id={`${idPrefix}-about`}>{msg.about()}</a>
           </li>
           <li>
-            <a href='#' onClick={onLogout}>{msg.logOut()}</a>
+            <a href='#' onClick={onLogout} id={`${idPrefix}-logout`}>{msg.logOut()}</a>
           </li>
         </ul>
       </li>
