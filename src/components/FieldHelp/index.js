@@ -19,8 +19,9 @@ class FieldHelp extends React.Component {
         {this.props.content}
       </Popover>)
 
+    const container = this.props.container === null ? undefined : this.props.container || this
     return (
-      <OverlayTrigger trigger='click' rootClose placement='top' overlay={popover} container={this}>
+      <OverlayTrigger trigger='click' rootClose placement='top' overlay={popover} container={container}>
         <div role='button' title={tooltip} className={this.props.text && style['field-text']} style={{ position: 'relative' }}>
           {this.props.text}
           {this.props.children}
@@ -36,6 +37,7 @@ FieldHelp.propTypes = {
   text: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),    // decorated text
   tooltip: PropTypes.string,                                          // tooltip shown when hovering the text
   children: PropTypes.any,
+  container: PropTypes.any,
 }
 
 export default FieldHelp

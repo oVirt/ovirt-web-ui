@@ -44,7 +44,7 @@ const VmStatus = ({ vm, hosts, config }) => {
     <span id={`${vm.get('name')}-status`}>
       <VmStatusIcon state={vm.get('status')} />
       &nbsp;
-      {content ? <FieldHelp content={content} text={value} /> : value}
+      {content ? <FieldHelp content={content} text={value} container={null} /> : value}
       <HostConsole vm={vm} />
     </span>
   )
