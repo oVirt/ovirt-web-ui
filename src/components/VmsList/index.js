@@ -12,15 +12,16 @@ import { msg } from '../../intl'
  * Data are fetched but no VM is available to display
  */
 const NoVm = () => {
+  const idPrefix = `novm`
   return (
     <div className='blank-slate-pf'>
       <div className='blank-slate-pf-icon'>
-        <span className='pficon pficon pficon-add-circle-o' />
+        <span className='pficon pficon pficon-add-circle-o' id={`${idPrefix}-icon`} />
       </div>
-      <h1>
+      <h1 id={`${idPrefix}-title`}>
         {msg.noVmAvailable()}
       </h1>
-      <p>
+      <p id={`${idPrefix}-text`}>
         {msg.noVmAvailableForLoggedUser()}
       </p>
     </div>

@@ -24,6 +24,7 @@ import { getOsHumanName } from '../utils'
 class Vm extends React.Component {
   render () {
     let { vm, icons, visibility, onStart, os } = this.props
+    const idPrefix = `vm-${vm.get('name')}`
     const state = vm.get('status')
 
     let iconId = vm.getIn(['icons', 'large', 'id'])
@@ -53,7 +54,7 @@ class Vm extends React.Component {
             </div>
             <h2 className='card-pf-title text-center'>
               <NavLink to={`/vm/${vm.get('id')}`} className={style['vm-detail-link']}>
-                <p className={[style['vm-name'], style['crop']].join(' ')} title={vm.get('name')} data-toggle='tooltip'>
+                <p className={[style['vm-name'], style['crop']].join(' ')} title={vm.get('name')} data-toggle='tooltip' id={`${idPrefix}-status-name`}>
                   <VmStatusIcon state={state} />&nbsp;{vm.get('name')}
                 </p>
               </NavLink>

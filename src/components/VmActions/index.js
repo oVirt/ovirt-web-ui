@@ -55,6 +55,7 @@ class Button extends React.Component {
       shortTitle,
       button,
       popover,
+      id,
     } = this.props
 
     let handleClick = hrefWithoutHistory(onClick)
@@ -75,7 +76,7 @@ class Button extends React.Component {
     if (isOnCard) {
       return (
         <div className='card-pf-item'>
-          <span className={className} data-toggle='tooltip' data-placement='left' title={tooltip} onClick={handleClick} />
+          <span className={className} data-toggle='tooltip' data-placement='left' title={tooltip} onClick={handleClick} id={id} />
           {popoverComponent}
         </div>
       )
@@ -83,7 +84,7 @@ class Button extends React.Component {
 
     if (actionDisabled) {
       return (
-        <button className={`${button} ${style['disabled-button']}`} disabled='disabled'>
+        <button className={`${button} ${style['disabled-button']}`} disabled='disabled' id={id}>
           <span data-toggle='tooltip' data-placement='left' title={tooltip}>
             {shortTitle}
           </span>
@@ -94,7 +95,7 @@ class Button extends React.Component {
     return (
       <span className={style['full-button']}>
         <a href='#' onClick={handleClick} className={`${button} ${style['link']}`} id={shortTitle}>
-          <span data-toggle='tooltip' data-placement='left' title={tooltip}>
+          <span data-toggle='tooltip' data-placement='left' title={tooltip} id={`${id}-title`}>
             {shortTitle}
           </span>
         </a>
@@ -112,6 +113,7 @@ Button.propTypes = {
   actionDisabled: PropTypes.bool,
   isOnCard: PropTypes.bool.isRequired,
   popover: PropTypes.func,
+  id: PropTypes.string.isRequired,
 }
 
 const LinkButton = ({ className, tooltip, to, actionDisabled, isOnCard, shortTitle, button, id }) => {
@@ -283,6 +285,7 @@ class VmActions extends React.Component {
       consoleProtocol = 'Console in use'
     }
 
+    const idPrefix = `vmaction-${vm.get('name')}`
     return (
       <div className={`actions-line ${isOnCard ? 'card-pf-items text-center' : style['left-padding']}`}>
         <EmptyAction state={status} isOnCard={isOnCard} />
@@ -292,13 +295,15 @@ class VmActions extends React.Component {
           button='btn btn-success'
           className='fa fa-play'
           tooltip={msg.startVm()}
-          onClick={onStart} />
+          onClick={onStart}
+          id={`${idPrefix}-button-start`} />
 
         <Button isOnCard={isOnCard} actionDisabled={isPool || !canSuspend(status) || vm.getIn(['actionInProgress', 'suspend'])}
           shortTitle={msg.suspend()}
           button='btn btn-default'
           className='fa fa-moon-o'
           tooltip={msg.suspendVm()}
+          id={`${idPrefix}-button-suspend`}
           popover={({ close }) => <Confirmation text={msg.suspendVmQuestion()}
             okButton={{ label: msg.yes(), click: this.props.onSuspend }}
             cancelButton={{ label: msg.cancel(), click: () => { close() } }}
@@ -309,6 +314,7 @@ class VmActions extends React.Component {
           button='btn btn-danger'
           tooltip={msg.shutdownVm()}
           shortTitle={msg.shutdown()}
+          id={`${idPrefix}-button-shutdown`}
           popover={({ close }) => <Confirmation text={msg.shutdownVmQuestion()}
             okButton={{ label: msg.yes(), click: this.props.onShutdown }}
             cancelButton={{ label: msg.cancel(), click: () => { close() } }}
@@ -319,6 +325,7 @@ class VmActions extends React.Component {
           button='btn btn-default'
           tooltip={msg.rebootVm()}
           shortTitle={msg.reboot()}
+          id={`${idPrefix}-button-reboot`}
           popover={({ close }) => <Confirmation text={msg.rebootVmQuestion()}
             okButton={{ label: msg.yes(), click: this.props.onRestart }}
             cancelButton={{ label: msg.cancel(), click: () => { close() } }}
