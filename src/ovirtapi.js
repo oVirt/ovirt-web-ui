@@ -546,7 +546,13 @@ OvirtApi = {
   },
   checkFilter (): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'checkFilter' })
-    return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/permissions`, custHeaders: { Filter: false } })
+    return OvirtApi._httpGet({
+      url: `${AppConfiguration.applicationContext}/api/permissions`,
+      custHeaders: {
+        Filter: false,
+        Accept: 'application/json',
+      },
+    })
   },
 
   getPoolsByPage ({ page }: { page: number }): Promise<Object> {
