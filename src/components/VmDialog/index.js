@@ -431,7 +431,7 @@ class VmDialog extends React.Component {
     return (
       <DetailContainer>
         {title}
-        <ErrorAlert message={this.getLatestUserMessage()} />
+        <ErrorAlert message={this.getLatestUserMessage()} id={`${idPrefix}-erroralert`} />
         <br />
         <form>
           <Prompt
