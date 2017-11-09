@@ -1,7 +1,7 @@
 import {
   GET_ALL_TEMPLATES,
   REMOVE_TEMPLATE,
-  GET_SINGLE_TEMPLATE,
+  GET_TEMPLATE,
 } from '../constants/index'
 
 export function removeMissingTemplates ({ templateIdsToPreserve }) {
@@ -39,9 +39,9 @@ export function removeTemplate ({ id }) {
   }
 }
 
-export function getSingleTemplate ({ id }) {
+export function getTemplate ({ id }) {
   return {
-    type: GET_SINGLE_TEMPLATE,
+    type: GET_TEMPLATE,
     payload: {
       id,
     },

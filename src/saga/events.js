@@ -19,10 +19,10 @@ import {
   getEvents,
   refresh,
 
-  getSingleHost,
-  getSingleVm,
-  getSingleCluster,
-  getSingleTemplate,
+  getHost,
+  getVm,
+  getCluster,
+  getTemplate,
 } from '../actions'
 
 import { refreshData } from '../sagas' // TODO: move to separate file to avoid cyclic dependency
@@ -73,7 +73,7 @@ export function * eventListenerV42 () {
       yield * foreach(events.event, function* (event) {
         logDebug('Event received: ', event)
         lastReceivedEventIndex = event.index > lastReceivedEventIndex ? event.index : lastReceivedEventIndex
-        yield * parseEvent(event, resources)
+        parseEvent(event, resources)
       })
 
       yield * refreshResources(resources)
@@ -83,7 +83,7 @@ export function * eventListenerV42 () {
   }
 }
 
-function * parseEvent (event, resources) {
+function parseEvent (event, resources) {
   // TODO: improve refresh decision based on event type and not just on presence of related resource
   if (event.host && event.host.id) {
     resources.hosts = resources.hosts || {}
@@ -107,27 +107,27 @@ function * parseEvent (event, resources) {
 }
 
 function * refreshResources (resources) {
-  if (resources.hosts && Object.getOwnPropertyNames(resources.hosts)) {
-    yield * foreach(Object.getOwnPropertyNames(resources.hosts), function* (id) {
-      yield put(getSingleHost({ id }))
+  if (resources.hosts) {
+    yield * foreach(Object.keys(resources.hosts), function* (id) {
+      yield put(getHost({ id }))
     })
   }
 
-  if (resources.vms && Object.getOwnPropertyNames(resources.vms)) {
-    yield * foreach(Object.getOwnPropertyNames(resources.vms), function* (id) {
-      yield put(getSingleVm({ vmId: id }))
+  if (resources.vms) {
+    yield * foreach(Object.keys(resources.vms), function* (id) {
+      yield put(getVm({ vmId: id }))
     })
   }
 
-  if (resources.templates && Object.getOwnPropertyNames(resources.templates)) {
-    yield * foreach(Object.getOwnPropertyNames(resources.templates), function* (id) {
-      yield put(getSingleTemplate({ id }))
+  if (resources.templates) {
+    yield * foreach(Object.keys(resources.templates), function* (id) {
+      yield put(getTemplate({ id }))
     })
   }
 
-  if (resources.clusters && Object.getOwnPropertyNames(resources.clusters)) {
-    yield * foreach(Object.getOwnPropertyNames(resources.clusters), function* (id) {
-      yield put(getSingleCluster({ id }))
+  if (resources.clusters) {
+    yield * foreach(Object.keys(resources.clusters), function* (id) {
+      yield put(getCluster({ id }))
     })
   }
 }

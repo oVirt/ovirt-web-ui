@@ -1,5 +1,5 @@
 import { put, takeEvery, takeLatest } from 'redux-saga/effects'
-import { refresh, getSingleVm } from '../../actions/index'
+import { refresh, getVm } from '../../actions/index'
 import { ADD_NEW_VM, EDIT_VM } from './constants'
 import { setSavedVm } from './actions'
 import Api from '../../ovirtapi'
@@ -35,7 +35,7 @@ function* editVm (sagas, action) {
       },
     })
     if (!result2.error) {
-      yield sagas.fetchSingleVm(getSingleVm({ vmId: action.payload.vm.id }))
+      yield sagas.fetchVm(getVm({ vmId: action.payload.vm.id }))
       yield put(setSavedVm({ vm: Api.vmToInternal({ vm: result, getSubResources: false }) }))
     }
   }

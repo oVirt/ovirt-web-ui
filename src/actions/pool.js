@@ -80,7 +80,7 @@ export function removeMissingPools ({ poolIdsToPreserve }) {
   }
 }
 
-export function getSinglePool ({ poolId }) {
+export function getPool ({ poolId }) {
   return {
     type: GET_POOL,
     payload: {

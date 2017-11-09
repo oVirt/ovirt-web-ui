@@ -1,6 +1,6 @@
 import {
   GET_ALL_HOSTS,
-  GET_SINGLE_HOST,
+  GET_HOST,
 } from '../constants/index'
 
 export function removeMissingHosts ({ hostIdsToPreserve }) {
@@ -37,9 +37,9 @@ export function getAllHosts () {
   }
 }
 
-export function getSingleHost ({ id }) {
+export function getHost ({ id }) {
   return {
-    type: GET_SINGLE_HOST,
+    type: GET_HOST,
     payload: {
       id,
     },

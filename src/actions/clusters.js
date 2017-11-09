@@ -1,7 +1,7 @@
 import {
   GET_ALL_CLUSTERS,
   REMOVE_CLUSTER,
-  GET_SINGLE_CLUSTER,
+  GET_CLUSTER,
 } from '../constants/index'
 
 export function removeMissingClusters ({ clusterIdsToPreserve }) {
@@ -38,9 +38,9 @@ export function getAllClusters () {
   }
 }
 
-export function getSingleCluster ({ id }) {
+export function getCluster ({ id }) {
   return {
-    type: GET_SINGLE_CLUSTER,
+    type: GET_CLUSTER,
     payload: {
       id,
     },

@@ -467,8 +467,8 @@ OvirtApi = {
       },
     })
   },
-  getSingleTemplate ({ id }: IdType): Promise<Object> {
-    OvirtApi._assertLogin({ methodName: 'getSingleTemplate' })
+  getTemplate ({ id }: IdType): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'getTemplate' })
     const url = `${AppConfiguration.applicationContext}/api/templates/${id}`
     return OvirtApi._httpGet({ url })
   },
@@ -477,8 +477,8 @@ OvirtApi = {
     const url = `${AppConfiguration.applicationContext}/api/templates`
     return OvirtApi._httpGet({ url })
   },
-  getSingleCluster ({ id }: IdType): Promise<Object> {
-    OvirtApi._assertLogin({ methodName: 'getSingleCluster' })
+  getCluster ({ id }: IdType): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'getCluster' })
     const url = `${AppConfiguration.applicationContext}/api/clusters/${id}`
     return OvirtApi._httpGet({ url })
   },
@@ -487,8 +487,8 @@ OvirtApi = {
     const url = `${AppConfiguration.applicationContext}/api/clusters`
     return OvirtApi._httpGet({ url })
   },
-  getSingleHost ({ id }: IdType): Promise<Object> {
-    OvirtApi._assertLogin({ methodName: 'getSingleHost' })
+  getHost ({ id }: IdType): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'getHost' })
     const url = `${AppConfiguration.applicationContext}/api/hosts/${id}`
     return OvirtApi._httpGet({ url })
   },

@@ -29,7 +29,7 @@ import {
 
   downloadConsole,
   getUSBFilter,
-  getSingleVm,
+  getVm,
 
   updateVms,
 } from '../actions/index'
@@ -153,7 +153,7 @@ export function* logout () {
 function* autoConnectCheck (action) {
   const vmId = OptionsManager.loadAutoConnectOption()
   if (vmId && vmId.length > 0) {
-    const vm = yield callExternalAction('getVm', Api.getVm, getSingleVm({ vmId }), true)
+    const vm = yield callExternalAction('getVm', Api.getVm, getVm({ vmId }), true)
     if (vm && vm.error && vm.error.status === 404) {
       OptionsManager.clearAutoConnect()
     } else if (vm && vm.id && vm.status !== 'down') {

@@ -29,7 +29,7 @@ import {
   setVmSessions,
   persistState,
 
-  getSingleVm,
+  getVm,
 
   addClusters,
   removeCluster,
@@ -42,7 +42,7 @@ import {
 
   addAllOS,
 
-  getSinglePool,
+  getPool,
   removeMissingPools,
   removePools,
   updatePools,
@@ -86,13 +86,13 @@ import {
   CHECK_TOKEN_EXPIRED,
   CHANGE_VM_ICON,
   CHANGE_VM_ICON_BY_ID,
-  GET_SINGLE_CLUSTER,
+  GET_CLUSTER,
   GET_ALL_CLUSTERS,
   GET_ALL_FILES_FOR_ISO,
-  GET_SINGLE_HOST,
+  GET_HOST,
   GET_ALL_HOSTS,
   GET_ALL_OS,
-  GET_SINGLE_TEMPLATE,
+  GET_TEMPLATE,
   GET_ALL_TEMPLATES,
   GET_BY_PAGE,
   GET_CONSOLE_OPTIONS,
@@ -101,7 +101,7 @@ import {
   GET_POOLS_BY_PAGE,
   GET_RDP_VM,
   GET_USB_FILTER,
-  GET_SINGLE_VM,
+  GET_VM,
   GET_VMS_BY_COUNT,
   GET_VMS_BY_PAGE,
   DOWNLOAD_CONSOLE_VM,
@@ -311,7 +311,7 @@ function* fetchPoolsByPage (action) {
   yield put(persistState())
 }
 
-function* fetchSinglePool (action) {
+function* fetchPool (action) {
   const pool = yield callExternalAction('getPool', Api.getPool, action, true)
 
   if (pool && pool.id) {
@@ -333,7 +333,7 @@ function* fetchVmsSessions ({ vms }) {
   })
 }
 
-export function* fetchSingleVm (action) {
+export function* fetchVm (action) {
   yield startProgress({ vmId: action.payload.vmId, name: 'refresh_single' })
 
   const vm = yield callExternalAction('getVm', Api.getVm, action, true)
@@ -492,15 +492,15 @@ function* fetchVmSessions ({ vmId }) {
  * VmDetail is to be rendered.
  */
 export function* selectVmDetail (action) {
-  yield fetchSingleVm(getSingleVm({ vmId: action.payload.vmId })) // async data refresh
+  yield fetchVm(getVm({ vmId: action.payload.vmId })) // async data refresh
 }
 
 function* selectPoolDetail (action) {
-  yield fetchSinglePool(getSinglePool({ poolId: action.payload.poolId }))
+  yield fetchPool(getPool({ poolId: action.payload.poolId }))
 }
 
-function* fetchSingleResource (action, apiMethod, toInternalConverter, addAction, removeAction) {
-  const res = yield callExternalAction(apiMethod, Api[apiMethod], action)
+function* fetchResource (action, methodName, method, toInternalConverter, addAction, removeAction) {
+  const res = yield callExternalAction(methodName, method, action)
   if (res) {
     const internal = toInternalConverter(res)
     yield put(addAction(internal))
@@ -509,8 +509,8 @@ function* fetchSingleResource (action, apiMethod, toInternalConverter, addAction
   }
 }
 
-function* fetchSingleTemplate (action) {
-  yield * fetchSingleResource(action, 'getSingleTemplate',
+function* fetchTemplate (action) {
+  yield * fetchResource(action, 'getTemplate', Api.getTemplate,
     (template) => Api.templateToInternal({ template }),
     (templateInternal) => addTemplates({ templates: [ templateInternal ] }),
     (id) => removeTemplate({ id })
@@ -529,8 +529,8 @@ function* fetchAllTemplates (action) {
   }
 }
 
-function* fetchSingleCluster (action) {
-  yield * fetchSingleResource(action, 'getSingleCluster',
+function* fetchCluster (action) {
+  yield * fetchResource(action, 'getCluster', Api.getCluster,
     (cluster) => Api.clusterToInternal({ cluster }),
     (clusterInternal) => addClusters({ clusters: [ clusterInternal ] }),
     (id) => removeCluster({ id })
@@ -549,8 +549,8 @@ function* fetchAllClusters (action) {
   }
 }
 
-function* fetchSingleHost (action) {
-  yield * fetchSingleResource(action, 'getSingleHost',
+function* fetchHost (action) {
+  yield * fetchResource(action, 'getHost', Api.getHost,
     (host) => Api.hostToInternal({ host }),
     (hostInternal) => addHosts({ hosts: [ hostInternal ] }),
     (id) => removeHost({ id })
@@ -617,7 +617,7 @@ let sagasFunctions = {
   foreach,
   callExternalAction,
   fetchVmSessions,
-  fetchSingleVm,
+  fetchVm,
 }
 
 export function *rootSaga () {
@@ -627,7 +627,7 @@ export function *rootSaga () {
     takeLatest(CHECK_TOKEN_EXPIRED, doCheckTokenExpired),
 
     takeLatest(REFRESH_DATA, refreshData),
-    takeEvery(GET_SINGLE_VM, fetchSingleVm),
+    takeEvery(GET_VM, fetchVm),
     takeLatest(GET_BY_PAGE, fetchByPage),
     takeLatest(GET_VMS_BY_PAGE, fetchVmsByPage),
     takeLatest(GET_VMS_BY_COUNT, fetchVmsByCount),
@@ -644,12 +644,12 @@ export function *rootSaga () {
     takeEvery(START_POOL, startPool),
     takeEvery(REMOVE_VM, removeVm),
 
-    takeEvery(GET_SINGLE_CLUSTER, fetchSingleCluster),
+    takeEvery(GET_CLUSTER, fetchCluster),
     takeLatest(GET_ALL_CLUSTERS, fetchAllClusters),
-    takeEvery(GET_SINGLE_TEMPLATE, fetchSingleTemplate),
+    takeEvery(GET_TEMPLATE, fetchTemplate),
     takeLatest(GET_ALL_TEMPLATES, fetchAllTemplates),
     takeLatest(GET_ALL_OS, fetchAllOS),
-    takeEvery(GET_SINGLE_HOST, fetchSingleHost),
+    takeEvery(GET_HOST, fetchHost),
     takeLatest(GET_ALL_HOSTS, fetchAllHosts),
     takeLatest(GET_ISO_STORAGES, fetchISOStorages),
     takeLatest(GET_ALL_FILES_FOR_ISO, fetchAllFilesForISO),

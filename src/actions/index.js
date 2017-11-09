@@ -1,5 +1,5 @@
 import {
-  GET_SINGLE_VM,
+  GET_VM,
   GET_BY_PAGE,
   GET_USB_FILTER,
   PERSIST_STATE,
@@ -29,9 +29,9 @@ export function persistState () {
   }
 }
 
-export function getSingleVm ({ vmId }) {
+export function getVm ({ vmId }) {
   return {
-    type: GET_SINGLE_VM,
+    type: GET_VM,
     payload: {
       vmId,
     },
