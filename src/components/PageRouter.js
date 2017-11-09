@@ -34,12 +34,13 @@ const buildPath = (route) => {
 const Breadcrumb = ({ route, root }) => {
   let pathArray = buildPath(route)
   pathArray = [ root ].concat(pathArray)
+  const idPrefix = `breadcrumb`
   const breadcrumbPaths = []
   for (let i = 0; i < pathArray.length; i++) {
     if ((i + 1) === pathArray.length) {
-      breadcrumbPaths.push(<li key={pathArray[i].url} className='active'>{pathArray[i].title}</li>)
+      breadcrumbPaths.push(<li key={pathArray[i].url} className='active' id={`${idPrefix}-last-${i}`}>{pathArray[i].title}</li>)
     } else {
-      breadcrumbPaths.push(<li key={pathArray[i].url}><Link to={pathArray[i].url}>{pathArray[i].title}</Link></li>)
+      breadcrumbPaths.push(<li key={pathArray[i].url}><Link to={pathArray[i].url} id={`${idPrefix}-link-${i}`}>{pathArray[i].title}</Link></li>)
     }
   }
 
