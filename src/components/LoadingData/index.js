@@ -40,7 +40,7 @@ const LoadingData = ({ vms }) => {
 
   return (
     <div className={`alert alert-warning ${style['loading-data']}`}>
-      <strong>Loading ...</strong>
+      <strong id='load-in-progress'>Loading ...</strong>
     </div>)
 }
 LoadingData.propTypes = {

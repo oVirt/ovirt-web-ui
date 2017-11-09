@@ -14,9 +14,10 @@ const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, onUpdat
     getVms(vmId)
   }
 
+  const idPrefix = `vmslistnav`
   const toggleExpandButton = (
     <div className={`${style['toggle-expand-button']} ${expanded ? style['toggle-expand-button-expanded'] : ''}`}>
-      <a href='#' onClick={toggleExpansion}>
+      <a href='#' onClick={toggleExpansion} id={`${idPrefix}-button-expand`}>
         <span className={`fa ${expanded ? 'fa-angle-double-left' : 'fa-angle-double-right'}`} />
       </a>
     </div>
@@ -38,7 +39,7 @@ const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, onUpdat
           if (vm.get('id') === selectedVm.get('id')) { // is selected
             return (
               <li role='presentation' className={`${style['item']} ${style['item-selected']}`} key={vm.get('id')}>
-                <span className={style['item-text']}>{vm.get('name')}</span>
+                <span className={style['item-text']} id={`${idPrefix}-item-${vm.get('name')}`}>{vm.get('name')}</span>
               </li>
             )
           }
@@ -46,7 +47,7 @@ const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, onUpdat
           return (
             <li role='presentation' className={style['item']} key={vm.get('id')}>
               <Link to={`/vm/${vm.get('id')}`} className={style['item-link']} onClick={() => { linkClick(vm.get('id')) }}>
-                <span className={style['item-text']}>{vm.get('name')}</span>
+                <span className={style['item-text']} id={`${idPrefix}-item-${vm.get('name')}`}>{vm.get('name')}</span>
               </Link>
             </li>
           )

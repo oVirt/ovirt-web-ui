@@ -48,11 +48,19 @@ class OptionsDialog extends React.Component {
 
   render () {
     const { oVirtApiVersion } = this.props
+    const idPrefix = `optionsdialog`
+
     let content = (
       <form>
         <div className='form-group'>
           <FieldHelp content={msg.publicSSHKey()} text={msg.SSHKey()} />
-          <textarea type='text' className='form-control' rows='7' onChange={this.onSSHKeyChange} value={this.state.sshKey || ''} />
+          <textarea
+            type='text'
+            className='form-control'
+            rows='7'
+            onChange={this.onSSHKeyChange}
+            value={this.state.sshKey || ''}
+            id={`${idPrefix}-sshkey`} />
         </div>
       </form>
     )
@@ -64,7 +72,7 @@ class OptionsDialog extends React.Component {
 
       content = (
         <div>
-          <p>{msg.lowOVirtVersion({ apiVersion })}</p>
+          <p id={`${idPrefix}-lowversion`}>{msg.lowOVirtVersion({ apiVersion })}</p>
         </div>
         )
     }
@@ -73,15 +81,17 @@ class OptionsDialog extends React.Component {
         <div className='modal-dialog' role='document'>
           <div className='modal-content'>
             <div className='modal-header'>
-              <button type='button' className='close' data-dismiss='modal' aria-label='Close'><span aria-hidden='true'>&times;</span></button>
-              <h4 className='modal-title'>{msg.options()}</h4>
+              <button type='button' className='close' data-dismiss='modal' aria-label='Close' id={`${idPrefix}-button-close`}><span aria-hidden='true'>&times;</span></button>
+              <h4 className='modal-title' id={`${idPrefix}-title`}>{msg.options()}</h4>
             </div>
-            <div className='modal-body'>
+            <div className='modal-body' id={`${idPrefix}-body`}>
               {content}
             </div>
             <div className='modal-footer'>
-              {this.props.userId ? <button type='button' onClick={this.onSaveClick} className='btn btn-default' data-dismiss='modal'>{msg.save()}</button> : null}
-              <button type='button' className='btn btn-danger' data-dismiss='modal'>{msg.cancel()}</button>
+              {this.props.userId ? <button type='button' onClick={this.onSaveClick} className='btn btn-default' data-dismiss='modal' id={`${idPrefix}-button-save`}>{msg.save()}</button> : null}
+              <button type='button' className='btn btn-danger' data-dismiss='modal' id={`${idPrefix}-button-cancel`}>
+                {msg.cancel()}
+              </button>
             </div>
           </div>
         </div>

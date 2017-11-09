@@ -8,12 +8,13 @@ import { fixedStrings } from '../branding'
 
 const OvirtApiCheckFailed = ({ config }) => {
   const oVirtApiVersion = config.get('oVirtApiVersion')
-  console.log(`OvirtApiCheckFailed(): ${JSON.stringify(oVirtApiVersion.toJS())}`)
 
   const passed = oVirtApiVersion.get('passed')
   if (passed !== false) { // if unknown, the test has not finished yet
     return null
   }
+
+  console.info(`OvirtApiCheckFailed(): ${JSON.stringify(oVirtApiVersion.toJS())}`)
 
   const major = oVirtApiVersion.get('major')
   const minor = oVirtApiVersion.get('minor')
@@ -24,7 +25,9 @@ const OvirtApiCheckFailed = ({ config }) => {
   return (
     <div className='alert alert-danger'>
       <span className='pficon pficon-error-circle-o' />
-      <span dangerouslySetInnerHTML={{ __html: msg.htmlUnsupportedOvirtVersionFoundButVersionAtLeastRequired({ version, productName: fixedStrings.BRAND_NAME, requiredVersion: required }) }} />
+      <span
+        id='ovirtapi-check-failed'
+        dangerouslySetInnerHTML={{ __html: msg.htmlUnsupportedOvirtVersionFoundButVersionAtLeastRequired({ version, productName: fixedStrings.BRAND_NAME, requiredVersion: required }) }} />
     </div>
   )
 }

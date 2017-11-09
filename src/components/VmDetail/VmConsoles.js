@@ -8,6 +8,7 @@ import { canConsole } from 'ovirt-ui-components'
 import style from './style.css'
 
 const VmConsoles = ({ vm, onConsole, onRDP, usbFilter }) => {
+  const idPrefix = `vmconsoles-${vm.get('name')}`
   const vmConsoles = vm.get('consoles').valueSeq()
   if (canConsole(vm.get('status'))) {
     return (
@@ -29,7 +30,7 @@ const VmConsoles = ({ vm, onConsole, onRDP, usbFilter }) => {
 
         {
           isWindows(vm.getIn(['os', 'type']))
-            ? (<a href='#' key={vm.get('id')} onClick={hrefWithoutHistory(onRDP)} className={style['left-delimiter']}>RDP</a>) : null
+            ? (<a href='#' key={vm.get('id')} id={`${idPrefix}-rdp`} onClick={hrefWithoutHistory(onRDP)} className={style['left-delimiter']}>RDP</a>) : null
         }
       </dd>
     )
@@ -42,7 +43,8 @@ const VmConsoles = ({ vm, onConsole, onRDP, usbFilter }) => {
           vmConsoles.map(c => (
             <span
               className={style['console-vm-not-running']}
-              key={c.get('id')}>
+              key={c.get('id')}
+              id={`${idPrefix}-${c.get('protocol')}-notrunning`}>
               {c.get('protocol').toUpperCase()}
             </span>
           ))
@@ -50,7 +52,7 @@ const VmConsoles = ({ vm, onConsole, onRDP, usbFilter }) => {
 
         {
           isWindows(vm.getIn(['os', 'type']))
-            ? (<span onClick={onRDP} className={style['console-vm-not-running']}>RDP</span>) : null
+            ? (<span onClick={onRDP} className={style['console-vm-not-running']} id={`${idPrefix}-rdp-notrunning`}>RDP</span>) : null
         }
       </span>
     </dd>

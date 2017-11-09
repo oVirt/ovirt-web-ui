@@ -3,10 +3,10 @@ import PropTypes from 'prop-types'
 
 import { formatTwoDigits } from '../helpers'
 
-const Time = ({ time, cssClass }) => {
+const Time = ({ time, cssClass, id }) => {
   const t = new Date(time)
   return (
-    <div className={cssClass}>
+    <div className={cssClass} id={id}>
       {`${formatTwoDigits(t.getHours())}:${formatTwoDigits(t.getMinutes())}:${formatTwoDigits(t.getSeconds())}`}
     </div>
   )
@@ -14,6 +14,7 @@ const Time = ({ time, cssClass }) => {
 Time.propTypes = {
   time: PropTypes.number.isRequired,
   cssClass: PropTypes.string,
+  id: PropTypes.string,
 }
 
 export default Time

@@ -2,7 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
 import { msg } from '../../intl'
 
 import style from './style.css'
@@ -25,139 +24,11 @@ import {
   startVm,
   removeVm,
 } from '../../actions/index'
-import { hrefWithoutHistory } from '../../helpers'
 
 import Confirmation from '../Confirmation/index'
-import Popover from '../Confirmation/Popover'
 import ConsoleButton from './ConsoleButton'
-
-class Button extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = { show: false }
-    this.handleClick = e => {
-      this.setState({ show: !this.state.show })
-    }
-    this.closePopover = this.closePopover.bind(this)
-  }
-
-  closePopover () {
-    this.setState({ show: false })
-  }
-
-  render () {
-    let {
-      className,
-      tooltip = '',
-      actionDisabled = false,
-      isOnCard,
-      onClick,
-      shortTitle,
-      button,
-      popover,
-    } = this.props
-
-    let handleClick = hrefWithoutHistory(onClick)
-    let popoverComponent = null
-    if (popover) {
-      handleClick = this.handleClick
-      const PopoverBody = popover
-      popoverComponent = (<Popover show={this.state.show} width={200} height={80} target={this} placement={isOnCard ? 'top' : 'bottom'}>
-        <PopoverBody close={this.closePopover} />
-      </Popover>)
-    }
-
-    if (actionDisabled) {
-      className = `${className} ${style['action-disabled']}`
-      handleClick = undefined
-    }
-
-    if (isOnCard) {
-      return (
-        <div className='card-pf-item'>
-          <span className={className} data-toggle='tooltip' data-placement='left' title={tooltip} onClick={handleClick} />
-          {popoverComponent}
-        </div>
-      )
-    }
-
-    if (actionDisabled) {
-      return (
-        <button className={`${button} ${style['disabled-button']}`} disabled='disabled'>
-          <span data-toggle='tooltip' data-placement='left' title={tooltip}>
-            {shortTitle}
-          </span>
-        </button>
-      )
-    }
-
-    return (
-      <span className={style['full-button']}>
-        <a href='#' onClick={handleClick} className={`${button} ${style['link']}`} id={shortTitle}>
-          <span data-toggle='tooltip' data-placement='left' title={tooltip}>
-            {shortTitle}
-          </span>
-        </a>
-        {popoverComponent}
-      </span>
-    )
-  }
-}
-Button.propTypes = {
-  className: PropTypes.string.isRequired,
-  tooltip: PropTypes.string,
-  shortTitle: PropTypes.string.isRequired,
-  button: PropTypes.string.isRequired,
-  onClick: PropTypes.func,
-  actionDisabled: PropTypes.bool,
-  isOnCard: PropTypes.bool.isRequired,
-  popover: PropTypes.func,
-}
-
-const LinkButton = ({ className, tooltip, to, actionDisabled, isOnCard, shortTitle, button }) => {
-  if (actionDisabled) {
-    className = `${className} ${style['action-disabled']}`
-    to = undefined
-  }
-
-  if (isOnCard) {
-    return (
-      <div className='card-pf-item'>
-        <Link to={to}>
-          <span className={className} data-toggle='tooltip' data-placement='left' title={tooltip} />
-        </Link>
-      </div>
-    )
-  }
-
-  if (actionDisabled) {
-    return (
-      <button className={`${button} ${style['disabled-button']}`} disabled='disabled'>
-        <span data-toggle='tooltip' data-placement='left' title={tooltip}>
-          {shortTitle}
-        </span>
-      </button>
-    )
-  }
-
-  return (
-    <Link to={to} className={`${button} ${style['link']} ${style['full-button']}`}>
-      <span data-toggle='tooltip' data-placement='left' title={tooltip}>
-        {shortTitle}
-      </span>
-    </Link>
-  )
-}
-
-LinkButton.propTypes = {
-  className: PropTypes.string.isRequired,
-  tooltip: PropTypes.string,
-  shortTitle: PropTypes.string.isRequired,
-  button: PropTypes.string.isRequired,
-  to: PropTypes.string.isRequired,
-  actionDisabled: PropTypes.bool,
-  isOnCard: PropTypes.bool.isRequired,
-}
+import Button from './Button'
+import LinkButton from './LinkButton'
 
 const EmptyAction = ({ state, isOnCard }) => {
   if (!canConsole(state) && !canShutdown(state) && !canRestart(state) && !canStart(state)) {
@@ -183,6 +54,7 @@ class RemoveVmAction extends React.Component {
 
   render () {
     const { isOnCard, isPool, vm, onRemove, isDisks } = this.props
+    const idPrefix = `removeaction-${vm.get('name')}`
 
     if (isOnCard) {
       return null
@@ -192,15 +64,19 @@ class RemoveVmAction extends React.Component {
     let height = null
 
     if (isDisks) {
-      checkbox = (<div style={{ marginTop: '8px' }}><Checkbox checked={this.state.preserveDisks}
-        onClick={() => this.setState({ preserveDisks: !this.state.preserveDisks })}
-        label={msg.preserveDisks()} /></div>)
+      checkbox = (
+        <div style={{ marginTop: '8px' }} id={`${idPrefix}-preservedisks`}>
+          <Checkbox
+            checked={this.state.preserveDisks}
+            onClick={() => this.setState({ preserveDisks: !this.state.preserveDisks })}
+            label={msg.preserveDisks()} />
+        </div>)
       height = 75
     }
     let confirmRemoveText = null
     if (checkbox) {
       confirmRemoveText = (
-        <div>
+        <div id={`${idPrefix}-question`}>
           {msg.removeVmQustion()}
           <br />
           {checkbox}
@@ -218,12 +94,14 @@ class RemoveVmAction extends React.Component {
         tooltip={msg.removeVm()}
         button='btn btn-danger'
         shortTitle={msg.remove()}
+        id={`${idPrefix}-button-remove`}
         popover={({ close }) => <Confirmation
           height={height}
           text={confirmRemoveText}
           okButton={{ label: msg.yes(), click: () => onRemove({ force: false, preserveDisks: this.state.preserveDisks }) }}
           cancelButton={{ label: msg.cancel(), click: () => { close() } }}
           extraButton={{ label: msg.force(), click: () => onRemove({ force: true, preserveDisks: this.state.preserveDisks }) }}
+          uniqueId={vm.get('name')}
         />}
       />
     )
@@ -276,6 +154,7 @@ class VmActions extends React.Component {
       consoleProtocol = 'Console in use'
     }
 
+    const idPrefix = `vmaction-${vm.get('name')}`
     return (
       <div className={`actions-line ${isOnCard ? 'card-pf-items text-center' : style['left-padding']}`}>
         <EmptyAction state={status} isOnCard={isOnCard} />
@@ -285,28 +164,41 @@ class VmActions extends React.Component {
           button='btn btn-success'
           className='fa fa-play'
           tooltip={msg.startVm()}
-          onClick={onStart} />
+          onClick={onStart}
+          id={`${idPrefix}-button-start`} />
 
         <Button isOnCard={isOnCard} actionDisabled={isPool || !canSuspend(status) || vm.getIn(['actionInProgress', 'suspend'])}
           shortTitle={msg.suspend()}
           button='btn btn-default'
           className='fa fa-moon-o'
           tooltip={msg.suspendVm()}
-          popover={({ close }) => <Confirmation text={msg.suspendVmQuestion()} okButton={{ label: msg.yes(), click: this.props.onSuspend }} cancelButton={{ label: msg.cancel(), click: () => { close() } }} />} />
+          id={`${idPrefix}-button-suspend`}
+          popover={({ close }) => <Confirmation text={msg.suspendVmQuestion()}
+            okButton={{ label: msg.yes(), click: this.props.onSuspend }}
+            cancelButton={{ label: msg.cancel(), click: () => { close() } }}
+            uniqueId={vm.get('name')} />} />
 
         <Button isOnCard={isOnCard} actionDisabled={isPool || !canShutdown(status) || vm.getIn(['actionInProgress', 'shutdown'])}
           className='fa fa-power-off'
           button='btn btn-danger'
           tooltip={msg.shutdownVm()}
           shortTitle={msg.shutdown()}
-          popover={({ close }) => <Confirmation text={msg.shutdownVmQuestion()} okButton={{ label: msg.yes(), click: this.props.onShutdown }} cancelButton={{ label: msg.cancel(), click: () => { close() } }} />} />
+          id={`${idPrefix}-button-shutdown`}
+          popover={({ close }) => <Confirmation text={msg.shutdownVmQuestion()}
+            okButton={{ label: msg.yes(), click: this.props.onShutdown }}
+            cancelButton={{ label: msg.cancel(), click: () => { close() } }}
+            uniqueId={vm.get('name')} />} />
 
         <Button isOnCard={isOnCard} actionDisabled={isPool || !canRestart(status) || vm.getIn(['actionInProgress', 'restart'])}
           className='pficon pficon-restart'
           button='btn btn-default'
           tooltip={msg.rebootVm()}
           shortTitle={msg.reboot()}
-          popover={({ close }) => <Confirmation text={msg.rebootVmQuestion()} okButton={{ label: msg.yes(), click: this.props.onRestart }} cancelButton={{ label: msg.cancel(), click: () => { close() } }} />} />
+          id={`${idPrefix}-button-reboot`}
+          popover={({ close }) => <Confirmation text={msg.rebootVmQuestion()}
+            okButton={{ label: msg.yes(), click: this.props.onRestart }}
+            cancelButton={{ label: msg.cancel(), click: () => { close() } }}
+            uniqueId={vm.get('name')} />} />
 
         <ConsoleButton isOnCard={isOnCard} actionDisabled={isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole'])}
           button='btn btn-default'
@@ -320,7 +212,8 @@ class VmActions extends React.Component {
           shortTitle={msg.edit()}
           button='btn btn-primary'
           className={`pficon pficon-edit ${style['action-link']}`}
-          tooltip={msg.editVm()} to={`/vm/${vm.get('id')}/edit`} />
+          tooltip={msg.editVm()} to={`/vm/${vm.get('id')}/edit`}
+          id={`action-${vm.get('name')}-edit`} />
 
         <RemoveVmAction isOnCard={isOnCard} isPool={isPool} vm={vm} isDisks={vm.get('disks').size > 0} onRemove={onRemove} />
       </div>

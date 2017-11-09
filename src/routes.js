@@ -24,7 +24,7 @@ const getRoutes = (vms) => ([
         exact: true,
         component: () =>
           (<VmsPage />),
-        toolbars: [(match) => (<AddVmButton key='addbutton' />)],
+        toolbars: [(match) => (<AddVmButton key='addbutton' id={`route-add-vm`} />)],
       },
       {
         path: '/vm/add',

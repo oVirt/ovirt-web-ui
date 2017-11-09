@@ -12,9 +12,15 @@ export function hasUserHostConsoleAccess ({ vm, config, hosts }) {
 }
 
 export const CockpitAHREF = ({ host, text }) => {
-  text = text || host.get('name')
+  const hostName = host.get('name')
+  text = text || hostName
   return (
-    <a href={`https://${host.get('address')}:${AppConfiguration.cockpitPort}/machines`} target='_blank'>{text}</a>
+    <a
+      href={`https://${host.get('address')}:${AppConfiguration.cockpitPort}/machines`}
+      target='_blank'
+      id={`cockpitlink-${hostName}`}>
+      {text}
+    </a>
   )
 }
 CockpitAHREF.propTypes = {

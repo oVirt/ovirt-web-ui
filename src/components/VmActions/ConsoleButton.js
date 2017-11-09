@@ -57,6 +57,8 @@ class ConsoleButton extends React.Component {
       VmAction,
     } = this.props
 
+    const idPrefix = `consoleaction-${vm.get('name')}`
+
     let onClick = this.consoleConfirmationAboutToOpen
     if (actionDisabled) {
       className = `${className} ${style['action-disabled']}`
@@ -65,7 +67,11 @@ class ConsoleButton extends React.Component {
     let popoverComponent = null
     if (VmAction.getIn(['vms', vm.get('id'), 'consoleInUse']) && this.state.openModal) {
       popoverComponent = (<Popover width={200} height={80} target={this} placement={isOnCard ? 'top' : 'bottom'} show>
-        <Confirmation text={msg.consoleInUseContinue()} okButton={{ label: msg.yes(), click: this.onConsoleDownload }} cancelButton={{ label: msg.cancel(), click: this.onConsoleConfirmationClose }} />
+        <Confirmation
+          text={msg.consoleInUseContinue()}
+          okButton={{ label: msg.yes(), click: this.onConsoleDownload }}
+          cancelButton={{ label: msg.cancel(), click: this.onConsoleConfirmationClose }}
+          uniqueId={vm.get('name')} />
       </Popover>)
     }
 
@@ -80,7 +86,7 @@ class ConsoleButton extends React.Component {
 
     if (actionDisabled) {
       return (
-        <button className={`${button} ${style['disabled-button']}`} disabled='disabled'>
+        <button className={`${button} ${style['disabled-button']}`} disabled='disabled' id={`${idPrefix}-disabled`}>
           <span data-toggle='tooltip' data-placement='left' title={tooltip}>
             {shortTitle}
           </span>

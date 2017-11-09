@@ -14,6 +14,7 @@ import * as branding from '../../branding'
  * Main application header on top of the page
  */
 const VmsPageHeader = ({ onRefresh }) => {
+  const idPrefix = `pageheader`
   return (
     <nav className='navbar obrand_mastheadBackground obrand_topBorder navbar-pf-vertical'>
       <div className='navbar-header'>
@@ -22,7 +23,7 @@ const VmsPageHeader = ({ onRefresh }) => {
           <span className='icon-bar' />
           <span className='icon-bar' />
         </button>
-        <a href='#' className='navbar-brand obrand_headerLogoLink'>
+        <a href='#' className='navbar-brand obrand_headerLogoLink' id={`${idPrefix}-logo`}>
           <img className='obrand_mastheadLogo' src={branding.resourcesUrls.clearGif} />
         </a>
       </div>
@@ -30,7 +31,7 @@ const VmsPageHeader = ({ onRefresh }) => {
       <div className='collapse navbar-collapse'>
         <ul className='nav navbar-nav navbar-right navbar-iconic'>
           <li>
-            <a href='#' className='nav-item-iconic' onClick={hrefWithoutHistory(onRefresh)}>
+            <a href='#' className='nav-item-iconic' onClick={hrefWithoutHistory(onRefresh)} id={`${idPrefix}-refresh`}>
               <i className='fa fa-refresh' />
             </a>
           </li>

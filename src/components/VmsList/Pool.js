@@ -22,6 +22,7 @@ import { startPool } from '../../actions'
 class Pool extends React.Component {
   render () {
     let { pool, icons, visibility, onStart } = this.props
+    const idPrefix = `pool-${pool.get('name')}`
     const state = pool.get('status')
 
     const iconId = pool.getIn(['vm', 'icons', 'large', 'id'])
@@ -40,7 +41,7 @@ class Pool extends React.Component {
             </div>
             <h2 className='card-pf-title text-center'>
               <NavLink to={`/pool/${pool.get('id')}`} className={style['vm-detail-link']}>
-                <p className={[style['vm-name'], style['crop']].join(' ')} title={pool.get('name')} data-toggle='tooltip'>
+                <p className={[style['vm-name'], style['crop']].join(' ')} title={pool.get('name')} data-toggle='tooltip' id={`${idPrefix}-status-name`}>
                   <VmStatusIcon state={state} />&nbsp;{pool.get('name')}
                 </p>
               </NavLink>

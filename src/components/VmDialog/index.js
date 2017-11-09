@@ -384,6 +384,7 @@ class VmDialog extends React.Component {
     const { icons, vmDialog, clusters, templates, operatingSystems, storages } = this.props
     const vm = this.props.vm
     const isoStorages = storages.get('storages').filter(v => v.get('type') === 'iso')
+    const idPrefix = `vmdialog-${vm.get('name')}`
 
     let files = { '': { id: '', value: '[Eject]' } }
 
@@ -420,17 +421,17 @@ class VmDialog extends React.Component {
     const icon = iconId && icons.get(iconId)
 
     const title = isEdit ? (
-      <h1 className={style['header']}>
+      <h1 className={style['header']} id={`${idPrefix}-edit-title`}>
         <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' className={sharedStyle['vm-detail-icon']} />
         &nbsp;{vm.get('name')} - Edit
       </h1>) : (
-        <h1>Create A New Virtual Machine</h1>
+        <h1 id={`${idPrefix}-create-title`}>Create A New Virtual Machine</h1>
       )
 
     return (
       <DetailContainer>
         {title}
-        <ErrorAlert message={this.getLatestUserMessage()} />
+        <ErrorAlert message={this.getLatestUserMessage()} id={`${idPrefix}-erroralert`} />
         <br />
         <form>
           <Prompt
@@ -474,6 +475,7 @@ class VmDialog extends React.Component {
                 <SelectBox
                   onChange={this.onChangeCluster}
                   selected={cluster ? cluster.get('id') : ''}
+                  idPrefix='select-cluster'
                   items={sortedClusters.map(item => (
                     { id: item.get('id'), value: item.get('name') }
                   )).toJS()}
@@ -487,6 +489,7 @@ class VmDialog extends React.Component {
                 <SelectBox
                   onChange={this.onChangeTemplate}
                   selected={template ? template.get('id') : ''}
+                  idPrefix='select-template'
                   items={sortedTemplates.map(item => (
                     { id: item.get('id'), value: templateNameRenderer(item) }
                   )).toJS()}
@@ -500,6 +503,7 @@ class VmDialog extends React.Component {
                 <SelectBox
                   onChange={this.onChangeOperatingSystem}
                   selected={os ? os.get('id') : ''}
+                  idPrefix='select-os'
                   items={sortedOSs.map(item => (
                     { id: item.get('id'), value: item.get('description') }
                   )).toJS()}
@@ -549,6 +553,7 @@ class VmDialog extends React.Component {
                   onChange={this.onChangeCD}
                   selected={cdromFileId}
                   items={files}
+                  idPrefix='select-changecd'
                   />
               </dd>
 
