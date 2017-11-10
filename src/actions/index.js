@@ -102,3 +102,12 @@ export function getUSBFilter () {
     payload: {},
   }
 }
+
+export function getOption (optionName, version) {
+  return {
+    payload: {
+      optionName,
+      version
+    }
+  }
+}

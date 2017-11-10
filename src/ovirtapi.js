@@ -11,6 +11,7 @@ type VmIdType = { vmId: string }
 type PoolIdType = { poolId: string }
 type InputRequestType = { url: string, input: string, contentType?: string }
 type VmType = { vm: Object }
+type OptionVersionType = '3.6' | '4.0' | '4.1' | '4.2' | 'general'
 
 const zeroUUID: string = '00000000-0000-0000-0000-000000000000'
 
@@ -642,6 +643,33 @@ OvirtApi = {
   getSSHKey ({ userId }: { userId: string }): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'getSSHKey' })
     return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/users/${userId}/sshpublickeys` })
+  },
+  /**
+   * @return {Promise.<?string>} promise of option value if options exists, promise of null otherwise
+   */
+  getOption ({ optionName, version }: {optionName: string, version: OptionVersionType}): Promise<?string> {
+    OvirtApi._assertLogin({ methodName: 'getOption' })
+    return OvirtApi._httpGet({
+      url: `${AppConfiguration.applicationContext}/api/options/${optionName}`,
+      custHeaders: {
+        Accept: 'application/json',
+        Filter: true,
+      },
+    })
+      .then(response => {
+        const result = response.values.system_option_value
+          .filter((valueAndVersion: { value: string, version: OptionVersionType }) => valueAndVersion.version === version)
+          .map(valueAndVersion => valueAndVersion.value)[0]
+        logDebug(`Config option '${optionName}' was not found for version '${version}'.`)
+        return result === undefined ? null : result
+      })
+      .catch(error => {
+        if (error.status === 404) {
+          logDebug(`Config option '${optionName}' doesn't exist in any version.`)
+          return null
+        }
+        throw error
+      })
   },
 }
 
