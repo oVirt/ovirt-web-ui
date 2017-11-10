@@ -1,6 +1,7 @@
 import {
   GET_VM,
   GET_BY_PAGE,
+  GET_OPTION,
   GET_USB_FILTER,
   PERSIST_STATE,
   SET_ADMINISTATOR,
@@ -100,5 +101,21 @@ export function getUSBFilter () {
   return {
     type: GET_USB_FILTER,
     payload: {},
+  }
+}
+
+/**
+ * @param {string} optionName
+ * @param {OptionVersionType} version option version
+ * @param {string=} defaultValue
+ */
+export function getOption (optionName, version, defaultValue) {
+  return {
+    type: GET_OPTION,
+    payload: {
+      optionName,
+      version,
+      defaultValue,
+    },
   }
 }
