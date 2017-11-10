@@ -65,7 +65,8 @@ export function* login (action) {
     } else {
       if (yield checkOvirtApiVersion(oVirtMeta)) {
         yield put(getUSBFilter())
-        yield fetchPermissionWithoutFilter({}) // progress loader disabled in here
+        yield fetchPermissionWithoutFilter({})
+        yield initialLoad() // progress loader disabled in here
         yield autoConnectCheck({})
       } else { // oVirt API of incompatible version
         console.error('oVirt api version check failed')
@@ -193,14 +194,25 @@ function* initialLoad () {
 function* fetchPermissionWithoutFilter (action) {
   const data = yield callExternalAction('checkFilter', Api.checkFilter, { action: 'CHECK_FILTER' }, true)
 
-  // this must be processed before continuing with next steps
-  const isFiltered = data.error !== undefined
-  yield put(setUserFilterPermission(isFiltered))
-  yield waitTillEqual(Selectors.getFilter, isFiltered, 50)
+  const isAdmin = data.error === undefined
+  yield put(setAdministrator(isAdmin))
 
-  yield put(setUserFilterPermission(data.error !== undefined))
+  if (!isAdmin) {
+    put(setUserFilterPermission(true))
+    return
+  }
 
-  yield initialLoad()
+  const alwaysFilterOption = yield callExternalAction(
+    'getOption',
+    Api.getOption, {
+      payload: { optionName: 'AlwaysFilterResultsForWebUi', version: 'general' },
+    })
 
-  yield put(setAdministrator(data.error === undefined))
+  if (!alwaysFilterOption) {
+    put(setUserFilterPermission(false))
+  }
+
+  const alwaysFilterOptionTrue = alwaysFilterOption === 'true'
+  yield put(setUserFilterPermission(alwaysFilterOptionTrue))
+  yield waitTillEqual(Selectors.getFilter, alwaysFilterOptionTrue, 50)
 }
