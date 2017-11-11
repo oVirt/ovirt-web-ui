@@ -5,11 +5,6 @@ put anything here that should override styles
 from brand.css.
 *********************************************/
 
-.obrand_aboutApplicationLogo {
-    position: unset;
-    float: right;
-}
-
 #about-modal a {
     color: #ffffff;
 }
