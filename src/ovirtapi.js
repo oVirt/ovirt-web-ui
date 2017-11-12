@@ -546,7 +546,13 @@ OvirtApi = {
   },
   checkFilter (): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'checkFilter' })
-    return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/permissions`, custHeaders: { Filter: false } })
+    return OvirtApi._httpGet({
+      url: `${AppConfiguration.applicationContext}/api/permissions`,
+      custHeaders: {
+        Filter: false,
+        Accept: 'application/json',
+      },
+    })
   },
 
   getPoolsByPage ({ page }: { page: number }): Promise<Object> {
@@ -637,6 +643,67 @@ OvirtApi = {
     OvirtApi._assertLogin({ methodName: 'getSSHKey' })
     return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/users/${userId}/sshpublickeys` })
   },
+
+  /**
+   * @return {Promise.<?string>} promise of option value if options exists, promise of null otherwise.
+   *                             If default value is provided, the method never returns rejected promise and the default
+   *                             value is returned in case of missing option or any error.
+   */
+  getOption ({ optionName, version, defaultValue }: {optionName: string, version: string, defaultValue?: string}): Promise<?string> {
+    const rawPromise = getOptionWithoutDefault(optionName, version)
+
+    if (!defaultValue) {
+      return rawPromise
+    }
+
+    return rawPromise
+      .then(result => result === null ? defaultValue : result)
+      .catch(() => defaultValue)
+  },
+}
+
+/**
+ * @typedef {'general' | '4.2' | '4.1' | '4.0'} OptionVersionType
+ */
+/**
+ *
+ * @param {string} optionName
+ * @param {OptionVersionType} version
+ * @return {Promise.<?string>} promise of option value if options exists, promise of null otherwise.
+ */
+function getOptionWithoutDefault (optionName: string, version: string): Promise<?string> {
+  OvirtApi._assertLogin({ methodName: 'getOption' })
+  return OvirtApi._httpGet({
+    url: `${AppConfiguration.applicationContext}/api/options/${optionName}`,
+    custHeaders: {
+      Accept: 'application/json',
+      Filter: true,
+    },
+  })
+    .then(response => {
+      let result
+      try {
+        result = response.values.system_option_value
+          .filter((valueAndVersion) => valueAndVersion.version === version)
+          .map(valueAndVersion => valueAndVersion.value)[0]
+      } catch (error) {
+        if (error instanceof TypeError) {
+          logDebug(`Response to getting option '${optionName}' has unexpected format:`, response)
+        }
+        throw error
+      }
+      if (result === undefined) {
+        logDebug(`Config option '${optionName}' was not found for version '${version}'.`)
+        return null
+      }
+      return result
+    }, error => {
+      if (error.status === 404) {
+        logDebug(`Config option '${optionName}' doesn't exist in any version.`)
+        return null
+      }
+      throw error
+    })
 }
 
 const Api = OvirtApi
