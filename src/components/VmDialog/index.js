@@ -384,7 +384,7 @@ class VmDialog extends React.Component {
     const { icons, vmDialog, clusters, templates, operatingSystems, storages } = this.props
     const vm = this.props.vm
     const isoStorages = storages.get('storages').filter(v => v.get('type') === 'iso')
-    const idPrefix = `vmdialog-${vm.get('name')}`
+    const idPrefix = `vmdialog-${vm ? vm.get('name') : '_new'}`
 
     let files = { '': { id: '', value: '[Eject]' } }
 
