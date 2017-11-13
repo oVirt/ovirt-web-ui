@@ -44,6 +44,7 @@
 .page-router-render-component {
     flex-grow: 1;
     overflow: hidden;
+    height: 100%;
 }
 
 /* For VmDetail and VmDialog */
