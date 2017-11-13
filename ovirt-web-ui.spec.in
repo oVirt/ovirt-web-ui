@@ -56,6 +56,19 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Mon Nov 11 30 2017 Marek Libra <mlibra@redhat.com> - 1.3.1
+- verbose warning in console - https://github.com/oVirt/ovirt-web-ui/issues/376
+- scrolling of popups - https://github.com/oVirt/ovirt-web-ui/issues/394
+- no autologout - https://github.com/oVirt/ovirt-web-ui/issues/308
+- Make use of "AlwaysFilterResultsForWebUi" engine configuration parameter - https://github.com/oVirt/ovirt-web-ui/issues/317
+- fix empty name in Create VM dialog - https://github.com/oVirt/ovirt-web-ui/issues/365
+- select boxes are left-alligned - https://github.com/oVirt/ovirt-web-ui/issues/370
+- allow empty memory/cpu - https://github.com/oVirt/ovirt-web-ui/issues/369
+- docker image fixed - https://github.com/oVirt/ovirt-web-ui/issues/304
+- HTML IDs added for automated testing
+- Minor UI fixes
+- translations updated
+
 * Mon Oct 30 2017 Marek Libra <mlibra@redhat.com> - 1.3.0
 - BnB (Brand new Branding) - alligned witth ovirt-engine
 - Smartcard Enabled option
