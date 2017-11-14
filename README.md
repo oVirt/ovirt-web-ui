@@ -4,7 +4,7 @@
 
 Modern lightweight UI for standard (non-admin) oVirt users
 
-![Alt text](https://raw.githubusercontent.com/oVirt/ovirt-web-ui/master/doc/screenshots/v1.1.0_2017_Nov/01_vmsList.png "Screenshot")
+![Alt text](https://github.com/oVirt/ovirt-web-ui/raw/master/doc/screenshots/v1.3.2_2017-Nov/01_vmsList.png "Screenshot")
 
 VM Portal allows non-admin oVirt users to access, start, stop, and create new virtual machines. It is not intended
 to be a full-featured oVirt administration UI. Rather, its focus is on standard users with limited administration skills
@@ -29,12 +29,14 @@ or [Issues](https://github.com/oVirt/ovirt-web-ui/issues) GitHub sections.
 
 The upcoming milestones:
 
-### [v1.3.0](https://github.com/oVirt/ovirt-web-ui/milestone/5)
+### [v1.4.0](https://github.com/oVirt/ovirt-web-ui/milestone/6)
 The upcoming release shall newly support (among others):
 
-- Edit SSH public keys
-- Translation to other languages
-- Audit Log
+- event-driven data refresh to improve performance
+- Single Sign On oVirt host machine
+- Search by Name
+- Sorting
+
 
 ## Goals
 - fast UI responses and start-up
@@ -56,7 +58,7 @@ For more info, see [doc/goals.md](https://github.com/oVirt/ovirt-web-ui/blob/mas
 - Have `yarn` installed
     - it's not strictly required but **suggested** to use ovirt-engine-\* JS packages:
     - from `ovirt/tested` yum repo [http://resources.ovirt.org/repos/ovirt/tested/master/rpm](http://resources.ovirt.org/repos/ovirt/tested/master/rpm) (see [BZ 1427045](https://bugzilla.redhat.com/show_bug.cgi?id=1427045))
-        - `dnf install ovirt-engine-nodejs-6.9.4 ovirt-engine-nodejs-modules-1.0.4 ovirt-engine-yarn-0.19.1`
+        - `dnf install ovirt-engine-nodejs ovirt-engine-nodejs-modules ovirt-engine-yarn`
         - use: `export PATH=/usr/share/ovirt-engine-yarn/bin:/usr/share/ovirt-engine-nodejs/bin:$PATH`
 
 **Standalone installation from RPM**
