@@ -30,6 +30,8 @@ import { MAX_VM_MEMORY_FACTOR } from '../../constants/index'
 
 import { msg } from '../../intl'
 
+import { msg } from '../../intl'
+
 const zeroUID = '00000000-0000-0000-0000-000000000000'
 const FIRST_DEVICE = 0
 const SECOND_DEVICE = 1
@@ -248,7 +250,13 @@ class VmDialog extends React.Component {
 
   onChangeVmName (event) {
     const newName = event.target.value
-    this.setState({ name: newName, isChanged: true })
+    var regexp = /^[a-zA-Z0-9._\-+]+$/;
+
+    if (regexp.test(newName)) {
+      this.setState({ name: newName, isChanged: true, vmNameErrorText: null })}
+    else {
+      this.setState({ name: newName, isChanged: true, vmNameErrorText: msg.pleaseEnterValidVmName()})
+    }
 
     const template = this.getTemplate()
     if (!template) {
@@ -260,6 +268,7 @@ class VmDialog extends React.Component {
     }
     this.setState(state => { state.cloudInit.hostName = newName })
   }
+
   onChangeVmDescription (event) {
     this.setState({ description: event.target.value, isChanged: true })
   }
@@ -561,6 +570,10 @@ class VmDialog extends React.Component {
         {msg.bootMenuWarning()}
       </React.Fragment>)
       : msg.bootMenuTooltip()
+    
+    const vmNameError = this.state.vmNameErrorText
+      ? (<span className={`help-block ${style['error-text']}`} >{this.state.vmNameErrorText}</span>)
+      : null
 
     return (
       <DetailContainer>
@@ -582,7 +595,7 @@ class VmDialog extends React.Component {
               <dt>
                 <FieldHelp content={msg.uniqueNameOfTheVirtualMachine()} text={msg.name()} />
               </dt>
-              <dd>
+              <dd className={this.state.vmNameErrorText ? 'has-error' : ''}>
                 <input
                   type='text'
                   className='form-control'
@@ -590,6 +603,7 @@ class VmDialog extends React.Component {
                   placeholder={msg.enterVmName()}
                   onChange={this.onChangeVmName}
                   value={this.state.name || ''} />
+                  {vmNameError}
               </dd>
 
               <dt>
