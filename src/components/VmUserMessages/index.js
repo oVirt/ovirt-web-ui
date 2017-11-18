@@ -67,11 +67,14 @@ class VmUserMessages extends React.Component {
     }
 
     let idCounter = 0
+    const badgeElement = userMessages.get('records').size === 0
+        ? null
+        : <span className='badge' id={`${idPrefix}-size`}>{userMessages.get('records').size}</span>
     return (
       <li className='dropdown'>
         <a className='dropdown-toggle nav-item-iconic' href='#' title={msg.messages()} onClick={hrefWithoutHistory(onToggle)} id={`${idPrefix}-toggle`}>
           <i className='fa fa-bell' />
-          <span className='badge' id={`${idPrefix}-size`}>{userMessages.get('records').size}</span>
+          {badgeElement}
           <span className='caret' id={`${idPrefix}-caret`} />
         </a>
 
