@@ -66,6 +66,26 @@ class VmUserMessages extends React.Component {
       show = 'show'
     }
 
+    let messages = userMessages.get('records')
+    let messagesList = ''
+
+    if (messages.size !== 0) {
+      messagesList = (
+        <ul className={`list-group ${style['messages-list']}`}>
+          {messages.map(r => (<UserMessage key={r.time} record={r} id={`${idPrefix}-msg-${idCounter++}`} />))}
+        </ul>)
+    } else {
+      messagesList = (
+        <div className={`blank-slate-pf ${style['fix-blank-slate-pf']}`}>
+          <div className='blank-slate-pf-icon'>
+            <span className='pficon pficon pficon-info' />
+          </div>
+          <h1>
+            {msg.noMessages()}
+          </h1>
+        </div>)
+    }
+
     let idCounter = 0
     return (
       <li className='dropdown'>
@@ -78,9 +98,8 @@ class VmUserMessages extends React.Component {
         <div className={`dropdown-menu dropdown-menu-right infotip bottom-right ${show}`}>
           <div className={`arrow ${style['fix-arrow-position']}`} />
 
-          <ul className={`list-group ${style['messages-list']}`}>
-            {userMessages.get('records').map(r => (<UserMessage key={r.time} record={r} id={`${idPrefix}-msg-${idCounter++}`} />))}
-          </ul>
+          {messagesList}
+
           <ContactAdminInfo userMessages={userMessages} id={`${idPrefix}-contact`} />
 
           <div className='footer'>

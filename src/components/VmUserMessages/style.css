@@ -42,3 +42,7 @@ pre.message-box {
 .close-button {
     float: right;
 }
+
+.fix-blank-slate-pf {
+    margin-bottom: 0px;
+}
