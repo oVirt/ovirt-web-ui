@@ -36,3 +36,7 @@
 .full-button:first-child {
     margin-left: 0!important;
 }
+
+.margin-left-link {
+	margin-left: 15px!important;
+}
