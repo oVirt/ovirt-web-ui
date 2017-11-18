@@ -37,6 +37,8 @@ function sortedBy (immutableCollection, sortBy) { // TODO: move to helpers
   )
 }
 
+import { msg } from '../../intl'
+
 const zeroUID = '00000000-0000-0000-0000-000000000000'
 
 class VmDialog extends React.Component {
@@ -201,7 +203,13 @@ class VmDialog extends React.Component {
   }
 
   onChangeVmName (event) {
-    this.setState({ name: event.target.value, isChanged: true })
+    var regexp = /^[a-zA-Z0-9._\-+]+$/;
+
+    if (regexp.test(event.target.value)){
+      this.setState({ name: event.target.value, isChanged: true, vmNameErrorText: null })}
+    else{
+      this.setState({ name: event.target.value, isChanged: true, vmNameErrorText: msg.pleaseEnterValidVmName()})
+    }
   }
   onChangeVmDescription (event) {
     this.setState({ description: event.target.value, isChanged: true })
@@ -427,6 +435,10 @@ class VmDialog extends React.Component {
       </h1>) : (
         <h1 id={`${idPrefix}-create-title`}>Create A New Virtual Machine</h1>
       )
+    
+    const vmNameError = this.state.vmNameErrorText
+      ? (<span className={`help-block ${style['error-text']}`} >{this.state.vmNameErrorText}</span>)
+      : null
 
     return (
       <DetailContainer>
@@ -445,7 +457,7 @@ class VmDialog extends React.Component {
               <dt>
                 <FieldHelp content='Unique name of the virtual machine.' text='Name' />
               </dt>
-              <dd>
+              <dd className={this.state.vmNameErrorText ? 'has-error' : ''}>
                 <input
                   type='text'
                   className='form-control'
@@ -453,6 +465,7 @@ class VmDialog extends React.Component {
                   placeholder='Enter VM Name'
                   onChange={this.onChangeVmName}
                   value={this.state.name || ''} />
+                  {vmNameError}
               </dd>
 
               <dt>
