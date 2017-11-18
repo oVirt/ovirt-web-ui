@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { getByPage, getConsoleOptions, selectVmDetail } from '../../actions/index'
 import InfiniteScroll from 'react-infinite-scroller'
+import sort from 'alphanum-sort'
 
 import style from './style.css'
 
@@ -32,10 +33,10 @@ const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, onUpdat
   const emptyList = (<div />)
   let list = null
   if (expanded) {
-    const sortFunction = (vmA, vmB) => vmA.get('name').localeCompare(vmB.get('name'))
+    const sortedVms = sort(vms.get('vms').toArray())
     list = (
       <ul className={`menu ${style['ul-menu-cust']}`} role='menu' aria-labelledby='dropdownMenu1'>
-        {vms.get('vms').toList().sort(sortFunction).map(vm => {
+        {sortedVms.map(vm => {
           if (vm.get('id') === selectedVm.get('id')) { // is selected
             return (
               <li role='presentation' className={`${style['item']} ${style['item-selected']}`} key={vm.get('id')}>

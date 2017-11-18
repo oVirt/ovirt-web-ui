@@ -69,6 +69,7 @@
     "whatwg-fetch": "1.0.0"
   },
   "dependencies": {
+    "alphanum-sort": "1.0.2",
     "bootstrap-select": "1.12.4",
     "bootstrap-switch": "3.3.4",
     "immutable": "3.8.1",
