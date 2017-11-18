@@ -210,7 +210,7 @@ class VmActions extends React.Component {
 
         <LinkButton isOnCard={isOnCard}
           shortTitle={msg.edit()}
-          button='btn btn-primary'
+          button='btn btn-default'
           className={`pficon pficon-edit ${style['action-link']}`}
           tooltip={msg.editVm()} to={`/vm/${vm.get('id')}/edit`}
           id={`action-${vm.get('name')}-edit`} />
