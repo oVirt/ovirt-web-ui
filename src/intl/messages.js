@@ -112,6 +112,7 @@ export const messages = {
     message: 'Refresh',
     description: 'Reload data from server',
   },
+  pleaseEnterValidVmName: 'Please enter valid virtual machine name',
   about: {
     message: 'About',
     description: 'About application',

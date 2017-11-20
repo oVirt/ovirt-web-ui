@@ -41,3 +41,7 @@
     overflow: visible !important;
     display: flex;
 }
+
+.error-text{
+    font-size: 12px;
+}
