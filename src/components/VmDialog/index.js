@@ -203,12 +203,12 @@ class VmDialog extends React.Component {
   }
 
   onChangeVmName (event) {
-    var regexp = /^[a-zA-Z0-9._\-+]+$/;
+    var regexp = /^[a-zA-Z0-9._\-+]+$/
 
-    if (regexp.test(event.target.value)){
-      this.setState({ name: event.target.value, isChanged: true, vmNameErrorText: null })}
-    else{
-      this.setState({ name: event.target.value, isChanged: true, vmNameErrorText: msg.pleaseEnterValidVmName()})
+    if (regexp.test(event.target.value)) {
+      this.setState({ name: event.target.value, isChanged: true, vmNameErrorText: null })
+    } else {
+      this.setState({ name: event.target.value, isChanged: true, vmNameErrorText: msg.pleaseEnterValidVmName() })
     }
   }
   onChangeVmDescription (event) {
@@ -435,7 +435,7 @@ class VmDialog extends React.Component {
       </h1>) : (
         <h1 id={`${idPrefix}-create-title`}>Create A New Virtual Machine</h1>
       )
-    
+
     const vmNameError = this.state.vmNameErrorText
       ? (<span className={`help-block ${style['error-text']}`} >{this.state.vmNameErrorText}</span>)
       : null
@@ -465,7 +465,7 @@ class VmDialog extends React.Component {
                   placeholder='Enter VM Name'
                   onChange={this.onChangeVmName}
                   value={this.state.name || ''} />
-                  {vmNameError}
+                {vmNameError}
               </dd>
 
               <dt>
