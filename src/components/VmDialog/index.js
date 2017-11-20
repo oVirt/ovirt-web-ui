@@ -570,7 +570,7 @@ class VmDialog extends React.Component {
         {msg.bootMenuWarning()}
       </React.Fragment>)
       : msg.bootMenuTooltip()
-    
+
     const vmNameError = this.state.vmNameErrorText
       ? (<span className={`help-block ${style['error-text']}`} >{this.state.vmNameErrorText}</span>)
       : null
@@ -603,7 +603,7 @@ class VmDialog extends React.Component {
                   placeholder={msg.enterVmName()}
                   onChange={this.onChangeVmName}
                   value={this.state.name || ''} />
-                  {vmNameError}
+                {vmNameError}
               </dd>
 
               <dt>
