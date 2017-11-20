@@ -117,6 +117,7 @@ export const messages = {
     description: 'About application',
   },
   logOut: 'Log out',
+  noMessages: 'No\u00A0messages',
 }
 
 export type MessageIdType = $Keys<typeof messages>
