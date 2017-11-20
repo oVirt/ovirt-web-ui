@@ -208,9 +208,11 @@ class VmActions extends React.Component {
           usbFilter={config.get('usbFilter')}
           vm={vm} />
 
+        <span className={style['button-spacer']} />
+
         <LinkButton isOnCard={isOnCard}
           shortTitle={msg.edit()}
-          button={`btn btn-default ${style['margin-left-link']}`}
+          button='btn btn-default'
           className={`pficon pficon-edit ${style['action-link']}`}
           tooltip={msg.editVm()} to={`/vm/${vm.get('id')}/edit`}
           id={`action-${vm.get('name')}-edit`} />
