@@ -66,17 +66,14 @@ class VmUserMessages extends React.Component {
       show = 'show'
     }
 
-    let messages = userMessages.get('records')
-    let messagesList = ''
-
-    if (messages.size !== 0) {
-      messagesList = (
+    const messages = userMessages.get('records')
+    const messagesList = messages.size !== 0
+      ? (
         <ul className={`list-group ${style['messages-list']}`}>
           {messages.map(r => (<UserMessage key={r.time} record={r} id={`${idPrefix}-msg-${idCounter++}`} />))}
         </ul>)
-    } else {
-      messagesList = (
-        <div className='blank-slate-pf '>
+      : (
+        <div className={`blank-slate-pf ${style['no-messages']}`}>
           <div className='blank-slate-pf-icon'>
             <span className='pficon pficon pficon-info' />
           </div>
@@ -84,7 +81,6 @@ class VmUserMessages extends React.Component {
             {msg.noMessages()}
           </h1>
         </div>)
-    }
 
     let idCounter = 0
     return (

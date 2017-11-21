@@ -25,6 +25,11 @@
 	overflow-x: auto;
 }
 
+.no-messages {
+    border: none;
+    margin-bottom: 0;
+}
+
 .contact-admin {
     padding: 6px 15px;
 }
