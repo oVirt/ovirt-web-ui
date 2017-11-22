@@ -66,6 +66,22 @@ class VmUserMessages extends React.Component {
       show = 'show'
     }
 
+    const messages = userMessages.get('records')
+    const messagesList = messages.size !== 0
+      ? (
+        <ul className={`list-group ${style['messages-list']}`}>
+          {messages.map(r => (<UserMessage key={r.time} record={r} id={`${idPrefix}-msg-${idCounter++}`} />))}
+        </ul>)
+      : (
+        <div className={`blank-slate-pf ${style['no-messages']}`}>
+          <div className='blank-slate-pf-icon'>
+            <span className='pficon pficon pficon-info' />
+          </div>
+          <h1>
+            {msg.noMessages()}
+          </h1>
+        </div>)
+
     let idCounter = 0
     const badgeElement = userMessages.get('records').size === 0
         ? null
@@ -81,9 +97,8 @@ class VmUserMessages extends React.Component {
         <div className={`dropdown-menu dropdown-menu-right infotip bottom-right ${show}`}>
           <div className={`arrow ${style['fix-arrow-position']}`} />
 
-          <ul className={`list-group ${style['messages-list']}`}>
-            {userMessages.get('records').map(r => (<UserMessage key={r.time} record={r} id={`${idPrefix}-msg-${idCounter++}`} />))}
-          </ul>
+          {messagesList}
+
           <ContactAdminInfo userMessages={userMessages} id={`${idPrefix}-contact`} />
 
           <div className='footer'>

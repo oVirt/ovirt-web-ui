@@ -117,6 +117,10 @@ export const messages = {
     description: 'About application',
   },
   logOut: 'Log out',
+  noMessages: {
+    message: 'No\u00A0messages',
+    description: '\u00A0 is code for unbreakable space, please use it in your translation',
+  },
 }
 
 export type MessageIdType = $Keys<typeof messages>
