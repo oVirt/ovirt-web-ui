@@ -47,7 +47,7 @@ function getBrowserLocale (): ?string {
 }
 
 function getLocaleFromUrl (): ?string {
-  const localeMatch = /locale=([\w-]{2,})/.exec(window.location.search)
+  const localeMatch = /locale=(\w{2}([-_]\w{2})?)/.exec(window.location.search)
   if (localeMatch === null) {
     return null
   }
@@ -56,7 +56,7 @@ function getLocaleFromUrl (): ?string {
 }
 
 function coerceToSupportedLocale (locale: string): ?string {
-  if (locale === 'en' || locale.startsWith('en-')) {
+  if (/^en/.test(locale)) {
     return 'en'
   }
   if (getSupportedTranslatedLocales().has(locale)) {
@@ -79,7 +79,7 @@ function getSupportedTranslatedLanguageOnlyLocales (): {[string]: string} {
 }
 
 function getLocaleLanguage (locale: string): string {
-  return locale.split('-')[0]
+  return locale.split(/[-_]/)[0]
 }
 
 /**
