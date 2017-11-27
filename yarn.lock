@@ -5474,6 +5474,10 @@ string-length@^1.0.1:
   dependencies:
     strip-ansi "^3.0.0"
 
+string-natural-compare@2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/string-natural-compare/-/string-natural-compare-2.0.2.tgz#c5ce4e278ab5d1265ae6fc55435aeb7b76fcb001"
+
 string-width@^1.0.1, string-width@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/string-width/-/string-width-1.0.2.tgz#118bdf5b8cdc51a2a7e70d211e07e2b0b9b107d3"
