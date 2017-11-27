@@ -126,7 +126,7 @@ export const messages = {
     message: 'Refresh',
     description: 'Reload data from server',
   },
-  pleaseEnterValidVmName: 'Please enter valid virtual machine name',
+  pleaseEnterValidVmName: 'Please enter valid virtual machine name. Only lower-case and upper-case letters, numbers, \'_\', \'-\', \'.\' are allowed.',
   about: {
     message: 'About',
     description: 'About application',
