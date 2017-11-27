@@ -37,6 +37,7 @@
     margin-left: 0!important;
 }
 
-.margin-left-link {
-	margin-left: 15px!important;
+.button-spacer {
+    width: 10px;
+    display: inline-block;
 }
