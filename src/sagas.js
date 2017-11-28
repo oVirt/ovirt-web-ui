@@ -8,6 +8,7 @@ import {
   put,
   takeEvery,
   takeLatest,
+  throttle,
 } from 'redux-saga/effects'
 
 import { logDebug } from './helpers'
@@ -155,12 +156,16 @@ function* fetchIcon ({ iconId }) {
 function* refreshData (action) {
   console.log('refreshData(): ', action.payload)
   if (!action.payload.quiet) {
-    console.log('refreshData(): not quiet')
+    logDebug('refreshData(): not quiet')
     yield put(loadInProgress({ value: true }))
   }
-  yield put(getVmsByCount({ count: action.payload.page * AppConfiguration.pageLimit, shallowFetch: !!action.payload.shallowFetch }))
-  yield put(getPoolsByCount({ count: action.payload.page * AppConfiguration.pageLimit }))
+
+  // do refresh sequentially
+  yield fetchVmsByCount(getVmsByCount({ count: action.payload.page * AppConfiguration.pageLimit, shallowFetch: !!action.payload.shallowFetch }))
+  yield fetchPoolsByCount(getPoolsByCount({ count: action.payload.page * AppConfiguration.pageLimit }))
+
   yield put(loadInProgress({ value: false }))
+  logDebug('refreshData() finished')
 }
 
 function* fetchVmsByPage (action) {
@@ -584,7 +589,11 @@ function* schedulerPerMinute (action) {
     const oVirtVersion = Selectors.getOvirtVersion()
     if (oVirtVersion.get('passed')) {
       // Actions to be executed no more than once per minute:
-      yield put(refresh({ quiet: true, shallowFetch: true, page: Selectors.getCurrentPage() }))
+      yield refreshData(refresh({
+        quiet: true,
+        shallowFetch: true,
+        page: Selectors.getCurrentPage(),
+      }))
     } else {
       logDebug('schedulerPerMinute() event skipped since oVirt API version does not match')
     }
@@ -605,12 +614,14 @@ export function *rootSaga () {
     takeEvery(LOGOUT, logout),
     takeLatest(CHECK_TOKEN_EXPIRED, doCheckTokenExpired),
 
-    takeLatest(REFRESH_DATA, refreshData),
-    takeLatest(GET_BY_PAGE, fetchByPage),
-    takeLatest(GET_VMS_BY_PAGE, fetchVmsByPage),
-    takeLatest(GET_VMS_BY_COUNT, fetchVmsByCount),
-    takeLatest(GET_POOLS_BY_COUNT, fetchPoolsByCount),
-    takeLatest(GET_POOLS_BY_PAGE, fetchPoolsByPage),
+    takeEvery(SCHEDULER__1_MIN, schedulerPerMinute),
+    throttle(1000, REFRESH_DATA, refreshData),
+
+    throttle(100, GET_BY_PAGE, fetchByPage),
+    throttle(100, GET_VMS_BY_PAGE, fetchVmsByPage),
+    throttle(100, GET_VMS_BY_COUNT, fetchVmsByCount),
+    throttle(100, GET_POOLS_BY_COUNT, fetchPoolsByCount),
+    throttle(100, GET_POOLS_BY_PAGE, fetchPoolsByPage),
     takeLatest(PERSIST_STATE, persistStateSaga),
 
     takeEvery(SHUTDOWN_VM, shutdownVm),
@@ -626,8 +637,8 @@ export function *rootSaga () {
     takeLatest(GET_ALL_TEMPLATES, fetchAllTemplates),
     takeLatest(GET_ALL_OS, fetchAllOS),
     takeLatest(GET_ALL_HOSTS, fetchAllHosts),
-    takeLatest(GET_ISO_STORAGES, fetchISOStorages),
-    takeLatest(GET_ALL_FILES_FOR_ISO, fetchAllFilesForISO),
+    throttle(100, GET_ISO_STORAGES, fetchISOStorages),
+    throttle(100, GET_ALL_FILES_FOR_ISO, fetchAllFilesForISO),
 
     takeEvery(SELECT_VM_DETAIL, selectVmDetail),
     takeEvery(CHANGE_VM_ICON, changeVmIcon),
@@ -637,7 +648,7 @@ export function *rootSaga () {
 
     takeEvery(SELECT_POOL_DETAIL, selectPoolDetail),
     takeEvery(GET_USB_FILTER, fetchUSBFilter),
-    takeLatest(SCHEDULER__1_MIN, schedulerPerMinute),
+
     ...SagasWorkers(sagasFunctions),
   ]
 }

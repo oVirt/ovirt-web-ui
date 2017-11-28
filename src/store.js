@@ -3,8 +3,14 @@ import createSagaMiddleware from 'redux-saga'
 
 import reducer from './reducers'
 
+const onUncaughtSagaError = (...args) => {
+  console.error('Uncaught saga error (store.js): ', ...args)
+}
+
 // create the saga middleware
-export const sagaMiddleware = createSagaMiddleware()
+export const sagaMiddleware = createSagaMiddleware({
+  onError: onUncaughtSagaError,
+})
 
 const composeEnhancers =
   process.env.NODE_ENV !== 'production' &&

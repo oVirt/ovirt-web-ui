@@ -50,6 +50,6 @@ const config = actionReducer(initialState, {
   SET_USB_FILTER (state, { payload: { usbFilter } }) {
     return state.set('usbFilter', usbFilter)
   },
-})
+}, true)
 
 export default config
