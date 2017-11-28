@@ -55,6 +55,13 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Tue Nov 28 2017 Marek Libra <mlibra@redhat.com> - 1.3.3
+- Minor UI fixes and improvements
+- Fix frozen "Loading" msg - https://github.com/oVirt/ovirt-web-ui/pull/430
+- Fix of sorting of VMs in left vertical panel - https://github.com/oVirt/ovirt-web-ui/pull/428
+- Fix in locale recognition - https://github.com/oVirt/ovirt-web-ui/pull/438
+- Use of translated messages from API - https://github.com/oVirt/ovirt-web-ui/pull/131
+
 * Tue Nov 14 2017 Marek Libra <mlibra@redhat.com> - 1.3.2
 - fix of scrollbar on Webkit browsers
 
