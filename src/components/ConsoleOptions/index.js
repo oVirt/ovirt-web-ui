@@ -40,7 +40,7 @@ class ConsoleOptions extends React.Component {
     return (
       <div className={classes}>
         <dl>
-          <dt className={style['console-option-description']}>Connect automatically</dt>
+          <dt className={style['console-option-description']}>{msg.connectAutomatically()}</dt>
           <dd>
             <Switch
               animate
@@ -50,7 +50,7 @@ class ConsoleOptions extends React.Component {
               />
           </dd>
 
-          <dt className={style['console-option-description']}>Fullscreen</dt>
+          <dt className={style['console-option-description']}>{msg.fullScreen()}</dt>
           <dd>
             <Switch
               animate

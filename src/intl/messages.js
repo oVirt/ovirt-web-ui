@@ -189,7 +189,8 @@ export const messages = {
     message: 'Host Console',
     description: 'Label of link to the Cockpit app',
   },
-
+  connectAutomatically: 'Connect automatically',
+  fullScreen: 'Fullscreen',
 }
 
 export type MessageIdType = $Keys<typeof messages>
