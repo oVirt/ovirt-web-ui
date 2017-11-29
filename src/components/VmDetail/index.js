@@ -238,7 +238,7 @@ class VmDetail extends Component {
                   <dd id={`${idPrefix}-fqdn`}>{vm.get('fqdn')}</dd>
 
                   <dt><span className='pficon pficon-storage-domain' />&nbsp;
-                    <FieldHelp content={msg.currentlyInsertedIsoInCdRom()} text={msg.cd()} />
+                    <FieldHelp content={msg.currentlyInsertedIsoInCdDrive()} text={msg.cd()} />
                   </dt>
                   <dd id={`${idPrefix}-cdrom`}>{vm.getIn(['cdrom', 'file', 'id']) ? vm.getIn(['cdrom', 'file', 'id']) : msg.empty() }</dd>
                 </dl>

@@ -100,7 +100,7 @@ export const messages = {
   totalCountOfVirtualProcessorsVmWillBeEquippedWith: 'Total count of virtual processors the virtual machine will be equipped with.',
   fullyQualifiedDomainName: 'Fully Qualified Domain Name (FQDN) of the virtual machine. Please note, guest agent must be installed within the virtual machine to retrieve this value.',
   address: 'Address',
-  currentlyInsertedIsoInCdRom: 'Currently inserted ISO in CD-ROM',
+  currentlyInsertedIsoInCdDrive: 'Currently inserted ISO in CD drive',
   cd: 'CD',
   storageConnectedToVm: 'Storage connected to the virtual machine.',
   disks: 'Disks',
