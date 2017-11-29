@@ -191,6 +191,19 @@ export const messages = {
   },
   connectAutomatically: 'Connect automatically',
   fullScreen: 'Fullscreen',
+  createANewVm: 'Create A New Virtual Machine',
+  name: {
+    message: 'Name',
+    description: 'Virtual machine name',
+  },
+  uniqueNameOfTheVirtualMachine: 'Unique name of the virtual machine.',
+  enterVmName: 'Enter VM Name',
+  enterVmDescription: 'Enter VM Description (optional)',
+  vmMemory: 'VM Memory',
+  changeCd: 'Change CD.',
+  updateVm: 'Update VM',
+  createVm: 'Create VM',
+
 }
 
 export type MessageIdType = $Keys<typeof messages>

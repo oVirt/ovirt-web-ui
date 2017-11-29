@@ -2,10 +2,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 
+import { msg } from '../../intl'
+
 const AddVmButton = ({ id }) => {
   return (<div id={id}>
     <Link className='btn btn-primary' to='/vm/add'>
-      Add Virtual Machine
+      { msg.addNewVm() }
     </Link>
   </div>)
 }

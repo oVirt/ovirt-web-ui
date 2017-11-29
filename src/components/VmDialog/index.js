@@ -31,6 +31,8 @@ import SelectBox from '../SelectBox'
 
 import { MAX_VM_MEMORY_FACTOR } from '../../constants/index'
 
+import { msg } from '../../intl'
+
 function sortedBy (immutableCollection, sortBy) { // TODO: move to helpers
   return immutableCollection.sort(
     (a, b) => a.get(sortBy).localeCompare(b.get(sortBy))
@@ -415,7 +417,7 @@ class VmDialog extends React.Component {
     const os = this.getOS()
     const cdromFileId = this.getCDRomFileId()
 
-    const submitText = isEdit ? 'Update VM' : 'Create VM'
+    const submitText = isEdit ? msg.updateVm() : msg.createVm()
 
     const iconId = vm && vm.getIn(['icons', 'small', 'id'])
     const icon = iconId && icons.get(iconId)
@@ -423,9 +425,9 @@ class VmDialog extends React.Component {
     const title = isEdit ? (
       <h1 className={style['header']} id={`${idPrefix}-edit-title`}>
         <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' className={sharedStyle['vm-detail-icon']} />
-        &nbsp;{vm.get('name')} - Edit
+        &nbsp;{vm.get('name')} - {msg.edit()}
       </h1>) : (
-        <h1 id={`${idPrefix}-create-title`}>Create A New Virtual Machine</h1>
+        <h1 id={`${idPrefix}-create-title`}>{msg.createANewVm()}</h1>
       )
 
     return (
@@ -443,33 +445,33 @@ class VmDialog extends React.Component {
           <div className={style['vm-dialog-container']}>
             <dl className={sharedStyle['vm-properties']}>
               <dt>
-                <FieldHelp content='Unique name of the virtual machine.' text='Name' />
+                <FieldHelp content={msg.uniqueNameOfTheVirtualMachine()} text={msg.name()} />
               </dt>
               <dd>
                 <input
                   type='text'
                   className='form-control'
                   id='vmName'
-                  placeholder='Enter VM Name'
+                  placeholder={msg.enterVmName()}
                   onChange={this.onChangeVmName}
                   value={this.state.name || ''} />
               </dd>
 
               <dt>
-                <FieldHelp content='Optional user description of the virtual machine.' text='Description' />
+                <FieldHelp content={msg.optionalUserDescriptionOfVm()} text={msg.description()} />
               </dt>
               <dd>
                 <input
                   type='text'
                   className='form-control'
                   id='vmDescription'
-                  placeholder='Enter VM Description (optional)'
+                  placeholder={msg.enterVmDescription()}
                   onChange={this.onChangeVmDescription}
                   value={this.state.description || ''} />
               </dd>
 
               <dt>
-                <FieldHelp content='Group of hosts the virtual machine can be running on.' text='Cluster' />
+                <FieldHelp content={msg.groupOfHostsVmCanBeRunningOn()} text={msg.cluster()} />
               </dt>
               <dd className={style['field-overflow-visible']}>
                 <SelectBox
@@ -483,7 +485,7 @@ class VmDialog extends React.Component {
               </dd>
 
               <dt>
-                <FieldHelp content='Contains the configuration and disks which will be used to create this virtual machine. Please customize as needed.' text='Template' />
+                <FieldHelp content={msg.containsConfigurationAndDisksWhichWillBeUsedToCreateThisVm()} text={msg.template()} />
               </dt>
               <dd className={style['field-overflow-visible']}>
                 <SelectBox
@@ -497,7 +499,7 @@ class VmDialog extends React.Component {
               </dd>
 
               <dt>
-                <FieldHelp content='Operating system installed on the virtual machine.' text='Operating System' />
+                <FieldHelp content={msg.operatingSystemInstalledOnVm()} text={msg.operatingSystem()} />
               </dt>
               <dd className={style['field-overflow-visible']}>
                 <SelectBox
@@ -513,14 +515,14 @@ class VmDialog extends React.Component {
               <dt>
                 <span className='pficon pficon-memory' />
                 &nbsp;
-                <FieldHelp content='Total memory the virtual machine will be equipped with. In megabytes.' text='Defined Memory' />
+                <FieldHelp content={msg.totalMemoryVmWillBeEquippedWith} text={msg.definedMemory()} />
               </dt>
               <dd>
                 <input
                   type='number'
                   className='form-control'
                   id='vmMemory'
-                  placeholder='VM Memory'
+                  placeholder={msg.vmMemory()}
                   onChange={this.onChangeVmMemory}
                   value={this.state.memory / 1024 / 1024 || ''}
                   min={0}
@@ -530,14 +532,14 @@ class VmDialog extends React.Component {
               <dt>
                 <span className='pficon pficon-cpu' />
                 &nbsp;
-                <FieldHelp content='Total count of virtual processors the virtual machine will be equipped with.' text='CPUs' />
+                <FieldHelp content={msg.totalCountOfVirtualProcessorsVmWillBeEquippedWith()} text={msg.cpus()} />
               </dt>
               <dd>
                 <input
                   type='number'
                   className='form-control'
                   id='vmCpus'
-                  placeholder='CPUs'
+                  placeholder={msg.cpus()}
                   onChange={this.onChangeVmCpu}
                   value={this.state.cpus || ''}
                   min={1}
@@ -546,7 +548,7 @@ class VmDialog extends React.Component {
               <dt>
                 <span className='pficon pficon-storage-domain' />
                 &nbsp;
-                <FieldHelp content='Change CD.' text='CDRom' />
+                <FieldHelp content={msg.changeCd()} text={msg.cd()} />
               </dt>
               <dd className={style['field-overflow-visible']}>
                 <SelectBox
@@ -561,7 +563,7 @@ class VmDialog extends React.Component {
           </div>
 
           <div className={style['vm-dialog-buttons']}>
-            <Link className='btn btn-default' to={vm ? `/vm/${vm.get('id')}` : '/'}>Close</Link>
+            <Link className='btn btn-default' to={vm ? `/vm/${vm.get('id')}` : '/'}>{msg.close()}</Link>
             <button className='btn btn-primary' type='button' onClick={this.submitHandler}>{submitText}</button>
           </div>
         </form>
