@@ -45,6 +45,10 @@ ContactAdminInfo.propTypes = {
   id: PropTypes.string,
 }
 
+function spaceToNonbreakableSpace (text) {
+  return text.split(' ').join('\u00A0')
+}
+
 class VmUserMessages extends React.Component {
   constructor (props) {
     super(props)
@@ -78,7 +82,7 @@ class VmUserMessages extends React.Component {
             <span className='pficon pficon pficon-info' />
           </div>
           <h1>
-            {msg.noMessages()}
+            {spaceToNonbreakableSpace(msg.noMessages())}
           </h1>
         </div>)
 

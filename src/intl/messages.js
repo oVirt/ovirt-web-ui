@@ -117,10 +117,7 @@ export const messages = {
     description: 'About application',
   },
   logOut: 'Log out',
-  noMessages: {
-    message: 'No\u00A0messages',
-    description: '\u00A0 is code for unbreakable space, please use it in your translation',
-  },
+  noMessages: 'No messages',
   enum_VmStatus_up: {
     message: 'Up',
     description: 'VM is running. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
