@@ -172,6 +172,18 @@ function createFormattingFunctionsMap (messages: typeof messages): {[MessageIdTy
 export const msg: {[MessageIdType]: ((?Object) => string)} = createFormattingFunctionsMap(messages)
 
 /**
+ * Utility function to translate enums
+ */
+export function enumMsg (enumId: string, enumItem: string): string {
+  const messageKey: MessageIdType = (`enum_${enumId}_${enumItem}`: any)
+  const message = msg[messageKey]()
+  if (message !== messageKey) {
+    return message
+  }
+  return enumItem
+}
+
+/**
  * Exported for tests purposes only
  */
 export const localeDataMap = {
