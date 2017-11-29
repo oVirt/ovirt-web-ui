@@ -185,6 +185,10 @@ export const messages = {
     message: 'Unassigned',
     description: 'Error when obtaining virtual machine status. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
   },
+  hostConsole: {
+    message: 'Host Console',
+    description: 'Label of link to the Cockpit app',
+  },
 
 }
 
