@@ -44,7 +44,7 @@ const getRoutes = (vms) => ([
           {
             path: '/vm/:id/edit',
             component: VmDialogPage,
-            title: 'Edit',
+            title: msg.edit(),
             toolbars: [], // Recently not used. When needed, see VmDialog/style.css - .vm-dialog-buttons
           },
         ],

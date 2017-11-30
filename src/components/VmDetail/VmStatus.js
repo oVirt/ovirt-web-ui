@@ -5,12 +5,13 @@ import { connect } from 'react-redux'
 
 import { VmStatusIcon } from 'ovirt-ui-components'
 import FieldHelp from '../FieldHelp/index'
-import { msg } from '../../intl'
+import { msg, enumMsg } from '../../intl'
 
 import HostConsole, { hasUserHostConsoleAccess, CockpitAHREF } from '../HostConsole/index'
 
 const VmStatus = ({ vm, hosts, config }) => {
-  const value = vm.get('status') // TODO: translate
+  const status = vm.get('status')
+  const value = enumMsg('VmStatus', status)
   let hostContent, detailContent
 
   if (hasUserHostConsoleAccess({ vm, hosts, config })) {

@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import AppConfiguration from '../../config'
+import { msg } from './../../intl'
 
 import style from './style.css'
 
@@ -38,7 +39,7 @@ const HostConsole = ({ vm, hosts, config }) => {
   // TODO: change to Cockpit SSO link once ready
   return (
     <span className={style['container']}>
-      (see <CockpitAHREF host={host} text='Host Console' />)
+      <CockpitAHREF host={host} text={msg.hostConsole()} />
     </span>
   )
 }

@@ -100,7 +100,7 @@ export const messages = {
   totalCountOfVirtualProcessorsVmWillBeEquippedWith: 'Total count of virtual processors the virtual machine will be equipped with.',
   fullyQualifiedDomainName: 'Fully Qualified Domain Name (FQDN) of the virtual machine. Please note, guest agent must be installed within the virtual machine to retrieve this value.',
   address: 'Address',
-  currentlyInsertedIsoInCdRom: 'Currently inserted ISO in CD-ROM',
+  currentlyInsertedIsoInCdDrive: 'Currently inserted ISO in CD drive',
   cd: 'CD',
   storageConnectedToVm: 'Storage connected to the virtual machine.',
   disks: 'Disks',
@@ -117,10 +117,90 @@ export const messages = {
     description: 'About application',
   },
   logOut: 'Log out',
-  noMessages: {
-    message: 'No\u00A0messages',
-    description: '\u00A0 is code for unbreakable space, please use it in your translation',
+  noMessages: 'No messages',
+  enum_VmStatus_up: {
+    message: 'Up',
+    description: 'VM is running. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
   },
+  enum_VmStatus_down: {
+    message: 'Down',
+    description: 'VM is turned off. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
+  },
+  enum_VmStatus_poweringup: {
+    message: 'Powering up',
+    description: 'VM is starting. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
+  },
+  enum_VmStatus_paused: {
+    message: 'Paused',
+    description: 'VM is paused. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
+  },
+  enum_VmStatus_migratingfrom: {
+    message: 'Migrating from',
+    description: 'VM is migrating. This instance is migration source. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
+  },
+  enum_VmStatus_migratingto: {
+    message: 'Migrating to',
+    description: 'VM is migrating. This instance is migration destination. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
+  },
+  enum_VmStatus_unknown: {
+    message: 'Unknown',
+    description: 'VM is in unknown state. Connection hot hypervisor is probably broken. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
+  },
+  enum_VmStatus_waitingforlaunch: {
+    message: 'Waiting for launch',
+    description: 'VM is down but planned to started. be One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
+  },
+  enum_VmStatus_rebootinprogress: {
+    message: 'Reboot in progress',
+    description: 'One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
+  },
+  enum_VmStatus_savingstate: {
+    message: 'Saving state',
+    description: 'Being hibernated. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
+  },
+  enum_VmStatus_restoringstate: {
+    message: 'Restoring state',
+    description: 'Waking up from hibernation. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
+  },
+  enum_VmStatus_suspended: {
+    message: 'Suspended',
+    description: 'Hibernated. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
+  },
+  enum_VmStatus_illegalimage: {
+    message: 'Illegal image',
+    description: 'Disk image is in illegal state. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
+  },
+  enum_VmStatus_imagelocked: {
+    message: 'Image locked',
+    description: 'Disk image is locked. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
+  },
+  enum_VmStatus_poweringdown: {
+    message: 'Powering down',
+    description: 'VM is being turned off. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
+  },
+  enum_VmStatus_unassigned: {
+    message: 'Unassigned',
+    description: 'Error when obtaining virtual machine status. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
+  },
+  hostConsole: {
+    message: 'Host Console',
+    description: 'Label of link to the Cockpit app',
+  },
+  connectAutomatically: 'Connect automatically',
+  fullScreen: 'Fullscreen',
+  createANewVm: 'Create A New Virtual Machine',
+  name: {
+    message: 'Name',
+    description: 'Virtual machine name',
+  },
+  uniqueNameOfTheVirtualMachine: 'Unique name of the virtual machine.',
+  enterVmName: 'Enter VM Name',
+  enterVmDescription: 'Enter VM Description (optional)',
+  vmMemory: 'VM Memory',
+  changeCd: 'Change CD.',
+  updateVm: 'Update VM',
+  createVm: 'Create VM',
+
 }
 
 export type MessageIdType = $Keys<typeof messages>
