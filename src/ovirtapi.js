@@ -176,7 +176,7 @@ OvirtApi = {
       cdrom: {},
       sessions: [],
       display: {
-        smartcardEnabled: vm['display']['smartcard_enabled'] ? vm['display']['smartcard_enabled'] === 'true' : false,
+        smartcardEnabled: vm.display && vm.display.smartcard_enabled ? vm.display.smartcard_enabled === 'true' : false,
       },
     }
     if (getSubResources) {
