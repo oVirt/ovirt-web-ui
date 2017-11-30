@@ -55,6 +55,10 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Thu Nov 30 2017 Marek Libra <mlibra@redhat.com> - 1.3.4
+- Fix for headless VMs - https://github.com/oVirt/ovirt-web-ui/pull/444
+- Updated translations
+
 * Tue Nov 28 2017 Marek Libra <mlibra@redhat.com> - 1.3.3
 - Minor UI fixes and improvements
 - Fix frozen "Loading" msg - https://github.com/oVirt/ovirt-web-ui/pull/430
