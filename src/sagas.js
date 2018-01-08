@@ -241,6 +241,9 @@ function* fetchVmsByCountV42 (action) {
   if (allVms && allVms['vm']) { // array
     const internalVms = allVms.vm.map(vm => Api.vmToInternal({ vm, getSubResources: true }))
 
+    const vmIdsToPreserve = internalVms.map(vm => vm.id)
+    yield put(removeMissingVms({ vmIdsToPreserve }))
+
     yield put(updateVms({ vms: internalVms, copySubResources: true, page: page }))
   }
 
