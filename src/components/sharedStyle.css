@@ -43,7 +43,7 @@
 
 .page-router-render-component {
     flex-grow: 1;
-    overflow: hidden;
+    overflow: auto;
     height: 100%;
 }
 
