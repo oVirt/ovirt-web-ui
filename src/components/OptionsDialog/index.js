@@ -23,13 +23,30 @@ class OptionsDialog extends React.Component {
     }
     this.onSSHKeyChange = this.onSSHKeyChange.bind(this)
     this.onSaveClick = this.onSaveClick.bind(this)
+    this.setEventHandlers = this.setEventHandlers.bind(this)
   }
 
   componentDidMount () {
+    this.setEventHandlers(true)
+  }
+
+  componentDidUpdate () {
+    this.setEventHandlers()
+  }
+
+  setEventHandlers (mount) {
     const dom = ReactDOM.findDOMNode(this)
-    $(dom).on('shown.bs.modal', function (e) {
+    if (mount) {
+      $(dom).on('shown.bs.modal', function (e) {
+        if (this.props.userId) {
+          this.props.getSSH()
+        }
+      }.bind(this))
+    }
+    $(dom).on('hidden.bs.modal', function (e) {
       if (this.props.userId) {
-        this.props.onOpen()
+        this.props.getSSH()
+        this.setState({ 'sshKey': this.props.optionsDialog.get('sshKey') })
       }
     }.bind(this))
   }
@@ -65,6 +82,7 @@ class OptionsDialog extends React.Component {
       </form>
     )
 
+    console.log('wtf', this.props.userId)
     if (!this.props.userId) {
       const apiVersion = oVirtApiVersion && oVirtApiVersion.get('major')
         ? `${oVirtApiVersion.get('major')}.${oVirtApiVersion.get('minor')}`
@@ -104,7 +122,7 @@ OptionsDialog.propTypes = {
   userId: PropTypes.string,
   optionsDialog: PropTypes.object.isRequired,
   oVirtApiVersion: PropTypes.object,
-  onOpen: PropTypes.func.isRequired,
+  getSSH: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
 }
 
@@ -114,7 +132,7 @@ export default connect(
     oVirtApiVersion: state.config.get('oVirtApiVersion'),
   }),
   (dispatch, { userId }) => ({
-    onOpen: () => dispatch(getSSHKey({ userId })),
+    getSSH: () => dispatch(getSSHKey({ userId })),
     onSave: ({ key, sshId }) => dispatch(saveSSHKey({ key, userId, sshId })),
   })
 )(OptionsDialog)
