@@ -27,15 +27,18 @@ class OptionsDialog extends React.Component {
 
   componentDidMount () {
     const dom = ReactDOM.findDOMNode(this)
-    $(dom).on('shown.bs.modal', function (e) {
+    $(dom).on('show.bs.modal', function (e) {
+      this.setState({ 'sshKey': 'Loading...' })
       if (this.props.userId) {
-        this.props.onOpen()
+        this.props.getSSH()
       }
     }.bind(this))
   }
 
   componentWillReceiveProps (nextProps) {
-    this.setState({ 'sshKey': nextProps.optionsDialog.get('sshKey') })
+    if (nextProps.optionsDialog.get('loaded')) {
+      this.setState({ 'sshKey': nextProps.optionsDialog.get('sshKey') })
+    }
   }
 
   onSSHKeyChange (event) {
@@ -104,7 +107,7 @@ OptionsDialog.propTypes = {
   userId: PropTypes.string,
   optionsDialog: PropTypes.object.isRequired,
   oVirtApiVersion: PropTypes.object,
-  onOpen: PropTypes.func.isRequired,
+  getSSH: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
 }
 
@@ -114,7 +117,7 @@ export default connect(
     oVirtApiVersion: state.config.get('oVirtApiVersion'),
   }),
   (dispatch, { userId }) => ({
-    onOpen: () => dispatch(getSSHKey({ userId })),
+    getSSH: () => dispatch(getSSHKey({ userId })),
     onSave: ({ key, sshId }) => dispatch(saveSSHKey({ key, userId, sshId })),
   })
 )(OptionsDialog)
