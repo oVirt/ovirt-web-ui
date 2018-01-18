@@ -1,4 +1,4 @@
-import { SET_SSH_KEY, GET_SSH_KEY, SAVE_SSH_KEY } from './constants'
+import { SET_SSH_KEY, GET_SSH_KEY, SAVE_SSH_KEY, SET_UNLOADED } from './constants'
 
 export function setSSHKey ({ key, id }) {
   return {
@@ -27,5 +27,12 @@ export function getSSHKey ({ userId }) {
     payload: {
       userId,
     },
+  }
+}
+
+export function setUnloaded () {
+  return {
+    type: SET_UNLOADED,
+    payload: {},
   }
 }
