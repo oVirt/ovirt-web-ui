@@ -515,7 +515,7 @@ class VmDialog extends React.Component {
               <dt>
                 <span className='pficon pficon-memory' />
                 &nbsp;
-                <FieldHelp content={msg.totalMemoryVmWillBeEquippedWith} text={msg.definedMemory()} />
+                <FieldHelp content={msg.totalMemoryVmWillBeEquippedWith()} text={msg.definedMemory()} />
               </dt>
               <dd>
                 <input
