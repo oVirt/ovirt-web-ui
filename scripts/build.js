@@ -13,6 +13,8 @@ var paths = require('../config/paths');
 var checkRequiredFiles = require('./utils/checkRequiredFiles');
 var recursive = require('recursive-readdir');
 var stripAnsi = require('strip-ansi');
+var formatMessage = require('./utils/utils').formatMessage;
+var isLikelyASyntaxError = require('./utils/utils').isLikelyASyntaxError;
 
 checkRequiredFiles();
 
@@ -97,7 +99,12 @@ function printFileSizes(stats, previousSizeMap) {
 
 // Create the production build and print the deployment instructions.
 function build(previousSizeMap) {
+  // Delete flow folder, because package flow wan't to do that before start
+  rimrafSync('/tmp/flow');
+  console.log('Flow folder deleted');
+
   console.log('Creating an optimized production build...');
+
   webpack(config).run((err, stats) => {
     if (err) {
       console.error('Failed to create a production build. Reason:');
@@ -105,62 +112,114 @@ function build(previousSizeMap) {
       process.exit(1);
     }
 
-    console.log(chalk.green('Compiled successfully.'));
-    console.log();
+    var hasErrors = stats.hasErrors();
+    var hasWarnings = stats.hasWarnings();
 
-    console.log('File sizes after gzip:');
-    console.log();
-    printFileSizes(stats, previousSizeMap);
-    console.log();
+    // We have switched off the default Webpack output in WebpackDevServer
+    // options so we are going to "massage" the warnings and errors and present
+    // them in a readable focused way.
+    // We use stats.toJson({}, true) to make output more compact and readable:
+    // https://github.com/facebookincubator/create-react-app/issues/401#issuecomment-238291901
 
-    var openCommand = process.platform === 'win32' ? 'start' : 'open';
-    var homepagePath = require(paths.appPackageJson).homepage;
-    var publicPath = config.output.publicPath;
-    if (homepagePath && homepagePath.indexOf('.github.io/') !== -1) {
-      // "homepage": "http://user.github.io/project"
-      console.log('The project was built assuming it is hosted at ' + chalk.green(publicPath) + '.');
-      console.log('You can control this with the ' + chalk.green('homepage') + ' field in your '  + chalk.cyan('package.json') + '.');
+    if (!hasErrors && !hasWarnings) {
+
+      console.log(chalk.green('Compiled successfully.'));
       console.log();
-      console.log('The ' + chalk.cyan('build') + ' folder is ready to be deployed.');
-      console.log('To publish it at ' + chalk.green(homepagePath) + ', run:');
+
+      console.log('File sizes after gzip:');
       console.log();
-      console.log('  ' + chalk.cyan('git') + ' commit -am ' + chalk.yellow('"Save local changes"'));
-      console.log('  ' + chalk.cyan('git') + ' checkout -B gh-pages');
-      console.log('  ' + chalk.cyan('git') + ' add -f build');
-      console.log('  ' + chalk.cyan('git') + ' commit -am ' + chalk.yellow('"Rebuild website"'));
-      console.log('  ' + chalk.cyan('git') + ' filter-branch -f --prune-empty --subdirectory-filter build');
-      console.log('  ' + chalk.cyan('git') + ' push -f origin gh-pages');
-      console.log('  ' + chalk.cyan('git') + ' checkout -');
+      printFileSizes(stats, previousSizeMap);
       console.log();
-    } else if (publicPath !== '/') {
-      // "homepage": "http://mywebsite.com/project"
-      console.log('The project was built assuming it is hosted at ' + chalk.green(publicPath) + '.');
-      console.log('You can control this with the ' + chalk.green('homepage') + ' field in your '  + chalk.cyan('package.json') + '.');
-      console.log();
-      console.log('The ' + chalk.cyan('build') + ' folder is ready to be deployed.');
-      console.log();
-    } else {
-      // no homepage or "homepage": "http://mywebsite.com"
-      console.log('The project was built assuming it is hosted at the server root.');
-      if (homepagePath) {
-        // "homepage": "http://mywebsite.com"
+
+      var openCommand = process.platform === 'win32' ? 'start' : 'open';
+      var homepagePath = require(paths.appPackageJson).homepage;
+      var publicPath = config.output.publicPath;
+      if (homepagePath && homepagePath.indexOf('.github.io/') !== -1) {
+        // "homepage": "http://user.github.io/project"
+        console.log('The project was built assuming it is hosted at ' + chalk.green(publicPath) + '.');
         console.log('You can control this with the ' + chalk.green('homepage') + ' field in your '  + chalk.cyan('package.json') + '.');
         console.log();
-      } else {
-        // no homepage
-        console.log('To override this, specify the ' + chalk.green('homepage') + ' in your '  + chalk.cyan('package.json') + '.');
-        console.log('For example, add this to build it for GitHub Pages:')
+        console.log('The ' + chalk.cyan('build') + ' folder is ready to be deployed.');
+        console.log('To publish it at ' + chalk.green(homepagePath) + ', run:');
         console.log();
-        console.log('  ' + chalk.green('"homepage"') + chalk.cyan(': ') + chalk.green('"http://myname.github.io/myapp"') + chalk.cyan(','));
+        console.log('  ' + chalk.cyan('git') + ' commit -am ' + chalk.yellow('"Save local changes"'));
+        console.log('  ' + chalk.cyan('git') + ' checkout -B gh-pages');
+        console.log('  ' + chalk.cyan('git') + ' add -f build');
+        console.log('  ' + chalk.cyan('git') + ' commit -am ' + chalk.yellow('"Rebuild website"'));
+        console.log('  ' + chalk.cyan('git') + ' filter-branch -f --prune-empty --subdirectory-filter build');
+        console.log('  ' + chalk.cyan('git') + ' push -f origin gh-pages');
+        console.log('  ' + chalk.cyan('git') + ' checkout -');
+        console.log();
+      } else if (publicPath !== '/') {
+        // "homepage": "http://mywebsite.com/project"
+        console.log('The project was built assuming it is hosted at ' + chalk.green(publicPath) + '.');
+        console.log('You can control this with the ' + chalk.green('homepage') + ' field in your '  + chalk.cyan('package.json') + '.');
+        console.log();
+        console.log('The ' + chalk.cyan('build') + ' folder is ready to be deployed.');
+        console.log();
+      } else {
+        // no homepage or "homepage": "http://mywebsite.com"
+        console.log('The project was built assuming it is hosted at the server root.');
+        if (homepagePath) {
+          // "homepage": "http://mywebsite.com"
+          console.log('You can control this with the ' + chalk.green('homepage') + ' field in your '  + chalk.cyan('package.json') + '.');
+          console.log();
+        } else {
+          // no homepage
+          console.log('To override this, specify the ' + chalk.green('homepage') + ' in your '  + chalk.cyan('package.json') + '.');
+          console.log('For example, add this to build it for GitHub Pages:')
+          console.log();
+          console.log('  ' + chalk.green('"homepage"') + chalk.cyan(': ') + chalk.green('"http://myname.github.io/myapp"') + chalk.cyan(','));
+          console.log();
+        }
+        console.log('The ' + chalk.cyan('build') + ' folder is ready to be deployed.');
+        console.log('You may also serve it locally with a static server:')
+        console.log();
+        console.log('  ' + chalk.cyan('npm') +  ' install -g pushstate-server');
+        console.log('  ' + chalk.cyan('pushstate-server') + ' build');
+        console.log('  ' + chalk.cyan(openCommand) + ' http://localhost:9000');
         console.log();
       }
-      console.log('The ' + chalk.cyan('build') + ' folder is ready to be deployed.');
-      console.log('You may also serve it locally with a static server:')
+      return;
+    }
+
+    var json = stats.toJson({}, true);
+    var formattedErrors = json.errors.map(message =>
+      'Error in ' + formatMessage(message)
+    );
+    var formattedWarnings = json.warnings.map(message =>
+      'Warning in ' + formatMessage(message)
+    );
+    // console.log(stats.hasErrors());
+    // console.log(stats.toJson({}, true));
+
+    if (hasErrors) {
+      console.log(chalk.red('Failed to compile.'));
       console.log();
-      console.log('  ' + chalk.cyan('npm') +  ' install -g pushstate-server');
-      console.log('  ' + chalk.cyan('pushstate-server') + ' build');
-      console.log('  ' + chalk.cyan(openCommand) + ' http://localhost:9000');
+      if (formattedErrors.some(isLikelyASyntaxError)) {
+        // If there are any syntax errors, show just them.
+        // This prevents a confusing ESLint parsing error
+        // preceding a much more useful Babel syntax error.
+        formattedErrors = formattedErrors.filter(isLikelyASyntaxError);
+      }
+      formattedErrors.forEach(message => {
+        console.log(message);
+        console.log();
+      });
+      // If errors exist, ignore warnings.
+      return;
+    }
+    if (hasWarnings) {
+      console.log(chalk.yellow('Compiled with warnings.'));
       console.log();
+      formattedWarnings.forEach(message => {
+        console.log(message);
+        console.log();
+      });
+      // Teach some ESLint tricks.
+      console.log('You may use special comments to disable some warnings.');
+      console.log('Use ' + chalk.yellow('// eslint-disable-next-line') + ' to ignore the next line.');
+      console.log('Use ' + chalk.yellow('/* eslint-disable */') + ' to ignore all warnings in a file.');
     }
   });
 }

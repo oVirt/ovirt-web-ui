@@ -17,6 +17,8 @@ var config = require('../config/webpack.config.dev');
 var paths = require('../config/paths');
 var env = require('../config/env')
 var rimraf = require('rimraf')
+var formatMessage = require('./utils/utils').formatMessage
+var isLikelyASyntaxError = require('./utils/utils').isLikelyASyntaxError
 
 // Tools like Cloud9 rely on this.
 var DEFAULT_PORT = process.env.PORT || 3000;
@@ -34,32 +36,6 @@ if (isSmokeTest) {
       process.exit(0);
     }
   };
-}
-
-// Some custom utilities to prettify Webpack output.
-// This is a little hacky.
-// It would be easier if webpack provided a rich error object.
-var friendlySyntaxErrorLabel = 'Syntax error:';
-function isLikelyASyntaxError(message) {
-  return message.indexOf(friendlySyntaxErrorLabel) !== -1;
-}
-function formatMessage(message) {
-  return message
-    // Make some common errors shorter:
-    .replace(
-      // Babel syntax error
-      'Module build failed: SyntaxError:',
-      friendlySyntaxErrorLabel
-    )
-    .replace(
-      // Webpack file not found error
-      /Module not found: Error: Cannot resolve 'file' or 'directory'/,
-      'Module not found:'
-    )
-    // Internal stacks are generally useless so we strip them
-    .replace(/^\s*at\s.*:\d+:\d+[\s\)]*\n/gm, '') // at ... ...:x:y
-    // Webpack loader names obscure CSS filenames
-    .replace('./~/css-loader!./~/postcss-loader!', '');
 }
 
 var isFirstClear = true;
