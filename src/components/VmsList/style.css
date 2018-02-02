@@ -88,6 +88,10 @@
 
 .card-icon {
     text-align: center;
+    height: 134px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .operating-system-label {
