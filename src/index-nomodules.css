@@ -73,3 +73,7 @@ div.toolbar-pf {
 .popover {
   min-width: 120px;
 }
+
+span.fa.fa-birthday-cake.card-pf-icon-circle {
+  margin-bottom: 6px;
+}
