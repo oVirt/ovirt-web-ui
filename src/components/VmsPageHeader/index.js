@@ -18,7 +18,7 @@ const VmsPageHeader = ({ onRefresh }) => {
   return (
     <nav className='navbar obrand_mastheadBackground obrand_topBorder navbar-pf-vertical'>
       <div className='navbar-header'>
-        <a href='#' className='navbar-brand obrand_headerLogoLink' id={`${idPrefix}-logo`}>
+        <a href='/' className='navbar-brand obrand_headerLogoLink' id={`${idPrefix}-logo`}>
           <img className='obrand_mastheadLogo' src={branding.resourcesUrls.clearGif} />
         </a>
       </div>
