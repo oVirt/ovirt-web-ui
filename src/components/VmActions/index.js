@@ -206,7 +206,8 @@ class VmActions extends React.Component {
           tooltip={consoleProtocol}
           shortTitle={msg.console()}
           usbFilter={config.get('usbFilter')}
-          vm={vm} />
+          vm={vm}
+          userId={config.getIn(['user', 'id'])} />
 
         <span className={style['button-spacer']} />
 
