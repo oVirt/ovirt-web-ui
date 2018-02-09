@@ -371,6 +371,9 @@ OvirtApi = {
       return {
         id: c.id,
         consoleUser: c.console_user === 'true',
+        user: {
+          id: c.user ? c.user.id : null,
+        },
       }
     })
   },
