@@ -42,7 +42,7 @@ export const messages = {
   },
   htmlUnsupportedOvirtVersionFoundButVersionAtLeastRequired: '<strong>Unsupported {version} {productName} version,</strong> found but version at least {requiredVersion} is required.',
   authorizationExpired: 'Authorization expired. The page is going to be reloaded to re-login.',
-  useCtrlAltDel: 'Use Ctrl+Alt+Del',
+  useCtrlAltEnd: 'Use Ctrl+Alt+End',
   mapCtrlAltDelKeyboardShortcutToCtrlAltEnd: 'Map Ctrl + Alt + Del keyboard shortcut to Ctrl + Alt + End',
   noVmAvailable: 'No VM available.',
   noVmAvailableForLoggedUser: 'No VM is available for the logged user.',
