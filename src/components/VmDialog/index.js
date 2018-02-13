@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
-import { Link, Redirect, Prompt } from 'react-router-dom'
+import { Redirect, Prompt, Link } from 'react-router-dom'
 
 import { logDebug, generateUnique, templateNameRenderer } from '../../helpers'
 
@@ -383,7 +383,7 @@ class VmDialog extends React.Component {
   }
 
   render () {
-    const { icons, vmDialog, clusters, templates, operatingSystems, storages } = this.props
+    const { icons, vmDialog, clusters, templates, operatingSystems, storages, previousPath } = this.props
     const vm = this.props.vm
     const isoStorages = storages.get('storages').filter(v => v.get('type') === 'iso')
     const idPrefix = `vmdialog-${vm ? vm.get('name') : '_new'}`
@@ -563,7 +563,7 @@ class VmDialog extends React.Component {
           </div>
 
           <div className={style['vm-dialog-buttons']}>
-            <Link className='btn btn-default' to={vm ? `/vm/${vm.get('id')}` : '/'}>{msg.close()}</Link>
+            <Link className='btn btn-default' to={previousPath}>{msg.close()}</Link>
             <button className='btn btn-primary' type='button' onClick={this.submitHandler}>{submitText}</button>
           </div>
         </form>
@@ -584,6 +584,7 @@ VmDialog.propTypes = {
   icons: PropTypes.object.isRequired,
   vms: PropTypes.object.isRequired,
   storages: PropTypes.object.isRequired,
+  previousPath: PropTypes.string.isRequired,
 
   onCloseDialog: PropTypes.func.isRequired,
   addVm: PropTypes.func.isRequired,

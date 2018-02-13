@@ -72,6 +72,7 @@ class PageRouter extends React.Component {
     super(props)
     this.handleKeyPress = this.handleKeyPress.bind(this)
     this.keyPressed = null
+    this.previousPath = '/'
   }
 
   handleKeyPress (event) {
@@ -92,6 +93,12 @@ class PageRouter extends React.Component {
   componentDidMount () {
     window.addEventListener('keydown', this.handleKeyPress)
     window.addEventListener('keyup', (e) => { this.keyPressed = null })
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (this.previousPath !== this.props.location.pathname && nextProps.location.pathname !== this.props.location.pathname) {
+      this.previousPath = this.props.location.pathname
+    }
   }
 
   render () {
@@ -118,7 +125,7 @@ class PageRouter extends React.Component {
         {tools}
       </Toolbar>
       <div className={style['page-router-render-component']}>
-        <RenderComponent route={branch.route} match={branch.match} location={location} history={history} />
+        <RenderComponent route={branch.route} match={branch.match} location={location} history={history} previousPath={this.previousPath} />
       </div>
     </div>)
   }

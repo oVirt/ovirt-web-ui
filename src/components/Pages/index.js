@@ -40,6 +40,7 @@ VmDetailPage.propTypes = {
   match: PropTypes.object.isRequired,
   location: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
+  previousPath: PropTypes.string.isRequired,
 }
 
 class PoolDetailPage extends React.Component {
@@ -69,6 +70,7 @@ PoolDetailPage.propTypes = {
   match: PropTypes.object.isRequired,
   location: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
+  previousPath: PropTypes.string.isRequired,
 }
 
 class VmDialogPage extends React.Component {
@@ -82,9 +84,9 @@ class VmDialogPage extends React.Component {
   }
 
   render () {
-    let { match, vms } = this.props
+    let { match, vms, previousPath } = this.props
     if ((match.params.id && vms.getIn(['vms', match.params.id])) || !match.params.id) {
-      return (<VmDialog vm={vms.getIn(['vms', match.params.id])} />)
+      return (<VmDialog vm={vms.getIn(['vms', match.params.id])} previousPath={previousPath} />)
     }
     return null
   }
@@ -98,6 +100,7 @@ VmDialogPage.propTypes = {
   match: PropTypes.object.isRequired,
   location: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
+  previousPath: PropTypes.string.isRequired,
 }
 
 const VmDetailPageConnected = connect(
