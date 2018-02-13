@@ -15,7 +15,7 @@ class FieldHelp extends React.Component {
     const tooltip = this.props.tooltip || 'Click for help'
 
     const popover = (
-      <Popover id='popover-positioned-top' title={this.props.title}>
+      <Popover id='popover-positioned-top' className={style['field-help-min-width']} title={this.props.title}>
         {this.props.content}
       </Popover>)
 

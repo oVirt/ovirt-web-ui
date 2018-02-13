@@ -8,7 +8,7 @@
     width: 200px;
     min-height: 26px;
     white-space: nowrap;
-    overflow: hidden;
+    overflow: visible;
     text-overflow: ellipsis;
     color: #888;
     font-weight: normal;
