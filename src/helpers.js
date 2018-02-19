@@ -27,8 +27,8 @@ export function logDebug (msg, ...params) {
  * Write ERROR log message to console
  * @param msg
  */
-export function logError (msg) {
-  console.log(`Error: ${msg}`)
+export function logError (...messages) {
+  console.error(...messages)
 }
 
 // "payload":{"message":"Not Found","shortMessage":"LOGIN failed","type":404,"action":{"type":"LOGIN","payload":{"credentials":{"username":"admin@internal","password":"admi"}}}}}
