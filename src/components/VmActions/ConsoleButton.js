@@ -118,6 +118,7 @@ ConsoleButton.propTypes = {
   button: PropTypes.string.isRequired,
   actionDisabled: PropTypes.bool,
   isOnCard: PropTypes.bool,
+  userId: PropTypes.string,
   onDownloadConsole: PropTypes.func.isRequired,
   onConsoleSessionConfirmaClose: PropTypes.func.isRequired,
   onCheckConsoleSessionInUse: PropTypes.func.isRequired,
@@ -127,8 +128,8 @@ export default connect(
   (state) => ({
     VmAction: state.VmAction,
   }),
-  (dispatch, { vm, consoleId, usbFilter }) => ({
-    onCheckConsoleSessionInUse: () => dispatch(checkConsoleInUse({ vmId: vm.get('id'), usbFilter })),
+  (dispatch, { vm, consoleId, usbFilter, userId }) => ({
+    onCheckConsoleSessionInUse: () => dispatch(checkConsoleInUse({ vmId: vm.get('id'), usbFilter, userId })),
     onConsoleSessionConfirmaClose: () => dispatch(setConsoleInUse({ vmId: vm.get('id'), consoleInUse: false })),
     onDownloadConsole: () => dispatch(downloadConsole({ vmId: vm.get('id'), consoleId, usbFilter })),
   })
