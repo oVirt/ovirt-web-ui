@@ -178,6 +178,7 @@ OvirtApi = {
       display: {
         smartcardEnabled: vm.display && vm.display.smartcard_enabled ? vm.display.smartcard_enabled === 'true' : false,
       },
+      bootMenuEnabled: vm.bios && vm.bios.boot_menu && vm.bios.boot_menu.enabled === 'true',
     }
     if (getSubResources) {
       if (vm.disk_attachments && vm.disk_attachments.disk_attachment) {
@@ -247,6 +248,12 @@ OvirtApi = {
       os: vm.os && vm.os.type ? {
         type: vm.os.type,
       } : undefined,
+
+      bios: {
+        boot_menu: {
+          enabled: vm.bootMenuEnabled,
+        },
+      },
     }
   },
 

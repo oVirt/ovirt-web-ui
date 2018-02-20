@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
 import { Redirect, Prompt, Link } from 'react-router-dom'
+import Switch from 'react-bootstrap-switch'
 
 import { logDebug, generateUnique, templateNameRenderer } from '../../helpers'
 
@@ -65,6 +66,7 @@ class VmDialog extends React.Component {
       osId: undefined,
       saved: false,
       isChanged: false,
+      bootMenuEnabled: false,
     }
 
     this.closeDialog = this.closeDialog.bind(this)
@@ -88,6 +90,7 @@ class VmDialog extends React.Component {
     this.onChangeVmMemory = this.onChangeVmMemory.bind(this)
     this.onChangeVmCpu = this.onChangeVmCpu.bind(this)
     this.onChangeCD = this.onChangeCD.bind(this)
+    this.onChangeBootMenuEnabled = this.onChangeBootMenuEnabled.bind(this)
   }
 
   componentWillMount () {
@@ -112,6 +115,7 @@ class VmDialog extends React.Component {
             id: null,
           },
         },
+        bootMenuEnabled: vm.get('bootMenuEnabled'),
       })
     }
     setTimeout(() => this.initDefaults(), 0)
@@ -193,6 +197,7 @@ class VmDialog extends React.Component {
           'threads': '1',
         },
       },
+      bootMenuEnabled: this.state.bootMenuEnabled,
       'status': this.props.vm ? this.props.vm.get('status') : '',
     }
   }
@@ -328,6 +333,10 @@ class VmDialog extends React.Component {
     }
 
     // fire external data retrieval here if needed after Cluster change
+  }
+
+  onChangeBootMenuEnabled (switchComponent, value) {
+    this.setState({ bootMenuEnabled: value })
   }
 
   /**
@@ -557,6 +566,18 @@ class VmDialog extends React.Component {
                   items={files}
                   idPrefix='select-changecd'
                   />
+              </dd>
+
+              <dt>
+                <FieldHelp content={msg.bootMenuTooltip()} text={msg.bootMenu()} />
+              </dt>
+              <dd>
+                <Switch
+                  animate
+                  bsSize='mini'
+                  value={!!this.state.bootMenuEnabled}
+                  onChange={this.onChangeBootMenuEnabled}
+                />
               </dd>
 
             </dl>

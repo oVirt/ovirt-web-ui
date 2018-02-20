@@ -260,6 +260,10 @@ class VmDetail extends Component {
                   </dt>
                   {noDisks}
                   {disksElement}
+                  <dt>
+                    <FieldHelp content={msg.bootMenuTooltip()} text={msg.bootMenu()} />
+                  </dt>
+                  <dd>{vm.get('bootMenuEnabled') ? msg.on() : msg.off()}</dd>
                 </dl>
               </div>
             </DetailContainer>

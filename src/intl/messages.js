@@ -200,7 +200,10 @@ export const messages = {
   changeCd: 'Change CD.',
   updateVm: 'Update VM',
   createVm: 'Create VM',
-
+  on: 'On',
+  off: 'Off',
+  bootMenu: 'Boot Menu',
+  bootMenuTooltip: 'Boot menu allows to select bootable device. It is accessible from a console.',
 }
 
 export type MessageIdType = $Keys<typeof messages>
