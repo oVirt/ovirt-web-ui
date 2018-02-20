@@ -61,7 +61,7 @@ class ConsoleOptions extends React.Component {
           </dd>
 
           <dt className={style['console-option-description']}>
-            <FieldHelp content={msg.mapCtrlAltDelKeyboardShortcutToCtrlAltEnd()} text={msg.useCtrlAltDel()} />
+            <FieldHelp content={msg.mapCtrlAltDelKeyboardShortcutToCtrlAltEnd()} text={msg.useCtrlAltEnd()} />
           </dt>
           <dd>
             <Switch
