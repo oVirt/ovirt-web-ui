@@ -563,8 +563,8 @@ class VmDialog extends React.Component {
           </div>
 
           <div className={style['vm-dialog-buttons']}>
-            <Link className='btn btn-default' to={previousPath}>{msg.close()}</Link>
-            <button className='btn btn-primary' type='button' onClick={this.submitHandler}>{submitText}</button>
+            <Link id='button-close' className='btn btn-default' to={previousPath}>{msg.close()}</Link>
+            <button id='button-submit' className='btn btn-primary' type='button' onClick={this.submitHandler}>{submitText}</button>
           </div>
         </form>
 
