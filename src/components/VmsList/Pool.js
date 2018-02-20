@@ -16,6 +16,8 @@ import { VmIcon, VmStatusIcon } from 'ovirt-ui-components'
 
 import { startPool } from '../../actions'
 
+import { getOsHumanName } from '../utils'
+
 /**
  * Single icon-card in the list
  */
@@ -26,6 +28,7 @@ class Pool extends React.Component {
     const state = pool.get('status')
 
     const iconId = pool.getIn(['vm', 'icons', 'large', 'id'])
+    const osName = getOsHumanName(pool.getIn(['vm', 'os', 'type']))
     const icon = icons.get(iconId)
     const isSelected = pool.get('id') === visibility.get('selectedPoolDetail')
 
@@ -38,6 +41,9 @@ class Pool extends React.Component {
                 <VmIcon icon={icon} className={style['card-pf-icon']}
                   missingIconClassName='fa fa-birthday-cake card-pf-icon-circle' />
               </Link>
+              <div>
+                <span className={style['operating-system-label']}>{ osName }</span>
+              </div>
             </div>
             <h2 className='card-pf-title text-center'>
               <NavLink to={`/pool/${pool.get('id')}`} className={style['vm-detail-link']}>
