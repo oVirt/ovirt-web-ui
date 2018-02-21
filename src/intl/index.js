@@ -176,10 +176,11 @@ export const msg: {[MessageIdType]: ((?Object) => string)} = createFormattingFun
  */
 export function enumMsg (enumId: string, enumItem: string): string {
   const messageKey: MessageIdType = (`enum_${enumId}_${enumItem}`: any)
-  const message = msg[messageKey]()
-  if (message !== messageKey) {
-    return message
+  const messageFormattingFunction = msg[messageKey]
+  if (messageFormattingFunction) {
+    return messageFormattingFunction()
   }
+  console.warn(`No translation for enum item "${enumId}.${enumItem}" found.`)
   return enumItem
 }
 
