@@ -77,6 +77,7 @@ import {
 
 import {
   CHECK_TOKEN_EXPIRED,
+  CHECK_VM_AVAILABILITY,
   CHANGE_VM_ICON,
   CHANGE_VM_ICON_BY_ID,
   GET_ALL_CLUSTERS,
@@ -581,6 +582,16 @@ function* fetchUSBFilter (action) {
   }
 }
 
+function* checkVmAvailability (action) {
+  const vm = yield callExternalAction('getVm', Api.getVm, action)
+
+  if (vm && vm.id) {
+    yield fetchSingleVm({ payload: { vmId: action.payload.vmId } })
+  } else {
+    yield put(redirectRoute({ route: '/' }))
+  }
+}
+
 function* schedulerPerMinute (action) {
   logDebug('Starting schedulerPerMinute() scheduler')
 
@@ -640,6 +651,7 @@ export function *rootSaga () {
     takeLatest(GET_ALL_TEMPLATES, fetchAllTemplates),
     takeLatest(GET_ALL_OS, fetchAllOS),
     takeLatest(GET_ALL_HOSTS, fetchAllHosts),
+    takeLatest(CHECK_VM_AVAILABILITY, checkVmAvailability),
     throttle(100, GET_ISO_STORAGES, fetchISOStorages),
     throttle(100, GET_ALL_FILES_FOR_ISO, fetchAllFilesForISO),
 

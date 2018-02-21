@@ -103,6 +103,7 @@ class PageRouter extends React.Component {
 
   render () {
     let { route, location, history, routeReducer } = this.props
+
     if (routeReducer.get('redirect') && routeReducer.get('redirect') !== location.pathname) {
       return (<Redirect to={routeReducer.get('redirect')} />)
     }
