@@ -7,19 +7,8 @@ import Api from '../../ovirtapi'
 function* createNewVm (sagas, action) {
   const result = yield sagas.callExternalAction('addNewVm', Api.addNewVm, action)
   if (!result.error) {
-    const vm = Api.vmToInternal({ vm: result })
-    const result2 = yield sagas.callExternalAction('changeCD', Api.changeCD, {
-      type: 'CHANGE_CD',
-      payload: {
-        vmId: vm.id,
-        cdrom: action.payload.vm.cdrom,
-        running: false,
-      },
-    })
-    if (!result2.error) {
-      yield put(refresh({ page: action.payload.page }))
-      yield put(setSavedVm({ vm: Api.vmToInternal({ vm: result }) }))
-    }
+    yield put(refresh({ page: action.payload.page }))
+    yield put(setSavedVm({ vm: Api.vmToInternal({ vm: result }) }))
   }
 }
 

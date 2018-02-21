@@ -33,6 +33,7 @@ import SelectBox from '../SelectBox'
 import { MAX_VM_MEMORY_FACTOR } from '../../constants/index'
 
 import { msg } from '../../intl'
+import { Fragment } from '../utils'
 
 function sortedBy (immutableCollection, sortBy) { // TODO: move to helpers
   return immutableCollection.sort(
@@ -554,19 +555,23 @@ class VmDialog extends React.Component {
                   min={1}
                   step={1} />
               </dd>
-              <dt>
-                <span className='pficon pficon-storage-domain' />
-                &nbsp;
-                <FieldHelp content={msg.changeCd()} text={msg.cd()} />
-              </dt>
-              <dd className={style['field-overflow-visible']}>
-                <SelectBox
-                  onChange={this.onChangeCD}
-                  selected={cdromFileId}
-                  items={files}
-                  idPrefix='select-changecd'
-                  />
-              </dd>
+              { isEdit && (
+                <Fragment>
+                  <dt>
+                    <span className='pficon pficon-storage-domain' />
+                    &nbsp;
+                    <FieldHelp content={msg.changeCd()} text={msg.cd()} />
+                  </dt>
+                  <dd className={style['field-overflow-visible']}>
+                    <SelectBox
+                      onChange={this.onChangeCD}
+                      selected={cdromFileId}
+                      items={files}
+                      idPrefix='select-changecd'
+                      />
+                  </dd>
+                </Fragment>
+              )}
 
               <dt>
                 <FieldHelp content={msg.bootMenuTooltip()} text={msg.bootMenu()} />
