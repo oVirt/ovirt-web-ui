@@ -16,6 +16,13 @@ class VmDetailPage extends React.Component {
     }
   }
 
+  componentWillUpdate () {
+    const vmInStore = this.props.vms.getIn(['vms', this.props.match.params.id])
+    if (!vmInStore && Selectors.isFilterChecked()) {
+      this.props.getVms({ vmId: this.props.match.params.id })
+    }
+  }
+
   render () {
     let { match, vms, config } = this.props
     if (vms.getIn(['vms', match.params.id])) {
@@ -49,6 +56,14 @@ class PoolDetailPage extends React.Component {
       this.props.getPools({ poolId: this.props.match.params.id })
     }
   }
+
+  componentWillUpdate () {
+    const poolInStore = this.props.vms.getIn(['pools', this.props.match.params.id, 'vm'])
+    if (!poolInStore && Selectors.isFilterChecked()) {
+      this.props.getPools({ poolId: this.props.match.params.id })
+    }
+  }
+
   render () {
     let { match, vms, config } = this.props
     if (vms.getIn(['pools', match.params.id, 'vm'])) {
