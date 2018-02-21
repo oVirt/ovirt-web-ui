@@ -10,8 +10,21 @@ import { selectVmDetail, selectPoolDetail, getISOStorages } from '../../actions/
 import Selectors from '../../selectors'
 
 class VmDetailPage extends React.Component {
+  constructor (props) {
+    super(props)
+    this.requestSent = false
+  }
+
   componentWillMount () {
     if (Selectors.isFilterChecked()) {
+      this.props.getVms({ vmId: this.props.match.params.id })
+    }
+  }
+
+  componentWillUpdate () {
+    const vmInStore = this.props.vms.getIn(['vms', this.props.match.params.id])
+    if (!vmInStore && Selectors.isFilterChecked() && !this.requestSent) {
+      this.requestSent = true
       this.props.getVms({ vmId: this.props.match.params.id })
     }
   }
@@ -44,11 +57,25 @@ VmDetailPage.propTypes = {
 }
 
 class PoolDetailPage extends React.Component {
+  constructor (props) {
+    super(props)
+    this.requestSent = false
+  }
+
   componentWillMount () {
     if (Selectors.isFilterChecked()) {
       this.props.getPools({ poolId: this.props.match.params.id })
     }
   }
+
+  componentWillUpdate () {
+    const poolInStore = this.props.vms.getIn(['pools', this.props.match.params.id, 'vm'])
+    if (!poolInStore && Selectors.isFilterChecked() && !this.requestSent) {
+      this.requestSent = true
+      this.props.getPools({ poolId: this.props.match.params.id })
+    }
+  }
+
   render () {
     let { match, vms, config } = this.props
     if (vms.getIn(['pools', match.params.id, 'vm'])) {
