@@ -126,7 +126,7 @@ export const messages = {
     message: 'Down',
     description: 'VM is turned off. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
   },
-  enum_VmStatus_poweringup: {
+  enum_VmStatus_powering_up: {
     message: 'Powering up',
     description: 'VM is starting. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
   },
@@ -134,31 +134,27 @@ export const messages = {
     message: 'Paused',
     description: 'VM is paused. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
   },
-  enum_VmStatus_migratingfrom: {
-    message: 'Migrating from',
-    description: 'VM is migrating. This instance is migration source. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
-  },
-  enum_VmStatus_migratingto: {
-    message: 'Migrating to',
-    description: 'VM is migrating. This instance is migration destination. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
+  enum_VmStatus_migrating: {
+    message: 'Migrating',
+    description: 'VM is migrating from one host machine to another host machine. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
   },
   enum_VmStatus_unknown: {
     message: 'Unknown',
     description: 'VM is in unknown state. Connection hot hypervisor is probably broken. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
   },
-  enum_VmStatus_waitingforlaunch: {
+  enum_VmStatus_wait_for_launch: {
     message: 'Waiting for launch',
     description: 'VM is down but planned to started. be One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
   },
-  enum_VmStatus_rebootinprogress: {
+  enum_VmStatus_reboot_in_progress: {
     message: 'Reboot in progress',
     description: 'One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
   },
-  enum_VmStatus_savingstate: {
+  enum_VmStatus_saving_state: {
     message: 'Saving state',
     description: 'Being hibernated. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
   },
-  enum_VmStatus_restoringstate: {
+  enum_VmStatus_restoring_state: {
     message: 'Restoring state',
     description: 'Waking up from hibernation. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
   },
@@ -166,15 +162,11 @@ export const messages = {
     message: 'Suspended',
     description: 'Hibernated. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
   },
-  enum_VmStatus_illegalimage: {
-    message: 'Illegal image',
-    description: 'Disk image is in illegal state. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
-  },
-  enum_VmStatus_imagelocked: {
+  enum_VmStatus_image_locked: {
     message: 'Image locked',
     description: 'Disk image is locked. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
   },
-  enum_VmStatus_poweringdown: {
+  enum_VmStatus_powering_down: {
     message: 'Powering down',
     description: 'VM is being turned off. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
   },
