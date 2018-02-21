@@ -5,7 +5,7 @@ import { Redirect } from 'react-router-dom'
 
 import VmDetail from '../VmDetail'
 import VmDialog from '../VmDialog/index'
-import { selectVmDetail, selectPoolDetail, getISOStorages } from '../../actions/index'
+import { selectVmDetail, selectPoolDetail, getISOStorages, checkVMAviability } from '../../actions/index'
 
 import Selectors from '../../selectors'
 
@@ -25,10 +25,9 @@ class VmDetailPage extends React.Component {
         console.info('VmDetailPage: VM id can not be found: ', match.params.id, ' . Load is still in progress - wating before redirect')
         return null
       }
+      this.props.checkVMAviability({ vmId: match.params.id })
     }
-
-    console.info('VmDetailPage: VM id can not be found: ', match.params.id, ' . Redirecting to / ')
-    return <Redirect to='/' />
+    return null
   }
 }
 
@@ -36,6 +35,7 @@ VmDetailPage.propTypes = {
   vms: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
   getVms: PropTypes.func.isRequired,
+  checkVMAviability: PropTypes.func.isRequired,
   route: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
   location: PropTypes.object.isRequired,
@@ -110,6 +110,7 @@ const VmDetailPageConnected = connect(
   }),
   (dispatch) => ({
     getVms: ({ vmId }) => dispatch(selectVmDetail({ vmId })),
+    checkVMAviability: ({ vmId }) => dispatch(checkVMAviability({ vmId })),
   })
 )(VmDetailPage)
 

@@ -1,6 +1,7 @@
 import {
   CHANGE_VM_ICON,
   CHANGE_VM_ICON_BY_ID,
+  CHECK_VM_AVIABILITY,
   CLEAR_USER_MSGS,
   DOWNLOAD_CONSOLE_VM,
   GET_RDP_VM,
@@ -341,6 +342,15 @@ export function changeVmIconById ({ vmId, iconId }) {
     type: CHANGE_VM_ICON_BY_ID,
     payload: {
       iconId,
+      vmId,
+    },
+  }
+}
+
+export function checkVMAviability ({ vmId }) {
+  return {
+    type: CHECK_VM_AVIABILITY,
+    payload: {
       vmId,
     },
   }
