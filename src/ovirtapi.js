@@ -11,6 +11,11 @@ type VmIdType = { vmId: string }
 type PoolIdType = { poolId: string }
 type InputRequestType = { url: string, input: string, contentType?: string }
 type VmType = { vm: Object }
+type CloudInitInternalType = {
+  enabled: boolean,
+  hostName: string,
+  sshAuthorizedKeys: string
+}
 
 const zeroUUID: string = '00000000-0000-0000-0000-000000000000'
 
@@ -179,6 +184,7 @@ OvirtApi = {
         smartcardEnabled: vm.display && vm.display.smartcard_enabled ? vm.display.smartcard_enabled === 'true' : false,
       },
       bootMenuEnabled: vm.bios && vm.bios.boot_menu && vm.bios.boot_menu.enabled === 'true',
+      ...cloudInitApiToInternal(vm),
     }
     if (getSubResources) {
       if (vm.disk_attachments && vm.disk_attachments.disk_attachment) {
@@ -254,6 +260,13 @@ OvirtApi = {
           enabled: vm.bootMenuEnabled,
         },
       },
+
+      initialization: vm.cloudInit.enabled
+        ? {
+          host_name: vm.cloudInit.hostName,
+          authorized_ssh_keys: vm.cloudInit.sshAuthorizedKeys,
+        }
+        : {},
     }
   },
 
@@ -317,6 +330,7 @@ OvirtApi = {
       os: {
         type: template.os ? template.os.type : undefined,
       },
+      ...cloudInitApiToInternal(template),
 
     }
   },
@@ -673,6 +687,16 @@ OvirtApi = {
       .then(result => result === null ? defaultValue : result)
       .catch(() => defaultValue)
   },
+}
+
+function cloudInitApiToInternal (vmLike: Object): { cloudInit: CloudInitInternalType } {
+  return {
+    cloudInit: {
+      enabled: !!vmLike.initialization,
+      hostName: (vmLike.initialization && vmLike.initialization.host_name) || '',
+      sshAuthorizedKeys: (vmLike.initialization && vmLike.initialization.authorized_ssh_keys) || '',
+    },
+  }
 }
 
 /**

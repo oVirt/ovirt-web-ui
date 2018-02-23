@@ -33,6 +33,7 @@ import SelectBox from '../SelectBox'
 import { MAX_VM_MEMORY_FACTOR } from '../../constants/index'
 
 import { msg } from '../../intl'
+import CloudInitEditor from '../CloudInitEditor'
 
 function sortedBy (immutableCollection, sortBy) { // TODO: move to helpers
   return immutableCollection.sort(
@@ -67,6 +68,11 @@ class VmDialog extends React.Component {
       saved: false,
       isChanged: false,
       bootMenuEnabled: false,
+      cloudInit: {
+        enabled: false,
+        hostName: '',
+        sshAuthorizedKeys: '',
+      },
     }
 
     this.closeDialog = this.closeDialog.bind(this)
@@ -116,6 +122,7 @@ class VmDialog extends React.Component {
           },
         },
         bootMenuEnabled: vm.get('bootMenuEnabled'),
+        cloudInit: vm.get('cloudInit').toJS(),
       })
     }
     setTimeout(() => this.initDefaults(), 0)
@@ -198,6 +205,7 @@ class VmDialog extends React.Component {
         },
       },
       bootMenuEnabled: this.state.bootMenuEnabled,
+      cloudInit: this.state.cloudInit,
       'status': this.props.vm ? this.props.vm.get('status') : '',
     }
   }
@@ -282,13 +290,14 @@ class VmDialog extends React.Component {
 
   doChangeTemplateIdTo (templateId) {
     const template = this.getTemplate(templateId)
-    let { memory, cpus, osId } = this.state
+    let { memory, cpus, osId, cloudInit } = this.state
 
     if (template) {
       memory = template.get('memory')
       cpus = template.getIn(['cpu', 'topology', 'cores'], 1) * template.getIn(['cpu', 'topology', 'sockets'], 1) * template.getIn(['cpu', 'topology', 'threads'], 1)
 
       osId = this.getOsIdFromType(template.getIn(['os', 'type'], 'Blank'))
+      cloudInit = template.get('cloudInit').toJS()
     }
 
     this.setState({
@@ -296,6 +305,7 @@ class VmDialog extends React.Component {
       memory,
       cpus,
       isChanged: true,
+      cloudInit,
     })
 
     if (this.state.osId !== osId) {
@@ -583,6 +593,16 @@ class VmDialog extends React.Component {
                   onChange={this.onChangeBootMenuEnabled}
                 />
               </dd>
+
+              <CloudInitEditor
+                enabled={this.state.cloudInit.enabled}
+                hostName={this.state.cloudInit.hostName}
+                sshAuthorizedKeys={this.state.cloudInit.sshAuthorizedKeys}
+                onEnabledChange={value => this.setState(state => { state.cloudInit.enabled = value })}
+                onHostNameChange={value => this.setState(state => { state.cloudInit.hostName = value })}
+                onSshAuthorizedKeysChange={value =>
+                  this.setState(state => { state.cloudInit.sshAuthorizedKeys = value })}
+              />
 
             </dl>
           </div>
