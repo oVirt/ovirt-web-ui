@@ -17,6 +17,7 @@ const initialState = Immutable.fromJS({
   isFilterChecked: false,
   administrator: false,
   usbFilter: null,
+  vnicProfiles: {},
 })
 
 const config = actionReducer(initialState, {
@@ -49,6 +50,9 @@ const config = actionReducer(initialState, {
   },
   SET_USB_FILTER (state, { payload: { usbFilter } }) {
     return state.set('usbFilter', usbFilter)
+  },
+  SET_VNIC_PROFILES (state, { payload: { vnicProfiles } }) {
+    return state.set('vnicProfiles', vnicProfiles)
   },
 }, true)
 

@@ -1,0 +1,30 @@
+.nics-list {
+    overflow: hidden;
+    width: 100%;
+    margin-left: 2em;
+
+    height: inherit; /* remove when re-enabling show/hide */
+}
+.nics-ul {
+    list-style-type: none;
+    padding: 0;
+    margin-bottom: 0px !important;
+}
+
+.smaller {
+    font-size: 50%;
+    vertical-align: middle;
+    margin-left: 0.5em;
+}
+
+.light {
+    color: #888;
+}
+
+.button-more {
+    margin-left: 2em;
+    color: #0088ce;
+    text-decoration: none;
+    font-size: small;
+    cursor: pointer;
+}

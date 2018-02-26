@@ -27,6 +27,8 @@ import {
   removeMissingHosts,
   removeMissingTemplates,
   removeMissingOSs,
+  removeMissingNetworks,
+  removeMissingVnicProfiles,
   setVmSessions,
   persistState,
 
@@ -35,6 +37,8 @@ import {
   addHosts,
   addTemplates,
   addAllOS,
+  addNetworks,
+  addVnicProfiles,
 
   getSinglePool,
   removeMissingPools,
@@ -51,6 +55,7 @@ import {
   removeMissingStorages,
   setFiles,
   setVmCDRom,
+  setVmNics,
   setUSBFilter,
 } from './actions/index'
 
@@ -76,14 +81,18 @@ import {
 } from './saga/consoles'
 
 import {
+  ADD_VM_NIC,
   CHECK_TOKEN_EXPIRED,
   CHANGE_VM_ICON,
   CHANGE_VM_ICON_BY_ID,
+  DELETE_VM_NIC,
   GET_ALL_CLUSTERS,
   GET_ALL_FILES_FOR_ISO,
   GET_ALL_HOSTS,
+  GET_ALL_NETWORKS,
   GET_ALL_OS,
   GET_ALL_TEMPLATES,
+  GET_ALL_VNIC_PROFILES,
   GET_BY_PAGE,
   GET_CONSOLE_OPTIONS,
   GET_ISO_STORAGES,
@@ -181,7 +190,7 @@ function* fetchVmsByPageV42 (action) {
   const { shallowFetch, page } = action.payload
   let additional = []
   if (!shallowFetch) {
-    additional = ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles']
+    additional = ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics']
   }
   action.payload.additional = additional
   // TODO: paging: split this call to a loop per up to 25 vms
@@ -212,6 +221,7 @@ function* fetchVmsByPageVLower (action) {
       yield fetchDisks({ vms: internalVms })
       yield fetchVmsSessions({ vms: internalVms })
       yield fetchVmsCDRom({ vms: internalVms })
+      yield fetchVmsNics({ vms: internalVms })
     } else {
       logDebug('getVmsByPage() shallow fetch requested - skipping other resources')
     }
@@ -233,7 +243,7 @@ function* fetchVmsByCountV42 (action) {
   const { shallowFetch, page } = action.payload
   let additional = []
   if (!shallowFetch) {
-    additional = ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles']
+    additional = ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics']
   }
   action.payload.additional = additional
   const allVms = yield callExternalAction('getVmsByCount', Api.getVmsByCount, action)
@@ -269,6 +279,7 @@ function* fetchVmsByCountVLower (action) {
       yield fetchDisks({ vms: internalVms })
       yield fetchVmsSessions({ vms: internalVms })
       yield fetchVmsCDRom({ vms: internalVms })
+      yield fetchVmsNics({ vms: internalVms })
     } else {
       logDebug('fetchVmsByCount() shallow fetch requested - skipping other resources')
     }
@@ -340,6 +351,7 @@ export function* fetchSingleVm (action) {
     internalVm.consoles = yield fetchConsoleVmMeta({ vmId: internalVm.id })
     internalVm.sessions = yield fetchVmSessions({ vmId: internalVm.id })
     internalVm.cdrom = yield fetchVmCDRom({ vmId: internalVm.id, running: internalVm.status === 'up' })
+    internalVm.nics = yield fetchVmNics({ vmId: internalVm.id })
 
     yield put(updateVms({ vms: [internalVm] }))
     yield fetchUnknwonIconsForVms({ vms: [internalVm] })
@@ -414,6 +426,22 @@ function* changeVmIcon (action) {
     yield put(updateVms({ vms: [internalVm] }))
     yield fetchUnknwonIconsForVms({ vms: [internalVm] })
   }
+}
+
+function* addVmNic (action) {
+  const nic = yield callExternalAction('addNicToVm', Api.addNicToVm, action)
+
+  if (nic && nic.id) {
+    const nicsInternal = yield fetchVmNics({ vmId: action.payload.vmId })
+    yield put(setVmNics({ vmId: action.payload.vmId, nics: nicsInternal }))
+  }
+}
+
+function* deleteVmNic (action) {
+  yield callExternalAction('deleteNicFromVm', Api.deleteNicFromVm, action)
+
+  const nicsInternal = yield fetchVmNics({ vmId: action.payload.vmId })
+  yield put(setVmNics({ vmId: action.payload.vmId, nics: nicsInternal }))
 }
 
 function* startProgress ({ vmId, poolId, name }) {
@@ -552,6 +580,23 @@ function* fetchAllOS (action) {
   }
 }
 
+function* fetchVmsNics ({ vms }) {
+  yield * foreach(vms, function* (vm) {
+    const nicsInternal = yield fetchVmNics({ vmId: vm.id })
+    yield put(setVmNics({ vmId: vm.id, nics: nicsInternal }))
+  })
+}
+
+function* fetchVmNics ({ vmId }) {
+  const nics = yield callExternalAction('getVmsNic', Api.getVmsNic, { type: 'GET_VM_NICS', payload: { vmId } })
+
+  if (nics && nics['nic']) {
+    const nicsInternal = nics.nic.map(nic => Api.nicToInternal({ nic }))
+    return nicsInternal
+  }
+  return []
+}
+
 function* fetchISOStorages (action) {
   const storages = yield callExternalAction('getStorages', Api.getStorages, action)
   if (storages && storages['storage_domain']) {
@@ -578,6 +623,28 @@ function* fetchUSBFilter (action) {
   const usbFilter = yield callExternalAction('getUSBFilter', Api.getUSBFilter, action)
   if (usbFilter) {
     yield put(setUSBFilter({ usbFilter }))
+  }
+}
+
+function* fetchAllVnicProfiles (action) {
+  const vnicProfiles = yield callExternalAction('getAllVnicProfiles', Api.getAllVnicProfiles, action)
+  if (vnicProfiles && vnicProfiles['vnic_profile']) {
+    const vnicProfilesInternal = vnicProfiles.vnic_profile.map(vnicProfile => Api.vnicProfileToInternal({ vnicProfile }))
+    yield put(addVnicProfiles({ vnicProfiles: vnicProfilesInternal }))
+
+    const vnicProfileIdsToPreserve = vnicProfilesInternal.map(item => item.id)
+    yield put(removeMissingVnicProfiles({ vnicProfileIdsToPreserve }))
+  }
+}
+
+function* fetchAllNetworks (action) {
+  const networks = yield callExternalAction('getAllNetworks', Api.getAllNetworks, action)
+  if (networks && networks['network']) {
+    const networksInternal = networks.network.map(network => Api.networkToInternal({ network }))
+    yield put(addNetworks({ networks: networksInternal }))
+
+    const networkIdsToPreserve = networksInternal.map(item => item.id)
+    yield put(removeMissingNetworks({ networkIdsToPreserve }))
   }
 }
 
@@ -640,12 +707,16 @@ export function *rootSaga () {
     takeLatest(GET_ALL_TEMPLATES, fetchAllTemplates),
     takeLatest(GET_ALL_OS, fetchAllOS),
     takeLatest(GET_ALL_HOSTS, fetchAllHosts),
+    takeLatest(GET_ALL_VNIC_PROFILES, fetchAllVnicProfiles),
+    takeLatest(GET_ALL_NETWORKS, fetchAllNetworks),
     throttle(100, GET_ISO_STORAGES, fetchISOStorages),
     throttle(100, GET_ALL_FILES_FOR_ISO, fetchAllFilesForISO),
 
     takeEvery(SELECT_VM_DETAIL, selectVmDetail),
     takeEvery(CHANGE_VM_ICON, changeVmIcon),
     takeEvery(CHANGE_VM_ICON_BY_ID, changeVmIcon),
+    takeEvery(ADD_VM_NIC, addVmNic),
+    takeEvery(DELETE_VM_NIC, deleteVmNic),
     takeEvery(GET_CONSOLE_OPTIONS, getConsoleOptions),
     takeEvery(SAVE_CONSOLE_OPTIONS, saveConsoleOptions),
 

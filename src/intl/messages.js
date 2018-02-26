@@ -49,6 +49,8 @@ export const messages = {
   consoleInUseContinue: 'Console in use, continue?',
   yes: 'Yes',
   cancel: 'Cancel',
+  ok: 'Ok',
+  New: 'New',
   save: 'Save',
   preserveDisks: 'Preserve disks',
   removeVmQustion: 'Remove the VM?',
@@ -209,6 +211,15 @@ export const messages = {
     message: 'Loading ...',
     description: 'Pending request to the server indicator label.',
   },
+  nic: 'Network interfaces',
+  noNics: 'no NICs',
+  addNewNic: 'Add new NIC',
+  vnicProfile: 'VNIC Profile',
+  thisOperationCantBeUndone: 'This operation cannot be undone.',
+  areYouSureYouWantToDeleteNic: 'Are you sure you want to delete NIC {nicName}?',
+  delete: 'Delete',
+  confirmDelete: 'Confirm delete',
+  nicsTooltip: 'Connected VM network interfaces.',
 }
 
 export type MessageIdType = $Keys<typeof messages>

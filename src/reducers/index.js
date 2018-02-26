@@ -13,6 +13,8 @@ import hosts from './hosts'
 import route from './route'
 import operatingSystems from './operatingSystems'
 import storages from './storages'
+import networks from './networks'
+import vnicProfiles from './vnicProfiles'
 import { reducer as VmAction } from '../components/VmActions/reducer'
 import { reducer as VmDialog } from '../components/VmDialog/reducer'
 import { reducer as OptionsDialog } from '../components/OptionsDialog/reducer'
@@ -38,6 +40,8 @@ export default combineReducers({
   hosts,
   route,
   storages,
+  networks,
+  vnicProfiles,
   VmAction,
   VmDialog,
   OptionsDialog,
