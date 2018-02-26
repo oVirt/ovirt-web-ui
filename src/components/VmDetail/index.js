@@ -24,6 +24,7 @@ import FieldHelp from '../FieldHelp/index'
 import DetailContainer from '../DetailContainer'
 import ConsoleOptions from '../ConsoleOptions/index'
 import VmDisks from '../VmDisks/index'
+import VmNics from '../VmNics/index'
 import VmsListNavigation from '../VmsListNavigation/index'
 import VmStatus from './VmStatus'
 import { NextRunLabel } from './labels'
@@ -57,9 +58,11 @@ class VmDetail extends Component {
       openConsoleSettings: false,
       vmsNavigationExpanded: true,
       editDisks: false,
+      openNicSettings: false,
     }
 
     this.consoleSettings = this.consoleSettings.bind(this)
+    this.nicSettings = this.nicSettings.bind(this)
     this.toggleVmsNavExpansion = this.toggleVmsNavExpansion.bind(this)
     this.handleIconChange = this.handleIconChange.bind(this)
     this.handleIconChangeToDefault = this.handleIconChangeToDefault.bind(this)
@@ -83,6 +86,14 @@ class VmDetail extends Component {
     this.props.onConsoleOptionsOpen()
     this.setState({
       openConsoleSettings: !this.state.openConsoleSettings,
+    })
+
+    e.preventDefault()
+  }
+
+  nicSettings (e) {
+    this.setState({
+      openNicSettings: !this.state.openNicSettings,
     })
 
     e.preventDefault()
@@ -140,6 +151,7 @@ class VmDetail extends Component {
     }
     const icon = icons.get(iconId)
     const disks = vm.get('disks')
+    const nics = vm.get('nics')
     const osName = getOsHumanName(vm.getIn(['os', 'type']))
     const cluster = Selectors.getClusterById(vm.getIn(['cluster', 'id']))
     const template = Selectors.getTemplateById(vm.getIn(['template', 'id']))
@@ -166,8 +178,25 @@ class VmDetail extends Component {
         </a>
       </small>)
 
+    const nicOptionsShowHide = !isPool && vm.getIn(['pool', 'id']) === undefined ? (
+      <small>
+        <a href='#' onClick={this.nicSettings} id={`${idPrefix}-nicoptions-showhide`}>
+          <i className={`pficon pficon-edit`} />
+        </a>
+      </small>
+    ) : (
+      <small>
+        <a href='#' id={`${idPrefix}-nicoptions-showhide`} className='disabled'>
+          <i className={`pficon pficon-edit`} />
+        </a>
+      </small>
+    )
+
     const hasDisks = disks.size > 0
     const noDisks = hasDisks || (<small>{msg.noDisks()} &nbsp;</small>)
+
+    const hasNics = nics.size > 0
+    const noNics = hasNics || (<dd><small>{msg.noNics()}</small></dd>)
 
     const consolesHelp = (
       <div>
@@ -277,6 +306,14 @@ class VmDetail extends Component {
                   </dt>
                   {noDisks}
                   {disksElement}
+                  <dt><span className='pficon pficon-container-node' />
+                    &nbsp;
+                    <FieldHelp content={msg.nicsTooltip()} text={msg.nic()} />
+                    &nbsp;
+                    {nicOptionsShowHide}
+                  </dt>
+                  {noNics}
+                  <VmNics nics={nics} vmId={vm.get('id')} showSettings={this.state.openNicSettings} />
                   <dt>
                     <FieldHelp content={msg.bootMenuTooltip()} text={msg.bootMenu()} />
                   </dt>
