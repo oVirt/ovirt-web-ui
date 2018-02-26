@@ -149,7 +149,7 @@ const vms = actionReducer(initialState, {
         if (state.getIn(['vms', vmId])) {
           return state.setIn(['vms', vmId, 'lastMessage'], payload.shortMessage ? payload.shortMessage : payload.message)
         } else { // fail, if VM not found
-          logError(`vms.updateVmIcon() reducer: vmId ${vmId} not found`)
+          logError('API reports an error associated to nonexistent VM. error=', payload, 'vmId=', vmId)
         }
       }
     }
