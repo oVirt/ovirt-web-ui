@@ -205,6 +205,10 @@ export const messages = {
   hostNameTooltip: 'Virtual Machine hostname.',
   sshAuthorizedKeys: 'SSH Authorized Keys',
   sshAuthorizedKeysTooltip: 'New line separated public SSH keys allowing for passwordless remote login.',
+  loadingTripleDot: {
+    message: 'Loading ...',
+    description: 'Pending request to the server indicator label.',
+  },
 }
 
 export type MessageIdType = $Keys<typeof messages>
