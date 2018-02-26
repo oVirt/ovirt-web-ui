@@ -15,6 +15,7 @@ import operatingSystems from './operatingSystems'
 import storages from './storages'
 import storageDomains from './storageDomains'
 import dataCenters from './dataCenters'
+import vnicProfiles from './vnicProfiles'
 import { reducer as VmAction } from '../components/VmActions/reducer'
 import { reducer as VmDialog } from '../components/VmDialog/reducer'
 import { reducer as OptionsDialog } from '../components/OptionsDialog/reducer'
@@ -44,6 +45,7 @@ export default combineReducers({
   dataCenters,
   route,
   storages,
+  vnicProfiles,
   VmAction,
   VmDialog,
   OptionsDialog,
