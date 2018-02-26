@@ -554,19 +554,23 @@ class VmDialog extends React.Component {
                   min={1}
                   step={1} />
               </dd>
-              <dt>
-                <span className='pficon pficon-storage-domain' />
-                &nbsp;
-                <FieldHelp content={msg.changeCd()} text={msg.cd()} />
-              </dt>
-              <dd className={style['field-overflow-visible']}>
-                <SelectBox
-                  onChange={this.onChangeCD}
-                  selected={cdromFileId}
-                  items={files}
-                  idPrefix='select-changecd'
-                  />
-              </dd>
+              { isEdit && (
+                <div> {/* this <div> is ugly anti-pattern and should be replaced by React.Fragment as soon as upgraded to React 16 */}
+                  <dt>
+                    <span className='pficon pficon-storage-domain' />
+                    &nbsp;
+                    <FieldHelp content={msg.changeCd()} text={msg.cd()} />
+                  </dt>
+                  <dd className={style['field-overflow-visible']}>
+                    <SelectBox
+                      onChange={this.onChangeCD}
+                      selected={cdromFileId}
+                      items={files}
+                      idPrefix='select-changecd'
+                      />
+                  </dd>
+                </div>
+              )}
 
               <dt>
                 <FieldHelp content={msg.bootMenuTooltip()} text={msg.bootMenu()} />
