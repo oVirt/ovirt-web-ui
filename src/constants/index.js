@@ -1,17 +1,21 @@
 // Keep alphabetically sorted
 // TODO: sort alphabetically
 // TODO: remove all constants except those used within sagas
+export const ADD_VM_NIC = 'ADD_VM_NIC'
 export const CHANGE_VM_ICON = 'CHANGE_VM_ICON'
 export const CHANGE_VM_ICON_BY_ID = 'CHANGE_VM_ICON_BY_ID'
 export const CHECK_TOKEN_EXPIRED = 'CHECK_TOKEN_EXPIRED'
 export const CLEAR_USER_MSGS = 'CLEAR_USER_MSGS'
+export const DELETE_VM_NIC = 'DELETE_VM_NIC'
 export const DOWNLOAD_CONSOLE_VM = 'DOWNLOAD_CONSOLE_VM'
 export const FAILED_EXTERNAL_ACTION = 'FAILED_EXTERNAL_ACTION'
 export const GET_ALL_CLUSTERS = 'GET_ALL_CLUSTERS'
 export const GET_ALL_FILES_FOR_ISO = 'GET_ALL_FILES_FOR_ISO'
 export const GET_ALL_HOSTS = 'GET_ALL_HOSTS'
+export const GET_ALL_NETWORKS = 'GET_ALL_NETWORKS'
 export const GET_ALL_OS = 'GET_ALL_OS'
 export const GET_ALL_TEMPLATES = 'GET_ALL_TEMPLATES'
+export const GET_ALL_VNIC_PROFILES = 'GET_ALL_VNIC_PROFILES'
 export const GET_BY_PAGE = 'GET_BY_PAGE'
 export const GET_CONSOLE_OPTIONS = 'GET_CONSOLE_OPTIONS'
 export const GET_ISO_STORAGES = 'GET_ISO_STORAGES'

@@ -1,7 +1,9 @@
 import {
+  ADD_VM_NIC,
   CHANGE_VM_ICON,
   CHANGE_VM_ICON_BY_ID,
   CLEAR_USER_MSGS,
+  DELETE_VM_NIC,
   DOWNLOAD_CONSOLE_VM,
   GET_RDP_VM,
   GET_VMS_BY_COUNT,
@@ -342,6 +344,36 @@ export function changeVmIconById ({ vmId, iconId }) {
     payload: {
       iconId,
       vmId,
+    },
+  }
+}
+
+export function setVmNics ({ vmId, nics }) {
+  return {
+    type: 'SET_VM_NICS',
+    payload: {
+      vmId,
+      nics,
+    },
+  }
+}
+
+export function addVmNic ({ vmId, nic }) {
+  return {
+    type: ADD_VM_NIC,
+    payload: {
+      vmId,
+      nic,
+    },
+  }
+}
+
+export function deleteVmNic ({ vmId, nicId }) {
+  return {
+    type: DELETE_VM_NIC,
+    payload: {
+      vmId,
+      nicId,
     },
   }
 }

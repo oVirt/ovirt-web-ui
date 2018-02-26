@@ -21,6 +21,8 @@ export * from './options'
 export * from './pool'
 export * from './route'
 export * from './storage'
+export * from './networks'
+export * from './vnicProfiles'
 
 export function schedulerOneMinute () {
   return {
