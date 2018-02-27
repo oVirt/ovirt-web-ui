@@ -142,9 +142,9 @@ class VmDetail extends Component {
     let optionsJS = options.hasIn(['options', 'consoleOptions', vm.get('id')]) ? options.getIn(['options', 'consoleOptions', vm.get('id')]).toJS() : {}
 
     const consoleOptionsShowHide = (
-      <small>
+      <small className={style.editPencilLink}>
         <a href='#' onClick={this.consoleSettings} id={`${idPrefix}-consoleoptions-showhide`}>
-          <i className={`pficon pficon-edit`} />&nbsp;
+          <i className={`pficon pficon-edit`} />
         </a>
       </small>)
 
@@ -246,7 +246,6 @@ class VmDetail extends Component {
                   <dt><span className='pficon pficon-screen' />
                     &nbsp;
                     <FieldHelp content={consolesHelp} text={msg.console()} />
-                    &nbsp;
                     {consoleOptionsShowHide}
                   </dt>
                   <VmConsoles vm={vm} onConsole={onConsole} onRDP={onRDP} usbFilter={config.get('usbFilter')} />
@@ -255,7 +254,6 @@ class VmDetail extends Component {
                   <dt><span className='fa fa-database' />
                     &nbsp;
                     <FieldHelp content={msg.storageConnectedToVm()} text={msg.disks()} />
-                    &nbsp;
                   </dt>
                   {noDisks}
                   {disksElement}
