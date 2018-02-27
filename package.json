@@ -77,6 +77,7 @@
     "ovirt-ui-components": "0.2.6",
     "patternfly": "3.26.6",
     "patternfly-bootstrap-combobox": "1.1.7",
+    "patternfly-react": "1.10.1",
     "prop-types": "15.5.10",
     "react": "15.6.1",
     "react-bootstrap": "0.31.2",
