@@ -10,7 +10,7 @@ import style from './style.css'
 const VmDisk = ({ disk }) => {
   const idPrefix = `vmdisk-${disk.get('name')}`
   const bootable = disk.get('bootable') ? (<span className={'label label-info ' + style['smaller']} id={`${idPrefix}-bootable`}>Bootable</span>) : ''
-  const inactive = disk.get('active') ? '' : (<span className={'label label-default' + style['smaller']} id={`${idPrefix}-inactive`}>Inactive</span>)
+  const inactive = disk.get('active') ? '' : (<span className={'label label-info ' + style['smaller']} id={`${idPrefix}-inactive`}>Inactive</span>)
 
   const provSize = userFormatOfBytes(disk.get('provisionedSize'))
   const actSize = userFormatOfBytes(disk.get('actualSize'), provSize.suffix)
