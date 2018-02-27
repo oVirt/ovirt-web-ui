@@ -54,7 +54,6 @@ class VmDetail extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      renderDisks: true,
       openConsoleSettings: false,
       vmsNavigationExpanded: true,
     }
@@ -138,7 +137,7 @@ class VmDetail extends Component {
     const cluster = Selectors.getClusterById(vm.getIn(['cluster', 'id']))
     const template = Selectors.getTemplateById(vm.getIn(['template', 'id']))
 
-    const disksElement = (<VmDisks disks={disks} open={this.state.renderDisks} />)
+    const disksElement = (<VmDisks disks={disks} />)
 
     let optionsJS = options.hasIn(['options', 'consoleOptions', vm.get('id')]) ? options.getIn(['options', 'consoleOptions', vm.get('id')]).toJS() : {}
 

@@ -59,7 +59,6 @@ class VmDisks extends Component {
 
   render () {
     const { disks,
-      /* open */
       } = this.props
 
     if (!disks || disks.isEmpty()) {
@@ -67,10 +66,6 @@ class VmDisks extends Component {
     }
 
     let classes = style['disks-list']
-/*    if (open) { // show/hide button recently not used
-      classes += ` ${style['open-disks']}`
-    }
-*/
 
     let disksToRender = disks.sort((a, b) => a.get('name').localeCompare(b.get('name')) - (a.get('bootable') ? 1000 : 0))
     if (!this.state.renderMore) {
@@ -109,7 +104,6 @@ class VmDisks extends Component {
 }
 VmDisks.propTypes = {
   disks: PropTypes.object,
-  open: PropTypes.bool,
 }
 
 export default VmDisks
