@@ -55,6 +55,21 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Wed Feb 28 2018 Marek Libra <mlibra@redhat.com> - 1.3.6
+- VM detail landing after refresh fixed (https://github.com/oVirt/ovirt-web-ui/pull/497)
+- Dialog for SSH keys fixed (https://github.com/oVirt/ovirt-web-ui/pull/464)
+- Basic cloud-init support (https://github.com/oVirt/ovirt-web-ui/pull/498)
+- CD removed from New VM dialog (https://github.com/oVirt/ovirt-web-ui/pull/496)
+- Boot menu configuration added (https://github.com/oVirt/ovirt-web-ui/pull/493)
+- Console re-connect fixed for warning message (https://github.com/oVirt/ovirt-web-ui/pull/483)
+- Tooltips fixed (https://github.com/oVirt/ovirt-web-ui/pull/469)
+- Close button navigates to previous page (https://github.com/oVirt/ovirt-web-ui/pull/482)
+- Broken grid fixed for pools (https://github.com/oVirt/ovirt-web-ui/pull/473)
+- Flow type check fix (https://github.com/oVirt/ovirt-web-ui/pull/470)
+- Fix label in CTRL+ALT+DEL option (https://github.com/oVirt/ovirt-web-ui/pull/484)
+- Change logo link to home page URL (https://github.com/oVirt/ovirt-web-ui/pull/474)
+- Translations updated
+
 * Wed Jan 24 2018 Marek Libra <mlibra@redhat.com> - 1.3.5
 - Translations updated
 - Fix for page reload - https://github.com/oVirt/ovirt-web-ui/pull/465
