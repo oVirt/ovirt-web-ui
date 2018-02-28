@@ -196,6 +196,15 @@ export const messages = {
   off: 'Off',
   bootMenu: 'Boot Menu',
   bootMenuTooltip: 'Boot menu allows to select bootable device. It is accessible from a console.',
+  cloudInit: {
+    message: 'Cloud-Init',
+    description: 'Name of technology allowing to initialize operating system installation. Most likely not translatable.',
+  },
+  cloudInitTooltip: 'Early initialization of Linux operating systems.',
+  hostName: 'Hostname',
+  hostNameTooltip: 'Virtual Machine hostname.',
+  sshAuthorizedKeys: 'SSH Authorized Keys',
+  sshAuthorizedKeysTooltip: 'New line separated public SSH keys allowing for passwordless remote login.',
 }
 
 export type MessageIdType = $Keys<typeof messages>

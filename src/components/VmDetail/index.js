@@ -264,6 +264,10 @@ class VmDetail extends Component {
                     <FieldHelp content={msg.bootMenuTooltip()} text={msg.bootMenu()} />
                   </dt>
                   <dd>{vm.get('bootMenuEnabled') ? msg.on() : msg.off()}</dd>
+                  <dt>
+                    <FieldHelp content={msg.cloudInitTooltip()} text={msg.cloudInit()} />
+                  </dt>
+                  <dd>{vm.getIn(['cloudInit', 'enabled']) ? msg.on() : msg.off()}</dd>
                 </dl>
               </div>
             </DetailContainer>
