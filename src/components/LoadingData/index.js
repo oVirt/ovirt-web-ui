@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
 
+import { msg } from '../../intl'
 import style from './style.css'
 
 const isActionInProgress = ({ vms, pools }) => {
@@ -40,7 +41,7 @@ const LoadingData = ({ vms }) => {
 
   return (
     <div className={`alert alert-warning ${style['loading-data']}`}>
-      <strong id='load-in-progress'>Loading ...</strong>
+      <strong id='load-in-progress'>{msg.loadingTripleDot()}</strong>
     </div>)
 }
 LoadingData.propTypes = {
