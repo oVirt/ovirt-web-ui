@@ -5,13 +5,15 @@ function customizeErrorMessage (message) {
   return result
 }
 
+export function extractErrorText (exception) {
+  return (exception.responseJSON && (exception.responseJSON.detail || exception.responseJSON.fault && exception.responseJSON.fault.detail))
+    ? (exception.responseJSON.detail || exception.responseJSON.fault.detail)
+    : (exception.statusText || 'UNKNOWN')
+}
+
 export function failedExternalAction ({ message, shortMessage, exception, action }) {
   if (exception) {
-    message = message || (
-      (exception['responseJSON'] && (exception.responseJSON.detail || exception.responseJSON.fault && exception.responseJSON.fault.detail))
-        ? (exception.responseJSON.detail || exception.responseJSON.fault.detail)
-        : (exception['statusText'] || 'UNKNOWN')
-      )
+    message = message || extractErrorText(exception)
     message = shortMessage + '\n' + customizeErrorMessage(message)
 
     const type = exception['status'] ? exception['status'] : 'ERROR'

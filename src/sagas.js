@@ -3,6 +3,9 @@ import { persistStateToLocalStorage } from './storage'
 import Selectors from './selectors'
 import AppConfiguration from './config'
 import SagasWorkers from './saga/builder'
+import vmDisksSagas from './components/VmDisks/sagas'
+import newVmDialogSagas from './components/NewDiskDialog/sagas'
+import { flatMap } from './utils'
 
 import {
   put,
@@ -35,6 +38,8 @@ import {
   addHosts,
   addTemplates,
   addAllOS,
+  setStorageDomains,
+  setDataCenters,
 
   getSinglePool,
   removeMissingPools,
@@ -84,6 +89,7 @@ import {
   GET_ALL_HOSTS,
   GET_ALL_OS,
   GET_ALL_TEMPLATES,
+  GET_ALL_STORAGE_DOMAINS,
   GET_BY_PAGE,
   GET_CONSOLE_OPTIONS,
   GET_ISO_STORAGES,
@@ -353,13 +359,11 @@ export function* fetchSingleVm (action) {
   yield put(updateVmsPoolsCount())
 }
 
-function* fetchDisks ({ vms }) {
+export function* fetchDisks ({ vms }) {
   yield * foreach(vms, function* (vm) {
     const vmId = vm.id
     const disks = yield fetchVmDisks({ vmId })
-    if (disks && disks.length > 0) {
-      yield put(setVmDisks({ vmId, disks }))
-    }
+    yield put(setVmDisks({ vmId, disks }))
   })
 }
 
@@ -514,6 +518,50 @@ function* fetchAllTemplates (action) {
   }
 }
 
+/**
+ * Storage domain not attached to any data center won't be fetched.
+ */
+function* fetchAllAttachedStorageDomains (action) {
+  Object.assign(action, { payload: { additional: [ 'storage_domains' ] } })
+  const dataCentersApi = yield callExternalAction('getAllDataCenters', Api.getAllDataCenters, action)
+  if (!dataCentersApi || !dataCentersApi.data_center) {
+    return
+  }
+
+  // getting data centers is necessary to get storage domains with statuses
+  // so why not to store them when we have them fresh
+  const dataCentersInternal = dataCentersApi.data_center.map(Api.dataCenterToInternal)
+  yield put(setDataCenters(dataCentersInternal))
+
+  const storageDomainsApi = flatMap(
+    dataCentersApi.data_center,
+    dataCenterApi => (dataCenterApi.storage_domains && dataCenterApi.storage_domains.storage_domain) || [])
+  const storageDomainsInternal = storageDomainsApi.map(Api.storageDomainToInternal)
+  const storageDomainsMerged = mergeStorageDomains(storageDomainsInternal)
+  yield put(setStorageDomains(storageDomainsMerged))
+}
+
+/**
+ * @param {Array<StorageDomainInternal>} storageDomainsInternal list of all storage domains.
+ *                                       It may contain single storage multiple times with status for different data
+ *                                       center.
+ * @return {Array<StorageDomainInternal>} List of storage domains with merged statuses. Each storage domain from input
+ *                                        is listed exactly once.
+ */
+function mergeStorageDomains (storageDomainsInternal) {
+  const idToStorageDomain = storageDomainsInternal.reduce((accum, storageDomain) => {
+    const isNew = !(storageDomain.id in accum)
+    if (isNew) {
+      accum[storageDomain.id] = storageDomain
+      return accum
+    }
+    Object.assign(accum[storageDomain.id].status, storageDomain.status)
+    return accum
+  }, {})
+  const mergedStorageDomains = Object.values(idToStorageDomain)
+  return mergedStorageDomains
+}
+
 function* fetchAllClusters (action) {
   const clusters = yield callExternalAction('getAllClusters', Api.getAllClusters, action)
 
@@ -638,6 +686,7 @@ export function *rootSaga () {
 
     takeLatest(GET_ALL_CLUSTERS, fetchAllClusters),
     takeLatest(GET_ALL_TEMPLATES, fetchAllTemplates),
+    takeLatest(GET_ALL_STORAGE_DOMAINS, fetchAllAttachedStorageDomains),
     takeLatest(GET_ALL_OS, fetchAllOS),
     takeLatest(GET_ALL_HOSTS, fetchAllHosts),
     throttle(100, GET_ISO_STORAGES, fetchISOStorages),
@@ -651,6 +700,9 @@ export function *rootSaga () {
 
     takeEvery(SELECT_POOL_DETAIL, selectPoolDetail),
     takeEvery(GET_USB_FILTER, fetchUSBFilter),
+
+    ...vmDisksSagas,
+    ...newVmDialogSagas,
 
     ...SagasWorkers(sagasFunctions),
   ]

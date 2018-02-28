@@ -40,6 +40,10 @@ export const messages = {
     message: 'unknown',
     description: 'followed by "version" to create "unknown version"',
   },
+  unknownDatacenter: {
+    message: 'unknown',
+    description: 'unknown datacenter',
+  },
   htmlUnsupportedOvirtVersionFoundButVersionAtLeastRequired: '<strong>Unsupported {version} {productName} version,</strong> found but version at least {requiredVersion} is required.',
   authorizationExpired: 'Authorization expired. The page is going to be reloaded to re-login.',
   useCtrlAltEnd: 'Use Ctrl+Alt+End',
@@ -210,6 +214,41 @@ export const messages = {
     message: 'Loading ...',
     description: 'Pending request to the server indicator label.',
   },
+  thisOperationCantBeUndone: 'This operation cannot be undone.',
+  areYouSureYouWantToDeleteDisk: 'Are you sure you want to delete disk {diskName}?',
+  delete: 'Delete',
+  confirmDelete: 'Confirm delete',
+  diskCapacity: 'Disk Capacity',
+  more: {
+    message: 'more',
+    description: 'more/less pair used to control collapsable long listing',
+  },
+  less: {
+    message: 'less',
+    description: 'more/less pair used to control collapsable long listing',
+  },
+  new: {
+    message: 'New',
+    description: 'New disk',
+  },
+  ok: 'OK',
+  createNewDisk: 'Create New Disk',
+  diskSizeHasToBeAPositiveInteger: 'Disk size has to be a positive integer.',
+  noActiveStorageDomainInDataCenter: 'There is no active data storage domain in data center "{dataCenterName}"',
+  alias: {
+    message: 'Alias',
+    description: 'In sense of "human friendly name"',
+  },
+  storageDomain: {
+    message: 'Storage domain',
+    description: 'An entity in the system where disks of virtual machines are stored. Abstraction of external file/block storages.',
+  },
+  size: {
+    message: 'Size',
+    description: '... of disk of virtual machine',
+  },
+  errorWhileCreatingNewDisk: 'Error while creating new disk:',
+  notEditableForPoolsOrPoolVms: 'Not editable for Pools or pool VMs.',
 }
 
 export type MessageIdType = $Keys<typeof messages>

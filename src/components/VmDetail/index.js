@@ -56,12 +56,14 @@ class VmDetail extends Component {
     this.state = {
       openConsoleSettings: false,
       vmsNavigationExpanded: true,
+      editDisks: false,
     }
 
     this.consoleSettings = this.consoleSettings.bind(this)
     this.toggleVmsNavExpansion = this.toggleVmsNavExpansion.bind(this)
     this.handleIconChange = this.handleIconChange.bind(this)
     this.handleIconChangeToDefault = this.handleIconChangeToDefault.bind(this)
+    this.editDisks = this.editDisks.bind(this)
   }
 
   toggleVmsNavExpansion (e) {
@@ -70,6 +72,11 @@ class VmDetail extends Component {
     })
 
     e.preventDefault()
+  }
+
+  editDisks (e) {
+    e.preventDefault()
+    this.setState({ editDisks: !this.state.editDisks })
   }
 
   consoleSettings (e) {
@@ -137,7 +144,18 @@ class VmDetail extends Component {
     const cluster = Selectors.getClusterById(vm.getIn(['cluster', 'id']))
     const template = Selectors.getTemplateById(vm.getIn(['template', 'id']))
 
-    const disksElement = (<VmDisks disks={disks} />)
+    const disksElement = (<VmDisks disks={disks} vmId={vm.get('id')} edit={this.state.editDisks} />)
+
+    const diskEditAllowed = !isPool && !vm.getIn(['pool', 'id'])
+    const pencilIcon = (<i className={`pficon pficon-edit`} />)
+    const disksEditPencil = (
+      <small className={style.editPencilLink}>
+        {
+          diskEditAllowed
+          ? (<a href='#' onClick={this.editDisks} id={`${idPrefix}-edit-disks`}>{pencilIcon}</a>)
+          : (<FieldHelp content={msg.notEditableForPoolsOrPoolVms()} text={pencilIcon} />)
+        }
+      </small>)
 
     let optionsJS = options.hasIn(['options', 'consoleOptions', vm.get('id')]) ? options.getIn(['options', 'consoleOptions', vm.get('id')]).toJS() : {}
 
@@ -149,7 +167,7 @@ class VmDetail extends Component {
       </small>)
 
     const hasDisks = disks.size > 0
-    const noDisks = hasDisks || (<small>{msg.noDisks()}</small>)
+    const noDisks = hasDisks || (<small>{msg.noDisks()} &nbsp;</small>)
 
     const consolesHelp = (
       <div>
@@ -176,7 +194,7 @@ class VmDetail extends Component {
     }
 
     return (
-      <div className={style['main-container']}>
+      <div className={style['main-container']} data-thisIsVmDetail>
         <VmsListNavigation selectedVm={vm} expanded={this.state.vmsNavigationExpanded} toggleExpansion={this.toggleVmsNavExpansion} />
         <div className={style['vm-detail-main']}>
           <div className={this.state.vmsNavigationExpanded ? style['vms-nav-expanded'] : style['vms-nav-collapsed']}>
@@ -251,9 +269,11 @@ class VmDetail extends Component {
                   <VmConsoles vm={vm} onConsole={onConsole} onRDP={onRDP} usbFilter={config.get('usbFilter')} />
                   <ConsoleOptions smartcardOptionEnable={vm.getIn(['display', 'smartcardEnabled'])} options={optionsJS} onSave={onConsoleOptionsSave} open={this.state.openConsoleSettings} />
 
-                  <dt><span className='fa fa-database' />
+                  <dt>
+                    <span className='fa fa-database' />
                     &nbsp;
                     <FieldHelp content={msg.storageConnectedToVm()} text={msg.disks()} />
+                    {disksEditPencil}
                   </dt>
                   {noDisks}
                   {disksElement}

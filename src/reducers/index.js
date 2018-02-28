@@ -13,9 +13,13 @@ import hosts from './hosts'
 import route from './route'
 import operatingSystems from './operatingSystems'
 import storages from './storages'
+import storageDomains from './storageDomains'
+import dataCenters from './dataCenters'
 import { reducer as VmAction } from '../components/VmActions/reducer'
 import { reducer as VmDialog } from '../components/VmDialog/reducer'
 import { reducer as OptionsDialog } from '../components/OptionsDialog/reducer'
+import NewDiskDialog from '../components/NewDiskDialog/reducers'
+import pendingTasks from './pendingTasks'
 
 function router (redirectUrl = '/', action) {
   switch (action.type) {
@@ -36,9 +40,13 @@ export default combineReducers({
   clusters,
   operatingSystems,
   hosts,
+  storageDomains,
+  dataCenters,
   route,
   storages,
   VmAction,
   VmDialog,
   OptionsDialog,
+  NewDiskDialog,
+  pendingTasks,
 })

@@ -1,0 +1,10 @@
+.spinner {
+    vertical-align: middle;
+    margin-right: 20px !important;
+}
+
+.errorAlert {
+    margin-left: 0;
+    margin-bottom: 30px;
+    top: 0;
+}
