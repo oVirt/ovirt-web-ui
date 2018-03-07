@@ -291,7 +291,7 @@ class VmDetail extends Component {
                 <dl className={sharedStyle['vm-properties']}>
                   <dt><span className='pficon pficon-screen' />
                     &nbsp;
-                    <FieldHelp content={consolesHelp} text={msg.console()} />
+                    <FieldHelp content={consolesHelp} text={msg.console()} popoverWidth='220px' />
                     {consoleOptionsShowHide}
                   </dt>
                   <VmConsoles vm={vm} onConsole={onConsole} onRDP={onRDP} usbFilter={config.get('usbFilter')} />
