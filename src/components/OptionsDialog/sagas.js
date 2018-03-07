@@ -10,8 +10,12 @@ function* saveSSHKey (sagas, action) {
 function* getSSHKey (sagas, action) {
   yield put(setUnloaded())
   const result = yield sagas.callExternalAction('getSSHKey', Api.getSSHKey, action)
-  if (!result.error && result.ssh_public_key && result.ssh_public_key.length > 0) {
-    yield put(setSSHKey(Api.SSHKeyToInternal({ sshKey: result.ssh_public_key[0] })))
+  if (!result.error) {
+    if (result.ssh_public_key && result.ssh_public_key.length > 0) {
+      yield put(setSSHKey(Api.SSHKeyToInternal({ sshKey: result.ssh_public_key[0] })))
+    } else {
+      yield put(setSSHKey(Api.SSHKeyToInternal({ sshKey: '' })))
+    }
   }
 }
 
