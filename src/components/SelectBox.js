@@ -3,25 +3,23 @@ import PropTypes from 'prop-types'
 
 import style from './sharedStyle.css'
 
-const checkItems = (items) => {
-  if (!Object.keys(items).length) {
-    return { '': { id: '', value: '&nbsp' } }
-  }
-  return items
+const NOBREAK_SPACE = '\u00A0'
+
+function getSelectedId (props) {
+  return props.selected ||
+    Object.values(props.items)[0] && Object.values(props.items)[0].id
 }
 
 class SelectBox extends React.Component {
   constructor (props) {
     super(props)
-    const items = checkItems(props.items)
-    this.state = { selected: props.selected || Object.values(items)[0].id, changed: false }
+    this.state = { selected: getSelectedId(props), changed: false }
     this.handleChange = this.handleChange.bind(this)
   }
 
   componentWillReceiveProps (nextProps) {
     if (!this.state.changed) {
-      const items = checkItems(nextProps.items)
-      this.setState({ selected: nextProps.selected || Object.values(items)[0].id })
+      this.setState({ selected: getSelectedId(nextProps) })
     }
   }
 
@@ -35,7 +33,7 @@ class SelectBox extends React.Component {
   render () {
     let { items, idPrefix } = this.props
 
-    items = checkItems(items)
+    const selectedItem = items[this.state.selected] || Object.values(items)[0]
 
     let idCounter = 0
     return (
@@ -43,7 +41,7 @@ class SelectBox extends React.Component {
         <div className='dropdown'>
           <button className={`btn btn-default dropdown-toggle ${style['dropdown-button']}`} type='button' data-toggle='dropdown' id={`${idPrefix}-button-toggle`}>
             <span className={style['dropdown-button-text']} id={`${idPrefix}-button-text`}>
-              {items[this.state.selected] ? items[this.state.selected].value : Object.values(items)[0].value}
+              {selectedItem ? selectedItem.value : NOBREAK_SPACE}
             </span>
             <span className='caret' id={`${idPrefix}-button-caret`} />
           </button>
@@ -62,9 +60,9 @@ class SelectBox extends React.Component {
 }
 
 SelectBox.propTypes = {
-  selected: PropTypes.string.isRequired,
-  items: PropTypes.object.isRequired,
-  onChange: PropTypes.func.isRequired,
+  selected: PropTypes.string,          // false-ish for the first item
+  items: PropTypes.object.isRequired,  // {[string]: { id: string, value: string} } ; yes, the id is there twice
+  onChange: PropTypes.func.isRequired, // (selectedId: string) => any
   idPrefix: PropTypes.string.isRequired,
 }
 
