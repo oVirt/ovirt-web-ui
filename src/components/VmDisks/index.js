@@ -103,7 +103,7 @@ class VmDisks extends Component {
   }
 }
 VmDisks.propTypes = {
-  disks: PropTypes.object,
+  disks: PropTypes.object, // deep immutable.js array
 }
 
 export default VmDisks

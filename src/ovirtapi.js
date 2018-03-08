@@ -173,7 +173,7 @@ OvirtApi = {
           id: vm['large_icon'] ? vm.large_icon['id'] : undefined,
         },
       },
-      disks: {},
+      disks: [],
       consoles: [],
       pool: {
         id: vm['vm_pool'] ? vm.vm_pool['id'] : undefined,
@@ -189,7 +189,7 @@ OvirtApi = {
     if (getSubResources) {
       if (vm.disk_attachments && vm.disk_attachments.disk_attachment) {
         for (let i in vm.disk_attachments.disk_attachment) {
-          parsedVm.disks[vm.disk_attachments.disk_attachment[i].id] = this.diskToInternal({ attachment: vm.disk_attachments.disk_attachment[i], disk: vm.disk_attachments.disk_attachment[i].disk })
+          parsedVm.disks.push(this.diskToInternal({ attachment: vm.disk_attachments.disk_attachment[i], disk: vm.disk_attachments.disk_attachment[i].disk }))
         }
       }
 
