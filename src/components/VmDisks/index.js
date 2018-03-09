@@ -6,6 +6,8 @@ import VmDisk from './VmDisk'
 import style from './style.css'
 import NewDiskDialog from '../NewDiskDialog'
 
+const SHORT_LIST_LENGTH = 2
+
 class VmDisks extends Component {
   constructor (props) {
     super(props)
@@ -26,28 +28,27 @@ class VmDisks extends Component {
 
     let disksToRender = disks.sort((a, b) => a.get('name').localeCompare(b.get('name')) - (a.get('bootable') ? 1000 : 0))
     if (!this.state.renderMore) {
-      disksToRender = disksToRender.slice(0, 2)
+      disksToRender = disksToRender.slice(0, SHORT_LIST_LENGTH)
     }
 
     const idPrefix = `vmdisks-`
 
-    let moreButton = null
-    if (this.state.renderMore) {
-      moreButton = (
-        <div className={style['button-more']} onClick={() => this.setState({ renderMore: false })} id={`${idPrefix}-button-less`}>
-          {msg.less()}
-        </div>
+    const hiddenCount = disks.size - SHORT_LIST_LENGTH
+    const moreButton = hiddenCount > 0
+      ? (
+        this.state.renderMore
+          ? (
+            <div className={style['button-more']} onClick={() => this.setState({ renderMore: false })} id={`${idPrefix}-button-less`}>
+              {msg.less()}
+            </div>
+          )
+          : (
+            <div className={style['button-more']} onClick={() => this.setState({ renderMore: true })} id={`${idPrefix}-button-more`}>
+              {msg.more()} ({hiddenCount})
+            </div>
+          )
       )
-    } else {
-      const hiddenCount = disks.size - 2
-      if (hiddenCount > 0) {
-        moreButton = (
-          <div className={style['button-more']} onClick={() => this.setState({ renderMore: true })} id={`${idPrefix}-button-more`}>
-            {msg.more()} ({hiddenCount})
-          </div>
-        )
-      }
-    }
+      : null
 
     const newButton = edit && (
       <button className='btn btn-default' onClick={() => this.setState({ showNewDialog: true })}>{msg.new()}</button>
