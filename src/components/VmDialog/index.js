@@ -290,7 +290,7 @@ class VmDialog extends React.Component {
 
   doChangeTemplateIdTo (templateId) {
     const template = this.getTemplate(templateId)
-    let { memory, cpus, osId, cloudInit } = this.state
+    let { memory, cpus, osId, cloudInit, bootMenuEnabled } = this.state
 
     if (template) {
       memory = template.get('memory')
@@ -298,6 +298,7 @@ class VmDialog extends React.Component {
 
       osId = this.getOsIdFromType(template.getIn(['os', 'type'], 'Blank'))
       cloudInit = template.get('cloudInit').toJS()
+      bootMenuEnabled = template.get('bootMenuEnabled')
     }
 
     this.setState({
@@ -306,6 +307,7 @@ class VmDialog extends React.Component {
       cpus,
       isChanged: true,
       cloudInit,
+      bootMenuEnabled,
     })
 
     if (this.state.osId !== osId) {

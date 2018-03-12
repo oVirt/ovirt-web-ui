@@ -183,7 +183,7 @@ OvirtApi = {
       display: {
         smartcardEnabled: vm.display && vm.display.smartcard_enabled ? vm.display.smartcard_enabled === 'true' : false,
       },
-      bootMenuEnabled: vm.bios && vm.bios.boot_menu && vm.bios.boot_menu.enabled === 'true',
+      bootMenuEnabled: bootMenuToInternal(vm),
       cloudInit: cloudInitApiToInternal(vm),
     }
     if (getSubResources) {
@@ -331,7 +331,7 @@ OvirtApi = {
         type: template.os ? template.os.type : undefined,
       },
       cloudInit: cloudInitApiToInternal(template),
-
+      bootMenuEnabled: bootMenuToInternal(template),
     }
   },
 
@@ -687,6 +687,10 @@ OvirtApi = {
       .then(result => result === null ? defaultValue : result)
       .catch(() => defaultValue)
   },
+}
+
+function bootMenuToInternal (vmLike: Object): boolean {
+  return vmLike.bios && vmLike.bios.boot_menu && vmLike.bios.boot_menu.enabled === 'true'
 }
 
 function cloudInitApiToInternal (vmLike: Object): CloudInitInternalType {
