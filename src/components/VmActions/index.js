@@ -154,6 +154,11 @@ class VmActions extends React.Component {
       consoleProtocol = 'Console in use'
     }
 
+    const handleSuspend = (close) => () => {
+      this.props.onSuspend()
+      close()
+    }
+
     const idPrefix = `vmaction-${vm.get('name')}`
     return (
       <div className={`actions-line ${isOnCard ? 'card-pf-items text-center' : style['left-padding']}`}>
@@ -174,7 +179,7 @@ class VmActions extends React.Component {
           tooltip={msg.suspendVm()}
           id={`${idPrefix}-button-suspend`}
           popover={({ close }) => <Confirmation text={msg.suspendVmQuestion()}
-            okButton={{ label: msg.yes(), click: this.props.onSuspend }}
+            okButton={{ label: msg.yes(), click: handleSuspend(close) }}
             cancelButton={{ label: msg.cancel(), click: () => { close() } }}
             uniqueId={vm.get('name')} />} />
 
