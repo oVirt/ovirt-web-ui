@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 
 import { OverlayTrigger, Popover } from 'react-bootstrap'
 
+import { msg } from '../../intl'
 import style from './style.css'
 
 /**
@@ -12,7 +13,7 @@ import style from './style.css'
 class FieldHelp extends React.Component {
 
   render () {
-    const tooltip = this.props.tooltip || 'Click for help'
+    const tooltip = this.props.tooltip || msg.clickForHelp()
 
     const popover = (
       <Popover id='popover-positioned-top' className={style['field-help-min-width']} title={this.props.title}>
@@ -33,8 +34,8 @@ class FieldHelp extends React.Component {
 
 FieldHelp.propTypes = {
   title: PropTypes.string,                                            // popover title
-  content: PropTypes.oneOfType([PropTypes.string, PropTypes.object]), // popover content
-  text: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),    // decorated text
+  content: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),   // popover content
+  text: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),      // decorated text
   tooltip: PropTypes.string,                                          // tooltip shown when hovering the text
   children: PropTypes.any,
   container: PropTypes.any,
