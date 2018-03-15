@@ -26,6 +26,7 @@ import {
 
   getByPage,
   getAllTemplates,
+  getAllStorageDomains,
   getAllClusters,
   getAllHosts,
   getAllOperatingSystems,
@@ -188,6 +189,7 @@ function* initialLoad () {
   yield put(getAllHosts())
   yield put(getAllOperatingSystems())
   yield put(getAllTemplates({ shallowFetch: false }))
+  yield put(getAllStorageDomains())
 
   yield put(getByPage({ page: 1 })) // first page of VMs list
 }

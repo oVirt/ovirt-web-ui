@@ -104,3 +104,7 @@ dd.console-box {
     transition: padding-left .5s;
     overflow: auto;
 }
+
+.editPencilLink {
+    margin-left: 10px
+}

@@ -1,19 +1,9 @@
 .disks-list {
-/*    transition: height 1s; // show/hide button recently not used
-    height: 0px;
-    */
     overflow: hidden;
     width: 100%;
     margin-left: 2em;
+}
 
-    height: inherit; /* remove when re-enabling show/hide */
-}
-/* show/hide button recently not used
-.open-disks {
-    height: inherit;
-    margin-left: 2em;
-}
-*/
 .disks-ul {
     list-style-type: none;
     padding: 0;

@@ -173,7 +173,7 @@ OvirtApi = {
           id: vm['large_icon'] ? vm.large_icon['id'] : undefined,
         },
       },
-      disks: {},
+      disks: [],
       consoles: [],
       pool: {
         id: vm['vm_pool'] ? vm.vm_pool['id'] : undefined,
@@ -189,7 +189,10 @@ OvirtApi = {
     if (getSubResources) {
       if (vm.disk_attachments && vm.disk_attachments.disk_attachment) {
         for (let i in vm.disk_attachments.disk_attachment) {
-          parsedVm.disks[vm.disk_attachments.disk_attachment[i].id] = this.diskToInternal({ attachment: vm.disk_attachments.disk_attachment[i], disk: vm.disk_attachments.disk_attachment[i].disk })
+          parsedVm.disks.push(this.diskToInternal({
+            attachment: vm.disk_attachments.disk_attachment[i],
+            disk: vm.disk_attachments.disk_attachment[i].disk,
+          }))
         }
       }
 
@@ -295,12 +298,16 @@ OvirtApi = {
       iface: attachment['interface'],
 
       id: disk.id,
-      name: disk['name'],
+      name: disk['name'], // same as `alias`
       status: disk['status'],
 
       actualSize: disk['actual_size'],
       provisionedSize: disk['provisioned_size'],
       format: disk['format'],
+      storageDomainId: disk.storage_domains &&
+        disk.storage_domains.storage_domain &&
+        disk.storage_domains.storage_domain[0] &&
+        disk.storage_domains.storage_domain[0].id,
     }
   },
 
@@ -335,10 +342,37 @@ OvirtApi = {
     }
   },
 
+  storageDomainToInternal (apiStorageDomain: Object): Object {
+    /*
+     * status and data_center properties are only returned when storage domain accessed through
+     * /datacenters/{id}/storagedomains not when accessed through /storagedomains
+     */
+    const statusPerDataCenter = apiStorageDomain.status && apiStorageDomain.data_center
+      ? {
+        [apiStorageDomain.data_center.id]: apiStorageDomain.status,
+      }
+      : {}
+    return {
+      id: apiStorageDomain.id,
+      name: apiStorageDomain.name,
+      statusPerDataCenter,
+      type: apiStorageDomain.type,
+    }
+  },
+
+  dataCenterToInternal (apiDataCenter: Object): Object {
+    return {
+      id: apiDataCenter.id,
+      name: apiDataCenter.name,
+      status: apiDataCenter.status,
+    }
+  },
+
   clusterToInternal ({ cluster }: { cluster: Object }): Object {
     return {
       id: cluster.id,
       name: cluster.name,
+      dataCenterId: cluster.data_center.id,
 
       memoryPolicy: {
         overCommitPercent: cluster['memory_policy'] && cluster['memory_policy']['over_commit'] && cluster['memory_policy']['over_commit']['percent'] ? cluster['memory_policy']['over_commit']['percent'] : 100,
@@ -488,6 +522,12 @@ OvirtApi = {
   getAllTemplates (): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'getAllTemplates' })
     const url = `${AppConfiguration.applicationContext}/api/templates`
+    return OvirtApi._httpGet({ url })
+  },
+  getAllDataCenters ({ additional }: { additional: Array<string> }): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'getAllDataCenters' })
+    const url = `${AppConfiguration.applicationContext}/api/datacenters` +
+      (additional && additional.length > 0 ? `?follow=${additional.join(',')}` : '')
     return OvirtApi._httpGet({ url })
   },
   getAllClusters (): Promise<Object> {
@@ -648,6 +688,34 @@ OvirtApi = {
     const input = JSON.stringify({ large_icon: { id: iconId } })
     return OvirtApi._httpPut({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}`,
+      input,
+    })
+  },
+  removeDisk (diskId: string): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'removeDisk' })
+    const url = `${AppConfiguration.applicationContext}/api/disks/${diskId}?async=true`
+    return OvirtApi._httpDelete({ url })
+  },
+  addDiskAttachment ({ sizeB, storageDomainId, alias, vmId, iface }: { sizeB: string, storageDomainId: string, alias: string, vmId: string, iface: string }): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'addDiskAttachment' })
+    const payload = {
+      interface: iface,
+      disk: {
+        provisioned_size: sizeB,
+        format: 'cow',
+        storage_domains: {
+          storage_domain: [
+            {
+              id: storageDomainId,
+            },
+          ],
+        },
+        alias,
+      },
+    }
+    const input = JSON.stringify(payload)
+    return OvirtApi._httpPost({
+      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/diskattachments`,
       input,
     })
   },

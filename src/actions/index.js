@@ -21,6 +21,9 @@ export * from './options'
 export * from './pool'
 export * from './route'
 export * from './storage'
+export * from './storageDomains'
+export * from './dataCenters'
+export * from './pendingTasks'
 
 export function schedulerOneMinute () {
   return {
@@ -37,6 +40,9 @@ export function persistState () {
   }
 }
 
+/**
+ * Not creator of an action. Returned object can't be dispatched to the store.
+ */
 export function getSingleVm ({ vmId }) {
   return {
     type: GET_VM,
