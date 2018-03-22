@@ -5,7 +5,7 @@
 .vm-detail-container dt {
     clear: left;
     float: left;
-    width: 200px;
+    width: 250px;
     min-height: 26px;
     white-space: nowrap;
     text-overflow: ellipsis;
