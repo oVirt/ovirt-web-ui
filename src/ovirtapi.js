@@ -180,6 +180,7 @@ OvirtApi = {
       },
       cdrom: {},
       sessions: [],
+      nics: [],
       display: {
         smartcardEnabled: vm.display && vm.display.smartcard_enabled ? vm.display.smartcard_enabled === 'true' : false,
       },
@@ -204,6 +205,9 @@ OvirtApi = {
       }
       if (vm.sessions && vm.sessions.session) {
         parsedVm.sessions = this.sessionsToInternal({ sessions: vm.sessions })
+      }
+      if (vm.nics && vm.nics.nic) {
+        parsedVm.nics = vm.nics.nic.map((nic: Object): Object => this.nicToInternal({ nic }))
       }
     }
     return parsedVm
@@ -377,6 +381,50 @@ OvirtApi = {
       memoryPolicy: {
         overCommitPercent: cluster['memory_policy'] && cluster['memory_policy']['over_commit'] && cluster['memory_policy']['over_commit']['percent'] ? cluster['memory_policy']['over_commit']['percent'] : 100,
       },
+    }
+  },
+
+  nicToInternal ({ nic }: { nic: Object }): Object {
+    return {
+      id: nic.id,
+      name: nic.name,
+      vnicProfile: {
+        id: nic.vnic_profile.id,
+      },
+    }
+  },
+
+  internalNicToOvirt ({ nic }: { nic: Object }): Object {
+    return {
+      name: nic.name,
+      interface: 'virtio',
+      vnic_profile: {
+        id: nic.vnicProfile.id,
+      },
+    }
+  },
+
+  vnicProfileToInternal ({ vnicProfile }: { vnicProfile: Object }): Object {
+    let vnicProfileInternal = {
+      id: vnicProfile.id,
+      name: vnicProfile.name,
+      network: {
+        id: vnicProfile.network.id,
+        name: null,
+      },
+    }
+
+    if (vnicProfile.network.name) {
+      vnicProfileInternal.network.name = vnicProfile.network.name
+    }
+
+    return vnicProfileInternal
+  },
+
+  networkToInternal ({ network }: { network: Object }): Object {
+    return {
+      id: network.id,
+      name: network.name,
     }
   },
 
@@ -666,6 +714,21 @@ OvirtApi = {
       input,
     })
   },
+  addNicToVm ({ nic, vmId }: { nic: Object, vmId: string }): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'addNicToVm' })
+    const input = JSON.stringify(OvirtApi.internalNicToOvirt({ nic }))
+    logDebug(`OvirtApi.addNicToVm(): ${input}`)
+    return OvirtApi._httpPost({
+      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/nics`,
+      input,
+    })
+  },
+  deleteNicFromVm ({ nicId, vmId }: { nicId: string, vmId: string }): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'deleteNicFromVm' })
+    return OvirtApi._httpDelete({
+      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/nics/${nicId}`,
+    })
+  },
   getUSBFilter (): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'getUSBFilter' })
     return OvirtApi._httpGet({
@@ -754,6 +817,20 @@ OvirtApi = {
     return rawPromise
       .then(result => result === null ? defaultValue : result)
       .catch(() => defaultValue)
+  },
+
+  getAllVnicProfiles (): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'getVnicProfiles' })
+    return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/vnicprofiles?follow=network` })
+  },
+
+  getVmsNic ({ vmId }: { vmId: string }): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'getVmsNic' })
+    return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/nics` })
+  },
+  getAllNetworks (): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'getNetworks' })
+    return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/networks` })
   },
 }
 

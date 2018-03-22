@@ -53,6 +53,10 @@ export const messages = {
   consoleInUseContinue: 'Console in use, continue?',
   yes: 'Yes',
   cancel: 'Cancel',
+  newNic: {
+    message: 'New',
+    description: 'New NIC',
+  },
   save: 'Save',
   preserveDisks: 'Preserve disks',
   removeVmQustion: 'Remove the VM?',
@@ -249,6 +253,13 @@ export const messages = {
   },
   errorWhileCreatingNewDisk: 'Error while creating new disk:',
   notEditableForPoolsOrPoolVms: 'Not editable for Pools or pool VMs.',
+  nic: 'Network interfaces',
+  noNics: 'no NICs',
+  addNewNic: 'Add new NIC',
+  vnicProfile: 'VNIC Profile',
+  areYouSureYouWantToDeleteNic: 'Are you sure you want to delete NIC {nicName}?',
+  nicsTooltip: 'Connected VM network interfaces.',
+  network: 'Network',
 }
 
 export type MessageIdType = $Keys<typeof messages>
