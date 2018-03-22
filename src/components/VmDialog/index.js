@@ -216,7 +216,18 @@ class VmDialog extends React.Component {
   }
 
   onChangeVmName (event) {
-    this.setState({ name: event.target.value, isChanged: true })
+    const newName = event.target.value
+    this.setState({ name: newName, isChanged: true })
+
+    const template = this.getTemplate()
+    if (!template) {
+      return
+    }
+    const templateHostName = template.getIn(['cloudInit', 'hostName'])
+    if (templateHostName) {
+      return
+    }
+    this.setState(state => { state.cloudInit.hostName = newName })
   }
   onChangeVmDescription (event) {
     this.setState({ description: event.target.value, isChanged: true })
