@@ -1089,17 +1089,31 @@ boom@2.x.x:
   dependencies:
     hoek "2.x.x"
 
+bootstrap-datepicker@^1.7.1:
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/bootstrap-datepicker/-/bootstrap-datepicker-1.7.1.tgz#4ee7faf34888dbec7834fbf9dbe7c4277e01ddaf"
+  dependencies:
+    jquery ">=1.7.1 <4.0.0"
+
 bootstrap-datepicker@~1.6.4:
   version "1.6.4"
   resolved "https://registry.yarnpkg.com/bootstrap-datepicker/-/bootstrap-datepicker-1.6.4.tgz#889ebeced8eaa2ff15ec1f273e4b07531cc43da0"
   dependencies:
     jquery ">=1.7.1"
 
+bootstrap-sass@^3.3.7:
+  version "3.3.7"
+  resolved "https://registry.yarnpkg.com/bootstrap-sass/-/bootstrap-sass-3.3.7.tgz#6596c7ab40f6637393323ab0bc80d064fc630498"
+
 bootstrap-select@1.12.4, bootstrap-select@^1.12.2:
   version "1.12.4"
   resolved "https://registry.yarnpkg.com/bootstrap-select/-/bootstrap-select-1.12.4.tgz#7f15d3c0ce978868d9c09c70f96624f55fa02ee1"
   dependencies:
     jquery ">=1.8"
+
+bootstrap-slider@^9.9.0:
+  version "9.10.0"
+  resolved "https://registry.yarnpkg.com/bootstrap-slider/-/bootstrap-slider-9.10.0.tgz#1103d6bc00cfbfa8cfc9a2599ab518c55643da3f"
 
 bootstrap-switch@3.3.4, bootstrap-switch@~3.3.4:
   version "3.3.4"
@@ -1134,6 +1148,10 @@ braces@^1.8.2:
     expand-range "^1.8.1"
     preserve "^0.2.0"
     repeat-element "^1.1.2"
+
+breakjs@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/breakjs/-/breakjs-1.0.0.tgz#ec8353a06862eb43962deae09072ee66a4cd8459"
 
 browser-resolve@^1.11.2:
   version "1.11.2"
@@ -1199,7 +1217,7 @@ bytes@2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/bytes/-/bytes-2.3.0.tgz#d5b680a165b6201739acb611542aabc2d8ceb070"
 
-c3@~0.4.11:
+c3@^0.4.11, c3@~0.4.11:
   version "0.4.11"
   resolved "https://registry.yarnpkg.com/c3/-/c3-0.4.11.tgz#3f2b6c7bd33577a3473dd61176735565b4d0f3ce"
   dependencies:
@@ -1342,6 +1360,10 @@ change-case@3.0.x:
     title-case "^2.1.0"
     upper-case "^1.1.1"
     upper-case-first "^1.1.0"
+
+change-emitter@^0.1.2:
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/change-emitter/-/change-emitter-0.1.6.tgz#e8b2fe3d7f1ab7d69a32199aff91ea6931409515"
 
 chokidar@^1.0.0, chokidar@^1.6.1:
   version "1.6.1"
@@ -1776,6 +1798,13 @@ datatables.net-colreorder@>=1.2.0, datatables.net-colreorder@~1.3.2:
     datatables.net ">=1.10.9"
     jquery ">=1.7"
 
+datatables.net-colreorder@^1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/datatables.net-colreorder/-/datatables.net-colreorder-1.4.1.tgz#389e4b1a274e203979a3718d86c5884d0a0166b6"
+  dependencies:
+    datatables.net "^1.10.15"
+    jquery ">=1.7"
+
 datatables.net-select@~1.2.0:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/datatables.net-select/-/datatables.net-select-1.2.1.tgz#c2d0fe5abbf2babaaeb34af757d4286d3e5c239d"
@@ -1890,7 +1919,7 @@ dom-converter@~0.1:
   dependencies:
     utila "~0.3"
 
-dom-helpers@^3.2.0:
+dom-helpers@^3.2.0, dom-helpers@^3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/dom-helpers/-/dom-helpers-3.2.1.tgz#3203e07fed217bd1f424b019735582fc37b2825a"
 
@@ -2382,7 +2411,7 @@ fb-watchman@^2.0.0:
   dependencies:
     bser "^2.0.0"
 
-fbjs@^0.8.9:
+fbjs@^0.8.1, fbjs@^0.8.9:
   version "0.8.9"
   resolved "https://registry.yarnpkg.com/fbjs/-/fbjs-0.8.9.tgz#180247fbd347dcc9004517b904f865400a0c8f14"
   dependencies:
@@ -2494,6 +2523,10 @@ flow-babel-webpack-plugin@1.1.0:
 "flow-bin@>=0.44.2 <1":
   version "0.51.1"
   resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.51.1.tgz#7929c6f0a94e765429fcb2ee6e468278faa9c732"
+
+font-awesome-sass@^4.7.0:
+  version "4.7.0"
+  resolved "https://registry.yarnpkg.com/font-awesome-sass/-/font-awesome-sass-4.7.0.tgz#4eda693e915009ce00b228e0964dc5eca9bc34e1"
 
 font-awesome@^4.7.0:
   version "4.7.0"
@@ -2787,6 +2820,10 @@ hoist-non-react-statics@^1.2.0:
 hoist-non-react-statics@^2.2.1:
   version "2.2.2"
   resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-2.2.2.tgz#c0eca5a7d5a28c5ada3107eb763b01da6bfa81fb"
+
+hoist-non-react-statics@^2.3.1:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-2.5.0.tgz#d2ca2dfc19c5a91c5a6615ce8e564ef0347e2a40"
 
 home-or-tmp@^2.0.0:
   version "2.0.0"
@@ -3480,7 +3517,7 @@ jquery-match-height@^0.7.2:
   version "0.7.2"
   resolved "https://registry.yarnpkg.com/jquery-match-height/-/jquery-match-height-0.7.2.tgz#f8d9f3ba5314daab109cf07408674be204be5f0e"
 
-jquery@3.2.1, "jquery@>= 2.1.x", jquery@>=1.7, jquery@>=1.7.0, jquery@>=1.7.1, jquery@>=1.8, "jquery@^1.8.3 || ^2.0 || ^3.0", jquery@~3.2.1:
+jquery@3.2.1, "jquery@>= 2.1.x", jquery@>=1.7, jquery@>=1.7.0, jquery@>=1.7.1, "jquery@>=1.7.1 <4.0.0", jquery@>=1.8, "jquery@^1.8.3 || ^2.0 || ^3.0", jquery@~3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.2.1.tgz#5c4d9de652af6cd0a770154a631bba12b015c787"
 
@@ -3721,6 +3758,10 @@ lodash.merge@^4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/lodash.merge/-/lodash.merge-4.6.0.tgz#69884ba144ac33fe699737a6086deffadd0f89c5"
 
+lodash.orderby@^4.6.0:
+  version "4.6.0"
+  resolved "https://registry.yarnpkg.com/lodash.orderby/-/lodash.orderby-4.6.0.tgz#e697f04ce5d78522f54d9338b32b81a3393e4eb3"
+
 lodash.pickby@^4.0.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/lodash.pickby/-/lodash.pickby-4.6.0.tgz#7dea21d8c18d7703a27c704c15d3b84a67e33aff"
@@ -3896,6 +3937,10 @@ moment-timezone@^0.4.0, moment-timezone@^0.4.1:
 "moment@>= 2.6.0", moment@^2.10, moment@~2.14.1:
   version "2.14.1"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.14.1.tgz#b35b27c47e57ed2ddc70053d6b07becdb291741c"
+
+moment@^2.19.1:
+  version "2.21.0"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.21.0.tgz#2a114b51d2a6ec9e6d83cf803f838a878d8a023a"
 
 ms@0.7.1:
   version "0.7.1"
@@ -4327,6 +4372,24 @@ patternfly-bootstrap-treeview@~2.1.0:
     bootstrap "3.3.x"
     jquery ">= 2.1.x"
 
+patternfly-react@1.10.1:
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/patternfly-react/-/patternfly-react-1.10.1.tgz#fc9c1c856d7d0e56c14c2da4b2959ae1831b072c"
+  dependencies:
+    breakjs "^1.0.0"
+    classnames "^2.2.5"
+    patternfly "^3.38.0"
+    react-bootstrap "^0.31.5"
+    react-bootstrap-switch "^15.5.3"
+    react-c3js "^0.1.20"
+    react-fontawesome "^1.6.1"
+    reactabular-table "^8.12.0"
+    recompose "^0.26.0"
+  optionalDependencies:
+    lodash.orderby "^4.6.0"
+    sortabular "^1.5.1"
+    table-resolver "^3.2.0"
+
 patternfly@3.26.6:
   version "3.26.6"
   resolved "https://registry.yarnpkg.com/patternfly/-/patternfly-3.26.6.tgz#ea78bda1f04e40e05f92ecae9dfb19c01d152764"
@@ -4350,6 +4413,36 @@ patternfly@3.26.6:
     google-code-prettify "~1.0.5"
     jquery-match-height "^0.7.2"
     moment "~2.14.1"
+    moment-timezone "^0.4.1"
+    patternfly-bootstrap-combobox "~1.1.7"
+    patternfly-bootstrap-treeview "~2.1.0"
+
+patternfly@^3.38.0:
+  version "3.42.0"
+  resolved "https://registry.yarnpkg.com/patternfly/-/patternfly-3.42.0.tgz#bdf9b1171ff7e2f4395094c4a7cb58e44122232e"
+  dependencies:
+    bootstrap "~3.3.7"
+    font-awesome "^4.7.0"
+    jquery "~3.2.1"
+  optionalDependencies:
+    bootstrap-datepicker "^1.7.1"
+    bootstrap-sass "^3.3.7"
+    bootstrap-select "^1.12.2"
+    bootstrap-slider "^9.9.0"
+    bootstrap-switch "~3.3.4"
+    bootstrap-touchspin "~3.1.1"
+    c3 "~0.4.11"
+    d3 "~3.5.17"
+    datatables.net "^1.10.15"
+    datatables.net-colreorder "^1.4.1"
+    datatables.net-colreorder-bs "~1.3.2"
+    datatables.net-select "~1.2.0"
+    drmonty-datatables-colvis "~1.1.2"
+    eonasdan-bootstrap-datetimepicker "^4.17.47"
+    font-awesome-sass "^4.7.0"
+    google-code-prettify "~1.0.5"
+    jquery-match-height "^0.7.2"
+    moment "^2.19.1"
     moment-timezone "^0.4.1"
     patternfly-bootstrap-combobox "~1.1.7"
     patternfly-bootstrap-treeview "~2.1.0"
@@ -4687,7 +4780,7 @@ prop-types-extra@^1.0.1:
   dependencies:
     warning "^3.0.0"
 
-prop-types@15.5.10, prop-types@^15.5.10, prop-types@^15.5.4, prop-types@^15.5.8:
+prop-types@15.5.10, prop-types@^15.5.10, prop-types@^15.5.4, prop-types@^15.5.6, prop-types@^15.5.8:
   version "15.5.10"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.5.10.tgz#2797dfc3126182e3a95e3dfbb2e893ddd7456154"
   dependencies:
@@ -4776,6 +4869,10 @@ react-bootstrap-switch@15.5.0:
   version "15.5.0"
   resolved "https://registry.yarnpkg.com/react-bootstrap-switch/-/react-bootstrap-switch-15.5.0.tgz#225152e339ab586c0991be14e5229c04eaac998b"
 
+react-bootstrap-switch@^15.5.3:
+  version "15.5.3"
+  resolved "https://registry.yarnpkg.com/react-bootstrap-switch/-/react-bootstrap-switch-15.5.3.tgz#97287791d4ec0d1892d142542e7e5248002b1251"
+
 react-bootstrap@0.31.2:
   version "0.31.2"
   resolved "https://registry.yarnpkg.com/react-bootstrap/-/react-bootstrap-0.31.2.tgz#f59184676ecedfc4c572d29ffdd6f9126ea8fe6a"
@@ -4792,6 +4889,27 @@ react-bootstrap@0.31.2:
     uncontrollable "^4.1.0"
     warning "^3.0.0"
 
+react-bootstrap@^0.31.5:
+  version "0.31.5"
+  resolved "https://registry.yarnpkg.com/react-bootstrap/-/react-bootstrap-0.31.5.tgz#57040fa8b1274e1e074803c21a1b895fdabea05a"
+  dependencies:
+    babel-runtime "^6.11.6"
+    classnames "^2.2.5"
+    dom-helpers "^3.2.0"
+    invariant "^2.2.1"
+    keycode "^2.1.2"
+    prop-types "^15.5.10"
+    prop-types-extra "^1.0.1"
+    react-overlays "^0.7.4"
+    uncontrollable "^4.1.0"
+    warning "^3.0.0"
+
+react-c3js@^0.1.20:
+  version "0.1.20"
+  resolved "https://registry.yarnpkg.com/react-c3js/-/react-c3js-0.1.20.tgz#561bb211bd691be42af39726d11bab42d09f3e7b"
+  dependencies:
+    c3 "^0.4.11"
+
 react-dom@15.6.1:
   version "15.6.1"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-15.6.1.tgz#2cb0ed4191038e53c209eb3a79a23e2a4cf99470"
@@ -4800,6 +4918,12 @@ react-dom@15.6.1:
     loose-envify "^1.1.0"
     object-assign "^4.1.0"
     prop-types "^15.5.10"
+
+react-fontawesome@^1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/react-fontawesome/-/react-fontawesome-1.6.1.tgz#eddce17e7dc731aa09fd4a186688a61793a16c5c"
+  dependencies:
+    prop-types "^15.5.6"
 
 react-infinite-scroller@1.0.15:
   version "1.0.15"
@@ -4835,6 +4959,16 @@ react-overlays@^0.7.0:
     dom-helpers "^3.2.0"
     prop-types "^15.5.8"
     react-prop-types "^0.4.0"
+    warning "^3.0.0"
+
+react-overlays@^0.7.4:
+  version "0.7.4"
+  resolved "https://registry.yarnpkg.com/react-overlays/-/react-overlays-0.7.4.tgz#ef2ec652c3444ab8aa014262b18f662068e56d5c"
+  dependencies:
+    classnames "^2.2.5"
+    dom-helpers "^3.2.1"
+    prop-types "^15.5.10"
+    prop-types-extra "^1.0.1"
     warning "^3.0.0"
 
 react-prop-types@^0.4.0:
@@ -4895,6 +5029,12 @@ react@15.6.1:
     loose-envify "^1.1.0"
     object-assign "^4.1.0"
     prop-types "^15.5.10"
+
+reactabular-table@^8.12.0:
+  version "8.12.1"
+  resolved "https://registry.yarnpkg.com/reactabular-table/-/reactabular-table-8.12.1.tgz#7155a725da95fe0a11dd00e53123fd77cdeb5b40"
+  dependencies:
+    classnames "^2.2.5"
 
 read-pkg-up@^1.0.1:
   version "1.0.1"
@@ -5008,6 +5148,15 @@ recast@~0.11.12:
     esprima "~3.1.0"
     private "~0.1.5"
     source-map "~0.5.0"
+
+recompose@^0.26.0:
+  version "0.26.0"
+  resolved "https://registry.yarnpkg.com/recompose/-/recompose-0.26.0.tgz#9babff039cb72ba5bd17366d55d7232fbdfb2d30"
+  dependencies:
+    change-emitter "^0.1.2"
+    fbjs "^0.8.1"
+    hoist-non-react-statics "^2.3.1"
+    symbol-observable "^1.0.4"
 
 recursive-readdir@2.0.0:
   version "2.0.0"
@@ -5390,6 +5539,10 @@ sort-keys@^1.0.0:
   dependencies:
     is-plain-obj "^1.0.0"
 
+sortabular@^1.5.1:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/sortabular/-/sortabular-1.5.1.tgz#56316ee5755435d3d357bb81f5e2caa4a5ab95b0"
+
 source-list-map@^0.1.4, source-list-map@~0.1.7:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/source-list-map/-/source-list-map-0.1.8.tgz#c550b2ab5427f6b3f21f5afead88c4f5587b2106"
@@ -5570,13 +5723,17 @@ swap-case@^1.1.0:
     lower-case "^1.1.1"
     upper-case "^1.1.1"
 
-symbol-observable@^1.0.3:
+symbol-observable@^1.0.3, symbol-observable@^1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/symbol-observable/-/symbol-observable-1.0.4.tgz#29bf615d4aa7121bdd898b22d4b3f9bc4e2aa03d"
 
 symbol-tree@^3.2.1:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/symbol-tree/-/symbol-tree-3.2.2.tgz#ae27db38f660a7ae2e1c3b7d1bc290819b8519e6"
+
+table-resolver@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/table-resolver/-/table-resolver-3.2.0.tgz#1be8d6f1a71896cf599853af76dd8d35c1dce3e2"
 
 table@^3.7.8:
   version "3.8.3"
