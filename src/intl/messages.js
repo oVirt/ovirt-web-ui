@@ -102,7 +102,7 @@ export const messages = {
   definedMemory: 'Defined Memory',
   totalMemoryVmWillBeEquippedWith: 'Total memory the virtual machine will be equipped with.',
   lowOVirtVersion: 'SSH keys can not be managed with recent oVirt <strong>{apiVersion}</strong> version. Please upgrade oVirt to <strong>4.2</strong> or higher.',
-  publicSSHKey: 'Your public SSH key.',
+  publicSSHKey: 'Specify public key for access to guest serial console via SSH authentication.',
   SSHKey: 'SSH Key',
   cpus: 'CPUs',
   totalCountOfVirtualProcessorsVmWillBeEquippedWith: 'Total count of virtual processors the virtual machine will be equipped with.',
