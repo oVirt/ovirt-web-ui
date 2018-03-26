@@ -14,9 +14,10 @@ class FieldHelp extends React.Component {
 
   render () {
     const tooltip = this.props.tooltip || msg.clickForHelp()
+    const popoverStyle = this.props.popoverWidth ? { width: this.props.popoverWidth } : null
 
     const popover = (
-      <Popover id='popover-positioned-top' className={style['field-help-min-width']} title={this.props.title}>
+      <Popover id='popover-positioned-top' style={popoverStyle} className={style['field-help-min-width']} title={this.props.title}>
         {this.props.content}
       </Popover>)
 
@@ -39,6 +40,7 @@ FieldHelp.propTypes = {
   tooltip: PropTypes.string,                                          // tooltip shown when hovering the text
   children: PropTypes.any,
   container: PropTypes.any,
+  popoverWidth: PropTypes.string,
 }
 
 export default FieldHelp
