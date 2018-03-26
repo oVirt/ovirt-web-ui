@@ -24,7 +24,7 @@ BuildArch: noarch
 BuildRequires: ovirt-engine-nodejs = 8.0.0
 BuildRequires: ovirt-engine-yarn = 0.24.4
 
-BuildRequires: ovirt-engine-nodejs-modules >= 1.5.2
+BuildRequires: ovirt-engine-nodejs-modules >= 1.5.3
 
 %description
 This package provides new VM Portal for %{product}, so far as technical preview.
@@ -55,7 +55,7 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
-* Thu Mar 22 2018 Marek Libra <mlibra@redhat.com> - 1.3.7
+* Mon Mar 26 2018 Marek Libra <mlibra@redhat.com> - 1.3.7-2
 - VM networks editation - https://github.com/oVirt/ovirt-web-ui/pull/517
 - VM disks editation - https://github.com/oVirt/ovirt-web-ui/pull/523
 - ssh dialog UI fix - https://github.com/oVirt/ovirt-web-ui/pull/519
