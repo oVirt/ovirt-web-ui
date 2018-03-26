@@ -24,7 +24,7 @@ BuildArch: noarch
 BuildRequires: ovirt-engine-nodejs = 8.0.0
 BuildRequires: ovirt-engine-yarn = 0.24.4
 
-BuildRequires: ovirt-engine-nodejs-modules >= 1.5.2
+BuildRequires: ovirt-engine-nodejs-modules >= 1.5.3
 
 %description
 This package provides new VM Portal for %{product}, so far as technical preview.
