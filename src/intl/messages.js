@@ -209,7 +209,7 @@ export const messages = {
     message: 'Cloud-Init',
     description: 'Name of technology allowing to initialize operating system installation. Most likely not translatable.',
   },
-  cloudInitTooltip: 'Early initialization of Linux operating systems.',
+  cloudInitTooltip: 'Set up early initialization of Linux virtual machine using cloud-init.',
   hostName: 'Hostname',
   hostNameTooltip: 'Virtual Machine hostname.',
   sshAuthorizedKeys: 'SSH Authorized Keys',
