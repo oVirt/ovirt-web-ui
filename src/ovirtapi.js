@@ -242,6 +242,11 @@ OvirtApi = {
       type: vm.type,
 
       memory: vm.memory,
+      memory_policy: {
+        max: vm.memory_policy.max,
+        guaranteed: vm.memory_policy.guaranteed,
+      },
+
       cpu: {
         topology: {
           cores: vm.cpu.topology.cores,
