@@ -35,25 +35,28 @@ const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, onUpdat
   if (expanded) {
     const sortedVms = vms.get('vms')
       .sort((vmA, vmB) => naturalCompare.caseInsensitive(vmA.get('name'), vmB.get('name')))
+
+    const items = sortedVms.map(vm => {
+      if (vm.get('id') === selectedVm.get('id')) { // is selected
+        return (
+          <li role='presentation' className={`${style['item']} ${style['item-selected']}`} key={vm.get('id')}>
+            <span className={style['item-text']} id={`${idPrefix}-item-${vm.get('name')}`}>{vm.get('name')}</span>
+          </li>
+        )
+      }
+
+      return (
+        <li role='presentation' className={style['item']} key={vm.get('id')}>
+          <Link to={`/vm/${vm.get('id')}`} className={style['item-link']} onClick={() => { linkClick(vm.get('id')) }}>
+            <span className={style['item-text']} id={`${idPrefix}-item-${vm.get('name')}`}>{vm.get('name')}</span>
+          </Link>
+        </li>
+      )
+    }) // ImmutableJS OrderedMap
+
     list = (
       <ul className={`menu ${style['ul-menu-cust']}`} role='menu' aria-labelledby='dropdownMenu1'>
-        {sortedVms.map(vm => {
-          if (vm.get('id') === selectedVm.get('id')) { // is selected
-            return (
-              <li role='presentation' className={`${style['item']} ${style['item-selected']}`} key={vm.get('id')}>
-                <span className={style['item-text']} id={`${idPrefix}-item-${vm.get('name')}`}>{vm.get('name')}</span>
-              </li>
-            )
-          }
-
-          return (
-            <li role='presentation' className={style['item']} key={vm.get('id')}>
-              <Link to={`/vm/${vm.get('id')}`} className={style['item-link']} onClick={() => { linkClick(vm.get('id')) }}>
-                <span className={style['item-text']} id={`${idPrefix}-item-${vm.get('name')}`}>{vm.get('name')}</span>
-              </Link>
-            </li>
-          )
-        })}
+        {items.toArray()}
       </ul>
     )
   }
