@@ -21,7 +21,7 @@ import type { MessageIdType } from './messages'
 // expected translations ['de', 'fr', 'es', 'ko', 'it', 'ja', 'pt-BR', 'ru', 'zh-CN']
 import translatedMessages from './translated-messages.json'
 
-const DEFAULT_LOCALE = 'en'
+export const DEFAULT_LOCALE = 'en'
 
 /**
  * Currently selected locale

@@ -117,7 +117,9 @@
       "^.+\\.css$": "<rootDir>/config/jest/CSSStub.js",
       "ovirtapi": "<rootDir>/src/mock/ovirtapi.mock.js"
     },
-    "scriptPreprocessor": "<rootDir>/config/jest/transform.js",
+    "transform": {
+      ".*": "<rootDir>/config/jest/transform.js"
+    },
     "setupFiles": [
       "<rootDir>/config/polyfills.js"
     ],

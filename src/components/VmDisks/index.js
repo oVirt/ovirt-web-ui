@@ -5,6 +5,7 @@ import { msg } from '../../intl'
 import VmDisk from './VmDisk'
 import style from './style.css'
 import NewDiskDialog from '../NewDiskDialog'
+import { sortDisksForDisplay } from './utils'
 
 const SHORT_LIST_LENGTH = 2
 
@@ -26,14 +27,7 @@ class VmDisks extends Component {
 
     let classes = style['disks-list']
 
-    let disksToRender = disks.sort((a, b) => {
-      const aBoot = a.get('bootable')
-      const bBoot = b.get('bootable')
-
-      return aBoot && !bBoot ? -1
-        : !aBoot && bBoot ? 1
-        : a.get('name').localeCompare(b.get('name'))
-    })
+    let disksToRender = sortDisksForDisplay(disks)
     if (!this.state.renderMore) {
       disksToRender = disksToRender.slice(0, SHORT_LIST_LENGTH)
     }
