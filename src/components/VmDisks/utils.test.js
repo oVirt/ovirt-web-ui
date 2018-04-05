@@ -49,15 +49,48 @@ const samples = [
   },
 
   {
-    testTitle: 'name with number',
+    testTitle: 'name with number, locale collation',
     locale: 'cs',
     test: fromJS([
       { bootable: false, name: 'r' },
       { bootable: false, name: 'ř10' },
       { bootable: false, name: 'ř9' },
+      { bootable: true, name: 'hotel' },
+      { bootable: true, name: 'coast' },
+      { bootable: true, name: 'charlie' },
+      { bootable: true, name: 'delta' },
       { bootable: false, name: 'ř' },
     ]),
     expect: fromJS([
+      { bootable: true, name: 'coast' },
+      { bootable: true, name: 'delta' },
+      { bootable: true, name: 'hotel' },
+      { bootable: true, name: 'charlie' },
+      { bootable: false, name: 'r' },
+      { bootable: false, name: 'ř' },
+      { bootable: false, name: 'ř9' },
+      { bootable: false, name: 'ř10' },
+    ]),
+  },
+
+  {
+    testTitle: 'name with number, locale collation',
+    locale: 'en',
+    test: fromJS([
+      { bootable: false, name: 'r' },
+      { bootable: false, name: 'ř10' },
+      { bootable: false, name: 'ř9' },
+      { bootable: true, name: 'hotel' },
+      { bootable: true, name: 'coast' },
+      { bootable: true, name: 'charlie' },
+      { bootable: true, name: 'delta' },
+      { bootable: false, name: 'ř' },
+    ]),
+    expect: fromJS([
+      { bootable: true, name: 'charlie' },
+      { bootable: true, name: 'coast' },
+      { bootable: true, name: 'delta' },
+      { bootable: true, name: 'hotel' },
       { bootable: false, name: 'r' },
       { bootable: false, name: 'ř' },
       { bootable: false, name: 'ř9' },
@@ -72,5 +105,9 @@ describe('disk sorting', () => {
       const result = sortDisksForDisplay(sample.test, sample.locale)
       expect(result).toEqual(sample.expect)
     })
+  })
+
+  test(`invalid locale should fail`, () => {
+    expect(() => sortDisksForDisplay(samples[0].test, 'BadLocale')).toThrow()
   })
 })

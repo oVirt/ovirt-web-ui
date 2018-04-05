@@ -1,8 +1,8 @@
 
-import { locale as appLocale, DEFAULT_LOCALE } from '../../intl'
+import { locale as appLocale } from '../../intl'
 
 function localeCompare (a, b, locale = appLocale) {
-  return a.localeCompare(b, [ locale, DEFAULT_LOCALE ], { numeric: true })
+  return a.localeCompare(b, locale, { numeric: true })
 }
 
 /*
