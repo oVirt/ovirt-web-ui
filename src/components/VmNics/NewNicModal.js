@@ -4,10 +4,12 @@ import { Button, Modal, Icon } from 'patternfly-react'
 import SelectBox from '../SelectBox'
 import { msg } from '../../intl'
 
+const EMPTY_ID = ''
+
 class NewNicModal extends Component {
   constructor (props) {
     super(props)
-    const defaultVnicProfileId = props.vnicProfiles.findKey((value) => value.get('name') === 'ovirtmgmt')
+    const defaultVnicProfileId = EMPTY_ID
     this.state = { showModal: false, vnicProfileId: defaultVnicProfileId }
     this.open = this.open.bind(this)
     this.close = this.close.bind(this)
@@ -41,6 +43,15 @@ class NewNicModal extends Component {
   render () {
     let { vnicProfiles } = this.props
 
+    let preparedVnicProfiles = vnicProfiles.map((value, key) => (
+      {
+        id: key,
+        value: `${value.getIn(['network', 'name'])}/${value.get('name')}`,
+      }
+    )).toJS()
+
+    preparedVnicProfiles = Object.assign({}, { '': { id: '', value: msg.vnicProfileEmpty() } }, preparedVnicProfiles)
+
     return (
       <div>
         <Button bsStyle='default' bsSize='small' onClick={this.open}>
@@ -66,17 +77,8 @@ class NewNicModal extends Component {
                   { msg.vnicProfile() }
                 </label>
                 <div className='col-sm-9'>
-                  <SelectBox items={
-                      vnicProfiles.map((value, key) => (
-                        {
-                          id: key,
-                          value: `${value.getIn(['network', 'name'])}/${value.get('name')}`,
-                        }
-                      )).toJS()
-                    }
-                    selected={
-                      vnicProfiles.findKey((value) => value.get('name') === 'ovirtmgmt')
-                    }
+                  <SelectBox items={preparedVnicProfiles}
+                    selected={EMPTY_ID}
                     idPrefix='vnicProfiles-select'
                     onChange={this.handleVnicProfileChange}
                   />

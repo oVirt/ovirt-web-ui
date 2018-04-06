@@ -398,19 +398,23 @@ OvirtApi = {
       id: nic.id,
       name: nic.name,
       vnicProfile: {
-        id: nic.vnic_profile.id,
+        id: nic.vnic_profile ? nic.vnic_profile.id : null,
       },
     }
   },
 
   internalNicToOvirt ({ nic }: { nic: Object }): Object {
-    return {
+    const res = {
       name: nic.name,
       interface: 'virtio',
-      vnic_profile: {
-        id: nic.vnicProfile.id,
-      },
+      vnic_profile: undefined,
     }
+    if (nic.vnicProfile.id) {
+      res.vnic_profile = {
+        id: nic.vnicProfile.id,
+      }
+    }
+    return res
   },
 
   vnicProfileToInternal ({ vnicProfile }: { vnicProfile: Object }): Object {
