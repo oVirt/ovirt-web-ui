@@ -16,7 +16,7 @@ function* removeDisk (action) {
   yield put(addDiskRemovalPendingTask({ diskId }))
   let diskRemoved = false
   for (let delaySec of [ 4, 4, 4, 60 ]) {
-    const apiDisk = yield callExternalAction('disk', Api.disk, { type: 'GET_DISK_DETAILS', payload: { diskId } })
+    const apiDisk = yield callExternalAction('disk', Api.disk, { type: 'GET_DISK_DETAILS', payload: { diskId } }, true)
     if (apiDisk.error && apiDisk.error.status === 404) {
       diskRemoved = true
       break
