@@ -32,11 +32,13 @@ OvirtApi = {
       throw new Exception(`OvirtApi in '${methodName}': sso token is expired`)
     }
   },
-  _httpGet ({ url, custHeaders = { 'Accept': 'application/json', Filter: Selectors.getFilter() } }: { url: string, custHeaders?: Object}): Promise<Object> {
+  _httpGet ({ url, custHeaders = {} }: { url: string, custHeaders?: Object}): Promise<Object> {
     logDebug(`_httpGet start: url="${url}"`)
     const headers = Object.assign({
       'Authorization': `Bearer ${OvirtApi._getLoginToken()}`,
       'Accept-Language': AppConfiguration.queryParams.locale, // can be: undefined, empty or string
+      'Filter': Selectors.getFilter(),
+      'Accept': 'application/json',
     }, custHeaders)
     logDebug(`_httpGet: url="${url}", headers="${JSON.stringify(headers)}"`)
 
@@ -57,7 +59,7 @@ OvirtApi = {
         'Content-Type': contentType,
         'Authorization': `Bearer ${OvirtApi._getLoginToken()}`,
         'Accept-Language': AppConfiguration.queryParams.locale,
-        'Filter': 'true',
+        'Filter': Selectors.getFilter(),
       },
       data: input,
     }).then((data: Object): Promise<Object> => Promise.resolve(data))
@@ -74,6 +76,7 @@ OvirtApi = {
         'Content-Type': contentType,
         'Authorization': `Bearer ${OvirtApi._getLoginToken()}`,
         'Accept-Language': AppConfiguration.queryParams.locale,
+        'Filter': Selectors.getFilter(),
       },
       data: input,
     }).then((data: Object): Promise<Object> => Promise.resolve(data))
@@ -85,6 +88,7 @@ OvirtApi = {
   _httpDelete ({ url, custHeaders = { 'Accept': 'application/json' } }: { url: string, custHeaders?: Object }): Promise<Object> {
     const headers = Object.assign({
       'Authorization': `Bearer ${OvirtApi._getLoginToken()}`,
+      'Filter': Selectors.getFilter(),
     }, custHeaders)
     logDebug(`_httpDelete: url="${url}", headers="${JSON.stringify(headers)}"`)
 
