@@ -398,7 +398,7 @@ OvirtApi = {
       id: nic.id,
       name: nic.name,
       vnicProfile: {
-        id: nic.vnic_profile.id,
+        id: nic.vnic_profile ? nic.vnic_profile.id : null,
       },
     }
   },
