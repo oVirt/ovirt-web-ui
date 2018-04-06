@@ -93,14 +93,17 @@ class VmDisk extends React.PureComponent {
 
     return (
       <li>
-        <span id={`${idPrefix}`}>
-          {name}
-          &nbsp;
-          {capacityInfo}
-          {bootable}
-          {inactive}
-          &nbsp;
-          {deleteButton}
+        <span id={`${idPrefix}`} className={style['vmdisk-item']}>
+          <span className={style['vmdisk-item-info']}>
+            {name}
+            &nbsp;
+            {capacityInfo}
+            {bootable}
+            {inactive}
+          </span>
+          <span className={style['vmdisk-item-delete']}>
+            {deleteButton}
+          </span>
           {deletionConfirmationDialog}
         </span>
       </li>

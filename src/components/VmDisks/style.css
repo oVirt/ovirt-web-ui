@@ -8,6 +8,7 @@
     list-style-type: none;
     padding: 0;
     margin-bottom: 0px !important;
+    display: table;
 }
 
 .smaller {
@@ -26,4 +27,15 @@
     text-decoration: none;
     font-size: small;
     cursor: pointer;
+}
+
+.vmdisk-item {
+    display: block;
+}
+
+.vmdisk-item span.vmdisk-item-info {
+    margin-right: 5px;
+}
+.vmdisk-item span.vmdisk-item-delete {
+    float: right;
 }
