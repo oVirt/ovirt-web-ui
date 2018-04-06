@@ -260,6 +260,8 @@ export const messages = {
   areYouSureYouWantToDeleteNic: 'Are you sure you want to delete NIC {nicName}?',
   nicsTooltip: 'Connected VM network interfaces.',
   network: 'Network',
+  noNetwork: 'No network',
+  vnicProfileEmpty: '<Empty>',
 }
 
 export type MessageIdType = $Keys<typeof messages>

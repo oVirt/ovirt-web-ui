@@ -7,7 +7,6 @@ import DeleteConfirmationModal from '../VmModals/DeleteConfirmationModal'
 import { msg } from '../../intl'
 import FieldHelp from '../FieldHelp'
 import naturalCompare from 'string-natural-compare'
-import { logError } from '../../helpers'
 
 import NewNicModal from './NewNicModal'
 import style from './style.css'
@@ -39,15 +38,15 @@ class VmNic extends React.Component {
     const idPrefix = `vmnic-${nic.get('name')}`
     const nicInfoContent = (
       <div id={`${idPrefix}-nic-info`}>
-        {msg.network()}: {vnicProfile.getIn(['network', 'name'])}
+        {msg.network()}: {vnicProfile ? vnicProfile.getIn(['network', 'name']) : msg.noNetwork()}
         <br />
-        {msg.vnicProfile()}: {vnicProfile.get('name')}
+        {msg.vnicProfile()}: {vnicProfile ? vnicProfile.get('name') : msg.noNetwork()}
       </div>
     )
 
     const text = (
       <span className={style['light']} id={`${idPrefix}-nic`}>
-        ({vnicProfile ? `${vnicProfile.getIn(['network', 'name'])}/${vnicProfile.get('name')}` : null})
+        ({vnicProfile ? `${vnicProfile.getIn(['network', 'name'])}/${vnicProfile.get('name')}` : `${msg.noNetwork()}`})
       </span>
     )
 
@@ -80,7 +79,7 @@ class VmNic extends React.Component {
 }
 VmNic.propTypes = {
   nic: PropTypes.object.isRequired,
-  vnicProfile: PropTypes.object.isRequired,
+  vnicProfile: PropTypes.object,
   showSettings: PropTypes.bool,
   onDelete: PropTypes.func.isRequired,
 }
@@ -143,10 +142,6 @@ class VmNics extends Component {
           {
             nicsToRender.map(nic => {
               const vnicProfile = vnicProfiles.get(nic.getIn(['vnicProfile', 'id']))
-              if (!vnicProfile) {
-                logError(`VNIC Profile with id (${nic.getIn(['vnicProfile', 'id'])}) is not defined.`)
-                return null
-              }
               return (<VmNic nic={nic} vnicProfile={vnicProfile} key={nic.get('id')} showSettings={showSettings} onDelete={onNicDelete} />)
             })
           }
