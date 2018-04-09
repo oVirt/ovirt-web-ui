@@ -55,6 +55,15 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Mon Apr 9 2018 Marek Libra <mlibra@redhat.com> - 1.3.8
+- Adjust min memory while editing memory - https://github.com/oVirt/ovirt-web-ui/pull/538
+- Fixed the VmDisks sort - https://github.com/oVirt/ovirt-web-ui/pull/547
+- All HTTP methods use proper 'Filter' header - https://github.com/oVirt/ovirt-web-ui/pull/550
+- Fix: Avoid VM IDs in VMS navigation item list - https://github.com/oVirt/ovirt-web-ui/pull/540
+- Fixed disk sorting - https://github.com/oVirt/ovirt-web-ui/pull/547
+- Fixed error by deleting disk - https://github.com/oVirt/ovirt-web-ui/pull/551
+- additional smaller UI enhancements
+
 * Mon Mar 26 2018 Marek Libra <mlibra@redhat.com> - 1.3.7-2
 - VM networks editation - https://github.com/oVirt/ovirt-web-ui/pull/517
 - VM disks editation - https://github.com/oVirt/ovirt-web-ui/pull/523
