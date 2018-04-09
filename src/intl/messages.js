@@ -262,6 +262,7 @@ export const messages = {
   network: 'Network',
   noNetwork: 'No network',
   vnicProfileEmpty: '<Empty>',
+  bootMenuWarning: 'All changes will take effect only after reboot!',
 }
 
 export type MessageIdType = $Keys<typeof messages>

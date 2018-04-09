@@ -435,6 +435,7 @@ class VmDialog extends React.Component {
     }
 
     const isEdit = !!vm
+    const isUp = (isEdit && vm.get('status') === 'up')
 
     const sortedClusters = sortedBy(clusters.get('clusters'), 'name')
 
@@ -461,6 +462,16 @@ class VmDialog extends React.Component {
       </h1>) : (
         <h1 id={`${idPrefix}-create-title`}>{msg.createANewVm()}</h1>
       )
+
+    const bootMenuHint = isUp
+      ? (<React.Fragment>
+        {msg.bootMenuTooltip()}
+        <br />
+        <span className='pficon pficon-warning-triangle-o' />
+        &nbsp;
+        {msg.bootMenuWarning()}
+      </React.Fragment>)
+      : msg.bootMenuTooltip()
 
     return (
       <DetailContainer>
@@ -596,7 +607,14 @@ class VmDialog extends React.Component {
               )}
 
               <dt>
-                <FieldHelp content={msg.bootMenuTooltip()} text={msg.bootMenu()} />
+                {
+                  isUp &&
+                  <React.Fragment>
+                    <span className='pficon pficon-warning-triangle-o' />
+                    &nbsp;
+                  </React.Fragment>
+                }
+                <FieldHelp content={bootMenuHint} text={msg.bootMenu()} />
               </dt>
               <dd>
                 <Switch
