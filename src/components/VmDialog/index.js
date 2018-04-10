@@ -609,11 +609,7 @@ class VmDialog extends React.Component {
 
               <dt>
                 {
-                  isUp &&
-                  <React.Fragment>
-                    <span className='pficon pficon-warning-triangle-o' />
-                    &nbsp;
-                  </React.Fragment>
+                  isUp && <span className={'pficon pficon-warning-triangle-o ' + style['space-right']} />
                 }
                 <FieldHelp content={bootMenuHint} text={msg.bootMenu()} />
               </dt>
