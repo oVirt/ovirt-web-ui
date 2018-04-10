@@ -41,3 +41,7 @@
     overflow: visible !important;
     display: flex;
 }
+
+.space-right {
+    padding-right: 0.3em;
+}

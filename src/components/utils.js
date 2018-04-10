@@ -10,3 +10,8 @@ export function getOsHumanName (osName: string): string {
   const os = Selectors.getOperatingSystemByName(osName)
   return os && os.get('description') || osName
 }
+
+export function isRunning (status: string): boolean {
+  console.log('---------- status: ', status)
+  return ['wait_for_launch', 'up', 'powering_up', 'powering_down', 'migrating', 'paused'].includes(status)
+}
