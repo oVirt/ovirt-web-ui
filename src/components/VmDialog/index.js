@@ -6,6 +6,7 @@ import { Redirect, Prompt, Link } from 'react-router-dom'
 import Switch from 'react-bootstrap-switch'
 
 import { logDebug, generateUnique, templateNameRenderer } from '../../helpers'
+import { isRunning } from '../utils'
 
 import style from './style.css'
 import sharedStyle from '../sharedStyle.css'
@@ -435,7 +436,7 @@ class VmDialog extends React.Component {
     }
 
     const isEdit = !!vm
-    const isUp = (isEdit && vm.get('status') === 'up')
+    const isUp = (isEdit && isRunning(vm.get('status')))
 
     const sortedClusters = sortedBy(clusters.get('clusters'), 'name')
 
