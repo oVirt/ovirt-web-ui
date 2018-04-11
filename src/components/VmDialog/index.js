@@ -98,6 +98,8 @@ class VmDialog extends React.Component {
     this.onChangeVmCpu = this.onChangeVmCpu.bind(this)
     this.onChangeCD = this.onChangeCD.bind(this)
     this.onChangeBootMenuEnabled = this.onChangeBootMenuEnabled.bind(this)
+
+    this.handleCloudInitChange = this.handleCloudInitChange.bind(this)
   }
 
   componentWillMount () {
@@ -415,6 +417,14 @@ class VmDialog extends React.Component {
     this.setState(stateChange)
   }
 
+  handleCloudInitChange (key) {
+    return (value) => {
+      this.setState((prevState) => {
+        return { cloudInit: Object.assign({}, prevState.cloudInit, { [key]: value }) }
+      })
+    }
+  }
+
   render () {
     const { icons, vmDialog, clusters, templates, operatingSystems, storages, previousPath } = this.props
     const vm = this.props.vm
@@ -626,10 +636,9 @@ class VmDialog extends React.Component {
                 enabled={this.state.cloudInit.enabled}
                 hostName={this.state.cloudInit.hostName}
                 sshAuthorizedKeys={this.state.cloudInit.sshAuthorizedKeys}
-                onEnabledChange={value => this.setState(state => { state.cloudInit.enabled = value })}
-                onHostNameChange={value => this.setState(state => { state.cloudInit.hostName = value })}
-                onSshAuthorizedKeysChange={value =>
-                  this.setState(state => { state.cloudInit.sshAuthorizedKeys = value })}
+                onEnabledChange={this.handleCloudInitChange('enabled')}
+                onHostNameChange={this.handleCloudInitChange('hostName')}
+                onSshAuthorizedKeysChange={this.handleCloudInitChange('sshAuthorizedKeys')}
               />
 
             </dl>
