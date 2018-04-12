@@ -8,12 +8,14 @@
     list-style-type: none;
     padding: 0;
     margin-bottom: 0px !important;
+    display: table;
 }
 
 .smaller {
     font-size: 50%;
     vertical-align: middle;
     margin-left: 0.5em;
+    display: inline-block;
 }
 
 .light {
@@ -26,4 +28,23 @@
     text-decoration: none;
     font-size: small;
     cursor: pointer;
+}
+
+.disks-list li {
+    display: table-row;
+}
+
+.disks-list li > span {
+    display: table-cell;
+}
+
+.vmdisk-item-info > *:last-child {
+    margin-right: 5px;
+}
+
+.vmdisk-item-delete {
+    vertical-align: middle;
+}
+.vmdisk-item-delete button {
+    display: block;
 }
