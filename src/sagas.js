@@ -426,6 +426,13 @@ function* changeVmIcon (action) {
 
   if (vm && vm.id) {
     const internalVm = Api.vmToInternal({ vm })
+
+    internalVm.disks = yield fetchVmDisks({ vmId: internalVm.id })
+    internalVm.consoles = yield fetchConsoleVmMeta({ vmId: internalVm.id })
+    internalVm.sessions = yield fetchVmSessions({ vmId: internalVm.id })
+    internalVm.cdrom = yield fetchVmCDRom({ vmId: internalVm.id, running: internalVm.status === 'up' })
+    internalVm.nics = yield fetchVmNics({ vmId: internalVm.id })
+
     yield put(updateVms({ vms: [internalVm] }))
     yield fetchUnknwonIconsForVms({ vms: [internalVm] })
   }
