@@ -318,6 +318,15 @@ class VmDetail extends Component {
                   </dt>
                   <dd>{vm.get('bootMenuEnabled') ? msg.on() : msg.off()}</dd>
                   <dt>
+                    <FieldHelp content={msg.bootSequenceTooltip()} text={msg.bootSequence()} />
+                  </dt>
+                  <dd>
+                    <ol className={style['boot-devices-list']}>
+                      {vm.getIn(['os', 'bootDevices']).map((device) =>
+                        <li key={device}>{msg[`${device}Boot`]()}</li>)}
+                    </ol>
+                  </dd>
+                  <dt>
                     <FieldHelp content={msg.cloudInitTooltip()} text={msg.cloudInit()} />
                   </dt>
                   <dd>{vm.getIn(['cloudInit', 'enabled']) ? msg.on() : msg.off()}</dd>

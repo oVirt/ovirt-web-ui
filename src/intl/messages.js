@@ -263,6 +263,15 @@ export const messages = {
   noNetwork: 'No network',
   vnicProfileEmpty: '<Empty>',
   bootMenuWarning: 'All changes will take effect after reboot only.',
+  bootSequence: 'Boot Sequence',
+  firstDevice: 'First Device',
+  secondDevice: 'Second Device',
+  bootSequenceTooltip: 'Device order in which VM will search OS for running.',
+  firstDeviceTooltip: 'First device in order.',
+  secondDeviceTooltip: 'Second device in order.',
+  hdBoot: 'Hard Disk',
+  networkBoot: 'Network (PXE)',
+  cdromBoot: 'CD-ROM',
 }
 
 export type MessageIdType = $Keys<typeof messages>

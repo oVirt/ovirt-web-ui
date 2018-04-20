@@ -6,7 +6,7 @@ import { Redirect, Prompt, Link } from 'react-router-dom'
 import Switch from 'react-bootstrap-switch'
 
 import { logDebug, generateUnique, templateNameRenderer } from '../../helpers'
-import { isRunning } from '../utils'
+import { isRunning, transformArrayToObject } from '../utils'
 
 import style from './style.css'
 import sharedStyle from '../sharedStyle.css'
@@ -43,6 +43,9 @@ function sortedBy (immutableCollection, sortBy) { // TODO: move to helpers
 }
 
 const zeroUID = '00000000-0000-0000-0000-000000000000'
+const FIRST_DEVICE = 0
+const SECOND_DEVICE = 1
+const defaultDevices = ['hd', null]
 
 class VmDialog extends React.Component {
   constructor (props) {
@@ -66,6 +69,7 @@ class VmDialog extends React.Component {
       clusterId: undefined,
       templateId: undefined,
       osId: undefined,
+      bootDevices: defaultDevices,
       saved: false,
       isChanged: false,
       bootMenuEnabled: false,
@@ -98,6 +102,7 @@ class VmDialog extends React.Component {
     this.onChangeVmCpu = this.onChangeVmCpu.bind(this)
     this.onChangeCD = this.onChangeCD.bind(this)
     this.onChangeBootMenuEnabled = this.onChangeBootMenuEnabled.bind(this)
+    this.onChangeBootDevice = this.onChangeBootDevice.bind(this)
 
     this.handleCloudInitChange = this.handleCloudInitChange.bind(this)
   }
@@ -109,6 +114,14 @@ class VmDialog extends React.Component {
   componentDidMount () {
     const vm = this.props.vm
     if (vm) { // 'edit' mode
+      const bootDevices = vm.getIn(['os', 'bootDevices']).toJS()
+
+      const resultDevices = []
+
+      for (let i = 0; i < defaultDevices.length; i++) {
+        resultDevices.push(bootDevices[i] ? bootDevices[i] : defaultDevices[i])
+      }
+
       this.setState({
         id: vm.get('id'),
         name: vm.get('name'),
@@ -119,6 +132,7 @@ class VmDialog extends React.Component {
         clusterId: vm.getIn(['cluster', 'id']),
         templateId: vm.getIn(['template', 'id']),
         osId: this.getOsIdFromType(vm.getIn(['os', 'type'])),
+        bootDevices: resultDevices,
         cdrom: {
           file: {
             id: null,
@@ -199,6 +213,7 @@ class VmDialog extends React.Component {
       },
       'os': {
         'type': os.get('name'),
+        'bootDevices': this.state.bootDevices,
       },
       'cpu': {
         'topology': {
@@ -425,8 +440,22 @@ class VmDialog extends React.Component {
     }
   }
 
+  onChangeBootDevice (id) {
+    return (device) => {
+      this.setState((prevState) => {
+        const copiedDevices = prevState.bootDevices.slice()
+        copiedDevices[id] = device
+        for (let i = id + 1; i < copiedDevices.length; i++) {
+          copiedDevices[i] = copiedDevices[i] === device ? null : copiedDevices[i]
+        }
+        return { bootDevices: copiedDevices }
+      })
+    }
+  }
+
   render () {
     const { icons, vmDialog, clusters, templates, operatingSystems, storages, previousPath } = this.props
+    const { bootDevices } = this.state
     const vm = this.props.vm
     const isoStorages = storages.get('storages').filter(v => v.get('type') === 'iso')
     const idPrefix = `vmdialog-${vm ? vm.get('name') : '_new'}`
@@ -465,6 +494,8 @@ class VmDialog extends React.Component {
 
     const iconId = vm && vm.getIn(['icons', 'small', 'id'])
     const icon = iconId && icons.get(iconId)
+
+    const allowedBootDevices = ['hd', 'network', 'cdrom']
 
     const title = isEdit ? (
       <h1 className={style['header']} id={`${idPrefix}-edit-title`}>
@@ -631,6 +662,40 @@ class VmDialog extends React.Component {
                   onChange={this.onChangeBootMenuEnabled}
                 />
               </dd>
+              <dt>
+                <FieldHelp content={msg.bootSequenceTooltip()} text={msg.bootSequence()} />
+              </dt>
+              <dd />
+              <div>
+                <dt className={style['field-shifted']}>
+                  <FieldHelp content={msg.firstDeviceTooltip()} text={msg.firstDevice()} />
+                </dt>
+                <dd className={style['field-overflow-visible']}>
+                  <SelectBox
+                    onChange={this.onChangeBootDevice(FIRST_DEVICE)}
+                    selected={bootDevices[FIRST_DEVICE]}
+                    idPrefix='select-first-device'
+                    items={transformArrayToObject(allowedBootDevices.map(item => (
+                      { id: item, value: msg[`${item}Boot`]() }
+                    )))}
+                    />
+                </dd>
+                <dt className={style['field-shifted']}>
+                  <FieldHelp content={msg.secondDeviceTooltip()} text={msg.secondDevice()} />
+                </dt>
+                <dd className={style['field-overflow-visible']}>
+                  <SelectBox
+                    onChange={this.onChangeBootDevice(SECOND_DEVICE)}
+                    selected={bootDevices[SECOND_DEVICE]}
+                    idPrefix='select-second-device'
+                    items={transformArrayToObject([{ id: null, value: '[None]' }, ...allowedBootDevices.filter(item => (
+                      item !== bootDevices[FIRST_DEVICE]
+                    )).map(item => (
+                      { id: item, value: msg[`${item}Boot`]() }
+                    ))])}
+                    />
+                </dd>
+              </div>
 
               <CloudInitEditor
                 enabled={this.state.cloudInit.enabled}
