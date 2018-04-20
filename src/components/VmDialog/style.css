@@ -45,3 +45,7 @@
 .space-right {
     padding-right: 0.3em;
 }
+
+.field-shifted {
+    padding-left: 20px;
+}

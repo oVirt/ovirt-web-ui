@@ -108,3 +108,7 @@ dd.console-box {
 .editPencilLink {
     margin-left: 10px
 }
+
+.field-shifted {
+    padding-left: 20px;
+}

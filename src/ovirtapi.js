@@ -162,6 +162,8 @@ OvirtApi = {
 
       os: {
         type: vm['os'] ? vm.os['type'] : undefined,
+        bootDevices: vm.os && vm.os.boot && vm.os.boot.devices && vm.os.boot.devices.device
+          ? vm.os.boot.devices.device : [],
       },
 
       highAvailability: {
@@ -271,8 +273,13 @@ OvirtApi = {
         id: vm.cluster.id,
       } : undefined,
 
-      os: vm.os && vm.os.type ? {
-        type: vm.os.type,
+      os: vm.os && (vm.os.type || vm.os.bootDevices) ? {
+        type: vm.os.type || undefined,
+        boot: {
+          devices: {
+            device: vm.os.bootDevices.filter((item) => item !== null),
+          },
+        },
       } : undefined,
 
       bios: {

@@ -139,6 +139,8 @@ class VmDetail extends Component {
       config,
     } = this.props
 
+    const sequence = [ 'first', 'second' ]
+
     const name = isPool ? pool.get('name') : vm.get('name')
     const idPrefix = `vmdetail-${name}`
     let iconId = vm.getIn(['icons', 'large', 'id'])
@@ -317,6 +319,24 @@ class VmDetail extends Component {
                     <FieldHelp content={msg.bootMenuTooltip()} text={msg.bootMenu()} />
                   </dt>
                   <dd>{vm.get('bootMenuEnabled') ? msg.on() : msg.off()}</dd>
+                  <dt>
+                    <FieldHelp content={msg.bootSequenceTooltip()} text={msg.bootSequence()} />
+                  </dt>
+                  <dd />
+                  <div>
+                    {
+                      vm.getIn(['os', 'bootDevices']).map((device, key) =>
+                        <React.Fragment>
+                          <dt className={style['field-shifted']}>
+                            <FieldHelp content={msg[`${sequence[key]}DeviceTooltip`]()} text={msg[`${sequence[key]}Device`]()} />
+                          </dt>
+                          <dd>
+                            {msg[`${device}Boot`]()}
+                          </dd>
+                        </React.Fragment>
+                      )
+                    }
+                  </div>
                   <dt>
                     <FieldHelp content={msg.cloudInitTooltip()} text={msg.cloudInit()} />
                   </dt>
