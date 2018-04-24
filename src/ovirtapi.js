@@ -385,7 +385,7 @@ OvirtApi = {
     return {
       id: cluster.id,
       name: cluster.name,
-      dataCenterId: cluster.data_center.id,
+      dataCenterId: cluster.data_center && cluster.data_center.id,
 
       memoryPolicy: {
         overCommitPercent: cluster['memory_policy'] && cluster['memory_policy']['over_commit'] && cluster['memory_policy']['over_commit']['percent'] ? cluster['memory_policy']['over_commit']['percent'] : 100,
