@@ -577,12 +577,12 @@ function* fetchAllAttachedStorageDomains (action) {
  */
 function mergeStorageDomains (storageDomainsInternal) {
   const idToStorageDomain = storageDomainsInternal.reduce((accum, storageDomain) => {
-    const isNew = !(storageDomain.id in accum)
-    if (isNew) {
+    const existingStorageDomain = accum[storageDomain.id]
+    if (!existingStorageDomain) {
       accum[storageDomain.id] = storageDomain
       return accum
     }
-    Object.assign(accum[storageDomain.id].status, storageDomain.status)
+    Object.assign(existingStorageDomain.statusPerDataCenter, storageDomain.statusPerDataCenter)
     return accum
   }, {})
   const mergedStorageDomains = Object.values(idToStorageDomain)
