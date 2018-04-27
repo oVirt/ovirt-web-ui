@@ -7,34 +7,30 @@ import style from './style.css'
 
 const Confirmation = ({ okButton, cancelButton, extraButton, text, height, uniqueId }) => {
   const idPrefix = `confirmation-${uniqueId || ''}`
-  let extra = null
-  if (extraButton) {
-    extra = (
-      <Button id={`${idPrefix}-button-extra1`} bsSize='xsmall' className={`${style['confirmation-extra-button']} button-l`} bsStyle='info' onClick={extraButton.click}>
-        {extraButton.label}
-      </Button>
-    )
-  }
-  let s = {}
+
+  const s = {}
   if (height) {
     s['height'] = height
   }
+
   return (
     <span className={style['confirmation-body']} style={s} id={`${idPrefix}-body`}>
       {typeof text === 'string'
-        ? (
-          <p className={style['confirmation-text']}>
-            {text}
-          </p>)
-          : text }
+        ? (<p className={style['confirmation-text']}>{text}</p>)
+        : (<div className={style['confirmation-text']}>{text}</div>) }
+
       <ButtonToolbar className={style['confirmation-toolbar']}>
-        <Button bsSize='xsmall' className={`button-l ${style['ok-button']}`} bsStyle='info' onClick={okButton.click} id={`${idPrefix}-button-ok`}>
+        <Button id={`${idPrefix}-button-ok`} bsSize='xsmall' bsStyle='info' className={`${style['confirmation-ok-button']}`} onClick={okButton.click}>
           {okButton.label}
         </Button>
-        <Button bsSize='xsmall' onClick={cancelButton.click} id={`${idPrefix}-button-cancel`}>
+        <Button id={`${idPrefix}-button-cancel`} bsSize='xsmall' onClick={cancelButton.click}>
           {cancelButton.label}
         </Button>
-        {extra}
+        {extraButton && (
+          <Button id={`${idPrefix}-button-extra1`} bsSize='xsmall' bsStyle='info' className={`${style['confirmation-extra-button']}`} onClick={extraButton.click}>
+            {extraButton.label}
+          </Button>
+        )}
       </ButtonToolbar>
     </span>)
 }
