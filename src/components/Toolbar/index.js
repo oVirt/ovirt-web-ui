@@ -13,7 +13,11 @@ const VmDetailToolbar = ({ match, vms }) => {
 
 VmDetailToolbar.propTypes = {
   vms: PropTypes.object.isRequired,
-  match: PropTypes.object.isRequired,
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+    }).isRequired,
+  }).isRequired,
 }
 
 const VmDetailToolbarConnected = connect(
@@ -30,7 +34,11 @@ const PoolDetailToolbar = ({ match, vms }) => {
 }
 PoolDetailToolbar.propTypes = {
   vms: PropTypes.object.isRequired,
-  match: PropTypes.object.isRequired,
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+    }).isRequired,
+  }).isRequired,
 }
 
 const PoolDetailToolbarConnected = connect(
