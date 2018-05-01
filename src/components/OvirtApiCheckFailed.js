@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import Product from '../version'
 import { msg } from '../intl'
 import { fixedStrings } from '../branding'
+import ErrorAlert from './ErrorAlert'
 
 const OvirtApiCheckFailed = ({ config }) => {
   const oVirtApiVersion = config.get('oVirtApiVersion')
@@ -21,14 +22,14 @@ const OvirtApiCheckFailed = ({ config }) => {
   const version = major ? `${major}.${minor}` : `"${msg.unknown()}"`
 
   const required = `${Product.ovirtApiVersionRequired.major}.${Product.ovirtApiVersionRequired.minor}`
+  const message = msg.htmlUnsupportedOvirtVersionFoundButVersionAtLeastRequired({
+    version,
+    productName: fixedStrings.BRAND_NAME,
+    requiredVersion: required,
+  })
 
   return (
-    <div className='alert alert-danger'>
-      <span className='pficon pficon-error-circle-o' />
-      <span
-        id='ovirtapi-check-failed'
-        dangerouslySetInnerHTML={{ __html: msg.htmlUnsupportedOvirtVersionFoundButVersionAtLeastRequired({ version, productName: fixedStrings.BRAND_NAME, requiredVersion: required }) }} />
-    </div>
+    <ErrorAlert id='ovirtapi-check-failed' dangerouslySetInnerHTML={{ __html: message }} />
   )
 }
 OvirtApiCheckFailed.propTypes = {
