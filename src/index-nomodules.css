@@ -46,6 +46,7 @@ div.toolbar-pf {
 .alert {
   top: 30px;
   margin-left: 201px;
+  z-index: 100;
 }
 
 .bootstrap-switch-container .bootstrap-switch-label {
