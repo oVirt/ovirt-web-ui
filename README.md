@@ -4,7 +4,7 @@
 
 Modern lightweight UI for standard (non-admin) oVirt users
 
-![Alt text](https://github.com/oVirt/ovirt-web-ui/raw/master/doc/screenshots/v1.3.2_2017-Nov/01_vmsList.png "Screenshot")
+![Alt text](https://github.com/oVirt/ovirt-web-ui/raw/master/doc/screenshots/v1.3.9_2018-May/01_vmList.png "Screenshot")
 
 VM Portal allows non-admin oVirt users to access, start, stop, and create new virtual machines. It is not intended
 to be a full-featured oVirt administration UI. Rather, its focus is on standard users with limited administration skills
