@@ -52,7 +52,6 @@ class VmActions extends React.Component {
     super(props)
 
     this.state = {
-      forceShutdown: false,
       removePreserveDisks: false,
     }
   }
@@ -133,20 +132,10 @@ class VmActions extends React.Component {
           id={`${idPrefix}-button-shutdown`}
           popover={({ close }) =>
             <Confirmation
-              text={(
-                <div>
-                  <div>{msg.shutdownVmQuestion()}</div>
-                  <div style={{ marginTop: '8px' }}>
-                    <Checkbox
-                      checked={this.state.forceShutdown}
-                      onClick={() => { this.setState((s) => { return { forceShutdown: !s.forceShutdown } }) }}
-                      label={msg.force()}
-                    />
-                  </div>
-                </div>
-              )}
-              okButton={{ label: msg.yes(), click: () => { this.state.forceShutdown ? this.props.onForceShutdown() : this.props.onShutdown() } }}
+              text={msg.shutdownVmQuestion()}
+              okButton={{ label: msg.yes(), click: () => { this.props.onShutdown() } }}
               cancelButton={{ label: msg.cancel(), click: () => { close() } }}
+              extraButton={{ label: msg.force(), click: () => { this.props.onForceShutdown() } }}
               uniqueId={vm.get('name')} />}
         />
 
