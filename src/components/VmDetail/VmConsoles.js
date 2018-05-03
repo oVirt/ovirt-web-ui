@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import { isWindows, hrefWithoutHistory } from '../../helpers'
 import ConsoleButton from '../VmActions/ConsoleButton'
-import { canConsole } from 'ovirt-ui-components'
+import { canConsole } from '../../vm-status'
 
 import style from './style.css'
 

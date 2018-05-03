@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { Checkbox } from 'ovirt-ui-components'
 
 import { connect } from 'react-redux'
 import { msg } from '../../intl'
@@ -7,14 +8,13 @@ import { msg } from '../../intl'
 import style from './style.css'
 
 import {
-  Checkbox,
   canRestart,
   canShutdown,
   canStart,
   canConsole,
   canSuspend,
   canRemove,
-} from 'ovirt-ui-components'
+} from '../../vm-status'
 
 import {
   shutdownVm,
