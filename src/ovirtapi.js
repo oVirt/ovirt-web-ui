@@ -222,6 +222,10 @@ OvirtApi = {
    * @returns {} - Internal representation of a Pool
    */
   poolToInternal ({ pool }: { pool: Object }): Object {
+    if (!pool['name']) {
+      console.info('poolToInternal: Pool received without name: ', JSON.stringify(pool), pool)
+    }
+
     return {
       name: pool['name'],
       description: pool['description'],
