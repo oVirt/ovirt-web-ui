@@ -30,7 +30,17 @@ class Vms extends React.Component {
       style['full-window'],
     ].join(' ')
 
-    const sortFunction = (vmA, vmB) => vmA.get('name').localeCompare(vmB.get('name'))
+    const sortFunction = (vmA, vmB) => {
+      const vmAName = vmA.get('name')
+      if (!vmAName) {
+        return -1
+      }
+      return vmAName.localeCompare(vmB.get('name'))
+    }
+
+    const sortedVms = vms.get('vms').toList().sort(sortFunction)
+    const sortedPools = vms.get('pools').toList().sort(sortFunction) // TODO: sort vms and pools together!
+
     return (
       <InfiniteScroll
         loadMore={this.loadMore}
@@ -43,18 +53,14 @@ class Vms extends React.Component {
             <div className={containerClass}>
               <div className={style['scrollingWrapper']}>
                 <div className='row row-cards-pf'>
-                  {vms.get('vms').toList()
-                    .sort(sortFunction)
-                    .map(vm => <Vm vm={vm} key={vm.get('id')} />)}
-                  {vms.get('pools').toList()// TODO: sort vms and pools together!
-                    .sort(sortFunction)
-                    .map(pool => {
-                      if (pool.get('vmsCount') < pool.get('maxUserVms') && pool.get('size') > 0) {
-                        return <Pool pool={pool} key={pool.get('id')} />
-                      } else {
-                        return null
-                      }
-                    })}
+                  {sortedVms.map(vm => <Vm vm={vm} key={vm.get('id')} />)}
+                  {sortedPools.map(pool => {
+                    if (pool.get('vmsCount') < pool.get('maxUserVms') && pool.get('size') > 0) {
+                      return <Pool pool={pool} key={pool.get('id')} />
+                    } else {
+                      return null
+                    }
+                  })}
                 </div>
                 <div className={style['overlay']} />
               </div>
