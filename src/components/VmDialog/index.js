@@ -486,7 +486,7 @@ class VmDialog extends React.Component {
       : msg.bootMenuTooltip()
 
     return (
-      <DetailContainer>
+      <DetailContainer container='true'>
         {title}
         {this.getLatestUserMessage() && (<ErrorAlert message={this.getLatestUserMessage()} id={`${idPrefix}-erroralert`} />)}
         <br />
