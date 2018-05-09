@@ -30,6 +30,10 @@
     margin-bottom: 0;
 }
 
+.no-messages h1 {
+    white-space: nowrap;
+}
+
 .contact-admin {
     padding: 6px 15px;
 }
