@@ -22,14 +22,15 @@ const OvirtApiCheckFailed = ({ config }) => {
   const version = major ? `${major}.${minor}` : `"${msg.unknown()}"`
 
   const required = `${Product.ovirtApiVersionRequired.major}.${Product.ovirtApiVersionRequired.minor}`
-  const message = msg.htmlUnsupportedOvirtVersionFoundButVersionAtLeastRequired({
+  const htmlMessage = msg.htmlUnsupportedOvirtVersionFoundButVersionAtLeastRequired({
     version,
     productName: fixedStrings.BRAND_NAME,
     requiredVersion: required,
   })
+  const message = (<span dangerouslySetInnerHTML={{ __html: htmlMessage }} />)
 
   return (
-    <ErrorAlert id='ovirtapi-check-failed' dangerouslySetInnerHTML={{ __html: message }} />
+    <ErrorAlert id='ovirtapi-check-failed'>{message}</ErrorAlert>
   )
 }
 OvirtApiCheckFailed.propTypes = {
