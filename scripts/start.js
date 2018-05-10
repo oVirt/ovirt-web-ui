@@ -25,19 +25,6 @@ var DEFAULT_PORT = process.env.PORT || 3000;
 var compiler;
 var handleCompile;
 
-// You can safely remove this after ejecting.
-// We only use this block for testing of Create React App itself:
-var isSmokeTest = process.argv.some(arg => arg.indexOf('--smoke-test') > -1);
-if (isSmokeTest) {
-  handleCompile = function (err, stats) {
-    if (err || stats.hasErrors() || stats.hasWarnings()) {
-      process.exit(1);
-    } else {
-      process.exit(0);
-    }
-  };
-}
-
 var isFirstClear = true;
 function clearConsole() {
   // On first run, clear completely so it doesn't show half screen on Windows.
@@ -311,6 +298,7 @@ function getUserInfo (protocol, port) {
   if (!engineUrl) {
     throw new Error('Please run script with the `ENGINE_URL` environment variable set.')
   }
+  engineUrl = engineUrl.replace(/\/$/, '')
   console.log(`Please authenticate against oVirt running at ${engineUrl}`);
 
   var DEFAULT_USER = 'admin@internal';
@@ -350,33 +338,28 @@ function getUserInfo (protocol, port) {
       if (err) {
         return reject(err)
       }
-      if (body['access_token']) {
-        const usersApiUrl = `${engineUrl}/api/users`
-        request(usersApiUrl, { json: true, strictSSL: false, headers: { Authorization: `Bearer ${body['access_token']}` } }, (userErr, userResponse, userBody) => {
-          // This request not always return current user data, it may be caused by server error, or current user isn't administrator and have no permissions for that
-          if (!userErr && userBody.user && userBody.user.length > 0 ) {
-            for (let i in userBody.user) {
-              if (userBody.user[i]['user_name'] === (username.slice(0, username.indexOf('@')) + '@' + domain)) {
-                resolve({
-                  userName: username.slice(0, username.indexOf('@')),
-                  ssoToken: body.access_token,
-                  domain: domain,
-                  userId: userBody.user[i].id,
+      if (body.access_token) {
+        const usersApiUrl = `${engineUrl}/api/`
+        request(usersApiUrl,
+                { json: true, strictSSL: false, headers: { Authorization: `Bearer ${body.access_token}` } }, 
+                (error1, response1, body1) => {
+                  let userId = undefined
+
+                  if (!error1 && body1.authenticated_user) {
+                    userId = body1.authenticated_user.id
+                  } else {
+                    userId = readlineSync.question(`oVirt user id (optional, it can be found at ${usersApiUrl}) : `, {
+                      defaultInput: null,
+                    })
+                  }
+
+                  resolve({
+                    userName: username.slice(0, username.indexOf('@')),
+                    ssoToken: body.access_token,
+                    domain,
+                    userId,
+                  })
                 })
-                return
-              }
-            }
-          }
-          var userId = readlineSync.question(`oVirt user id (optional, it can be found at ${usersApiUrl}) : `, {
-            defaultInput: null,
-          });            
-          resolve({
-            userName: username.slice(0, username.indexOf('@')),
-            ssoToken: body.access_token,
-            domain: domain,
-            userId: userId,
-          })
-        })
       } else {
         reject(JSON.stringify(body))
       }
