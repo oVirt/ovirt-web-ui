@@ -466,11 +466,14 @@ class VmDialog extends React.Component {
     const iconId = vm && vm.getIn(['icons', 'small', 'id'])
     const icon = iconId && icons.get(iconId)
 
-    const title = isEdit ? (
-      <h1 className={style['header']} id={`${idPrefix}-edit-title`}>
-        <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' className={sharedStyle['vm-detail-icon']} />
-        &nbsp;{vm.get('name')} - {msg.edit()}
-      </h1>) : (
+    const title = isEdit
+      ? (
+        <h1 className={style['header']} id={`${idPrefix}-edit-title`}>
+          <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' className={sharedStyle['vm-detail-icon']} />
+          &nbsp;{vm.get('name')} - {msg.edit()}
+        </h1>
+      )
+      : (
         <h1 id={`${idPrefix}-create-title`}>{msg.createANewVm()}</h1>
       )
 
@@ -487,7 +490,7 @@ class VmDialog extends React.Component {
     return (
       <DetailContainer>
         {title}
-        <ErrorAlert message={this.getLatestUserMessage()} id={`${idPrefix}-erroralert`} />
+        {this.getLatestUserMessage() && (<ErrorAlert message={this.getLatestUserMessage()} id={`${idPrefix}-erroralert`} />)}
         <br />
         <form>
           <Prompt

@@ -78,13 +78,13 @@ const App = ({ vms, visibility, config }) => {
       <div>
         <VmsPageHeader page={vms.get('page')} title={fixedStrings.BRAND_NAME + ' ' + msg.vmPortal()} />
         <VerticalMenu menuItems={menu} /> { /* Disabled, to enable search for left sidebar menu */ }
-        <TokenExpired />
         <LoadingData />
         {renderRoutes(routes)}
         {detailToRender}
         <AboutDialog />
         <OptionsDialog userId={config.getIn(['user', 'id'])} />
         <OvirtApiCheckFailed />
+        <TokenExpired />
       </div>
     </Router>
   )

@@ -1,17 +1,21 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const ErrorAlert = ({ message, id }) => {
-  return message ? (
+const ErrorAlert = ({ id, message, children }) => {
+  return (
     <div className='alert alert-danger'>
       <span className='pficon pficon-error-circle-o' />
-      <strong id={id}>{message}</strong>
+      <span id={id}>
+        {message && (<strong>{message}</strong>)}
+        {children}
+      </span>
     </div>
-  ) : null
+  )
 }
 ErrorAlert.propTypes = {
+  id: PropTypes.string.isRequired,
   message: PropTypes.string,
-  id: PropTypes.string,
+  children: PropTypes.node,
 }
 
 export default ErrorAlert
