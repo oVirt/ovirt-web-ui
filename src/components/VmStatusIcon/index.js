@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react'
+import React from 'react'
+import PropTypes from 'prop-types'
 
 import style from './style.css'
 
@@ -50,17 +51,15 @@ const VmStatusIcon = ({ state }) => {
       return <Icon className='pficon pficon-volume' tooltip="The VM's image is locked" />
 
     case undefined: // better not to happen ...
-      // TODO: use configurable logger
-      console.log(`-- VmStatusIcon component: VM state is undefined`)
+      console.info(`VmStatusIcon component: VM state is undefined`)
       return (<div />)
     default: // better not to happen ...
-      // TODO: use configurable logger
-      console.log(`-- VmStatusIcon component: unrecognized VM state '${state}'`)
+      console.info(`VmStatusIcon component: unrecognized VM state '${state}'`)
       return <Icon className='pficon pficon-zone' tooltip={`The VM state is '${state}'`} />
   }
 }
 VmStatusIcon.propTypes = {
-  state: React.PropTypes.string.isRequired,
+  state: PropTypes.string.isRequired,
 }
 
 export default VmStatusIcon
