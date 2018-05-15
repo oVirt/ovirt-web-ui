@@ -1,0 +1,17 @@
+input.file-input {
+	display: none;
+}
+
+.icon-box {
+	display: inline-block;
+}
+
+.btn-box {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+}
+
+.btn {
+	font-size: 16px;
+}

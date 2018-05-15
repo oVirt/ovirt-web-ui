@@ -30,8 +30,8 @@ import VmStatus from './VmStatus'
 import { NextRunLabel } from './labels'
 import LastMessage from './LastMessage'
 import VmConsoles from './VmConsoles'
+import VmIcon from '../VmIcon'
 
-import { VmIcon } from 'ovirt-ui-components'
 import Selectors from '../../selectors'
 import { getOsHumanName } from '../utils'
 

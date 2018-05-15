@@ -13,10 +13,8 @@ import sharedStyle from '../sharedStyle.css'
 
 import DetailContainer from '../DetailContainer'
 import ErrorAlert from '../ErrorAlert'
-
 import FieldHelp from '../FieldHelp/index'
-
-import { VmIcon } from 'ovirt-ui-components'
+import VmIcon from '../VmIcon'
 
 import Selectors from '../../selectors'
 import {
