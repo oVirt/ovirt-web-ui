@@ -2606,10 +2606,6 @@ fstream@^1.0.0, fstream@^1.0.2, fstream@~1.0.10:
     mkdirp ">=0.5 0"
     rimraf "2"
 
-full-icu@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/full-icu/-/full-icu-1.2.1.tgz#28d7f1caafb14cac262364ca584fe7f2044a4ab2"
-
 function-bind@^1.0.2:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/function-bind/-/function-bind-1.1.0.tgz#16176714c801798e4e8f2cf7f7529467bb4a5771"
@@ -4995,6 +4991,10 @@ react-router-dom@4.2.2:
     prop-types "^15.5.4"
     react-router "^4.2.0"
     warning "^3.0.0"
+
+react-router-navigation-prompt@^1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/react-router-navigation-prompt/-/react-router-navigation-prompt-1.6.1.tgz#d5b8cb60e009d89a69b055018f86d7784aee9fc3"
 
 react-router@4.2.0, react-router@^4.2.0:
   version "4.2.0"
