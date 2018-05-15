@@ -96,7 +96,7 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "fix": "eslint -c config/eslint.js config src --fix",
+    "fix": "eslint -c config/eslint.js src --fix",
     "prebuild": "yarn run test",
     "test": "jest --no-watchman --env=jsdom",
     "test:watch": "jest --watch --no-watchman --env=jsdom",
