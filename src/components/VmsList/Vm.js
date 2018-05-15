@@ -13,8 +13,7 @@ import style from './style.css'
 import VmStatusText from './VmStatusText'
 import VmActions from '../VmActions'
 import VmIcon from '../VmIcon'
-
-import { VmStatusIcon } from 'ovirt-ui-components'
+import VmStatusIcon from '../VmStatusIcon'
 
 import { startVm } from '../../actions/index'
 
