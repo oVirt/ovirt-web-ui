@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Checkbox } from 'ovirt-ui-components'
+
+import Checkbox from '../Checkbox'
 
 import { connect } from 'react-redux'
 import { msg } from '../../intl'
