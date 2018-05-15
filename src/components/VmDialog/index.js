@@ -2,7 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
-import { Redirect, Prompt, Link } from 'react-router-dom'
+import { Redirect, Link } from 'react-router-dom'
+import NavigationPrompt from 'react-router-navigation-prompt'
 import Switch from 'react-bootstrap-switch'
 
 import { logDebug, generateUnique, templateNameRenderer } from '../../helpers'
@@ -11,28 +12,22 @@ import { isRunning, transformArrayToObject } from '../utils'
 import style from './style.css'
 import sharedStyle from '../sharedStyle.css'
 
+import CloudInitEditor from '../CloudInitEditor'
 import DetailContainer from '../DetailContainer'
 import ErrorAlert from '../ErrorAlert'
-import FieldHelp from '../FieldHelp/index'
+import FieldHelp from '../FieldHelp'
+import NavigationConfirmationModal from '../NavigationConfirmationModal'
+import SelectBox from '../SelectBox'
 import VmIcon from '../VmIcon'
 
 import Selectors from '../../selectors'
-import {
-  closeDialog,
-} from '../../actions/index'
 
-import {
-  editVm,
-  createVm,
-  setSavedVm,
-} from './actions'
-
-import SelectBox from '../SelectBox'
+import { closeDialog } from '../../actions/index'
+import { editVm, createVm, setSavedVm } from './actions'
 
 import { MAX_VM_MEMORY_FACTOR } from '../../constants/index'
 
 import { msg } from '../../intl'
-import CloudInitEditor from '../CloudInitEditor'
 
 function sortedBy (immutableCollection, sortBy) { // TODO: move to helpers
   return immutableCollection.sort(
@@ -522,11 +517,11 @@ class VmDialog extends React.Component {
         {this.getLatestUserMessage() && (<ErrorAlert message={this.getLatestUserMessage()} id={`${idPrefix}-erroralert`} />)}
         <br />
         <form>
-          <Prompt
-            when={this.state.isChanged}
-            message={location => (
-              `Are you sure you want to go to ${location.pathname}`
-            )} />
+          <NavigationPrompt when={this.state.isChanged}>
+            {({ isActive, onConfirm, onCancel }) => (
+              <NavigationConfirmationModal show={isActive} onYes={onConfirm} onNo={onCancel} />
+            )}
+          </NavigationPrompt>
 
           <div className={style['vm-dialog-container']}>
             <dl className={sharedStyle['vm-properties']}>
