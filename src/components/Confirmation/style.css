@@ -1,14 +1,21 @@
+.confirmation-body {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+}
+
 .confirmation-text {
-    margin: 0;
+    margin: 0 0 5px 0;
     padding: .3em 0;
     font-size: small;
     text-align: center;
-    margin-bottom: 5px;
 }
 
 .confirmation-toolbar {
     margin-top: 5px;
     display: flex;
+    flex-direction: row;
+    align-content: center;
     justify-content: center;
 }
 
@@ -16,11 +23,6 @@
     margin-left: 15px !important;
 }
 
-.ok-button {
-	margin-right: 2px;
-    margin-left: 23px !important;
-}
-
-.confirmation-body {
-    display: inline-block;
+.confirmation-ok-button {
+    margin-right: 2px !important;
 }

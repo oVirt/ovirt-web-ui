@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { Checkbox } from 'ovirt-ui-components'
 
 import { connect } from 'react-redux'
 import { msg } from '../../intl'
@@ -7,14 +8,13 @@ import { msg } from '../../intl'
 import style from './style.css'
 
 import {
-  Checkbox,
   canRestart,
   canShutdown,
   canStart,
   canConsole,
   canSuspend,
   canRemove,
-} from 'ovirt-ui-components'
+} from '../../vm-status'
 
 import {
   shutdownVm,
@@ -25,7 +25,7 @@ import {
   removeVm,
 } from '../../actions/index'
 
-import Confirmation from '../Confirmation/index'
+import Confirmation from '../Confirmation'
 import ConsoleButton from './ConsoleButton'
 import Button from './Button'
 import LinkButton from './LinkButton'
@@ -43,83 +43,19 @@ EmptyAction.propTypes = {
   isOnCard: PropTypes.bool.isRequired,
 }
 
-class RemoveVmAction extends React.Component {
-  constructor (props) {
-    super(props)
-
-    this.state = {
-      preserveDisks: false,
-    }
-  }
-
-  render () {
-    const { isOnCard, isPool, vm, onRemove, isDisks } = this.props
-    const idPrefix = `removeaction-${vm.get('name')}`
-
-    if (isOnCard) {
-      return null
-    }
-
-    let checkbox = null
-    let height = null
-
-    if (isDisks) {
-      checkbox = (
-        <div style={{ marginTop: '8px' }} id={`${idPrefix}-preservedisks`}>
-          <Checkbox
-            checked={this.state.preserveDisks}
-            onClick={() => this.setState({ preserveDisks: !this.state.preserveDisks })}
-            label={msg.preserveDisks()} />
-        </div>)
-      height = 75
-    }
-    let confirmRemoveText = null
-    if (checkbox) {
-      confirmRemoveText = (
-        <div id={`${idPrefix}-question`}>
-          {msg.removeVmQustion()}
-          <br />
-          {checkbox}
-        </div>)
-    } else {
-      confirmRemoveText = msg.removeVmQustion()
-    }
-
-    const status = vm.get('status')
-    const isDisabled = isPool || vm.getIn(['actionInProgress', 'remove']) || !canRemove(status)
-
-    return (
-      <Button isOnCard={false} actionDisabled={isDisabled}
-        className='pficon pficon-remove'
-        tooltip={msg.removeVm()}
-        button='btn btn-danger'
-        shortTitle={msg.remove()}
-        id={`${idPrefix}-button-remove`}
-        popover={({ close }) => <Confirmation
-          height={height}
-          text={confirmRemoveText}
-          okButton={{ label: msg.yes(), click: () => onRemove({ force: false, preserveDisks: this.state.preserveDisks }) }}
-          cancelButton={{ label: msg.cancel(), click: () => { close() } }}
-          extraButton={{ label: msg.force(), click: () => onRemove({ force: true, preserveDisks: this.state.preserveDisks }) }}
-          uniqueId={vm.get('name')}
-        />}
-      />
-    )
-  }
-}
-RemoveVmAction.propTypes = {
-  vm: PropTypes.object.isRequired,
-  isOnCard: PropTypes.bool,
-  isPool: PropTypes.bool,
-  onRemove: PropTypes.func.isRequired,
-  isDisks: PropTypes.bool,
-}
-
 /**
  * Active actions on a single VM-card.
  * List of actions depends on the VM state.
  */
 class VmActions extends React.Component {
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      removePreserveDisks: false,
+    }
+  }
+
   render () {
     let {
       vm,
@@ -144,8 +80,7 @@ class VmActions extends React.Component {
 
     let consoleProtocol = ''
     if (!vm.get('consoles').isEmpty()) {
-      const vConsole = vm.get('consoles').find(c => c.get('protocol') === 'spice') ||
-        vm.getIn(['consoles', 0])
+      const vConsole = vm.get('consoles').find(c => c.get('protocol') === 'spice') || vm.getIn(['consoles', 0])
       const protocol = vConsole.get('protocol').toUpperCase()
       consoleProtocol = msg.openProtocolConsole({ protocol })
     }
@@ -164,66 +99,110 @@ class VmActions extends React.Component {
       <div className={`actions-line ${isOnCard ? 'card-pf-items text-center' : style['left-padding']}`}>
         <EmptyAction state={status} isOnCard={isOnCard} />
 
-        <Button isOnCard={isOnCard} actionDisabled={(!isPool && !canStart(status)) || vm.getIn(['actionInProgress', 'start'])}
+        <Button isOnCard={isOnCard}
+          actionDisabled={(!isPool && !canStart(status)) || vm.getIn(['actionInProgress', 'start'])}
           shortTitle={msg.run()}
+          tooltip={msg.startVm()}
           button='btn btn-success'
           className='fa fa-play'
-          tooltip={msg.startVm()}
-          onClick={onStart}
-          id={`${idPrefix}-button-start`} />
+          id={`${idPrefix}-button-start`}
+          onClick={onStart} />
 
-        <Button isOnCard={isOnCard} actionDisabled={isPool || !canSuspend(status) || vm.getIn(['actionInProgress', 'suspend'])}
+        <Button isOnCard={isOnCard}
+          actionDisabled={isPool || !canSuspend(status) || vm.getIn(['actionInProgress', 'suspend'])}
           shortTitle={msg.suspend()}
+          tooltip={msg.suspendVm()}
           button='btn btn-default'
           className='fa fa-moon-o'
-          tooltip={msg.suspendVm()}
           id={`${idPrefix}-button-suspend`}
-          popover={({ close }) => <Confirmation text={msg.suspendVmQuestion()}
-            okButton={{ label: msg.yes(), click: handleSuspend(close) }}
-            cancelButton={{ label: msg.cancel(), click: () => { close() } }}
-            uniqueId={vm.get('name')} />} />
+          popover={({ close }) =>
+            <Confirmation
+              text={msg.suspendVmQuestion()}
+              okButton={{ label: msg.yes(), click: handleSuspend(close) }}
+              cancelButton={{ label: msg.cancel(), click: () => { close() } }}
+              uniqueId={vm.get('name')} />}
+        />
 
-        <Button isOnCard={isOnCard} actionDisabled={isPool || !canShutdown(status) || vm.getIn(['actionInProgress', 'shutdown'])}
-          className='fa fa-power-off'
-          button='btn btn-danger'
-          tooltip={msg.shutdownVm()}
+        <Button isOnCard={isOnCard}
+          actionDisabled={isPool || !canShutdown(status) || vm.getIn(['actionInProgress', 'shutdown'])}
           shortTitle={msg.shutdown()}
+          tooltip={msg.shutdownVm()}
+          button='btn btn-danger'
+          className='fa fa-power-off'
           id={`${idPrefix}-button-shutdown`}
-          popover={({ close }) => <Confirmation text={msg.shutdownVmQuestion()}
-            okButton={{ label: msg.yes(), click: this.props.onShutdown }}
-            cancelButton={{ label: msg.cancel(), click: () => { close() } }}
-            uniqueId={vm.get('name')} />} />
+          popover={({ close }) =>
+            <Confirmation
+              text={msg.shutdownVmQuestion()}
+              okButton={{ label: msg.yes(), click: () => { this.props.onShutdown() } }}
+              cancelButton={{ label: msg.cancel(), click: () => { close() } }}
+              extraButton={{ label: msg.force(), click: () => { this.props.onForceShutdown() } }}
+              uniqueId={vm.get('name')} />}
+        />
 
-        <Button isOnCard={isOnCard} actionDisabled={isPool || !canRestart(status) || vm.getIn(['actionInProgress', 'restart'])}
-          className='pficon pficon-restart'
-          button='btn btn-default'
-          tooltip={msg.rebootVm()}
+        <Button isOnCard={isOnCard}
+          actionDisabled={isPool || !canRestart(status) || vm.getIn(['actionInProgress', 'restart'])}
           shortTitle={msg.reboot()}
+          tooltip={msg.rebootVm()}
+          button='btn btn-default'
+          className='pficon pficon-restart'
           id={`${idPrefix}-button-reboot`}
-          popover={({ close }) => <Confirmation text={msg.rebootVmQuestion()}
-            okButton={{ label: msg.yes(), click: this.props.onRestart }}
-            cancelButton={{ label: msg.cancel(), click: () => { close() } }}
-            uniqueId={vm.get('name')} />} />
+          popover={({ close }) =>
+            <Confirmation
+              text={msg.rebootVmQuestion()}
+              okButton={{ label: msg.yes(), click: this.props.onRestart }}
+              cancelButton={{ label: msg.cancel(), click: () => { close() } }}
+              uniqueId={vm.get('name')} />}
+        />
 
-        <ConsoleButton isOnCard={isOnCard} actionDisabled={isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole'])}
+        <ConsoleButton isOnCard={isOnCard}
+          actionDisabled={isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole'])}
+          shortTitle={msg.console()}
+          tooltip={consoleProtocol}
           button='btn btn-default'
           className='pficon pficon-screen'
-          tooltip={consoleProtocol}
-          shortTitle={msg.console()}
-          usbFilter={config.get('usbFilter')}
           vm={vm}
+          usbFilter={config.get('usbFilter')}
           userId={config.getIn(['user', 'id'])} />
 
         <span className={style['button-spacer']} />
 
         <LinkButton isOnCard={isOnCard}
           shortTitle={msg.edit()}
+          tooltip={msg.editVm()} to={`/vm/${vm.get('id')}/edit`}
           button='btn btn-default'
           className={`pficon pficon-edit ${style['action-link']}`}
-          tooltip={msg.editVm()} to={`/vm/${vm.get('id')}/edit`}
           id={`action-${vm.get('name')}-edit`} />
 
-        <RemoveVmAction isOnCard={isOnCard} isPool={isPool} vm={vm} isDisks={vm.get('disks').size > 0} onRemove={onRemove} />
+        {!isOnCard && (
+          <Button isOnCard={false}
+            actionDisabled={isPool || !canRemove(status) || vm.getIn(['actionInProgress', 'remove'])}
+            shortTitle={msg.remove()}
+            tooltip={msg.removeVm()}
+            button='btn btn-danger'
+            className='pficon pficon-remove'
+            id={`${idPrefix}-button-remove`}
+            popover={({ close }) =>
+              <Confirmation
+                text={(
+                  <div>
+                    <div id={`${idPrefix}-question`}>{msg.removeVmQustion()}</div>
+                    {vm.get('disks').size > 0 && (
+                      <div style={{ marginTop: '8px' }} id={`${idPrefix}-preservedisks`}>
+                        <Checkbox
+                          checked={this.state.removePreserveDisks}
+                          onClick={() => this.setState((s) => { return { removePreserveDisks: !s.removePreserveDisks } })}
+                          label={msg.preserveDisks()} />
+                      </div>
+                    )}
+                  </div>
+                )}
+                okButton={{ label: msg.yes(), click: () => onRemove({ force: false, preserveDisks: this.state.removePreserveDisks }) }}
+                cancelButton={{ label: msg.cancel(), click: () => { close() } }}
+                extraButton={{ label: msg.force(), click: () => onRemove({ force: true, preserveDisks: this.state.removePreserveDisks }) }}
+                uniqueId={vm.get('name')}
+              />}
+          />
+        )}
       </div>
     )
   }
