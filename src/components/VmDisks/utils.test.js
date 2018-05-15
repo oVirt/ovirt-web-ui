@@ -51,7 +51,7 @@ const samples = [
  * Issue: npm package "full-icu" does post-installation setup consisting of downloading "icu4c-data"
  * _in a version corresponding to running nodejs_ which is determined at runtime.
  * Can be fixed by
- *   - either including all potential icu4c-data versions in ovirt-engine-nodejs-modules 
+ *   - either including all potential icu4c-data versions in ovirt-engine-nodejs-modules
  *   - or proper dependencies of full-icu package
 
   {
