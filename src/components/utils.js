@@ -11,6 +11,21 @@ export function getOsHumanName (osName: string): string {
   return os && os.get('description') || osName
 }
 
+export function getVmIcon (icons: Object, operatingSystems: Array<Object>, vm: Object): Object {
+  let iconId = vm.getIn(['icons', 'large', 'id'])
+
+  const validOsIcon = operatingSystems.find((v, k) => v.getIn(['icons', 'large', 'id']) === iconId)
+  // api can reference old os icon, otherwise use custom icon
+  if (validOsIcon) {
+    // get current os icon
+    const vmOs = operatingSystems.find((v, k) => v.get('name') === vm.getIn(['os', 'type']))
+    if (vmOs) {
+      iconId = vmOs.getIn(['icons', 'large', 'id'])
+    }
+  }
+  return icons.get(iconId)
+}
+
 export function isRunning (status: string): boolean {
   console.log('---------- status: ', status)
   return ['wait_for_launch', 'up', 'powering_up', 'powering_down', 'migrating', 'paused'].includes(status)

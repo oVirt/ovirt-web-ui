@@ -136,7 +136,7 @@ function* persistStateSaga () {
   yield persistStateToLocalStorage({ icons: Selectors.getAllIcons().toJS() })
 }
 
-function* fetchUnknwonIconsForVms ({ vms, os }) {
+function* fetchUnknownIconsForVms ({ vms, os }) {
   // unique iconIds from all vms or os (if available)
   const iconsIds = new Set()
   if (vms) {
@@ -205,6 +205,7 @@ function* fetchVmsByPageV42 (action) {
     const internalVms = allVms.vm.map(vm => Api.vmToInternal({ vm, getSubResources: true }))
 
     yield put(updateVms({ vms: internalVms, copySubResources: true, page: page }))
+    yield fetchUnknownIconsForVms({ vms: internalVms })
   }
 
   yield put(persistState())
@@ -220,6 +221,7 @@ function* fetchVmsByPageVLower (action) {
     const internalVms = allVms.vm.map(vm => Api.vmToInternal({ vm }))
 
     yield put(updateVms({ vms: internalVms, copySubResources: true, page: page }))
+    yield fetchUnknownIconsForVms({ vms: internalVms })
 
     if (!shallowFetch) {
       yield fetchConsoleMetadatas({ vms: internalVms })
@@ -260,6 +262,7 @@ function* fetchVmsByCountV42 (action) {
     yield put(removeMissingVms({ vmIdsToPreserve }))
 
     yield put(updateVms({ vms: internalVms, copySubResources: true, page: page }))
+    yield fetchUnknownIconsForVms({ vms: internalVms })
   }
 
   yield put(persistState())
@@ -278,6 +281,7 @@ function* fetchVmsByCountVLower (action) {
     yield put(removeMissingVms({ vmIdsToPreserve }))
 
     yield put(updateVms({ vms: internalVms, copySubResources: true }))
+    yield fetchUnknownIconsForVms({ vms: internalVms })
 
     if (!shallowFetch) {
       yield fetchConsoleMetadatas({ vms: internalVms })
@@ -359,7 +363,7 @@ export function* fetchSingleVm (action) {
     internalVm.nics = yield fetchVmNics({ vmId: internalVm.id })
 
     yield put(updateVms({ vms: [internalVm] }))
-    yield fetchUnknwonIconsForVms({ vms: [internalVm] })
+    yield fetchUnknownIconsForVms({ vms: [internalVm] })
   } else {
     if (vm && vm.error && vm.error.status === 404) {
       yield put(removeVms({ vmIds: [action.payload.vmId] }))
@@ -620,7 +624,7 @@ function* fetchAllOS (action) {
 
     const osIdsToPreserve = operatingSystemsInternal.map(item => item.id)
     // load icons for OS
-    yield fetchUnknwonIconsForVms({ os: operatingSystemsInternal })
+    yield fetchUnknownIconsForVms({ os: operatingSystemsInternal })
     yield put(removeMissingOSs({ osIdsToPreserve }))
   }
 }
