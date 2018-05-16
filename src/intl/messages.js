@@ -272,6 +272,14 @@ export const messages = {
   hdBoot: 'Hard Disk',
   networkBoot: 'Network (PXE)',
   cdromBoot: 'CD-ROM',
+  unsavedChangesTitle: {
+    message: 'Dialog contains unsaved changes',
+    description: 'Title of modal dialog opened when a user tried to navigate off an editor page after changes have been made.',
+  },
+  unsavedChangesConfirmMessage: {
+    message: 'Are you sure you want to drop your changes?',
+    description: 'Message in the modal dialog opened when a user tried to navigate off an editor page after changes have been made.',
+  },
 }
 
 export type MessageIdType = $Keys<typeof messages>

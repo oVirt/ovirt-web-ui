@@ -2,26 +2,20 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
-import {
-  BrowserRouter as Router,
-} from 'react-router-dom'
+import { BrowserRouter as Router } from 'react-router-dom'
 import { renderRoutes } from 'react-router-config'
 
-import VmsPageHeader from './components/VmsPageHeader/index'
-
-import Options from './components/Options'
 import AboutDialog from './components/About'
+import ContainerFluid from './components/ContainerFluid'
+import LoadingData from './components/LoadingData'
+import Options from './components/Options'
 import OptionsDialog from './components/OptionsDialog'
 import OvirtApiCheckFailed from './components/OvirtApiCheckFailed'
-import CloseDialogConfirmation from './components/CloseDialogConfirmation/index'
 import TokenExpired from './components/TokenExpired'
-import ContainerFluid from './components/ContainerFluid'
-import LoadingData from './components/LoadingData/index'
-
 import VerticalMenu from './components/VerticalMenu'
+import VmsPageHeader from './components/VmsPageHeader'
 
 import { getRoutes, getMenu } from './routes'
-import rednerModal from './components/VmModals/rednerModal'
 import AppConfiguration from './config'
 import { fixedStrings } from './branding'
 import { msg } from './intl'
@@ -42,7 +36,19 @@ const NoLogin = () => {
   )
 }
 
+/**
+ * Main App component. Wrap the main react-router components together with
+ * the various dialogs and error messages that may be needed.
+ */
 const App = ({ vms, visibility, config }) => {
+  if (!config.get('loginToken')) { // login is missing
+    return (
+      <ContainerFluid>
+        <NoLogin />
+      </ContainerFluid>
+    )
+  }
+
   let detailToRender = null
   switch (visibility.get('dialogToShow')) {
     case 'Options':
@@ -53,28 +59,8 @@ const App = ({ vms, visibility, config }) => {
   const routes = getRoutes(vms)
   const menu = getMenu()
 
-  if (!config.get('loginToken')) { // login is missing
-    return (
-      <ContainerFluid>
-        <NoLogin />
-      </ContainerFluid>
-    )
-  }
-
-  const openConfirmation = (message, callback) => {
-    rednerModal({
-      Component: CloseDialogConfirmation,
-      onYes: () => {
-        callback(true)
-      },
-      onNo: () => {
-        callback(false)
-      },
-    })
-  }
-
   return (
-    <Router getUserConfirmation={openConfirmation} basename={AppConfiguration.applicationURL}>
+    <Router basename={AppConfiguration.applicationURL}>
       <div>
         <VmsPageHeader page={vms.get('page')} title={fixedStrings.BRAND_NAME + ' ' + msg.vmPortal()} />
         <VerticalMenu menuItems={menu} /> { /* Disabled, to enable search for left sidebar menu */ }
