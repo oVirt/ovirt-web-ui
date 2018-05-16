@@ -3,15 +3,19 @@ import React from 'react'
 import AddVmButton from './components/VmDialog/AddVmButton'
 import PageRouter from './components/PageRouter'
 import { VmDetailToolbar, PoolDetailToolbar } from './components/Toolbar/index'
-import VmsPage from './components/Pages/VmsPage'
+import VmsList from './components/VmsList'
 import { VmDetailPage, PoolDetailPage, VmDialogPage } from './components/Pages/index'
 import { msg } from './intl'
 
 /**
  * Function get vms object, and return routes object
- * Every route must has path, component that presentate page,
- * title (except top route), it can be function (get match parameter) or string,
- * toolbars as array of functions that get match parameter and return component.
+ *
+ * Every route must have:
+ *   - path,
+ *   - component that presents page,
+ *   - title (except top route), it can be function (get match parameter) or string,
+ *   - toolbars (as array of functions that get match parameter and return a component)
+ *
  * @param vms {object}
  * @return {array}
  */
@@ -23,7 +27,7 @@ const getRoutes = (vms) => ([
         path: '/',
         exact: true,
         component: () =>
-          (<VmsPage />),
+          (<VmsList />),
         toolbars: [(match) => (<AddVmButton key='addbutton' id={`route-add-vm`} />)],
       },
       {

@@ -9,54 +9,56 @@ import Vms from './Vms'
 import { msg } from '../../intl'
 
 /**
- * Data are fetched but no VM is available to display
+ * Component displayed when VMs or Pools exist but the data is still loading.
  */
-const NoVm = () => {
-  const idPrefix = `novm`
+const VmLoading = () => {
+  return <div />
+}
+
+/**
+ * Component displayed when no VMs or Pools could be loaded for the current user.
+ */
+const NoVmAvailable = () => {
+  const idPrefix = 'no-vm'
   return (
-    <div className='blank-slate-pf'>
-      <div className='blank-slate-pf-icon'>
-        <span className='pficon pficon pficon-add-circle-o' id={`${idPrefix}-icon`} />
+    <ContainerFluid>
+      <div className='blank-slate-pf'>
+        <div className='blank-slate-pf-icon'>
+          <span className='pficon pficon pficon-add-circle-o' id={`${idPrefix}-icon`} />
+        </div>
+        <h1 id={`${idPrefix}-title`}>
+          {msg.noVmAvailable()}
+        </h1>
+        <p id={`${idPrefix}-text`}>
+          {msg.noVmAvailableForLoggedUser()}
+        </p>
       </div>
-      <h1 id={`${idPrefix}-title`}>
-        {msg.noVmAvailable()}
-      </h1>
-      <p id={`${idPrefix}-text`}>
-        {msg.noVmAvailableForLoggedUser()}
-      </p>
-    </div>
+    </ContainerFluid>
   )
 }
 
-const VmsList = ({ vms, visibility }) => {
-  const isDetailVisible = !!visibility.get('dialogToShow')
+const VmsList = ({ vms }) => {
+  const haveVms = (vms.get('vms') && !vms.get('vms').isEmpty())
+  const havePools = (vms.get('pools') && !vms.get('pools').isEmpty())
 
-  if ((vms.get('vms') && !vms.get('vms').isEmpty()) || (vms.get('pools') && !vms.get('pools').isEmpty())) {
-    return (
-      <Vms />
-    )
-  } else if (!isDetailVisible) {
-    if (vms.get('loadInProgress')) {
-      return <div /> // "Loading Data ..." message rendered elsewhere
-    } else { // No VM available and initial data load is finished
-      return (
-        <ContainerFluid>
-          <NoVm />
-        </ContainerFluid>
-      )
-    }
+  let el = null
+
+  if (haveVms || havePools) {
+    el = <Vms />
+  } else if (vms.get('loadInProgress')) {
+    el = <VmLoading />
+  } else {
+    el = <NoVmAvailable />
   }
 
-  return null
+  return el
 }
 VmsList.propTypes = {
   vms: PropTypes.object.isRequired,
-  visibility: PropTypes.object.isRequired,
 }
 
 export default withRouter(connect(
   (state) => ({
     vms: state.vms,
-    visibility: state.visibility,
   })
 )(VmsList))

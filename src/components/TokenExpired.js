@@ -6,7 +6,7 @@ import ErrorAlert from './ErrorAlert'
 import { msg } from '../intl'
 
 // TODO: allow the user to cancel the automatic reload?
-// If so, change visibility.isTokenExpired to false and add additional check to doCheckTokenExpired() before actual reload
+// If so, change config.isTokenExpired to false and add additional check to doCheckTokenExpired() before actual reload
 const TokenExpired = ({ config }) => {
   if (!config.get('isTokenExpired')) {
     return null

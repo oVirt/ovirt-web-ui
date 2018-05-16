@@ -1,11 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { Grid } from 'patternfly-react'
 
-export const ContainerFluid = ({ children }) => (
-  <div className='container-fluid'>
-    {children}
-  </div>
-)
+const ContainerFluid = ({ children }) => (<Grid fluid>{children}</Grid>)
 
 ContainerFluid.propTypes = {
   children: PropTypes.node,

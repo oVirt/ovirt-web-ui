@@ -3,11 +3,7 @@ import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
 
-import {
-  logout,
-  toggleOptions,
-  clearUserMessages,
-} from '../../actions/index'
+import { logout } from '../../actions/index'
 
 import { msg } from '../../intl'
 
@@ -20,7 +16,7 @@ const UserMenu = ({ config, onLogout }) => {
       </li>
     )
   } else {
-    const idPrefix = `usermenu`
+    const idPrefix = 'usermenu'
     return (
       <li className='dropdown'>
         <a className='dropdown-toggle nav-item-iconic' href='#' data-toggle='dropdown' title={config.getIn(['user', 'name'])} id={`${idPrefix}-user`}>
@@ -45,7 +41,6 @@ const UserMenu = ({ config, onLogout }) => {
 UserMenu.propTypes = {
   config: PropTypes.object.isRequired,
   onLogout: PropTypes.func.isRequired,
-  onOptions: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -53,8 +48,6 @@ export default connect(
     config: state.config,
   }),
   (dispatch) => ({
-    onClearMessages: () => dispatch(clearUserMessages()),
     onLogout: () => dispatch(logout()),
-    onOptions: () => dispatch(toggleOptions()),
   })
 )(UserMenu)

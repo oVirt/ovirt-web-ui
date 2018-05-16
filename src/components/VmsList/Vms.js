@@ -10,6 +10,10 @@ import ScrollPositionHistory from '../ScrollPositionHistory'
 import { getByPage } from '../../actions/index'
 import InfiniteScroll from 'react-infinite-scroller'
 
+/**
+ * Use Patternfly 'Single Select Card View' pattern to show every VM and Pool
+ * available to the current user.
+ */
 class Vms extends React.Component {
   constructor (props) {
     super(props)
@@ -23,12 +27,7 @@ class Vms extends React.Component {
   }
 
   render () {
-    let { vms } = this.props
-    const containerClass = ['container-fluid',
-      'container-cards-pf',
-      style['movable-left'],
-      style['full-window'],
-    ].join(' ')
+    const { vms } = this.props
 
     const sortFunction = (vmA, vmB) => {
       const vmAName = vmA.get('name')
@@ -39,7 +38,10 @@ class Vms extends React.Component {
     }
 
     const sortedVms = vms.get('vms').toList().sort(sortFunction)
-    const sortedPools = vms.get('pools').toList().sort(sortFunction) // TODO: sort vms and pools together!
+    const sortedPools = vms.get('pools')
+                           .filter(pool => (pool.get('vmsCount') < pool.get('maxUserVms') && pool.get('size') > 0))
+                           .toList()
+                           .sort(sortFunction) // TODO: sort vms and pools together!
 
     return (
       <InfiniteScroll
@@ -50,17 +52,11 @@ class Vms extends React.Component {
       >
         <div>
           <ScrollPositionHistory uniquePrefix='vms-list'>
-            <div className={containerClass}>
+            <div className={`container-fluid container-cards-pf ${style['movable-left']} ${style['full-window']}`}>
               <div className={style['scrollingWrapper']}>
                 <div className='row row-cards-pf'>
                   {sortedVms.map(vm => <Vm vm={vm} key={vm.get('id')} />)}
-                  {sortedPools.map(pool => {
-                    if (pool.get('vmsCount') < pool.get('maxUserVms') && pool.get('size') > 0) {
-                      return <Pool pool={pool} key={pool.get('id')} />
-                    } else {
-                      return null
-                    }
-                  })}
+                  {sortedPools.map(pool => <Pool pool={pool} key={pool.get('id')} />)}
                 </div>
                 <div className={style['overlay']} />
               </div>
