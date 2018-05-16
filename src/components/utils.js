@@ -15,3 +15,11 @@ export function isRunning (status: string): boolean {
   console.log('---------- status: ', status)
   return ['wait_for_launch', 'up', 'powering_up', 'powering_down', 'migrating', 'paused'].includes(status)
 }
+
+export function transformArrayToObject (arr: Array<Object>): Object {
+  const result = {}
+  for (let i = 0; i < arr.length; i++) {
+    result[arr[i].id] = arr[i]
+  }
+  return result
+}
