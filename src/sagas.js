@@ -425,9 +425,7 @@ function* changeVmIcon (action) {
   }
 
   if (vm && vm.id) {
-    const internalVm = Api.vmToInternal({ vm })
-    yield put(updateVms({ vms: [internalVm] }))
-    yield fetchUnknwonIconsForVms({ vms: [internalVm] })
+    yield fetchSingleVm({ payload: { vmId: vm.id } })
   }
 }
 
