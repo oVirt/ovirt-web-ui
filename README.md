@@ -135,7 +135,6 @@ For Firefox: [https://addons.mozilla.org/en-us/firefox/addon/remotedev/](https:/
 
 
 ## Technical Details
-- components maintained in [ovirt-ui-components](https://github.com/oVirt/ovirt-ui-components)
 - based on React, Patternfly, Redux, Redux-Saga
 - based on ejected [create-react-app](https://facebook.github.io/react/blog/2016/07/22/create-apps-with-no-configuration.html)
 

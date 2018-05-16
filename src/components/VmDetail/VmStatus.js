@@ -1,10 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
 import { connect } from 'react-redux'
 
-import { VmStatusIcon } from 'ovirt-ui-components'
-import FieldHelp from '../FieldHelp/index'
+import VmStatusIcon from '../VmStatusIcon'
+import FieldHelp from '../FieldHelp'
+
 import { msg, enumMsg } from '../../intl'
 
 import HostConsole, { hasUserHostConsoleAccess, CockpitAHREF } from '../HostConsole/index'

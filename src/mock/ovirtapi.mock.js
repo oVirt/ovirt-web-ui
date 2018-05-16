@@ -1,8 +1,3 @@
-import $ from 'jquery'
-
-import { logDebug } from '../helpers'
-import { Exception } from '../exceptions'
-import Selectors from '../selectors'
 import AppConfiguration from '../config'
 import { vms, disks, api } from './data.mock'
 import MainApi from '../ovirtapi'
@@ -26,12 +21,11 @@ OvirtApi = {
   consolesToInternal: MainApi.consolesToInternal,
   // ----
   login ({ credentials }) {
-    
     return Promise.resolve({
       'access_token': '123456789',
       'scope': 'ovirt-app-api ovirt-ext=token-info:authz-search ovirt-ext=token-info:public-authz-search ovirt-ext=token-info:validate',
       'exp': '1493207433000',
-      'token_type': 'bearer'
+      'token_type': 'bearer',
     })
   },
   getOvirtApiMeta () {
@@ -103,7 +97,6 @@ OvirtApi = {
         for (let j in vms.vm[i].graphics_console) {
           if (vms.vm[i].graphics_console[j].id === consoleId) {
             return Promise.resolve({ graphics_console: vms.vm[i].graphics_console })
-            
           }
         }
       }

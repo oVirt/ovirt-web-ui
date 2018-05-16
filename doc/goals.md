@@ -27,7 +27,7 @@ The **ovirt-web-ui** project states following goals:
 First version of the project mimics recent GWT Basic User Portal from the functional perspective.
 
 Ongoing development will lead to the refined scope of recent Extended User Portal.
-Preferably, new integrating application will be introduced to implement the "Extended User Portal" scope while reusing recent code (ovirt-web-ui, ovirt-ui-components).
+Preferably, new integrating application will be introduced to implement the "Extended User Portal" scope while reusing recent code.
  
 TBD: More detailed scope - both recent and future
     
@@ -43,10 +43,6 @@ The web-based project is split into modules:
     - Redux store
     - top-level webpage composition              
   
-- The ovirt-ui-components project
-  Holds reusable UI components the ovirt-web-ui is built from.
-  To reuse them in other project, the context needs to be provided by the integrating project (see above).
-
 Implementation is not specific to particular provider, recently oVirt REST API and ManageIQ are taken into consideration.
 An API is used to abstract from particular provider's specifics.
 
@@ -155,5 +151,4 @@ TBD: size and expected data examples
 ## Links
 
 - [oVirt web-ui project on Github](https://github.com/oVirt/ovirt-web-ui)
-- [ovirt-ui-components](https://github.com/matobet/ovirt-ui-components)
 

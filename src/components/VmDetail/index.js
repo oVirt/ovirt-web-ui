@@ -18,7 +18,7 @@ import {
   changeVmIconById,
 } from '../../actions/index'
 
-import { templateNameRenderer } from '../../helpers'
+import { templateNameRenderer, userFormatOfBytes } from '../../helpers'
 
 import FieldHelp from '../FieldHelp/index'
 import DetailContainer from '../DetailContainer'
@@ -30,8 +30,8 @@ import VmStatus from './VmStatus'
 import { NextRunLabel } from './labels'
 import LastMessage from './LastMessage'
 import VmConsoles from './VmConsoles'
+import VmIcon from '../VmIcon'
 
-import { userFormatOfBytes, VmIcon } from 'ovirt-ui-components'
 import Selectors from '../../selectors'
 import { getOsHumanName } from '../utils'
 

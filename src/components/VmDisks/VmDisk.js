@@ -1,5 +1,5 @@
 import React from 'react'
-import { userFormatOfBytes } from 'ovirt-ui-components'
+import { userFormatOfBytes } from '../../helpers'
 import PropTypes from 'prop-types'
 import { Modal } from 'patternfly-react'
 import { connect } from 'react-redux'
