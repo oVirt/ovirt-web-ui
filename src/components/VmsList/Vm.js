@@ -46,14 +46,13 @@ const Vm = ({ vm, icons, os, onStart }) => {
             </Link>
           </h2>
 
-          <VmActions vm={vm} isOnCard onStart={onStart} />
+          <VmActions isOnCard vm={vm} onStart={onStart} />
           <VmStatusText vm={vm} />
         </div>
       </div>
     </div>
   )
 }
-
 Vm.propTypes = {
   vm: PropTypes.object.isRequired,
   icons: PropTypes.object.isRequired,

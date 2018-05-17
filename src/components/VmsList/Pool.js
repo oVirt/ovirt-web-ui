@@ -47,14 +47,13 @@ const Pool = ({ pool, icons, onStart }) => {
             </Link>
           </h2>
 
-          <VmActions vm={pool.get('vm')} isOnCard isPool onStart={onStart} pool={pool} />
+          <VmActions isOnCard vm={pool.get('vm')} onStart={onStart} pool={pool} />
           <VmStatusText vm={pool.get('vm')} />
         </div>
       </div>
     </div>
   )
 }
-
 Pool.propTypes = {
   pool: PropTypes.object.isRequired,
   icons: PropTypes.object.isRequired,

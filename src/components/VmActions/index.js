@@ -1,12 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import Checkbox from '../Checkbox'
-
 import { connect } from 'react-redux'
-import { msg } from '../../intl'
 
 import style from './style.css'
+import { msg } from '../../intl'
 
 import {
   canRestart,
@@ -26,9 +24,10 @@ import {
   removeVm,
 } from '../../actions/index'
 
+import Button from './Button'
+import Checkbox from '../Checkbox'
 import Confirmation from '../Confirmation'
 import ConsoleButton from './ConsoleButton'
-import Button from './Button'
 import LinkButton from './LinkButton'
 
 const EmptyAction = ({ state, isOnCard }) => {
@@ -45,8 +44,9 @@ EmptyAction.propTypes = {
 }
 
 /**
- * Active actions on a single VM-card.
- * List of actions depends on the VM state.
+ * Set of actions for a single VM or Pool, either on a single VM card or on the VM
+ * edit page.  The availability of actions depends on the VM state and the `isOnCard`
+ * location of the VmActions component.
  */
 class VmActions extends React.Component {
   constructor (props) {
@@ -64,19 +64,12 @@ class VmActions extends React.Component {
       isOnCard = false,
       onStartVm,
       onStartPool,
-      isPool,
-      onRemove,
       config,
     } = this.props
 
-    let onStart = onStartVm
-    if (isPool && pool) {
-      onStart = onStartPool
-    }
-    if (isPool && !pool) {
-      return null
-    }
-
+    const isPool = !!pool
+    const isPoolVm = vm.getIn(['pool', 'id'], false) // a Pool VM is different the a Pool (definition)
+    const onStart = (isPool ? onStartPool : onStartVm)
     const status = vm.get('status')
 
     let consoleProtocol = ''
@@ -85,14 +78,8 @@ class VmActions extends React.Component {
       const protocol = vConsole.get('protocol').toUpperCase()
       consoleProtocol = msg.openProtocolConsole({ protocol })
     }
-
     if (vm.get('consoleInUse')) {
       consoleProtocol = 'Console in use'
-    }
-
-    const handleSuspend = (close) => () => {
-      this.props.onSuspend()
-      close()
     }
 
     const idPrefix = `vmaction-${vm.get('name')}`
@@ -110,7 +97,7 @@ class VmActions extends React.Component {
           onClick={onStart} />
 
         <Button isOnCard={isOnCard}
-          actionDisabled={isPool || !canSuspend(status) || vm.getIn(['actionInProgress', 'suspend'])}
+          actionDisabled={isPool || isPoolVm || !canSuspend(status) || vm.getIn(['actionInProgress', 'suspend'])}
           shortTitle={msg.suspend()}
           tooltip={msg.suspendVm()}
           button='btn btn-default'
@@ -119,8 +106,8 @@ class VmActions extends React.Component {
           popover={({ close }) =>
             <Confirmation
               text={msg.suspendVmQuestion()}
-              okButton={{ label: msg.yes(), click: handleSuspend(close) }}
-              cancelButton={{ label: msg.cancel(), click: () => { close() } }}
+              okButton={{ label: msg.yes(), click: () => { this.props.onSuspend(); close() } }}
+              cancelButton={{ label: msg.cancel(), click: () => close() }}
               uniqueId={vm.get('name')} />}
         />
 
@@ -134,9 +121,9 @@ class VmActions extends React.Component {
           popover={({ close }) =>
             <Confirmation
               text={msg.shutdownVmQuestion()}
-              okButton={{ label: msg.yes(), click: () => { this.props.onShutdown() } }}
-              cancelButton={{ label: msg.cancel(), click: () => { close() } }}
-              extraButton={{ label: msg.force(), click: () => { this.props.onForceShutdown() } }}
+              okButton={{ label: msg.yes(), click: () => { this.props.onShutdown(); close() } }}
+              cancelButton={{ label: msg.cancel(), click: () => close() }}
+              extraButton={{ label: msg.force(), click: () => { this.props.onForceShutdown(); close() } }}
               uniqueId={vm.get('name')} />}
         />
 
@@ -150,8 +137,8 @@ class VmActions extends React.Component {
           popover={({ close }) =>
             <Confirmation
               text={msg.rebootVmQuestion()}
-              okButton={{ label: msg.yes(), click: this.props.onRestart }}
-              cancelButton={{ label: msg.cancel(), click: () => { close() } }}
+              okButton={{ label: msg.yes(), click: () => { this.props.onRestart(); close() } }}
+              cancelButton={{ label: msg.cancel(), click: () => close() }}
               uniqueId={vm.get('name')} />}
         />
 
@@ -197,9 +184,9 @@ class VmActions extends React.Component {
                     )}
                   </div>
                 )}
-                okButton={{ label: msg.yes(), click: () => onRemove({ force: false, preserveDisks: this.state.removePreserveDisks }) }}
-                cancelButton={{ label: msg.cancel(), click: () => { close() } }}
-                extraButton={{ label: msg.force(), click: () => onRemove({ force: true, preserveDisks: this.state.removePreserveDisks }) }}
+                okButton={{ label: msg.yes(), click: () => { this.props.onRemove({ force: false, preserveDisks: this.state.removePreserveDisks }); close() } }}
+                cancelButton={{ label: msg.cancel(), click: () => close() }}
+                extraButton={{ label: msg.force(), click: () => { this.props.onRemove({ force: true, preserveDisks: this.state.removePreserveDisks }); close() } }}
                 uniqueId={vm.get('name')}
               />}
           />
@@ -208,13 +195,11 @@ class VmActions extends React.Component {
     )
   }
 }
-
 VmActions.propTypes = {
   vm: PropTypes.object.isRequired,
-  config: PropTypes.object.isRequired,
-  isOnCard: PropTypes.bool,
-  isPool: PropTypes.bool,
   pool: PropTypes.object,
+  isOnCard: PropTypes.bool,
+  config: PropTypes.object.isRequired,
   onShutdown: PropTypes.func.isRequired,
   onRestart: PropTypes.func.isRequired,
   onForceShutdown: PropTypes.func.isRequired,
@@ -226,7 +211,6 @@ VmActions.propTypes = {
 
 export default connect(
   (state) => ({
-    icons: state.icons,
     config: state.config,
   }),
   (dispatch, { vm, pool }) => ({
