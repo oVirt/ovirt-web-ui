@@ -447,7 +447,7 @@ class VmDialog extends React.Component {
   }
 
   render () {
-    const { icons, vmDialog, clusters, templates, operatingSystems, storages, previousPath } = this.props
+    const { icons, vmDialog, clusters, templates, storages, previousPath } = this.props
     const { bootDevices } = this.state
     const vm = this.props.vm
     const isoStorages = storages.get('storages').filter(v => v.get('type') === 'iso')
@@ -474,13 +474,16 @@ class VmDialog extends React.Component {
 
     const filteredTemplates = templates.get('templates')
       .filter(template => template.get('clusterId') === this.state.clusterId || !template.get('clusterId'))
-    const sortedTemplates = sortedBy(filteredTemplates, 'name')
-
-    const sortedOSs = sortedBy(operatingSystems.get('operatingSystems'), 'description')
 
     const cluster = this.getCluster()
-    const template = this.getTemplate()
+    const architecture = cluster && cluster.get('architecture')
+
+    const sortedOSs = sortedBy(Selectors.getOperatingSystemsByArchitecture(architecture), 'description')
     const os = this.getOS()
+
+    const template = this.getTemplate()
+    const sortedTemplates = sortedBy(filteredTemplates, 'name')
+
     const cdromFileId = this.getCDRomFileId()
 
     const submitText = isEdit ? msg.updateVm() : msg.createVm()

@@ -1,5 +1,8 @@
 import { Exception } from './exceptions'
 
+const PPC_64 = 'ppc64'
+const S390X = 's390x'
+
 let Selectors = {}
 Selectors = {
   init ({ store }) {
@@ -26,6 +29,17 @@ Selectors = {
   getOperatingSystemByName (name) {
     return getState().operatingSystems.get('operatingSystems').toList().find(os =>
       os.get('name') === name)
+  },
+  getOperatingSystemsByArchitecture (architecture) {
+    return getState().operatingSystems.get('operatingSystems').filter(os => {
+      const osName = os.get('name')
+      if (architecture === PPC_64 || architecture === S390X) {
+        return osName.includes(architecture)
+      } else {
+        // default to x64_86 for others (x64_86, undefined - all architectures)
+        return !osName.includes(PPC_64) && !osName.includes(S390X)
+      }
+    })
   },
   getClusterById (clusterId) {
     return getState().clusters.getIn(['clusters', clusterId])
