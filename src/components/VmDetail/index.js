@@ -33,7 +33,7 @@ import VmConsoles from './VmConsoles'
 import VmIcon from '../VmIcon'
 
 import Selectors from '../../selectors'
-import { getOsHumanName } from '../utils'
+import { getOsHumanName, getVmIcon } from '../utils'
 
 function rephraseVmType (vmType) {
   const types = {
@@ -143,15 +143,7 @@ class VmDetail extends Component {
 
     const name = isPool ? pool.get('name') : vm.get('name')
     const idPrefix = `vmdetail-${name}`
-    let iconId = vm.getIn(['icons', 'large', 'id'])
-    const vmsIcons = operatingSystems.get('operatingSystems').find((v, k) => v.getIn(['icons', 'large', 'id']) === iconId)
-    if (vmsIcons) {
-      const vmOs = operatingSystems.get('operatingSystems').find((v, k) => v.get('name') === vm.getIn(['os', 'type']))
-      if (vmOs) {
-        iconId = vmOs.getIn(['icons', 'large', 'id'])
-      }
-    }
-    const icon = icons.get(iconId)
+    const icon = getVmIcon(icons, operatingSystems.get('operatingSystems'), vm)
     const disks = vm.get('disks')
     const nics = vm.get('nics')
     const osName = getOsHumanName(vm.getIn(['os', 'type']))

@@ -17,7 +17,7 @@ import VmStatusIcon from '../VmStatusIcon'
 
 import { startVm } from '../../actions/index'
 
-import { getOsHumanName } from '../utils'
+import { getOsHumanName, getVmIcon } from '../utils'
 
 /**
  * Single icon-card in the list
@@ -27,16 +27,7 @@ class Vm extends React.Component {
     let { vm, icons, visibility, onStart, os } = this.props
     const idPrefix = `vm-${vm.get('name')}`
     const state = vm.get('status')
-
-    let iconId = vm.getIn(['icons', 'large', 'id'])
-    const vmsIcons = os.get('operatingSystems').find((v, k) => v.getIn(['icons', 'large', 'id']) === iconId)
-    if (vmsIcons) {
-      const vmOs = os.get('operatingSystems').find((v, k) => v.get('name') === vm.getIn(['os', 'type']))
-      if (vmOs) {
-        iconId = vmOs.getIn(['icons', 'large', 'id'])
-      }
-    }
-    const icon = icons.get(iconId)
+    const icon = getVmIcon(icons, os.get('operatingSystems'), vm)
     const isSelected = vm.get('id') === visibility.get('selectedVmDetail')
     const osName = getOsHumanName(vm.getIn(['os', 'type']))
 
