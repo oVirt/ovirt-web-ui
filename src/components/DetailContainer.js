@@ -25,9 +25,9 @@ class DetailContainer extends Component {
   }
 
   render () {
-    const { children } = this.props
+    const { children, ...props } = this.props
     return (
-      <div className={`container-fluid ${sharedStyle['move-left-detail']} ${sharedStyle['detail-z-index']}`}>
+      <div className={`container-fluid ${sharedStyle['move-left-detail']} ${sharedStyle['detail-z-index']}`} {...props}>
         {children}
       </div>
     )

@@ -218,7 +218,7 @@ class VmDetail extends Component {
     return (
       <div className={style['main-container']} data-thisisvmdetail>
         <VmsListNavigation selectedVm={vm} expanded={this.state.vmsNavigationExpanded} toggleExpansion={this.toggleVmsNavExpansion} />
-        <div className={style['vm-detail-main']}>
+        <div className={style['vm-detail-main']} container='true'>
           <div className={this.state.vmsNavigationExpanded ? style['vms-nav-expanded'] : style['vms-nav-collapsed']}>
             <DetailContainer>
               <h1 className={style['header']}>
@@ -285,7 +285,7 @@ class VmDetail extends Component {
                 <dl className={sharedStyle['vm-properties']}>
                   <dt><span className='pficon pficon-screen' />
                     &nbsp;
-                    <FieldHelp content={consolesHelp} text={msg.console()} popoverWidth='220px' />
+                    <FieldHelp content={consolesHelp} text={msg.console()} />
                     {consoleOptionsShowHide}
                   </dt>
                   <VmConsoles vm={vm} onConsole={onConsole} onRDP={onRDP} usbFilter={config.get('usbFilter')} />
