@@ -27,7 +27,7 @@ import {
   login,
   updateIcons,
   setDomain,
-  schedulerFixedDelay,
+  startSchedulerFixedDelay,
   addActiveRequest,
   delayedRemoveActiveRequest,
 } from './actions'
@@ -142,6 +142,7 @@ function onResourcesLoaded () {
 
   // initiate data retrieval
   Selectors.init({ store })
+  initializeApiListener(store)
 
   loadPersistedState()
 
@@ -152,8 +153,7 @@ function onResourcesLoaded () {
     logError('Missing SSO Token!')
   }
 
-  store.dispatch(schedulerFixedDelay())
-  initializeApiListener(store)
+  store.dispatch(startSchedulerFixedDelay())
 }
 
 start()
