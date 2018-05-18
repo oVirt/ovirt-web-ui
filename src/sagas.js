@@ -457,22 +457,26 @@ function* startProgress ({ vmId, poolId, name }) {
   }
 }
 
-function* stopProgress ({ vmId, poolId, name, result }) {
-  const fetchSingle = vmId ? fetchSingleVm : fetchSinglePool
-  const getSingle = vmId ? getSingleVm : getSinglePool
-  const actionInProgress = vmId ? vmActionInProgress : poolActionInProgress
+function* getSingleInstance ({ result, poolId }) {
+  yield fetchSingleVm(getSingleVm({ vmId: result.vm.id }))
+  if (poolId) {
+    yield fetchSinglePool(getSinglePool({ poolId }))
+  }
+}
 
-  const params = vmId ? { vmId } : { poolId }
+function* stopProgress ({ vmId, poolId, name, result }) {
+  const actionInProgress = vmId ? vmActionInProgress : poolActionInProgress
   if (result && result.status === 'complete') {
     // do not call 'end of in progress' if successful,
     // since UI will be updated by refresh
     yield delay(5 * 1000)
-    yield fetchSingle(getSingle(params))
+    yield getSingleInstance({ result, poolId })
+
     yield delay(30 * 1000)
-    yield fetchSingle(getSingle(params))
+    yield getSingleInstance({ result, poolId })
   }
 
-  yield put(actionInProgress(Object.assign(params, { name, started: false })))
+  yield put(actionInProgress(Object.assign(vmId ? { vmId } : { poolId }, { name, started: false })))
 }
 
 function* shutdownVm (action) {
