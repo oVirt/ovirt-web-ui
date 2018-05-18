@@ -1,3 +1,4 @@
+import AppConfiguration from '../config'
 import {
   GET_VM,
   GET_BY_PAGE,
@@ -7,8 +8,9 @@ import {
   SET_ADMINISTATOR,
   SET_USER_FILTER_PERMISSION,
   CHECK_TOKEN_EXPIRED,
-  SCHEDULER_FIXED_DELAY,
-} from '../constants'
+  START_SCHEDULER_FIXED_DELAY,
+  STOP_SCHEDULER_FIXED_DELAY,
+} from '../constants/index'
 
 export * from './error'
 export * from './vm'
@@ -27,18 +29,31 @@ export * from './pendingTasks'
 export * from './vnicProfiles'
 export * from './activeRequests'
 
-export function schedulerFixedDelay () {
+export function startSchedulerFixedDelay ({ delayInSeconds } = { delayInSeconds: AppConfiguration.schedulerFixedDelayInSeconds }) {
   return {
-    type: SCHEDULER_FIXED_DELAY,
+    type: START_SCHEDULER_FIXED_DELAY,
+    payload: { delayInSeconds },
+  }
+}
+
+export function stopSchedulerFixedDelay () {
+  return {
+    type: STOP_SCHEDULER_FIXED_DELAY,
     payload: {},
+  }
+}
+
+export function enableScheduler ({ enabled = true }) {
+  return {
+    type: 'ENABLE_SCHEDULER',
+    payload: { enabled },
   }
 }
 
 export function persistState () {
   return {
     type: PERSIST_STATE,
-    payload: {
-    },
+    payload: {},
   }
 }
 

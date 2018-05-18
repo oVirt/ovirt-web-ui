@@ -17,6 +17,7 @@ const initialState = Immutable.fromJS({
   isFilterChecked: false,
   administrator: false,
   usbFilter: null,
+  schedulerEnabled: false,
 })
 
 const config = actionReducer(initialState, {
@@ -49,6 +50,9 @@ const config = actionReducer(initialState, {
   },
   SET_USB_FILTER (state, { payload: { usbFilter } }) {
     return state.set('usbFilter', usbFilter)
+  },
+  ENABLE_SCHEDULER (state, { payload: { enabled } }) {
+    return state.set('schedulerEnabled', enabled)
   },
 }, true)
 

@@ -18,6 +18,9 @@ Selectors = {
   getOvirtVersion () {
     return getState().config.get('oVirtApiVersion')
   },
+  isSchedulerEnabled () {
+    return getState().config.get('schedulerEnabled')
+  },
   // --- icons --
   getAllIcons () {
     return getState().icons
