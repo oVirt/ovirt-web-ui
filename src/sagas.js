@@ -115,7 +115,7 @@ import {
   SAVE_CONSOLE_OPTIONS,
   SELECT_POOL_DETAIL,
   SELECT_VM_DETAIL,
-  SCHEDULER__1_MIN,
+  SCHEDULER_FIXED_DELAY,
   SHUTDOWN_VM,
   START_POOL,
   START_VM,
@@ -678,13 +678,13 @@ function* fetchAllNetworks () {
   }
 }
 
-function* schedulerPerMinute (action) {
-  logDebug('Starting schedulerPerMinute() scheduler')
+function* schedulerWithFixedDelay (action) {
+  logDebug('Starting schedulerWithFixedDelay() scheduler')
 
   // TODO: do we need to stop the loop? Consider takeLatest in the rootSaga 'restarts' the loop if needed
   while (true) {
-    yield delay(60 * 1000) // 1 minute
-    logDebug('schedulerPerMinute() event')
+    yield delay(AppConfiguration.schedulerFixedDelayInSeconds * 1000)
+    logDebug(`schedulerWithFixedDelay() event after delay of ${AppConfiguration.schedulerFixedDelayInSeconds} seconds`)
 
     const oVirtVersion = Selectors.getOvirtVersion()
     if (oVirtVersion.get('passed')) {
@@ -695,7 +695,7 @@ function* schedulerPerMinute (action) {
         page: Selectors.getCurrentPage(),
       }))
     } else {
-      logDebug('schedulerPerMinute() event skipped since oVirt API version does not match')
+      logDebug('schedulerWithFixedDelay() event skipped since oVirt API version does not match')
     }
   }
 }
@@ -714,7 +714,7 @@ export function* rootSaga () {
     takeEvery(LOGOUT, logout),
     takeLatest(CHECK_TOKEN_EXPIRED, doCheckTokenExpired),
 
-    takeEvery(SCHEDULER__1_MIN, schedulerPerMinute),
+    takeEvery(SCHEDULER_FIXED_DELAY, schedulerWithFixedDelay),
     throttle(1000, REFRESH_DATA, refreshData),
 
     throttle(100, GET_BY_PAGE, fetchByPage),

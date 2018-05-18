@@ -9,6 +9,7 @@ const AppConfiguration = {
   applicationContext: '',
   applicationURL: '/',
   pageLimit: 8,
+  schedulerFixedDelayInSeconds: 60,
 
   consoleClientResourcesURL: 'https://www.ovirt.org/documentation/admin-guide/virt/console-client-resources/',
   cockpitPort: '9090',
