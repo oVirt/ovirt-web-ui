@@ -5,8 +5,8 @@ import { connect } from 'react-redux'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { renderRoutes } from 'react-router-config'
 
+import { Grid } from 'patternfly-react'
 import AboutDialog from './components/About'
-import ContainerFluid from './components/ContainerFluid'
 import LoadingData from './components/LoadingData'
 import OptionsDialog from './components/OptionsDialog'
 import OvirtApiCheckFailed from './components/OvirtApiCheckFailed'
@@ -42,9 +42,9 @@ const NoLogin = () => {
 const App = ({ vms, config }) => {
   if (!config.get('loginToken')) { // login is missing
     return (
-      <ContainerFluid>
+      <Grid fluid>
         <NoLogin />
-      </ContainerFluid>
+      </Grid>
     )
   }
 
