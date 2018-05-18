@@ -38,7 +38,7 @@ const getRoutes = (vms) => ([
       },
       {
         path: '/vm/:id',
-        title: (match) => { return vms.getIn(['vms', match.params.id, 'name']) },
+        title: (match) => vms.getIn(['vms', match.params.id, 'name']),
         component: VmDetailPage,
         toolbars: [(match) => (<VmDetailToolbar match={match} key='vmaction' />)],
         routes: [
@@ -53,7 +53,7 @@ const getRoutes = (vms) => ([
 
       {
         path: '/pool/:id',
-        title: (match) => { return vms.getIn(['pools', match.params.id, 'name']) },
+        title: (match) => vms.getIn(['pools', match.params.id, 'name']),
         component: PoolDetailPage,
         toolbars: [(match) => (<PoolDetailToolbar match={match} key='poolaction' />)],
       },

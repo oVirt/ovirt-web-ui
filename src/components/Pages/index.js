@@ -45,11 +45,11 @@ class VmDetailPage extends React.Component {
     if (vms.getIn(['vms', match.params.id])) {
       return (<VmDetail vm={vms.getIn(['vms', match.params.id])} config={config} />)
     } else if (vms.get('loadInProgress')) {
-      console.info(`VmDetailPage: VM id can not be found: ${match.params.id}. Load is still in progress - waiting before redirect`)
+      console.info(`VmDetailPage: VM id cannot be found: ${match.params.id}. Load is still in progress - waiting before redirect`)
       return null
     }
 
-    console.info(`VmDetailPage: VM id can not be found: ${match.params.id}. Redirecting to / `)
+    console.info(`VmDetailPage: VM id cannot be found: ${match.params.id}. Redirecting to / `)
     return <Redirect to='/' />
   }
 }
@@ -136,8 +136,7 @@ const PoolDetailPageConnected = connect(
  */
 class VmDialogPage extends React.Component {
   componentWillMount () {
-    console.info('VmDialogPage will getCDRom()')
-    this.props.getCDRom() // refresh data
+    this.props.getCDRom()
 
     // in case the location is entered from outside, refresh data
     if (this.props.match.params.id) {
@@ -150,11 +149,11 @@ class VmDialogPage extends React.Component {
     if ((match.params.id && vms.getIn(['vms', match.params.id])) || !match.params.id) {
       return (<VmDialog vm={vms.getIn(['vms', match.params.id])} previousPath={previousPath} />)
     } else if (vms.get('loadInProgress')) {
-      console.info(`VmDialogPage: VM id can not be found: ${match.params.id}. Load is still in progress - waiting before redirect`)
+      console.info(`VmDialogPage: VM id cannot be found: ${match.params.id}. Load is still in progress - waiting before redirect`)
       return null
     }
 
-    console.info(`VmDialogPage: VM id can not be found: ${match.params.id}.`)
+    console.info(`VmDialogPage: VM id cannot be found: ${match.params.id}.`)
     return null
   }
 }

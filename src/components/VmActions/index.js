@@ -62,13 +62,18 @@ class VmActions extends React.Component {
       vm,
       pool,
       isOnCard = false,
+      config,
       onStartVm,
       onStartPool,
-      config,
+      onShutdown,
+      onRestart,
+      onForceShutdown,
+      onSuspend,
+      onRemove,
     } = this.props
 
     const isPool = !!pool
-    const isPoolVm = vm.getIn(['pool', 'id'], false) // a Pool VM is different the a Pool (definition)
+    const isPoolVm = !!vm.getIn(['pool', 'id'], false) // a Pool VM is different than a Pool (definition)
     const onStart = (isPool ? onStartPool : onStartVm)
     const status = vm.get('status')
 
@@ -106,7 +111,7 @@ class VmActions extends React.Component {
           popover={({ close }) =>
             <Confirmation
               text={msg.suspendVmQuestion()}
-              okButton={{ label: msg.yes(), click: () => { this.props.onSuspend(); close() } }}
+              okButton={{ label: msg.yes(), click: () => { onSuspend(); close() } }}
               cancelButton={{ label: msg.cancel(), click: () => close() }}
               uniqueId={vm.get('name')} />}
         />
@@ -121,9 +126,9 @@ class VmActions extends React.Component {
           popover={({ close }) =>
             <Confirmation
               text={msg.shutdownVmQuestion()}
-              okButton={{ label: msg.yes(), click: () => { this.props.onShutdown(); close() } }}
+              okButton={{ label: msg.yes(), click: () => { onShutdown(); close() } }}
               cancelButton={{ label: msg.cancel(), click: () => close() }}
-              extraButton={{ label: msg.force(), click: () => { this.props.onForceShutdown(); close() } }}
+              extraButton={{ label: msg.force(), click: () => { onForceShutdown(); close() } }}
               uniqueId={vm.get('name')} />}
         />
 
@@ -137,7 +142,7 @@ class VmActions extends React.Component {
           popover={({ close }) =>
             <Confirmation
               text={msg.rebootVmQuestion()}
-              okButton={{ label: msg.yes(), click: () => { this.props.onRestart(); close() } }}
+              okButton={{ label: msg.yes(), click: () => { onRestart(); close() } }}
               cancelButton={{ label: msg.cancel(), click: () => close() }}
               uniqueId={vm.get('name')} />}
         />
@@ -184,9 +189,9 @@ class VmActions extends React.Component {
                     )}
                   </div>
                 )}
-                okButton={{ label: msg.yes(), click: () => { this.props.onRemove({ force: false, preserveDisks: this.state.removePreserveDisks }); close() } }}
+                okButton={{ label: msg.yes(), click: () => { onRemove({ force: false, preserveDisks: this.state.removePreserveDisks }); close() } }}
                 cancelButton={{ label: msg.cancel(), click: () => close() }}
-                extraButton={{ label: msg.force(), click: () => { this.props.onRemove({ force: true, preserveDisks: this.state.removePreserveDisks }); close() } }}
+                extraButton={{ label: msg.force(), click: () => { onRemove({ force: true, preserveDisks: this.state.removePreserveDisks }); close() } }}
                 uniqueId={vm.get('name')}
               />}
           />
