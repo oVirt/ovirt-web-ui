@@ -1,9 +1,6 @@
 
 import { locale as appLocale } from '../../intl'
-
-function localeCompare (a, b, locale = appLocale) {
-  return a.localeCompare(b, locale, { numeric: true })
-}
+import { localeCompare } from '../../helpers'
 
 /*
  * Sort an Immutable List of Maps (set of disks) for display on the VmDisks list.

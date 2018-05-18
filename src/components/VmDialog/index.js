@@ -7,7 +7,7 @@ import NavigationPrompt from 'react-router-navigation-prompt'
 import Switch from 'react-bootstrap-switch'
 
 import { logDebug, generateUnique, templateNameRenderer } from '../../helpers'
-import { isRunning, transformArrayToObject } from '../utils'
+import { isRunning } from '../utils'
 
 import style from './style.css'
 import sharedStyle from '../sharedStyle.css'
@@ -28,12 +28,6 @@ import { editVm, createVm, setSavedVm } from './actions'
 import { MAX_VM_MEMORY_FACTOR } from '../../constants/index'
 
 import { msg } from '../../intl'
-
-function sortedBy (immutableCollection, sortBy) { // TODO: move to helpers
-  return immutableCollection.sort(
-    (a, b) => a.get(sortBy).localeCompare(b.get(sortBy))
-  )
-}
 
 const zeroUID = '00000000-0000-0000-0000-000000000000'
 const FIRST_DEVICE = 0
@@ -453,13 +447,13 @@ class VmDialog extends React.Component {
     const isoStorages = storages.get('storages').filter(v => v.get('type') === 'iso')
     const idPrefix = `vmdialog-${vm ? vm.get('name') : '_new'}`
 
-    let files = { '': { id: '', value: '[Eject]' } }
+    let files = [{ id: '', value: '[Eject]' }]
 
     isoStorages.toList().forEach(v => {
       if (v.get('files')) {
-        v.get('files').forEach(item => {
-          files[item['id']] = { id: item['id'], value: item['name'] }
-        })
+        files.push(...v.get('files').map(item => (
+          { id: item['id'], value: item['name'] }
+        )))
       }
     })
 
@@ -470,19 +464,16 @@ class VmDialog extends React.Component {
     const isEdit = !!vm
     const isUp = (isEdit && isRunning(vm.get('status')))
 
-    const sortedClusters = sortedBy(clusters.get('clusters'), 'name')
-
     const filteredTemplates = templates.get('templates')
       .filter(template => template.get('clusterId') === this.state.clusterId || !template.get('clusterId'))
 
     const cluster = this.getCluster()
     const architecture = cluster && cluster.get('architecture')
 
-    const sortedOSs = sortedBy(Selectors.getOperatingSystemsByArchitecture(architecture), 'description')
+    const oss = Selectors.getOperatingSystemsByArchitecture(architecture)
     const os = this.getOS()
 
     const template = this.getTemplate()
-    const sortedTemplates = sortedBy(filteredTemplates, 'name')
 
     const cdromFileId = this.getCDRomFileId()
 
@@ -562,7 +553,8 @@ class VmDialog extends React.Component {
                   onChange={this.onChangeCluster}
                   selected={cluster ? cluster.get('id') : ''}
                   idPrefix='select-cluster'
-                  items={sortedClusters.map(item => (
+                  sort
+                  items={clusters.get('clusters').toList().map(item => (
                     { id: item.get('id'), value: item.get('name') }
                   )).toJS()}
                   />
@@ -576,7 +568,8 @@ class VmDialog extends React.Component {
                   onChange={this.onChangeTemplate}
                   selected={template ? template.get('id') : ''}
                   idPrefix='select-template'
-                  items={sortedTemplates.map(item => (
+                  sort
+                  items={filteredTemplates.toList().map(item => (
                     { id: item.get('id'), value: templateNameRenderer(item) }
                   )).toJS()}
                   />
@@ -590,7 +583,8 @@ class VmDialog extends React.Component {
                   onChange={this.onChangeOperatingSystem}
                   selected={os ? os.get('id') : ''}
                   idPrefix='select-os'
-                  items={sortedOSs.map(item => (
+                  sort
+                  items={oss.toList().map(item => (
                     { id: item.get('id'), value: item.get('description') }
                   )).toJS()}
                   />
@@ -639,9 +633,10 @@ class VmDialog extends React.Component {
                   <dd className={style['field-overflow-visible']}>
                     <SelectBox
                       onChange={this.onChangeCD}
-                      selected={cdromFileId}
-                      items={files}
                       idPrefix='select-changecd'
+                      selected={cdromFileId}
+                      sort
+                      items={files}
                       />
                   </dd>
                 </div>
@@ -675,9 +670,9 @@ class VmDialog extends React.Component {
                     onChange={this.onChangeBootDevice(FIRST_DEVICE)}
                     selected={bootDevices[FIRST_DEVICE]}
                     idPrefix='select-first-device'
-                    items={transformArrayToObject(allowedBootDevices.map(item => (
+                    items={allowedBootDevices.map(item => (
                       { id: item, value: msg[`${item}Boot`]() }
-                    )))}
+                    ))}
                     />
                 </dd>
                 <dt className={style['field-shifted']}>
@@ -688,11 +683,11 @@ class VmDialog extends React.Component {
                     onChange={this.onChangeBootDevice(SECOND_DEVICE)}
                     selected={bootDevices[SECOND_DEVICE]}
                     idPrefix='select-second-device'
-                    items={transformArrayToObject([{ id: null, value: '[None]' }, ...allowedBootDevices.filter(item => (
+                    items={[{ id: null, value: '[None]' }, ...allowedBootDevices.filter(item => (
                       item !== bootDevices[FIRST_DEVICE]
                     )).map(item => (
                       { id: item, value: msg[`${item}Boot`]() }
-                    ))])}
+                    ))]}
                     />
                 </dd>
               </div>
