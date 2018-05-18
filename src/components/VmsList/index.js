@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
-import ContainerFluid from '../ContainerFluid'
+import { Grid } from 'patternfly-react'
 import Vms from './Vms'
 import { msg } from '../../intl'
 
@@ -21,7 +21,7 @@ const VmLoading = () => {
 const NoVmAvailable = () => {
   const idPrefix = 'no-vm'
   return (
-    <ContainerFluid>
+    <Grid fluid>
       <div className='blank-slate-pf'>
         <div className='blank-slate-pf-icon'>
           <span className='pficon pficon pficon-add-circle-o' id={`${idPrefix}-icon`} />
@@ -33,7 +33,7 @@ const NoVmAvailable = () => {
           {msg.noVmAvailableForLoggedUser()}
         </p>
       </div>
-    </ContainerFluid>
+    </Grid>
   )
 }
 

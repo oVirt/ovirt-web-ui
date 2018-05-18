@@ -2,9 +2,8 @@ import React from 'react'
 
 import AddVmButton from './components/VmDialog/AddVmButton'
 import PageRouter from './components/PageRouter'
-import { VmDetailToolbar, PoolDetailToolbar } from './components/Toolbar/index'
-import VmsList from './components/VmsList'
-import { VmDetailPage, PoolDetailPage, VmDialogPage } from './components/Pages/index'
+import { VmDetailToolbar, PoolDetailToolbar } from './components/Toolbar'
+import { PoolDetailPage, VmDetailPage, VmDialogPage, VmsPage } from './components/Pages'
 import { msg } from './intl'
 
 /**
@@ -26,10 +25,10 @@ const getRoutes = (vms) => ([
       {
         path: '/',
         exact: true,
-        component: () =>
-          (<VmsList />),
+        component: VmsPage,
         toolbars: [(match) => (<AddVmButton key='addbutton' id={`route-add-vm`} />)],
       },
+
       {
         path: '/vm/add',
         exact: true,
@@ -39,25 +38,22 @@ const getRoutes = (vms) => ([
       },
       {
         path: '/vm/:id',
-        title: (match) => {
-          return vms.getIn(['vms', match.params.id, 'name'])
-        },
+        title: (match) => { return vms.getIn(['vms', match.params.id, 'name']) },
         component: VmDetailPage,
         toolbars: [(match) => (<VmDetailToolbar match={match} key='vmaction' />)],
         routes: [
           {
             path: '/vm/:id/edit',
+            title: (match) => msg.edit(),
             component: VmDialogPage,
-            title: msg.edit(),
             toolbars: [], // Recently not used. When needed, see VmDialog/style.css - .vm-dialog-buttons
           },
         ],
       },
+
       {
         path: '/pool/:id',
-        title: (match) => {
-          return vms.getIn(['pools', match.params.id, 'name'])
-        },
+        title: (match) => { return vms.getIn(['pools', match.params.id, 'name']) },
         component: PoolDetailPage,
         toolbars: [(match) => (<PoolDetailToolbar match={match} key='poolaction' />)],
       },
