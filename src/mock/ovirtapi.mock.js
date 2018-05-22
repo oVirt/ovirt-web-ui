@@ -2,6 +2,8 @@ import AppConfiguration from '../config'
 import { vms, disks, api } from './data.mock'
 import MainApi from '../ovirtapi'
 
+/* eslint prefer-promise-reject-errors: 'off' */
+
 let OvirtApi = {}
 OvirtApi = {
   // ----
