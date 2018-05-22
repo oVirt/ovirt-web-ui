@@ -726,7 +726,7 @@ let sagasFunctions = {
 }
 
 export function *rootSaga () {
-  yield [
+  yield all([
     takeEvery(LOGIN, login),
     takeEvery(LOGOUT, logout),
     takeLatest(CHECK_TOKEN_EXPIRED, doCheckTokenExpired),
@@ -774,5 +774,5 @@ export function *rootSaga () {
     ...newVmDialogSagas,
 
     ...SagasWorkers(sagasFunctions),
-  ]
+  ])
 }
