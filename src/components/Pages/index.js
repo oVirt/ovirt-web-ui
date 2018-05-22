@@ -4,11 +4,22 @@ import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom'
 
 import VmDetail from '../VmDetail'
-import VmDialog from '../VmDialog/index'
-import { selectVmDetail, selectPoolDetail, getISOStorages } from '../../actions/index'
+import VmDialog from '../VmDialog'
+import VmsList from '../VmsList'
 
+import { selectVmDetail, selectPoolDetail, getISOStorages } from '../../actions'
 import Selectors from '../../selectors'
 
+/**
+ * Route component (for PageRouter) to view the list of VMs and Pools
+ */
+const VmsPage = () => {
+  return <VmsList />
+}
+
+/**
+ * Route component (for PageRouter) to view a VM's details
+ */
 class VmDetailPage extends React.Component {
   constructor (props) {
     super(props)
@@ -33,29 +44,40 @@ class VmDetailPage extends React.Component {
     let { match, vms, config } = this.props
     if (vms.getIn(['vms', match.params.id])) {
       return (<VmDetail vm={vms.getIn(['vms', match.params.id])} config={config} />)
-    } else {
-      if (vms.get('loadInProgress')) {
-        console.info('VmDetailPage: VM id can not be found: ', match.params.id, ' . Load is still in progress - wating before redirect')
-        return null
-      }
+    } else if (vms.get('loadInProgress')) {
+      console.info(`VmDetailPage: VM id cannot be found: ${match.params.id}. Load is still in progress - waiting before redirect`)
+      return null
     }
 
-    console.info('VmDetailPage: VM id can not be found: ', match.params.id, ' . Redirecting to / ')
+    console.info(`VmDetailPage: VM id cannot be found: ${match.params.id}. Redirecting to / `)
     return <Redirect to='/' />
   }
 }
-
 VmDetailPage.propTypes = {
   vms: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
-  getVms: PropTypes.func.isRequired,
+
   route: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
   location: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
   previousPath: PropTypes.string.isRequired,
-}
 
+  getVms: PropTypes.func.isRequired,
+}
+const VmDetailPageConnected = connect(
+  (state) => ({
+    vms: state.vms,
+    config: state.config,
+  }),
+  (dispatch) => ({
+    getVms: ({ vmId }) => dispatch(selectVmDetail({ vmId })),
+  })
+)(VmDetailPage)
+
+/**
+ * Route component (for PageRouter) to view a Pool's details
+ */
 class PoolDetailPage extends React.Component {
   constructor (props) {
     super(props)
@@ -78,68 +100,27 @@ class PoolDetailPage extends React.Component {
 
   render () {
     let { match, vms, config } = this.props
+
     if (vms.getIn(['pools', match.params.id, 'vm'])) {
       return (<VmDetail vm={vms.getIn(['pools', match.params.id, 'vm'])} pool={vms.getIn(['pools', match.params.id])} config={config} isPool />)
-    } else {
-      if (vms.get('loadInProgress')) {
-        return null
-      }
+    } else if (vms.get('loadInProgress')) {
+      return null
     }
     return <Redirect to='/' />
   }
 }
-
 PoolDetailPage.propTypes = {
   vms: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
+
+  route: PropTypes.object.isRequired,
+  match: PropTypes.object.isRequired,
+  location: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired,
+  previousPath: PropTypes.string.isRequired,
+
   getPools: PropTypes.func.isRequired,
-  route: PropTypes.object.isRequired,
-  match: PropTypes.object.isRequired,
-  location: PropTypes.object.isRequired,
-  history: PropTypes.object.isRequired,
-  previousPath: PropTypes.string.isRequired,
 }
-
-class VmDialogPage extends React.Component {
-  componentWillMount () {
-    this.props.getCDRom() // refresh data
-    if (this.props.match.params.id) {
-      this.props.getVms({ vmId: this.props.match.params.id }) // refresh data
-
-      // in case the location is entered from outside
-    }
-  }
-
-  render () {
-    let { match, vms, previousPath } = this.props
-    if ((match.params.id && vms.getIn(['vms', match.params.id])) || !match.params.id) {
-      return (<VmDialog vm={vms.getIn(['vms', match.params.id])} previousPath={previousPath} />)
-    }
-    return null
-  }
-}
-
-VmDialogPage.propTypes = {
-  vms: PropTypes.object.isRequired,
-  getVms: PropTypes.func.isRequired,
-  getCDRom: PropTypes.func.isRequired,
-  route: PropTypes.object.isRequired,
-  match: PropTypes.object.isRequired,
-  location: PropTypes.object.isRequired,
-  history: PropTypes.object.isRequired,
-  previousPath: PropTypes.string.isRequired,
-}
-
-const VmDetailPageConnected = connect(
-  (state) => ({
-    vms: state.vms,
-    config: state.config,
-  }),
-  (dispatch) => ({
-    getVms: ({ vmId }) => dispatch(selectVmDetail({ vmId })),
-  })
-)(VmDetailPage)
-
 const PoolDetailPageConnected = connect(
   (state) => ({
     vms: state.vms,
@@ -150,13 +131,51 @@ const PoolDetailPageConnected = connect(
   })
 )(PoolDetailPage)
 
+/**
+ * Route component (for PageRouter) to edit a VM
+ */
+class VmDialogPage extends React.Component {
+  componentWillMount () {
+    this.props.getCDRom()
+
+    // in case the location is entered from outside, refresh data
+    if (this.props.match.params.id) {
+      this.props.getVms({ vmId: this.props.match.params.id })
+    }
+  }
+
+  render () {
+    let { match, vms, previousPath } = this.props
+    if ((match.params.id && vms.getIn(['vms', match.params.id])) || !match.params.id) {
+      return (<VmDialog vm={vms.getIn(['vms', match.params.id])} previousPath={previousPath} />)
+    } else if (vms.get('loadInProgress')) {
+      console.info(`VmDialogPage: VM id cannot be found: ${match.params.id}. Load is still in progress - waiting before redirect`)
+      return null
+    }
+
+    console.info(`VmDialogPage: VM id cannot be found: ${match.params.id}.`)
+    return null
+  }
+}
+VmDialogPage.propTypes = {
+  vms: PropTypes.object.isRequired,
+
+  route: PropTypes.object.isRequired,
+  match: PropTypes.object.isRequired,
+  location: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired,
+  previousPath: PropTypes.string.isRequired,
+
+  getCDRom: PropTypes.func.isRequired,
+  getVms: PropTypes.func.isRequired,
+}
 const VmDialogPageConnected = connect(
   (state) => ({
     vms: state.vms,
   }),
   (dispatch) => ({
-    getVms: ({ vmId }) => dispatch(selectVmDetail({ vmId })),
     getCDRom: () => dispatch(getISOStorages()),
+    getVms: ({ vmId }) => dispatch(selectVmDetail({ vmId })),
   })
 )(VmDialogPage)
 
@@ -164,4 +183,5 @@ export {
   PoolDetailPageConnected as PoolDetailPage,
   VmDetailPageConnected as VmDetailPage,
   VmDialogPageConnected as VmDialogPage,
+  VmsPage,
 }

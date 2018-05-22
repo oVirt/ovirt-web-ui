@@ -22,7 +22,6 @@ import VmIcon from '../VmIcon'
 
 import Selectors from '../../selectors'
 
-import { closeDialog } from '../../actions/index'
 import { editVm, createVm, setSavedVm } from './actions'
 
 import { MAX_VM_MEMORY_FACTOR } from '../../constants/index'
@@ -73,7 +72,6 @@ class VmDialog extends React.Component {
       },
     }
 
-    this.closeDialog = this.closeDialog.bind(this)
     this.submitHandler = this.submitHandler.bind(this)
     this.initDefaults = this.initDefaults.bind(this)
     this.onIntegerChanged = this.onIntegerChanged.bind(this)
@@ -219,11 +217,6 @@ class VmDialog extends React.Component {
       cloudInit: this.state.cloudInit,
       'status': this.props.vm ? this.props.vm.get('status') : '',
     }
-  }
-
-  closeDialog (e) {
-    e.preventDefault()
-    this.props.onCloseDialog()
   }
 
   onChangeVmName (event) {
@@ -730,7 +723,6 @@ VmDialog.propTypes = {
   storages: PropTypes.object.isRequired,
   previousPath: PropTypes.string.isRequired,
 
-  onCloseDialog: PropTypes.func.isRequired,
   addVm: PropTypes.func.isRequired,
   updateVm: PropTypes.func.isRequired,
   onInit: PropTypes.func.isRequired,
@@ -748,7 +740,6 @@ export default connect(
     storages: state.storages,
   }),
   (dispatch) => ({
-    onCloseDialog: () => dispatch(closeDialog({ force: false })),
     addVm: (vm, actionUniqueId, page) => dispatch(createVm(vm, actionUniqueId, page)),
     updateVm: (vm, actionUniqueId) => dispatch(editVm(vm, actionUniqueId)),
     onInit: () => dispatch(setSavedVm({ vm: null })),

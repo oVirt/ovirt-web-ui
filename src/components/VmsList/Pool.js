@@ -2,11 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
-import {
-  Link,
-  NavLink,
-  withRouter,
-} from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 
 import style from './style.css'
 
@@ -20,60 +16,53 @@ import { startPool } from '../../actions'
 import { getOsHumanName } from '../utils'
 
 /**
- * Single icon-card in the list
+ * Single icon-card in the list for a Pool
  */
-class Pool extends React.Component {
-  render () {
-    let { pool, icons, visibility, onStart } = this.props
-    const idPrefix = `pool-${pool.get('name')}`
-    const state = pool.get('status')
+const Pool = ({ pool, icons, onStart }) => {
+  const idPrefix = `pool-${pool.get('name')}`
+  const state = pool.get('status')
+  const osName = getOsHumanName(pool.getIn(['vm', 'os', 'type']))
+  const iconId = pool.getIn(['vm', 'icons', 'large', 'id'])
+  const icon = icons.get(iconId)
 
-    const iconId = pool.getIn(['vm', 'icons', 'large', 'id'])
-    const osName = getOsHumanName(pool.getIn(['vm', 'os', 'type']))
-    const icon = icons.get(iconId)
-    const isSelected = pool.get('id') === visibility.get('selectedPoolDetail')
-
-    return (
-      <div className={`col-xs-12 col-sm-6 col-md-4 col-lg-3 ${isSelected ? style['selectedPool'] : ''}`}>
-        <div className='card-pf card-pf-view card-pf-view-select card-pf-view-single-select'>
-          <div className='card-pf-body'>
-            <div className={`card-pf-top-element ${style['card-icon']}`}>
-              <Link to={`/pool/${pool.get('id')}`}>
-                <VmIcon icon={icon} className={style['card-pf-icon']}
-                  missingIconClassName='fa fa-birthday-cake card-pf-icon-circle' />
-              </Link>
-              <div>
-                <span className={style['operating-system-label']}>{ osName }</span>
-              </div>
+  return (
+    <div className={`col-xs-12 col-sm-6 col-md-4 col-lg-3`}>
+      <div className='card-pf card-pf-view card-pf-view-select card-pf-view-single-select'>
+        <div className='card-pf-body'>
+          <div className={`card-pf-top-element ${style['card-icon']}`}>
+            <Link to={`/pool/${pool.get('id')}`}>
+              <VmIcon icon={icon} className={style['card-pf-icon']}
+                missingIconClassName='fa fa-birthday-cake card-pf-icon-circle' />
+            </Link>
+            <div>
+              <span className={style['operating-system-label']}>{ osName }</span>
             </div>
-            <h2 className='card-pf-title text-center'>
-              <NavLink to={`/pool/${pool.get('id')}`} className={style['vm-detail-link']}>
-                <p className={[style['vm-name'], style['crop']].join(' ')} title={pool.get('name')} data-toggle='tooltip' id={`${idPrefix}-status-name`}>
-                  <VmStatusIcon state={state} />&nbsp;{pool.get('name')}
-                </p>
-              </NavLink>
-            </h2>
-
-            <VmActions vm={pool.get('vm')} isOnCard isPool onStart={onStart} pool={pool} />
-            <VmStatusText vm={pool.get('vm')} />
-
           </div>
+
+          <h2 className='card-pf-title text-center'>
+            <Link to={`/pool/${pool.get('id')}`} className={style['vm-detail-link']}>
+              <p className={`${style['vm-name']} ${style['crop']}`} title={pool.get('name')} data-toggle='tooltip' id={`${idPrefix}-status-name`}>
+                <VmStatusIcon state={state} />&nbsp;{pool.get('name')}
+              </p>
+            </Link>
+          </h2>
+
+          <VmActions isOnCard vm={pool.get('vm')} onStart={onStart} pool={pool} />
+          <VmStatusText vm={pool.get('vm')} />
         </div>
       </div>
-    )
-  }
+    </div>
+  )
 }
 Pool.propTypes = {
   pool: PropTypes.object.isRequired,
   icons: PropTypes.object.isRequired,
   onStart: PropTypes.func.isRequired,
-  visibility: PropTypes.object.isRequired,
 }
 
 export default withRouter(connect(
   (state) => ({
     icons: state.icons,
-    visibility: state.visibility,
   }),
   (dispatch, { pool }) => ({
     onStart: () => dispatch(startPool({ poolId: pool.get('id') })),
