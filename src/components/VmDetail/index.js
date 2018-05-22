@@ -314,20 +314,16 @@ class VmDetail extends Component {
                     <FieldHelp content={msg.bootSequenceTooltip()} text={msg.bootSequence()} />
                   </dt>
                   <dd />
-                  <div>
-                    {
-                      vm.getIn(['os', 'bootDevices']).map((device, key) =>
-                        <React.Fragment>
-                          <dt className={style['field-shifted']}>
-                            <FieldHelp content={msg[`${sequence[key]}DeviceTooltip`]()} text={msg[`${sequence[key]}Device`]()} />
-                          </dt>
-                          <dd>
-                            {msg[`${device}Boot`]()}
-                          </dd>
-                        </React.Fragment>
-                      )
-                    }
-                  </div>
+                  {vm.getIn(['os', 'bootDevices']).map((device, key) =>
+                    <React.Fragment key={key}>
+                      <dt className={style['field-shifted']}>
+                        <FieldHelp content={msg[`${sequence[key]}DeviceTooltip`]()} text={msg[`${sequence[key]}Device`]()} />
+                      </dt>
+                      <dd>
+                        {msg[`${device}Boot`]()}
+                      </dd>
+                    </React.Fragment>
+                  )}
                   <dt>
                     <FieldHelp content={msg.cloudInitTooltip()} text={msg.cloudInit()} />
                   </dt>
