@@ -47,4 +47,3 @@ export function loginFailed ({ errorCode, message }) {
     },
   }
 }
-

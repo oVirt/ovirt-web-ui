@@ -63,10 +63,10 @@ class VmNic extends React.Component {
           </span>
           {
             showSettings
-            ? (<Button bsStyle='default' bsSize='small' onClick={this.handleOpenDialog}>
-              {msg.delete()}
-            </Button>)
-            : null
+              ? (<Button bsStyle='default' bsSize='small' onClick={this.handleOpenDialog}>
+                {msg.delete()}
+              </Button>)
+              : null
           }
           <DeleteConfirmationModal show={this.state.showDeleteModal} onDelete={this.handleDelete} onClose={this.handleClose}>
             <p dangerouslySetInnerHTML={{ __html: msg.areYouSureYouWantToDeleteNic({ nicName: `"<strong>${this.props.nic.get('name')}</strong>"` }) }} />

@@ -4,7 +4,7 @@ import { ADD_NEW_VM, EDIT_VM } from './constants'
 import { setSavedVm } from './actions'
 import Api from '../../ovirtapi'
 
-function* createNewVm (sagas, action) {
+function * createNewVm (sagas, action) {
   const result = yield sagas.callExternalAction('addNewVm', Api.addNewVm, action)
   if (!result.error) {
     yield put(refresh({ page: action.payload.page }))
@@ -12,7 +12,7 @@ function* createNewVm (sagas, action) {
   }
 }
 
-function* editVm (sagas, action) {
+function * editVm (sagas, action) {
   const result = yield sagas.callExternalAction('editVm', Api.editVm, action)
   if (!result.error) {
     const result2 = yield sagas.callExternalAction('changeCD', Api.changeCD, {

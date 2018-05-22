@@ -3,11 +3,11 @@ import { SAVE_SSH_KEY, GET_SSH_KEY } from './constants'
 import { setSSHKey, setUnloaded } from './actions'
 import Api from '../../ovirtapi'
 
-function* saveSSHKey (sagas, action) {
+function * saveSSHKey (sagas, action) {
   yield sagas.callExternalAction('saveSSHKey', Api.saveSSHKey, action)
 }
 
-function* getSSHKey (sagas, action) {
+function * getSSHKey (sagas, action) {
   yield put(setUnloaded())
   const result = yield sagas.callExternalAction('getSSHKey', Api.getSSHKey, action)
   if (result.error) {

@@ -11,7 +11,7 @@ import {
 } from './actions'
 import { extractErrorText } from '../../actions'
 
-function* createDiskForVm (action) {
+function * createDiskForVm (action) {
   yield put(setNewDiskDialogProgressIndicator(true))
   const vmId = action.payload.vmId
   const result = yield callExternalAction('addDiskAttachment', Api.addDiskAttachment, action)

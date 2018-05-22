@@ -53,7 +53,7 @@ function adjustVVFile ({ data, options, usbFilter, isSpice }) {
   return data
 }
 
-export function* downloadVmConsole (action) {
+export function * downloadVmConsole (action) {
   let { vmId, consoleId, usbFilter } = action.payload
 
   let isSpice = false
@@ -90,24 +90,24 @@ export function* downloadVmConsole (action) {
   }
 }
 
-export function* getConsoleOptions (action) {
+export function * getConsoleOptions (action) {
   const options = OptionsManager.loadConsoleOptions(action.payload)
   yield put(setConsoleOptions({ vmId: action.payload.vmId, options }))
   return options
 }
 
-export function* saveConsoleOptions (action) {
+export function * saveConsoleOptions (action) {
   OptionsManager.saveConsoleOptions(action.payload)
   yield getConsoleOptions(getConsoleOptionsAction({ vmId: action.payload.vmId }))
 }
 
-export function* getRDPVm (action) {
+export function * getRDPVm (action) {
   const rdpBuilder = new RDPBuilder(action.payload)
   const data = rdpBuilder.buildRDP()
   fileDownload({ data, fileName: 'console.rdp', mimeType: 'application/rdp' })
 }
 
-export function* fetchConsoleVmMeta ({ vmId }) {
+export function * fetchConsoleVmMeta ({ vmId }) {
   const consoles = yield callExternalAction('consoles', Api.consoles, { type: 'INTERNAL_CONSOLES', payload: { vmId } })
 
   if (consoles && consoles['graphics_console']) { // && consoles['graphics_console'].length > 0) {

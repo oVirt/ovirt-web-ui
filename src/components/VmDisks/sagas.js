@@ -6,7 +6,7 @@ import { callExternalAction, delay } from '../../saga/utils'
 import { fetchDisks } from '../../sagas'
 import { addDiskRemovalPendingTask, removeDiskRemovalPendingTask } from '../../actions'
 
-function* removeDisk (action) {
+function * removeDisk (action) {
   const diskId = action.payload.diskId
   const vmToRefreshId = action.payload.vmToRefreshId
   const result = yield callExternalAction('removeDisk', Api.removeDisk, { payload: diskId })

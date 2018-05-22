@@ -158,8 +158,8 @@ class VmDetail extends Component {
       <small className={style.editPencilLink}>
         {
           diskEditAllowed
-          ? (<a href='#' onClick={this.editDisks} id={`${idPrefix}-edit-disks`}>{pencilIcon}</a>)
-          : (<FieldHelp content={msg.notEditableForPoolsOrPoolVms()} text={pencilIcon} />)
+            ? (<a href='#' onClick={this.editDisks} id={`${idPrefix}-edit-disks`}>{pencilIcon}</a>)
+            : (<FieldHelp content={msg.notEditableForPoolsOrPoolVms()} text={pencilIcon} />)
         }
       </small>)
 
@@ -205,14 +205,14 @@ class VmDetail extends Component {
       onIconChange={this.handleIconChange}
       onIconDefault={this.handleIconChangeToDefault}
       showEdit
-      />)
+    />)
 
     if (isPool) {
       vmIcon = <VmIcon
         icon={icon}
         missingIconClassName='pficon pficon-virtual-machine'
         className={sharedStyle['vm-detail-icon']}
-        />
+      />
     }
 
     return (

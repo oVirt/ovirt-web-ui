@@ -17,7 +17,7 @@ import {
 
 export const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
-export function* callExternalAction (methodName, method, action, canBeMissing = false) {
+export function * callExternalAction (methodName, method, action, canBeMissing = false) {
   try {
     logDebug(`External action ${methodName}() starts on ${JSON.stringify(hidePassword({ action }))}`)
     const result = yield call(method, action.payload)
@@ -46,7 +46,7 @@ export function* callExternalAction (methodName, method, action, canBeMissing = 
   }
 }
 
-export function* waitTillEqual (leftArg, rightArg, limit) {
+export function * waitTillEqual (leftArg, rightArg, limit) {
   let counter = limit
 
   const left = typeof leftArg === 'function' ? leftArg : () => leftArg

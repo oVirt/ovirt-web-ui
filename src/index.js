@@ -16,15 +16,6 @@ import 'patternfly/dist/css/patternfly-additions.css'
 import * as branding from './branding'
 import { getSelectedMessages, locale } from './intl/index'
 
-// Patternfly dependencies
-// jQuery needs to be globally available (webpack.ProvidePlugin can be also used for this)
-window.$ = window.jQuery = require('jquery')
-require('bootstrap/dist/js/bootstrap')
-window.patternfly = {}
-window.patternfly = require('patternfly/dist/js/patternfly')
-window.selectpicker = require('bootstrap-select/js/bootstrap-select.js')
-window.combobox = require('patternfly-bootstrap-combobox/js/bootstrap-combobox.js')
-
 import store, { sagaMiddleware } from './store'
 import Selectors from './selectors'
 import AppConfiguration, { readConfiguration } from './config'
@@ -34,6 +25,15 @@ import { rootSaga } from './sagas'
 import { login, updateIcons, setDomain, schedulerOneMinute } from './actions'
 
 import App from './App'
+
+// Patternfly dependencies
+// jQuery needs to be globally available (webpack.ProvidePlugin can be also used for this)
+window.$ = window.jQuery = require('jquery')
+require('bootstrap/dist/js/bootstrap')
+window.patternfly = {}
+window.patternfly = require('patternfly/dist/js/patternfly')
+window.selectpicker = require('bootstrap-select/js/bootstrap-select.js')
+window.combobox = require('patternfly-bootstrap-combobox/js/bootstrap-combobox.js')
 
 function renderApp () {
   ReactDOM.render(

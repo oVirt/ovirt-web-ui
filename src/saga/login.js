@@ -48,7 +48,7 @@ import {
   downloadVmConsole,
 } from './consoles'
 
-export function* login (action) {
+export function * login (action) {
   yield put(loadInProgress({ value: true }))
 
   let token = action.payload.token // the user is already logged in via oVirt SSO
@@ -89,7 +89,7 @@ export function* login (action) {
   }
 }
 
-export function* doCheckTokenExpired (action) {
+export function * doCheckTokenExpired (action) {
   try {
     yield call(Api.getOvirtApiMeta, action.payload)
     console.info('doCheckTokenExpired(): token is still valid') // info level: to pair former HTTP 401 error message with updated information
@@ -139,7 +139,7 @@ export function compareVersion (actual, required) {
   return false
 }
 
-function* checkOvirtApiVersion (oVirtMeta) {
+function * checkOvirtApiVersion (oVirtMeta) {
   if (!(oVirtMeta && oVirtMeta['product_info'] && oVirtMeta['product_info']['version'] &&
       oVirtMeta['product_info']['version']['major'] && oVirtMeta['product_info']['version']['minor'])) {
     console.error('Incompatible oVirt API version: ', oVirtMeta)
@@ -166,11 +166,11 @@ function* checkOvirtApiVersion (oVirtMeta) {
   return passed
 }
 
-export function* logout () {
+export function * logout () {
   window.location.href = `${AppConfiguration.applicationURL}/sso/logout`
 }
 
-function* autoConnectCheck (action) {
+function * autoConnectCheck (action) {
   const vmId = OptionsManager.loadAutoConnectOption()
   if (vmId && vmId.length > 0) {
     const vm = yield callExternalAction('getVm', Api.getVm, getSingleVm({ vmId }), true)
@@ -185,7 +185,7 @@ function* autoConnectCheck (action) {
   }
 }
 
-function* initialLoad () {
+function * initialLoad () {
   yield put(getAllClusters()) // no shallow
   yield put(getAllHosts())
   yield put(getAllOperatingSystems())
@@ -196,7 +196,7 @@ function* initialLoad () {
   yield put(getByPage({ page: 1 })) // first page of VMs list
 }
 
-function* fetchPermissionWithoutFilter (action) {
+function * fetchPermissionWithoutFilter (action) {
   const data = yield callExternalAction('checkFilter', Api.checkFilter, { action: 'CHECK_FILTER' }, true)
 
   const isAdmin = data.error === undefined
