@@ -1115,6 +1115,10 @@ bootstrap-select@1.13.1:
   version "1.13.1"
   resolved "https://registry.yarnpkg.com/bootstrap-select/-/bootstrap-select-1.13.1.tgz#f59c02926fb5ac6356b9d1cdbc5384c2f013d9ba"
 
+bootstrap-slider-without-jquery@^10.0.0:
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/bootstrap-slider-without-jquery/-/bootstrap-slider-without-jquery-10.0.0.tgz#5c304461b3b915037c7c118806c8ca08102f5de3"
+
 bootstrap-slider@^9.9.0:
   version "9.10.0"
   resolved "https://registry.yarnpkg.com/bootstrap-slider/-/bootstrap-slider-9.10.0.tgz#1103d6bc00cfbfa8cfc9a2599ab518c55643da3f"
@@ -1127,9 +1131,13 @@ bootstrap-touchspin@~3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/bootstrap-touchspin/-/bootstrap-touchspin-3.1.1.tgz#9779deac72aaf577e5e762b8512c747c871d9597"
 
-bootstrap@3.3.7, bootstrap@3.3.x, bootstrap@^3.3, bootstrap@~3.3.7:
+bootstrap@3.3.x, bootstrap@^3.3, bootstrap@~3.3.7:
   version "3.3.7"
   resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-3.3.7.tgz#5a389394549f23330875a3b150656574f8a9eb71"
+
+bootstrap@4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-4.1.1.tgz#3aec85000fa619085da8d2e4983dfd67cf2114cb"
 
 brace-expansion@^1.1.7:
   version "1.1.11"
@@ -1723,6 +1731,10 @@ crypto-browserify@~3.2.6:
 css-color-names@0.0.4:
   version "0.0.4"
   resolved "https://registry.yarnpkg.com/css-color-names/-/css-color-names-0.0.4.tgz#808adc2e79cf84738069b646cb20ec27beb629e0"
+
+css-element-queries@^1.0.1:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/css-element-queries/-/css-element-queries-1.0.2.tgz#a32edfee4a5023688ef4d45f402077306d51d44c"
 
 css-loader@0.24.0:
   version "0.24.0"
@@ -4241,10 +4253,6 @@ lodash.merge@^4.6.0:
   version "4.6.1"
   resolved "https://registry.yarnpkg.com/lodash.merge/-/lodash.merge-4.6.1.tgz#adc25d9cb99b9391c59624f379fbba60d7111d54"
 
-lodash.orderby@^4.6.0:
-  version "4.6.0"
-  resolved "https://registry.yarnpkg.com/lodash.orderby/-/lodash.orderby-4.6.0.tgz#e697f04ce5d78522f54d9338b32b81a3393e4eb3"
-
 lodash.pickby@^4.0.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/lodash.pickby/-/lodash.pickby-4.6.0.tgz#7dea21d8c18d7703a27c704c15d3b84a67e33aff"
@@ -5011,57 +5019,28 @@ patternfly-bootstrap-treeview@~2.1.0:
     bootstrap "3.3.x"
     jquery ">= 2.1.x"
 
-patternfly-react@1.10.1:
-  version "1.10.1"
-  resolved "https://registry.yarnpkg.com/patternfly-react/-/patternfly-react-1.10.1.tgz#fc9c1c856d7d0e56c14c2da4b2959ae1831b072c"
+patternfly-react@2.3.4:
+  version "2.3.4"
+  resolved "https://registry.yarnpkg.com/patternfly-react/-/patternfly-react-2.3.4.tgz#6fd9697617b5cbb4f0400ce5eef1a2fce2b01f20"
   dependencies:
+    bootstrap-slider-without-jquery "^10.0.0"
     breakjs "^1.0.0"
     classnames "^2.2.5"
-    patternfly "^3.38.0"
-    react-bootstrap "^0.31.5"
+    css-element-queries "^1.0.1"
+    patternfly "^3.42.0"
+    react-bootstrap "^0.32.1"
     react-bootstrap-switch "^15.5.3"
     react-c3js "^0.1.20"
     react-fontawesome "^1.6.1"
-    reactabular-table "^8.12.0"
+    reactabular-table "^8.13.0"
     recompose "^0.26.0"
   optionalDependencies:
-    lodash.orderby "^4.6.0"
     sortabular "^1.5.1"
     table-resolver "^3.2.0"
 
-patternfly@3.46.2:
+patternfly@3.46.2, patternfly@^3.42.0:
   version "3.46.2"
   resolved "https://registry.yarnpkg.com/patternfly/-/patternfly-3.46.2.tgz#3806c76452a40106f1c822b369b6c5cc382a7a98"
-  dependencies:
-    bootstrap "~3.3.7"
-    font-awesome "^4.7.0"
-    jquery "~3.2.1"
-  optionalDependencies:
-    bootstrap-datepicker "^1.7.1"
-    bootstrap-sass "^3.3.7"
-    bootstrap-select "1.12.2"
-    bootstrap-slider "^9.9.0"
-    bootstrap-switch "~3.3.4"
-    bootstrap-touchspin "~3.1.1"
-    c3 "~0.4.11"
-    d3 "~3.5.17"
-    datatables.net "^1.10.15"
-    datatables.net-colreorder "^1.4.1"
-    datatables.net-colreorder-bs "~1.3.2"
-    datatables.net-select "~1.2.0"
-    drmonty-datatables-colvis "~1.1.2"
-    eonasdan-bootstrap-datetimepicker "^4.17.47"
-    font-awesome-sass "^4.7.0"
-    google-code-prettify "~1.0.5"
-    jquery-match-height "^0.7.2"
-    moment "^2.19.1"
-    moment-timezone "^0.4.1"
-    patternfly-bootstrap-combobox "~1.1.7"
-    patternfly-bootstrap-treeview "~2.1.0"
-
-patternfly@^3.38.0:
-  version "3.46.0"
-  resolved "https://registry.yarnpkg.com/patternfly/-/patternfly-3.46.0.tgz#926ace762cba19dea8e11b680c739250266ba0b4"
   dependencies:
     bootstrap "~3.3.7"
     font-awesome "^4.7.0"
@@ -5137,6 +5116,10 @@ po2json@^0.4.5:
   dependencies:
     gettext-parser "1.1.0"
     nomnom "1.8.1"
+
+popper.js@^1.14.3:
+  version "1.14.3"
+  resolved "https://registry.yarnpkg.com/popper.js/-/popper.js-1.14.3.tgz#1438f98d046acf7b4d78cd502bf418ac64d4f095"
 
 posix-character-classes@^0.1.0:
   version "0.1.1"
@@ -5564,7 +5547,7 @@ react-bootstrap-switch@15.5.3, react-bootstrap-switch@^15.5.3:
   version "15.5.3"
   resolved "https://registry.yarnpkg.com/react-bootstrap-switch/-/react-bootstrap-switch-15.5.3.tgz#97287791d4ec0d1892d142542e7e5248002b1251"
 
-react-bootstrap@0.32.1:
+react-bootstrap@0.32.1, react-bootstrap@^0.32.1:
   version "0.32.1"
   resolved "https://registry.yarnpkg.com/react-bootstrap/-/react-bootstrap-0.32.1.tgz#60624c1b48a39d773ef6cce6421a4f33ecc166bb"
   dependencies:
@@ -5578,21 +5561,6 @@ react-bootstrap@0.32.1:
     react-overlays "^0.8.0"
     react-prop-types "^0.4.0"
     react-transition-group "^2.0.0"
-    uncontrollable "^4.1.0"
-    warning "^3.0.0"
-
-react-bootstrap@^0.31.5:
-  version "0.31.5"
-  resolved "https://registry.yarnpkg.com/react-bootstrap/-/react-bootstrap-0.31.5.tgz#57040fa8b1274e1e074803c21a1b895fdabea05a"
-  dependencies:
-    babel-runtime "^6.11.6"
-    classnames "^2.2.5"
-    dom-helpers "^3.2.0"
-    invariant "^2.2.1"
-    keycode "^2.1.2"
-    prop-types "^15.5.10"
-    prop-types-extra "^1.0.1"
-    react-overlays "^0.7.4"
     uncontrollable "^4.1.0"
     warning "^3.0.0"
 
@@ -5646,16 +5614,6 @@ react-intl@2.4.0:
 react-is@^16.3.2:
   version "16.3.2"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.3.2.tgz#f4d3d0e2f5fbb6ac46450641eb2e25bf05d36b22"
-
-react-overlays@^0.7.4:
-  version "0.7.4"
-  resolved "https://registry.yarnpkg.com/react-overlays/-/react-overlays-0.7.4.tgz#ef2ec652c3444ab8aa014262b18f662068e56d5c"
-  dependencies:
-    classnames "^2.2.5"
-    dom-helpers "^3.2.1"
-    prop-types "^15.5.10"
-    prop-types-extra "^1.0.1"
-    warning "^3.0.0"
 
 react-overlays@^0.8.0:
   version "0.8.3"
@@ -5742,9 +5700,9 @@ react@16.3.2:
     object-assign "^4.1.1"
     prop-types "^15.6.0"
 
-reactabular-table@^8.12.0:
-  version "8.13.0"
-  resolved "https://registry.yarnpkg.com/reactabular-table/-/reactabular-table-8.13.0.tgz#d960798c089c2b59b0eda8f6930e46c8dea09b4a"
+reactabular-table@^8.13.0:
+  version "8.14.0"
+  resolved "https://registry.yarnpkg.com/reactabular-table/-/reactabular-table-8.14.0.tgz#2ce05de47d499db91678fa9518505ea509bf3d7f"
   dependencies:
     classnames "^2.2.5"
 
