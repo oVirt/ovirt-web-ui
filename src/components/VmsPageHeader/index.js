@@ -40,12 +40,11 @@ const VmsPageHeader = ({ onRefresh }) => {
   )
 }
 VmsPageHeader.propTypes = {
-  page: PropTypes.number.isRequired,
   onRefresh: PropTypes.func.isRequired,
 }
 
 export default connect(
-  (state) => ({ }),
+  () => ({ }),
   (dispatch, { page }) => ({
     onRefresh: () => dispatch(refresh({ quiet: false, shallowFetch: false, page })),
   })

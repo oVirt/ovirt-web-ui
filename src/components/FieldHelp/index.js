@@ -69,7 +69,6 @@ FieldHelp.propTypes = {
   tooltip: PropTypes.string, // tooltip shown when hovering the text
   children: PropTypes.any,
   container: PropTypes.any,
-  getParentPosition: PropTypes.func,
 }
 
 export default FieldHelp

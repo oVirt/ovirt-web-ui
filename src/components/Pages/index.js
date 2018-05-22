@@ -56,13 +56,7 @@ class VmDetailPage extends React.Component {
 VmDetailPage.propTypes = {
   vms: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
-
-  route: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
-  location: PropTypes.object.isRequired,
-  history: PropTypes.object.isRequired,
-  previousPath: PropTypes.string.isRequired,
-
   getVms: PropTypes.func.isRequired,
 }
 const VmDetailPageConnected = connect(
@@ -112,13 +106,7 @@ class PoolDetailPage extends React.Component {
 PoolDetailPage.propTypes = {
   vms: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
-
-  route: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
-  location: PropTypes.object.isRequired,
-  history: PropTypes.object.isRequired,
-  previousPath: PropTypes.string.isRequired,
-
   getPools: PropTypes.func.isRequired,
 }
 const PoolDetailPageConnected = connect(
@@ -159,11 +147,7 @@ class VmDialogPage extends React.Component {
 }
 VmDialogPage.propTypes = {
   vms: PropTypes.object.isRequired,
-
-  route: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
-  location: PropTypes.object.isRequired,
-  history: PropTypes.object.isRequired,
   previousPath: PropTypes.string.isRequired,
 
   getCDRom: PropTypes.func.isRequired,

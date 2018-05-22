@@ -6,7 +6,7 @@ function customizeErrorMessage (message) {
 }
 
 export function extractErrorText (exception) {
-  return (exception.responseJSON && (exception.responseJSON.detail || exception.responseJSON.fault && exception.responseJSON.fault.detail))
+  return (exception.responseJSON && (exception.responseJSON.detail || (exception.responseJSON.fault && exception.responseJSON.fault.detail)))
     ? (exception.responseJSON.detail || exception.responseJSON.fault.detail)
     : (exception.statusText || 'UNKNOWN')
 }

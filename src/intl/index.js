@@ -143,7 +143,7 @@ function removeMessageDescription (messages: { [MessageIdType]: MessageType }): 
 
 const defaultMessages: { [MessageIdType]: string } = removeMessageDescription(messages)
 
-function createIdsMap (messages: typeof messages): { [MessageIdType]: MessageIdType } {
+function createIdsMap (messages: any): { [MessageIdType]: MessageIdType } {
   return Object.keys(messages)
     .reduce((sum, key) => Object.assign(sum, { [key]: key }), {})
 }
@@ -159,7 +159,7 @@ function createIdsMap (messages: typeof messages): { [MessageIdType]: MessageIdT
  */
 export const msgId: {[MessageIdType]: MessageIdType} = createIdsMap(messages)
 
-function createFormattingFunctionsMap (messages: typeof messages): {[MessageIdType]: ((?Object) => string)} {
+function createFormattingFunctionsMap (messages: any): {[MessageIdType]: ((?Object) => string)} {
   return Object.keys(messages)
     .reduce((sum, key) => Object.assign(sum, { [key]: (values) => formatMessage(key, values) }), {})
 }

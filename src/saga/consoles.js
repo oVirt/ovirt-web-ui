@@ -26,13 +26,13 @@ function adjustVVFile ({ data, options, usbFilter, isSpice }) {
   // logDebug('adjustVVFile data before: ', data)
   logDebug('adjustVVFile options: ', options)
 
-  if (options && (options.get && options.get('fullscreen') || options.fullscreen)) {
+  if (options && ((options.get && options.get('fullscreen')) || options.fullscreen)) {
     data = data.replace(/^fullscreen=0/mg, 'fullscreen=1')
   }
 
   const pattern = /^secure-attention=.*$/mg
   let text = 'secure-attention=ctrl+alt+del'
-  if (options && (options.get && options.get('ctrlAltDelToEnd') || options.ctrlAltDelToEnd)) {
+  if (options && ((options.get && options.get('ctrlAltDelToEnd')) || options.ctrlAltDelToEnd)) {
     text = 'secure-attention=ctrl+alt+end'
   }
   if (data.match(pattern)) {
