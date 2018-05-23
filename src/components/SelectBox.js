@@ -6,8 +6,7 @@ import style from './sharedStyle.css'
 const NOBREAK_SPACE = '\u00A0'
 
 function getSelectedId (props) {
-  return props.selected ||
-    Object.values(props.items)[0] && Object.values(props.items)[0].id
+  return props.selected || (Object.values(props.items)[0] && Object.values(props.items)[0].id)
 }
 
 class SelectBox extends React.Component {

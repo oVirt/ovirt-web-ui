@@ -8,7 +8,7 @@ import Selectors from '../selectors'
  */
 export function getOsHumanName (osName: string): string {
   const os = Selectors.getOperatingSystemByName(osName)
-  return os && os.get('description') || osName
+  return (os && os.get('description')) || osName
 }
 
 export function getVmIcon (icons: Object, operatingSystems: Array<Object>, vm: Object): Object {
