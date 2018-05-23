@@ -16,6 +16,8 @@ import 'patternfly/dist/css/patternfly-additions.css'
 import * as branding from './branding'
 import { getSelectedMessages, locale } from './intl/index'
 
+// eslint-disable "import/first": off
+
 // Patternfly dependencies
 // jQuery needs to be globally available (webpack.ProvidePlugin can be also used for this)
 window.$ = window.jQuery = require('jquery')
