@@ -154,7 +154,7 @@ class VmNics extends Component {
   }
 }
 VmNics.propTypes = {
-  vmId: PropTypes.string.isRequired,
+  vmId: PropTypes.string.isRequired, // eslint-disable-line react/no-unused-prop-types
   nics: PropTypes.object.isRequired,
   vnicProfiles: PropTypes.object.isRequired,
   showSettings: PropTypes.bool,

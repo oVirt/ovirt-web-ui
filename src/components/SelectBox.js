@@ -59,6 +59,7 @@ class SelectBox extends React.Component {
 }
 
 SelectBox.propTypes = {
+  // eslint-disable-next-line react/no-unused-prop-types
   selected: PropTypes.string, // false-ish for the first item
   items: PropTypes.object.isRequired, // {[string]: { id: string, value: string} } ; yes, the id is there twice
   onChange: PropTypes.func.isRequired, // (selectedId: string) => any

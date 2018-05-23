@@ -110,15 +110,15 @@ class ConsoleButton extends React.Component {
 ConsoleButton.propTypes = {
   vm: PropTypes.object.isRequired,
   VmAction: PropTypes.object.isRequired,
-  usbFilter: PropTypes.string.isRequired,
-  consoleId: PropTypes.string,
+  usbFilter: PropTypes.string.isRequired, // eslint-disable-line react/no-unused-prop-types
+  consoleId: PropTypes.string, // eslint-disable-line react/no-unused-prop-types
   className: PropTypes.string.isRequired,
   tooltip: PropTypes.string,
   shortTitle: PropTypes.string.isRequired,
   button: PropTypes.string.isRequired,
   actionDisabled: PropTypes.bool,
   isOnCard: PropTypes.bool,
-  userId: PropTypes.string,
+  userId: PropTypes.string, // eslint-disable-line react/no-unused-prop-types
   onDownloadConsole: PropTypes.func.isRequired,
   onConsoleSessionConfirmaClose: PropTypes.func.isRequired,
   onCheckConsoleSessionInUse: PropTypes.func.isRequired,
