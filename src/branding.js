@@ -6,8 +6,8 @@ let loaded: ?Promise<void>
 
 function getBrandedResourceUrl (resourceId: string): string {
   const separator = AppConfiguration.applicationURL.endsWith('/')
-      ? ''
-      : '/'
+    ? ''
+    : '/'
   return `${AppConfiguration.applicationURL}${separator}branding/${resourceId}`
 }
 

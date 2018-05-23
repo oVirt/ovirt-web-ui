@@ -630,7 +630,7 @@ function* fetchAllOS (action) {
 }
 
 function* fetchVmsNics ({ vms }) {
-  yield all(vms.map((vm) => call(function *() {
+  yield all(vms.map((vm) => call(function* () {
     const nicsInternal = yield fetchVmNics({ vmId: vm.id })
     yield put(setVmNics({ vmId: vm.id, nics: nicsInternal }))
   })))
@@ -725,7 +725,7 @@ let sagasFunctions = {
   fetchSingleVm,
 }
 
-export function *rootSaga () {
+export function* rootSaga () {
   yield [
     takeEvery(LOGIN, login),
     takeEvery(LOGOUT, logout),

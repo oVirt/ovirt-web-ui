@@ -10,7 +10,7 @@ function* getConsoleInUseModal (sagas, action) {
     sessionsInternal.find(
       (x) => x.consoleUser &&
             (!userId || x.user.id === userId)
-      ) !== undefined) {
+    ) !== undefined) {
     yield put(setConsoleInUse({ vmId, consoleInUse: true }))
   } else {
     yield put(downloadConsole({ vmId, usbFilter }))

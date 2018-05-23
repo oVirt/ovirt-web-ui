@@ -11,7 +11,6 @@ import style from './style.css'
 import { PendingTaskTypes } from '../../reducers/pendingTasks'
 
 class VmDisk extends React.PureComponent {
-
   constructor (props) {
     super(props)
     this.state = { showConfirmDeleteDialog: false }
@@ -113,7 +112,7 @@ VmDisk.propTypes = {
   disk: PropTypes.object.isRequired,
   edit: PropTypes.bool.isRequired,
   beingDeleted: PropTypes.bool.isRequired,
-  removeFunction: PropTypes.func.isRequired,  // (diskId: string) => any,
+  removeFunction: PropTypes.func.isRequired, // (diskId: string) => any,
 }
 
 function isDiskBeingDeleted (diskId, pendingTasks) {

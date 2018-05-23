@@ -68,8 +68,8 @@ CloudInitEditor.propTypes = {
   enabled: PropTypes.bool.isRequired,
   hostName: PropTypes.string.isRequired,
   sshAuthorizedKeys: PropTypes.string.isRequired,
-  onEnabledChange: PropTypes.func.isRequired,           // (boolean) => any
-  onHostNameChange: PropTypes.func.isRequired,          // (string) => any
+  onEnabledChange: PropTypes.func.isRequired, // (boolean) => any
+  onHostNameChange: PropTypes.func.isRequired, // (string) => any
   onSshAuthorizedKeysChange: PropTypes.func.isRequired, // (string) => any
 }
 

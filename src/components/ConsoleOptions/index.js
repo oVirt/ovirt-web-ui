@@ -47,7 +47,7 @@ class ConsoleOptions extends React.Component {
               bsSize='mini'
               value={!!this.props.options.autoConnect}
               onChange={this.onChangeOptions('autoConnect')}
-              />
+            />
           </dd>
 
           <dt className={style['console-option-description']}>{msg.fullScreen()}</dt>

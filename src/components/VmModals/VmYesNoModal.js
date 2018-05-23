@@ -5,7 +5,6 @@ import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 
 class VmYesNoModal extends React.Component {
-
   componentDidMount () {
     const dom = ReactDOM.findDOMNode(this)
     $(dom).modal('show')

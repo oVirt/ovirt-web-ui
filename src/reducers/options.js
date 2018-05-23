@@ -9,7 +9,7 @@ function setOptions ({ state, type, options }) {
 import { actionReducer } from './utils'
 
 const initialState = Immutable.fromJS({ options: {
-  consoleOptions: {},  // It contains vmId: { autoConnect: boolean }
+  consoleOptions: {}, // It contains vmId: { autoConnect: boolean }
 } })
 
 const options = actionReducer(initialState, {
