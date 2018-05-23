@@ -16,8 +16,7 @@ import csLocalData from 'react-intl/locale-data/cs'
 import huLocalData from 'react-intl/locale-data/hu'
 import heLocalData from 'react-intl/locale-data/he'
 
-import { messages } from './messages'
-import type { MessageIdType } from './messages'
+import { messages, type MessageIdType } from './messages'
 // expected translations ['de', 'fr', 'es', 'ko', 'it', 'ja', 'pt-BR', 'ru', 'zh-CN']
 import translatedMessages from './translated-messages.json'
 

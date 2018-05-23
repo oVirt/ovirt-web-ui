@@ -1,8 +1,6 @@
 import Immutable from 'immutable'
 import { actionReducer } from './utils'
 
-import { actionReducer } from './utils'
-
 function setOptions ({ state, type, options }) {
   const optionsObj = {}
   optionsObj[type] = options
