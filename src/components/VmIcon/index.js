@@ -8,7 +8,7 @@ import style from './style.css'
  * or default when icon not provided
  */
 const VmIcon = ({ icon, className, missingIconClassName, showEdit, onIconChange, onIconDefault }) => {
-  const openFileDialog = function () {
+  const openFileDialog = () => {
     $('input#uploadIconInput').trigger('click')
   }
   if (icon) {
