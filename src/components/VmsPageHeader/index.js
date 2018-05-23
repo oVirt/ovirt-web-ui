@@ -40,7 +40,7 @@ const VmsPageHeader = ({ onRefresh }) => {
   )
 }
 VmsPageHeader.propTypes = {
-  page: PropTypes.number.isRequired,
+  page: PropTypes.number.isRequired, // eslint-disable-line react/no-unused-prop-types
   onRefresh: PropTypes.func.isRequired,
 }
 

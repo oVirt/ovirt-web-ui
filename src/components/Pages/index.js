@@ -57,11 +57,7 @@ VmDetailPage.propTypes = {
   vms: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
 
-  route: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
-  location: PropTypes.object.isRequired,
-  history: PropTypes.object.isRequired,
-  previousPath: PropTypes.string.isRequired,
 
   getVms: PropTypes.func.isRequired,
 }
@@ -113,11 +109,7 @@ PoolDetailPage.propTypes = {
   vms: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
 
-  route: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
-  location: PropTypes.object.isRequired,
-  history: PropTypes.object.isRequired,
-  previousPath: PropTypes.string.isRequired,
 
   getPools: PropTypes.func.isRequired,
 }
@@ -160,10 +152,7 @@ class VmDialogPage extends React.Component {
 VmDialogPage.propTypes = {
   vms: PropTypes.object.isRequired,
 
-  route: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
-  location: PropTypes.object.isRequired,
-  history: PropTypes.object.isRequired,
   previousPath: PropTypes.string.isRequired,
 
   getCDRom: PropTypes.func.isRequired,
