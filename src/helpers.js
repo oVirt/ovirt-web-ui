@@ -131,7 +131,7 @@ export function hrefWithoutHistory (handler) {
 
 export function getURLQueryParameterByName (name) {
   const url = window.location.href
-  name = name.replace(/[\[\]]/g, '\\$&')
+  name = name.replace(/[\[\]]/g, '\\$&') // eslint-disable-line no-useless-escape
   const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)')
   const results = regex.exec(url)
 
