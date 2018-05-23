@@ -1,3 +1,4 @@
+/* eslint-disable prefer-promise-reject-errors */
 import AppConfiguration from '../config'
 import { vms, disks, api } from './data.mock'
 import MainApi from '../ovirtapi'
