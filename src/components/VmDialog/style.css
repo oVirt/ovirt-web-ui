@@ -49,3 +49,15 @@
 .field-shifted {
     padding-left: 20px;
 }
+
+.upload-button {
+    margin: 5px;
+}
+
+.hide {
+    display: none !important;
+}
+
+.error-text{
+    font-size: 12px;
+}
