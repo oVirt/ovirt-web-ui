@@ -23,6 +23,7 @@ import DetailContainer from '../DetailContainer'
 import ConsoleOptions from '../ConsoleOptions/index'
 import VmDisks from '../VmDisks/index'
 import VmNics from '../VmNics/index'
+import VmSnapshots from '../VmSnapshots/index'
 import VmsListNavigation from '../VmsListNavigation/index'
 import VmStatus from './VmStatus'
 import { NextRunLabel } from './labels'
@@ -56,11 +57,9 @@ class VmDetail extends Component {
       openConsoleSettings: false,
       vmsNavigationExpanded: true,
       editDisks: false,
-      openNicSettings: false,
     }
 
     this.consoleSettings = this.consoleSettings.bind(this)
-    this.nicSettings = this.nicSettings.bind(this)
     this.toggleVmsNavExpansion = this.toggleVmsNavExpansion.bind(this)
     this.editDisks = this.editDisks.bind(this)
   }
@@ -118,6 +117,7 @@ class VmDetail extends Component {
     const icon = getVmIcon(icons, operatingSystems, vm)
     const disks = vm.get('disks')
     const nics = vm.get('nics')
+    const snapshots = vm.get('snapshots')
     const osName = getOsHumanName(vm.getIn(['os', 'type']))
     const cluster = Selectors.getClusterById(vm.getIn(['cluster', 'id']))
     const template = Selectors.getTemplateById(vm.getIn(['template', 'id']))
@@ -144,24 +144,10 @@ class VmDetail extends Component {
         </a>
       </small>)
 
-    const notPoolOrPoolVm = !isPool && !isPoolVm
-    const nicOptionsShowHide = notPoolOrPoolVm ? (
-      <small>
-        <a href='#' onClick={this.nicSettings} id={`${idPrefix}-nicoptions-showhide`}>
-          {pencilIcon}
-        </a>
-      </small>
-    ) : (
-      <small>
-        <FieldHelp content={msg.notEditableForPoolsOrPoolVms()} text={pencilIcon} />
-      </small>
-    )
+    const notPoolOrPoolVm = !isPool && vm.getIn(['pool', 'id']) === undefined
 
     const hasDisks = disks.size > 0
     const noDisks = hasDisks || (<small>{msg.noDisks()} &nbsp;</small>)
-
-    const hasNics = nics.size > 0
-    const noNics = hasNics || (<dd><small>{msg.noNics()}</small></dd>)
 
     const consolesHelp = (
       <div>
@@ -260,14 +246,8 @@ class VmDetail extends Component {
                   </dt>
                   {noDisks}
                   {disksElement}
-                  <dt><span className='pficon pficon-container-node' />
-                    &nbsp;
-                    <FieldHelp content={msg.nicsTooltip()} text={msg.nic()} />
-                    &nbsp;
-                    {nicOptionsShowHide}
-                  </dt>
-                  {noNics}
-                  <VmNics vm={vm} nics={nics} showSettings={this.state.openNicSettings && notPoolOrPoolVm} />
+                  <VmNics nics={nics} vmId={vm.get('id')} enableSettings={notPoolOrPoolVm} />
+                  <VmSnapshots snapshots={snapshots} vm={vm} enableSettings={notPoolOrPoolVm} />
                   <dt>
                     <FieldHelp content={msg.bootMenuTooltip()} text={msg.bootMenu()} />
                   </dt>

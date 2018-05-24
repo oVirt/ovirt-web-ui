@@ -22,6 +22,7 @@ import {
   SET_VM_DISKS,
   SET_VM_NICS,
   SET_VM_SESSIONS,
+  SET_VM_SNAPSHOTS,
   SHUTDOWN_VM,
   START_VM,
   SUSPEND_VM,
@@ -274,6 +275,16 @@ export function setVmSessions ({ vmId, sessions }) {
     payload: {
       vmId,
       sessions,
+    },
+  }
+}
+
+export function setVmSnapshots ({ vmId, snapshots }) {
+  return {
+    type: SET_VM_SNAPSHOTS,
+    payload: {
+      vmId,
+      snapshots,
     },
   }
 }

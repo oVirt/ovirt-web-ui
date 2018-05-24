@@ -5,6 +5,7 @@ import AppConfiguration from './config'
 import SagasWorkers from './saga/builder'
 import vmDisksSagas from './components/VmDisks/sagas'
 import newVmDialogSagas from './components/NewDiskDialog/sagas'
+import vmSnapshotsSagas from './components/VmSnapshots/sagas'
 import { flatMap } from './utils'
 
 import {
@@ -42,6 +43,7 @@ import {
   setDataCenters,
   addNetworksToVnicProfiles,
   setVnicProfiles,
+  setVmSnapshots,
 
   getSinglePool,
   removeMissingPools,
@@ -260,6 +262,7 @@ function* fetchVmsByPageVLower (action) {
       yield fetchVmsSessions({ vms: internalVms })
       yield fetchVmsCDRom({ vms: internalVms })
       yield fetchVmsNics({ vms: internalVms })
+      yield fetchVmsSnapshots({ vms: internalVms })
     } else {
       logDebug('getVmsByPage() shallow fetch requested - skipping other resources')
     }
@@ -319,6 +322,7 @@ function* fetchVmsByCountVLower (action) {
       yield fetchVmsSessions({ vms: internalVms })
       yield fetchVmsCDRom({ vms: internalVms })
       yield fetchVmsNics({ vms: internalVms })
+      yield fetchVmsSnapshots({ vms: internalVms })
     } else {
       logDebug('fetchVmsByCountVLower() shallow fetch requested - skipping other resources')
     }
@@ -334,7 +338,7 @@ export function* fetchSingleVm (action) {
   const isOvirtGTE42 = compareVersionToCurrent({ major: 4, minor: 2 })
   if (isOvirtGTE42 && !shallowFetch) {
     action.payload.additional =
-      ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics']
+      ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics', 'snapshots']
   }
 
   const vm = yield callExternalAction('getVm', Api.getVm, action, true)
@@ -480,7 +484,7 @@ function* deleteVmNic (action) {
   yield put(setVmNics({ vmId: action.payload.vmId, nics: nicsInternal }))
 }
 
-function* startProgress ({ vmId, poolId, name }) {
+export function* startProgress ({ vmId, poolId, name }) {
   if (vmId) {
     yield put(vmActionInProgress({ vmId, name, started: true }))
   } else {
@@ -496,16 +500,16 @@ function* getSingleInstance ({ vmId, poolId }) {
   yield all(fetches)
 }
 
-function* stopProgress ({ vmId, poolId, name, result }) {
+export function* stopProgress ({ vmId, poolId, name, result }) {
   const actionInProgress = vmId ? vmActionInProgress : poolActionInProgress
   if (result && result.status === 'complete') {
     // do not call "end of in progress" if successful,
     // since UI will be updated by refresh
     yield delay(5 * 1000)
-    yield getSingleInstance({ vmId: result.vm.id, poolId })
+    yield getSingleInstance({ vmId, poolId })
 
     yield delay(30 * 1000)
-    yield getSingleInstance({ vmId: result.vm.id, poolId })
+    yield getSingleInstance({ vmId, poolId })
   }
 
   yield put(actionInProgress(Object.assign(vmId ? { vmId } : { poolId }, { name, started: false })))
@@ -672,6 +676,22 @@ function* fetchVmNics ({ vmId }) {
   return []
 }
 
+function* fetchVmsSnapshots ({ vms }) {
+  yield all(vms.map((vm) => call(function* () {
+    yield fetchVmSnapshots({ vmId: vm.id })
+  })))
+}
+
+export function* fetchVmSnapshots ({ vmId }) {
+  const snapshots = yield callExternalAction('snapshots', Api.snapshots, { type: 'GET_VM_SNAPSHOT', payload: { vmId } })
+  let snapshotsInternal = []
+
+  if (snapshots && snapshots['snapshot']) {
+    snapshotsInternal = snapshots.snapshot.map(snapshot => Api.snapshotToInternal({ snapshot }))
+  }
+  yield put(setVmSnapshots({ vmId, snapshots: snapshotsInternal }))
+}
+
 function* fetchISOStorages (action) {
   // If https://bugzilla.redhat.com/show_bug.cgi?id=1436403 was implemented,
   // this could fetch just ISO storage domain types
@@ -819,6 +839,7 @@ export function* rootSaga () {
 
     ...vmDisksSagas,
     ...newVmDialogSagas,
+    ...vmSnapshotsSagas,
 
     ...SagasWorkers(sagasFunctions),
   ])
