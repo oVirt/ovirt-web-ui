@@ -192,6 +192,7 @@ OvirtApi = {
       },
       bootMenuEnabled: bootMenuToInternal(vm),
       cloudInit: cloudInitApiToInternal(vm),
+      snapshots: vm.snapshots && vm.snapshots.snapshot ? vm.snapshots.snapshot.map((snapshot) => this.snapshotToInternal({ snapshot })) : [],
     }
     if (getSubResources) {
       if (vm.disk_attachments && vm.disk_attachments.disk_attachment) {
@@ -302,6 +303,14 @@ OvirtApi = {
       file: {
         id: cdrom.file.id,
       },
+    }
+  },
+
+  snapshotToInternal ({ snapshot }: { snapshot: Object }): Object {
+    return {
+      id: snapshot.id,
+      description: snapshot.description,
+      persistMemoryState: snapshot.persist_memorystate === 'true',
     }
   },
 
@@ -538,6 +547,12 @@ OvirtApi = {
     }).sort((a: Object, b: Object): number => b.protocol.length - a.protocol.length) // Hack: 'VNC' is shorter then 'SPICE'
   },
 
+  internalSnapshotToOvirt ({ snapshot }: { snapshot: Object }): { description: string } {
+    return {
+      description: snapshot.description,
+    }
+  },
+
   // ----
 
   getOvirtApiMeta (): Promise<Object> {
@@ -545,9 +560,12 @@ OvirtApi = {
     const url = `${AppConfiguration.applicationContext}/api/`
     return OvirtApi._httpGet({ url })
   },
-  getVm ({ vmId }: VmIdType): Promise<Object> {
+  getVm ({ vmId, additional }: { vmId: string, additional: Array<string> }): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'getVm' })
-    const url = `${AppConfiguration.applicationContext}/api/vms/${vmId}`
+    let url = `${AppConfiguration.applicationContext}/api/vms/${vmId}`
+    if (additional && additional.length > 0) {
+      url += `?follow=${additional.join(',')}`
+    }
     return OvirtApi._httpGet({ url })
   },
   getVmsByPage ({ page, additional }: { page: number, additional: Array<string> }): Promise<Object> {
@@ -660,6 +678,29 @@ OvirtApi = {
       input: '<action />',
       contentType: 'application/xml',
     })
+  },
+  addNewSnapshot ({ vmId, snapshot }: { vmId: string, snapshot: Object }): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'addNewSnapshot' })
+    const input = JSON.stringify(OvirtApi.internalSnapshotToOvirt({ snapshot }))
+    logDebug(`OvirtApi.addNewSnapshot(): ${input}`)
+    return OvirtApi._httpPost({
+      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots`,
+      input,
+    })
+  },
+  deleteSnapshot ({ snapshotId, vmId }: { snapshotId: string, vmId: string }): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'deleteVmSnapshot' })
+    return OvirtApi._httpDelete({
+      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots/${snapshotId}`,
+    })
+  },
+  snapshot ({ vmId, snapshotId }: { vmId: string, snapshotId: string }): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'snapshot' })
+    return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots/${snapshotId}` })
+  },
+  snapshots ({ vmId }: { vmId: string }): Promise<Object> {
+    OvirtApi._assertLogin({ methodName: 'snapshots' })
+    return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots` })
   },
   icon ({ id }: { id: string }): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'icon' })

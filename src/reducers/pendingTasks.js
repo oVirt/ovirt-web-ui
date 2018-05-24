@@ -12,11 +12,14 @@ import { fromJS } from 'immutable'
 import { actionReducer } from './utils'
 import {
   ADD_DISK_REMOVAL_PENDING_TASK,
+  ADD_SNAPSHOT_REMOVAL_PENDING_TASK,
   REMOVE_DISK_REMOVAL_PENDING_TASK,
+  REMOVE_SNAPSHOT_REMOVAL_PENDING_TASK,
 } from '../constants'
 
 export const PendingTaskTypes = {
   DISK_REMOVAL: 'DISK_REMOVAL',
+  SNAPSHOT_REMOVAL: 'SNAPSHOT_REMOVAL',
 }
 
 const initialState = fromJS([])
@@ -33,6 +36,19 @@ export default actionReducer(initialState, {
   [REMOVE_DISK_REMOVAL_PENDING_TASK] (pendingTasks, { payload }) {
     const index = pendingTasks.findKey(
       task => task.type === PendingTaskTypes.DISK_REMOVAL && task.diskId === payload.diskId)
+    return pendingTasks.delete(index)
+  },
+  [ADD_SNAPSHOT_REMOVAL_PENDING_TASK] (pendingTasks, { payload }) {
+    const existingTask = pendingTasks.find(task =>
+      task.type === PendingTaskTypes.SNAPSHOT_REMOVAL && task.snapshotId === payload)
+    if (existingTask) {
+      return pendingTasks
+    }
+    return pendingTasks.push(payload)
+  },
+  [REMOVE_SNAPSHOT_REMOVAL_PENDING_TASK] (pendingTasks, { payload }) {
+    const index = pendingTasks.findKey(
+      task => task.type === PendingTaskTypes.SNAPSHOT_REMOVAL && task.snapshotId === payload.snapshotId)
     return pendingTasks.delete(index)
   },
 })
