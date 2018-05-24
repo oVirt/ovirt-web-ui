@@ -5,6 +5,7 @@ import AppConfiguration from './config'
 import SagasWorkers from './saga/builder'
 import vmDisksSagas from './components/VmDisks/sagas'
 import newVmDialogSagas from './components/NewDiskDialog/sagas'
+import vmSnapshotsSagas from './components/VmSnapshots/sagas'
 import { flatMap } from './utils'
 
 import {
@@ -39,6 +40,7 @@ import {
   setDataCenters,
   addNetworksToVnicProfiles,
   setVnicProfiles,
+  setVmSnapshots,
 
   getSinglePool,
   removeMissingPools,
@@ -184,7 +186,7 @@ function* fetchVmsByPageV42 (action) {
   const { shallowFetch, page } = action.payload
   let additional = []
   if (!shallowFetch) {
-    additional = ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics']
+    additional = ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics', 'snapshots']
   }
   action.payload.additional = additional
   // TODO: paging: split this call to a loop per up to 25 vms
@@ -218,6 +220,7 @@ function* fetchVmsByPageVLower (action) {
       yield fetchVmsSessions({ vms: internalVms })
       yield fetchVmsCDRom({ vms: internalVms })
       yield fetchVmsNics({ vms: internalVms })
+      yield fetchVmsSnapshots({ vms: internalVms })
     } else {
       logDebug('getVmsByPage() shallow fetch requested - skipping other resources')
     }
@@ -239,7 +242,7 @@ function* fetchVmsByCountV42 (action) {
   const { shallowFetch, page } = action.payload
   let additional = []
   if (!shallowFetch) {
-    additional = ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics']
+    additional = ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics', 'snapshots']
   }
   action.payload.additional = additional
   const allVms = yield callExternalAction('getVmsByCount', Api.getVmsByCount, action)
@@ -278,6 +281,7 @@ function* fetchVmsByCountVLower (action) {
       yield fetchVmsSessions({ vms: internalVms })
       yield fetchVmsCDRom({ vms: internalVms })
       yield fetchVmsNics({ vms: internalVms })
+      yield fetchVmsSnapshots({ vms: internalVms })
     } else {
       logDebug('fetchVmsByCount() shallow fetch requested - skipping other resources')
     }
@@ -340,16 +344,12 @@ function* fetchVmsSessions ({ vms }) {
 export function* fetchSingleVm (action) {
   yield startProgress({ vmId: action.payload.vmId, name: 'refresh_single' })
 
+  action.payload.additional = ['disk_attachments', 'graphics_consoles', 'sessions', 'cdroms', 'nics', 'snapshots']
   const vm = yield callExternalAction('getVm', Api.getVm, action, true)
 
   if (vm && vm.id) {
-    const internalVm = Api.vmToInternal({ vm })
-
+    const internalVm = Api.vmToInternal({ vm, getSubResources: true })
     internalVm.disks = yield fetchVmDisks({ vmId: internalVm.id })
-    internalVm.consoles = yield fetchConsoleVmMeta({ vmId: internalVm.id })
-    internalVm.sessions = yield fetchVmSessions({ vmId: internalVm.id })
-    internalVm.cdrom = yield fetchVmCDRom({ vmId: internalVm.id, running: internalVm.status === 'up' })
-    internalVm.nics = yield fetchVmNics({ vmId: internalVm.id })
 
     yield put(updateVms({ vms: [internalVm] }))
     yield fetchUnknownIconsForVms({ vms: [internalVm] })
@@ -425,7 +425,7 @@ function* deleteVmNic (action) {
   yield put(setVmNics({ vmId: action.payload.vmId, nics: nicsInternal }))
 }
 
-function* startProgress ({ vmId, poolId, name }) {
+export function* startProgress ({ vmId, poolId, name }) {
   if (vmId) {
     yield put(vmActionInProgress({ vmId, name, started: true }))
   } else {
@@ -441,16 +441,16 @@ function* getSingleInstance ({ vmId, poolId }) {
   yield all(fetches)
 }
 
-function* stopProgress ({ vmId, poolId, name, result }) {
+export function* stopProgress ({ vmId, poolId, name, result }) {
   const actionInProgress = vmId ? vmActionInProgress : poolActionInProgress
   if (result && result.status === 'complete') {
     // do not call 'end of in progress' if successful,
     // since UI will be updated by refresh
     yield delay(5 * 1000)
-    yield getSingleInstance({ vmId: result.vm.id, poolId })
+    yield getSingleInstance({ vmId, poolId })
 
     yield delay(30 * 1000)
-    yield getSingleInstance({ vmId: result.vm.id, poolId })
+    yield getSingleInstance({ vmId, poolId })
   }
 
   yield put(actionInProgress(Object.assign(vmId ? { vmId } : { poolId }, { name, started: false })))
@@ -615,6 +615,22 @@ function* fetchVmNics ({ vmId }) {
   return []
 }
 
+function* fetchVmsSnapshots ({ vms }) {
+  yield all(vms.map((vm) => call(function* () {
+    yield fetchVmSnapshots({ vmId: vm.id })
+  })))
+}
+
+export function* fetchVmSnapshots ({ vmId }) {
+  const snapshots = yield callExternalAction('snapshots', Api.snapshots, { type: 'GET_VM_SNAPSHOT', payload: { vmId } })
+  let snapshotsInternal = []
+
+  if (snapshots && snapshots['snapshot']) {
+    snapshotsInternal = snapshots.snapshot.map(snapshot => Api.snapshotToInternal({ snapshot }))
+  }
+  yield put(setVmSnapshots({ vmId, snapshots: snapshotsInternal }))
+}
+
 function* fetchISOStorages (action) {
   const storages = yield callExternalAction('getStorages', Api.getStorages, action)
   if (storages && storages['storage_domain']) {
@@ -745,6 +761,7 @@ export function* rootSaga () {
 
     ...vmDisksSagas,
     ...newVmDialogSagas,
+    ...vmSnapshotsSagas,
 
     ...SagasWorkers(sagasFunctions),
   ])

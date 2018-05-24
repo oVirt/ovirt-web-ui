@@ -1,7 +1,27 @@
 import Immutable, { Map } from 'immutable'
 import { logError } from '../helpers'
 import { actionReducer, removeMissingItems } from './utils'
-import { SET_VM_NICS } from '../constants'
+import {
+  FAILED_EXTERNAL_ACTION,
+  LOGOUT,
+  POOL_ACTION_IN_PROGRESS,
+  REMOVE_MISSING_POOLS,
+  REMOVE_MISSING_VMS,
+  REMOVE_POOLS,
+  REMOVE_VMS,
+  SET_CHANGED,
+  SET_PAGE,
+  SET_VM_DISKS,
+  SET_VM_CDROM,
+  SET_VM_CONSOLES,
+  SET_VM_NICS,
+  SET_VM_SESSIONS,
+  SET_VM_SNAPSHOTS,
+  UPDATE_POOLS,
+  UPDATE_VMPOOLS_COUNT,
+  UPDATE_VMS,
+  VM_ACTION_IN_PROGRESS,
+} from '../constants'
 
 const initialState = Immutable.fromJS({
   vms: {},
@@ -15,7 +35,7 @@ const initialState = Immutable.fromJS({
 })
 
 const vms = actionReducer(initialState, {
-  UPDATE_VMS (state, { payload: { vms, copySubResources, page } }) {
+  [UPDATE_VMS] (state, { payload: { vms, copySubResources, page } }) {
     const emptyMap = Map()
     const updates = {}
     vms.forEach(vm => {
@@ -29,6 +49,7 @@ const vms = actionReducer(initialState, {
         updates[vm.id].consoles = state.getIn(['vms', vm.id, 'consoles'], emptyMap).toJS()
         updates[vm.id].cdrom = state.getIn(['vms', vm.id, 'cdrom'], Immutable.fromJS({ file: { id: '' } })).toJS()
         updates[vm.id].nics = state.getIn(['vms', vm.id, 'nics'], Immutable.fromJS([])).toJS()
+        updates[vm.id].snapshots = state.getIn(['vms', vm.id, 'snapshots'], Immutable.fromJS([])).toJS()
       }
     })
     const imUpdates = Immutable.fromJS(updates)
@@ -38,15 +59,15 @@ const vms = actionReducer(initialState, {
     }
     return st
   },
-  REMOVE_VMS (state, { payload: { vmIds } }) {
+  [REMOVE_VMS] (state, { payload: { vmIds } }) {
     const mutable = state.asMutable()
     vmIds.forEach(vmId => mutable.deleteIn([ 'vms', vmId ]))
     return mutable.asImmutable()
   },
-  REMOVE_MISSING_VMS (state, { payload: { vmIdsToPreserve } }) {
+  [REMOVE_MISSING_VMS] (state, { payload: { vmIdsToPreserve } }) {
     return removeMissingItems({ state, subStateName: 'vms', idsToPreserve: vmIdsToPreserve })
   },
-  SET_VM_DISKS (state, { payload: { vmId, disks } }) {
+  [SET_VM_DISKS] (state, { payload: { vmId, disks } }) {
     if (state.getIn(['vms', vmId])) {
       return state.setIn(['vms', vmId, 'disks'], Immutable.fromJS(disks)) // deep immutable
     } else { // fail, if VM not found
@@ -54,12 +75,20 @@ const vms = actionReducer(initialState, {
     }
     return state
   },
-  SET_VM_CDROM (state, { payload: { vmId, cdrom } }) {
+  [SET_VM_CDROM] (state, { payload: { vmId, cdrom } }) {
     if (state.getIn(['vms', vmId])) {
       return state.setIn(['vms', vmId, 'cdrom'], Immutable.fromJS(cdrom)) // deep immutable
     } else { // fail, if VM not found
       logError(`vms.setVmCdrom() reducer: vmId ${vmId} not found`)
     }
+    return state
+  },
+  [SET_VM_SNAPSHOTS] (state, { payload: { vmId, snapshots } }) {
+    if (state.getIn(['vms', vmId])) {
+      return state.setIn(['vms', vmId, 'snapshots'], Immutable.fromJS(snapshots)) // deep immutable
+    }
+
+    logError(`vms.setVmSnapshots() reducer: vmId ${vmId} not found`)
     return state
   },
   [SET_VM_NICS] (state, { payload: { vmId, nics } }) {
@@ -70,19 +99,19 @@ const vms = actionReducer(initialState, {
     }
     return state
   },
-  VM_ACTION_IN_PROGRESS (state, { payload: { vmId, name, started } }) {
+  [VM_ACTION_IN_PROGRESS] (state, { payload: { vmId, name, started } }) {
     if (state.getIn(['vms', vmId])) {
       return state.setIn(['vms', vmId, 'actionInProgress', name], started)
     }
     return state
   },
-  POOL_ACTION_IN_PROGRESS (state, { payload: { poolId, name, started } }) {
+  [POOL_ACTION_IN_PROGRESS] (state, { payload: { poolId, name, started } }) {
     return state.setIn(['pools', poolId, 'vm', 'actionInProgress', name], started)
   },
-  SET_VM_CONSOLES (state, { payload: { vmId, consoles } }) {
+  [SET_VM_CONSOLES] (state, { payload: { vmId, consoles } }) {
     return state.setIn(['vms', vmId, 'consoles'], Immutable.fromJS(consoles))
   },
-  SET_VM_SESSIONS (state, { payload: { vmId, sessions } }) {
+  [SET_VM_SESSIONS] (state, { payload: { vmId, sessions } }) {
     let consoleInUse = false
     for (var i in sessions) {
       if (sessions[i].consoleUser) {
@@ -93,7 +122,7 @@ const vms = actionReducer(initialState, {
     state = state.setIn(['vms', vmId, 'sessions'], Immutable.fromJS(sessions))
     return state.setIn(['vms', vmId, 'consoleInUse'], consoleInUse)
   },
-  UPDATE_POOLS (state, { payload: { pools } }) {
+  [UPDATE_POOLS] (state, { payload: { pools } }) {
     const updates = {}
     pools.forEach(pool => {
       if (!state.getIn(['pools', pool.id])) {
@@ -105,12 +134,12 @@ const vms = actionReducer(initialState, {
 
     return state.mergeIn(['pools'], imUpdates)
   },
-  REMOVE_POOLS (state, { payload: { poolIds } }) {
+  [REMOVE_POOLS] (state, { payload: { poolIds } }) {
     const mutable = state.asMutable()
     poolIds.forEach(poolId => mutable.deleteIn([ 'pools', poolId ]))
     return mutable.asImmutable()
   },
-  REMOVE_MISSING_POOLS (state, { payload: { poolIdsToPreserve } }) {
+  [REMOVE_MISSING_POOLS] (state, { payload: { poolIdsToPreserve } }) {
     const newPools = poolIdsToPreserve
       .reduce((pools, poolId) => {
         const pool = state.getIn(['pools', poolId])
@@ -122,7 +151,7 @@ const vms = actionReducer(initialState, {
       .asImmutable()
     return state.set('pools', newPools)
   },
-  UPDATE_VMPOOLS_COUNT (state) {
+  [UPDATE_VMPOOLS_COUNT] (state) {
     state.get('pools').toList().map(pool => {
       state = state.setIn(['pools', pool.id, 'vmsCount'], 0)
     })
@@ -135,13 +164,13 @@ const vms = actionReducer(initialState, {
     })
     return state
   },
-  LOGOUT (state) { // see the config() reducer
+  [LOGOUT] (state) { // see the config() reducer
     return state.set('vms', Immutable.fromJS({}))
   },
-  SET_PAGE (state, { payload: { page } }) {
+  [SET_PAGE] (state, { payload: { page } }) {
     return state.set('page', page)
   },
-  FAILED_EXTERNAL_ACTION (state, { payload }) { // see the userMessages() reducer
+  [FAILED_EXTERNAL_ACTION] (state, { payload }) { // see the userMessages() reducer
     /* Example:
      payload = {
      "message": "[Cannot run VM. There is no host that satisfies current scheduling constraints. See below for details:, The host vdsm did not satisfy internal filter CPU because it does not have enough cores to run the VM.]",
@@ -161,7 +190,7 @@ const vms = actionReducer(initialState, {
     }
     return state
   },
-  SET_CHANGED (state, { payload: { value } }) {
+  [SET_CHANGED] (state, { payload: { value } }) {
     return state.set('notAllPagesLoaded', value)
   },
 })
