@@ -172,9 +172,6 @@ OvirtApi = {
       },
 
       icons: {
-        small: {
-          id: vm['small_icon'] ? vm.small_icon['id'] : undefined,
-        },
         large: {
           id: vm['large_icon'] ? vm.large_icon['id'] : undefined,
         },
@@ -294,6 +291,10 @@ OvirtApi = {
           authorized_ssh_keys: vm.cloudInit.sshAuthorizedKeys,
         }
         : {},
+
+      large_icon: vm.icons && vm.icons.large && (vm.icons.large.id || (vm.icons.large.data && vm.icons.large.media_type))
+        ? vm.icons.large
+        : undefined,
     }
   },
 
@@ -469,9 +470,6 @@ OvirtApi = {
       name: os.name,
       description: os.description,
       icons: {
-        small: {
-          id: os['small_icon'] ? os.small_icon['id'] : undefined,
-        },
         large: {
           id: os['large_icon'] ? os.large_icon['id'] : undefined,
         },
@@ -761,22 +759,6 @@ OvirtApi = {
       custHeaders: {
         'Accept': 'text/plain',
       },
-    })
-  },
-  changeIcon ({ vmId, iconBase64, mimeType }: { vmId: string, iconBase64: string, mimeType: string }): Promise<Object> {
-    OvirtApi._assertLogin({ methodName: 'changeIcon' })
-    const input = JSON.stringify({ large_icon: { data: iconBase64, media_type: mimeType } })
-    return OvirtApi._httpPut({
-      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}`,
-      input,
-    })
-  },
-  changeIconById ({ vmId, iconId }: { vmId: string, iconId: string }): Promise<Object> {
-    OvirtApi._assertLogin({ methodName: 'changeIconById' })
-    const input = JSON.stringify({ large_icon: { id: iconId } })
-    return OvirtApi._httpPut({
-      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}`,
-      input,
     })
   },
   removeDisk (diskId: string): Promise<Object> {

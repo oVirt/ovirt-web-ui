@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import Immutable from 'immutable'
 
 import { connect } from 'react-redux'
 import { Redirect, Link } from 'react-router-dom'
@@ -7,13 +8,14 @@ import NavigationPrompt from 'react-router-navigation-prompt'
 import Switch from 'react-bootstrap-switch'
 
 import { logDebug, generateUnique, templateNameRenderer } from '../../helpers'
-import { isRunning } from '../utils'
+import { isRunning, getVmIconId, isValidOsIcon } from '../utils'
 
 import style from './style.css'
 import sharedStyle from '../sharedStyle.css'
 
 import CloudInitEditor from '../CloudInitEditor'
 import DetailContainer from '../DetailContainer'
+import IconUpload from './IconUpload'
 import ErrorAlert from '../ErrorAlert'
 import FieldHelp from '../FieldHelp'
 import NavigationConfirmationModal from '../NavigationConfirmationModal'
@@ -64,6 +66,16 @@ class VmDialog extends React.Component {
         hostName: '',
         sshAuthorizedKeys: '',
       },
+
+      icon: {
+        id: undefined,
+        mediaType: undefined,
+        data: undefined,
+      },
+
+      uiErrors: {
+        icon: undefined,
+      },
     }
 
     this.submitHandler = this.submitHandler.bind(this)
@@ -90,6 +102,8 @@ class VmDialog extends React.Component {
     this.onChangeBootDevice = this.onChangeBootDevice.bind(this)
 
     this.handleCloudInitChange = this.handleCloudInitChange.bind(this)
+    this.onIconChange = this.onIconChange.bind(this)
+    this.setUiError = this.setUiError.bind(this)
   }
 
   componentWillMount () {
@@ -125,6 +139,11 @@ class VmDialog extends React.Component {
         },
         bootMenuEnabled: vm.get('bootMenuEnabled'),
         cloudInit: vm.get('cloudInit').toJS(),
+        icon: {
+          id: getVmIconId(this.props.operatingSystems.get('operatingSystems'), vm),
+          mediaType: undefined,
+          data: undefined,
+        },
       })
     }
     setTimeout(() => this.initDefaults(), 0)
@@ -136,6 +155,14 @@ class VmDialog extends React.Component {
       actionUniqueId,
     })
     return actionUniqueId
+  }
+
+  setUiError (name, error) {
+    this.setState({
+      uiErrors: Object.assign({}, this.state.uiErrors, {
+        [name]: error,
+      }),
+    })
   }
 
   submitHandler (e) {
@@ -210,6 +237,13 @@ class VmDialog extends React.Component {
       bootMenuEnabled: this.state.bootMenuEnabled,
       cloudInit: this.state.cloudInit,
       'status': this.props.vm ? this.props.vm.get('status') : '',
+      icons: {
+        large: {
+          id: this.state.icon.id,
+          media_type: this.state.icon.id ? undefined : this.state.icon.mediaType,
+          data: this.state.icon.id ? undefined : this.state.icon.data,
+        },
+      },
     }
   }
 
@@ -263,10 +297,46 @@ class VmDialog extends React.Component {
   }
 
   doChangeOsIdTo (osId) {
+    const os = this.props.operatingSystems.get('operatingSystems').get(osId)
+    if (os) {
+      this.onChangeOsIconId(os.getIn(['icons', 'large', 'id']))
+    }
     this.setState({
       osId,
       isChanged: true,
     })
+  }
+
+  onChangeOsIconId (iconId) {
+    if (this.state.icon.id && isValidOsIcon(this.props.operatingSystems.get('operatingSystems'), this.state.icon.id)) { // change unless custom icon is selected
+      this.doChangeIconId(iconId)
+    }
+  }
+
+  doChangeIconId (iconId) {
+    this.setUiError('icon')
+    this.setState({
+      icon: {
+        id: iconId,
+      },
+      isChanged: true,
+    })
+  }
+
+  onIconChange (icon) {
+    if (icon) {
+      this.setUiError('icon')
+      this.setState({
+        icon,
+        isChanged: true,
+      })
+    } else {
+      // set default os icon
+      const os = this.getOS()
+      if (os) {
+        this.doChangeIconId(os.getIn(['icons', 'large', 'id']))
+      }
+    }
   }
 
   getOsIdFromType (type) {
@@ -404,8 +474,13 @@ class VmDialog extends React.Component {
 
     if (!this.getOS()) {
       const osList = operatingSystems.get('operatingSystems').toList()
-      const def = osList.sort((a, b) => a.get('id').localeCompare(b.get('id'))).first()
-      stateChange.osId = def ? def.get('id') : undefined
+      const os = osList.sort((a, b) => a.get('id').localeCompare(b.get('id'))).first()
+      if (os) {
+        stateChange.osId = os.get('id')
+        stateChange.icon = {
+          id: os.getIn(['icons', 'large', 'id']),
+        }
+      }
       logDebug(`VmDialog initDefaults(): Setting initial value for osId = ${this.state.osId} to ${stateChange.osId}`)
     }
 
@@ -473,21 +548,10 @@ class VmDialog extends React.Component {
 
     const submitText = isEdit ? msg.updateVm() : msg.createVm()
 
-    const iconId = vm && vm.getIn(['icons', 'small', 'id'])
-    const icon = iconId && icons.get(iconId)
-
     const allowedBootDevices = ['hd', 'network', 'cdrom']
+    const dialogHeader = isEdit ? `${vm.get('name')} - ${msg.edit()}` : msg.createANewVm()
 
-    const title = isEdit
-      ? (
-        <h1 className={style['header']} id={`${idPrefix}-edit-title`}>
-          <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' className={sharedStyle['vm-detail-icon']} />
-          &nbsp;{vm.get('name')} - {msg.edit()}
-        </h1>
-      )
-      : (
-        <h1 id={`${idPrefix}-create-title`}>{msg.createANewVm()}</h1>
-      )
+    const icon = this.state.icon.id ? icons.get(this.state.icon.id) : Immutable.fromJS(this.state.icon)
 
     const bootMenuHint = isUp
       ? (<React.Fragment>
@@ -500,8 +564,11 @@ class VmDialog extends React.Component {
       : msg.bootMenuTooltip()
 
     return (
-      <DetailContainer container='true'>
-        {title}
+      <DetailContainer>
+        <h1 className={style['header']} id={`${idPrefix}-${isEdit ? 'edit' : 'create'}-title`}>
+          <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' />
+          &nbsp;{dialogHeader}
+        </h1>
         {this.getLatestUserMessage() && (<ErrorAlert message={this.getLatestUserMessage()} id={`${idPrefix}-erroralert`} />)}
         <br />
         <form>
@@ -694,7 +761,10 @@ class VmDialog extends React.Component {
                 onHostNameChange={this.handleCloudInitChange('hostName')}
                 onSshAuthorizedKeysChange={this.handleCloudInitChange('sshAuthorizedKeys')}
               />
-
+              <IconUpload
+                onIconChange={this.onIconChange}
+                onErrorChange={(error) => this.setUiError('icon', error)}
+                error={this.state.uiErrors.icon} />
             </dl>
           </div>
 
