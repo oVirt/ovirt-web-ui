@@ -15,7 +15,7 @@ import './index-nomodules.css'
 import 'patternfly/dist/css/patternfly.css'
 import 'patternfly/dist/css/patternfly-additions.css'
 import * as branding from './branding'
-import { getSelectedMessages, locale } from './intl/index'
+import { getSelectedMessages, locale } from './intl'
 
 import store, { sagaMiddleware } from './store'
 import Selectors from './selectors'
@@ -23,7 +23,7 @@ import AppConfiguration, { readConfiguration } from './config'
 import { loadStateFromLocalStorage } from './storage'
 import { logDebug, logError, valuesOfObject } from './helpers'
 import { rootSaga } from './sagas'
-import { login, updateIcons, setDomain, schedulerFixedDelay } from './actions'
+import { login, updateIcons, setDomain } from './actions'
 
 import App from './App'
 
@@ -131,8 +131,6 @@ function onResourcesLoaded () {
   } else {
     logError('Missing SSO Token!')
   }
-
-  store.dispatch(schedulerFixedDelay())
 }
 
 start()
