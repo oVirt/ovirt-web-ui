@@ -47,7 +47,7 @@ class Vms extends React.Component {
       <InfiniteScroll
         loadMore={this.loadMore}
         hasMore={vms.get('notAllPagesLoaded')}
-        loader={<div className={style['loaderBox']}><div className={style['loader']} /></div>}
+        loader={<div key='infinite-scroll-loader' className={style['loaderBox']}><div className={style['loader']} /></div>}
         useWindow={false}
       >
         <div>
