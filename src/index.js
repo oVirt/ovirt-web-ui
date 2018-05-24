@@ -15,7 +15,7 @@ import './index-nomodules.css'
 import 'patternfly/dist/css/patternfly.css'
 import 'patternfly/dist/css/patternfly-additions.css'
 import * as branding from './branding'
-import { getSelectedMessages, locale } from './intl/index'
+import { getSelectedMessages, locale } from './intl'
 
 import store, { sagaMiddleware } from './store'
 import Selectors from './selectors'
@@ -27,7 +27,6 @@ import {
   login,
   updateIcons,
   setDomain,
-  schedulerFixedDelay,
   addActiveRequest,
   delayedRemoveActiveRequest,
 } from './actions'
@@ -142,6 +141,7 @@ function onResourcesLoaded () {
 
   // initiate data retrieval
   Selectors.init({ store })
+  initializeApiListener(store)
 
   loadPersistedState()
 
@@ -151,9 +151,6 @@ function onResourcesLoaded () {
   } else {
     logError('Missing SSO Token!')
   }
-
-  store.dispatch(schedulerFixedDelay())
-  initializeApiListener(store)
 }
 
 start()
