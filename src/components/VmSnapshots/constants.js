@@ -1,0 +1,1 @@
+export const DELETE_VM_SNAPSHOT = 'DELETE_VM_SNAPSHOT'

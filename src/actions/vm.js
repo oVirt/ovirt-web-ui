@@ -1,5 +1,6 @@
 import {
   ADD_VM_NIC,
+  ADD_VM_SNAPSHOT,
   CHANGE_VM_ICON,
   CHANGE_VM_ICON_BY_ID,
   CLEAR_USER_MSGS,
@@ -16,13 +17,17 @@ import {
   REMOVE_VM,
   REMOVE_VMS,
   RESTART_VM,
+  SET_CHANGED,
   SET_DOMAIN,
   SET_LOAD_IN_PROGRESS,
   SET_OVIRT_API_VERSION,
+  SET_PAGE,
+  SET_VM_CDROM,
   SET_VM_CONSOLES,
   SET_VM_DISKS,
   SET_VM_NICS,
   SET_VM_SESSIONS,
+  SET_VM_SNAPSHOTS,
   SHUTDOWN_VM,
   START_VM,
   SUSPEND_VM,
@@ -288,6 +293,26 @@ export function setVmSessions ({ vmId, sessions }) {
   }
 }
 
+export function setVmSnapshots ({ vmId, snapshots }) {
+  return {
+    type: SET_VM_SNAPSHOTS,
+    payload: {
+      vmId,
+      snapshots,
+    },
+  }
+}
+
+export function addVmSnapshot ({ vmId, snapshot }) {
+  return {
+    type: ADD_VM_SNAPSHOT,
+    payload: {
+      vmId,
+      snapshot,
+    },
+  }
+}
+
 export function getRDP ({ vmName, username, domain, fqdn }) {
   return {
     type: GET_RDP_VM,
@@ -302,7 +327,7 @@ export function getRDP ({ vmName, username, domain, fqdn }) {
 
 export function setPage ({ page }) {
   return {
-    type: 'SET_PAGE',
+    type: SET_PAGE,
     payload: {
       page,
     },
@@ -311,7 +336,7 @@ export function setPage ({ page }) {
 
 export function setChanged ({ value }) {
   return {
-    type: 'SET_CHANGED',
+    type: SET_CHANGED,
     payload: {
       value,
     },
@@ -320,7 +345,7 @@ export function setChanged ({ value }) {
 
 export function setVmCDRom ({ cdrom, vmId }) {
   return {
-    type: 'SET_VM_CDROM',
+    type: SET_VM_CDROM,
     payload: {
       cdrom,
       vmId,

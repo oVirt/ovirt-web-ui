@@ -272,6 +272,12 @@ export const messages = {
   hdBoot: 'Hard Disk',
   networkBoot: 'Network (PXE)',
   cdromBoot: 'CD-ROM',
+  snapshot: 'Snapshots',
+  snapshotsTooltip: 'VM snapshots.',
+  noSnapshots: 'no snapshots',
+  newSnapshot: 'New snapshot',
+  addNewSnapshot: 'Add new snapshot',
+  areYouSureYouWantToDeleteSnapshot: 'Are you sure you want to delete snapshot {description}?',
   unsavedChangesTitle: {
     message: 'Dialog contains unsaved changes',
     description: 'Title of modal dialog opened when a user tried to navigate off an editor page after changes have been made.',
