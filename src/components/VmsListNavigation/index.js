@@ -69,7 +69,7 @@ const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, onUpdat
           loadMore={loadMore}
           hasMore={vms.get('notAllPagesLoaded')}
           useWindow={false}
-          >
+        >
           {list || emptyList}
         </InfiniteScroll>
       </div>

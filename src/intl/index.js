@@ -16,8 +16,7 @@ import csLocalData from 'react-intl/locale-data/cs'
 import huLocalData from 'react-intl/locale-data/hu'
 import heLocalData from 'react-intl/locale-data/he'
 
-import { messages } from './messages'
-import type { MessageIdType } from './messages'
+import { messages, type MessageIdType } from './messages'
 // expected translations ['de', 'fr', 'es', 'ko', 'it', 'ja', 'pt-BR', 'ru', 'zh-CN']
 import translatedMessages from './translated-messages.json'
 
@@ -143,7 +142,7 @@ function removeMessageDescription (messages: { [MessageIdType]: MessageType }): 
 
 const defaultMessages: { [MessageIdType]: string } = removeMessageDescription(messages)
 
-function createIdsMap (messages: typeof messages): { [MessageIdType]: MessageIdType } {
+function createIdsMap (messages: { [MessageIdType]: MessageType }): { [MessageIdType]: MessageIdType } {
   return Object.keys(messages)
     .reduce((sum, key) => Object.assign(sum, { [key]: key }), {})
 }
@@ -159,7 +158,7 @@ function createIdsMap (messages: typeof messages): { [MessageIdType]: MessageIdT
  */
 export const msgId: {[MessageIdType]: MessageIdType} = createIdsMap(messages)
 
-function createFormattingFunctionsMap (messages: typeof messages): {[MessageIdType]: ((?Object) => string)} {
+function createFormattingFunctionsMap (messages: { [MessageIdType]: MessageType }): {[MessageIdType]: ((?Object) => string)} {
   return Object.keys(messages)
     .reduce((sum, key) => Object.assign(sum, { [key]: (values) => formatMessage(key, values) }), {})
 }

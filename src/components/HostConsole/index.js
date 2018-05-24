@@ -55,4 +55,3 @@ export default connect(
     config: state.config,
   })
 )(HostConsole)
-

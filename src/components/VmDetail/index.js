@@ -100,18 +100,17 @@ class VmDetail extends Component {
   }
 
   handleIconChange (e) {
-    const that = this
     const reader = new FileReader()
     const file = e.target.files[0]
 
-    reader.onload = function (upload) {
+    reader.onload = (upload) => {
       let iconBase64 = upload.target.result
       iconBase64 = iconBase64.replace('data:', '')
       const semiIndex = iconBase64.indexOf(';')
       const mimeType = iconBase64.slice(0, semiIndex)
       iconBase64 = iconBase64.slice(semiIndex + 1).replace('base64,', '')
 
-      that.props.onIconChange({ iconBase64, mimeType })
+      this.props.onIconChange({ iconBase64, mimeType })
     }
     reader.readAsDataURL(file)
   }
@@ -158,8 +157,8 @@ class VmDetail extends Component {
       <small className={style.editPencilLink}>
         {
           diskEditAllowed
-          ? (<a href='#' onClick={this.editDisks} id={`${idPrefix}-edit-disks`}>{pencilIcon}</a>)
-          : (<FieldHelp content={msg.notEditableForPoolsOrPoolVms()} text={pencilIcon} />)
+            ? (<a href='#' onClick={this.editDisks} id={`${idPrefix}-edit-disks`}>{pencilIcon}</a>)
+            : (<FieldHelp content={msg.notEditableForPoolsOrPoolVms()} text={pencilIcon} />)
         }
       </small>)
 
@@ -205,14 +204,14 @@ class VmDetail extends Component {
       onIconChange={this.handleIconChange}
       onIconDefault={this.handleIconChangeToDefault}
       showEdit
-      />)
+    />)
 
     if (isPool) {
       vmIcon = <VmIcon
         icon={icon}
         missingIconClassName='pficon pficon-virtual-machine'
         className={sharedStyle['vm-detail-icon']}
-        />
+      />
     }
 
     return (

@@ -14,8 +14,8 @@ export function sortDisksForDisplay (disks, locale = appLocale) {
     const aBoot = a.get('bootable')
     const bBoot = b.get('bootable')
 
-    return aBoot && !bBoot ? -1
-      : !aBoot && bBoot ? 1
-      : localeCompare(a.get('name'), b.get('name'), locale)
+    return (aBoot && !bBoot) ? -1 : (
+      (!aBoot && bBoot) ? 1 : localeCompare(a.get('name'), b.get('name'), locale)
+    )
   })
 }

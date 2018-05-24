@@ -15,7 +15,6 @@ import {
 import { msg } from '../../intl'
 
 class OptionsDialog extends React.Component {
-
   constructor (props) {
     super(props)
     this.state = {
@@ -77,7 +76,7 @@ class OptionsDialog extends React.Component {
         <div>
           <p id={`${idPrefix}-lowversion`}>{msg.lowOVirtVersion({ apiVersion })}</p>
         </div>
-        )
+      )
     }
     return (
       <div className='modal fade' tabIndex='-1' role='dialog' id='options-modal' aria-hidden='true' aria-labelledby='optionsModalLabel'>

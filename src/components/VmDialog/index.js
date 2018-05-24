@@ -555,7 +555,7 @@ class VmDialog extends React.Component {
                   items={sortedClusters.map(item => (
                     { id: item.get('id'), value: item.get('name') }
                   )).toJS()}
-                  />
+                />
               </dd>
 
               <dt>
@@ -569,7 +569,7 @@ class VmDialog extends React.Component {
                   items={sortedTemplates.map(item => (
                     { id: item.get('id'), value: templateNameRenderer(item) }
                   )).toJS()}
-                  />
+                />
               </dd>
 
               <dt>
@@ -583,7 +583,7 @@ class VmDialog extends React.Component {
                   items={sortedOSs.map(item => (
                     { id: item.get('id'), value: item.get('description') }
                   )).toJS()}
-                  />
+                />
               </dd>
 
               <dt>
@@ -632,7 +632,7 @@ class VmDialog extends React.Component {
                       selected={cdromFileId}
                       items={files}
                       idPrefix='select-changecd'
-                      />
+                    />
                   </dd>
                 </div>
               )}
@@ -668,7 +668,7 @@ class VmDialog extends React.Component {
                     items={transformArrayToObject(allowedBootDevices.map(item => (
                       { id: item, value: msg[`${item}Boot`]() }
                     )))}
-                    />
+                  />
                 </dd>
                 <dt className={style['field-shifted']}>
                   <FieldHelp content={msg.secondDeviceTooltip()} text={msg.secondDevice()} />
@@ -683,7 +683,7 @@ class VmDialog extends React.Component {
                     )).map(item => (
                       { id: item, value: msg[`${item}Boot`]() }
                     ))])}
-                    />
+                  />
                 </dd>
               </div>
 

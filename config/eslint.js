@@ -54,7 +54,7 @@ module.exports = {
   },
 
   rules: {
-    'no-duplicate-imports': 0,
+    'no-duplicate-imports': 2,
     'comma-dangle': [2, 'always-multiline'],
     'object-curly-spacing': [2, 'always'],
     'import/no-duplicates': 2,
@@ -115,6 +115,7 @@ module.exports = {
       'always'
     ],
     'flowtype/use-flow-type': 1,
-    'flowtype/valid-syntax': 1
+    'flowtype/valid-syntax': 1,
+    'generator-star-spacing': [2, {"before": false, "after": true}],
   },
 }

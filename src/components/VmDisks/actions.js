@@ -12,4 +12,3 @@ export function removeDisk (diskId: string, vmToRefreshId?: string) {
     },
   }
 }
-

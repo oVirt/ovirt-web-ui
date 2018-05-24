@@ -63,13 +63,12 @@ class FieldHelp extends React.Component {
 }
 
 FieldHelp.propTypes = {
-  title: PropTypes.string,                                            // popover title
-  content: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),   // popover content
-  text: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),      // decorated text
-  tooltip: PropTypes.string,                                          // tooltip shown when hovering the text
+  title: PropTypes.string, // popover title
+  content: PropTypes.oneOfType([PropTypes.string, PropTypes.node]), // popover content
+  text: PropTypes.oneOfType([PropTypes.string, PropTypes.node]), // decorated text
+  tooltip: PropTypes.string, // tooltip shown when hovering the text
   children: PropTypes.any,
   container: PropTypes.any,
-  getParentPosition: PropTypes.func,
 }
 
 export default FieldHelp

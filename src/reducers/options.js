@@ -1,4 +1,5 @@
 import Immutable from 'immutable'
+import { actionReducer } from './utils'
 
 function setOptions ({ state, type, options }) {
   const optionsObj = {}
@@ -6,10 +7,8 @@ function setOptions ({ state, type, options }) {
   return state.mergeIn(['options'], optionsObj)
 }
 
-import { actionReducer } from './utils'
-
 const initialState = Immutable.fromJS({ options: {
-  consoleOptions: {},  // It contains vmId: { autoConnect: boolean }
+  consoleOptions: {}, // It contains vmId: { autoConnect: boolean }
 } })
 
 const options = actionReducer(initialState, {

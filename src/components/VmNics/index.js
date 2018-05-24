@@ -63,10 +63,10 @@ class VmNic extends React.Component {
           </span>
           {
             showSettings
-            ? (<Button bsStyle='default' bsSize='small' onClick={this.handleOpenDialog}>
-              {msg.delete()}
-            </Button>)
-            : null
+              ? (<Button bsStyle='default' bsSize='small' onClick={this.handleOpenDialog}>
+                {msg.delete()}
+              </Button>)
+              : null
           }
           <DeleteConfirmationModal show={this.state.showDeleteModal} onDelete={this.handleDelete} onClose={this.handleClose}>
             <p dangerouslySetInnerHTML={{ __html: msg.areYouSureYouWantToDeleteNic({ nicName: `"<strong>${this.props.nic.get('name')}</strong>"` }) }} />
@@ -154,7 +154,7 @@ class VmNics extends Component {
   }
 }
 VmNics.propTypes = {
-  vmId: PropTypes.string.isRequired,
+  vmId: PropTypes.string.isRequired, // eslint-disable-line react/no-unused-prop-types
   nics: PropTypes.object.isRequired,
   vnicProfiles: PropTypes.object.isRequired,
   showSettings: PropTypes.bool,

@@ -36,11 +36,10 @@ export default class RDPBuilder {
     this.address = fqdn || vmName
     this.guestID = ''
     this.fullScreen = true
-    this.fullScreenTitle
     this.width = 640
     this.height = 480
     this.authenticationLevel = 2
-    this.useLocalDrives
+    this.useLocalDrives = false
     this.redirectPrinters = false
     this.redirectClipboard = true
     this.redirectSmartCards = false
