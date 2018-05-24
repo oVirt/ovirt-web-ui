@@ -1,0 +1,12 @@
+
+.upload-button {
+    margin: 5px;
+}
+
+.hide {
+    display: none !important;
+}
+
+.error-text{
+    font-size: 12px;
+}

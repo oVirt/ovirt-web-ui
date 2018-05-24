@@ -69,14 +69,13 @@ class SelectBox extends React.Component {
 }
 
 SelectBox.propTypes = {
-  // eslint-disable-next-line react/no-unused-prop-types
+  /* eslint-disable react/no-unused-prop-types */
   selected: PropTypes.string, // id of a selected item, false-ish for the first item
-  // eslint-disable-next-line react/no-unused-prop-types
   items: PropTypes.array.isRequired, // Array<{ id: string, value: string }>, order matters if sort is false-ish
+  sort: PropTypes.bool, // sorted alphabetically by current locale with { numeric: true } if true
+  /* eslint-enable react/no-unused-prop-types */
   onChange: PropTypes.func.isRequired, // (selectedId: string) => any
   idPrefix: PropTypes.string.isRequired,
-  // eslint-disable-next-line react/no-unused-prop-types
-  sort: PropTypes.bool, // sorted alphabetically by current locale with { numeric: true } if true
 }
 
 export default SelectBox
