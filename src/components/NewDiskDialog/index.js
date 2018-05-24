@@ -10,7 +10,6 @@ import { flatMap, parseGbToBytes } from '../../utils'
 import style from './style.css'
 
 class NewDiskDialog extends React.Component {
-
   constructor (props) {
     super(props)
     props.cleanStoreSubtreeFunction()

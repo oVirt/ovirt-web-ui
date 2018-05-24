@@ -16,6 +16,16 @@ import 'patternfly/dist/css/patternfly-additions.css'
 import * as branding from './branding'
 import { getSelectedMessages, locale } from './intl/index'
 
+import store, { sagaMiddleware } from './store'
+import Selectors from './selectors'
+import AppConfiguration, { readConfiguration } from './config'
+import { loadStateFromLocalStorage } from './storage'
+import { logDebug, logError, valuesOfObject } from './helpers'
+import { rootSaga } from './sagas'
+import { login, updateIcons, setDomain, schedulerOneMinute } from './actions'
+
+import App from './App'
+
 // eslint-disable "import/first": off
 
 // Patternfly dependencies
@@ -26,16 +36,6 @@ window.patternfly = {}
 window.patternfly = require('patternfly/dist/js/patternfly')
 window.selectpicker = require('bootstrap-select/js/bootstrap-select.js')
 window.combobox = require('patternfly-bootstrap-combobox/js/bootstrap-combobox.js')
-
-import store, { sagaMiddleware } from './store'
-import Selectors from './selectors'
-import AppConfiguration, { readConfiguration } from './config'
-import { loadStateFromLocalStorage } from './storage'
-import { logDebug, logError, valuesOfObject } from './helpers'
-import { rootSaga } from './sagas'
-import { login, updateIcons, setDomain, schedulerOneMinute } from './actions'
-
-import App from './App'
 
 function renderApp () {
   ReactDOM.render(

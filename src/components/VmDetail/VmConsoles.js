@@ -24,7 +24,7 @@ const VmConsoles = ({ vm, onConsole, onRDP, usbFilter }) => {
               tooltip={`Open ${c.get('protocol').toUpperCase()} console`}
               shortTitle={c.get('protocol').toUpperCase()}
               usbFilter={usbFilter}
-              />
+            />
           ))
         }
 

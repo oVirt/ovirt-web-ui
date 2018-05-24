@@ -90,7 +90,7 @@ export function shortErrorMessage ({ action }) {
   return shortMessages[action.type] ? shortMessages[action.type] : msg.actionFailed({ action: action.type })
 }
 
-export function * foreach (array, fn, context) {
+export function* foreach (array, fn, context) {
   var i = 0
   var length = array.length
 

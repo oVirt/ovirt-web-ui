@@ -39,9 +39,9 @@ class Vms extends React.Component {
 
     const sortedVms = vms.get('vms').toList().sort(sortFunction)
     const sortedPools = vms.get('pools')
-                           .filter(pool => (pool.get('vmsCount') < pool.get('maxUserVms') && pool.get('size') > 0))
-                           .toList()
-                           .sort(sortFunction) // TODO: sort vms and pools together!
+      .filter(pool => (pool.get('vmsCount') < pool.get('maxUserVms') && pool.get('size') > 0))
+      .toList()
+      .sort(sortFunction) // TODO: sort vms and pools together!
 
     return (
       <InfiniteScroll
