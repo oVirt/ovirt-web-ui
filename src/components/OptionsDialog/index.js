@@ -1,9 +1,8 @@
-import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import ReactDOM from 'react-dom'
+import { Modal } from 'patternfly-react'
 
 import FieldHelp from '../FieldHelp/index'
 
@@ -19,19 +18,18 @@ class OptionsDialog extends React.Component {
     super(props)
     this.state = {
       sshKey: props.optionsDialog.get('sshKey') || '',
+      openModal: false,
     }
     this.onSSHKeyChange = this.onSSHKeyChange.bind(this)
     this.onSaveClick = this.onSaveClick.bind(this)
+    this.handleModalOpen = this.handleModalOpen.bind(this)
   }
 
-  componentDidMount () {
-    const dom = ReactDOM.findDOMNode(this)
-    $(dom).on('show.bs.modal', function (e) {
-      this.setState({ 'sshKey': 'Loading...' })
-      if (this.props.userId) {
-        this.props.getSSH()
-      }
-    }.bind(this))
+  handleModalOpen () {
+    if (this.props.userId) {
+      this.props.getSSH()
+    }
+    this.setState({ 'sshKey': 'Loading...', openModal: true })
   }
 
   componentWillReceiveProps (nextProps) {
@@ -46,6 +44,7 @@ class OptionsDialog extends React.Component {
 
   onSaveClick () {
     this.props.onSave({ key: this.state.sshKey, sshId: this.props.optionsDialog.get('sshId') })
+    this.setState({ openModal: false })
   }
 
   render () {
@@ -79,25 +78,26 @@ class OptionsDialog extends React.Component {
       )
     }
     return (
-      <div className='modal fade' tabIndex='-1' role='dialog' id='options-modal' aria-hidden='true' aria-labelledby='optionsModalLabel'>
-        <div className='modal-dialog' role='document'>
-          <div className='modal-content'>
-            <div className='modal-header'>
-              <button type='button' className='close' data-dismiss='modal' aria-label='Close' id={`${idPrefix}-button-close`}><span aria-hidden='true'>&times;</span></button>
-              <h4 className='modal-title' id={`${idPrefix}-title`}>{msg.options()}</h4>
-            </div>
-            <div className='modal-body' id={`${idPrefix}-body`}>
+      <React.Fragment>
+        <a href='#' onClick={this.handleModalOpen}>{msg.options()}</a>
+        { this.state.openModal &&
+          <Modal onHide={() => this.setState({ openModal: false })} show>
+            <Modal.Header>
+              <Modal.CloseButton onClick={() => this.setState({ openModal: false })} />
+              <Modal.Title id={`${idPrefix}-title`}>{msg.options()}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body id={`${idPrefix}-body`}>
               {content}
-            </div>
-            <div className='modal-footer'>
-              {this.props.userId ? <button type='button' onClick={this.onSaveClick} className='btn btn-default' data-dismiss='modal' id={`${idPrefix}-button-save`}>{msg.save()}</button> : null}
-              <button type='button' className='btn btn-danger' data-dismiss='modal' id={`${idPrefix}-button-cancel`}>
+            </Modal.Body>
+            <Modal.Footer>
+              {this.props.userId ? <button type='button' onClick={this.onSaveClick} className='btn btn-default' id={`${idPrefix}-button-save`}>{msg.save()}</button> : null}
+              <button onClick={() => this.setState({ openModal: false })} type='button' className='btn btn-danger' id={`${idPrefix}-button-cancel`}>
                 {msg.cancel()}
               </button>
-            </div>
-          </div>
-        </div>
-      </div>
+            </Modal.Footer>
+          </Modal>
+        }
+      </React.Fragment>
     )
   }
 }
