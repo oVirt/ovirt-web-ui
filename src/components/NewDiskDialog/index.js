@@ -198,11 +198,8 @@ class NewDiskDialog extends React.Component {
     const suitableStorageDomains = this.getSuitableStorageDomains()
     const someStorageDomainSuitable = suitableStorageDomains.length > 0
     const storageDomainsDropdownItems = someStorageDomainSuitable
-      ? suitableStorageDomains.reduce(
-        (accum, storageDomain) =>
-          Object.assign(accum, { [storageDomain.id]: { id: storageDomain.id, value: storageDomain.name } }),
-        {})
-      : {}
+      ? suitableStorageDomains.map(domain => ({ id: domain.id, value: domain.name }))
+      : []
     const storageDomainEditor = (
       <div className={`form-group ${someStorageDomainSuitable ? '' : 'has-error'}`}>
         <label className='col-sm-3 control-label' htmlFor={storageDomainId}>{msg.storageDomain()}</label>
@@ -211,8 +208,9 @@ class NewDiskDialog extends React.Component {
             className='form-control'
             onChange={this.onStorageDomainChange}
             idPrefix={storageDomainId}
-            items={storageDomainsDropdownItems}
-            selected={this.state.storageDomainId} />
+            selected={this.state.storageDomainId}
+            sort
+            items={storageDomainsDropdownItems} />
           {someStorageDomainSuitable || (
             <span className='help-block'>
               {msg.noActiveStorageDomainInDataCenter({ dataCenterName: this.getDataCenterName() })}

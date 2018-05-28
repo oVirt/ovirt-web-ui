@@ -1,4 +1,5 @@
 import { Blob } from 'blob-util'
+import { locale as appLocale } from './intl'
 
 let logDebugEnabled = true
 
@@ -193,4 +194,12 @@ export function userFormatOfBytes (number, suffix) {
   }
 
   return buildRetVal(number, suffix)
+}
+
+export function localeCompare (a, b, locale = appLocale) {
+  return a.localeCompare(b, locale, { numeric: true })
+}
+
+export function sortedBy (array, sortBy, locale = appLocale) {
+  return array.sort((a, b) => localeCompare(a[sortBy], b[sortBy], locale))
 }

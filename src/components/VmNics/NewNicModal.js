@@ -43,14 +43,12 @@ class NewNicModal extends Component {
   render () {
     let { vnicProfiles } = this.props
 
-    let preparedVnicProfiles = vnicProfiles.map((value, key) => (
+    let preparedVnicProfiles = [ { id: EMPTY_ID, value: msg.vnicProfileEmpty() }, ...vnicProfiles.toList().map(item => (
       {
-        id: key,
-        value: `${value.getIn(['network', 'name'])}/${value.get('name')}`,
+        id: item.get('id'),
+        value: `${item.getIn(['network', 'name'])}/${item.get('name')}`,
       }
-    )).toJS()
-
-    preparedVnicProfiles = Object.assign({}, { '': { id: '', value: msg.vnicProfileEmpty() } }, preparedVnicProfiles)
+    )).toJS()]
 
     return (
       <div>
@@ -77,9 +75,11 @@ class NewNicModal extends Component {
                   { msg.vnicProfile() }
                 </label>
                 <div className='col-sm-9'>
-                  <SelectBox items={preparedVnicProfiles}
+                  <SelectBox
                     selected={EMPTY_ID}
                     idPrefix='vnicProfiles-select'
+                    sort
+                    items={preparedVnicProfiles}
                     onChange={this.handleVnicProfileChange}
                   />
                 </div>
