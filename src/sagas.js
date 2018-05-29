@@ -88,8 +88,6 @@ import {
 import {
   ADD_VM_NIC,
   CHECK_TOKEN_EXPIRED,
-  CHANGE_VM_ICON,
-  CHANGE_VM_ICON_BY_ID,
   DELETE_VM_NIC,
   GET_ALL_CLUSTERS,
   GET_ALL_FILES_FOR_ISO,
@@ -140,12 +138,10 @@ function* fetchUnknownIconsForVms ({ vms, os }) {
   // unique iconIds from all vms or os (if available)
   const iconsIds = new Set()
   if (vms) {
-    vms.map(vm => vm.icons.small.id).forEach(id => iconsIds.add(id))
     vms.map(vm => vm.icons.large.id).forEach(id => iconsIds.add(id))
   }
 
   if (os) {
-    os.map(os => os.icons.small.id).forEach(id => iconsIds.add(id))
     os.map(os => os.icons.large.id).forEach(id => iconsIds.add(id))
   }
 
@@ -418,19 +414,6 @@ function* fetchVmDisks ({ vmId }) {
     return internalDisks
   }
   return []
-}
-
-function* changeVmIcon (action) {
-  let vm = null
-  if (action.payload.iconId) {
-    vm = yield callExternalAction('changeIconById', Api.changeIconById, action)
-  } else {
-    vm = yield callExternalAction('changeIcon', Api.changeIcon, action)
-  }
-
-  if (vm && vm.id) {
-    yield fetchSingleVm({ payload: { vmId: vm.id } })
-  }
 }
 
 function* addVmNic (action) {
@@ -760,8 +743,6 @@ export function* rootSaga () {
     throttle(100, GET_ALL_FILES_FOR_ISO, fetchAllFilesForISO),
 
     takeEvery(SELECT_VM_DETAIL, selectVmDetail),
-    takeEvery(CHANGE_VM_ICON, changeVmIcon),
-    takeEvery(CHANGE_VM_ICON_BY_ID, changeVmIcon),
     takeEvery(ADD_VM_NIC, addVmNic),
     takeEvery(DELETE_VM_NIC, deleteVmNic),
     takeEvery(GET_CONSOLE_OPTIONS, getConsoleOptions),

@@ -14,8 +14,6 @@ import {
   getConsoleOptions,
   saveConsoleOptions,
   getRDP,
-  changeVmIcon,
-  changeVmIconById,
 } from '../../actions/index'
 
 import { templateNameRenderer, userFormatOfBytes } from '../../helpers'
@@ -64,8 +62,6 @@ class VmDetail extends Component {
     this.consoleSettings = this.consoleSettings.bind(this)
     this.nicSettings = this.nicSettings.bind(this)
     this.toggleVmsNavExpansion = this.toggleVmsNavExpansion.bind(this)
-    this.handleIconChange = this.handleIconChange.bind(this)
-    this.handleIconChangeToDefault = this.handleIconChangeToDefault.bind(this)
     this.editDisks = this.editDisks.bind(this)
   }
 
@@ -97,30 +93,6 @@ class VmDetail extends Component {
     })
 
     e.preventDefault()
-  }
-
-  handleIconChange (e) {
-    const reader = new FileReader()
-    const file = e.target.files[0]
-
-    reader.onload = (upload) => {
-      let iconBase64 = upload.target.result
-      iconBase64 = iconBase64.replace('data:', '')
-      const semiIndex = iconBase64.indexOf(';')
-      const mimeType = iconBase64.slice(0, semiIndex)
-      iconBase64 = iconBase64.slice(semiIndex + 1).replace('base64,', '')
-
-      this.props.onIconChange({ iconBase64, mimeType })
-    }
-    reader.readAsDataURL(file)
-  }
-
-  handleIconChangeToDefault () {
-    const vmOs = this.props.operatingSystems.get('operatingSystems').find((v, k) => v.get('name') === this.props.vm.getIn(['os', 'type']))
-    if (vmOs) {
-      const iconId = vmOs.getIn(['icons', 'large', 'id'])
-      this.props.onIconChangeToDefault({ iconId })
-    }
   }
 
   render () {
@@ -197,21 +169,10 @@ class VmDetail extends Component {
       </div>
     )
 
-    let vmIcon = (<VmIcon
-      icon={icon}
-      missingIconClassName='pficon pficon-virtual-machine'
-      className={sharedStyle['vm-detail-icon']}
-      onIconChange={this.handleIconChange}
-      onIconDefault={this.handleIconChangeToDefault}
-      showEdit
-    />)
+    let vmIcon = (<VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' />)
 
     if (isPool) {
-      vmIcon = <VmIcon
-        icon={icon}
-        missingIconClassName='pficon pficon-virtual-machine'
-        className={sharedStyle['vm-detail-icon']}
-      />
+      vmIcon = <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' />
     }
 
     return (
@@ -350,8 +311,6 @@ VmDetail.propTypes = {
   isPool: PropTypes.bool,
   config: PropTypes.object.isRequired,
   onRDP: PropTypes.func.isRequired,
-  onIconChange: PropTypes.func.isRequired,
-  onIconChangeToDefault: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -367,7 +326,5 @@ export default connect(
     onConsoleOptionsSave: ({ options }) => dispatch(saveConsoleOptions({ vmId: vm.get('id'), options })),
     onConsoleOptionsOpen: () => dispatch(getConsoleOptions({ vmId: vm.get('id') })),
     onRDP: () => dispatch(getRDP({ vmName: vm.get('name'), username: config.getIn([ 'user', 'name' ]), domain: config.get('domain'), fqdn: vm.get('fqdn') })),
-    onIconChange: ({ iconBase64, mimeType }) => dispatch(changeVmIcon({ vmId: vm.get('id'), iconBase64, mimeType })),
-    onIconChangeToDefault: ({ iconId }) => dispatch(changeVmIconById({ vmId: vm.get('id'), iconId })),
   })
 )(VmDetail)
