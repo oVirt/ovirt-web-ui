@@ -8,7 +8,7 @@ import {
   SET_USER_FILTER_PERMISSION,
   CHECK_TOKEN_EXPIRED,
   SCHEDULER_FIXED_DELAY,
-} from '../constants/index'
+} from '../constants'
 
 export * from './error'
 export * from './vm'
