@@ -19,7 +19,6 @@ import {
 import { logDebug } from './helpers'
 
 import {
-  loadInProgress,
   setChanged,
   updateIcons,
   setVmDisks,
@@ -125,11 +124,9 @@ import {
 } from './constants/index'
 
 function* fetchByPage (action) {
-  yield put(loadInProgress({ value: true }))
   yield put(setChanged({ value: false }))
   yield fetchVmsByPage(action)
   yield fetchPoolsByPage(action)
-  yield put(loadInProgress({ value: false }))
 }
 
 function* persistStateSaga () {
@@ -169,14 +166,12 @@ function* refreshData (action) {
   console.log('refreshData(): ', action.payload)
   if (!action.payload.quiet) {
     logDebug('refreshData(): not quiet')
-    yield put(loadInProgress({ value: true }))
   }
 
   // do refresh sequentially
   yield fetchVmsByCount(getVmsByCount({ count: action.payload.page * AppConfiguration.pageLimit, shallowFetch: !!action.payload.shallowFetch }))
   yield fetchPoolsByCount(getPoolsByCount({ count: action.payload.page * AppConfiguration.pageLimit }))
 
-  yield put(loadInProgress({ value: false }))
   logDebug('refreshData() finished')
 }
 

@@ -15,7 +15,6 @@ import {
   REMOVE_VMS,
   RESTART_VM,
   SET_DOMAIN,
-  SET_LOAD_IN_PROGRESS,
   SET_OVIRT_API_VERSION,
   SET_VM_CONSOLES,
   SET_VM_DISKS,
@@ -179,15 +178,6 @@ export function clearUserMessages () {
   return {
     type: CLEAR_USER_MSGS,
     payload: {},
-  }
-}
-
-export function loadInProgress ({ value }) {
-  return {
-    type: SET_LOAD_IN_PROGRESS,
-    payload: {
-      value,
-    },
   }
 }
 

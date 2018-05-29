@@ -37,7 +37,7 @@ const NoVmAvailable = () => {
   )
 }
 
-const VmsList = ({ vms }) => {
+const VmsList = ({ vms, requestActive }) => {
   const haveVms = (vms.get('vms') && !vms.get('vms').isEmpty())
   const havePools = (vms.get('pools') && !vms.get('pools').isEmpty())
 
@@ -45,7 +45,7 @@ const VmsList = ({ vms }) => {
 
   if (haveVms || havePools) {
     el = <Vms />
-  } else if (vms.get('loadInProgress')) {
+  } else if (requestActive) {
     el = <VmLoading />
   } else {
     el = <NoVmAvailable />
@@ -55,10 +55,12 @@ const VmsList = ({ vms }) => {
 }
 VmsList.propTypes = {
   vms: PropTypes.object.isRequired,
+  requestActive: PropTypes.bool.isRequired,
 }
 
 export default withRouter(connect(
   (state) => ({
     vms: state.vms,
+    requestActive: !state.activeRequests.isEmpty(),
   })
 )(VmsList))

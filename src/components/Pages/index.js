@@ -41,10 +41,10 @@ class VmDetailPage extends React.Component {
   }
 
   render () {
-    let { match, vms, config } = this.props
+    let { match, vms, config, requestActive } = this.props
     if (vms.getIn(['vms', match.params.id])) {
       return (<VmDetail vm={vms.getIn(['vms', match.params.id])} config={config} />)
-    } else if (vms.get('loadInProgress')) {
+    } else if (requestActive) {
       console.info(`VmDetailPage: VM id cannot be found: ${match.params.id}. Load is still in progress - waiting before redirect`)
       return null
     }
@@ -56,15 +56,16 @@ class VmDetailPage extends React.Component {
 VmDetailPage.propTypes = {
   vms: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
-
   match: PropTypes.object.isRequired,
-
   getVms: PropTypes.func.isRequired,
+  requestActive: PropTypes.bool.isRequired,
 }
+
 const VmDetailPageConnected = connect(
   (state) => ({
     vms: state.vms,
     config: state.config,
+    requestActive: !state.activeRequests.isEmpty(),
   }),
   (dispatch) => ({
     getVms: ({ vmId }) => dispatch(selectVmDetail({ vmId })),
@@ -95,11 +96,11 @@ class PoolDetailPage extends React.Component {
   }
 
   render () {
-    let { match, vms, config } = this.props
+    let { match, vms, config, requestActive } = this.props
 
     if (vms.getIn(['pools', match.params.id, 'vm'])) {
       return (<VmDetail vm={vms.getIn(['pools', match.params.id, 'vm'])} pool={vms.getIn(['pools', match.params.id])} config={config} isPool />)
-    } else if (vms.get('loadInProgress')) {
+    } else if (requestActive) {
       return null
     }
     return <Redirect to='/' />
@@ -108,15 +109,15 @@ class PoolDetailPage extends React.Component {
 PoolDetailPage.propTypes = {
   vms: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
-
   match: PropTypes.object.isRequired,
-
   getPools: PropTypes.func.isRequired,
+  requestActive: PropTypes.bool.isRequired,
 }
 const PoolDetailPageConnected = connect(
   (state) => ({
     vms: state.vms,
     config: state.config,
+    requestActive: !state.activeRequests.isEmpty(),
   }),
   (dispatch) => ({
     getPools: ({ poolId }) => dispatch(selectPoolDetail({ poolId })),
@@ -137,10 +138,10 @@ class VmDialogPage extends React.Component {
   }
 
   render () {
-    let { match, vms, previousPath } = this.props
+    let { match, vms, previousPath, requestActive } = this.props
     if ((match.params.id && vms.getIn(['vms', match.params.id])) || !match.params.id) {
       return (<VmDialog vm={vms.getIn(['vms', match.params.id])} previousPath={previousPath} />)
-    } else if (vms.get('loadInProgress')) {
+    } else if (requestActive) {
       console.info(`VmDialogPage: VM id cannot be found: ${match.params.id}. Load is still in progress - waiting before redirect`)
       return null
     }
@@ -157,10 +158,12 @@ VmDialogPage.propTypes = {
 
   getCDRom: PropTypes.func.isRequired,
   getVms: PropTypes.func.isRequired,
+  requestActive: PropTypes.bool.isRequired,
 }
 const VmDialogPageConnected = connect(
   (state) => ({
     vms: state.vms,
+    requestActive: !state.activeRequests.isEmpty(),
   }),
   (dispatch) => ({
     getCDRom: () => dispatch(getISOStorages()),

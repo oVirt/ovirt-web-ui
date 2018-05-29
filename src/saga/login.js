@@ -15,7 +15,6 @@ import {
   loginSuccessful,
   loginFailed,
 
-  loadInProgress,
   failedExternalAction,
   showTokenExpiredMessage,
   setOvirtApiVersion,
@@ -49,8 +48,6 @@ import {
 } from './consoles'
 
 export function* login (action) {
-  yield put(loadInProgress({ value: true }))
-
   let token = action.payload.token // the user is already logged in via oVirt SSO
   let result = {}
 
@@ -63,9 +60,7 @@ export function* login (action) {
     }))
 
     const oVirtMeta = yield callExternalAction('getOvirtApiMeta', Api.getOvirtApiMeta, action)
-    if (!oVirtMeta['product_info']) { // REST API call failed
-      yield put(yield put(loadInProgress({ value: false })))
-    } else {
+    if (oVirtMeta['product_info']) {
       if (yield checkOvirtApiVersion(oVirtMeta)) {
         yield put(getUSBFilter())
         yield fetchPermissionWithoutFilter({})
@@ -77,7 +72,6 @@ export function* login (action) {
           message: composeIncompatibleOVirtApiVersionMessage(oVirtMeta),
           shortMessage: 'oVirt API version check failed',
         }))
-        yield put(yield put(loadInProgress({ value: false })))
       }
     }
   } else {
@@ -85,7 +79,6 @@ export function* login (action) {
       errorCode: result['error_code'] ? result['error_code'] : 'no_access',
       message: result['error'] ? (result.error['statusText'] ? result.error['statusText'] : JSON.stringify(result['error'])) : 'Login Failed',
     }))
-    yield put(yield put(loadInProgress({ value: false })))
   }
 }
 
