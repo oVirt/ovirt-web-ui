@@ -25,6 +25,7 @@ export * from './storageDomains'
 export * from './dataCenters'
 export * from './pendingTasks'
 export * from './vnicProfiles'
+export * from './activeRequests'
 
 export function schedulerOneMinute () {
   return {
