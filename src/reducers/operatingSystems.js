@@ -3,7 +3,6 @@ import { actionReducer, removeMissingItems } from './utils'
 
 const initialState = fromJS({
   operatingSystems: {},
-  loadInProgress: true,
 })
 const operatingSystems = actionReducer(initialState, {
   ADD_ALL_OS (state, { payload: { os } }) {
