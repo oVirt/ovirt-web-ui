@@ -401,7 +401,7 @@ class VmDialog extends React.Component {
   getTemplate (templateId) {
     templateId = templateId || this.state.templateId
     if (templateId) {
-      const template = this.props.templates.get('templates').get(templateId)
+      const template = this.props.templates.get(templateId)
       if (template) {
         return template
       }
@@ -467,7 +467,7 @@ class VmDialog extends React.Component {
     }
 
     if (!this.getTemplate()) {
-      const def = templates.getIn(['templates', zeroUID]) || this.props.templates.get('templates').toList().first()
+      const def = templates.get(zeroUID) || this.props.templates.toList().first()
       stateChange.templateId = def ? def.get('id') : undefined
       logDebug(`VmDialog initDefaults(): Setting initial value for templateId = ${this.state.templateId} to ${stateChange.templateId}`)
     }
@@ -533,7 +533,7 @@ class VmDialog extends React.Component {
     const isEdit = !!vm
     const isUp = (isEdit && isRunning(vm.get('status')))
 
-    const filteredTemplates = templates.get('templates')
+    const filteredTemplates = templates
       .filter(template => template.get('clusterId') === this.state.clusterId || !template.get('clusterId'))
 
     const cluster = this.getCluster()
@@ -783,7 +783,7 @@ VmDialog.propTypes = {
   vm: PropTypes.object, // optional, VM object to edit
 
   clusters: PropTypes.object.isRequired,
-  templates: PropTypes.object.isRequired,
+  templates: PropTypes.object.isRequired, // deep immutable, {[id: string]: Template}
   operatingSystems: PropTypes.object.isRequired,
   userMessages: PropTypes.object.isRequired,
   vmDialog: PropTypes.object.isRequired,

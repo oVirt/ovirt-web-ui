@@ -45,7 +45,7 @@ Selectors = {
     return getState().clusters.getIn(['clusters', clusterId])
   },
   getTemplateById (templateId) {
-    return getState().templates.getIn(['templates', templateId])
+    return getState().templates.get(templateId)
   },
   getFilter () {
     return getState().config.get('filter')

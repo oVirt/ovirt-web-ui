@@ -29,7 +29,6 @@ import {
   removeMissingVms,
   removeMissingClusters,
   removeMissingHosts,
-  removeMissingTemplates,
   removeMissingOSs,
   setVmSessions,
   persistState,
@@ -37,7 +36,7 @@ import {
   getSingleVm,
   addClusters,
   addHosts,
-  addTemplates,
+  setTemplates,
   addAllOS,
   setStorageDomains,
   setDataCenters,
@@ -525,10 +524,7 @@ function* fetchAllTemplates (action) {
 
   if (templates && templates['template']) {
     const templatesInternal = templates.template.map(template => Api.templateToInternal({ template }))
-    yield put(addTemplates({ templates: templatesInternal }))
-
-    const templateIdsToPreserve = templatesInternal.map(item => item.id)
-    yield put(removeMissingTemplates({ templateIdsToPreserve }))
+    yield put(setTemplates(templatesInternal))
   }
 }
 
