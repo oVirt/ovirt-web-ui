@@ -62,6 +62,7 @@ import {
   setVmCDRom,
   setVmNics,
   setUSBFilter,
+  removeActiveRequest,
 } from './actions/index'
 
 import {
@@ -88,6 +89,7 @@ import {
 import {
   ADD_VM_NIC,
   CHECK_TOKEN_EXPIRED,
+  DELAYED_REMOVE_ACTIVE_REQUEST,
   DELETE_VM_NIC,
   GET_ALL_CLUSTERS,
   GET_ALL_FILES_FOR_ISO,
@@ -705,6 +707,11 @@ function* schedulerWithFixedDelay (action) {
   }
 }
 
+function* delayedRemoveActiveRequest ({ payload: requestId }) {
+  yield delay(500)
+  yield put(removeActiveRequest(requestId))
+}
+
 // Sagas workers for using in different sagas modules
 let sagasFunctions = {
   foreach,
@@ -755,6 +762,7 @@ export function* rootSaga () {
 
     takeEvery(SELECT_POOL_DETAIL, selectPoolDetail),
     takeEvery(GET_USB_FILTER, fetchUSBFilter),
+    takeEvery(DELAYED_REMOVE_ACTIVE_REQUEST, delayedRemoveActiveRequest),
 
     ...vmDisksSagas,
     ...newVmDialogSagas,
