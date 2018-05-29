@@ -16,8 +16,12 @@ type CloudInitInternalType = {
   hostName: string,
   sshAuthorizedKeys: string
 }
+type ListenerType = (requestId: Object, eventType: 'START' | 'STOP') => void
+type MethodType = 'GET' | 'POST' | 'PUT' | 'DELETE'
 
 const zeroUUID: string = '00000000-0000-0000-0000-000000000000'
+
+const listeners: Set<ListenerType> = new Set()
 
 let OvirtApi = {}
 OvirtApi = {
@@ -34,6 +38,7 @@ OvirtApi = {
   },
   _httpGet ({ url, custHeaders = {} }: { url: string, custHeaders?: Object}): Promise<Object> {
     logDebug(`_httpGet start: url="${url}"`)
+    const requestId = notifyStart('GET', url)
     const headers = Object.assign({
       'Authorization': `Bearer ${OvirtApi._getLoginToken()}`,
       'Accept-Language': AppConfiguration.queryParams.locale, // can be: undefined, empty or string
@@ -45,13 +50,19 @@ OvirtApi = {
     return $.ajax(url, {
       type: 'GET',
       headers,
-    }).then((data: Object): Promise<Object> => Promise.resolve(data))
+    })
+      .then((data: Object): Object => {
+        notifyStop(requestId)
+        return data
+      })
       .catch((data: Object): Promise<Object> => {
         logDebug(`Ajax failed: ${JSON.stringify(data)}`)
+        notifyStop(requestId)
         return Promise.reject(data)
       })
   },
   _httpPost ({ url, input, contentType = 'application/json' }: InputRequestType): Promise<Object> {
+    const requestId = notifyStart('POST', url)
     return $.ajax(url, {
       type: 'POST',
       headers: {
@@ -62,13 +73,19 @@ OvirtApi = {
         'Filter': Selectors.getFilter(),
       },
       data: input,
-    }).then((data: Object): Promise<Object> => Promise.resolve(data))
+    })
+      .then((data: Object): Object => {
+        notifyStop(requestId)
+        return data
+      })
       .catch((data: Object): Promise<Object> => {
         logDebug(`Ajax failed: ${JSON.stringify(data)}`)
+        notifyStop(requestId)
         return Promise.reject(data)
       })
   },
   _httpPut ({ url, input, contentType = 'application/json' }: InputRequestType): Promise<Object> {
+    const requestId = notifyStart('PUT', url)
     return $.ajax(url, {
       type: 'PUT',
       headers: {
@@ -79,9 +96,14 @@ OvirtApi = {
         'Filter': Selectors.getFilter(),
       },
       data: input,
-    }).then((data: Object): Promise<Object> => Promise.resolve(data))
+    })
+      .then((data: Object): Object => {
+        notifyStop(requestId)
+        return data
+      })
       .catch((data: Object): Promise<Object> => {
         logDebug(`Ajax failed: ${JSON.stringify(data)}`)
+        notifyStop(requestId)
         return Promise.reject(data)
       })
   },
@@ -90,14 +112,20 @@ OvirtApi = {
       'Authorization': `Bearer ${OvirtApi._getLoginToken()}`,
       'Filter': Selectors.getFilter(),
     }, custHeaders)
+    const requestId = notifyStart('DELETE', url)
     logDebug(`_httpDelete: url="${url}", headers="${JSON.stringify(headers)}"`)
 
     return $.ajax(url, {
       type: 'DELETE',
       headers,
-    }).then((data: Object): Promise<Object> => Promise.resolve(data))
+    })
+      .then((data: Object): Object => {
+        notifyStop(requestId)
+        return data
+      })
       .catch((data: Object): Promise<Object> => {
         logDebug(`Ajax failed: ${JSON.stringify(data)}`)
+        notifyStop(requestId)
         return Promise.reject(data)
       })
   },
@@ -839,6 +867,19 @@ OvirtApi = {
     OvirtApi._assertLogin({ methodName: 'getNetworks' })
     return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/networks` })
   },
+  addHttpListener (listener: ListenerType) {
+    listeners.add(listener)
+  },
+}
+
+function notifyStart (method: MethodType, url: string): Object {
+  const requestId = { method, url }
+  listeners.forEach(listener => listener(requestId, 'START'))
+  return requestId
+}
+
+function notifyStop (requestId: Object) {
+  listeners.forEach(listener => listener(requestId, 'STOP'))
 }
 
 function bootMenuToInternal (vmLike: Object): boolean {
