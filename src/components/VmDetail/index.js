@@ -98,20 +98,21 @@ class VmDetail extends Component {
   render () {
     const {
       vm,
+      pool,
       icons,
       userMessages,
-      onConsole,
-      isPool,
-      onConsoleOptionsSave,
       options,
-      pool,
-      onRDP,
-      operatingSystems,
       config,
+      operatingSystems,
+      onConsole,
+      onConsoleOptionsSave,
+      onRDP,
     } = this.props
 
     const sequence = [ 'first', 'second' ]
 
+    const isPool = !!pool
+    const isPoolVm = !!vm.getIn(['pool', 'id'], false)
     const name = isPool ? pool.get('name') : vm.get('name')
     const idPrefix = `vmdetail-${name}`
     const icon = getVmIcon(icons, operatingSystems.get('operatingSystems'), vm)
@@ -123,7 +124,7 @@ class VmDetail extends Component {
 
     const disksElement = (<VmDisks disks={disks} vmId={vm.get('id')} edit={this.state.editDisks} />)
 
-    const diskEditAllowed = !isPool && !vm.getIn(['pool', 'id'])
+    const diskEditAllowed = !isPool && !isPoolVm
     const pencilIcon = (<i className={`pficon pficon-edit`} />)
     const disksEditPencil = (
       <small className={style.editPencilLink}>
@@ -143,7 +144,7 @@ class VmDetail extends Component {
         </a>
       </small>)
 
-    const notPoolOrPoolVm = !isPool && vm.getIn(['pool', 'id']) === undefined
+    const notPoolOrPoolVm = !isPool && !isPoolVm
     const nicOptionsShowHide = notPoolOrPoolVm ? (
       <small>
         <a href='#' onClick={this.nicSettings} id={`${idPrefix}-nicoptions-showhide`}>
@@ -304,12 +305,12 @@ VmDetail.propTypes = {
   icons: PropTypes.object.isRequired,
   operatingSystems: PropTypes.object.isRequired,
   userMessages: PropTypes.object.isRequired,
+  options: PropTypes.object.isRequired,
+  config: PropTypes.object.isRequired,
+
   onConsole: PropTypes.func.isRequired,
   onConsoleOptionsSave: PropTypes.func.isRequired,
   onConsoleOptionsOpen: PropTypes.func.isRequired,
-  options: PropTypes.object.isRequired,
-  isPool: PropTypes.bool,
-  config: PropTypes.object.isRequired,
   onRDP: PropTypes.func.isRequired,
 }
 
