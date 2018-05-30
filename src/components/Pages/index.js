@@ -1,14 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Redirect } from 'react-router-dom'
 
 import VmDetail from '../VmDetail'
 import VmDialog from '../VmDialog'
 import VmsList from '../VmsList'
 
 import { selectVmDetail, selectPoolDetail, getISOStorages } from '../../actions'
-import Selectors from '../../selectors'
 
 /**
  * Route component (for PageRouter) to view the list of VMs and Pools
@@ -26,31 +24,36 @@ class VmDetailPage extends React.Component {
     this.requestSent = false
   }
 
-  componentWillMount () {
-    if (Selectors.isFilterChecked()) {
-      this.props.getVms({ vmId: this.props.match.params.id })
+  fetchTheVmIfNeeded () {
+    const { match, vms, getVms } = this.props
+    let requested = false
+
+    if (!this.requestSent && !vms.getIn(['vms', match.params.id])) {
+      this.requestSent = requested = true
+      getVms({ vmId: match.params.id })
     }
+
+    return requested
+  }
+
+  componentWillMount () {
+    this.fetchTheVmIfNeeded()
   }
 
   componentWillUpdate () {
-    const vmInStore = this.props.vms.getIn(['vms', this.props.match.params.id])
-    if (!vmInStore && Selectors.isFilterChecked() && !this.requestSent) {
-      this.requestSent = true
-      this.props.getVms({ vmId: this.props.match.params.id })
-    }
+    this.fetchTheVmIfNeeded()
   }
 
   render () {
-    let { match, vms, config, requestActive } = this.props
+    const { match, vms, config } = this.props
+
     if (vms.getIn(['vms', match.params.id])) {
       return (<VmDetail vm={vms.getIn(['vms', match.params.id])} config={config} />)
-    } else if (requestActive) {
-      console.info(`VmDetailPage: VM id cannot be found: ${match.params.id}. Load is still in progress - waiting before redirect`)
-      return null
     }
 
-    console.info(`VmDetailPage: VM id cannot be found: ${match.params.id}. Redirecting to / `)
-    return <Redirect to='/' />
+    // TODO: Add handling for if the fetch runs but fails (FETCH-FAIL)
+    console.info(`VmDetailPage: VM id cannot be found: ${match.params.id}`)
+    return null
   }
 }
 VmDetailPage.propTypes = {
@@ -81,29 +84,36 @@ class PoolDetailPage extends React.Component {
     this.requestSent = false
   }
 
-  componentWillMount () {
-    if (Selectors.isFilterChecked()) {
-      this.props.getPools({ poolId: this.props.match.params.id })
+  fetchThePoolIfNeeded () {
+    const { match, vms, getPools } = this.props
+    let requested = false
+
+    if (!this.requestSent && !vms.getIn(['pools', match.params.id, 'vm'])) {
+      this.requestSent = requested = true
+      getPools({ poolId: match.params.id })
     }
+
+    return requested
+  }
+
+  componentWillMount () {
+    this.fetchThePoolIfNeeded()
   }
 
   componentWillUpdate () {
-    const poolInStore = this.props.vms.getIn(['pools', this.props.match.params.id, 'vm'])
-    if (!poolInStore && Selectors.isFilterChecked() && !this.requestSent) {
-      this.requestSent = true
-      this.props.getPools({ poolId: this.props.match.params.id })
-    }
+    this.fetchThePoolIfNeeded()
   }
 
   render () {
-    let { match, vms, config, requestActive } = this.props
+    const { match, vms, config } = this.props
 
     if (vms.getIn(['pools', match.params.id, 'vm'])) {
-      return (<VmDetail vm={vms.getIn(['pools', match.params.id, 'vm'])} pool={vms.getIn(['pools', match.params.id])} config={config} isPool />)
-    } else if (requestActive) {
-      return null
+      return (<VmDetail vm={vms.getIn(['pools', match.params.id, 'vm'])} pool={vms.getIn(['pools', match.params.id])} config={config} />)
     }
-    return <Redirect to='/' />
+
+    // TODO: Add handling for if the fetch runs but fails (FETCH-FAIL)
+    console.info(`PoolDetailPage: Pool id cannot be found: ${match.params.id}`)
+    return null
   }
 }
 PoolDetailPage.propTypes = {
@@ -125,28 +135,50 @@ const PoolDetailPageConnected = connect(
 )(PoolDetailPage)
 
 /**
- * Route component (for PageRouter) to edit a VM
+ * Route component (for PageRouter) to create or edit a VM
  */
 class VmDialogPage extends React.Component {
+  constructor (props) {
+    super(props)
+    this.requestSent = false
+    this.isAdd = !props.match.params.id || /\/add$/.test(props.match.path)
+  }
+
+  fetchTheVmIfNeeded () {
+    const { match, vms, getVms } = this.props
+    let requested = false
+
+    if (!this.isAdd && !this.requestSent && !vms.getIn(['vms', match.params.id])) {
+      this.requestSent = requested = true
+      getVms({ vmId: match.params.id })
+    }
+
+    return requested
+  }
+
   componentWillMount () {
     this.props.getCDRom()
 
-    // in case the location is entered from outside, refresh data
-    if (this.props.match.params.id) {
-      this.props.getVms({ vmId: this.props.match.params.id })
-    }
+    const requested = this.fetchTheVmIfNeeded()
+    if (requested) console.info(`VmDialogPage: WillMount requesting: ${this.props.match.params.id}`)
+  }
+
+  componentWillUpdate () {
+    const requested = this.fetchTheVmIfNeeded()
+    if (requested) console.info(`VmDialogPage: WillUpdate requested: ${this.props.match.params.id}`)
   }
 
   render () {
-    let { match, vms, previousPath, requestActive } = this.props
-    if ((match.params.id && vms.getIn(['vms', match.params.id])) || !match.params.id) {
-      return (<VmDialog vm={vms.getIn(['vms', match.params.id])} previousPath={previousPath} />)
-    } else if (requestActive) {
-      console.info(`VmDialogPage: VM id cannot be found: ${match.params.id}. Load is still in progress - waiting before redirect`)
-      return null
+    const { match, vms, previousPath } = this.props
+
+    if (this.isAdd) {
+      return <VmDialog previousPath={previousPath} />
+    } else if (match.params.id && vms.getIn(['vms', match.params.id])) {
+      return <VmDialog previousPath={previousPath} vm={vms.getIn(['vms', match.params.id])} />
     }
 
-    console.info(`VmDialogPage: VM id cannot be found: ${match.params.id}.`)
+    // TODO: Add handling for if the fetch runs but fails (FETCH-FAIL)
+    console.info(`VmDialogPage: VM id cannot be found: ${match.params.id}`)
     return null
   }
 }
