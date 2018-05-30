@@ -27,14 +27,13 @@ import {
   vmActionInProgress,
   setVmConsoles,
   removeMissingVms,
-  removeMissingClusters,
   removeMissingHosts,
   removeMissingOSs,
   setVmSessions,
   persistState,
 
   getSingleVm,
-  addClusters,
+  setClusters,
   addHosts,
   setTemplates,
   addAllOS,
@@ -577,10 +576,7 @@ function* fetchAllClusters (action) {
 
   if (clusters && clusters['cluster']) {
     const clustersInternal = clusters.cluster.map(cluster => Api.clusterToInternal({ cluster }))
-    yield put(addClusters({ clusters: clustersInternal }))
-
-    const clusterIdsToPreserve = clustersInternal.map(item => item.id)
-    yield put(removeMissingClusters({ clusterIdsToPreserve }))
+    yield put(setClusters(clustersInternal))
   }
 }
 

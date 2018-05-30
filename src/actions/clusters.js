@@ -1,22 +1,12 @@
 import {
   GET_ALL_CLUSTERS,
-} from '../constants/index'
+  SET_CLUSTERS,
+} from '../constants'
 
-export function removeMissingClusters ({ clusterIdsToPreserve }) {
+export function setClusters (clusters) {
   return {
-    type: 'REMOVE_MISSING_CLUSTERS',
-    payload: {
-      clusterIdsToPreserve,
-    },
-  }
-}
-
-export function addClusters ({ clusters }) {
-  return {
-    type: 'ADD_CLUSTERS',
-    payload: {
-      clusters,
-    },
+    type: SET_CLUSTERS,
+    payload: clusters,
   }
 }
 

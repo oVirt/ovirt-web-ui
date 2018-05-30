@@ -40,12 +40,12 @@ class NewDiskDialog extends React.Component {
   }
 
   getDataCenterId () {
-    if (!this.props.clusters.clusters || Object.keys(this.props.clusters.clusters).length === 0) {
+    if (!this.props.clusters || Object.keys(this.props.clusters).length === 0) {
       // data not yet loaded
       return null
     }
     const clusterId = this.props.vm.cluster.id
-    const cluster = Object.values(this.props.clusters.clusters)
+    const cluster = Object.values(this.props.clusters)
       .filter(cluster => cluster.id === clusterId)[0]
     return cluster && cluster.dataCenterId
   }

@@ -1,22 +1,15 @@
 import { fromJS } from 'immutable'
-import { actionReducer, removeMissingItems } from './utils'
 
-const initialState = fromJS({
-  clusters: {},
-})
+import { actionReducer } from './utils'
+import { arrayToMap } from '../helpers'
+import { SET_CLUSTERS } from '../constants'
+
+const initialState = fromJS({})
 
 const clusters = actionReducer(initialState, {
-  ADD_CLUSTERS (state, { payload: { clusters } }) {
-    const updates = {}
-    clusters.forEach(cluster => {
-      updates[cluster.id] = cluster
-    })
-    const imUpdates = fromJS(updates)
-    return state.mergeIn(['clusters'], imUpdates)
-  },
-
-  REMOVE_MISSING_CLUSTERS (state, { payload: { clusterIdsToPreserve } }) {
-    return removeMissingItems({ state, subStateName: 'clusters', idsToPreserve: clusterIdsToPreserve })
+  [SET_CLUSTERS] (state, { payload: clusters }) {
+    const idToCluster = arrayToMap(clusters, cluster => cluster.id)
+    return fromJS(idToCluster)
   },
 })
 
