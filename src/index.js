@@ -23,7 +23,7 @@ import AppConfiguration, { readConfiguration } from './config'
 import { loadStateFromLocalStorage } from './storage'
 import { logDebug, logError, valuesOfObject } from './helpers'
 import { rootSaga } from './sagas'
-import { login, updateIcons, setDomain, schedulerOneMinute } from './actions'
+import { login, updateIcons, setDomain, schedulerFixedDelay } from './actions'
 
 import App from './App'
 
@@ -132,7 +132,7 @@ function onResourcesLoaded () {
     logError('Missing SSO Token!')
   }
 
-  store.dispatch(schedulerOneMinute())
+  store.dispatch(schedulerFixedDelay())
 }
 
 start()

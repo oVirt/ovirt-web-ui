@@ -7,7 +7,7 @@ import {
   SET_ADMINISTATOR,
   SET_USER_FILTER_PERMISSION,
   CHECK_TOKEN_EXPIRED,
-  SCHEDULER__1_MIN,
+  SCHEDULER_FIXED_DELAY,
 } from '../constants/index'
 
 export * from './error'
@@ -26,9 +26,9 @@ export * from './dataCenters'
 export * from './pendingTasks'
 export * from './vnicProfiles'
 
-export function schedulerOneMinute () {
+export function schedulerFixedDelay () {
   return {
-    type: SCHEDULER__1_MIN,
+    type: SCHEDULER_FIXED_DELAY,
     payload: {},
   }
 }
