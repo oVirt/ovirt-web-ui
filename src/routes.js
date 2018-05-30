@@ -38,13 +38,13 @@ const getRoutes = (vms) => ([
       },
       {
         path: '/vm/:id',
-        title: (match) => vms.getIn(['vms', match.params.id, 'name']),
+        title: (match) => vms.getIn(['vms', match.params.id, 'name']) || match.params.id,
         component: VmDetailPage,
         toolbars: [(match) => (<VmDetailToolbar match={match} key='vmaction' />)],
         routes: [
           {
             path: '/vm/:id/edit',
-            title: (match) => msg.edit(),
+            title: (match) => msg.edit() || match.params.id,
             component: VmDialogPage,
             toolbars: [], // Recently not used. When needed, see VmDialog/style.css - .vm-dialog-buttons
           },
@@ -53,7 +53,7 @@ const getRoutes = (vms) => ([
 
       {
         path: '/pool/:id',
-        title: (match) => vms.getIn(['pools', match.params.id, 'name']),
+        title: (match) => vms.getIn(['pools', match.params.id, 'name']) || match.params.id,
         component: PoolDetailPage,
         toolbars: [(match) => (<PoolDetailToolbar match={match} key='poolaction' />)],
       },
