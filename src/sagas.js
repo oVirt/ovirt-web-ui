@@ -27,13 +27,12 @@ import {
   vmActionInProgress,
   setVmConsoles,
   removeMissingVms,
-  removeMissingHosts,
   setVmSessions,
   persistState,
 
   getSingleVm,
   setClusters,
-  addHosts,
+  setHosts,
   setTemplates,
   setOperatingSystems,
   setStorageDomains,
@@ -584,10 +583,7 @@ function* fetchAllHosts (action) {
 
   if (hosts && hosts['host']) {
     const hostsInternal = hosts.host.map(host => Api.hostToInternal({ host }))
-    yield put(addHosts({ hosts: hostsInternal }))
-
-    const hostIdsToPreserve = hostsInternal.map(item => item.id)
-    yield put(removeMissingHosts({ hostIdsToPreserve }))
+    yield put(setHosts(hostsInternal))
   }
 }
 

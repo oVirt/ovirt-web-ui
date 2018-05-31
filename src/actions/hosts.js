@@ -1,22 +1,12 @@
 import {
   GET_ALL_HOSTS,
-} from '../constants/index'
+  SET_HOSTS,
+} from '../constants'
 
-export function removeMissingHosts ({ hostIdsToPreserve }) {
+export function setHosts (hosts) {
   return {
-    type: 'REMOVE_MISSING_HOSTS',
-    payload: {
-      hostIdsToPreserve,
-    },
-  }
-}
-
-export function addHosts ({ hosts }) {
-  return {
-    type: 'ADD_HOSTS',
-    payload: {
-      hosts,
-    },
+    type: SET_HOSTS,
+    payload: hosts,
   }
 }
 
