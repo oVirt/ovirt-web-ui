@@ -544,9 +544,12 @@ OvirtApi = {
     const url = `${AppConfiguration.applicationContext}/api/`
     return OvirtApi._httpGet({ url })
   },
-  getVm ({ vmId }: VmIdType): Promise<Object> {
+  getVm ({ vmId, additional }: { vmId: string, additional: Array<string> }): Promise<Object> {
     OvirtApi._assertLogin({ methodName: 'getVm' })
-    const url = `${AppConfiguration.applicationContext}/api/vms/${vmId}`
+    let url = `${AppConfiguration.applicationContext}/api/vms/${vmId}`
+    if (additional && additional.length > 0) {
+      url += `?follow=${additional.join(',')}`
+    }
     return OvirtApi._httpGet({ url })
   },
   getVmsByPage ({ page, additional }: { page: number, additional: Array<string> }): Promise<Object> {

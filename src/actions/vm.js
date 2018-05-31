@@ -27,7 +27,11 @@ import {
   UPDATE_ICONS,
   UPDATE_VMS,
   VM_ACTION_IN_PROGRESS,
-} from '../constants/index'
+  ADD_VMS_FETCHED_BY_ID,
+  REMOVE_VMS_FETCHED_BY_ID,
+  ADD_POOLS_FETCHED_BY_ID,
+  REMOVE_POOLS_FETCHED_BY_ID,
+} from '../constants'
 
 export function login ({ username, password, token, userId }) {
   return {
@@ -352,6 +356,42 @@ export function deleteVmNic ({ vmId, nicId }) {
     payload: {
       vmId,
       nicId,
+    },
+  }
+}
+
+export function addVmsFetchedById ({ vmIds }) {
+  return {
+    type: ADD_VMS_FETCHED_BY_ID,
+    payload: {
+      vmIds,
+    },
+  }
+}
+
+export function removeVmsFetchedById ({ vmIds }) {
+  return {
+    type: REMOVE_VMS_FETCHED_BY_ID,
+    payload: {
+      vmIds,
+    },
+  }
+}
+
+export function addPoolsFetchedById ({ poolIds }) {
+  return {
+    type: ADD_POOLS_FETCHED_BY_ID,
+    payload: {
+      poolIds,
+    },
+  }
+}
+
+export function removePoolsFetchedById ({ poolIds }) {
+  return {
+    type: REMOVE_POOLS_FETCHED_BY_ID,
+    payload: {
+      poolIds,
     },
   }
 }

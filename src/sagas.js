@@ -34,6 +34,10 @@ import {
   removeMissingOSs,
   setVmSessions,
   persistState,
+  addVmsFetchedById,
+  addPoolsFetchedById,
+  removeVmsFetchedById,
+  removePoolsFetchedById,
 
   getSingleVm,
   addClusters,
@@ -62,7 +66,7 @@ import {
   setVmCDRom,
   setVmNics,
   setUSBFilter,
-} from './actions/index'
+} from './actions'
 
 import {
   callExternalAction,
@@ -122,6 +126,14 @@ import {
   SUSPEND_VM,
 } from './constants/index'
 
+/**
+ * Compare the current oVirt version (held in redux) to the given version.
+ */
+function compareVersionToCurrent ({ major, minor }) {
+  const current = Selectors.getOvirtVersion()
+  return compareVersion(current, { major, minor })
+}
+
 function* fetchByPage (action) {
   yield put(loadInProgress({ value: true }))
   yield put(setChanged({ value: false }))
@@ -164,39 +176,66 @@ function* fetchIcon ({ iconId }) {
 }
 
 function* refreshData (action) {
-  console.log('refreshData(): ', action.payload)
+  logDebug('refreshData(): ', action.payload)
   if (!action.payload.quiet) {
-    logDebug('refreshData(): not quiet')
     yield put(loadInProgress({ value: true }))
   }
 
-  // do refresh sequentially
-  yield fetchVmsByCount(getVmsByCount({ count: action.payload.page * AppConfiguration.pageLimit, shallowFetch: !!action.payload.shallowFetch }))
-  yield fetchPoolsByCount(getPoolsByCount({ count: action.payload.page * AppConfiguration.pageLimit }))
+  // refresh VMs and remove any that haven't been refreshed
+  const vmsFetchedById = []
+  for (let vmId of Selectors.getVmsFetchedById().toArray()) {
+    const status = yield fetchSingleVm(getSingleVm({ vmId }))
+    if (status) vmsFetchedById.push(vmId)
+  }
 
+  const fetchedVmIds = yield fetchVmsByCount(getVmsByCount({
+    count: action.payload.page * AppConfiguration.pageLimit,
+    shallowFetch: !!action.payload.shallowFetch,
+  }))
+
+  yield put(removeMissingVms({ vmIdsToPreserve: [ ...fetchedVmIds, ...vmsFetchedById ] }))
+  yield put(removeVmsFetchedById({ vmIds: fetchedVmIds }))
+
+  // refresh Pools and remove any that haven't been refreshed
+  const poolsFetchedById = []
+  for (let poolId of Selectors.getPoolsFetchedById().toArray()) {
+    const status = yield fetchSinglePool(getSinglePool({ poolId }))
+    if (status) poolsFetchedById.push(poolId)
+  }
+
+  const fetchedPoolIds = yield fetchPoolsByCount(getPoolsByCount({
+    count: action.payload.page * AppConfiguration.pageLimit,
+  }))
+
+  yield put(removeMissingPools({ poolIdsToPreserve: [ ...fetchedPoolIds, ...poolsFetchedById ] }))
+  yield put(removePoolsFetchedById({ poolIds: fetchedPoolIds }))
+
+  // update counts
+  yield put(updateVmsPoolsCount())
   yield put(loadInProgress({ value: false }))
-  logDebug('refreshData() finished')
+  logDebug('refreshData(): finished')
 }
 
 function* fetchVmsByPage (action) {
-  const actual = Selectors.getOvirtVersion().toJS()
-  if (compareVersion({ major: parseInt(actual.major), minor: parseInt(actual.minor) }, { major: 4, minor: 2 })) {
+  if (compareVersionToCurrent({ major: 4, minor: 2 })) {
     yield fetchVmsByPageV42(action)
   } else {
     yield fetchVmsByPageVLower(action)
   }
 }
 
+/**
+ * Fetch VMs with additional nested data requested (on ovirt 4.2 and later)
+ */
 function* fetchVmsByPageV42 (action) {
   const { shallowFetch, page } = action.payload
-  let additional = []
-  if (!shallowFetch) {
-    additional = ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics']
-  }
-  action.payload.additional = additional
+
+  action.payload.additional = shallowFetch
+    ? []
+    : ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics']
+
   // TODO: paging: split this call to a loop per up to 25 vms
   const allVms = yield callExternalAction('getVmsByPage', Api.getVmsByPage, action)
-
   if (allVms && allVms['vm']) { // array
     const internalVms = allVms.vm.map(vm => Api.vmToInternal({ vm, getSubResources: true }))
 
@@ -207,12 +246,14 @@ function* fetchVmsByPageV42 (action) {
   yield put(persistState())
 }
 
+/**
+ * Fetch VMs and individually fetch nested data as requested (on ovirt 4.1 and earlier)
+ */
 function* fetchVmsByPageVLower (action) {
   const { shallowFetch, page } = action.payload
 
   // TODO: paging: split this call to a loop per up to 25 vms
   const allVms = yield callExternalAction('getVmsByPage', Api.getVmsByPage, action)
-
   if (allVms && allVms['vm']) { // array
     const internalVms = allVms.vm.map(vm => Api.vmToInternal({ vm }))
 
@@ -233,48 +274,47 @@ function* fetchVmsByPageVLower (action) {
   yield put(persistState())
 }
 
+/**
+ * Fetch a given number of VMs (**action.payload.count**).
+ */
 function* fetchVmsByCount (action) {
-  const actual = Selectors.getOvirtVersion().toJS()
-  if (compareVersion({ major: parseInt(actual.major), minor: parseInt(actual.minor) }, { major: 4, minor: 2 })) {
-    yield fetchVmsByCountV42(action)
+  if (compareVersionToCurrent({ major: 4, minor: 2 })) {
+    return yield fetchVmsByCountV42(action)
   } else {
-    yield fetchVmsByCountVLower(action)
+    return yield fetchVmsByCountVLower(action)
   }
 }
 
 function* fetchVmsByCountV42 (action) {
-  const { shallowFetch, page } = action.payload
-  let additional = []
-  if (!shallowFetch) {
-    additional = ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics']
-  }
-  action.payload.additional = additional
-  const allVms = yield callExternalAction('getVmsByCount', Api.getVmsByCount, action)
+  const { shallowFetch } = action.payload
+  const fetchedVmIds = []
 
+  action.payload.additional = shallowFetch
+    ? []
+    : ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics']
+
+  const allVms = yield callExternalAction('getVmsByCount', Api.getVmsByCount, action)
   if (allVms && allVms['vm']) { // array
     const internalVms = allVms.vm.map(vm => Api.vmToInternal({ vm, getSubResources: true }))
+    internalVms.forEach(vm => fetchedVmIds.push(vm.id))
 
-    const vmIdsToPreserve = internalVms.map(vm => vm.id)
-    yield put(removeMissingVms({ vmIdsToPreserve }))
-
-    yield put(updateVms({ vms: internalVms, copySubResources: true, page: page }))
+    yield put(updateVms({ vms: internalVms, copySubResources: true }))
     yield fetchUnknownIconsForVms({ vms: internalVms })
   }
 
   yield put(persistState())
+  return fetchedVmIds
 }
 
 function* fetchVmsByCountVLower (action) {
   const { shallowFetch } = action.payload
+  const fetchedVmIds = []
 
   // TODO: paging: split this call to a loop per up to 25 vms
   const allVms = yield callExternalAction('getVmsByCount', Api.getVmsByCount, action)
-
   if (allVms && allVms['vm']) { // array
     const internalVms = allVms.vm.map(vm => Api.vmToInternal({ vm }))
-
-    const vmIdsToPreserve = internalVms.map(vm => vm.id)
-    yield put(removeMissingVms({ vmIdsToPreserve }))
+    internalVms.forEach(vm => fetchedVmIds.push(vm.id))
 
     yield put(updateVms({ vms: internalVms, copySubResources: true }))
     yield fetchUnknownIconsForVms({ vms: internalVms })
@@ -286,27 +326,66 @@ function* fetchVmsByCountVLower (action) {
       yield fetchVmsCDRom({ vms: internalVms })
       yield fetchVmsNics({ vms: internalVms })
     } else {
-      logDebug('fetchVmsByCount() shallow fetch requested - skipping other resources')
+      logDebug('fetchVmsByCountVLower() shallow fetch requested - skipping other resources')
     }
   }
 
   yield put(persistState())
+  return fetchedVmIds
+}
+
+export function* fetchSingleVm (action) {
+  const { vmId, shallowFetch } = action.payload
+  yield startProgress({ vmId, name: 'refresh_single' })
+
+  const isOvirtGTE42 = compareVersionToCurrent({ major: 4, minor: 2 })
+  if (isOvirtGTE42 && !shallowFetch) {
+    action.payload.additional =
+      ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics']
+  }
+
+  yield put(addVmsFetchedById({ vmIds: [ vmId ] }))
+  const vm = yield callExternalAction('getVm', Api.getVm, action, true)
+  let internalVm = false
+  if (vm && vm.id) {
+    internalVm = Api.vmToInternal({ vm, getSubResources: isOvirtGTE42 })
+
+    if (!isOvirtGTE42 && !shallowFetch) {
+      internalVm.disks = yield fetchVmDisks({ vmId: internalVm.id })
+      internalVm.consoles = yield fetchConsoleVmMeta({ vmId: internalVm.id })
+      internalVm.sessions = yield fetchVmSessions({ vmId: internalVm.id })
+      internalVm.cdrom = yield fetchVmCDRom({ vmId: internalVm.id, running: internalVm.status === 'up' })
+      internalVm.nics = yield fetchVmNics({ vmId: internalVm.id })
+    }
+
+    yield put(updateVms({ vms: [internalVm] }))
+    yield fetchUnknownIconsForVms({ vms: [internalVm] })
+  } else {
+    if (vm && vm.error && vm.error.status === 404) {
+      yield put(removeVmsFetchedById({ vmIds: [vmId] }))
+      yield put(removeVms({ vmIds: [vmId] }))
+    }
+  }
+  yield stopProgress({ vmId, name: 'refresh_single' })
+
+  yield put(updateVmsPoolsCount())
+  return internalVm
 }
 
 function* fetchPoolsByCount (action) {
-  const allPools = yield callExternalAction('getPoolsByCount', Api.getPoolsByCount, action)
+  const fetchedPoolIds = []
 
+  const allPools = yield callExternalAction('getPoolsByCount', Api.getPoolsByCount, action)
   if (allPools && allPools['vm_pool']) { // array
     const internalPools = allPools.vm_pool.map(pool => Api.poolToInternal({ pool }))
-
-    const poolIdsToPreserve = internalPools.map(pool => pool.id)
-    yield put(removeMissingPools({ poolIdsToPreserve }))
+    internalPools.forEach(pool => fetchedPoolIds.push(pool.id))
 
     yield put(updatePools({ pools: internalPools }))
     yield put(updateVmsPoolsCount())
   }
 
   yield put(persistState())
+  return fetchedPoolIds
 }
 
 function* fetchPoolsByPage (action) {
@@ -323,58 +402,29 @@ function* fetchPoolsByPage (action) {
 }
 
 function* fetchSinglePool (action) {
+  const { poolId } = action.payload
+
+  yield put(addPoolsFetchedById({ poolIds: [poolId] }))
   const pool = yield callExternalAction('getPool', Api.getPool, action, true)
-
+  let internalPool = false
   if (pool && pool.id) {
-    const internalPool = Api.poolToInternal({ pool })
-
+    internalPool = Api.poolToInternal({ pool })
     yield put(updatePools({ pools: [internalPool] }))
   } else {
     if (pool && pool.error && pool.error.status === 404) {
-      yield put(removePools({ poolIds: [action.payload.poolId] }))
+      yield put(removePoolsFetchedById({ poolIds: [poolId] }))
+      yield put(removePools({ poolIds: [poolId] }))
     }
   }
+
   yield put(updateVmsPoolsCount())
+  return internalPool
 }
 
 function* fetchVmsSessions ({ vms }) {
   yield * foreach(vms, function* (vm) {
     const sessionsInternal = yield fetchVmSessions({ vmId: vm.id })
     yield put(setVmSessions({ vmId: vm.id, sessions: sessionsInternal }))
-  })
-}
-
-export function* fetchSingleVm (action) {
-  yield startProgress({ vmId: action.payload.vmId, name: 'refresh_single' })
-
-  const vm = yield callExternalAction('getVm', Api.getVm, action, true)
-
-  if (vm && vm.id) {
-    const internalVm = Api.vmToInternal({ vm })
-
-    internalVm.disks = yield fetchVmDisks({ vmId: internalVm.id })
-    internalVm.consoles = yield fetchConsoleVmMeta({ vmId: internalVm.id })
-    internalVm.sessions = yield fetchVmSessions({ vmId: internalVm.id })
-    internalVm.cdrom = yield fetchVmCDRom({ vmId: internalVm.id, running: internalVm.status === 'up' })
-    internalVm.nics = yield fetchVmNics({ vmId: internalVm.id })
-
-    yield put(updateVms({ vms: [internalVm] }))
-    yield fetchUnknownIconsForVms({ vms: [internalVm] })
-  } else {
-    if (vm && vm.error && vm.error.status === 404) {
-      yield put(removeVms({ vmIds: [action.payload.vmId] }))
-    }
-  }
-  yield stopProgress({ vmId: action.payload.vmId, name: 'refresh_single' })
-
-  yield put(updateVmsPoolsCount())
-}
-
-export function* fetchDisks ({ vms }) {
-  yield * foreach(vms, function* (vm) {
-    const vmId = vm.id
-    const disks = yield fetchVmDisks({ vmId })
-    yield put(setVmDisks({ vmId, disks }))
   })
 }
 
@@ -401,7 +451,15 @@ function* fetchConsoleMetadatas ({ vms }) {
   })
 }
 
-function* fetchVmDisks ({ vmId }) {
+export function* fetchDisks ({ vms }) {
+  yield * foreach(vms, function* (vm) {
+    const vmId = vm.id
+    const disks = yield fetchVmDisks({ vmId })
+    yield put(setVmDisks({ vmId, disks }))
+  })
+}
+
+function* fetchVmDisks ({ vmId }) { // Would __additional__ (API param __follow_) work here as well?
   const diskattachments = yield callExternalAction('diskattachments', Api.diskattachments, { type: 'GET_DISK_ATTACHMENTS', payload: { vmId } })
 
   if (diskattachments && diskattachments['disk_attachment']) { // array
@@ -440,27 +498,22 @@ function* startProgress ({ vmId, poolId, name }) {
   }
 }
 
-function* getSingleInstance ({ vmId, poolId }) {
-  const fetches = [ fetchSingleVm(getSingleVm({ vmId })) ]
-  if (poolId) {
-    fetches.push(fetchSinglePool(getSinglePool({ poolId })))
-  }
-  yield all(fetches)
-}
-
 function* stopProgress ({ vmId, poolId, name, result }) {
+  const fetchSingle = vmId ? fetchSingleVm : fetchSinglePool
+  const getSingle = vmId ? getSingleVm : getSinglePool
   const actionInProgress = vmId ? vmActionInProgress : poolActionInProgress
+
+  const params = vmId ? { vmId } : { poolId }
   if (result && result.status === 'complete') {
-    // do not call 'end of in progress' if successful,
+    // do not call "end of in progress" if successful,
     // since UI will be updated by refresh
     yield delay(5 * 1000)
-    yield getSingleInstance({ vmId: result.vm.id, poolId })
-
+    yield fetchSingle(getSingle(params))
     yield delay(30 * 1000)
-    yield getSingleInstance({ vmId: result.vm.id, poolId })
+    yield fetchSingle(getSingle(params))
   }
 
-  yield put(actionInProgress(Object.assign(vmId ? { vmId } : { poolId }, { name, started: false })))
+  yield put(actionInProgress(Object.assign(params, { name, started: false })))
 }
 
 function* shutdownVm (action) {
@@ -668,8 +721,7 @@ function* fetchAllVnicProfiles (action) {
   if (vnicProfiles && vnicProfiles['vnic_profile']) {
     const vnicProfilesInternal = vnicProfiles.vnic_profile.map(vnicProfile => Api.vnicProfileToInternal({ vnicProfile }))
     yield put(setVnicProfiles({ vnicProfiles: vnicProfilesInternal }))
-    const actual = Selectors.getOvirtVersion().toJS()
-    if (!compareVersion({ major: parseInt(actual.major), minor: parseInt(actual.minor) }, { major: 4, minor: 2 })) {
+    if (!compareVersionToCurrent({ major: 4, minor: 2 })) {
       yield fetchAllNetworks()
     }
   }

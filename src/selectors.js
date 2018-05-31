@@ -59,6 +59,12 @@ Selectors = {
   getCurrentPage () {
     return getState().vms.get('page')
   },
+  getVmsFetchedById () {
+    return getState().vms.get('vmsFetchedById')
+  },
+  getPoolsFetchedById () {
+    return getState().vms.get('poolsFetchedById')
+  },
 }
 
 function getState () {

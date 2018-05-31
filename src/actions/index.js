@@ -4,11 +4,11 @@ import {
   GET_OPTION,
   GET_USB_FILTER,
   PERSIST_STATE,
-  SET_ADMINISTATOR,
+  SET_ADMINISTRATOR,
   SET_USER_FILTER_PERMISSION,
   CHECK_TOKEN_EXPIRED,
   SCHEDULER_FIXED_DELAY,
-} from '../constants/index'
+} from '../constants'
 
 export * from './error'
 export * from './vm'
@@ -44,11 +44,12 @@ export function persistState () {
 /**
  * Not creator of an action. Returned object can't be dispatched to the store.
  */
-export function getSingleVm ({ vmId }) {
+export function getSingleVm ({ vmId, shallowFetch = false }) {
   return {
     type: GET_VM,
     payload: {
       vmId,
+      shallowFetch,
     },
   }
 }
@@ -64,7 +65,7 @@ export function setUserFilterPermission (filter) {
 
 export function setAdministrator (administrator) {
   return {
-    type: SET_ADMINISTATOR,
+    type: SET_ADMINISTRATOR,
     payload: {
       administrator,
     },
