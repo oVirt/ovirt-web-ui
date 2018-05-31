@@ -35,7 +35,7 @@ const config = actionReducer(initialState, {
   SET_USER_FILTER_PERMISSION (state, { payload: { filter } }) {
     return state.set('filter', filter).set('isFilterChecked', true)
   },
-  SET_ADMINISTATOR (state, { payload: { administrator } }) {
+  SET_ADMINISTRATOR (state, { payload: { administrator } }) {
     return state.set('administrator', administrator)
   },
   SHOW_TOKEN_EXPIRED_MSG (state) {
