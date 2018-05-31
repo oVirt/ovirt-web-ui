@@ -61,3 +61,6 @@ const config = actionReducer(initialState, {
 }, true)
 
 export default config
+export {
+  initialState,
+}

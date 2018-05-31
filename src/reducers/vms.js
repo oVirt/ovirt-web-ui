@@ -195,3 +195,6 @@ const vms = actionReducer(initialState, {
 })
 
 export default vms
+export {
+  initialState,
+}

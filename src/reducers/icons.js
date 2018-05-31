@@ -14,3 +14,6 @@ const icons = actionReducer(initialState, {
 })
 
 export default icons
+export {
+  initialState,
+}
