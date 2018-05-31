@@ -23,3 +23,6 @@ const templates = actionReducer(initialState, {
 })
 
 export default templates
+export {
+  initialState,
+}
