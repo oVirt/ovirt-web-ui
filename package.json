@@ -104,8 +104,8 @@
     "eslint": "eslint -c config/eslint.js src",
     "eslint:fix": "eslint -c config/eslint.js src --fix",
     "prebuild": "yarn run test",
-    "test": "jest --no-watchman --env=jsdom",
-    "test:watch": "jest --watch --no-watchman --env=jsdom",
+    "test": "jest --no-watchman",
+    "test:watch": "jest --watch --no-watchman",
     "intl:extract": "babel-node scripts/intl/extract-messages.js --presets env,flow && rip json2pot -o extra/to-zanata/messages.pot extra/to-zanata/messages.json",
     "intl:push": "zanata-cli push",
     "intl:pull": "zanata-cli pull",
@@ -131,7 +131,7 @@
     "testPathIgnorePatterns": [
       "<rootDir>/(build|docs|node_modules|__tests__/helper|config)/"
     ],
-    "testEnvironment": "node",
+    "testEnvironment": "jsdom",
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(js|jsx)$"
   },
   "eslintConfig": {

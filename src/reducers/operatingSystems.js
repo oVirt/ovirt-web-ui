@@ -13,3 +13,6 @@ const operatingSystems = actionReducer(initialState, {
 })
 
 export default operatingSystems
+export {
+  initialState,
+}
