@@ -121,13 +121,21 @@ function composeIncompatibleOVirtApiVersionMessage (oVirtMeta) {
   return `oVirt API version requested >= ${requested}, but ${found} found`
 }
 
+/**
+ * Compare the actual { major, minor } version (JS or ImmutableJS Map) to the required
+ * { major, minor } and return if the **actual** is greater then or equal to **required**.
+ * Backward compatibility of the API is assumed.
+ */
 export function compareVersion (actual, required) {
   logDebug(`compareVersion(), actual=${JSON.stringify(actual)}, required=${JSON.stringify(required)}`)
 
+  const actualMajor = parseInt(actual.get ? actual.get('major') : actual.major)
+  const actualMinor = parseInt(actual.get ? actual.get('minor') : actual.minor)
+
   // assuming backward compatibility of oVirt API
-  if (actual.major >= required.major) {
-    if (actual.major === required.major) {
-      if (actual.minor < required.minor) {
+  if (actualMajor >= required.major) {
+    if (actualMajor === required.major) {
+      if (actualMinor < required.minor) {
         return false
       }
     }
@@ -153,10 +161,7 @@ function* checkOvirtApiVersion (oVirtMeta) {
 
   const actual = oVirtMeta['product_info']['version']
   const required = Product.ovirtApiVersionRequired
-  const passed = compareVersion({
-    major: parseInt(actual.major),
-    minor: parseInt(actual.minor),
-  }, required)
+  const passed = compareVersion(actual, required)
 
   yield put(setOvirtApiVersion({ passed, ...actual }))
   return passed

@@ -1,17 +1,20 @@
-import Immutable, { Map } from 'immutable'
+import Immutable, { Map, Set } from 'immutable'
 import { logError } from '../helpers'
 import { actionReducer, removeMissingItems } from './utils'
-import { SET_VM_NICS } from '../constants'
 
 const initialState = Immutable.fromJS({
   vms: {},
   pools: {},
+
   page: 1,
   /**
    * true ~ we need to fetch further vms and pools
    * false ~ all visible entities already fetched
    */
   notAllPagesLoaded: true,
+
+  vmsFetchedById: Set(),
+  poolsFetchedById: Set(),
 })
 
 const vms = actionReducer(initialState, {
@@ -46,6 +49,13 @@ const vms = actionReducer(initialState, {
   REMOVE_MISSING_VMS (state, { payload: { vmIdsToPreserve } }) {
     return removeMissingItems({ state, subStateName: 'vms', idsToPreserve: vmIdsToPreserve })
   },
+  ADD_VMS_FETCHED_BY_ID (state, { payload: { vmIds } }) {
+    return state.update('vmsFetchedById', set => set.union(vmIds))
+  },
+  REMOVE_VMS_FETCHED_BY_ID (state, { payload: { vmIds } }) {
+    return state.update('vmsFetchedById', set => set.subtract(vmIds))
+  },
+
   SET_VM_DISKS (state, { payload: { vmId, disks } }) {
     if (state.getIn(['vms', vmId])) {
       return state.setIn(['vms', vmId, 'disks'], Immutable.fromJS(disks)) // deep immutable
@@ -62,22 +72,13 @@ const vms = actionReducer(initialState, {
     }
     return state
   },
-  [SET_VM_NICS] (state, { payload: { vmId, nics } }) {
+  SET_VM_NICS (state, { payload: { vmId, nics } }) {
     if (state.getIn(['vms', vmId])) {
       return state.setIn(['vms', vmId, 'nics'], Immutable.fromJS(nics)) // deep immutable
     } else { // fail, if VM not found
       logError(`vms.setVmNics() reducer: vmId ${vmId} not found`)
     }
     return state
-  },
-  VM_ACTION_IN_PROGRESS (state, { payload: { vmId, name, started } }) {
-    if (state.getIn(['vms', vmId])) {
-      return state.setIn(['vms', vmId, 'actionInProgress', name], started)
-    }
-    return state
-  },
-  POOL_ACTION_IN_PROGRESS (state, { payload: { poolId, name, started } }) {
-    return state.setIn(['pools', poolId, 'vm', 'actionInProgress', name], started)
   },
   SET_VM_CONSOLES (state, { payload: { vmId, consoles } }) {
     return state.setIn(['vms', vmId, 'consoles'], Immutable.fromJS(consoles))
@@ -93,6 +94,17 @@ const vms = actionReducer(initialState, {
     state = state.setIn(['vms', vmId, 'sessions'], Immutable.fromJS(sessions))
     return state.setIn(['vms', vmId, 'consoleInUse'], consoleInUse)
   },
+
+  VM_ACTION_IN_PROGRESS (state, { payload: { vmId, name, started } }) {
+    if (state.getIn(['vms', vmId])) {
+      return state.setIn(['vms', vmId, 'actionInProgress', name], started)
+    }
+    return state
+  },
+  POOL_ACTION_IN_PROGRESS (state, { payload: { poolId, name, started } }) {
+    return state.setIn(['pools', poolId, 'vm', 'actionInProgress', name], started)
+  },
+
   UPDATE_POOLS (state, { payload: { pools } }) {
     const updates = {}
     pools.forEach(pool => {
@@ -122,6 +134,13 @@ const vms = actionReducer(initialState, {
       .asImmutable()
     return state.set('pools', newPools)
   },
+  ADD_POOLS_FETCHED_BY_ID (state, { payload: { poolIds } }) {
+    return state.update('poolsFetchedById', set => set.merge(poolIds))
+  },
+  REMOVE_POOLS_FETCHED_BY_ID (state, { payload: { poolIds } }) {
+    return state.update('poolsFetchedById', set => set.subtract(poolIds))
+  },
+
   UPDATE_VMPOOLS_COUNT (state) {
     state.get('pools').toList().map(pool => {
       state = state.setIn(['pools', pool.id, 'vmsCount'], 0)
@@ -135,12 +154,14 @@ const vms = actionReducer(initialState, {
     })
     return state
   },
+
   LOGOUT (state) { // see the config() reducer
     return state.set('vms', Immutable.fromJS({}))
   },
   SET_PAGE (state, { payload: { page } }) {
     return state.set('page', page)
   },
+
   FAILED_EXTERNAL_ACTION (state, { payload }) { // see the userMessages() reducer
     /* Example:
      payload = {
