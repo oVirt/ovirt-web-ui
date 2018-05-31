@@ -114,7 +114,7 @@ class VmDetail extends Component {
 
     const name = isPool ? pool.get('name') : vm.get('name')
     const idPrefix = `vmdetail-${name}`
-    const icon = getVmIcon(icons, operatingSystems.get('operatingSystems'), vm)
+    const icon = getVmIcon(icons, operatingSystems, vm)
     const disks = vm.get('disks')
     const nics = vm.get('nics')
     const osName = getOsHumanName(vm.getIn(['os', 'type']))
@@ -302,7 +302,7 @@ VmDetail.propTypes = {
   vm: PropTypes.object,
   pool: PropTypes.object,
   icons: PropTypes.object.isRequired,
-  operatingSystems: PropTypes.object.isRequired,
+  operatingSystems: PropTypes.object.isRequired, // deep immutable, {[id: string]: OperatingSystem}
   userMessages: PropTypes.object.isRequired,
   onConsole: PropTypes.func.isRequired,
   onConsoleOptionsSave: PropTypes.func.isRequired,

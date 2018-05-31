@@ -22,7 +22,7 @@ const Vm = ({ vm, icons, os, onStart }) => {
   const idPrefix = `vm-${vm.get('name')}`
   const state = vm.get('status')
   const osName = getOsHumanName(vm.getIn(['os', 'type']))
-  const icon = getVmIcon(icons, os.get('operatingSystems'), vm)
+  const icon = getVmIcon(icons, os, vm)
 
   return (
     <div className={`col-xs-12 col-sm-6 col-md-4 col-lg-3`}>
@@ -63,7 +63,7 @@ Vm.propTypes = {
 export default withRouter(connect(
   (state) => ({
     icons: state.icons,
-    os: state.operatingSystems,
+    os: state.operatingSystems, // deep immutable, {[id: string]: OperatingSystem}
   }),
   (dispatch, { vm }) => ({
     onStart: () => dispatch(startVm({ vmId: vm.get('id') })),

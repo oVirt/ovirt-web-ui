@@ -140,7 +140,7 @@ class VmDialog extends React.Component {
         bootMenuEnabled: vm.get('bootMenuEnabled'),
         cloudInit: vm.get('cloudInit').toJS(),
         icon: {
-          id: getVmIconId(this.props.operatingSystems.get('operatingSystems'), vm),
+          id: getVmIconId(this.props.operatingSystems, vm),
           mediaType: undefined,
           data: undefined,
         },
@@ -207,7 +207,6 @@ class VmDialog extends React.Component {
    */
   composeVm () {
     const os = this.props.operatingSystems
-      .get('operatingSystems')
       .get(this.state.osId)
 
     return {
@@ -297,7 +296,7 @@ class VmDialog extends React.Component {
   }
 
   doChangeOsIdTo (osId) {
-    const os = this.props.operatingSystems.get('operatingSystems').get(osId)
+    const os = this.props.operatingSystems.get(osId)
     if (os) {
       this.onChangeOsIconId(os.getIn(['icons', 'large', 'id']))
     }
@@ -308,7 +307,7 @@ class VmDialog extends React.Component {
   }
 
   onChangeOsIconId (iconId) {
-    if (this.state.icon.id && isValidOsIcon(this.props.operatingSystems.get('operatingSystems'), this.state.icon.id)) { // change unless custom icon is selected
+    if (this.state.icon.id && isValidOsIcon(this.props.operatingSystems, this.state.icon.id)) { // change unless custom icon is selected
       this.doChangeIconId(iconId)
     }
   }
@@ -351,7 +350,7 @@ class VmDialog extends React.Component {
   getOS () {
     const osId = this.state.osId
     if (osId) {
-      const os = this.props.operatingSystems.get('operatingSystems').get(osId)
+      const os = this.props.operatingSystems.get(osId)
       if (os) {
         return os
       }
@@ -473,7 +472,7 @@ class VmDialog extends React.Component {
     }
 
     if (!this.getOS()) {
-      const osList = operatingSystems.get('operatingSystems').toList()
+      const osList = operatingSystems.toList()
       const os = osList.sort((a, b) => a.get('id').localeCompare(b.get('id'))).first()
       if (os) {
         stateChange.osId = os.get('id')
@@ -784,7 +783,7 @@ VmDialog.propTypes = {
 
   clusters: PropTypes.object.isRequired, // deep immutable, {[id: string]: Cluster}
   templates: PropTypes.object.isRequired, // deep immutable, {[id: string]: Template}
-  operatingSystems: PropTypes.object.isRequired,
+  operatingSystems: PropTypes.object.isRequired, // deep immutable, {[id: string]: OperatingSystem}
   userMessages: PropTypes.object.isRequired,
   vmDialog: PropTypes.object.isRequired,
   icons: PropTypes.object.isRequired,

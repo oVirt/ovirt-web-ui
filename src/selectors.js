@@ -27,11 +27,11 @@ Selectors = {
     return getState().vms.getIn(['vms', vmId, 'disks'])
   },
   getOperatingSystemByName (name) {
-    return getState().operatingSystems.get('operatingSystems').toList().find(os =>
+    return getState().operatingSystems.toList().find(os =>
       os.get('name') === name)
   },
   getOperatingSystemsByArchitecture (architecture) {
-    return getState().operatingSystems.get('operatingSystems').filter(os => {
+    return getState().operatingSystems.filter(os => {
       const osName = os.get('name')
       if (architecture === PPC_64 || architecture === S390X) {
         return osName.includes(architecture)
