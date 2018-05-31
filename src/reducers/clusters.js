@@ -21,3 +21,6 @@ const clusters = actionReducer(initialState, {
 })
 
 export default clusters
+export {
+  initialState,
+}
