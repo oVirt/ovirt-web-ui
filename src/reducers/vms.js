@@ -6,7 +6,6 @@ import { SET_VM_NICS } from '../constants'
 const initialState = Immutable.fromJS({
   vms: {},
   pools: {},
-  loadInProgress: true,
   page: 1,
   /**
    * true ~ we need to fetch further vms and pools
@@ -138,9 +137,6 @@ const vms = actionReducer(initialState, {
   },
   LOGOUT (state) { // see the config() reducer
     return state.set('vms', Immutable.fromJS({}))
-  },
-  SET_LOAD_IN_PROGRESS (state, { payload: { value } }) {
-    return state.set('loadInProgress', value)
   },
   SET_PAGE (state, { payload: { page } }) {
     return state.set('page', page)

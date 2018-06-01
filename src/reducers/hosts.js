@@ -3,7 +3,6 @@ import { actionReducer, removeMissingItems } from './utils'
 
 const initialState = fromJS({
   hosts: {},
-  loadInProgress: true,
 })
 
 const hosts = actionReducer(initialState, {

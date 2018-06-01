@@ -3,7 +3,6 @@ import { actionReducer, removeMissingItems } from './utils'
 
 const initialState = fromJS({
   clusters: {},
-  loadInProgress: true,
 })
 
 const clusters = actionReducer(initialState, {

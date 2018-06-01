@@ -6,25 +6,6 @@ import { connect } from 'react-redux'
 import { msg } from '../../intl'
 import style from './style.css'
 
-const isActionInProgress = ({ vms, pools }) => {
-  const vmsActions = vms.filter((v) =>
-    v.get('actionInProgress') && !v.get('actionInProgress').filter((start) => !!start).isEmpty()
-  )
-
-  const poolsActions = pools.filter((v) =>
-    v.get('actionInProgress') && !v.get('actionInProgress').filter((start) => !!start).isEmpty()
-  )
-
-  return !vmsActions.isEmpty() || !poolsActions.isEmpty()
-}
-
-const isLoadInProgress = ({ vms }) => {
-  const isLoadInProgress = !!vms.get('loadInProgress')
-  const isAIP = isActionInProgress({ vms: vms.get('vms'), pools: vms.get('pools') })
-
-  return isLoadInProgress || isAIP
-}
-
 /**
  * The user is informed about communication with server when
  * - data is being initially loaded
@@ -34,8 +15,8 @@ const isLoadInProgress = ({ vms }) => {
  *
  * Regular polling does not lead to rendering this "Loading ..." message.
  */
-const LoadingData = ({ vms }) => {
-  if (!isLoadInProgress({ vms })) {
+const LoadingData = ({ requestActive }) => {
+  if (!requestActive) {
     return null
   }
 
@@ -45,11 +26,11 @@ const LoadingData = ({ vms }) => {
     </div>)
 }
 LoadingData.propTypes = {
-  vms: PropTypes.object.isRequired,
+  requestActive: PropTypes.bool.isRequired,
 }
 
 export default connect(
   (state) => ({
-    vms: state.vms,
+    requestActive: !state.activeRequests.isEmpty(),
   })
 )(LoadingData)

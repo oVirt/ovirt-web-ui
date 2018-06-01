@@ -23,7 +23,15 @@ import AppConfiguration, { readConfiguration } from './config'
 import { loadStateFromLocalStorage } from './storage'
 import { logDebug, logError, valuesOfObject } from './helpers'
 import { rootSaga } from './sagas'
-import { login, updateIcons, setDomain, schedulerFixedDelay } from './actions'
+import {
+  login,
+  updateIcons,
+  setDomain,
+  schedulerFixedDelay,
+  addActiveRequest,
+  delayedRemoveActiveRequest,
+} from './actions'
+import OvirtApi from './ovirtapi'
 
 import App from './App'
 
@@ -107,6 +115,18 @@ function start () {
     .then(onResourcesLoaded)
 }
 
+function initializeApiListener (store: Object) {
+  OvirtApi.addHttpListener((requestId, eventType) => {
+    if (eventType === 'START') {
+      store.dispatch(addActiveRequest(requestId))
+      return
+    }
+    if (eventType === 'STOP') {
+      store.dispatch(delayedRemoveActiveRequest(requestId))
+    }
+  })
+}
+
 function onResourcesLoaded () {
   console.log(`Current configuration: ${JSON.stringify(AppConfiguration)}`)
 
@@ -133,6 +153,7 @@ function onResourcesLoaded () {
   }
 
   store.dispatch(schedulerFixedDelay())
+  initializeApiListener(store)
 }
 
 start()

@@ -3,7 +3,6 @@ import { actionReducer, removeMissingItems } from './utils'
 
 const initialState = fromJS({
   templates: {},
-  loadInProgress: true,
 })
 
 const templates = actionReducer(initialState, {
