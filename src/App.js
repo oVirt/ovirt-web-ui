@@ -6,9 +6,7 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import { renderRoutes } from 'react-router-config'
 
 import { Grid } from 'patternfly-react'
-import AboutDialog from './components/About'
 import LoadingData from './components/LoadingData'
-import OptionsDialog from './components/OptionsDialog'
 import OvirtApiCheckFailed from './components/OvirtApiCheckFailed'
 import TokenExpired from './components/TokenExpired'
 import VerticalMenu from './components/VerticalMenu'
@@ -58,8 +56,6 @@ const App = ({ vms, config }) => {
         <VerticalMenu menuItems={menu} /> { /* Disabled, to enable search for left sidebar menu */ }
         <LoadingData />
         {renderRoutes(routes)}
-        <AboutDialog />
-        <OptionsDialog userId={config.getIn(['user', 'id'])} />
         <OvirtApiCheckFailed />
         <TokenExpired />
       </div>

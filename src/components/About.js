@@ -3,6 +3,9 @@ import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
 
+import { msg } from '../intl'
+
+import { Modal } from 'patternfly-react'
 import Product from '../version'
 import { fixedStrings } from '../branding'
 
@@ -23,47 +26,51 @@ const LegalInfo = () => {
   )
 }
 
-const AboutDialog = ({ oVirtApiVersion }) => {
-  // TODO: link documentation: https://github.com/oVirt/ovirt-web-ui/issues/134
-  // TODO: oVirt API version
-
-  const idPrefix = `about`
-
-  let apiVersion = 'unknown'
-  if (oVirtApiVersion && oVirtApiVersion.get('major')) {
-    apiVersion = `${oVirtApiVersion.get('major')}.${oVirtApiVersion.get('minor')}`
-    console.log(apiVersion)
+class AboutDialog extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = { openModal: false }
   }
+  render () {
+    // TODO: link documentation: https://github.com/oVirt/ovirt-web-ui/issues/134
+    // TODO: oVirt API version
 
-  return (
-    <div className='modal fade' id='about-modal' tabIndex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
-      <div className='modal-dialog'>
-        <div className='modal-content about-modal-pf obrand_aboutBackground'>
-          <div className='modal-header'>
-            <button type='button' className='close' data-dismiss='modal' aria-hidden='true' id={`${idPrefix}-close`}>
-              <span className='pficon pficon-close' />
-            </button>
-          </div>
-          <div className='modal-body'>
-            <h1 id={`${idPrefix}-title`}>{fixedStrings.BRAND_NAME} VM Portal</h1>
-            <div className='product-versions-pf'>
-              <ul className='list-unstyled'>
-                <li id={`${idPrefix}-version`}>Version <strong id={`${idPrefix}-version-value`}>{Product.version}-{Product.release}</strong></li>
-                <li id={`${idPrefix}-apiversion`}>{fixedStrings.BRAND_NAME} API Version <strong id={`${idPrefix}-apiversion-value`}>{apiVersion}</strong></li>
-                <li id={`${idPrefix}-issues`}>Please report issues on <strong><a href='https://github.com/oVirt/ovirt-web-ui/issues' target='_blank' id={`${idPrefix}-issues-link`}>GitHub Issue Tracker</a></strong></li>
-              </ul>
-            </div>
+    const { oVirtApiVersion } = this.props
+    const idPrefix = `about`
 
-            <LegalInfo />
+    let apiVersion = 'unknown'
+    if (oVirtApiVersion && oVirtApiVersion.get('major')) {
+      apiVersion = `${oVirtApiVersion.get('major')}.${oVirtApiVersion.get('minor')}`
+    }
 
-          </div>
-          <div className='modal-footer'>
-            <div className='obrand_aboutApplicationLogo' id={`${idPrefix}-applogo`} />
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+    return (
+      <React.Fragment>
+        <a href='#' id='about-modal' onClick={() => this.setState({ openModal: true })}>{msg.about()}</a>
+        { this.state.openModal &&
+          <Modal id={`${idPrefix}-modal`} contentClassName='about-modal-pf obrand_aboutBackground' onHide={() => this.setState({ openModal: false })} show>
+            <Modal.Header>
+              <Modal.CloseButton onClick={() => this.setState({ openModal: false })} />
+            </Modal.Header>
+            <Modal.Body>
+              <h1 id={`${idPrefix}-title`}>{fixedStrings.BRAND_NAME} VM Portal</h1>
+              <div className='product-versions-pf'>
+                <ul className='list-unstyled'>
+                  <li id={`${idPrefix}-version`}>Version <strong id={`${idPrefix}-version-value`}>{Product.version}-{Product.release}</strong></li>
+                  <li id={`${idPrefix}-apiversion`}>{fixedStrings.BRAND_NAME} API Version <strong id={`${idPrefix}-apiversion-value`}>{apiVersion}</strong></li>
+                  <li id={`${idPrefix}-issues`}>Please report issues on <strong><a href='https://github.com/oVirt/ovirt-web-ui/issues' target='_blank' id={`${idPrefix}-issues-link`}>GitHub Issue Tracker</a></strong></li>
+                </ul>
+              </div>
+
+              <LegalInfo />
+            </Modal.Body>
+            <Modal.Footer>
+              <div className='obrand_aboutApplicationLogo' id={`${idPrefix}-applogo`} />
+            </Modal.Footer>
+          </Modal>
+        }
+      </React.Fragment>
+    )
+  }
 }
 AboutDialog.propTypes = {
   oVirtApiVersion: PropTypes.object,

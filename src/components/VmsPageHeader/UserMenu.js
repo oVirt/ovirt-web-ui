@@ -6,6 +6,8 @@ import { connect } from 'react-redux'
 import { logout } from '../../actions/index'
 
 import { msg } from '../../intl'
+import AboutDialog from '../About'
+import OptionsDialog from '../OptionsDialog'
 
 const UserMenu = ({ config, onLogout }) => {
   if (!config.get('loginToken')) { // this shall really not happen!
@@ -24,10 +26,10 @@ const UserMenu = ({ config, onLogout }) => {
         </a>
         <ul className='dropdown-menu'>
           <li>
-            <a href='#' data-toggle='modal' data-target='#options-modal' id={`${idPrefix}-options`}>{msg.options()}</a>
+            <OptionsDialog userId={config.getIn(['user', 'id'])} />
           </li>
           <li>
-            <a href='#' data-toggle='modal' data-target='#about-modal' id={`${idPrefix}-about`}>{msg.about()}</a>
+            <AboutDialog />
           </li>
           <li>
             <a href='#' onClick={onLogout} id={`${idPrefix}-logout`}>{msg.logOut()}</a>
