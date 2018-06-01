@@ -224,7 +224,7 @@ class VmDialog extends React.Component {
         },
       },
       'os': {
-        'type': os.get('name'),
+        'type': os ? os.get('name') : null,
         'bootDevices': this.state.bootDevices || [],
       },
       'cpu': {
