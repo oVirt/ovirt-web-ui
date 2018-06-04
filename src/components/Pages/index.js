@@ -61,9 +61,7 @@ VmDetailPage.propTypes = {
   config: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
   getVms: PropTypes.func.isRequired,
-  requestActive: PropTypes.bool.isRequired,
 }
-
 const VmDetailPageConnected = connect(
   (state) => ({
     vms: state.vms,
@@ -121,7 +119,6 @@ PoolDetailPage.propTypes = {
   config: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
   getPools: PropTypes.func.isRequired,
-  requestActive: PropTypes.bool.isRequired,
 }
 const PoolDetailPageConnected = connect(
   (state) => ({
@@ -190,7 +187,6 @@ VmDialogPage.propTypes = {
 
   getCDRom: PropTypes.func.isRequired,
   getVms: PropTypes.func.isRequired,
-  requestActive: PropTypes.bool.isRequired,
 }
 const VmDialogPageConnected = connect(
   (state) => ({
