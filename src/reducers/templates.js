@@ -1,24 +1,18 @@
 import { fromJS } from 'immutable'
-import { actionReducer, removeMissingItems } from './utils'
 
-const initialState = fromJS({
-  templates: {},
-})
+import { actionReducer } from './utils'
+import { SET_TEMPLATES } from '../constants'
+
+const initialState = fromJS({})
 
 const templates = actionReducer(initialState, {
-  ADD_TEMPLATES (state, { payload: { templates } }) {
-    const updates = {}
-    templates.forEach(template => {
-      updates[template.id] = template
-    })
-    const imUpdates = fromJS(updates)
-    return state.mergeIn(['templates'], imUpdates)
+  [SET_TEMPLATES] (state, { payload: templates }) {
+    const idToTemplate = templates.reduce((accum, template) => {
+      accum[template.id] = template
+      return accum
+    }, {})
+    return fromJS(idToTemplate)
   },
-
-  REMOVE_MISSING_TEMPLATES (state, { payload: { templateIdsToPreserve } }) {
-    return removeMissingItems({ state, subStateName: 'templates', idsToPreserve: templateIdsToPreserve })
-  },
-
 })
 
 export default templates

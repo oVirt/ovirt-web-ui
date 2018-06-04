@@ -1,21 +1,15 @@
 import {
   GET_ALL_TEMPLATES,
-} from '../constants/index'
+  SET_TEMPLATES,
+} from '../constants'
 
-export function removeMissingTemplates ({ templateIdsToPreserve }) {
+/**
+ * @param {Array<Object>} templates
+ */
+export function setTemplates (templates) {
   return {
-    type: 'REMOVE_MISSING_TEMPLATES',
-    payload: {
-      templateIdsToPreserve,
-    },
-  }
-}
-export function addTemplates ({ templates }) {
-  return {
-    type: 'ADD_TEMPLATES',
-    payload: {
-      templates,
-    },
+    type: SET_TEMPLATES,
+    payload: templates,
   }
 }
 
