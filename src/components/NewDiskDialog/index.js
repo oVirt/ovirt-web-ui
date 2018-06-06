@@ -275,7 +275,7 @@ class NewDiskDialog extends React.Component {
 NewDiskDialog.propTypes = {
   vm: PropTypes.object.isRequired, // plain JS object
   clusters: PropTypes.object.isRequired, // plain JS object
-  storageDomains: PropTypes.array.isRequired, // plain JS object
+  storageDomains: PropTypes.object.isRequired, // plain JS object, {[id: string]: StorageDomain}
   dataCenters: PropTypes.array.isRequired, // plain JS object
   errorText: PropTypes.string,
   showProgressIndicator: PropTypes.bool.isRequired,

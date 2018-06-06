@@ -7,7 +7,7 @@ import VmDetail from '../VmDetail'
 import VmDialog from '../VmDialog'
 import VmsList from '../VmsList'
 
-import { selectVmDetail, selectPoolDetail, getISOStorages } from '../../actions'
+import { selectVmDetail, selectPoolDetail, getIsoStorageDomains } from '../../actions'
 import Selectors from '../../selectors'
 
 /**
@@ -166,7 +166,7 @@ const VmDialogPageConnected = connect(
     requestActive: !state.activeRequests.isEmpty(),
   }),
   (dispatch) => ({
-    getCDRom: () => dispatch(getISOStorages()),
+    getCDRom: () => dispatch(getIsoStorageDomains()),
     getVms: ({ vmId }) => dispatch(selectVmDetail({ vmId })),
   })
 )(VmDialogPage)

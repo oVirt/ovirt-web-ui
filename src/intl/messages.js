@@ -28,7 +28,6 @@ export const messages = {
   failedToRetrieveDiskDetails: 'Failed to retrieve disk details',
   failedToRetrieveVmDisks: 'Failed to retrieve VM disks',
   failedToRetrieveIsoStorages: 'Failed to retrieve ISO storages',
-  failedToRetrieveFilesFromStorage: 'Failed to retrieve files from storage',
   failedToRetrieveVmDetails: 'Failed to retrieve VM details',
   failedToChangeVmIcon: 'Failed to change VM icon',
   failedToChangeVmIconToDefault: 'Failed to change VM icon to default',
