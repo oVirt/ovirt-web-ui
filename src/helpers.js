@@ -203,3 +203,17 @@ export function localeCompare (a, b, locale = appLocale) {
 export function sortedBy (array, sortBy, locale = appLocale) {
   return array.sort((a, b) => localeCompare(a[sortBy], b[sortBy], locale))
 }
+
+/**
+ * Similar to lodash keyBy
+ * @param {Array<T>} array
+ * @param {(T) => K} keySelector
+ * @return {{[K]: T}} map
+ */
+export function arrayToMap (array, keySelector) {
+  return array.reduce((accum, item) => {
+    const key = keySelector(item)
+    accum[key] = item
+    return accum
+  }, {})
+}

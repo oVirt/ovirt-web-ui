@@ -42,7 +42,7 @@ Selectors = {
     })
   },
   getClusterById (clusterId) {
-    return getState().clusters.getIn(['clusters', clusterId])
+    return getState().clusters.get(clusterId)
   },
   getTemplateById (templateId) {
     return getState().templates.get(templateId)
