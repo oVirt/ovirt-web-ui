@@ -29,10 +29,6 @@ import {
   removeMissingVms,
   setVmSessions,
   persistState,
-  addVmsFetchedById,
-  addPoolsFetchedById,
-  removeVmsFetchedById,
-  removePoolsFetchedById,
 
   getSingleVm,
   setClusters,
@@ -174,33 +170,37 @@ function* refreshData (action) {
   logDebug('refreshData(): ', action.payload)
 
   // refresh VMs and remove any that haven't been refreshed
-  const vmsFetchedById = []
-  for (let vmId of Selectors.getVmsFetchedById().toArray()) {
-    const status = yield fetchSingleVm(getSingleVm({ vmId }))
-    if (status) vmsFetchedById.push(vmId)
-  }
-
   const fetchedVmIds = yield fetchVmsByCount(getVmsByCount({
     count: action.payload.page * AppConfiguration.pageLimit,
     shallowFetch: !!action.payload.shallowFetch,
   }))
 
-  yield put(removeMissingVms({ vmIdsToPreserve: [ ...fetchedVmIds, ...vmsFetchedById ] }))
-  yield put(removeVmsFetchedById({ vmIds: fetchedVmIds }))
+  const fetchedDirectlyVmIds =
+    (yield all(
+      Selectors
+        .getVmIds()
+        .filter(vmId => !fetchedVmIds.includes(vmId))
+        .map(vmId => call(fetchSingleVm, getSingleVm({ vmId })))
+    ))
+      .reduce((vmIds, vm) => { if (vm) vmIds.push(vm.id); return vmIds }, [])
+
+  yield put(removeMissingVms({ vmIdsToPreserve: [ ...fetchedVmIds, ...fetchedDirectlyVmIds ] }))
 
   // refresh Pools and remove any that haven't been refreshed
-  const poolsFetchedById = []
-  for (let poolId of Selectors.getPoolsFetchedById().toArray()) {
-    const status = yield fetchSinglePool(getSinglePool({ poolId }))
-    if (status) poolsFetchedById.push(poolId)
-  }
-
   const fetchedPoolIds = yield fetchPoolsByCount(getPoolsByCount({
     count: action.payload.page * AppConfiguration.pageLimit,
   }))
 
-  yield put(removeMissingPools({ poolIdsToPreserve: [ ...fetchedPoolIds, ...poolsFetchedById ] }))
-  yield put(removePoolsFetchedById({ poolIds: fetchedPoolIds }))
+  const fetchedDirectlyPoolIds =
+    (yield all(
+      Selectors
+        .getPoolIds()
+        .filter(poolId => !fetchedPoolIds.includes(poolId))
+        .map(poolId => call(fetchSinglePool, getSinglePool({ poolId })))
+    ))
+      .reduce((poolIds, pool) => { if (pool) poolIds.push(pool.id); return poolIds }, [])
+
+  yield put(removeMissingPools({ poolIdsToPreserve: [ ...fetchedPoolIds, ...fetchedDirectlyPoolIds ] }))
 
   // update counts
   yield put(updateVmsPoolsCount())
@@ -334,7 +334,6 @@ export function* fetchSingleVm (action) {
       ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics']
   }
 
-  yield put(addVmsFetchedById({ vmIds: [ vmId ] }))
   const vm = yield callExternalAction('getVm', Api.getVm, action, true)
   let internalVm = null
   if (vm && vm.id) {
@@ -352,7 +351,6 @@ export function* fetchSingleVm (action) {
     yield fetchUnknownIconsForVms({ vms: [internalVm] })
   } else {
     if (vm && vm.error && vm.error.status === 404) {
-      yield put(removeVmsFetchedById({ vmIds: [vmId] }))
       yield put(removeVms({ vmIds: [vmId] }))
     }
   }
@@ -393,7 +391,6 @@ function* fetchPoolsByPage (action) {
 function* fetchSinglePool (action) {
   const { poolId } = action.payload
 
-  yield put(addPoolsFetchedById({ poolIds: [poolId] }))
   const pool = yield callExternalAction('getPool', Api.getPool, action, true)
   let internalPool = false
   if (pool && pool.id) {
@@ -401,7 +398,6 @@ function* fetchSinglePool (action) {
     yield put(updatePools({ pools: [internalPool] }))
   } else {
     if (pool && pool.error && pool.error.status === 404) {
-      yield put(removePoolsFetchedById({ poolIds: [poolId] }))
       yield put(removePools({ poolIds: [poolId] }))
     }
   }

@@ -1,4 +1,4 @@
-import Immutable, { Map, Set } from 'immutable'
+import Immutable, { Map } from 'immutable'
 import { logError } from '../helpers'
 import { actionReducer, removeMissingItems } from './utils'
 
@@ -12,9 +12,6 @@ const initialState = Immutable.fromJS({
    * false ~ all visible entities already fetched
    */
   notAllPagesLoaded: true,
-
-  vmsFetchedById: Set(),
-  poolsFetchedById: Set(),
 })
 
 const vms = actionReducer(initialState, {
@@ -48,12 +45,6 @@ const vms = actionReducer(initialState, {
   },
   REMOVE_MISSING_VMS (state, { payload: { vmIdsToPreserve } }) {
     return removeMissingItems({ state, subStateName: 'vms', idsToPreserve: vmIdsToPreserve })
-  },
-  ADD_VMS_FETCHED_BY_ID (state, { payload: { vmIds } }) {
-    return state.update('vmsFetchedById', set => set.union(vmIds))
-  },
-  REMOVE_VMS_FETCHED_BY_ID (state, { payload: { vmIds } }) {
-    return state.update('vmsFetchedById', set => set.subtract(vmIds))
   },
 
   SET_VM_DISKS (state, { payload: { vmId, disks } }) {
@@ -134,16 +125,10 @@ const vms = actionReducer(initialState, {
       .asImmutable()
     return state.set('pools', newPools)
   },
-  ADD_POOLS_FETCHED_BY_ID (state, { payload: { poolIds } }) {
-    return state.update('poolsFetchedById', set => set.merge(poolIds))
-  },
-  REMOVE_POOLS_FETCHED_BY_ID (state, { payload: { poolIds } }) {
-    return state.update('poolsFetchedById', set => set.subtract(poolIds))
-  },
 
   UPDATE_VMPOOLS_COUNT (state) {
     state.get('pools').toList().map(pool => {
-      state = state.setIn(['pools', pool.id, 'vmsCount'], 0)
+      state = state.setIn(['pools', pool.get('id'), 'vmsCount'], 0)
     })
 
     state.get('vms').toList().map(vm => {

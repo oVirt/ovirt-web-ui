@@ -59,11 +59,17 @@ Selectors = {
   getCurrentPage () {
     return getState().vms.get('page')
   },
-  getVmsFetchedById () {
-    return getState().vms.get('vmsFetchedById')
+  getVmIds () {
+    return getState().vms.get('vms').reduce((vmIds, vm, vmId) => {
+      vmIds.push(vmId)
+      return vmIds
+    }, [])
   },
-  getPoolsFetchedById () {
-    return getState().vms.get('poolsFetchedById')
+  getPoolIds () {
+    return getState().vms.get('pools').reduce((poolIds, pool, poolId) => {
+      poolIds.push(poolId)
+      return poolIds
+    }, [])
   },
 }
 
