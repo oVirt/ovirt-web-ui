@@ -9,7 +9,7 @@ import { msg } from './../../intl'
 import style from './style.css'
 
 export function hasUserHostConsoleAccess ({ vm, config, hosts }) {
-  return config.get('administrator') && vm.get('hostId') && hosts.getIn(['hosts', vm.get('hostId')])
+  return config.get('administrator') && vm.get('hostId') && hosts.get(vm.get('hostId'))
 }
 
 export const CockpitAHREF = ({ host, text }) => {
@@ -34,7 +34,7 @@ const HostConsole = ({ vm, hosts, config }) => {
     return null
   }
 
-  const host = hosts.getIn(['hosts', vm.get('hostId')])
+  const host = hosts.get(vm.get('hostId'))
 
   // TODO: change to Cockpit SSO link once ready
   return (
@@ -45,7 +45,7 @@ const HostConsole = ({ vm, hosts, config }) => {
 }
 HostConsole.propTypes = {
   vm: PropTypes.object.isRequired,
-  hosts: PropTypes.object.isRequired,
+  hosts: PropTypes.object.isRequired, // deep immutable, {[id: string]: Host}
   config: PropTypes.object.isRequired,
 }
 

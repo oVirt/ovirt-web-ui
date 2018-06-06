@@ -15,7 +15,7 @@ const VmStatus = ({ vm, hosts, config }) => {
   let hostContent, detailContent
 
   if (hasUserHostConsoleAccess({ vm, hosts, config })) {
-    const host = hosts.getIn(['hosts', vm.get('hostId')])
+    const host = hosts.get(vm.get('hostId'))
 
     hostContent = (
       <p>
@@ -52,7 +52,7 @@ const VmStatus = ({ vm, hosts, config }) => {
 }
 VmStatus.propTypes = {
   vm: PropTypes.object.isRequired,
-  hosts: PropTypes.object.isRequired,
+  hosts: PropTypes.object.isRequired, // deep immutable, {[id: string]: Host}
   config: PropTypes.object.isRequired,
 }
 
