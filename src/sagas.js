@@ -51,14 +51,13 @@ import {
   refresh,
   getVmsByCount,
   getPoolsByCount,
-  setStorages,
-  removeMissingStorages,
-  setFiles,
+  addStorageDomains,
+  setStorageDomainsFiles,
   setVmCDRom,
   setVmNics,
   setUSBFilter,
   removeActiveRequest,
-} from './actions/index'
+} from './actions'
 
 import {
   callExternalAction,
@@ -87,7 +86,6 @@ import {
   DELAYED_REMOVE_ACTIVE_REQUEST,
   DELETE_VM_NIC,
   GET_ALL_CLUSTERS,
-  GET_ALL_FILES_FOR_ISO,
   GET_ALL_HOSTS,
   GET_ALL_OS,
   GET_ALL_TEMPLATES,
@@ -95,7 +93,7 @@ import {
   GET_ALL_VNIC_PROFILES,
   GET_BY_PAGE,
   GET_CONSOLE_OPTIONS,
-  GET_ISO_STORAGES,
+  GET_ISO_STORAGE_DOMAINS,
   GET_POOLS_BY_COUNT,
   GET_POOLS_BY_PAGE,
   GET_RDP_VM,
@@ -117,7 +115,7 @@ import {
   START_POOL,
   START_VM,
   SUSPEND_VM,
-} from './constants/index'
+} from './constants'
 
 function* fetchByPage (action) {
   yield put(setChanged({ value: false }))
@@ -619,21 +617,17 @@ function* fetchISOStorages (action) {
   const storages = yield callExternalAction('getStorages', Api.getStorages, action)
   if (storages && storages['storage_domain']) {
     const storagesInternal = storages.storage_domain.map(storage => Api.storageToInternal({ storage })).filter(v => v.type === 'iso')
-    yield put(setStorages({ storages: storagesInternal }))
-    for (let i in storagesInternal) {
-      yield fetchAllFilesForISO({ payload: { storageId: storagesInternal[i].id } })
-    }
-    const storageIdsToPreserve = storagesInternal.map(item => item.id)
-    yield put(removeMissingStorages({ storageIdsToPreserve }))
+    yield put(addStorageDomains(storagesInternal))
+    const isoFilesFetches = storagesInternal.map(storageDomain => fetchAllFilesForISO(storageDomain.id))
+    yield all(isoFilesFetches)
   }
 }
 
-function* fetchAllFilesForISO (action) {
-  const files = yield callExternalAction('getStorageFiles', Api.getStorageFiles, action)
-
+function* fetchAllFilesForISO (storageDomainId) {
+  const files = yield callExternalAction('getStorageFiles', Api.getStorageFiles, { payload: { storageId: storageDomainId } })
   if (files && files['file']) {
     const filesInternal = files.file.map(file => Api.fileToInternal({ file }))
-    yield put(setFiles({ storageId: action.payload.storageId, files: filesInternal }))
+    yield put(setStorageDomainsFiles(storageDomainId, filesInternal))
   }
 }
 
@@ -730,8 +724,7 @@ export function* rootSaga () {
     takeLatest(GET_ALL_OS, fetchAllOS),
     takeLatest(GET_ALL_HOSTS, fetchAllHosts),
     takeLatest(GET_ALL_VNIC_PROFILES, fetchAllVnicProfiles),
-    throttle(100, GET_ISO_STORAGES, fetchISOStorages),
-    throttle(100, GET_ALL_FILES_FOR_ISO, fetchAllFilesForISO),
+    throttle(100, GET_ISO_STORAGE_DOMAINS, fetchISOStorages),
 
     takeEvery(SELECT_VM_DETAIL, selectVmDetail),
     takeEvery(ADD_VM_NIC, addVmNic),
