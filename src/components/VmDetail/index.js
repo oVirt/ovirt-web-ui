@@ -45,7 +45,7 @@ function rephraseVmType (vmType) {
     return types[type]
   }
 
-  console.info('rephraseVmType(): vmType not explicitely defined: ', vmType)
+  console.info('rephraseVmType(): vmType not explicitly defined: ', vmType)
   return vmType
 }
 
@@ -112,7 +112,7 @@ class VmDetail extends Component {
     const sequence = [ 'first', 'second' ]
 
     const isPool = !!pool
-    const isPoolVm = !!vm.getIn(['pool', 'id'], false)
+    const isPoolVm = !!vm.getIn(['pool', 'id'])
     const name = isPool ? pool.get('name') : vm.get('name')
     const idPrefix = `vmdetail-${name}`
     const icon = getVmIcon(icons, operatingSystems, vm)

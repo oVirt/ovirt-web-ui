@@ -51,7 +51,7 @@ class VmDetailPage extends React.Component {
       return (<VmDetail vm={vms.getIn(['vms', match.params.id])} config={config} />)
     }
 
-    // TODO: Add handling for if the fetch runs but fails (FETCH-FAIL)
+    // TODO: Add handling for if the fetch runs but fails (FETCH-FAIL), see issue #631
     console.info(`VmDetailPage: VM id cannot be found: ${match.params.id}`)
     return null
   }
@@ -109,7 +109,7 @@ class PoolDetailPage extends React.Component {
       return (<VmDetail vm={vms.getIn(['pools', match.params.id, 'vm'])} pool={vms.getIn(['pools', match.params.id])} config={config} />)
     }
 
-    // TODO: Add handling for if the fetch runs but fails (FETCH-FAIL)
+    // TODO: Add handling for if the fetch runs but fails (FETCH-FAIL), see issue #631
     console.info(`PoolDetailPage: Pool id cannot be found: ${match.params.id}`)
     return null
   }
@@ -174,7 +174,7 @@ class VmDialogPage extends React.Component {
       return <VmDialog previousPath={previousPath} vm={vms.getIn(['vms', match.params.id])} />
     }
 
-    // TODO: Add handling for if the fetch runs but fails (FETCH-FAIL)
+    // TODO: Add handling for if the fetch runs but fails (FETCH-FAIL), see issue #631
     console.info(`VmDialogPage: VM id cannot be found: ${match.params.id}`)
     return null
   }

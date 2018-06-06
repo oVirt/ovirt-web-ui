@@ -65,10 +65,7 @@ const App = ({ vms, config, appReady }) => {
 App.propTypes = {
   vms: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
-  appReady: PropTypes.bool,
-}
-App.defaultProps = {
-  appReady: false,
+  appReady: PropTypes.bool.isRequired,
 }
 
 export default connect(

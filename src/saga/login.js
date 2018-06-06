@@ -55,11 +55,10 @@ export function* login (action) {
   const { payload: { token, userId, credentials: { username } } } = action
 
   // Verify a SSO token exists
-  let result = {} // Q? Why does this exists?
   if (!token) {
     yield put(loginFailed({
-      errorCode: result['error_code'] ? result['error_code'] : 'no_access',
-      message: result['error'] ? (result.error['statusText'] ? result.error['statusText'] : JSON.stringify(result['error'])) : 'Login Failed',
+      errorCode: 'no_access',
+      message: 'Login Failed',
     }))
     return
   }
@@ -122,20 +121,17 @@ function composeIncompatibleOVirtApiVersionMessage (oVirtMeta) {
 }
 
 /**
- * Compare the actual { major, minor } version (JS or ImmutableJS Map) to the required
- * { major, minor } and return if the **actual** is greater then or equal to **required**.
+ * Compare the actual { major, minor } version to the required { major, minor } and
+ * return if the **actual** is greater then or equal to **required**.
+ *
  * Backward compatibility of the API is assumed.
  */
 export function compareVersion (actual, required) {
   logDebug(`compareVersion(), actual=${JSON.stringify(actual)}, required=${JSON.stringify(required)}`)
 
-  const actualMajor = parseInt(actual.get ? actual.get('major') : actual.major)
-  const actualMinor = parseInt(actual.get ? actual.get('minor') : actual.minor)
-
-  // assuming backward compatibility of oVirt API
-  if (actualMajor >= required.major) {
-    if (actualMajor === required.major) {
-      if (actualMinor < required.minor) {
+  if (actual.major >= required.major) {
+    if (actual.major === required.major) {
+      if (actual.minor < required.minor) {
         return false
       }
     }
@@ -185,7 +181,7 @@ function* autoConnectCheck () {
   }
 }
 
-function* initialLoad () { // NOTE: This is an in-order fetch, could be made parallel?
+function* initialLoad () {
   yield put(getAllClusters()) // no shallow
   yield put(getAllHosts())
   yield put(getAllOperatingSystems())
@@ -193,7 +189,7 @@ function* initialLoad () { // NOTE: This is an in-order fetch, could be made par
   yield put(getAllStorageDomains())
   yield put(getAllVnicProfiles())
 
-  yield put(getByPage({ page: 1 })) // first page of VMs list, sets _loadInProgress_ to false when done
+  yield put(getByPage({ page: 1 })) // first page of VMs list
 }
 
 function* fetchPermissionWithoutFilter () {

@@ -127,7 +127,7 @@ import {
  * Compare the current oVirt version (held in redux) to the given version.
  */
 function compareVersionToCurrent ({ major, minor }) {
-  const current = Selectors.getOvirtVersion()
+  const current = Selectors.getOvirtVersion().toJS()
   return compareVersion(current, { major, minor })
 }
 
@@ -327,7 +327,6 @@ function* fetchVmsByCountVLower (action) {
 
 export function* fetchSingleVm (action) {
   const { vmId, shallowFetch } = action.payload
-  yield startProgress({ vmId, name: 'refresh_single' })
 
   const isOvirtGTE42 = compareVersionToCurrent({ major: 4, minor: 2 })
   if (isOvirtGTE42 && !shallowFetch) {
@@ -337,7 +336,7 @@ export function* fetchSingleVm (action) {
 
   yield put(addVmsFetchedById({ vmIds: [ vmId ] }))
   const vm = yield callExternalAction('getVm', Api.getVm, action, true)
-  let internalVm = false
+  let internalVm = null
   if (vm && vm.id) {
     internalVm = Api.vmToInternal({ vm, getSubResources: isOvirtGTE42 })
 
@@ -357,7 +356,6 @@ export function* fetchSingleVm (action) {
       yield put(removeVms({ vmIds: [vmId] }))
     }
   }
-  yield stopProgress({ vmId, name: 'refresh_single' })
 
   yield put(updateVmsPoolsCount())
   return internalVm
@@ -450,7 +448,9 @@ export function* fetchDisks ({ vms }) {
   })
 }
 
-function* fetchVmDisks ({ vmId }) { // Would __additional__ (API param __follow_) work here as well?
+function* fetchVmDisks ({ vmId }) {
+  // TODO: Enhance to use the `follow` API parameter (in API >=4.2) to reduce the request count
+  //       This should follow the same style as `fetchSingleVm` and would require an extension to `Api.diskattachments`
   const diskattachments = yield callExternalAction('diskattachments', Api.diskattachments, { type: 'GET_DISK_ATTACHMENTS', payload: { vmId } })
 
   if (diskattachments && diskattachments['disk_attachment']) { // array
@@ -489,22 +489,27 @@ function* startProgress ({ vmId, poolId, name }) {
   }
 }
 
-function* stopProgress ({ vmId, poolId, name, result }) {
-  const fetchSingle = vmId ? fetchSingleVm : fetchSinglePool
-  const getSingle = vmId ? getSingleVm : getSinglePool
-  const actionInProgress = vmId ? vmActionInProgress : poolActionInProgress
+function* getSingleInstance ({ vmId, poolId }) {
+  const fetches = [ fetchSingleVm(getSingleVm({ vmId })) ]
+  if (poolId) {
+    fetches.push(fetchSinglePool(getSinglePool({ poolId })))
+  }
+  yield all(fetches)
+}
 
-  const params = vmId ? { vmId } : { poolId }
+function* stopProgress ({ vmId, poolId, name, result }) {
+  const actionInProgress = vmId ? vmActionInProgress : poolActionInProgress
   if (result && result.status === 'complete') {
     // do not call "end of in progress" if successful,
     // since UI will be updated by refresh
     yield delay(5 * 1000)
-    yield fetchSingle(getSingle(params))
+    yield getSingleInstance({ vmId: result.vm.id, poolId })
+
     yield delay(30 * 1000)
-    yield fetchSingle(getSingle(params))
+    yield getSingleInstance({ vmId: result.vm.id, poolId })
   }
 
-  yield put(actionInProgress(Object.assign(params, { name, started: false })))
+  yield put(actionInProgress(Object.assign(vmId ? { vmId } : { poolId }, { name, started: false })))
 }
 
 function* shutdownVm (action) {
@@ -717,7 +722,7 @@ function* fetchAllNetworks () {
 function* schedulerWithFixedDelay (action) {
   logDebug('Starting schedulerWithFixedDelay() scheduler')
 
-  // TODO: do we need to stop the loop? Consider takeLatest in the rootSaga 'restarts' the loop if needed
+  // TODO: Currently once a scheduler is started, it cannot be stopped. We should fix that.
   while (true) {
     yield delay(AppConfiguration.schedulerFixedDelayInSeconds * 1000)
     logDebug(`schedulerWithFixedDelay() event after delay of ${AppConfiguration.schedulerFixedDelayInSeconds} seconds`)
