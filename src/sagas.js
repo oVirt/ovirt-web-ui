@@ -28,7 +28,6 @@ import {
   setVmConsoles,
   removeMissingVms,
   removeMissingHosts,
-  removeMissingOSs,
   setVmSessions,
   persistState,
 
@@ -36,7 +35,7 @@ import {
   setClusters,
   addHosts,
   setTemplates,
-  addAllOS,
+  setOperatingSystems,
   setStorageDomains,
   setDataCenters,
   addNetworksToVnicProfiles,
@@ -597,12 +596,9 @@ function* fetchAllOS (action) {
 
   if (operatingSystems && operatingSystems['operating_system']) {
     const operatingSystemsInternal = operatingSystems.operating_system.map(os => Api.OSToInternal({ os }))
-    yield put(addAllOS({ os: operatingSystemsInternal }))
-
-    const osIdsToPreserve = operatingSystemsInternal.map(item => item.id)
+    yield put(setOperatingSystems(operatingSystemsInternal))
     // load icons for OS
     yield fetchUnknownIconsForVms({ os: operatingSystemsInternal })
-    yield put(removeMissingOSs({ osIdsToPreserve }))
   }
 }
 

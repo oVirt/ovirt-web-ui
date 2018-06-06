@@ -1,13 +1,15 @@
 import {
   GET_ALL_OS,
-} from '../constants/index'
+  SET_OPERATING_SYSTEMS,
+} from '../constants'
 
-export function removeMissingOSs ({ osIdsToPreserve }) {
+/**
+ * @param {Array<OperatingSystem>} operatingSystems
+ */
+export function setOperatingSystems (operatingSystems) {
   return {
-    type: 'REMOVE_MISSING_OSS',
-    payload: {
-      osIdsToPreserve,
-    },
+    type: SET_OPERATING_SYSTEMS,
+    payload: operatingSystems,
   }
 }
 
@@ -15,14 +17,5 @@ export function getAllOperatingSystems () {
   return {
     type: GET_ALL_OS,
     payload: {},
-  }
-}
-
-export function addAllOS ({ os }) {
-  return {
-    type: 'ADD_ALL_OS',
-    payload: {
-      os,
-    },
   }
 }

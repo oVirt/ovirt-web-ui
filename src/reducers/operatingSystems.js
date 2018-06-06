@@ -1,21 +1,14 @@
 import { fromJS } from 'immutable'
-import { actionReducer, removeMissingItems } from './utils'
 
-const initialState = fromJS({
-  operatingSystems: {},
-})
+import { arrayToMap } from '../helpers'
+import { SET_OPERATING_SYSTEMS } from '../constants'
+import { actionReducer } from './utils'
+
+const initialState = fromJS({})
 const operatingSystems = actionReducer(initialState, {
-  ADD_ALL_OS (state, { payload: { os } }) {
-    const updates = {}
-    os.forEach(os => {
-      updates[os.id] = os
-    })
-    const imUpdates = fromJS(updates)
-    return state.mergeIn(['operatingSystems'], imUpdates)
-  },
-
-  REMOVE_MISSING_OSS (state, { payload: { osIdsToPreserve } }) {
-    return removeMissingItems({ state, subStateName: 'operatingSystems', idsToPreserve: osIdsToPreserve })
+  [SET_OPERATING_SYSTEMS] (state, { payload: operatingSystems }) {
+    const idToOperatingSystem = arrayToMap(operatingSystems, os => os.id)
+    return fromJS(idToOperatingSystem)
   },
 })
 
