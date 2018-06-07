@@ -70,17 +70,24 @@ const findExactMatch = (branches) => {
 class PageRouter extends React.Component {
   constructor (props) {
     super(props)
-    this.handleKeyPress = this.handleKeyPress.bind(this)
+    this.handleKeyUp = this.handleKeyUp.bind(this)
+    this.handleKeyDown = this.handleKeyDown.bind(this)
     this.keyPressed = null
     this.previousPath = '/'
   }
 
-  handleKeyPress (event) {
+  handleKeyUp (event) {
     if (event.key === 'Escape' && this.keyPressed !== event.key) {
       this.keyPressed = event.key
       if (this.currentBranch.length > 1) {
-        this.props.redirectRoute(this.currentBranch[this.currentBranch.length - 2].match.url)
+        this.props.history.push(this.currentBranch[this.currentBranch.length - 2].match.url)
       }
+    }
+  }
+
+  handleKeyDown (event) {
+    if (event.key === 'Escape') {
+      this.keyPressed = null
     }
   }
 
@@ -91,8 +98,13 @@ class PageRouter extends React.Component {
   }
 
   componentDidMount () {
-    window.addEventListener('keydown', this.handleKeyPress)
-    window.addEventListener('keyup', (e) => { this.keyPressed = null })
+    window.addEventListener('keydown', this.handleKeyDown)
+    window.addEventListener('keyup', this.handleKeyUp)
+  }
+
+  componentWillUnmount () {
+    document.removeEventListener('keydown', this.handleKeyDown)
+    document.removeEventListener('keyup', this.handleKeyUp)
   }
 
   componentWillReceiveProps (nextProps) {
@@ -137,7 +149,6 @@ PageRouter.propTypes = {
   route: PropTypes.object.isRequired,
   routeReducer: PropTypes.object.isRequired,
   onRedirect: PropTypes.func.isRequired,
-  redirectRoute: PropTypes.func.isRequired,
 }
 
 export default withRouter(connect(
@@ -146,6 +157,5 @@ export default withRouter(connect(
   }),
   (dispatch) => ({
     onRedirect: () => dispatch(redirectRoute({ route: null })),
-    redirectRoute: (url) => dispatch(redirectRoute({ route: url })),
   })
 )(PageRouter))
