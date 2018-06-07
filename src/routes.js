@@ -32,6 +32,7 @@ const getRoutes = (vms) => ([
       {
         path: '/vm/add',
         exact: true,
+        closeable: true, // by ESC key
         title: (match) => msg.addNewVm(),
         component: VmDialogPage,
         toolbars: [], // Recently not used. When needed, see VmDialog/style.css - .vm-dialog-buttons
@@ -44,6 +45,7 @@ const getRoutes = (vms) => ([
         routes: [
           {
             path: '/vm/:id/edit',
+            closeable: true, // by ESC key
             title: (match) => msg.edit(),
             component: VmDialogPage,
             toolbars: [], // Recently not used. When needed, see VmDialog/style.css - .vm-dialog-buttons
