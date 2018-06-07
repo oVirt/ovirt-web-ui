@@ -17,6 +17,8 @@ import Toolbar from './Toolbar/Toolbar'
 
 import { msg } from '../intl'
 
+const ROOT_URL = '/'
+
 const buildPath = (route) => {
   let res = []
   for (let i in route) {
@@ -55,7 +57,9 @@ Breadcrumb.propTypes = {
 }
 
 const findExactMatch = (branches) => {
-  if (branches.length === 1) {
+  if (branches.length === 0) {
+    return null
+  } else if (branches.length === 1) {
     return branches[0]
   } else {
     for (let i = 0; i < branches.length; i++) {
@@ -63,69 +67,94 @@ const findExactMatch = (branches) => {
         return branches[i]
       }
     }
+    return branches[0]
   }
-  return null
 }
 
 class PageRouter extends React.Component {
   constructor (props) {
     super(props)
-    this.handleKeyPress = this.handleKeyPress.bind(this)
-    this.keyPressed = null
-    this.previousPath = '/'
+    this.state = {
+      previousPath: ROOT_URL,
+      branches: [],
+    }
+
+    this.handleKeyUp = this.handleKeyUp.bind(this)
   }
 
-  handleKeyPress (event) {
-    if (event.key === 'Escape' && this.keyPressed !== event.key) {
-      this.keyPressed = event.key
-      if (this.currentBranch.length > 1) {
-        this.props.redirectRoute(this.currentBranch[this.currentBranch.length - 2].match.url)
+  handleKeyUp (event) {
+    if (event.key === 'Escape') {
+      const branches = this.state.branches
+      const len = branches.length
+      let url
+
+      if (len === 1) {
+        if (branches[0].match.url !== ROOT_URL) {
+          url = ROOT_URL
+        }
+      } else if (len > 1) {
+        url = branches[len - 2].match.url
+      }
+
+      if (url) {
+        this.props.history.push(url)
       }
     }
   }
 
   componentDidUpdate () {
-    if (this.props.routeReducer.get('redirect') && this.props.routeReducer.get('redirect') !== this.props.location.pathname) {
+    if (this.props.redirect && this.props.redirect !== this.props.location.pathname) {
       this.props.onRedirect()
     }
   }
 
   componentDidMount () {
-    window.addEventListener('keydown', this.handleKeyPress)
-    window.addEventListener('keyup', (e) => { this.keyPressed = null })
+    document.addEventListener('keyup', this.handleKeyUp)
+  }
+
+  componentWillUnmount () {
+    document.removeEventListener('keyup', this.handleKeyUp)
   }
 
   componentWillReceiveProps (nextProps) {
-    if (this.previousPath !== this.props.location.pathname && nextProps.location.pathname !== this.props.location.pathname) {
-      this.previousPath = this.props.location.pathname
+    let { route, location } = nextProps
+
+    if (this.state.previousPath !== this.props.location.pathname && location.pathname !== this.props.location.pathname) {
+      this.setState({
+        previousPath: this.props.location.pathname,
+      })
     }
+    this.setState({
+      branches: matchRoutes(route.routes, location.pathname),
+    })
   }
 
   render () {
-    let { route, location, history, routeReducer } = this.props
-    if (routeReducer.get('redirect') && routeReducer.get('redirect') !== location.pathname) {
-      return (<Redirect to={routeReducer.get('redirect')} />)
-    }
-    const branches = matchRoutes(route.routes, location.pathname)
+    let { location, history, redirect } = this.props
 
-    let branch = findExactMatch(branches)
-    this.currentBranch = branches.slice()
-    this.currentBranch.unshift({ match: { url: '/' } })
+    if (redirect && redirect !== location.pathname) {
+      return (<Redirect to={redirect} />)
+    }
+
+    const branch = findExactMatch(this.state.branches)
+
+    if (!branch) {
+      return null
+    }
+
     let tools = []
-    if (branch) {
-      for (let i in branch.route.toolbars) {
-        tools.push(branch.route.toolbars[i](branch.match))
-      }
+    for (let i in branch.route.toolbars) {
+      tools.push(branch.route.toolbars[i](branch.match))
     }
 
     const RenderComponent = branch.route.component
     return (<div className={style['page-router']}>
-      <Breadcrumb route={branches} root={{ title: msg.virtualMachines(), url: '/' }} />
+      <Breadcrumb route={this.state.branches} root={{ title: msg.virtualMachines(), url: '/' }} />
       <Toolbar>
         {tools}
       </Toolbar>
       <div className={style['page-router-render-component']}>
-        <RenderComponent route={branch.route} match={branch.match} location={location} history={history} previousPath={this.previousPath} />
+        <RenderComponent route={branch.route} match={branch.match} location={location} history={history} previousPath={this.state.previousPath} />
       </div>
     </div>)
   }
@@ -135,17 +164,15 @@ PageRouter.propTypes = {
   location: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
   route: PropTypes.object.isRequired,
-  routeReducer: PropTypes.object.isRequired,
+  redirect: PropTypes.object, // can be null
   onRedirect: PropTypes.func.isRequired,
-  redirectRoute: PropTypes.func.isRequired,
 }
 
 export default withRouter(connect(
   (state) => ({
-    routeReducer: state.route,
+    redirect: state.route.get('redirect'),
   }),
   (dispatch) => ({
     onRedirect: () => dispatch(redirectRoute({ route: null })),
-    redirectRoute: (url) => dispatch(redirectRoute({ route: url })),
   })
 )(PageRouter))
