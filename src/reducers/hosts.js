@@ -8,7 +8,7 @@ const initialState = fromJS({})
 
 const hosts = actionReducer(initialState, {
   [SET_HOSTS] (state, { payload: hosts }) {
-    return arrayToMap(hosts, host => host.id)
+    return fromJS(arrayToMap(hosts, host => host.id))
   },
 })
 
