@@ -6,7 +6,7 @@ import VmDetail from '../VmDetail'
 import VmDialog from '../VmDialog'
 import VmsList from '../VmsList'
 
-import { selectVmDetail, selectPoolDetail, getISOStorages } from '../../actions'
+import { selectVmDetail, selectPoolDetail, getISOStorages, getConsoleOptions } from '../../actions'
 
 /**
  * Route component (for PageRouter) to view the list of VMs and Pools
@@ -21,38 +21,35 @@ const VmsPage = () => {
 class VmDetailPage extends React.Component {
   constructor (props) {
     super(props)
-    this.requestSent = false
+    this.state = {
+      vmId: undefined,
+    }
   }
 
-  fetchTheVmIfNeeded () {
-    const { match, vms, getVms } = this.props
-    let requested = false
+  static getDerivedStateFromProps (props, state) {
+    if (state.vmId !== props.match.params.id) {
+      const vmId = props.match.params.id
 
-    if (!this.requestSent && !vms.getIn(['vms', match.params.id])) {
-      this.requestSent = requested = true
-      getVms({ vmId: match.params.id })
+      // Assume the VM is not in props.vms, was shallow fetched or is stale.
+      // Force a refresh when it is selected for viewing.
+      props.getConsoleOptions(vmId)
+      props.getVmById(vmId)
+      return { vmId }
     }
 
-    return requested
-  }
-
-  componentWillMount () {
-    this.fetchTheVmIfNeeded()
-  }
-
-  componentWillUpdate () {
-    this.fetchTheVmIfNeeded()
+    return null
   }
 
   render () {
-    const { match, vms, config } = this.props
+    const { vms, config } = this.props
+    const { vmId } = this.state
 
-    if (vms.getIn(['vms', match.params.id])) {
-      return (<VmDetail vm={vms.getIn(['vms', match.params.id])} config={config} />)
+    if (vms.getIn(['vms', vmId])) {
+      return (<VmDetail vm={vms.getIn(['vms', vmId])} config={config} />)
     }
 
     // TODO: Add handling for if the fetch runs but fails (FETCH-FAIL), see issue #631
-    console.info(`VmDetailPage: VM id cannot be found: ${match.params.id}`)
+    console.info(`VmDetailPage: VM id cannot be found: ${vmId}`)
     return null
   }
 }
@@ -60,16 +57,18 @@ VmDetailPage.propTypes = {
   vms: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
-  getVms: PropTypes.func.isRequired,
+
+  getVmById: PropTypes.func.isRequired,
+  getConsoleOptions: PropTypes.func.isRequired,
 }
 const VmDetailPageConnected = connect(
   (state) => ({
     vms: state.vms,
     config: state.config,
-    requestActive: !state.activeRequests.isEmpty(),
   }),
   (dispatch) => ({
-    getVms: ({ vmId }) => dispatch(selectVmDetail({ vmId })),
+    getVmById: (vmId) => dispatch(selectVmDetail({ vmId })),
+    getConsoleOptions: (vmId) => dispatch(getConsoleOptions({ vmId })),
   })
 )(VmDetailPage)
 
@@ -79,38 +78,34 @@ const VmDetailPageConnected = connect(
 class PoolDetailPage extends React.Component {
   constructor (props) {
     super(props)
-    this.requestSent = false
+    this.state = {
+      poolId: undefined,
+    }
   }
 
-  fetchThePoolIfNeeded () {
-    const { match, vms, getPools } = this.props
-    let requested = false
+  static getDerivedStateFromProps (props, state) {
+    if (state.poolId !== props.match.params.id) {
+      const poolId = props.match.params.id
 
-    if (!this.requestSent && !vms.getIn(['pools', match.params.id, 'vm'])) {
-      this.requestSent = requested = true
-      getPools({ poolId: match.params.id })
+      // Assume the Pool is not in props.pools, was shallow fetched or is stale.
+      // Force a refresh when it is selected for viewing.
+      props.getPoolById(poolId)
+      return { poolId }
     }
 
-    return requested
-  }
-
-  componentWillMount () {
-    this.fetchThePoolIfNeeded()
-  }
-
-  componentWillUpdate () {
-    this.fetchThePoolIfNeeded()
+    return null
   }
 
   render () {
-    const { match, vms, config } = this.props
+    const { vms, config } = this.props
+    const { poolId } = this.state
 
-    if (vms.getIn(['pools', match.params.id, 'vm'])) {
-      return (<VmDetail vm={vms.getIn(['pools', match.params.id, 'vm'])} pool={vms.getIn(['pools', match.params.id])} config={config} />)
+    if (vms.getIn(['pools', poolId, 'vm'])) {
+      return (<VmDetail vm={vms.getIn(['pools', poolId, 'vm'])} pool={vms.getIn(['pools', poolId])} config={config} />)
     }
 
     // TODO: Add handling for if the fetch runs but fails (FETCH-FAIL), see issue #631
-    console.info(`PoolDetailPage: Pool id cannot be found: ${match.params.id}`)
+    console.info(`PoolDetailPage: Pool id cannot be found: ${poolId}`)
     return null
   }
 }
@@ -118,16 +113,16 @@ PoolDetailPage.propTypes = {
   vms: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
-  getPools: PropTypes.func.isRequired,
+
+  getPoolById: PropTypes.func.isRequired,
 }
 const PoolDetailPageConnected = connect(
   (state) => ({
     vms: state.vms,
     config: state.config,
-    requestActive: !state.activeRequests.isEmpty(),
   }),
   (dispatch) => ({
-    getPools: ({ poolId }) => dispatch(selectPoolDetail({ poolId })),
+    getPoolById: (poolId) => dispatch(selectPoolDetail({ poolId })),
   })
 )(PoolDetailPage)
 
@@ -137,65 +132,55 @@ const PoolDetailPageConnected = connect(
 class VmDialogPage extends React.Component {
   constructor (props) {
     super(props)
-    this.requestSent = false
-    this.isAdd = !props.match.params.id || /\/add$/.test(props.match.path)
+    this.state = {
+      vmId: undefined,
+    }
   }
 
-  fetchTheVmIfNeeded () {
-    const { match, vms, getVms } = this.props
-    let requested = false
+  static getDerivedStateFromProps (props, state) {
+    if (state.vmId !== props.match.params.id) {
+      const vmId = props.match.params.id
 
-    if (!this.isAdd && !this.requestSent && !vms.getIn(['vms', match.params.id])) {
-      this.requestSent = requested = true
-      getVms({ vmId: match.params.id })
+      // Assume the VM is not in props.vms, was shallow fetched or is stale.
+      // Force a refresh when it is selected for editing.
+      props.getAvailableCDImages()
+      props.getVmById(vmId)
+      return { vmId }
     }
 
-    return requested
-  }
-
-  componentWillMount () {
-    this.props.getCDRom()
-
-    const requested = this.fetchTheVmIfNeeded()
-    if (requested) console.info(`VmDialogPage: WillMount requesting: ${this.props.match.params.id}`)
-  }
-
-  componentWillUpdate () {
-    const requested = this.fetchTheVmIfNeeded()
-    if (requested) console.info(`VmDialogPage: WillUpdate requested: ${this.props.match.params.id}`)
+    return null
   }
 
   render () {
-    const { match, vms, previousPath } = this.props
+    const { vms, previousPath } = this.props
+    const { vmId } = this.state
 
-    if (this.isAdd) {
+    if (/\/add$/.test(this.props.match.path)) {
       return <VmDialog previousPath={previousPath} />
-    } else if (match.params.id && vms.getIn(['vms', match.params.id])) {
-      return <VmDialog previousPath={previousPath} vm={vms.getIn(['vms', match.params.id])} />
+    } else if (vmId && vms.getIn(['vms', vmId])) {
+      return <VmDialog previousPath={previousPath} vm={vms.getIn(['vms', vmId])} />
     }
 
     // TODO: Add handling for if the fetch runs but fails (FETCH-FAIL), see issue #631
-    console.info(`VmDialogPage: VM id cannot be found: ${match.params.id}`)
+    console.info(`VmDialogPage: VM id cannot be found: ${vmId}`)
     return null
   }
 }
 VmDialogPage.propTypes = {
   vms: PropTypes.object.isRequired,
-
-  match: PropTypes.object.isRequired,
   previousPath: PropTypes.string.isRequired,
+  match: PropTypes.object.isRequired,
 
-  getCDRom: PropTypes.func.isRequired,
-  getVms: PropTypes.func.isRequired,
+  getAvailableCDImages: PropTypes.func.isRequired,
+  getVmById: PropTypes.func.isRequired,
 }
 const VmDialogPageConnected = connect(
   (state) => ({
     vms: state.vms,
-    requestActive: !state.activeRequests.isEmpty(),
   }),
   (dispatch) => ({
-    getCDRom: () => dispatch(getISOStorages()),
-    getVms: ({ vmId }) => dispatch(selectVmDetail({ vmId })),
+    getAvailableCDImages: () => dispatch(getISOStorages()),
+    getVmById: (vmId) => dispatch(selectVmDetail({ vmId })),
   })
 )(VmDialogPage)
 

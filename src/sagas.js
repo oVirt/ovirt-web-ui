@@ -668,6 +668,8 @@ function* fetchVmNics ({ vmId }) {
 }
 
 function* fetchISOStorages (action) {
+  // If https://bugzilla.redhat.com/show_bug.cgi?id=1436403 was implemented,
+  // this could fetch just ISO storage domain types
   const storages = yield callExternalAction('getStorages', Api.getStorages, action)
   if (storages && storages['storage_domain']) {
     const storagesInternal = storages.storage_domain.map(storage => Api.storageToInternal({ storage })).filter(v => v.type === 'iso')
