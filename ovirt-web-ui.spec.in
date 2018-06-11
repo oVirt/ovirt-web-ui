@@ -7,7 +7,6 @@
 %global use_rhev %( test -z @RHEV@ && echo 1 || echo 0)
 %define debug_package %{nil}
 
-## %global source_basename @PACKAGE_TARNAME@-@PACKAGE_VERSION@
 %global source_basename @PACKAGE_TARNAME@
 
 Name:           ovirt-web-ui
