@@ -1,14 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Redirect } from 'react-router-dom'
 
 import VmDetail from '../VmDetail'
 import VmDialog from '../VmDialog'
 import VmsList from '../VmsList'
 
-import { selectVmDetail, selectPoolDetail, getIsoStorageDomains } from '../../actions'
-import Selectors from '../../selectors'
+import { selectVmDetail, selectPoolDetail, getIsoStorageDomains, getConsoleOptions } from '../../actions'
 
 /**
  * Route component (for PageRouter) to view the list of VMs and Pools
@@ -23,52 +21,54 @@ const VmsPage = () => {
 class VmDetailPage extends React.Component {
   constructor (props) {
     super(props)
-    this.requestSent = false
-  }
-
-  componentWillMount () {
-    if (Selectors.isFilterChecked()) {
-      this.props.getVms({ vmId: this.props.match.params.id })
+    this.state = {
+      vmId: undefined,
     }
   }
 
-  componentWillUpdate () {
-    const vmInStore = this.props.vms.getIn(['vms', this.props.match.params.id])
-    if (!vmInStore && Selectors.isFilterChecked() && !this.requestSent) {
-      this.requestSent = true
-      this.props.getVms({ vmId: this.props.match.params.id })
+  static getDerivedStateFromProps (props, state) {
+    if (state.vmId !== props.match.params.id) {
+      const vmId = props.match.params.id
+
+      // Assume the VM is not in props.vms, was shallow fetched or is stale.
+      // Force a refresh when it is selected for viewing.
+      props.getConsoleOptions(vmId)
+      props.getVmById(vmId)
+      return { vmId }
     }
+
+    return null
   }
 
   render () {
-    let { match, vms, config, requestActive } = this.props
-    if (vms.getIn(['vms', match.params.id])) {
-      return (<VmDetail vm={vms.getIn(['vms', match.params.id])} config={config} />)
-    } else if (requestActive) {
-      console.info(`VmDetailPage: VM id cannot be found: ${match.params.id}. Load is still in progress - waiting before redirect`)
-      return null
+    const { vms, config } = this.props
+    const { vmId } = this.state
+
+    if (vmId && vms.getIn(['vms', vmId])) {
+      return (<VmDetail vm={vms.getIn(['vms', vmId])} config={config} />)
     }
 
-    console.info(`VmDetailPage: VM id cannot be found: ${match.params.id}. Redirecting to / `)
-    return <Redirect to='/' />
+    // TODO: Add handling for if the fetch runs but fails (FETCH-FAIL), see issue #631
+    console.info(`VmDetailPage: VM id cannot be found: ${vmId}`)
+    return null
   }
 }
 VmDetailPage.propTypes = {
   vms: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
-  getVms: PropTypes.func.isRequired,
-  requestActive: PropTypes.bool.isRequired,
-}
 
+  getVmById: PropTypes.func.isRequired,
+  getConsoleOptions: PropTypes.func.isRequired,
+}
 const VmDetailPageConnected = connect(
   (state) => ({
     vms: state.vms,
     config: state.config,
-    requestActive: !state.activeRequests.isEmpty(),
   }),
   (dispatch) => ({
-    getVms: ({ vmId }) => dispatch(selectVmDetail({ vmId })),
+    getVmById: (vmId) => dispatch(selectVmDetail({ vmId })),
+    getConsoleOptions: (vmId) => dispatch(getConsoleOptions({ vmId })),
   })
 )(VmDetailPage)
 
@@ -78,96 +78,109 @@ const VmDetailPageConnected = connect(
 class PoolDetailPage extends React.Component {
   constructor (props) {
     super(props)
-    this.requestSent = false
-  }
-
-  componentWillMount () {
-    if (Selectors.isFilterChecked()) {
-      this.props.getPools({ poolId: this.props.match.params.id })
+    this.state = {
+      poolId: undefined,
     }
   }
 
-  componentWillUpdate () {
-    const poolInStore = this.props.vms.getIn(['pools', this.props.match.params.id, 'vm'])
-    if (!poolInStore && Selectors.isFilterChecked() && !this.requestSent) {
-      this.requestSent = true
-      this.props.getPools({ poolId: this.props.match.params.id })
+  static getDerivedStateFromProps (props, state) {
+    if (state.poolId !== props.match.params.id) {
+      const poolId = props.match.params.id
+
+      // Assume the Pool is not in props.pools, was shallow fetched or is stale.
+      // Force a refresh when it is selected for viewing.
+      props.getPoolById(poolId)
+      return { poolId }
     }
+
+    return null
   }
 
   render () {
-    let { match, vms, config, requestActive } = this.props
+    const { vms, config } = this.props
+    const { poolId } = this.state
 
-    if (vms.getIn(['pools', match.params.id, 'vm'])) {
-      return (<VmDetail vm={vms.getIn(['pools', match.params.id, 'vm'])} pool={vms.getIn(['pools', match.params.id])} config={config} isPool />)
-    } else if (requestActive) {
-      return null
+    if (poolId && vms.getIn(['pools', poolId, 'vm'])) {
+      return (<VmDetail vm={vms.getIn(['pools', poolId, 'vm'])} pool={vms.getIn(['pools', poolId])} config={config} />)
     }
-    return <Redirect to='/' />
+
+    // TODO: Add handling for if the fetch runs but fails (FETCH-FAIL), see issue #631
+    console.info(`PoolDetailPage: Pool id cannot be found: ${poolId}`)
+    return null
   }
 }
 PoolDetailPage.propTypes = {
   vms: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
   match: PropTypes.object.isRequired,
-  getPools: PropTypes.func.isRequired,
-  requestActive: PropTypes.bool.isRequired,
+
+  getPoolById: PropTypes.func.isRequired,
 }
 const PoolDetailPageConnected = connect(
   (state) => ({
     vms: state.vms,
     config: state.config,
-    requestActive: !state.activeRequests.isEmpty(),
   }),
   (dispatch) => ({
-    getPools: ({ poolId }) => dispatch(selectPoolDetail({ poolId })),
+    getPoolById: (poolId) => dispatch(selectPoolDetail({ poolId })),
   })
 )(PoolDetailPage)
 
 /**
- * Route component (for PageRouter) to edit a VM
+ * Route component (for PageRouter) to create or edit a VM
  */
 class VmDialogPage extends React.Component {
-  componentWillMount () {
-    this.props.getCDRom()
-
-    // in case the location is entered from outside, refresh data
-    if (this.props.match.params.id) {
-      this.props.getVms({ vmId: this.props.match.params.id })
+  constructor (props) {
+    super(props)
+    this.state = {
+      vmId: undefined,
     }
   }
 
-  render () {
-    let { match, vms, previousPath, requestActive } = this.props
-    if ((match.params.id && vms.getIn(['vms', match.params.id])) || !match.params.id) {
-      return (<VmDialog vm={vms.getIn(['vms', match.params.id])} previousPath={previousPath} />)
-    } else if (requestActive) {
-      console.info(`VmDialogPage: VM id cannot be found: ${match.params.id}. Load is still in progress - waiting before redirect`)
-      return null
+  static getDerivedStateFromProps (props, state) {
+    if (state.vmId !== props.match.params.id) {
+      const vmId = props.match.params.id
+
+      // Assume the VM is not in props.vms, was shallow fetched or is stale.
+      // Force a refresh when it is selected for editing.
+      props.getAvailableCDImages()
+      props.getVmById(vmId)
+      return { vmId }
     }
 
-    console.info(`VmDialogPage: VM id cannot be found: ${match.params.id}.`)
+    return null
+  }
+
+  render () {
+    const { vms, previousPath } = this.props
+    const { vmId } = this.state
+
+    if (/\/add$/.test(this.props.match.path)) {
+      return <VmDialog previousPath={previousPath} />
+    } else if (vmId && vms.getIn(['vms', vmId])) {
+      return <VmDialog previousPath={previousPath} vm={vms.getIn(['vms', vmId])} />
+    }
+
+    // TODO: Add handling for if the fetch runs but fails (FETCH-FAIL), see issue #631
+    console.info(`VmDialogPage: VM id cannot be found: ${vmId}`)
     return null
   }
 }
 VmDialogPage.propTypes = {
   vms: PropTypes.object.isRequired,
-
-  match: PropTypes.object.isRequired,
   previousPath: PropTypes.string.isRequired,
+  match: PropTypes.object.isRequired,
 
-  getCDRom: PropTypes.func.isRequired,
-  getVms: PropTypes.func.isRequired,
-  requestActive: PropTypes.bool.isRequired,
+  getAvailableCDImages: PropTypes.func.isRequired,
+  getVmById: PropTypes.func.isRequired,
 }
 const VmDialogPageConnected = connect(
   (state) => ({
     vms: state.vms,
-    requestActive: !state.activeRequests.isEmpty(),
   }),
   (dispatch) => ({
-    getCDRom: () => dispatch(getIsoStorageDomains()),
-    getVms: ({ vmId }) => dispatch(selectVmDetail({ vmId })),
+    getAvailableCDImages: () => dispatch(getIsoStorageDomains()),
+    getVmById: (vmId) => dispatch(selectVmDetail({ vmId })),
   })
 )(VmDialogPage)
 
