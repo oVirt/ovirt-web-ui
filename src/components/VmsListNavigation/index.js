@@ -3,18 +3,13 @@ import PropTypes from 'prop-types'
 
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { getByPage, getConsoleOptions, selectVmDetail } from '../../actions/index'
+import { getByPage } from '../../actions/index'
 import InfiniteScroll from 'react-infinite-scroller'
 import naturalCompare from 'string-natural-compare'
 
 import style from './style.css'
 
-const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, onUpdate, loadConsoleOptions, getVms }) => {
-  const linkClick = (vmId) => {
-    loadConsoleOptions(vmId)
-    getVms(vmId)
-  }
-
+const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, loadAnotherPage }) => {
   const idPrefix = `vmslistnav`
   const toggleExpandButton = (
     <div className={`${style['toggle-expand-button']} ${expanded ? style['toggle-expand-button-expanded'] : ''}`}>
@@ -26,11 +21,10 @@ const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, onUpdat
 
   const loadMore = () => {
     if (vms.get('notAllPagesLoaded')) {
-      onUpdate(vms.get('page') + 1)
+      loadAnotherPage(vms.get('page') + 1)
     }
   }
 
-  const emptyList = (<div />)
   let list = null
   if (expanded) {
     const sortedVms = vms.get('vms')
@@ -47,7 +41,7 @@ const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, onUpdat
 
       return (
         <li role='presentation' className={style['item']} key={vm.get('id')}>
-          <Link to={`/vm/${vm.get('id')}`} className={style['item-link']} onClick={() => { linkClick(vm.get('id')) }}>
+          <Link to={`/vm/${vm.get('id')}`} className={style['item-link']}>
             <span className={style['item-text']} id={`${idPrefix}-item-${vm.get('name')}`}>{vm.get('name')}</span>
           </Link>
         </li>
@@ -70,7 +64,7 @@ const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, onUpdat
           hasMore={vms.get('notAllPagesLoaded')}
           useWindow={false}
         >
-          {list || emptyList}
+          {list || (<div />)}
         </InfiniteScroll>
       </div>
     </div>
@@ -81,10 +75,8 @@ VmsListNavigation.propTypes = {
   vms: PropTypes.object.isRequired,
   expanded: PropTypes.bool,
 
-  getVms: PropTypes.func.isRequired,
   toggleExpansion: PropTypes.func.isRequired,
-  loadConsoleOptions: PropTypes.func.isRequired,
-  onUpdate: PropTypes.func.isRequired,
+  loadAnotherPage: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -92,8 +84,6 @@ export default connect(
     vms: state.vms,
   }),
   (dispatch) => ({
-    loadConsoleOptions: (vmId) => dispatch(getConsoleOptions({ vmId })),
-    onUpdate: (page) => dispatch(getByPage({ page })),
-    getVms: (vmId) => dispatch(selectVmDetail({ vmId })),
+    loadAnotherPage: (page) => dispatch(getByPage({ page })),
   })
 )(VmsListNavigation)
