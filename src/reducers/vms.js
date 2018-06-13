@@ -9,6 +9,7 @@ import {
   REMOVE_POOLS,
   REMOVE_VMS,
   SET_CHANGED,
+  SET_PAGE,
   SET_VM_CDROM,
   SET_VM_CONSOLES,
   SET_VM_DISKS,
@@ -25,6 +26,7 @@ import { actionReducer, removeMissingItems } from './utils'
 const initialState = Immutable.fromJS({
   vms: {},
   pools: {},
+
   page: 1,
   /**
    * true ~ we need to fetch further vms and pools
@@ -147,7 +149,7 @@ const vms = actionReducer(initialState, {
 
   [UPDATE_VMPOOLS_COUNT] (state) {
     state.get('pools').toList().map(pool => {
-      state = state.setIn(['pools', pool.id, 'vmsCount'], 0)
+      state = state.setIn(['pools', pool.get('id'), 'vmsCount'], 0)
     })
 
     state.get('vms').toList().map(vm => {
@@ -182,6 +184,10 @@ const vms = actionReducer(initialState, {
       }
     }
     return state
+  },
+
+  [SET_PAGE] (state, { payload: { page } }) {
+    return state.set('page', page)
   },
   [SET_CHANGED] (state, { payload: { value } }) {
     return state.set('notAllPagesLoaded', value)

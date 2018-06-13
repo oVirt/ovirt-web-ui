@@ -54,11 +54,12 @@ export function persistState () {
 /**
  * Not creator of an action. Returned object can't be dispatched to the store.
  */
-export function getSingleVm ({ vmId }) {
+export function getSingleVm ({ vmId, shallowFetch = false }) {
   return {
     type: GET_VM,
     payload: {
       vmId,
+      shallowFetch,
     },
   }
 }

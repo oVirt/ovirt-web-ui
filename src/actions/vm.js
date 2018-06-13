@@ -28,7 +28,7 @@ import {
   UPDATE_ICONS,
   UPDATE_VMS,
   VM_ACTION_IN_PROGRESS,
-} from '../constants/index'
+} from '../constants'
 
 export function login ({ username, password, token, userId }) {
   return {
