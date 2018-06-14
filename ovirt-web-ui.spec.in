@@ -35,7 +35,8 @@ This package provides new VM Portal for %{product}, so far as technical preview.
 %setup -q -n"%{source_basename}-%{version}"
 rpm -qa | grep ovirt-engine-nodejs
 
-echo "======== Workaround: 'yarn check' is recently failing on mismatch in dependency tree (out of scope of ovirt-web-ui) and old webpack v1. Manually verified that this is ok for recent code base but might be real failure in the future."
+echo "======== Workaround: 'yarn check' is recently failing on requiring webpack >= v2 . Manually verified that this is ok for recent code base but might be real failure in the future."
+echo "=== Please watch carefuly other potential types of errors"
 source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh || true # workaround: skip the error
 
 %build
