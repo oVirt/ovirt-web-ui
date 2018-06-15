@@ -266,7 +266,7 @@ class VmDetail extends Component {
                     {nicOptionsShowHide}
                   </dt>
                   {noNics}
-                  <VmNics nics={nics} vmId={vm.get('id')} showSettings={this.state.openNicSettings && notPoolOrPoolVm} />
+                  <VmNics vm={vm} nics={nics} showSettings={this.state.openNicSettings && notPoolOrPoolVm} />
                   <dt>
                     <FieldHelp content={msg.bootMenuTooltip()} text={msg.bootMenu()} />
                   </dt>
