@@ -11,7 +11,6 @@ import clusters from './clusters'
 import hosts from './hosts'
 import route from './route'
 import operatingSystems from './operatingSystems'
-import storages from './storages'
 import storageDomains from './storageDomains'
 import dataCenters from './dataCenters'
 import vnicProfiles from './vnicProfiles'
@@ -43,7 +42,6 @@ export default combineReducers({
   storageDomains,
   dataCenters,
   route,
-  storages,
   vnicProfiles,
   VmAction,
   VmDialog,

@@ -78,8 +78,7 @@ const shortMessages = {
   'INTERNAL_CONSOLES': msg.failedToRetrieveListOfVmConsoles(),
   'GET_DISK_DETAILS': msg.failedToRetrieveDiskDetails(),
   'GET_DISK_ATTACHMENTS': msg.failedToRetrieveVmDisks(),
-  'GET_ISO_STORAGES': msg.failedToRetrieveIsoStorages(),
-  'GET_ALL_FILES_FOR_ISO': msg.failedToRetrieveFilesFromStorage(),
+  'GET_ISO_STORAGE_DOMAINS': msg.failedToRetrieveIsoStorages(),
 
   'GET_VM': msg.failedToRetrieveVmDetails(),
   'CHANGE_VM_ICON': msg.failedToChangeVmIcon(),

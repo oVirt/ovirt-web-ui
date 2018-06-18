@@ -516,13 +516,13 @@ class VmDialog extends React.Component {
     const { icons, vmDialog, clusters, templates, storages, previousPath } = this.props
     const { bootDevices } = this.state
     const vm = this.props.vm
-    const isoStorages = storages.get('storages').filter(v => v.get('type') === 'iso')
+    const isoStorages = storages.filter(storageDomain => storageDomain.get('type') === 'iso')
     const idPrefix = `vmdialog-${vm ? vm.get('name') : '_new'}`
 
     let files = [{ id: '', value: '[Eject]' }]
 
-    isoStorages.toList().forEach(v => {
-      const fileList = v.get('files')
+    isoStorages.toList().forEach(storageDomain => {
+      const fileList = storageDomain.get('files')
       if (fileList) {
         files.push(...fileList.map(item => (
           { id: item['id'], value: item['name'] }
@@ -813,7 +813,7 @@ VmDialog.propTypes = {
   vmDialog: PropTypes.object.isRequired,
   icons: PropTypes.object.isRequired,
   vms: PropTypes.object.isRequired,
-  storages: PropTypes.object.isRequired,
+  storages: PropTypes.object.isRequired, // deep immutable, {[id: string]: StorageDomain}
   previousPath: PropTypes.string.isRequired,
 
   addVm: PropTypes.func.isRequired,
@@ -830,7 +830,7 @@ export default connect(
     vmDialog: state.VmDialog,
     icons: state.icons,
     vms: state.vms,
-    storages: state.storages,
+    storages: state.storageDomains,
   }),
   (dispatch) => ({
     addVm: (vm, actionUniqueId, page) => dispatch(createVm(vm, actionUniqueId, page)),
