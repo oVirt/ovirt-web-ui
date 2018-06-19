@@ -1,13 +1,17 @@
+import AppConfiguration from '../config'
 import {
-  GET_VM,
+  CHECK_TOKEN_EXPIRED,
   GET_BY_PAGE,
   GET_OPTION,
   GET_USB_FILTER,
+  GET_VM,
   PERSIST_STATE,
   SET_ADMINISTATOR,
+  SET_USB_FILTER,
   SET_USER_FILTER_PERMISSION,
-  CHECK_TOKEN_EXPIRED,
-  SCHEDULER_FIXED_DELAY,
+  SHOW_TOKEN_EXPIRED_MSG,
+  START_SCHEDULER_FIXED_DELAY,
+  STOP_SCHEDULER_FIXED_DELAY,
 } from '../constants'
 
 export * from './error'
@@ -26,9 +30,16 @@ export * from './pendingTasks'
 export * from './vnicProfiles'
 export * from './activeRequests'
 
-export function schedulerFixedDelay () {
+export function startSchedulerFixedDelay (delayInSeconds = AppConfiguration.schedulerFixedDelayInSeconds) {
   return {
-    type: SCHEDULER_FIXED_DELAY,
+    type: START_SCHEDULER_FIXED_DELAY,
+    payload: { delayInSeconds },
+  }
+}
+
+export function stopSchedulerFixedDelay () {
+  return {
+    type: STOP_SCHEDULER_FIXED_DELAY,
     payload: {},
   }
 }
@@ -36,8 +47,7 @@ export function schedulerFixedDelay () {
 export function persistState () {
   return {
     type: PERSIST_STATE,
-    payload: {
-    },
+    payload: {},
   }
 }
 
@@ -80,7 +90,7 @@ export function checkTokenExpired () {
 
 export function showTokenExpiredMessage () {
   return {
-    type: 'SHOW_TOKEN_EXPIRED_MSG',
+    type: SHOW_TOKEN_EXPIRED_MSG,
     payload: {},
   }
 }
@@ -97,7 +107,7 @@ export function getByPage ({ page, shallowFetch = true }) {
 
 export function setUSBFilter ({ usbFilter }) {
   return {
-    type: 'SET_USB_FILTER',
+    type: SET_USB_FILTER,
     payload: {
       usbFilter,
     },
