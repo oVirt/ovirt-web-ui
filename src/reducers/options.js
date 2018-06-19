@@ -1,4 +1,5 @@
 import Immutable from 'immutable'
+import { SET_CONSOLE_OPTIONS } from '../constants'
 import { actionReducer } from './utils'
 
 function setOptions ({ state, type, options }) {
@@ -12,7 +13,7 @@ const initialState = Immutable.fromJS({ options: {
 } })
 
 const options = actionReducer(initialState, {
-  SET_CONSOLE_OPTIONS (state, { payload: { vmId, options } }) {
+  [SET_CONSOLE_OPTIONS] (state, { payload: { vmId, options } }) {
     const optionsTemp = {}
     optionsTemp[vmId] = options
     return setOptions({ state, type: 'consoleOptions', options: optionsTemp })

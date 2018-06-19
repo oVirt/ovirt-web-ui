@@ -1,11 +1,12 @@
 import {
   GET_CONSOLE_OPTIONS,
   SAVE_CONSOLE_OPTIONS,
-} from '../constants/index'
+  SET_CONSOLE_OPTIONS,
+} from '../constants'
 
 export function setConsoleOptions ({ vmId, options }) {
   return {
-    type: 'SET_CONSOLE_OPTIONS',
+    type: SET_CONSOLE_OPTIONS,
     payload: {
       vmId,
       options,

@@ -6,7 +6,7 @@ import {
   GET_USB_FILTER,
   GET_VM,
   PERSIST_STATE,
-  SET_ADMINISTATOR,
+  SET_ADMINISTRATOR,
   SET_USB_FILTER,
   SET_USER_FILTER_PERMISSION,
   SHOW_TOKEN_EXPIRED_MSG,
@@ -74,7 +74,7 @@ export function setUserFilterPermission (filter) {
 
 export function setAdministrator (administrator) {
   return {
-    type: SET_ADMINISTATOR,
+    type: SET_ADMINISTRATOR,
     payload: {
       administrator,
     },

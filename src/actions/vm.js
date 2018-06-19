@@ -6,16 +6,18 @@ import {
   GET_RDP_VM,
   GET_VMS_BY_COUNT,
   GET_VMS_BY_PAGE,
-  LOGIN,
   LOGIN_SUCCESSFUL,
+  LOGIN,
   LOGOUT,
   REFRESH_DATA,
   REMOVE_MISSING_VMS,
   REMOVE_VM,
   REMOVE_VMS,
   RESTART_VM,
+  SET_CHANGED,
   SET_DOMAIN,
   SET_OVIRT_API_VERSION,
+  SET_VM_CDROM,
   SET_VM_CONSOLES,
   SET_VM_DISKS,
   SET_VM_NICS,
@@ -288,18 +290,9 @@ export function getRDP ({ vmName, username, domain, fqdn }) {
   }
 }
 
-export function setPage ({ page }) {
-  return {
-    type: 'SET_PAGE',
-    payload: {
-      page,
-    },
-  }
-}
-
 export function setChanged ({ value }) {
   return {
-    type: 'SET_CHANGED',
+    type: SET_CHANGED,
     payload: {
       value,
     },
@@ -308,7 +301,7 @@ export function setChanged ({ value }) {
 
 export function setVmCDRom ({ cdrom, vmId }) {
   return {
-    type: 'SET_VM_CDROM',
+    type: SET_VM_CDROM,
     payload: {
       cdrom,
       vmId,

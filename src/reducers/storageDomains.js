@@ -1,6 +1,10 @@
 import { fromJS } from 'immutable'
 
-import { SET_STORAGE_DOMAINS, ADD_STORAGE_DOMAINS, SET_STORAGE_DOMAIN_FILES } from '../constants'
+import {
+  ADD_STORAGE_DOMAINS,
+  SET_STORAGE_DOMAIN_FILES,
+  SET_STORAGE_DOMAINS,
+} from '../constants'
 import { actionReducer } from './utils'
 import { arrayToMap } from '../helpers'
 

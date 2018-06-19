@@ -1,7 +1,7 @@
 import {
   SELECT_POOL_DETAIL,
   SELECT_VM_DETAIL,
-} from '../constants/index'
+} from '../constants'
 
 export function selectVmDetail ({ vmId }) {
   return {

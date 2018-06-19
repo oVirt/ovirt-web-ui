@@ -4,7 +4,7 @@ import {
   LOGIN_FAILED,
   LOGIN_SUCCESSFUL,
   LOGOUT,
-  SET_ADMINISTATOR,
+  SET_ADMINISTRATOR,
   SET_DOMAIN,
   SET_OVIRT_API_VERSION,
   SET_USB_FILTER,
@@ -48,7 +48,7 @@ const config = actionReducer(initialState, {
       .set('filter', filter)
       .set('isFilterChecked', true)
   },
-  [SET_ADMINISTATOR] (state, { payload: { administrator } }) {
+  [SET_ADMINISTRATOR] (state, { payload: { administrator } }) {
     return state.set('administrator', administrator)
   },
   [SHOW_TOKEN_EXPIRED_MSG] (state) {

@@ -2,7 +2,7 @@ import {
   ADD_NETWORKS_TO_VNIC_PROFILES,
   SET_VNIC_PROFILES,
   GET_ALL_VNIC_PROFILES,
-} from '../constants/index'
+} from '../constants'
 
 export function setVnicProfiles ({ vnicProfiles }) {
   return {
