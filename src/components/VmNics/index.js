@@ -6,6 +6,7 @@ import { Button } from 'patternfly-react'
 import DeleteConfirmationModal from '../VmModals/DeleteConfirmationModal'
 import { msg } from '../../intl'
 import FieldHelp from '../FieldHelp'
+import { isRunning } from '../utils'
 import naturalCompare from 'string-natural-compare'
 
 import NewNicModal from './NewNicModal'
@@ -34,7 +35,7 @@ class VmNic extends React.Component {
   }
 
   render () {
-    let { nic, vnicProfile, showSettings } = this.props
+    let { nic, vnicProfile, showSettings, isUp } = this.props
     const idPrefix = `vmnic-${nic.get('name')}`
     const nicInfoContent = (
       <div id={`${idPrefix}-nic-info`}>
@@ -63,7 +64,7 @@ class VmNic extends React.Component {
           </span>
           {
             showSettings
-              ? (<Button bsStyle='default' bsSize='small' onClick={this.handleOpenDialog}>
+              ? (<Button bsStyle='default' bsSize='small' onClick={this.handleOpenDialog} disabled={isUp}>
                 {msg.delete()}
               </Button>)
               : null
@@ -81,6 +82,7 @@ VmNic.propTypes = {
   nic: PropTypes.object.isRequired,
   vnicProfile: PropTypes.object,
   showSettings: PropTypes.bool,
+  isUp: PropTypes.bool,
   onDelete: PropTypes.func.isRequired,
 }
 
@@ -93,7 +95,7 @@ class VmNics extends Component {
   }
 
   render () {
-    const { nics, vnicProfiles, onNicAdd, showSettings, onNicDelete } = this.props
+    const { vm, nics, showSettings, vnicProfiles, onNicAdd, onNicDelete } = this.props
 
     const MAX_VISIBLE_NICS = 2
 
@@ -142,7 +144,7 @@ class VmNics extends Component {
           {
             nicsToRender.map(nic => {
               const vnicProfile = vnicProfiles.get(nic.getIn(['vnicProfile', 'id']))
-              return (<VmNic nic={nic} vnicProfile={vnicProfile} key={nic.get('id')} showSettings={showSettings} onDelete={onNicDelete} />)
+              return (<VmNic isUp={isRunning(vm.get('status'))} nic={nic} vnicProfile={vnicProfile} key={nic.get('id')} showSettings={showSettings} onDelete={onNicDelete} />)
             })
           }
 
@@ -154,7 +156,7 @@ class VmNics extends Component {
   }
 }
 VmNics.propTypes = {
-  vmId: PropTypes.string.isRequired, // eslint-disable-line react/no-unused-prop-types
+  vm: PropTypes.object.isRequired, // eslint-disable-line react/no-unused-prop-types
   nics: PropTypes.object.isRequired,
   vnicProfiles: PropTypes.object.isRequired,
   showSettings: PropTypes.bool,
@@ -167,8 +169,8 @@ export default connect(
     vnicProfiles: state.vnicProfiles,
   }),
 
-  (dispatch, { vmId }) => ({
-    onNicAdd: ({ nic }) => dispatch(addVmNic({ vmId, nic })),
-    onNicDelete: ({ nicId }) => dispatch(deleteVmNic({ vmId, nicId })),
+  (dispatch, { vm }) => ({
+    onNicAdd: ({ nic }) => dispatch(addVmNic({ vmId: vm.get('id'), nic })),
+    onNicDelete: ({ nicId }) => dispatch(deleteVmNic({ vmId: vm.get('id'), nicId })),
   })
 )(VmNics)
