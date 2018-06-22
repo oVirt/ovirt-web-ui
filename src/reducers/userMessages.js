@@ -1,4 +1,9 @@
 import Immutable from 'immutable'
+import {
+  CLEAR_USER_MSGS,
+  FAILED_EXTERNAL_ACTION,
+  LOGIN_FAILED,
+} from '../constants'
 import { actionReducer } from './utils'
 
 function addLogEntry ({ state, message, type = 'ERROR', failedAction }) {
@@ -28,7 +33,7 @@ const initialState = Immutable.fromJS({
 })
 
 const userMessages = actionReducer(initialState, {
-  FAILED_EXTERNAL_ACTION (state, { payload: { message, shortMessage, type, action } }) { // see the vms() reducer
+  [FAILED_EXTERNAL_ACTION] (state, { payload: { message, shortMessage, type, action } }) { // see the vms() reducer
     return addLogEntry({
       state,
       message: message,
@@ -37,10 +42,10 @@ const userMessages = actionReducer(initialState, {
       failedAction: action,
     })
   },
-  LOGIN_FAILED (state, { payload: { message, errorCode } }) {
+  [LOGIN_FAILED] (state, { payload: { message, errorCode } }) {
     return addLogEntry({ state, message: message, type: errorCode })
   },
-  CLEAR_USER_MSGS (state) {
+  [CLEAR_USER_MSGS] (state) {
     return state.set('unread', false).update('records', records => records.clear())
   },
 })

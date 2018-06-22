@@ -3,9 +3,9 @@ import { fromJS } from 'immutable'
 import { actionReducer } from '../../reducers/utils'
 import {
   CLEAN_NEW_DISK_DIALOG_SUBTREE,
+  SET_NEW_DISK_DIALOG_DONE,
   SET_NEW_DISK_DIALOG_ERROR_TEXT,
   SET_NEW_DISK_DIALOG_PROGRESS_INDICATOR,
-  SET_NEW_DISK_DIALOG_DONE,
 } from './constants'
 
 const initialState = fromJS({

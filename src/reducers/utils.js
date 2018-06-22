@@ -1,5 +1,6 @@
 import { Map } from 'immutable'
 import { logDebug } from '../helpers'
+import { UPDATE_ICONS } from '../constants'
 
 /**
  * Takes initial state of the reducer and a map of action handlers and returns a redux-compatible reducer.
@@ -38,12 +39,12 @@ export const actionReducer = (initialState, handlers, verbose) => (state = initi
   if (verbose) {
     let actionJson = JSON.stringify(action)
     if (actionJson.length > 250) {
-      if (action.type === 'UPDATE_ICONS') {
+      if (action.type === UPDATE_ICONS) {
         actionJson = actionJson.substring(0, 50) + ' ... [truncated] ...'
       }
     }
 
-    logDebug('Reducing action: ', actionJson)
+    logDebug('Reducing action:', actionJson)
   }
 
   if (action.type in handlers) {

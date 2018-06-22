@@ -8,12 +8,14 @@ import newVmDialogSagas from './components/NewDiskDialog/sagas'
 import { flatMap } from './utils'
 
 import {
+  all,
+  call,
   put,
+  race,
+  take,
   takeEvery,
   takeLatest,
   throttle,
-  all,
-  call,
 } from 'redux-saga/effects'
 
 import { logDebug } from './helpers'
@@ -57,6 +59,7 @@ import {
   setVmNics,
   setUSBFilter,
   removeActiveRequest,
+  stopSchedulerFixedDelay,
 } from './actions'
 
 import {
@@ -110,7 +113,8 @@ import {
   SAVE_CONSOLE_OPTIONS,
   SELECT_POOL_DETAIL,
   SELECT_VM_DETAIL,
-  SCHEDULER_FIXED_DELAY,
+  START_SCHEDULER_FIXED_DELAY,
+  STOP_SCHEDULER_FIXED_DELAY,
   SHUTDOWN_VM,
   START_POOL,
   START_VM,
@@ -658,31 +662,51 @@ function* fetchAllNetworks () {
   }
 }
 
-function* schedulerWithFixedDelay (action) {
-  logDebug('Starting schedulerWithFixedDelay() scheduler')
-
-  // TODO: do we need to stop the loop? Consider takeLatest in the rootSaga 'restarts' the loop if needed
-  while (true) {
-    yield delay(AppConfiguration.schedulerFixedDelayInSeconds * 1000)
-    logDebug(`schedulerWithFixedDelay() event after delay of ${AppConfiguration.schedulerFixedDelayInSeconds} seconds`)
-
-    const oVirtVersion = Selectors.getOvirtVersion()
-    if (oVirtVersion.get('passed')) {
-      // Actions to be executed no more than once per minute:
-      yield refreshData(refresh({
-        quiet: true,
-        shallowFetch: true,
-        page: Selectors.getCurrentPage(),
-      }))
-    } else {
-      logDebug('schedulerWithFixedDelay() event skipped since oVirt API version does not match')
-    }
-  }
-}
-
 function* delayedRemoveActiveRequest ({ payload: requestId }) {
   yield delay(500)
   yield put(removeActiveRequest(requestId))
+}
+
+function* startSchedulerWithFixedDelay (action) {
+  // if a scheduler is already running, stop it
+  yield put(stopSchedulerFixedDelay())
+
+  // run a new scheduler
+  yield schedulerWithFixedDelay(action.payload.delayInSeconds)
+}
+
+let _SchedulerCount = 0
+
+function* schedulerWithFixedDelay (delayInSeconds = AppConfiguration.schedulerFixedDelayInSeconds) {
+  const myId = _SchedulerCount++
+  logDebug(`⏰ schedulerWithFixedDelay[${myId}] starting fixed delay scheduler`)
+
+  let enabled = true
+  while (enabled) {
+    logDebug(`⏰ schedulerWithFixedDelay[${myId}] stoppable delay for: ${delayInSeconds}`)
+    const { stopped } = yield race({
+      stopped: take(STOP_SCHEDULER_FIXED_DELAY),
+      fixedDelay: call(delay, (delayInSeconds * 1000)),
+    })
+
+    if (stopped) {
+      enabled = false
+      logDebug(`⏰ schedulerWithFixedDelay[${myId}] scheduler has been stopped`)
+    } else {
+      logDebug(`⏰ schedulerWithFixedDelay[${myId}] running after delay of: ${delayInSeconds}`)
+
+      const oVirtVersion = Selectors.getOvirtVersion()
+      if (oVirtVersion.get('passed')) {
+        yield refreshData(refresh({
+          quiet: true,
+          shallowFetch: true,
+          page: Selectors.getCurrentPage(),
+        }))
+      } else {
+        logDebug(`⏰ schedulerWithFixedDelay[${myId}] event skipped since oVirt API version does not match`)
+      }
+    }
+  }
 }
 
 // Sagas workers for using in different sagas modules
@@ -699,7 +723,8 @@ export function* rootSaga () {
     takeEvery(LOGOUT, logout),
     takeLatest(CHECK_TOKEN_EXPIRED, doCheckTokenExpired),
 
-    takeEvery(SCHEDULER_FIXED_DELAY, schedulerWithFixedDelay),
+    takeEvery(START_SCHEDULER_FIXED_DELAY, startSchedulerWithFixedDelay),
+    // STOP_SCHEDULER_FIXED_DELAY is taken by `schedulerWithFixedDelay()`
     throttle(1000, REFRESH_DATA, refreshData),
 
     throttle(100, GET_BY_PAGE, fetchByPage),

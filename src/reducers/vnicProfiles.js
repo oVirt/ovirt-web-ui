@@ -1,6 +1,9 @@
 import { fromJS } from 'immutable'
 import { actionReducer } from './utils'
-import { SET_VNIC_PROFILES, ADD_NETWORKS_TO_VNIC_PROFILES } from '../constants'
+import {
+  ADD_NETWORKS_TO_VNIC_PROFILES,
+  SET_VNIC_PROFILES,
+} from '../constants'
 
 const initialState = fromJS({})
 
