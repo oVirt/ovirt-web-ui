@@ -31,6 +31,7 @@ const BASE_CONFIG_FILE = 'session bpp:i:32\n' +
                           'gatewayprofileusagemethod:i:0\n' +
                           'promptcredentialonce:i:1\n' +
                           'use redirection server name:i:0'
+
 export default class RDPBuilder {
   constructor ({ vmName, username, domain, fqdn }) {
     this.address = fqdn || vmName

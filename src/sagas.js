@@ -2,10 +2,10 @@ import Api from 'ovirtapi'
 import { persistStateToLocalStorage } from './storage'
 import Selectors from './selectors'
 import AppConfiguration from './config'
-import SagasWorkers from './saga/builder'
-import vmDisksSagas from './components/VmDisks/sagas'
-import newVmDialogSagas from './components/NewDiskDialog/sagas'
 import { flatMap } from './utils'
+
+import vmDisksSagas from './components/VmDisks/sagas'
+import newDiskDialogSagas from './components/NewDiskDialog/sagas'
 
 import {
   all,
@@ -81,18 +81,21 @@ import {
   saveConsoleOptions,
   getRDPVm,
   fetchConsoleVmMeta,
-} from './saga/consoles'
+  getConsoleInUse,
+} from './saga/vm-console'
 
 import {
   ADD_VM_NIC,
+  CHECK_CONSOLE_IN_USE,
   CHECK_TOKEN_EXPIRED,
   DELAYED_REMOVE_ACTIVE_REQUEST,
   DELETE_VM_NIC,
+  DOWNLOAD_CONSOLE_VM,
   GET_ALL_CLUSTERS,
   GET_ALL_HOSTS,
   GET_ALL_OS,
-  GET_ALL_TEMPLATES,
   GET_ALL_STORAGE_DOMAINS,
+  GET_ALL_TEMPLATES,
   GET_ALL_VNIC_PROFILES,
   GET_BY_PAGE,
   GET_CONSOLE_OPTIONS,
@@ -103,7 +106,6 @@ import {
   GET_USB_FILTER,
   GET_VMS_BY_COUNT,
   GET_VMS_BY_PAGE,
-  DOWNLOAD_CONSOLE_VM,
   LOGIN,
   LOGOUT,
   PERSIST_STATE,
@@ -113,11 +115,11 @@ import {
   SAVE_CONSOLE_OPTIONS,
   SELECT_POOL_DETAIL,
   SELECT_VM_DETAIL,
-  START_SCHEDULER_FIXED_DELAY,
-  STOP_SCHEDULER_FIXED_DELAY,
   SHUTDOWN_VM,
   START_POOL,
+  START_SCHEDULER_FIXED_DELAY,
   START_VM,
+  STOP_SCHEDULER_FIXED_DELAY,
   SUSPEND_VM,
 } from './constants'
 
@@ -553,7 +555,7 @@ function* removeVm (action) {
   yield stopProgress({ vmId: action.payload.vmId, name: 'remove', result })
 }
 
-function* fetchVmSessions ({ vmId }) {
+export function* fetchVmSessions ({ vmId }) {
   const sessions = yield callExternalAction('sessions', Api.sessions, { payload: { vmId } })
 
   if (sessions && sessions['session']) {
@@ -765,14 +767,6 @@ function* schedulerWithFixedDelay (delayInSeconds = AppConfiguration.schedulerFi
   }
 }
 
-// Sagas workers for using in different sagas modules
-let sagasFunctions = {
-  foreach,
-  callExternalAction,
-  fetchVmSessions,
-  fetchSingleVm,
-}
-
 export function* rootSaga () {
   yield all([
     takeEvery(LOGIN, login),
@@ -793,11 +787,13 @@ export function* rootSaga () {
     takeEvery(SHUTDOWN_VM, shutdownVm),
     takeEvery(RESTART_VM, restartVm),
     takeEvery(START_VM, startVm),
-    takeEvery(DOWNLOAD_CONSOLE_VM, downloadVmConsole),
-    takeEvery(GET_RDP_VM, getRDPVm),
     takeEvery(SUSPEND_VM, suspendVm),
     takeEvery(START_POOL, startPool),
     takeEvery(REMOVE_VM, removeVm),
+
+    takeEvery(CHECK_CONSOLE_IN_USE, getConsoleInUse),
+    takeEvery(DOWNLOAD_CONSOLE_VM, downloadVmConsole),
+    takeEvery(GET_RDP_VM, getRDPVm),
 
     takeLatest(GET_ALL_CLUSTERS, fetchAllClusters),
     takeLatest(GET_ALL_TEMPLATES, fetchAllTemplates),
@@ -817,9 +813,8 @@ export function* rootSaga () {
     takeEvery(GET_USB_FILTER, fetchUSBFilter),
     takeEvery(DELAYED_REMOVE_ACTIVE_REQUEST, delayedRemoveActiveRequest),
 
+    // Sagas from Components
     ...vmDisksSagas,
-    ...newVmDialogSagas,
-
-    ...SagasWorkers(sagasFunctions),
+    ...newDiskDialogSagas,
   ])
 }

@@ -46,7 +46,7 @@ import {
 
 import {
   downloadVmConsole,
-} from './consoles'
+} from './vm-console'
 
 /**
  * Perform login checks, and if they pass, perform initial data loading
@@ -198,7 +198,7 @@ function* initialLoad () {
 function* fetchPermissionWithoutFilter () {
   const data = yield callExternalAction('checkFilter', Api.checkFilter, { action: 'CHECK_FILTER' }, true)
 
-  const isAdmin = data.error === undefined
+  const isAdmin = data.error === undefined // expect an error on `checkFilter` if the user isn't admin
   yield put(setAdministrator(isAdmin))
 
   if (!isAdmin) {
