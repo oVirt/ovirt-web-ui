@@ -2,16 +2,17 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import { downloadConsole } from '../../actions/index'
-
-import Confirmation from '../Confirmation/index'
-import Popover from '../Confirmation/Popover'
+import { downloadConsole, checkConsoleInUse, setConsoleInUse } from '../../actions'
 import { msg } from '../../intl'
 
+import Confirmation from '../Confirmation'
+import Popover from '../Confirmation/Popover'
 import style from './style.css'
 
-import { checkConsoleInUse, setConsoleInUse } from './actions'
-
+/**
+ * Button to send a virt-viewer connection file to the user for a VM's SPICE or VNC
+ * console, defaulting to the SPICE console if a specific __consoleId__ isn't provided.
+ */
 class ConsoleButton extends React.Component {
   constructor (props) {
     super(props)
@@ -24,17 +25,19 @@ class ConsoleButton extends React.Component {
   }
 
   consoleConfirmationAboutToOpen (e) {
+    if (e) e.preventDefault()
+
     this.setState({
       openModal: true,
     })
-    this.props.onCheckConsoleSessionInUse()
+    this.props.onCheckConsoleSessionInUse(this.props.userId, this.props.usbFilter)
   }
 
   onConsoleConfirmationClose () {
     this.setState({
       openModal: false,
     })
-    this.props.onConsoleSessionConfirmaClose()
+    this.props.onConsoleSessionConfirmClose()
   }
 
   onConsoleDownload () {
@@ -42,43 +45,46 @@ class ConsoleButton extends React.Component {
       openModal: false,
     })
 
-    this.props.onDownloadConsole()
+    this.props.onDownloadConsole(this.props.usbFilter)
   }
 
   render () {
-    let {
+    const {
       vm,
-      className,
-      tooltip = '',
+      isOnCard = false,
       actionDisabled = false,
-      isOnCard,
       shortTitle,
+      tooltip = '',
       button,
-      VmAction,
+      className,
     } = this.props
 
     const idPrefix = `consoleaction-${vm.get('name')}`
 
-    let onClick = this.consoleConfirmationAboutToOpen
-    if (actionDisabled) {
-      className = `${className} ${style['action-disabled']}`
-      onClick = undefined
-    }
     let popoverComponent = null
-    if (VmAction.getIn(['vms', vm.get('id'), 'consoleInUse']) && this.state.openModal) {
-      popoverComponent = (<Popover width={200} height={80} target={this} placement={isOnCard ? 'top' : 'bottom'} show>
-        <Confirmation
-          text={msg.consoleInUseContinue()}
-          okButton={{ label: msg.yes(), click: this.onConsoleDownload }}
-          cancelButton={{ label: msg.cancel(), click: this.onConsoleConfirmationClose }}
-          uniqueId={vm.get('name')} />
-      </Popover>)
+    if (vm.get('consoleInUse') && this.state.openModal) {
+      popoverComponent = (
+        <Popover width={200} height={80} target={this} placement={isOnCard ? 'top' : 'bottom'} show>
+          <Confirmation
+            text={msg.consoleInUseContinue()}
+            okButton={{ label: msg.yes(), click: this.onConsoleDownload }}
+            cancelButton={{ label: msg.cancel(), click: this.onConsoleConfirmationClose }}
+            uniqueId={vm.get('name')} />
+        </Popover>
+      )
     }
 
     if (isOnCard) {
+      const onClick = actionDisabled ? () => {} : this.consoleConfirmationAboutToOpen
       return (
         <div className='card-pf-item'>
-          <span className={className} data-toggle='tooltip' data-placement='left' title={tooltip} onClick={onClick} />
+          <span
+            className={`${className} ${actionDisabled ? style['action-disabled'] : ''}`}
+            data-toggle='tooltip'
+            data-placement='left'
+            title={tooltip}
+            onClick={onClick}
+          />
           {popoverComponent}
         </div>
       )
@@ -96,7 +102,7 @@ class ConsoleButton extends React.Component {
 
     return (
       <span className={style['full-button']}>
-        <a href='#' onClick={this.consoleConfirmationAboutToOpen} className={`${button} ${style['link']}`} id={shortTitle}>
+        <a href='#' className={`${button} ${style['link']}`} id={shortTitle} onClick={this.consoleConfirmationAboutToOpen}>
           <span data-toggle='tooltip' data-placement='left' title={tooltip}>
             {shortTitle}
           </span>
@@ -109,28 +115,31 @@ class ConsoleButton extends React.Component {
 
 ConsoleButton.propTypes = {
   vm: PropTypes.object.isRequired,
-  VmAction: PropTypes.object.isRequired,
-  usbFilter: PropTypes.string.isRequired, // eslint-disable-line react/no-unused-prop-types
-  consoleId: PropTypes.string, // eslint-disable-line react/no-unused-prop-types
-  className: PropTypes.string.isRequired,
-  tooltip: PropTypes.string,
-  shortTitle: PropTypes.string.isRequired,
-  button: PropTypes.string.isRequired,
-  actionDisabled: PropTypes.bool,
+
   isOnCard: PropTypes.bool,
-  userId: PropTypes.string, // eslint-disable-line react/no-unused-prop-types
-  onDownloadConsole: PropTypes.func.isRequired,
-  onConsoleSessionConfirmaClose: PropTypes.func.isRequired,
+  actionDisabled: PropTypes.bool,
+  shortTitle: PropTypes.string.isRequired,
+  tooltip: PropTypes.string,
+  button: PropTypes.string.isRequired,
+  className: PropTypes.string.isRequired,
+
+  consoleId: PropTypes.string, // eslint-disable-line react/no-unused-prop-types
+  usbFilter: PropTypes.string,
+  userId: PropTypes.string,
+
   onCheckConsoleSessionInUse: PropTypes.func.isRequired,
+  onConsoleSessionConfirmClose: PropTypes.func.isRequired,
+  onDownloadConsole: PropTypes.func.isRequired,
 }
 
 export default connect(
   (state) => ({
-    VmAction: state.VmAction,
+    usbFilter: state.config.get('usbFilter'),
+    userId: state.config.getIn(['user', 'id']),
   }),
-  (dispatch, { vm, consoleId, usbFilter, userId }) => ({
-    onCheckConsoleSessionInUse: () => dispatch(checkConsoleInUse({ vmId: vm.get('id'), usbFilter, userId })),
-    onConsoleSessionConfirmaClose: () => dispatch(setConsoleInUse({ vmId: vm.get('id'), consoleInUse: false })),
-    onDownloadConsole: () => dispatch(downloadConsole({ vmId: vm.get('id'), consoleId, usbFilter })),
+  (dispatch, { vm, consoleId }) => ({
+    onCheckConsoleSessionInUse: (userId, usbFilter) => dispatch(checkConsoleInUse({ vmId: vm.get('id'), userId, usbFilter })),
+    onConsoleSessionConfirmClose: () => dispatch(setConsoleInUse({ vmId: vm.get('id'), consoleInUse: false })),
+    onDownloadConsole: (usbFilter) => dispatch(downloadConsole({ vmId: vm.get('id'), consoleId, usbFilter })),
   })
 )(ConsoleButton)
