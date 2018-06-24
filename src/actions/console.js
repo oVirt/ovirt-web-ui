@@ -1,4 +1,4 @@
-import { SET_CONSOLE_IN_USE, CONSOLE_IN_USE } from './constants'
+import { SET_CONSOLE_IN_USE, CHECK_CONSOLE_IN_USE } from '../constants'
 
 export function setConsoleInUse ({ vmId, consoleInUse }) {
   return {
@@ -12,7 +12,7 @@ export function setConsoleInUse ({ vmId, consoleInUse }) {
 
 export function checkConsoleInUse ({ vmId, usbFilter, userId }) {
   return {
-    type: CONSOLE_IN_USE,
+    type: CHECK_CONSOLE_IN_USE,
     payload: {
       vmId,
       usbFilter,

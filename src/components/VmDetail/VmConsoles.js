@@ -1,17 +1,25 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { isWindows, hrefWithoutHistory } from '../../helpers'
-import ConsoleButton from '../VmActions/ConsoleButton'
+import { isWindows } from '../../helpers'
 import { canConsole } from '../../vm-status'
+
+import ConsoleButton from '../VmActions/ConsoleButton'
+import WindowsRdpButton from '../VmActions/WindowsRdpButton'
 
 import style from './style.css'
 
-const VmConsoles = ({ vm, onConsole, onRDP, usbFilter }) => {
+/**
+ * Render a button for each type of console configured for the given VM, and if the VM
+ * type is Windows add an RDP button.
+ */
+const VmConsoles = ({ vm }) => {
   const idPrefix = `vmconsoles-${vm.get('name')}`
   const vmConsoles = vm.get('consoles').valueSeq()
-  if (canConsole(vm.get('status'))) {
-    return (
+  const isWindowsVM = isWindows(vm.getIn(['os', 'type']))
+
+  return (canConsole(vm.get('status')))
+    ? (
       <dd className={style['console-box']}>
         {
           vmConsoles.map(c => (
@@ -21,48 +29,44 @@ const VmConsoles = ({ vm, onConsole, onRDP, usbFilter }) => {
               key={c.get('id')}
               button=''
               className='pficon pficon-screen'
-              tooltip={`Open ${c.get('protocol').toUpperCase()} console`}
+              tooltip={`Open ${c.get('protocol').toUpperCase()} console`} // TODO: l10n
               shortTitle={c.get('protocol').toUpperCase()}
-              usbFilter={usbFilter}
             />
           ))
         }
 
-        {
-          isWindows(vm.getIn(['os', 'type']))
-            ? (<a href='#' key={vm.get('id')} id={`${idPrefix}-rdp`} onClick={hrefWithoutHistory(onRDP)} className={style['left-delimiter']}>RDP</a>) : null
-        }
+        {isWindowsVM && <WindowsRdpButton vm={vm} className={style['left-delimiter']} />}
       </dd>
     )
-  }
+    : (
+      <dd>
+        <span>
+          {
+            vmConsoles.map(c => (
+              <span
+                className={style['console-vm-not-running']}
+                key={c.get('id')}
+                id={`${idPrefix}-${c.get('protocol')}-notrunning`}
+              >
+                {c.get('protocol').toUpperCase()}
+              </span>
+            ))
+          }
 
-  return (
-    <dd>
-      <span>
-        {
-          vmConsoles.map(c => (
+          {isWindowsVM && (
             <span
               className={style['console-vm-not-running']}
-              key={c.get('id')}
-              id={`${idPrefix}-${c.get('protocol')}-notrunning`}>
-              {c.get('protocol').toUpperCase()}
+              id={`${idPrefix}-rdp-notrunning`}
+            >
+              RDP
             </span>
-          ))
-        }
-
-        {
-          isWindows(vm.getIn(['os', 'type']))
-            ? (<span onClick={onRDP} className={style['console-vm-not-running']} id={`${idPrefix}-rdp-notrunning`}>RDP</span>) : null
-        }
-      </span>
-    </dd>
-  )
+          )}
+        </span>
+      </dd>
+    )
 }
 VmConsoles.propTypes = {
   vm: PropTypes.object.isRequired,
-  usbFilter: PropTypes.string.isRequired,
-  onConsole: PropTypes.func.isRequired,
-  onRDP: PropTypes.func.isRequired,
 }
 
 export default VmConsoles
