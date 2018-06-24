@@ -10,20 +10,18 @@ import style from './style.css'
 import sharedStyle from '../sharedStyle.css'
 
 import {
-  downloadConsole,
   getConsoleOptions,
   saveConsoleOptions,
-  getRDP,
-} from '../../actions/index'
+} from '../../actions'
 
 import { templateNameRenderer, userFormatOfBytes } from '../../helpers'
 
-import FieldHelp from '../FieldHelp/index'
+import FieldHelp from '../FieldHelp'
 import DetailContainer from '../DetailContainer'
-import ConsoleOptions from '../ConsoleOptions/index'
-import VmDisks from '../VmDisks/index'
-import VmNics from '../VmNics/index'
-import VmsListNavigation from '../VmsListNavigation/index'
+import ConsoleOptions from '../ConsoleOptions'
+import VmDisks from '../VmDisks'
+import VmNics from '../VmNics'
+import VmsListNavigation from '../VmsListNavigation'
 import VmStatus from './VmStatus'
 import { NextRunLabel } from './labels'
 import LastMessage from './LastMessage'
@@ -100,13 +98,10 @@ class VmDetail extends Component {
       vm,
       pool,
       icons,
-      userMessages,
       options,
-      config,
+      userMessages,
       operatingSystems,
-      onConsole,
       onConsoleOptionsSave,
-      onRDP,
     } = this.props
 
     const sequence = [ 'first', 'second' ]
@@ -249,7 +244,7 @@ class VmDetail extends Component {
                     <FieldHelp content={consolesHelp} text={msg.console()} />
                     {consoleOptionsShowHide}
                   </dt>
-                  <VmConsoles vm={vm} onConsole={onConsole} onRDP={onRDP} usbFilter={config.get('usbFilter')} />
+                  <VmConsoles vm={vm} />
                   <ConsoleOptions smartcardOptionEnable={vm.getIn(['display', 'smartcardEnabled'])} options={optionsJS} onSave={onConsoleOptionsSave} open={this.state.openConsoleSettings} />
 
                   <dt>
@@ -302,30 +297,26 @@ class VmDetail extends Component {
 VmDetail.propTypes = {
   vm: PropTypes.object,
   pool: PropTypes.object,
+
   icons: PropTypes.object.isRequired,
+  options: PropTypes.object.isRequired,
   operatingSystems: PropTypes.object.isRequired, // deep immutable, {[id: string]: OperatingSystem}
   userMessages: PropTypes.object.isRequired,
-  options: PropTypes.object.isRequired,
-  config: PropTypes.object.isRequired,
 
-  onConsole: PropTypes.func.isRequired,
   onConsoleOptionsSave: PropTypes.func.isRequired,
   onConsoleOptionsOpen: PropTypes.func.isRequired,
-  onRDP: PropTypes.func.isRequired,
 }
 
 export default connect(
   (state) => ({
     icons: state.icons,
-    userMessages: state.userMessages,
     options: state.options,
     operatingSystems: state.operatingSystems,
+    userMessages: state.userMessages,
   }),
 
-  (dispatch, { vm, config }) => ({
-    onConsole: ({ vmId, consoleId }) => dispatch(downloadConsole({ vmId, consoleId, usbFilter: config.get('usbFilter') })),
+  (dispatch, { vm }) => ({
     onConsoleOptionsSave: ({ options }) => dispatch(saveConsoleOptions({ vmId: vm.get('id'), options })),
     onConsoleOptionsOpen: () => dispatch(getConsoleOptions({ vmId: vm.get('id') })),
-    onRDP: () => dispatch(getRDP({ vmName: vm.get('name'), username: config.getIn([ 'user', 'name' ]), domain: config.get('domain'), fqdn: vm.get('fqdn') })),
   })
 )(VmDetail)

@@ -15,7 +15,6 @@ import storageDomains from './storageDomains'
 import dataCenters from './dataCenters'
 import vnicProfiles from './vnicProfiles'
 import activeRequests from './activeRequests'
-import { reducer as VmAction } from '../components/VmActions/reducer'
 import { reducer as VmDialog } from '../components/VmDialog/reducer'
 import { reducer as OptionsDialog } from '../components/OptionsDialog/reducer'
 import NewDiskDialog from '../components/NewDiskDialog/reducers'
@@ -43,7 +42,6 @@ export default combineReducers({
   dataCenters,
   route,
   vnicProfiles,
-  VmAction,
   VmDialog,
   OptionsDialog,
   NewDiskDialog,

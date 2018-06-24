@@ -22,7 +22,7 @@ import {
   startPool,
   startVm,
   removeVm,
-} from '../../actions/index'
+} from '../../actions'
 
 import Button from './Button'
 import Checkbox from '../Checkbox'
@@ -58,11 +58,10 @@ class VmActions extends React.Component {
   }
 
   render () {
-    let {
+    const {
       vm,
       pool,
       isOnCard = false,
-      config,
       onStartVm,
       onStartPool,
       onShutdown,
@@ -154,8 +153,7 @@ class VmActions extends React.Component {
           button='btn btn-default'
           className='pficon pficon-screen'
           vm={vm}
-          usbFilter={config.get('usbFilter')}
-          userId={config.getIn(['user', 'id'])} />
+        />
 
         <span className={style['button-spacer']} />
 
@@ -204,7 +202,7 @@ VmActions.propTypes = {
   vm: PropTypes.object.isRequired,
   pool: PropTypes.object,
   isOnCard: PropTypes.bool,
-  config: PropTypes.object.isRequired,
+
   onShutdown: PropTypes.func.isRequired,
   onRestart: PropTypes.func.isRequired,
   onForceShutdown: PropTypes.func.isRequired,
@@ -215,9 +213,7 @@ VmActions.propTypes = {
 }
 
 export default connect(
-  (state) => ({
-    config: state.config,
-  }),
+  (state) => ({ }),
   (dispatch, { vm, pool }) => ({
     onShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: false })),
     onRestart: () => dispatch(restartVm({ vmId: vm.get('id'), force: false })),
