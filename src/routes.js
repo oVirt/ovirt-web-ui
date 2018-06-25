@@ -18,8 +18,8 @@ import { msg } from './intl'
  * @param vms {object}
  * @return {array}
  */
-const getRoutes = (vms) => ([
-  {
+export default function getRoutes (vms) {
+  return [{
     component: PageRouter,
     routes: [
       {
@@ -37,6 +37,7 @@ const getRoutes = (vms) => ([
         toolbars: [], // Recently not used. When needed, see VmDialog/style.css - .vm-dialog-buttons
         closeable: true,
       },
+
       {
         path: '/vm/:id',
         title: (match) => vms.getIn(['vms', match.params.id, 'name']) || match.params.id,
@@ -60,19 +61,5 @@ const getRoutes = (vms) => ([
         toolbars: [(match) => (<PoolDetailToolbar match={match} key='poolaction' />)],
       },
     ],
-  },
-])
-
-/**
- * Return array of objects that describe vertical menu
- * @return {array}
- */
-const getMenu = () => ([
-  {
-    icon: 'pficon pficon-virtual-machine',
-    title: msg.virtualMachines(),
-    to: '/',
-  },
-])
-
-export { getRoutes, getMenu }
+  }]
+}
