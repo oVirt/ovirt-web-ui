@@ -44,16 +44,13 @@ const config = actionReducer(initialState, {
     return state.merge({ oVirtApiVersion: oVirtApiVersion })
   },
   [SET_USER_FILTER_PERMISSION] (state, { payload: { filter } }) {
-    return state
-      .set('filter', filter)
-      .set('isFilterChecked', true)
+    return state.set('filter', filter).set('isFilterChecked', true)
   },
   [SET_ADMINISTRATOR] (state, { payload: { administrator } }) {
     return state.set('administrator', administrator)
   },
   [SHOW_TOKEN_EXPIRED_MSG] (state) {
-    return state
-      .set('isTokenExpired', true)
+    return state.set('isTokenExpired', true)
   },
   [SET_DOMAIN] (state, { payload: { domain } }) {
     return state.set('domain', domain)
@@ -64,3 +61,6 @@ const config = actionReducer(initialState, {
 }, true)
 
 export default config
+export {
+  initialState,
+}

@@ -59,6 +59,18 @@ Selectors = {
   getCurrentPage () {
     return getState().vms.get('page')
   },
+  getVmIds () {
+    return getState().vms.get('vms').reduce((vmIds, vm, vmId) => {
+      vmIds.push(vmId)
+      return vmIds
+    }, [])
+  },
+  getPoolIds () {
+    return getState().vms.get('pools').reduce((poolIds, pool, poolId) => {
+      poolIds.push(poolId)
+      return poolIds
+    }, [])
+  },
 }
 
 function getState () {

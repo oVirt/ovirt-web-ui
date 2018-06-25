@@ -14,6 +14,7 @@ import {
 import {
   loginSuccessful,
   loginFailed,
+  startSchedulerFixedDelay,
 
   failedExternalAction,
   showTokenExpiredMessage,
@@ -36,7 +37,7 @@ import {
   getSingleVm,
 
   updateVms,
-} from '../actions/index'
+} from '../actions'
 
 import {
   callExternalAction,
@@ -47,39 +48,41 @@ import {
   downloadVmConsole,
 } from './consoles'
 
+/**
+ * Perform login checks, and if they pass, perform initial data loading
+ */
 export function* login (action) {
-  let token = action.payload.token // the user is already logged in via oVirt SSO
-  let result = {}
+  const { payload: { token, userId, credentials: { username } } } = action
 
-  if (token) {
-    const username = action.payload.credentials.username
-    yield put(loginSuccessful({
-      token,
-      username,
-      userId: action.payload.userId,
-    }))
-
-    const oVirtMeta = yield callExternalAction('getOvirtApiMeta', Api.getOvirtApiMeta, action)
-    if (oVirtMeta['product_info']) {
-      if (yield checkOvirtApiVersion(oVirtMeta)) {
-        yield put(getUSBFilter())
-        yield fetchPermissionWithoutFilter({})
-        yield initialLoad() // progress loader disabled in here
-        yield autoConnectCheck({})
-      } else { // oVirt API of incompatible version
-        console.error('oVirt api version check failed')
-        yield put(failedExternalAction({
-          message: composeIncompatibleOVirtApiVersionMessage(oVirtMeta),
-          shortMessage: 'oVirt API version check failed',
-        }))
-      }
-    }
-  } else {
+  // Verify a SSO token exists
+  if (!token) {
     yield put(loginFailed({
-      errorCode: result['error_code'] ? result['error_code'] : 'no_access',
-      message: result['error'] ? (result.error['statusText'] ? result.error['statusText'] : JSON.stringify(result['error'])) : 'Login Failed',
+      errorCode: 'no_access',
+      message: 'Login Failed', // TODO: Localize
     }))
+    return
   }
+
+  yield put(loginSuccessful({ token, username, userId }))
+
+  // Verify the API (exists and is the correct version)
+  const oVirtMeta = yield callExternalAction('getOvirtApiMeta', Api.getOvirtApiMeta, action)
+  const versionOk = yield checkOvirtApiVersion(oVirtMeta)
+  if (!versionOk) {
+    console.error('oVirt API version check failed')
+    yield put(failedExternalAction({
+      message: composeIncompatibleOVirtApiVersionMessage(oVirtMeta),
+      shortMessage: 'oVirt API version check failed', // TODO: Localize
+    }))
+    return
+  }
+
+  // API checks passed.  Load user data and the initial app data
+  yield fetchPermissionWithoutFilter()
+  yield put(getUSBFilter())
+  yield initialLoad()
+  yield autoConnectCheck()
+  yield put(startSchedulerFixedDelay())
 }
 
 export function* doCheckTokenExpired (action) {
@@ -107,20 +110,28 @@ export function* doCheckTokenExpired (action) {
 function composeIncompatibleOVirtApiVersionMessage (oVirtMeta) {
   const requested = `${Product.ovirtApiVersionRequired.major}.${Product.ovirtApiVersionRequired.minor}`
   let found
-  if (!(oVirtMeta && oVirtMeta['product_info'] && oVirtMeta['product_info']['version'] &&
-      oVirtMeta['product_info']['version']['major'] && oVirtMeta['product_info']['version']['minor'])) {
+  if (!(oVirtMeta &&
+        oVirtMeta['product_info'] &&
+        oVirtMeta['product_info']['version'] &&
+        oVirtMeta['product_info']['version']['major'] &&
+        oVirtMeta['product_info']['version']['minor'])) {
     found = JSON.stringify(oVirtMeta)
   } else {
     const version = oVirtMeta['product_info']['version']
     found = `${version.major}.${version.minor}`
   }
-  return `oVirt API version requested >= ${requested}, but ${found} found`
+  return `oVirt API version requested >= ${requested}, but ${found} found` // TODO: Localize
 }
 
+/**
+ * Compare the actual { major, minor } version to the required { major, minor } and
+ * return if the **actual** is greater then or equal to **required**.
+ *
+ * Backward compatibility of the API is assumed.
+ */
 export function compareVersion (actual, required) {
   logDebug(`compareVersion(), actual=${JSON.stringify(actual)}, required=${JSON.stringify(required)}`)
 
-  // assuming backward compatibility of oVirt API
   if (actual.major >= required.major) {
     if (actual.major === required.major) {
       if (actual.minor < required.minor) {
@@ -132,30 +143,26 @@ export function compareVersion (actual, required) {
   return false
 }
 
+/**
+ * Verify the API meta-data has version information available and that the version
+ * is compatible with our expected API version.
+ */
 function* checkOvirtApiVersion (oVirtMeta) {
-  if (!(oVirtMeta && oVirtMeta['product_info'] && oVirtMeta['product_info']['version'] &&
-      oVirtMeta['product_info']['version']['major'] && oVirtMeta['product_info']['version']['minor'])) {
+  if (!(oVirtMeta &&
+        oVirtMeta['product_info'] &&
+        oVirtMeta['product_info']['version'] &&
+        oVirtMeta['product_info']['version']['major'] &&
+        oVirtMeta['product_info']['version']['minor'])) {
     console.error('Incompatible oVirt API version: ', oVirtMeta)
-    yield put(setOvirtApiVersion({
-      passed: false,
-      ...oVirtMeta,
-    }))
+    yield put(setOvirtApiVersion({ passed: false, ...oVirtMeta }))
     return false
   }
 
   const actual = oVirtMeta['product_info']['version']
-
   const required = Product.ovirtApiVersionRequired
-  const passed = compareVersion({
-    major: parseInt(actual.major),
-    minor: parseInt(actual.minor),
-  }, required)
+  const passed = compareVersion(actual, required)
 
-  yield put(setOvirtApiVersion({
-    passed,
-    ...actual,
-  }))
-
+  yield put(setOvirtApiVersion({ passed, ...actual }))
   return passed
 }
 
@@ -163,7 +170,7 @@ export function* logout () {
   window.location.href = `${AppConfiguration.applicationURL}/sso/logout`
 }
 
-function* autoConnectCheck (action) {
+function* autoConnectCheck () {
   const vmId = OptionsManager.loadAutoConnectOption()
   if (vmId && vmId.length > 0) {
     const vm = yield callExternalAction('getVm', Api.getVm, getSingleVm({ vmId }), true)
@@ -172,7 +179,6 @@ function* autoConnectCheck (action) {
     } else if (vm && vm.id && vm.status !== 'down') {
       const internalVm = Api.vmToInternal({ vm })
       yield put(updateVms({ vms: [internalVm] }))
-
       yield downloadVmConsole(downloadConsole({ vmId }))
     }
   }
@@ -189,7 +195,7 @@ function* initialLoad () {
   yield put(getByPage({ page: 1 })) // first page of VMs list
 }
 
-function* fetchPermissionWithoutFilter (action) {
+function* fetchPermissionWithoutFilter () {
   const data = yield callExternalAction('checkFilter', Api.checkFilter, { action: 'CHECK_FILTER' }, true)
 
   const isAdmin = data.error === undefined
