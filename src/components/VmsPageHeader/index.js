@@ -13,7 +13,7 @@ import * as branding from '../../branding'
 /**
  * Main application header on top of the page
  */
-const VmsPageHeader = ({ onRefresh }) => {
+const VmsPageHeader = ({ page, onRefresh }) => {
   const idPrefix = `pageheader`
   return (
     <nav className='navbar obrand_mastheadBackground obrand_topBorder navbar-pf-vertical'>
@@ -26,7 +26,7 @@ const VmsPageHeader = ({ onRefresh }) => {
       <div className='collapse navbar-collapse'>
         <ul className='nav navbar-nav navbar-right navbar-iconic'>
           <li>
-            <a href='#' className='nav-item-iconic' onClick={hrefWithoutHistory(onRefresh)} id={`${idPrefix}-refresh`}>
+            <a href='#' className='nav-item-iconic' onClick={hrefWithoutHistory(() => onRefresh(page))} id={`${idPrefix}-refresh`}>
               <i className='fa fa-refresh' />
             </a>
           </li>
@@ -40,13 +40,15 @@ const VmsPageHeader = ({ onRefresh }) => {
   )
 }
 VmsPageHeader.propTypes = {
-  page: PropTypes.number.isRequired, // eslint-disable-line react/no-unused-prop-types
+  page: PropTypes.number.isRequired,
   onRefresh: PropTypes.func.isRequired,
 }
 
 export default connect(
-  (state) => ({ }),
-  (dispatch, { page }) => ({
-    onRefresh: () => dispatch(refresh({ quiet: false, shallowFetch: false, page })),
+  (state) => ({
+    page: state.vms.get('page'), // number of pages to request refresh
+  }),
+  (dispatch) => ({
+    onRefresh: (page) => dispatch(refresh({ quiet: false, shallowFetch: false, page })),
   })
 )(VmsPageHeader)
