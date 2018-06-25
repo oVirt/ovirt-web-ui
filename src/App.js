@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
-import { BrowserRouter as Router } from 'react-router-dom'
+import { ConnectedRouter } from 'connected-react-router'
 import { renderRoutes } from 'react-router-config'
 
 import { Grid } from 'patternfly-react'
@@ -37,7 +37,7 @@ const NoLogin = () => {
  * Main App component. Wrap the main react-router components together with
  * the various dialogs and error messages that may be needed.
  */
-const App = ({ vms, config, appReady }) => {
+const App = ({ history, vms, config, appReady }) => {
   if (!config.get('loginToken')) { // login is missing
     return (
       <Grid fluid>
@@ -50,7 +50,7 @@ const App = ({ vms, config, appReady }) => {
   const menu = getMenu()
 
   return (
-    <Router basename={AppConfiguration.applicationURL}>
+    <ConnectedRouter history={history}>
       <React.Fragment>
         <VmsPageHeader page={vms.get('page')} title={fixedStrings.BRAND_NAME + ' ' + msg.vmPortal()} />
         <VerticalMenu menuItems={menu} /> { /* Disabled, to enable search for left sidebar menu */ }
@@ -59,10 +59,12 @@ const App = ({ vms, config, appReady }) => {
         <OvirtApiCheckFailed />
         <TokenExpired />
       </React.Fragment>
-    </Router>
+    </ConnectedRouter>
   )
 }
 App.propTypes = {
+  history: PropTypes.object.isRequired,
+
   vms: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
   appReady: PropTypes.bool.isRequired,

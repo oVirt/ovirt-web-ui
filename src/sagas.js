@@ -20,6 +20,7 @@ import {
 
 import { logDebug } from './helpers'
 
+import { push } from 'connected-react-router'
 import {
   setChanged,
   updateIcons,
@@ -49,7 +50,6 @@ import {
   updateVmsPoolsCount,
   poolActionInProgress,
 
-  redirectRoute,
   refresh,
   getVmsByCount,
   getPoolsByCount,
@@ -545,9 +545,11 @@ function* startPool (action) {
 function* removeVm (action) {
   yield startProgress({ vmId: action.payload.vmId, name: 'remove' })
   const result = yield callExternalAction('remove', Api.remove, action)
+
   if (result.status === 'complete') {
-    yield put(redirectRoute({ route: '/' }))
+    yield put(push('/'))
   }
+
   yield stopProgress({ vmId: action.payload.vmId, name: 'remove', result })
 }
 
