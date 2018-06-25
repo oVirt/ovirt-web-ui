@@ -9,7 +9,6 @@ import options from './options'
 import templates from './templates'
 import clusters from './clusters'
 import hosts from './hosts'
-import route from './route'
 import operatingSystems from './operatingSystems'
 import storageDomains from './storageDomains'
 import dataCenters from './dataCenters'
@@ -21,27 +20,18 @@ import { reducer as OptionsDialog } from '../components/OptionsDialog/reducer'
 import NewDiskDialog from '../components/NewDiskDialog/reducers'
 import pendingTasks from './pendingTasks'
 
-function router (redirectUrl = '/', action) {
-  switch (action.type) {
-    default:
-      return redirectUrl
-  }
-}
-
 export default combineReducers({
   config,
   vms,
   userMessages,
   icons,
   options,
-  router,
   templates,
   clusters,
   operatingSystems,
   hosts,
   storageDomains,
   dataCenters,
-  route,
   vnicProfiles,
   VmAction,
   VmDialog,
