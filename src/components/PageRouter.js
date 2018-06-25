@@ -2,55 +2,16 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { matchRoutes } from 'react-router-config'
-import { Link, withRouter } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import { push } from 'connected-react-router'
 
-import { msg } from '../intl'
-
+import { RouterPropTypeShapes } from '../propTypeShapes'
 import style from './sharedStyle.css'
 import Toolbar from './Toolbar/Toolbar'
-
-const buildPath = (route) => {
-  let res = []
-  for (let i in route) {
-    if (typeof route[i].route.title === 'function') {
-      res.push({ title: route[i].route.title(route[i].match), url: route[i].match.url })
-    } else {
-      if (typeof route[i].route.title === 'string') {
-        res.push({ title: route[i].route.title, url: route[i].match.url })
-      }
-    }
-  }
-  return res
-}
-
-const Breadcrumb = ({ route, root }) => {
-  let pathArray = buildPath(route)
-  pathArray = [ root ].concat(pathArray)
-  const idPrefix = `breadcrumb`
-  const breadcrumbPaths = []
-  for (let i = 0; i < pathArray.length; i++) {
-    if ((i + 1) === pathArray.length) {
-      breadcrumbPaths.push(<li key={pathArray[i].url} className='active' id={`${idPrefix}-last-${i}`}>{pathArray[i].title}</li>)
-    } else {
-      breadcrumbPaths.push(<li key={pathArray[i].url}><Link to={pathArray[i].url} id={`${idPrefix}-link-${i}`}>{pathArray[i].title}</Link></li>)
-    }
-  }
-
-  return (<ol className={`breadcrumb ${style['breadcrumb']}`}>
-    {breadcrumbPaths}
-  </ol>)
-}
-
-Breadcrumb.propTypes = {
-  route: PropTypes.array.isRequired,
-  root: PropTypes.object.isRequired,
-}
+import Breadcrumb from './Breadcrumb'
 
 const findExactOrOnlyMatch = (branches) => {
-  return branches.length === 1
-    ? branches[0]
-    : branches.find(branch => branch.match.isExact) || null
+  return branches.length === 1 ? branches[0] : branches.find(branch => branch.match.isExact) || null
 }
 
 class PageRouter extends React.Component {
@@ -114,7 +75,7 @@ class PageRouter extends React.Component {
     const RenderComponent = branch.route.component
     return (
       <div className={style['page-router']}>
-        <Breadcrumb route={branches} root={{ title: msg.virtualMachines(), url: '/' }} />
+        <Breadcrumb branches={branches} />
         <Toolbar>
           {tools}
         </Toolbar>
@@ -127,8 +88,9 @@ class PageRouter extends React.Component {
 }
 
 PageRouter.propTypes = {
-  location: PropTypes.object.isRequired,
-  history: PropTypes.object.isRequired,
+  match: RouterPropTypeShapes.match.isRequired, // eslint-disable-line react/no-unused-prop-types
+  location: RouterPropTypeShapes.location.isRequired,
+  history: RouterPropTypeShapes.history.isRequired,
   route: PropTypes.object.isRequired,
 
   navigationHandler: PropTypes.func.isRequired,
