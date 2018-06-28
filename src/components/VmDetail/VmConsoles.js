@@ -2,7 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { isWindows, hrefWithoutHistory } from '../../helpers'
-import ConsoleButton from '../VmActions/ConsoleButton'
+import { ActionButtonWraper } from '../VmActions/Action'
+import ConsoleConfirmationModal from '../VmActions/ConsoleConfirmationModal'
 import { canConsole } from '../../vm-status'
 
 import style from './style.css'
@@ -15,15 +16,13 @@ const VmConsoles = ({ vm, onConsole, onRDP, usbFilter }) => {
       <dd className={style['console-box']}>
         {
           vmConsoles.map(c => (
-            <ConsoleButton
-              vm={vm}
-              consoleId={c.get('id')}
+            <ActionButtonWraper
               key={c.get('id')}
-              button=''
-              className='pficon pficon-screen'
-              tooltip={`Open ${c.get('protocol').toUpperCase()} console`}
               shortTitle={c.get('protocol').toUpperCase()}
-              usbFilter={usbFilter}
+              tooltip={`Open ${c.get('protocol').toUpperCase()} console`}
+              className=''
+              id={`${idPrefix}-button-console-${c.get('protocol')}`}
+              confirmation={<ConsoleConfirmationModal vm={vm} usbFilter={usbFilter} consoleId={c.get('id')} />}
             />
           ))
         }

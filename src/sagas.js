@@ -499,13 +499,14 @@ function* getSingleInstance ({ vmId, poolId }) {
 function* stopProgress ({ vmId, poolId, name, result }) {
   const actionInProgress = vmId ? vmActionInProgress : poolActionInProgress
   if (result && result.status === 'complete') {
-    // do not call "end of in progress" if successful,
+    vmId = vmId || result.vm.id
+    // do not call 'end of in progress' if successful,
     // since UI will be updated by refresh
     yield delay(5 * 1000)
-    yield getSingleInstance({ vmId: result.vm.id, poolId })
+    yield getSingleInstance({ vmId, poolId })
 
     yield delay(30 * 1000)
-    yield getSingleInstance({ vmId: result.vm.id, poolId })
+    yield getSingleInstance({ vmId, poolId })
   }
 
   yield put(actionInProgress(Object.assign(vmId ? { vmId } : { poolId }, { name, started: false })))
