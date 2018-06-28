@@ -36,7 +36,6 @@ export const LOGOUT = 'LOGOUT'
 export const MAX_VM_MEMORY_FACTOR = 4 // see Edit VM flow; magic constant to stay aligned with Web Admin
 export const PERSIST_STATE = 'PERSIST_STATE'
 export const POOL_ACTION_IN_PROGRESS = 'POOL_ACTION_IN_PROGRESS'
-export const REDIRECT = 'REDIRECT'
 export const REFRESH_DATA = 'REFRESH_DATA'
 export const REMOVE_ACTIVE_REQUEST = 'REMOVE_ACTIVE_REQUEST'
 export const REMOVE_DISK_REMOVAL_PENDING_TASK = 'REMOVE_DISK_REMOVAL_PENDING_TASK'
