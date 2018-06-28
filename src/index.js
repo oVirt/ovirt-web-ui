@@ -15,9 +15,9 @@ import './index-nomodules.css'
 import 'patternfly/dist/css/patternfly.css'
 import 'patternfly/dist/css/patternfly-additions.css'
 import * as branding from './branding'
-import { getSelectedMessages, locale } from './intl'
 
-import store, { sagaMiddleware } from './store'
+import { getSelectedMessages, locale } from './intl'
+import configureStore from './store'
 import Selectors from './selectors'
 import AppConfiguration, { readConfiguration } from './config'
 import { loadStateFromLocalStorage } from './storage'
@@ -45,11 +45,11 @@ window.patternfly = require('patternfly/dist/js/patternfly')
 window.selectpicker = require('bootstrap-select/js/bootstrap-select.js')
 window.combobox = require('patternfly-bootstrap-combobox/js/bootstrap-combobox.js')
 
-function renderApp () {
+function renderApp (store: Object) {
   ReactDOM.render(
     <Provider store={store}>
       <IntlProvider locale={locale} messages={getSelectedMessages()}>
-        <App />
+        <App history={store.history} />
       </IntlProvider>
     </Provider>,
     (document.getElementById('root'): any)
@@ -84,7 +84,7 @@ function fetchToken (): { token: string, username: string, domain: string, userI
   }
 }
 
-function loadPersistedState () {
+function loadPersistedState (store: Object) {
   // load persisted icons, etc ...
   const { icons } = loadStateFromLocalStorage()
 
@@ -108,12 +108,6 @@ function addLinkElement (rel: string, href: string) {
   window.document.head.appendChild(linkElement)
 }
 
-function start () {
-  readConfiguration()
-    .then(branding.loadOnce)
-    .then(onResourcesLoaded)
-}
-
 function initializeApiListener (store: Object) {
   OvirtApi.addHttpListener((requestId, eventType) => {
     if (eventType === 'START') {
@@ -131,26 +125,28 @@ function onResourcesLoaded () {
 
   addBrandedResources()
 
-  const { token, username, domain, userId }: { token: string, username: string, domain: string, userId: string } = fetchToken()
-
-  // do initial render
-  renderApp()
-
-  // handle external actions
-  sagaMiddleware.run(rootSaga)
-
-  // initiate data retrieval
+  const store = configureStore()
+  store.runSaga(rootSaga)
   Selectors.init({ store })
   initializeApiListener(store)
+  loadPersistedState(store)
 
-  loadPersistedState()
+  // do initial render
+  renderApp(store)
 
+  const { token, username, domain, userId }: { token: string, username: string, domain: string, userId: string } = fetchToken()
   store.dispatch(setDomain({ domain }))
   if (token) {
     store.dispatch(login({ username, token, userId }))
   } else {
     logError('Missing SSO Token!')
   }
+}
+
+function start () {
+  readConfiguration()
+    .then(branding.loadOnce)
+    .then(onResourcesLoaded)
 }
 
 start()

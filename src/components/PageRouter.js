@@ -2,150 +2,108 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { matchRoutes } from 'react-router-config'
+import { withRouter } from 'react-router-dom'
+import { push } from 'connected-react-router'
 
-import {
-  Link,
-  withRouter,
-  Redirect,
-} from 'react-router-dom'
-
-import { redirectRoute } from '../actions/route'
-
+import { RouterPropTypeShapes } from '../propTypeShapes'
 import style from './sharedStyle.css'
-
 import Toolbar from './Toolbar/Toolbar'
+import Breadcrumb from './Breadcrumb'
 
-import { msg } from '../intl'
-
-const buildPath = (route) => {
-  let res = []
-  for (let i in route) {
-    if (typeof route[i].route.title === 'function') {
-      res.push({ title: route[i].route.title(route[i].match), url: route[i].match.url })
-    } else {
-      if (typeof route[i].route.title === 'string') {
-        res.push({ title: route[i].route.title, url: route[i].match.url })
-      }
-    }
-  }
-  return res
-}
-
-const Breadcrumb = ({ route, root }) => {
-  let pathArray = buildPath(route)
-  pathArray = [ root ].concat(pathArray)
-  const idPrefix = `breadcrumb`
-  const breadcrumbPaths = []
-  for (let i = 0; i < pathArray.length; i++) {
-    if ((i + 1) === pathArray.length) {
-      breadcrumbPaths.push(<li key={pathArray[i].url} className='active' id={`${idPrefix}-last-${i}`}>{pathArray[i].title}</li>)
-    } else {
-      breadcrumbPaths.push(<li key={pathArray[i].url}><Link to={pathArray[i].url} id={`${idPrefix}-link-${i}`}>{pathArray[i].title}</Link></li>)
-    }
-  }
-
-  return (<ol className={`breadcrumb ${style['breadcrumb']}`}>
-    {breadcrumbPaths}
-  </ol>)
-}
-
-Breadcrumb.propTypes = {
-  route: PropTypes.array.isRequired,
-  root: PropTypes.object.isRequired,
-}
-
-const findExactMatch = (branches) => {
-  if (branches.length === 1) {
-    return branches[0]
-  } else {
-    for (let i = 0; i < branches.length; i++) {
-      if (branches[i].match.isExact) {
-        return branches[i]
-      }
-    }
-  }
-  return null
+const findExactOrOnlyMatch = (branches) => {
+  return branches.length === 1 ? branches[0] : branches.find(branch => branch.match.isExact) || null
 }
 
 class PageRouter extends React.Component {
   constructor (props) {
     super(props)
-    this.handleKeyPress = this.handleKeyPress.bind(this)
-    this.keyPressed = null
-    this.previousPath = '/'
-  }
+    this.state = {
+      previousPath: '/',
+      currentPath: null,
 
-  handleKeyPress (event) {
-    if (event.key === 'Escape' && this.keyPressed !== event.key) {
-      this.keyPressed = event.key
-      if (this.currentBranch.length > 1) {
-        this.props.redirectRoute(this.currentBranch[this.currentBranch.length - 2].match.url)
-      }
+      branches: [],
+      branch: null,
+      closeable: false,
     }
+
+    this.handleKeyUp = this.handleKeyUp.bind(this)
   }
 
-  componentDidUpdate () {
-    if (this.props.routeReducer.get('redirect') && this.props.routeReducer.get('redirect') !== this.props.location.pathname) {
-      this.props.onRedirect()
+  handleKeyUp (event) {
+    if (event.key === 'Escape' && this.state.closeable) {
+      this.props.navigationHandler(this.state.previousPath)
     }
   }
 
   componentDidMount () {
-    window.addEventListener('keydown', this.handleKeyPress)
-    window.addEventListener('keyup', (e) => { this.keyPressed = null })
+    document.addEventListener('keyup', this.handleKeyUp)
   }
 
-  componentWillReceiveProps (nextProps) {
-    if (this.previousPath !== this.props.location.pathname && nextProps.location.pathname !== this.props.location.pathname) {
-      this.previousPath = this.props.location.pathname
+  componentWillUnmount () {
+    document.removeEventListener('keyup', this.handleKeyUp)
+  }
+
+  static getDerivedStateFromProps ({ location, route }, { currentPath, previousPath }) {
+    const newPath = location.pathname
+    const updates = {}
+
+    if (currentPath !== newPath) {
+      updates.branches = matchRoutes(route.routes, location.pathname)
+      updates.branch = findExactOrOnlyMatch(updates.branches)
+      updates.closeable = !!updates.branch.route.closeable
+
+      updates.currentPath = newPath
+      if (previousPath !== currentPath) {
+        updates.previousPath = currentPath
+      }
     }
+
+    return Object.keys(updates).length > 0 ? updates : null
   }
 
   render () {
-    let { route, location, history, routeReducer } = this.props
-    if (routeReducer.get('redirect') && routeReducer.get('redirect') !== location.pathname) {
-      return (<Redirect to={routeReducer.get('redirect')} />)
-    }
-    const branches = matchRoutes(route.routes, location.pathname)
+    const { location, history } = this.props
+    const { previousPath, branches, branch } = this.state
 
-    let branch = findExactMatch(branches)
-    this.currentBranch = branches.slice()
-    this.currentBranch.unshift({ match: { url: '/' } })
-    let tools = []
-    if (branch) {
-      for (let i in branch.route.toolbars) {
-        tools.push(branch.route.toolbars[i](branch.match))
+    const tools = []
+    if (branch && branch.route.toolbars) {
+      for (const toolbarBuilder of branch.route.toolbars) {
+        tools.push(toolbarBuilder(branch.match))
       }
     }
 
     const RenderComponent = branch.route.component
-    return (<div className={style['page-router']}>
-      <Breadcrumb route={branches} root={{ title: msg.virtualMachines(), url: '/' }} />
-      <Toolbar>
-        {tools}
-      </Toolbar>
-      <div className={style['page-router-render-component']}>
-        <RenderComponent route={branch.route} match={branch.match} location={location} history={history} previousPath={this.previousPath} />
+    return (
+      <div className={style['page-router']}>
+        <Breadcrumb branches={branches} />
+        <Toolbar>
+          {tools}
+        </Toolbar>
+        <div className={style['page-router-render-component']}>
+          <RenderComponent route={branch.route} match={branch.match} location={location} history={history} previousPath={previousPath} />
+        </div>
       </div>
-    </div>)
+    )
   }
 }
 
 PageRouter.propTypes = {
-  location: PropTypes.object.isRequired,
-  history: PropTypes.object.isRequired,
+  match: RouterPropTypeShapes.match.isRequired, // eslint-disable-line react/no-unused-prop-types
+  location: RouterPropTypeShapes.location.isRequired,
+  history: RouterPropTypeShapes.history.isRequired,
   route: PropTypes.object.isRequired,
-  routeReducer: PropTypes.object.isRequired,
-  onRedirect: PropTypes.func.isRequired,
-  redirectRoute: PropTypes.func.isRequired,
+
+  navigationHandler: PropTypes.func.isRequired,
 }
 
-export default withRouter(connect(
-  (state) => ({
-    routeReducer: state.route,
-  }),
-  (dispatch) => ({
-    onRedirect: () => dispatch(redirectRoute({ route: null })),
-    redirectRoute: (url) => dispatch(redirectRoute({ route: url })),
-  })
-)(PageRouter))
+/*
+ * PageRouter gets props from react-router and uses redux actions for navigation
+ */
+export default withRouter(
+  connect(
+    undefined,
+    dispatch => ({
+      navigationHandler: (newPath) => dispatch(push(newPath)),
+    })
+  )(PageRouter)
+)
