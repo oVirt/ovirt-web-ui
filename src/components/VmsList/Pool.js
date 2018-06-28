@@ -6,7 +6,6 @@ import { Link, withRouter } from 'react-router-dom'
 
 import style from './style.css'
 
-import VmStatusText from './VmStatusText'
 import VmActions from '../VmActions'
 import VmIcon from '../VmIcon'
 import VmStatusIcon from '../VmStatusIcon'
@@ -28,15 +27,15 @@ const Pool = ({ pool, icons, onStart }) => {
   return (
     <div className={`col-xs-12 col-sm-6 col-md-4 col-lg-3`}>
       <div className='card-pf card-pf-view card-pf-view-select card-pf-view-single-select'>
+        <div>
+          <span className={style['operating-system-label']}>{ osName }</span>
+        </div>
         <div className='card-pf-body'>
           <div className={`card-pf-top-element ${style['card-icon']}`}>
             <Link to={`/pool/${pool.get('id')}`}>
               <VmIcon icon={icon} className={style['card-pf-icon']}
                 missingIconClassName='fa fa-birthday-cake card-pf-icon-circle' />
             </Link>
-            <div>
-              <span className={style['operating-system-label']}>{ osName }</span>
-            </div>
           </div>
 
           <h2 className='card-pf-title text-center'>
@@ -48,7 +47,6 @@ const Pool = ({ pool, icons, onStart }) => {
           </h2>
 
           <VmActions isOnCard vm={pool.get('vm')} onStart={onStart} pool={pool} />
-          <VmStatusText vm={pool.get('vm')} />
         </div>
       </div>
     </div>

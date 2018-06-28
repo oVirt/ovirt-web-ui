@@ -30,7 +30,8 @@
 
 .full-button {
 	display: inline-block;
-	margin-left: 5px;
+    text-align: center;
+    margin-left: 5px;
 }
 
 .full-button:first-child {
@@ -40,4 +41,9 @@
 .button-spacer {
     width: 10px;
     display: inline-block;
+}
+
+.action-height {
+    height: 27px;
+    margin-top: 5px !important;
 }

@@ -2,9 +2,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { isWindows } from '../../helpers'
+import { ActionButtonWraper } from '../VmActions/Action'
+import ConsoleConfirmationModal from '../VmActions/ConsoleConfirmationModal'
 import { canConsole } from '../../vm-status'
 
-import ConsoleButton from '../VmActions/ConsoleButton'
 import WindowsRdpButton from '../VmActions/WindowsRdpButton'
 
 import style from './style.css'
@@ -23,14 +24,13 @@ const VmConsoles = ({ vm }) => {
       <dd className={style['console-box']}>
         {
           vmConsoles.map(c => (
-            <ConsoleButton
-              vm={vm}
-              consoleId={c.get('id')}
+            <ActionButtonWraper
               key={c.get('id')}
-              button=''
-              className='pficon pficon-screen'
-              tooltip={`Open ${c.get('protocol').toUpperCase()} console`} // TODO: l10n
               shortTitle={c.get('protocol').toUpperCase()}
+              tooltip={`Open ${c.get('protocol').toUpperCase()} console`}
+              className=''
+              id={`${idPrefix}-button-console-${c.get('protocol')}`}
+              confirmation={<ConsoleConfirmationModal vm={vm} consoleId={c.get('id')} />}
             />
           ))
         }
