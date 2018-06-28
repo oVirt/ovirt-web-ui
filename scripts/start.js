@@ -126,7 +126,11 @@ function openBrowser(port, protocol) {
   }
   // Fallback to opn
   // (It will always open new tab)
-  opn(protocol + '://localhost:' + port + '/').catch(err => {
+  const options = {}
+  if (process.env.BROWSER) {
+    options.app = process.env.BROWSER
+  }
+  opn(protocol + '://localhost:' + port + '/', options).catch(err => {
     // ignore errors - can happen when starting the server in docker container
   })
 }
