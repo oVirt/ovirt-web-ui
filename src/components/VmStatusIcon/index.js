@@ -20,35 +20,35 @@ Icon.propTypes = {
 const VmStatusIcon = ({ state }) => {
   switch (state) {
     case 'up':
-      return <Icon className={`fa fa-play ${style['green']}`} tooltip='The VM is running.' />
+      return <Icon className={`pficon pficon-on-running ${style['green']}`} tooltip='The VM is running.' />
     case 'powering_up':
-      return <Icon className='fa fa-angle-double-up' tooltip='The VM is powering up.' />
+      return <Icon className='pficon pficon-in-progress' tooltip='The VM is powering up.' />
     case 'down':
-      return <Icon className='fa fa-power-off' tooltip='The VM is down.' />
+      return <Icon className='pficon pficon-off' tooltip='The VM is down.' />
     case 'paused':
-      return <Icon className='fa fa-pause' tooltip='The VM is paused.' />
+      return <Icon className='pficon pficon-paused' tooltip='The VM is paused.' />
     case 'suspended':
-      return <Icon className='fa fa-moon-o' tooltip='The VM is suspended.' />
+      return <Icon className='pficon pficon-asleep' tooltip='The VM is suspended.' />
     case 'powering_down':
-      return <Icon className='fa fa-angle-double-down' tooltip='The VM is going down.' />
+      return <Icon className='pficon pficon-in-progress' tooltip='The VM is going down.' />
     case 'not_responding':
       return <Icon className='pficon pficon-warning-triangle-o' tooltip='The VM is not responding.' />
     case 'unknown':
-      return <Icon className='pficon pficon-help' tooltip='The VM status is unknown.' />
+      return <Icon className='pficon pficon-unknown' tooltip='The VM status is unknown.' />
     case 'unassigned':
-      return <Icon className='pficon pficon-help' tooltip='The VM status is unassigned.' />
+      return <Icon className='pficon pficon-unknown' tooltip='The VM status is unassigned.' />
     case 'migrating':
-      return <Icon className='pficon pficon-service' tooltip='The VM is being migrated.' />
+      return <Icon className='pficon pficon-migration' tooltip='The VM is being migrated.' />
     case 'wait_for_launch':
-      return <Icon className='pficon pficon-service' tooltip='The VM is scheduled for launch.' />
+      return <Icon className='pficon pficon-pending' tooltip='The VM is scheduled for launch.' />
     case 'reboot_in_progress':
-      return <Icon className='pficon pficon-restart' tooltip='The VM is being rebooted.' />
+      return <Icon className='pficon pficon-in-progress' tooltip='The VM is being rebooted.' />
     case 'saving_state':
-      return <Icon className='pficon pficon-export' tooltip='The VM is saving its state.' />
+      return <Icon className='pficon pficon-pending' tooltip='The VM is saving its state.' />
     case 'restoring_state':
-      return <Icon className='pficon pficon-import' tooltip='The VM is restoring its state.' />
+      return <Icon className='pficon pficon-in-progress' tooltip='The VM is restoring its state.' />
     case 'image_locked':
-      return <Icon className='pficon pficon-volume' tooltip="The VM's image is locked" />
+      return <Icon className='pficon pficon-locked' tooltip="The VM's image is locked" />
 
     case undefined: // better not to happen ...
       console.info(`VmStatusIcon component: VM state is undefined`)
