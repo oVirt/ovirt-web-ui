@@ -47,6 +47,10 @@ body {
   overflow: auto;
 }
 
+#page-router-render-component > *:last-child {
+  flex-grow: 1;
+}
+
 /*
  * PatternFly overrides
  *   NOTE: 'flex-shrink: 0;' keeps a div from getting smaller when the window
@@ -78,6 +82,19 @@ body {
   height: 28px;
 }
 
+.card-pf .card-pf-footer {
+  background-color: inherit;
+  padding-top: 10px;
+
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.card-pf .card-pf-footer button {
+  margin-left: 5px;
+  height: 28px;
+  width: 28px;
+}
 
 .bootstrap-switch-container .bootstrap-switch-label {
   height: 27px !important;

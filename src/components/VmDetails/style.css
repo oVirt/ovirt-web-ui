@@ -1,0 +1,96 @@
+.grid-container { /* bootstrap4 .container-fluid (different padding/margins) */
+  width: 100%;
+  padding-right: 25px;
+  padding-left: 25px;
+  margin: 0 auto;
+}
+
+.grid-row { /* bootstrap4 .row */
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -20px;
+  margin-left: -20px;
+}
+
+.grid-column { /* bootstrap4 .col & .col-md */
+  position: relative;
+  width: 100%;
+  min-height: 1px;
+  padding-right: 20px;
+  padding-left: 20px;
+
+  flex: 1 1 0; /* grow shrink basis */
+  max-width: 100%;
+  /*
+    if the component specifies a column span X, it will override
+    flex and max-width so the col takes X/12 columns
+  */
+
+  display: flex;
+  flex-direction: column;
+}
+
+.details-container {
+  padding-top: 20px;
+  background-color: #f5f5f5;
+}
+
+.details-container > .grid-row > .grid-column > :global(*) {
+  /* all children takes equal amount of available space */
+  flex: 1 1 0;
+}
+
+/* click container for the edit icon */
+.card-edit-button {
+  float: right;
+  margin-top: -5px;
+  margin-left: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  width: 25px;
+  height: 25px;
+}
+
+.card-edit-button:hover {
+  text-decoration: none;
+}
+
+.card-edit-button-disabled {
+  color: darkgrey;
+}
+
+.card-edit-button-enabled {
+  color: black;
+}
+
+.card-item-title-icon {
+  margin-right: 6px; /* match the left margin on .badge */
+  vertical-align: top;
+}
+
+.card-item-count-badge {
+  vertical-align: top;
+}
+
+.os-name-tag {
+  position: absolute;
+  top: 0;
+  right: 10px;
+  padding: 0 10px;
+
+  background-color: #9c9c9c;
+  font-size: 90%;
+}
+
+/* TODO: Temporary style for filler text. Remove once it isn't needed. */
+.demo-text {
+  padding: 5px;
+  color: black;
+  background-color: #00adef;
+  text-align: center;
+  font-family: 'Comic Sans MS';
+  font-weight: bold;
+}

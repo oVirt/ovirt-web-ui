@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
+import { RouterPropTypeShapes } from '../../propTypeShapes'
 import VmActions from '../VmActions'
 
 const VmDetailToolbar = ({ match, vms }) => {
@@ -13,11 +14,7 @@ const VmDetailToolbar = ({ match, vms }) => {
 
 VmDetailToolbar.propTypes = {
   vms: PropTypes.object.isRequired,
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-    }).isRequired,
-  }).isRequired,
+  match: RouterPropTypeShapes.match.isRequired,
 }
 
 const VmDetailToolbarConnected = connect(
@@ -35,11 +32,7 @@ const PoolDetailToolbar = ({ match, vms }) => {
 
 PoolDetailToolbar.propTypes = {
   vms: PropTypes.object.isRequired,
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-    }).isRequired,
-  }).isRequired,
+  match: RouterPropTypeShapes.match.isRequired,
 }
 
 const PoolDetailToolbarConnected = connect(

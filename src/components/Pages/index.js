@@ -1,10 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import { RouterPropTypeShapes } from '../../propTypeShapes'
 
-import VmDetail from '../VmDetail'
 import VmDialog from '../VmDialog'
 import VmsList from '../VmsList'
+import VmDetails from '../VmDetails'
 
 import { selectVmDetail, selectPoolDetail, getIsoStorageDomains, getConsoleOptions } from '../../actions'
 
@@ -18,7 +19,7 @@ const VmsPage = () => {
 /**
  * Route component (for PageRouter) to view a VM's details
  */
-class VmDetailPage extends React.Component {
+class VmDetailsPage extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -41,11 +42,11 @@ class VmDetailPage extends React.Component {
   }
 
   render () {
-    const { vms, config } = this.props
+    const { vms } = this.props
     const { vmId } = this.state
 
     if (vmId && vms.getIn(['vms', vmId])) {
-      return (<VmDetail vm={vms.getIn(['vms', vmId])} config={config} />)
+      return (<VmDetails vm={vms.getIn(['vms', vmId])} />)
     }
 
     // TODO: Add handling for if the fetch runs but fails (FETCH-FAIL), see issue #631
@@ -53,29 +54,27 @@ class VmDetailPage extends React.Component {
     return null
   }
 }
-VmDetailPage.propTypes = {
+VmDetailsPage.propTypes = {
   vms: PropTypes.object.isRequired,
-  config: PropTypes.object.isRequired,
-  match: PropTypes.object.isRequired,
+  match: RouterPropTypeShapes.match.isRequired,
 
   getVmById: PropTypes.func.isRequired,
   getConsoleOptions: PropTypes.func.isRequired,
 }
-const VmDetailPageConnected = connect(
+const VmDetailsPageConnected = connect(
   (state) => ({
     vms: state.vms,
-    config: state.config,
   }),
   (dispatch) => ({
     getVmById: (vmId) => dispatch(selectVmDetail({ vmId })),
     getConsoleOptions: (vmId) => dispatch(getConsoleOptions({ vmId })),
   })
-)(VmDetailPage)
+)(VmDetailsPage)
 
 /**
  * Route component (for PageRouter) to view a Pool's details
  */
-class PoolDetailPage extends React.Component {
+class PoolDetailsPage extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -97,11 +96,12 @@ class PoolDetailPage extends React.Component {
   }
 
   render () {
-    const { vms, config } = this.props
+    const { vms } = this.props
     const { poolId } = this.state
 
     if (poolId && vms.getIn(['pools', poolId, 'vm'])) {
-      return (<VmDetail vm={vms.getIn(['pools', poolId, 'vm'])} pool={vms.getIn(['pools', poolId])} config={config} />)
+      // TODO: ux-redesign VmDetails will need to also handle viewing a Pool / Pool (template)? VM
+      return (<VmDetails vm={vms.getIn(['pools', poolId, 'vm'])} pool={vms.getIn(['pools', poolId])} />)
     }
 
     // TODO: Add handling for if the fetch runs but fails (FETCH-FAIL), see issue #631
@@ -109,27 +109,50 @@ class PoolDetailPage extends React.Component {
     return null
   }
 }
-PoolDetailPage.propTypes = {
+PoolDetailsPage.propTypes = {
   vms: PropTypes.object.isRequired,
-  config: PropTypes.object.isRequired,
-  match: PropTypes.object.isRequired,
+  match: RouterPropTypeShapes.match.isRequired,
 
   getPoolById: PropTypes.func.isRequired,
 }
-const PoolDetailPageConnected = connect(
+const PoolDetailsPageConnected = connect(
   (state) => ({
     vms: state.vms,
-    config: state.config,
   }),
   (dispatch) => ({
     getPoolById: (poolId) => dispatch(selectPoolDetail({ poolId })),
   })
-)(PoolDetailPage)
+)(PoolDetailsPage)
 
 /**
- * Route component (for PageRouter) to create or edit a VM
+ * Route component (for PageRouter) to create a new VM
  */
-class VmDialogPage extends React.Component {
+class VmCreatePage extends React.Component {
+  constructor (props) {
+    super(props)
+    props.getAvailableCDImages()
+  }
+
+  render () {
+    const { previousPath } = this.props
+    return <VmDialog previousPath={previousPath} />
+  }
+}
+VmCreatePage.propTypes = {
+  previousPath: PropTypes.string.isRequired,
+  getAvailableCDImages: PropTypes.func.isRequired,
+}
+const VmCreatePageConnected = connect(
+  null,
+  (dispatch) => ({
+    getAvailableCDImages: () => dispatch(getIsoStorageDomains()),
+  })
+)(VmCreatePage)
+
+/**
+ * Route component (for PageRouter) to edit a VM
+ */
+class VmEditPage extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -155,26 +178,24 @@ class VmDialogPage extends React.Component {
     const { vms, previousPath } = this.props
     const { vmId } = this.state
 
-    if (/\/add$/.test(this.props.match.path)) {
-      return <VmDialog previousPath={previousPath} />
-    } else if (vmId && vms.getIn(['vms', vmId])) {
+    if (vmId && vms.getIn(['vms', vmId])) {
       return <VmDialog previousPath={previousPath} vm={vms.getIn(['vms', vmId])} />
     }
 
     // TODO: Add handling for if the fetch runs but fails (FETCH-FAIL), see issue #631
-    console.info(`VmDialogPage: VM id cannot be found: ${vmId}`)
+    console.info(`VmEditPage: VM id cannot be found: ${vmId}`)
     return null
   }
 }
-VmDialogPage.propTypes = {
+VmEditPage.propTypes = {
   vms: PropTypes.object.isRequired,
   previousPath: PropTypes.string.isRequired,
-  match: PropTypes.object.isRequired,
+  match: RouterPropTypeShapes.match.isRequired,
 
   getAvailableCDImages: PropTypes.func.isRequired,
   getVmById: PropTypes.func.isRequired,
 }
-const VmDialogPageConnected = connect(
+const VmEditPageConnected = connect(
   (state) => ({
     vms: state.vms,
   }),
@@ -182,11 +203,12 @@ const VmDialogPageConnected = connect(
     getAvailableCDImages: () => dispatch(getIsoStorageDomains()),
     getVmById: (vmId) => dispatch(selectVmDetail({ vmId })),
   })
-)(VmDialogPage)
+)(VmEditPage)
 
 export {
-  PoolDetailPageConnected as PoolDetailPage,
-  VmDetailPageConnected as VmDetailPage,
-  VmDialogPageConnected as VmDialogPage,
+  PoolDetailsPageConnected as PoolDetailsPage,
+  VmDetailsPageConnected as VmDetailsPage,
+  VmCreatePageConnected as VmCreatePage,
+  VmEditPageConnected as VmEditPage,
   VmsPage,
 }
