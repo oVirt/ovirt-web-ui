@@ -1,20 +1,27 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
+import { connect } from 'react-redux'
 import { msg } from '../../intl'
 import style from '../sharedStyle.css'
 
-const buildPath = (route) => {
-  let res = []
-  for (let i in route) {
-    if (typeof route[i].route.title === 'function') {
-      res.push({ title: route[i].route.title(route[i].match), url: route[i].match.url })
-    } else {
-      if (typeof route[i].route.title === 'string') {
-        res.push({ title: route[i].route.title, url: route[i].match.url })
-      }
+const buildPath = (vms, branches) => {
+  const res = []
+
+  for (const branch of branches) {
+    if (typeof branch.route.title === 'function') {
+      res.push({
+        title: branch.route.title(branch.match, vms),
+        url: branch.match.url,
+      })
+    } else if (typeof branch.route.title === 'string') {
+      res.push({
+        title: branch.route.title,
+        url: branch.match.url,
+      })
     }
   }
+
   return res
 }
 
@@ -23,20 +30,19 @@ const root = {
   url: '/',
 }
 
-const Breadcrumb = ({ branches }) => {
-  const crumbs = [ root, ...buildPath(branches) ]
+const Breadcrumb = ({ vms, branches }) => {
+  const crumbs = [ root, ...buildPath(vms, branches) ]
   const idPrefix = `breadcrumb`
-  // const noExactMatch = branches.length === 1 && !branches[0].route.path
 
   return (
     <ol className={`breadcrumb ${style['breadcrumb']}`}>
       {crumbs.map((path, index, array) =>
         (index === (array.length - 1)) ? (
-          <li key={path.url} className='active' id={`${idPrefix}-last-${index}`}>
+          <li key={`${index}-${path.url}`} className='active' id={`${idPrefix}-last-${index}`}>
             {path.title}
           </li>
         ) : (
-          <li key={path.url}>
+          <li key={`${index}-${path.url}`}>
             <Link to={path.url} id={`${idPrefix}-link-${index}`}>{path.title}</Link>
           </li>
         )
@@ -46,6 +52,11 @@ const Breadcrumb = ({ branches }) => {
 }
 Breadcrumb.propTypes = {
   branches: PropTypes.array.isRequired,
+  vms: PropTypes.object.isRequired,
 }
 
-export default Breadcrumb
+export default connect(
+  state => ({
+    vms: state.vms,
+  })
+)(Breadcrumb)
