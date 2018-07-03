@@ -53,7 +53,7 @@ class PageRouter extends React.Component {
       updates.closeable = !!updates.branch.route.closeable
 
       updates.currentPath = newPath
-      if (previousPath !== currentPath) {
+      if (currentPath && (previousPath !== currentPath)) {
         updates.previousPath = currentPath
       }
     }
