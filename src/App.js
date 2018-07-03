@@ -36,7 +36,7 @@ const NoLogin = () => {
  * Main App component. Wrap the main react-router components together with
  * the various dialogs and error messages that may be needed.
  */
-const App = ({ history, vms, config, appReady }) => {
+const App = ({ history, config, appReady }) => {
   if (!config.get('loginToken')) { // login is missing
     return (
       <Grid fluid>
@@ -45,13 +45,11 @@ const App = ({ history, vms, config, appReady }) => {
     )
   }
 
-  const routes = getRoutes(vms)
-
   return (
     <ConnectedRouter history={history}>
       <React.Fragment>
         <VmsPageHeader title={fixedStrings.BRAND_NAME + ' ' + msg.vmPortal()} />
-        { appReady && renderRoutes(routes) }
+        { appReady && renderRoutes(getRoutes()) }
         <LoadingData />
         <OvirtApiCheckFailed />
         <TokenExpired />
@@ -62,14 +60,12 @@ const App = ({ history, vms, config, appReady }) => {
 App.propTypes = {
   history: PropTypes.object.isRequired,
 
-  vms: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
   appReady: PropTypes.bool.isRequired,
 }
 
 export default connect(
   (state) => ({
-    vms: state.vms,
     config: state.config,
     appReady: state.config.get('isFilterChecked'), // When is the app ready to display data components?
   })
