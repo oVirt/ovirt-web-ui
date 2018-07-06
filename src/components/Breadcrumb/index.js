@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { msg } from '../../intl'
-import style from '../sharedStyle.css'
 
 const buildPath = (vms, branches) => {
   const res = []
@@ -35,7 +34,7 @@ const Breadcrumb = ({ vms, branches }) => {
   const idPrefix = `breadcrumb`
 
   return (
-    <ol className={`breadcrumb ${style['breadcrumb']}`}>
+    <ol className='breadcrumb'>
       {crumbs.map((path, index, array) =>
         (index === (array.length - 1)) ? (
           <li key={`${index}-${path.url}`} className='active' id={`${idPrefix}-last-${index}`}>
