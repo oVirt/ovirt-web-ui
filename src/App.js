@@ -49,13 +49,13 @@ const App = ({ history, vms, config, appReady }) => {
 
   return (
     <ConnectedRouter history={history}>
-      <React.Fragment>
+      <div id='app-container'>
         <VmsPageHeader title={fixedStrings.BRAND_NAME + ' ' + msg.vmPortal()} />
         { appReady && renderRoutes(routes) }
         <LoadingData />
         <OvirtApiCheckFailed />
         <TokenExpired />
-      </React.Fragment>
+      </div>
     </ConnectedRouter>
   )
 }

@@ -2,7 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { msg } from '../../intl'
-import style from '../sharedStyle.css'
 
 const buildPath = (route) => {
   let res = []
@@ -29,7 +28,7 @@ const Breadcrumb = ({ branches }) => {
   // const noExactMatch = branches.length === 1 && !branches[0].route.path
 
   return (
-    <ol className={`breadcrumb ${style['breadcrumb']}`}>
+    <ol className='breadcrumb'>
       {crumbs.map((path, index, array) =>
         (index === (array.length - 1)) ? (
           <li key={path.url} className='active' id={`${idPrefix}-last-${index}`}>

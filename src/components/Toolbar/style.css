@@ -1,8 +1,7 @@
 .actions-padding {
-    padding-left: 0px;
+  padding-left: 0px;
 }
 
 .toolbar {
-    flex-shrink: 0;
-    width: 100%;
+  width: 100%;
 }

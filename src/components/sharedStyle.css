@@ -1,78 +1,42 @@
-.move-left-detail { /* VM detail on the right */
-    height: 100%;
-    display: block;
-    max-width: 95%;
-    opacity:1;
-}
-
-.move-left-detail-invisible {
-    opacity: 0;
-}
-
-.detail-z-index {
-	z-index: 1050;
-}
-
-.usermenu-z-index {
-    z-index: 2000;
-}
-
-.vertical-menu {
-	top: 62px !important;
-    display: none; /* remove to enable left sidebar menu */
-}
-
-.breadcrumb {
-    border-bottom: solid gray;
-    padding-left: 15px;
-    margin-bottom: 5px;
-
-    flex-shrink: 0;
-}
-
-.page-router {
-    position: absolute;
-    top: 62px;
-    left: 0px; /* set to 200 to enable left sidebar menu */
-    bottom: 0;
-    right: 0;
-
-    display: flex;
-    flex-direction: column;
-}
-
-.page-router-render-component {
-    flex-grow: 1;
-    overflow: auto;
-    height: 100%;
-}
-
 /* For VmDetail and VmDialog */
 .vm-properties {
-    font-size: large;
-    width: 50%;
-    min-width: 500px;
+  font-size: large;
+  width: 50%;
+  min-width: 500px;
 }
 
 .dropdown-button {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    align-items: baseline;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
 }
 
 .dropdown-button-text {
-    flex-grow: 1;
-    text-align: left;
+  flex-grow: 1;
+  text-align: left;
 }
 
 .dropdown {
-    width: 100%;
-    max-height: 300px;
-    overflow: auto;
-    text-align: left;
+  width: 100%;
+  max-height: 300px;
+  overflow: auto;
+  text-align: left;
 }
 
 .dropdown li {
-    cursor: pointer;
+  cursor: pointer;
+}
+
+/* For DetailContainer (in VmDetail and VmDialog) */
+.move-left-detail { /* VM detail on the right */
+  height: 100%;
+  display: block;
+  max-width: 95%;
+  width: 100%;
+  opacity: 1;
+}
+
+.detail-z-index {
+  z-index: 1050;
 }
