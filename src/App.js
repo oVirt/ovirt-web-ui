@@ -9,10 +9,9 @@ import { Grid } from 'patternfly-react'
 import LoadingData from './components/LoadingData'
 import OvirtApiCheckFailed from './components/OvirtApiCheckFailed'
 import TokenExpired from './components/TokenExpired'
-import VerticalMenu from './components/VerticalMenu'
 import VmsPageHeader from './components/VmsPageHeader'
 
-import { getRoutes, getMenu } from './routes'
+import getRoutes from './routes'
 import AppConfiguration from './config'
 import { fixedStrings } from './branding'
 import { msg } from './intl'
@@ -47,13 +46,11 @@ const App = ({ history, vms, config, appReady }) => {
   }
 
   const routes = getRoutes(vms)
-  const menu = getMenu()
 
   return (
     <ConnectedRouter history={history}>
       <React.Fragment>
-        <VmsPageHeader page={vms.get('page')} title={fixedStrings.BRAND_NAME + ' ' + msg.vmPortal()} />
-        <VerticalMenu menuItems={menu} /> { /* Disabled, to enable search for left sidebar menu */ }
+        <VmsPageHeader title={fixedStrings.BRAND_NAME + ' ' + msg.vmPortal()} />
         { appReady && renderRoutes(routes) }
         <LoadingData />
         <OvirtApiCheckFailed />
