@@ -15,6 +15,7 @@ import {
   SET_VM_DISKS,
   SET_VM_NICS,
   SET_VM_SESSIONS,
+  SET_VM_SNAPSHOTS,
   UPDATE_POOLS,
   UPDATE_VMPOOLS_COUNT,
   UPDATE_VMS,
@@ -50,6 +51,7 @@ const vms = actionReducer(initialState, {
         updates[vm.id].consoles = state.getIn(['vms', vm.id, 'consoles'], emptyMap).toJS()
         updates[vm.id].cdrom = state.getIn(['vms', vm.id, 'cdrom'], Immutable.fromJS({ file: { id: '' } })).toJS()
         updates[vm.id].nics = state.getIn(['vms', vm.id, 'nics'], Immutable.fromJS([])).toJS()
+        updates[vm.id].snapshots = state.getIn(['vms', vm.id, 'snapshots'], Immutable.fromJS([])).toJS()
       }
     })
     const imUpdates = Immutable.fromJS(updates)
@@ -67,7 +69,6 @@ const vms = actionReducer(initialState, {
   [REMOVE_MISSING_VMS] (state, { payload: { vmIdsToPreserve } }) {
     return removeMissingItems({ state, subStateName: 'vms', idsToPreserve: vmIdsToPreserve })
   },
-
   [SET_VM_DISKS] (state, { payload: { vmId, disks } }) {
     if (state.getIn(['vms', vmId])) {
       return state.setIn(['vms', vmId, 'disks'], Immutable.fromJS(disks)) // deep immutable
@@ -82,6 +83,14 @@ const vms = actionReducer(initialState, {
     } else { // fail, if VM not found
       logError(`vms.setVmCdrom() reducer: vmId ${vmId} not found`)
     }
+    return state
+  },
+  [SET_VM_SNAPSHOTS] (state, { payload: { vmId, snapshots } }) {
+    if (state.getIn(['vms', vmId])) {
+      return state.setIn(['vms', vmId, 'snapshots'], Immutable.fromJS(snapshots)) // deep immutable
+    }
+
+    logError(`vms.setVmSnapshots() reducer: vmId ${vmId} not found`)
     return state
   },
   [SET_VM_NICS] (state, { payload: { vmId, nics } }) {
@@ -106,7 +115,6 @@ const vms = actionReducer(initialState, {
     state = state.setIn(['vms', vmId, 'sessions'], Immutable.fromJS(sessions))
     return state.setIn(['vms', vmId, 'consoleInUse'], consoleInUse)
   },
-
   [VM_ACTION_IN_PROGRESS] (state, { payload: { vmId, name, started } }) {
     if (state.getIn(['vms', vmId])) {
       return state.setIn(['vms', vmId, 'actionInProgress', name], started)
@@ -116,7 +124,6 @@ const vms = actionReducer(initialState, {
   [POOL_ACTION_IN_PROGRESS] (state, { payload: { poolId, name, started } }) {
     return state.setIn(['pools', poolId, 'vm', 'actionInProgress', name], started)
   },
-
   [UPDATE_POOLS] (state, { payload: { pools } }) {
     const updates = {}
     pools.forEach(pool => {
