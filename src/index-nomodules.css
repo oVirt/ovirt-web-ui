@@ -129,3 +129,13 @@ body {
     display: -ms-flexbox;
     display: flex;
 }
+
+.navbar-nav > .dropdown {
+  position: inherit;
+}
+
+.drawer-pf .blank-slate-pf .blank-slate-pf-title {
+    font-size: 1em;
+    margin-bottom: 0;
+    margin-top: 15px;
+}

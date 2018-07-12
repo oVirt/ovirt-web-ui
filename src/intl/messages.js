@@ -131,7 +131,7 @@ export const messages = {
     description: 'About application',
   },
   logOut: 'Log out',
-  noMessages: 'No messages',
+  noMessages: 'There are no notifications to display.',
   enum_VmStatus_up: {
     message: 'Running',
     description: 'VM is running. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
@@ -293,6 +293,9 @@ export const messages = {
   areYouSureYouWantToRestoreSnapshot: 'Are you sure you want to restore snapshot {snapshotName}?',
   emptySnapshotDescription: 'Snapshot description is missing.',
   isPersistMemorySnapshot: 'Content of the memory of the virtual machine is included in the snapshot.',
+  clear: 'Clear',
+  clearAll: 'Clear all',
+  displayAll: 'Display all',
   unsavedChangesTitle: {
     message: 'Dialog contains unsaved changes',
     description: 'Title of modal dialog opened when a user tried to navigate off an editor page after changes have been made.',

@@ -1,53 +1,5 @@
-/* TODO: How to share the style with VmsList? */
-.crop {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    margin-left: 15px !important;
-}
-
-.fix-arrow-position {
-    left: 97% !important;
-}
-
-.usermsgs-unread {
-    color: red;
-    font-weight: bold;
-}
-
-.usermsgs-allread {
-}
-
-.messages-list {
-	height: 300px;
-	width: 500px;
-	overflow-y: auto;
-	overflow-x: auto;
-}
-
-.no-messages {
-    border: none;
-    margin-bottom: 0;
-}
-
-.no-messages h1 {
-    white-space: nowrap;
-}
-
-.contact-admin {
-    padding: 6px 15px;
-}
-
-pre.message-box {
-	white-space: pre-wrap;
-}
-
-.usermsg-time {
-	text-align: left;
-    border-bottom: solid 1px lightgray;
-    margin-bottom: 10px;
-}
-
-.close-button {
-    float: right;
+.panel-body {
+    border-bottom: 1px solid #d1d1d1;
+    padding: 26px 0 0 0;
+    background-color: #fff;
 }

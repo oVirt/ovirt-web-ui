@@ -1,6 +1,7 @@
 import Immutable from 'immutable'
 import {
   CLEAR_USER_MSGS,
+  DISMISS_USER_MSG,
   FAILED_EXTERNAL_ACTION,
   LOGIN_FAILED,
   SET_USERMSG_NOTIFIED,
@@ -53,7 +54,9 @@ const userMessages = actionReducer(initialState, {
   [SET_USERMSG_NOTIFIED] (state, { payload: { time } }) {
     return state.setIn(['records', state.get('records').findIndex(r => r.get('time') === time), 'notified'], true)
   },
-
+  [DISMISS_USER_MSG] (state, { payload: { time } }) {
+    return state.update('records', records => records.delete(state.get('records').findIndex(r => r.get('time') === time)))
+  },
 })
 
 export default userMessages

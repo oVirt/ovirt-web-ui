@@ -217,3 +217,11 @@ export function arrayToMap (array, keySelector) {
     return accum
   }, {})
 }
+
+export function getFormatedDateTime (timestamp) {
+  const t = new Date(timestamp)
+  return {
+    time: `${formatTwoDigits(t.getHours())}:${formatTwoDigits(t.getMinutes())}:${formatTwoDigits(t.getSeconds())}`,
+    date: `${t.getDate()}/${t.getMonth()}/${t.getFullYear()}`,
+  }
+}
