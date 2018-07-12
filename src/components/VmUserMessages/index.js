@@ -3,50 +3,35 @@ import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
 
+import { Notification, NotificationDrawer, MenuItem, Icon, Button } from 'patternfly-react'
+
 import style from './style.css'
 
-import Time from '../Time'
-
-import { clearUserMessages } from '../../actions/vm'
-import { hrefWithoutHistory } from '../../helpers'
+import { clearUserMessages, displayUserMessages, dismissUserMessage } from '../../actions'
+import { hrefWithoutHistory, getFormatedDateTime } from '../../helpers'
 import { msg } from '../../intl'
 
-const UserMessage = ({ record, id }) => {
-  // TODO: render record.type
-  return (
-    <li className={`list-group-item ${style.crop}`} title={record.message} data-toggle='tooltip'>
-      <span>
-        <pre className={style['message-box']} id={id}>
-          <Time time={record.time} cssClass={style['usermsg-time']} />
-          {record.message}
-        </pre>
-      </span>
-    </li>
-  )
+const UserMessage = ({ record, id, onDismissMessage }) => {
+  const time = getFormatedDateTime(record.get('time'))
+  return (<Notification seen>
+    <NotificationDrawer.Dropdown id={id}>
+      <MenuItem onClick={onDismissMessage}>
+        { msg.clear() }
+      </MenuItem>
+    </NotificationDrawer.Dropdown>
+    <Icon className='pull-left' type='pf' name='warning-triangle-o' />
+    <Notification.Content>
+      <Notification.Message>
+        {record.get('message')}
+      </Notification.Message>
+      <Notification.Info leftText={time.date} rightText={time.time} />
+    </Notification.Content>
+  </Notification>)
 }
 UserMessage.propTypes = {
   record: PropTypes.object.isRequired,
   id: PropTypes.string,
-}
-
-const ContactAdminInfo = ({ userMessages, id }) => {
-  if (userMessages.get('records').size === 0) {
-    return null
-  }
-
-  return (
-    <div className={style['contact-admin']} id={id}>
-      Contact your administrator in case of issues
-    </div>
-  )
-}
-ContactAdminInfo.propTypes = {
-  userMessages: PropTypes.object.isRequired,
-  id: PropTypes.string,
-}
-
-function spaceToNonbreakableSpace (text) {
-  return text.split(' ').join('\u00A0')
+  onDismissMessage: PropTypes.func.isRequired,
 }
 
 class VmUserMessages extends React.Component {
@@ -54,62 +39,58 @@ class VmUserMessages extends React.Component {
     super(props)
     this.state = {
       show: false,
+      expand: false,
     }
   }
 
   render () {
-    const { userMessages, onClearMessages } = this.props
+    const { userMessages, onClearMessages, onDisplayMessages, onDismissMessage } = this.props
 
     const idPrefix = `usermsgs`
-    const onToggle = () => {
-      this.setState({ show: !this.state.show })
+    const handleToggle = () => {
+      this.setState((prevState) => ({ show: !prevState.show }))
     }
 
-    let show = ''
-    if (this.state.show) {
-      show = 'show'
+    const handleExpand = () => {
+      this.setState((prevState) => ({ expanded: !prevState.expanded }))
     }
 
-    const messages = userMessages.get('records')
-    const messagesList = messages.size !== 0
-      ? (
-        <ul className={`list-group ${style['messages-list']}`}>
-          {messages.map(r => (<UserMessage key={r.time} record={r} id={`${idPrefix}-msg-${idCounter++}`} />))}
-        </ul>)
-      : (
-        <div className={`blank-slate-pf ${style['no-messages']}`}>
-          <div className='blank-slate-pf-icon'>
-            <span className='pficon pficon pficon-info' />
-          </div>
-          <h1>
-            {spaceToNonbreakableSpace(msg.noMessages())}
-          </h1>
-        </div>)
+    const filteredMessages = userMessages.get('records').filter((r) => r.get('show'))
+    const messagesList = filteredMessages.size ? filteredMessages.map(r => {
+      idCounter++
+      return <UserMessage key={`msg-${r.get('time')}`} record={r} id={`${idPrefix}-msg-${idCounter}-dropdown`} onDismissMessage={() => onDismissMessage(r.get('time'))} />
+    }) : <NotificationDrawer.EmptyState title={msg.noMessages()} />
 
     let idCounter = 0
-    const badgeElement = userMessages.get('records').size === 0
+    const badgeElement = filteredMessages.size === 0
       ? null
-      : <span className='badge' id={`${idPrefix}-size`}>{userMessages.get('records').size}</span>
+      : <span className='badge' id={`${idPrefix}-size`}>{filteredMessages.size}</span>
     return (
       <li className='dropdown'>
-        <a className='dropdown-toggle nav-item-iconic' href='#' title={msg.messages()} onClick={hrefWithoutHistory(onToggle)} id={`${idPrefix}-toggle`}>
+        <a className='dropdown-toggle nav-item-iconic' href='#' title={msg.messages()} onClick={hrefWithoutHistory(handleToggle)} id={`${idPrefix}-toggle`}>
           <i className='fa fa-bell' />
           {badgeElement}
           <span className='caret' id={`${idPrefix}-caret`} />
         </a>
-
-        <div className={`dropdown-menu dropdown-menu-right infotip bottom-right ${show}`}>
-          <div className={`arrow ${style['fix-arrow-position']}`} />
-
-          {messagesList}
-
-          <ContactAdminInfo userMessages={userMessages} id={`${idPrefix}-contact`} />
-
-          <div className='footer'>
-            <a href='#' onClick={hrefWithoutHistory(onClearMessages)} id={`${idPrefix}-clear`}>{msg.clearMessages()}</a>
-            <a href='#' onClick={hrefWithoutHistory(onToggle)} className={style['close-button']} id={`${idPrefix}-close`}>{msg.close()}</a>
-          </div>
-        </div>
+        <NotificationDrawer hide={!this.state.show} expanded={this.state.expanded}>
+          <NotificationDrawer.Title onCloseClick={handleToggle} onExpandClick={handleExpand} />
+          <NotificationDrawer.PanelBody className={style['panel-body']}>
+            {messagesList}
+            <NotificationDrawer.PanelAction>
+              <NotificationDrawer.PanelActionLink data-toggle='clear-all'>
+                <Button bsStyle='link' onClick={onClearMessages}>
+                  <Icon type='pf' name='close' />
+                  { msg.clearAll() }
+                </Button>
+              </NotificationDrawer.PanelActionLink>
+              <NotificationDrawer.PanelActionLink className='drawer-pf-action-link' data-toggle='mark-all-read'>
+                <Button bsStyle='link' onClick={onDisplayMessages}>
+                  { msg.displayAll() }
+                </Button>
+              </NotificationDrawer.PanelActionLink>
+            </NotificationDrawer.PanelAction>
+          </NotificationDrawer.PanelBody>
+        </NotificationDrawer>
       </li>
     )
   }
@@ -117,6 +98,8 @@ class VmUserMessages extends React.Component {
 VmUserMessages.propTypes = {
   userMessages: PropTypes.object.isRequired,
   onClearMessages: PropTypes.func.isRequired,
+  onDisplayMessages: PropTypes.func.isRequired,
+  onDismissMessage: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -125,5 +108,7 @@ export default connect(
   }),
   (dispatch) => ({
     onClearMessages: () => dispatch(clearUserMessages()),
+    onDisplayMessages: () => dispatch(displayUserMessages()),
+    onDismissMessage: (time) => dispatch(dismissUserMessage({ time })),
   })
 )(VmUserMessages)

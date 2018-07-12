@@ -1,6 +1,5 @@
 import {
   ADD_VM_NIC,
-  CLEAR_USER_MSGS,
   DELETE_VM_NIC,
   DOWNLOAD_CONSOLE_VM,
   GET_RDP_VM,
@@ -174,13 +173,6 @@ export function logout () {
     type: LOGOUT,
     payload: {
     },
-  }
-}
-
-export function clearUserMessages () {
-  return {
-    type: CLEAR_USER_MSGS,
-    payload: {},
   }
 }
 

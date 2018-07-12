@@ -1,6 +1,8 @@
 import Immutable from 'immutable'
 import {
   CLEAR_USER_MSGS,
+  DISMISS_USER_MSG,
+  DISPLAY_USER_MSGS,
   FAILED_EXTERNAL_ACTION,
   LOGIN_FAILED,
 } from '../constants'
@@ -10,12 +12,13 @@ function addLogEntry ({ state, message, type = 'ERROR', failedAction }) {
   // TODO: use seq
   return state
     .set('unread', true)
-    .update('records', records => records.push({
+    .update('records', records => records.push(Immutable.fromJS({
       message,
       type,
       failedAction,
       time: Date.now(),
-    }))
+      show: true,
+    })))
 }
 
 /**
@@ -46,7 +49,13 @@ const userMessages = actionReducer(initialState, {
     return addLogEntry({ state, message: message, type: errorCode })
   },
   [CLEAR_USER_MSGS] (state) {
-    return state.set('unread', false).update('records', records => records.clear())
+    return state.set('unread', false).update('records', records => records.map(r => r.set('show', false)))
+  },
+  [DISMISS_USER_MSG] (state, { payload: { time } }) {
+    return state.setIn(['records', state.get('records').findIndex(r => r.get('time') === time), 'show'], false)
+  },
+  [DISPLAY_USER_MSGS] (state) {
+    return state.update('records', records => records.map(r => r.set('show', true)))
   },
 })
 
