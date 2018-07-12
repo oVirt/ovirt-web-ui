@@ -85,6 +85,18 @@
   font-size: 90%;
 }
 
+/* Snapshots Card */
+.snapshot-item-view {
+
+}
+.snapshot-item-edit {
+
+}
+.snapshot-create {
+
+}
+
+
 /* TODO: Temporary style for filler text. Remove once it isn't needed. */
 .demo-text {
   padding: 5px;
