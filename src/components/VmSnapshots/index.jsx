@@ -7,7 +7,6 @@ import DeleteConfirmationModal from '../VmModals/DeleteConfirmationModal'
 import { msg } from '../../intl'
 import { isRunning } from '../utils'
 import FieldHelp from '../FieldHelp'
-import naturalCompare from 'string-natural-compare'
 import { PendingTaskTypes } from '../../reducers/pendingTasks'
 
 import VmDetailRow, { ExpandableList } from '../VmDetailRow'
@@ -141,8 +140,20 @@ const VmSnapshotConnected = connect(
   (dispatch) => ({})
 )(VmSnapshot)
 
+function sortSnaphots (a, b) {
+  const isAActive = a.get('type') === 'active'
+  const isBActive = b.get('type') === 'active'
+  if ((isAActive && isBActive) || (!isAActive && !isBActive)) {
+    return b.get('date') - a.get('date')
+  }
+  if (isAActive) {
+    return -1
+  }
+  return 1
+}
+
 const VmSnapshots = function ({ vm, snapshots, onSnapshotAdd, enableSettings, onSnapshotDelete, onSnapshotRestore }) {
-  let renderedSnapshots = snapshots.sort((a, b) => naturalCompare.caseInsensitive(a.get('description'), b.get('description'))).map(snapshot => (
+  let renderedSnapshots = snapshots.sort(sortSnaphots).map(snapshot => (
     <VmSnapshotConnected isUp={isRunning(vm.get('status'))} snapshot={snapshot} key={snapshot.get('id')} onDelete={onSnapshotDelete} onRestore={onSnapshotRestore} />
   )).toJS()
 
