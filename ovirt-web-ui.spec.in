@@ -57,6 +57,8 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Mon Jul 16 2018 Marek Libra <mlibra@redhat.com> - 1.4.0-2
+
 * Mon Jun 25 2018 Marek Libra <mlibra@redhat.com> - 1.4.0
 - A lot of UI fixes
 
