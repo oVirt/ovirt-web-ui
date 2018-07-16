@@ -60,6 +60,7 @@ class VmSnapshot extends React.Component {
     let { snapshot, showSettings, beingDeleted, isUp } = this.props
     const idPrefix = `vmsnapshot-${snapshot.get('id')}`
     const description = snapshot.get('description')
+    const isActive = snapshot.get('type') === 'active'
     const snapshotInfoContent = (
       <div id={`${idPrefix}-snapshot-info`}>
         {description}
@@ -98,14 +99,14 @@ class VmSnapshot extends React.Component {
           </span>
           {snapshotMemoryInfo}
           {
-            !isUp
+            !isUp && !isActive
               ? (<Button bsStyle='default' bsSize='small' onClick={this.handleOpenRestoreDialog} style={{ marginRight: '5px' }}>
                 {msg.restore()}
               </Button>)
               : null
           }
           {
-            showSettings
+            showSettings && !isActive
               ? (<Button bsStyle='default' bsSize='small' onClick={this.handleOpenDeleteDialog}>
                 {msg.delete()}
               </Button>)
