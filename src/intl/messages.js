@@ -245,6 +245,7 @@ export const messages = {
     message: 'Restore',
     description: 'Restore snapshot',
   },
+  confirmRestore: 'Confirm restore',
   ok: 'OK',
   createNewDisk: 'Create New Disk',
   diskSizeHasToBeAPositiveInteger: 'Disk size has to be a positive integer.',
