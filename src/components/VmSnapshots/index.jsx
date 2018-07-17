@@ -11,6 +11,7 @@ import { PendingTaskTypes } from '../../reducers/pendingTasks'
 
 import VmDetailRow, { ExpandableList } from '../VmDetailRow'
 import NewSnapshotModal from './NewSnapshotModal'
+import RestoreConfirmationModal from './RestoreConfirmationModal'
 import style from './style.css'
 
 const MAX_DESCRIPTION_LENGTH = 100
@@ -116,10 +117,7 @@ class VmSnapshot extends React.Component {
             <p dangerouslySetInnerHTML={{ __html: msg.areYouSureYouWantToDeleteSnapshot({ snapshotName: `"<strong>${getMinimazedString(description, MAX_DESCRIPTION_LENGTH)}</strong>"` }) }} />
             <p>{msg.thisOperationCantBeUndone()}</p>
           </DeleteConfirmationModal>
-          <DeleteConfirmationModal show={this.state.showRestoreModal} onDelete={this.handleRestore} onClose={this.handleClose}>
-            <p dangerouslySetInnerHTML={{ __html: msg.areYouSureYouWantToRestoreSnapshot({ snapshotName: `"<strong>${getMinimazedString(description, MAX_DESCRIPTION_LENGTH)}</strong>"` }) }} />
-            <p>{msg.thisOperationCantBeUndone()}</p>
-          </DeleteConfirmationModal>
+          <RestoreConfirmationModal show={this.state.showRestoreModal} onRestore={this.handleRestore} onClose={this.handleClose} description={getMinimazedString(description, MAX_DESCRIPTION_LENGTH)} />
         </span>
       </li>
     )
