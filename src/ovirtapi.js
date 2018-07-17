@@ -339,6 +339,8 @@ OvirtApi = {
     return {
       id: snapshot.id,
       description: snapshot.description,
+      type: snapshot.snapshot_type,
+      date: snapshot.date,
       persistMemoryState: snapshot.persist_memorystate === 'true',
     }
   },

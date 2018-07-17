@@ -17,7 +17,7 @@ function* addVmSnapshot (action) {
 function* deleteVmSnapshot (action) {
   const snapshotId = action.payload.snapshotId
   const vmId = action.payload.vmId
-  const result = yield callExternalAction('deleteVmSnapshot', Api.deleteVmSnapshot, { payload: { snapshotId, vmId } })
+  const result = yield callExternalAction('deleteVmSnapshot', Api.deleteSnapshot, { payload: { snapshotId, vmId } })
   if (result.error) {
     return
   }
