@@ -57,6 +57,43 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Mon Jul 16 2018 Marek Libra <mlibra@redhat.com> - 1.4.0-3
+Fixed issues:
+- web-ui about windows7 display？ [#644](https://github.com/oVirt/ovirt-web-ui/issues/644)
+- Refactor About and Options dialogs [#617](https://github.com/oVirt/ovirt-web-ui/issues/617)
+- No confirmation after `Esc` [#613](https://github.com/oVirt/ovirt-web-ui/issues/613)
+- filter os entries by cluster [#608](https://github.com/oVirt/ovirt-web-ui/issues/608)
+- fix os sorting [#607](https://github.com/oVirt/ovirt-web-ui/issues/607)
+- If yarn.lock gets fully regenerated, flow will break with a bad configuration [#602](https://github.com/oVirt/ovirt-web-ui/issues/602)
+- Messages option text "No messages" not proper. [#594](https://github.com/oVirt/ovirt-web-ui/issues/594)
+- VM Portal does not auto refresh [#593](https://github.com/oVirt/ovirt-web-ui/issues/593)
+- Edit VM 'Close' without saving fails [#592](https://github.com/oVirt/ovirt-web-ui/issues/592)
+- Safari browser [#590](https://github.com/oVirt/ovirt-web-ui/issues/590)
+- After reload Edit VM page, page become empty [#574](https://github.com/oVirt/ovirt-web-ui/issues/574)
+- VM Snapshot management [#573](https://github.com/oVirt/ovirt-web-ui/issues/573)
+- first click on vNIC profile select box item doesn't change the selected value [#571](https://github.com/oVirt/ovirt-web-ui/issues/571)
+- NIC hot unplug not work [#569](https://github.com/oVirt/ovirt-web-ui/issues/569)
+- Pending changes tooltip overflow [#568](https://github.com/oVirt/ovirt-web-ui/issues/568)
+- After click on 'Set default Icon' every additional data of VM is disappearing  [#567](https://github.com/oVirt/ovirt-web-ui/issues/567)
+- no way to boot from a network if the VM has no disk [#565](https://github.com/oVirt/ovirt-web-ui/issues/565)
+- Redirect to main page after F5 on VM Detail page [#563](https://github.com/oVirt/ovirt-web-ui/issues/563)
+- InfiniteScroller console warning about unique key [#562](https://github.com/oVirt/ovirt-web-ui/issues/562)
+- Upgrade npm dependencies [#558](https://github.com/oVirt/ovirt-web-ui/issues/558)
+- disable Boot menu switch in edit dialog when VM is running [#549](https://github.com/oVirt/ovirt-web-ui/issues/549)
+- add option to force shutdown a VM [#522](https://github.com/oVirt/ovirt-web-ui/issues/522)
+- Suspend button not disabled for pooled VMs [#462](https://github.com/oVirt/ovirt-web-ui/issues/462)
+- 16 users limit in vm pool [#456](https://github.com/oVirt/ovirt-web-ui/issues/456)
+- Toobar overlaps tooltip [#452](https://github.com/oVirt/ovirt-web-ui/issues/452)
+- Top line of tooltip not visible [#434](https://github.com/oVirt/ovirt-web-ui/issues/434)
+- Popup descriptions hidden in edit page [#422](https://github.com/oVirt/ovirt-web-ui/issues/422)
+- no cake as VM icon [#415](https://github.com/oVirt/ovirt-web-ui/issues/415)
+- Error message partially overlapped [#395](https://github.com/oVirt/ovirt-web-ui/issues/395)
+- New VM name validation & requirements [#382](https://github.com/oVirt/ovirt-web-ui/issues/382)
+- Move icon editing from VM detail page to VM edit page [#356](https://github.com/oVirt/ovirt-web-ui/issues/356)
+- Remove small icon from edit page [#355](https://github.com/oVirt/ovirt-web-ui/issues/355)
+- mobile: status and truncated description in VM grid is not clickable for mobile device [#344](https://github.com/oVirt/ovirt-web-ui/issues/344)
+- and other changes not tracked via issues (see github for full list of merged PRs)
+
 * Mon Jul 16 2018 Marek Libra <mlibra@redhat.com> - 1.4.0-2
 
 * Mon Jun 25 2018 Marek Libra <mlibra@redhat.com> - 1.4.0
