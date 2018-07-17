@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Modal } from 'patternfly-react'
+import ConfirmationModal from './ConfirmationModal'
 
 import { downloadConsole, checkConsoleInUse, setConsoleInUse } from '../../actions/index'
 
@@ -15,10 +15,13 @@ class ConsoleConfirmationModal extends React.Component {
     this.onConsoleDownload = this.onConsoleDownload.bind(this)
   }
 
-  componentWillReceiveProps (newProps) {
+  componentWillUpdate (newProps) {
     if (newProps.show && !this.checkConsoleInUseSended) {
       this.checkConsoleInUseSended = true
-      this.props.onCheckConsoleSessionInUse({ usbFilter: newProps.config.get('usbFilter'), userId: newProps.config.getIn(['user', 'id']) })
+      this.props.onCheckConsoleSessionInUse({ usbFilter: this.props.config.get('usbFilter'), userId: this.props.config.getIn(['user', 'id']) })
+    }
+    if (newProps.show && newProps.consoles.getIn(['vms', newProps.vm.get('id'), 'consoleInUse']) === false) {
+      this.onConsoleConfirmationClose()
     }
   }
 
@@ -33,46 +36,34 @@ class ConsoleConfirmationModal extends React.Component {
   }
 
   render () {
-    let {
+    const {
       vm,
-      onClose,
+      consoles,
       show,
     } = this.props
 
-    if (!vm.get('consoleInUse')) {
+    if (!show || !consoles.getIn(['vms', vm.get('id'), 'consoleInUse'])) {
       return null
     }
 
     return (
-      <Modal onHide={onClose} show={show}>
-        <Modal.Header>
-          <button
-            className='close'
-            onClick={onClose}
-          >
-            <span className='pficon pficon-close' title='Close' />
-          </button>
-          <Modal.Title>{ msg.console() }</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>{ msg.consoleInUseContinue() }</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <button className='btn btn-default' onClick={this.onConsoleConfirmationClose}>{msg.cancel()}</button>
-          <button className='btn btn-info' onClick={() => { this.onConsoleDownload(); onClose() }}>{msg.yes()}</button>
-        </Modal.Footer>
-      </Modal>
+      <ConfirmationModal
+        onClose={this.onConsoleConfirmationClose}
+        show={show}
+        title={msg.console()}
+        body={msg.consoleInUseContinue()}
+        confirm={{ title: msg.yes(), onClick: this.onConsoleDownload }}
+      />
     )
   }
 }
 
 ConsoleConfirmationModal.propTypes = {
   vm: PropTypes.object.isRequired,
+  consoles: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
-  usbFilter: PropTypes.string.isRequired, // eslint-disable-line react/no-unused-prop-types
   show: PropTypes.bool,
   consoleId: PropTypes.string, // eslint-disable-line react/no-unused-prop-types
-  userId: PropTypes.string, // eslint-disable-line react/no-unused-prop-types
   onDownloadConsole: PropTypes.func.isRequired,
   onConsoleSessionConfirmaClose: PropTypes.func.isRequired,
   onCheckConsoleSessionInUse: PropTypes.func.isRequired,
@@ -82,10 +73,11 @@ ConsoleConfirmationModal.propTypes = {
 export default connect(
   (state) => ({
     config: state.config,
+    consoles: state.consoles,
   }),
   (dispatch, { vm, consoleId }) => ({
     onCheckConsoleSessionInUse: ({ usbFilter, userId }) => dispatch(checkConsoleInUse({ vmId: vm.get('id'), usbFilter, userId })),
-    onConsoleSessionConfirmaClose: () => dispatch(setConsoleInUse({ vmId: vm.get('id'), consoleInUse: false })),
+    onConsoleSessionConfirmaClose: () => dispatch(setConsoleInUse({ vmId: vm.get('id'), consoleInUse: null })),
     onDownloadConsole: ({ usbFilter }) => dispatch(downloadConsole({ vmId: vm.get('id'), usbFilter, consoleId })),
   })
 )(ConsoleConfirmationModal)

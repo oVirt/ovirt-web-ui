@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import Button from './Button'
-import { getOnlyComponentProps } from '../utils'
+import { excludeKeys } from 'patternfly-react'
 
 class Action extends React.Component {
   constructor (props) {
@@ -43,17 +43,13 @@ Action.propTypes = {
 export default Action
 
 const ActionButtonWraper = (props) => {
-  const btnProps = getOnlyComponentProps(props, Button)
+  const btnProps = excludeKeys(props, [ 'confirmation' ])
   return <Action confirmation={props.confirmation} key={props.shortTitle}><Button {...btnProps} /></Action>
 }
 
 ActionButtonWraper.propTypes = {
-  actionDisabled: PropTypes.bool,
-  shortTitle: PropTypes.string.isRequired,
-  tooltip: PropTypes.string,
-  className: PropTypes.string.isRequired,
-  id: PropTypes.string.isRequired,
   confirmation: PropTypes.node,
+  ...Button.propTypes,
 }
 
 export { ActionButtonWraper }

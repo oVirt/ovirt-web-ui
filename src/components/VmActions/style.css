@@ -47,3 +47,7 @@
     height: 27px;
     margin-top: 5px !important;
 }
+
+.action-height button {
+    height: 27px;
+}

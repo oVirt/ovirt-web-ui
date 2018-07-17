@@ -37,17 +37,3 @@ export function isRunning (status: string): boolean {
   console.log('---------- status: ', status)
   return ['wait_for_launch', 'up', 'powering_up', 'powering_down', 'migrating', 'paused'].includes(status)
 }
-
-export function getOnlyComponentProps (props: Object, Component: Object): Object {
-  const componentPropTypes = Component.propTypes
-
-  const parentProps = {}
-
-  Object.entries(props).forEach(([propName, propValue]) => {
-    if (componentPropTypes[propName]) {
-      parentProps[propName] = propValue
-    }
-  })
-
-  return parentProps
-}

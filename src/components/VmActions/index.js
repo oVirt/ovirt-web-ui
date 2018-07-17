@@ -47,23 +47,24 @@ EmptyAction.propTypes = {
 
 class VmDropdownActions extends React.Component {
   render () {
-    let { actions, id } = this.props
-    if (actions.length === 0) {
+    const { actions, id } = this.props
+    let actionsCopy = [...actions]
+    if (actionsCopy.length === 0) {
       return null
     }
-    if (actions.length === 1) {
-      actions[0].className = 'btn btn-default'
-      return <ActionButtonWraper {...actions[0]} />
+    if (actionsCopy.length === 1) {
+      actionsCopy[0].className = 'btn btn-default'
+      return <ActionButtonWraper {...actionsCopy[0]} />
     }
     return (
-      <Action confirmation={actions[0].confirmation}>
+      <Action confirmation={actionsCopy[0].confirmation}>
         <SplitButton
           bsStyle='default'
-          title={actions[0].shortTitle}
-          onClick={actions[0].onClick}
+          title={actionsCopy[0].shortTitle}
+          onClick={actionsCopy[0].onClick}
           id={id}
         >
-          { actions.slice(1).map(action => <Action key={action.shortTitle} confirmation={action.confirmation}>
+          { actionsCopy.slice(1).map(action => <Action key={action.shortTitle} confirmation={action.confirmation}>
             <MenuItem onClick={action.onClick}>
               {action.shortTitle}
             </MenuItem>
@@ -205,7 +206,6 @@ class VmActions extends React.Component {
     if (isOnCard) {
       let filteredActions = actions.filter((action) => !action.actionDisabled).sort((a, b) => a.priority < b.priority ? 1 : 0)
       filteredActions = filteredActions.length === 0 ? [ actions[0] ] : filteredActions
-      console.log(filteredActions)
       return <div className={`actions-line card-pf-items text-center ${style['action-height']}`}><VmDropdownActions id={`${idPrefix}-actions`} actions={filteredActions} /></div>
     }
 
