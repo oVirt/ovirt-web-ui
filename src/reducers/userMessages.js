@@ -3,6 +3,7 @@ import {
   CLEAR_USER_MSGS,
   FAILED_EXTERNAL_ACTION,
   LOGIN_FAILED,
+  SET_NOTIFIED,
 } from '../constants'
 import { actionReducer } from './utils'
 
@@ -10,12 +11,13 @@ function addLogEntry ({ state, message, type = 'ERROR', failedAction }) {
   // TODO: use seq
   return state
     .set('unread', true)
-    .update('records', records => records.push({
+    .update('records', records => records.push(Immutable.fromJS({
       message,
       type,
       failedAction,
       time: Date.now(),
-    }))
+      notified: false,
+    })))
 }
 
 /**
@@ -48,6 +50,10 @@ const userMessages = actionReducer(initialState, {
   [CLEAR_USER_MSGS] (state) {
     return state.set('unread', false).update('records', records => records.clear())
   },
+  [SET_NOTIFIED] (state, { payload: { time } }) {
+    return state.setIn(['records', state.get('records').findIndex(r => r.get('time') === time), 'notified'], true)
+  },
+
 })
 
 export default userMessages

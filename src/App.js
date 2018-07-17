@@ -11,6 +11,7 @@ import OvirtApiCheckFailed from './components/OvirtApiCheckFailed'
 import TokenExpired from './components/TokenExpired'
 import VerticalMenu from './components/VerticalMenu'
 import VmsPageHeader from './components/VmsPageHeader'
+import ToastNotifications from './components/ToastNotifications'
 
 import { getRoutes, getMenu } from './routes'
 import AppConfiguration from './config'
@@ -58,6 +59,7 @@ const App = ({ history, vms, config, appReady }) => {
         <LoadingData />
         <OvirtApiCheckFailed />
         <TokenExpired />
+        <ToastNotifications />
       </React.Fragment>
     </ConnectedRouter>
   )

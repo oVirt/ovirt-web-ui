@@ -77,3 +77,7 @@
 .dropdown li {
     cursor: pointer;
 }
+
+.toast-margin-top {
+    margin-top: 0;
+}
