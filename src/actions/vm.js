@@ -16,6 +16,7 @@ import {
   RESTART_VM,
   SET_CHANGED,
   SET_DOMAIN,
+  SET_NOTIFIED,
   SET_OVIRT_API_VERSION,
   SET_VM_CDROM,
   SET_VM_CONSOLES,
@@ -181,6 +182,15 @@ export function clearUserMessages () {
   return {
     type: CLEAR_USER_MSGS,
     payload: {},
+  }
+}
+
+export function setNotificationNotified ({ time }) {
+  return {
+    type: SET_NOTIFIED,
+    payload: {
+      time,
+    },
   }
 }
 

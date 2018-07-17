@@ -35,11 +35,12 @@ class ConsoleConfirmationModal extends React.Component {
   render () {
     let {
       vm,
+      consoles,
       onClose,
       show,
     } = this.props
 
-    if (!vm.get('consoleInUse')) {
+    if (!consoles.getIn(['vms', vm.get('id'), 'consoleInUse'])) {
       return null
     }
 
@@ -68,11 +69,10 @@ class ConsoleConfirmationModal extends React.Component {
 
 ConsoleConfirmationModal.propTypes = {
   vm: PropTypes.object.isRequired,
+  consoles: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
-  usbFilter: PropTypes.string.isRequired, // eslint-disable-line react/no-unused-prop-types
   show: PropTypes.bool,
   consoleId: PropTypes.string, // eslint-disable-line react/no-unused-prop-types
-  userId: PropTypes.string, // eslint-disable-line react/no-unused-prop-types
   onDownloadConsole: PropTypes.func.isRequired,
   onConsoleSessionConfirmaClose: PropTypes.func.isRequired,
   onCheckConsoleSessionInUse: PropTypes.func.isRequired,
@@ -82,6 +82,7 @@ ConsoleConfirmationModal.propTypes = {
 export default connect(
   (state) => ({
     config: state.config,
+    consoles: state.consoles,
   }),
   (dispatch, { vm, consoleId }) => ({
     onCheckConsoleSessionInUse: ({ usbFilter, userId }) => dispatch(checkConsoleInUse({ vmId: vm.get('id'), usbFilter, userId })),

@@ -205,7 +205,6 @@ class VmActions extends React.Component {
     if (isOnCard) {
       let filteredActions = actions.filter((action) => !action.actionDisabled).sort((a, b) => a.priority < b.priority ? 1 : 0)
       filteredActions = filteredActions.length === 0 ? [ actions[0] ] : filteredActions
-      console.log(filteredActions)
       return <div className={`actions-line card-pf-items text-center ${style['action-height']}`}><VmDropdownActions id={`${idPrefix}-actions`} actions={filteredActions} /></div>
     }
 

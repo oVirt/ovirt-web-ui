@@ -1,13 +1,11 @@
 import Immutable from 'immutable'
 import { SET_CONSOLE_IN_USE } from '../constants'
+import { actionReducer } from './utils'
 
-export function reducer (state, action) {
-  state = state || Immutable.fromJS({ vms: {} })
+const consoles = actionReducer(Immutable.fromJS({ vms: {} }), {
+  [SET_CONSOLE_IN_USE] (state, { payload: { vmId, consoleInUse } }) {
+    return state.setIn(['vms', vmId, 'consoleInUse'], consoleInUse)
+  },
+})
 
-  switch (action.type) {
-    case SET_CONSOLE_IN_USE:
-      return state.setIn(['vms', action.payload.vmId, 'consoleInUse'], action.payload.consoleInUse)
-    default:
-      return state
-  }
-}
+export default consoles
