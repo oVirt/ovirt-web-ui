@@ -57,11 +57,15 @@ function setupCompiler(port, protocol) {
     var hasErrors = stats.hasErrors();
     var hasWarnings = stats.hasWarnings();
     if (!hasErrors && !hasWarnings) {
-      console.log(chalk.green('Compiled successfully!'));
+      const userInfo = JSON.parse(env['window.userInfo'])
+      console.log(chalk`{green Compiled successfully!}`);
+      console.log();
+      console.log(chalk`oVirt user: {yellow ${userInfo.userName}}, oVirt userId: {yellow ${userInfo.userId}}`);
+      console.log(chalk`oVirt SSO token: {yellow ${userInfo.ssoToken}}`)
       console.log();
       console.log('The app is running at:');
       console.log();
-      console.log('  ' + chalk.cyan(protocol + '://localhost:' + port + '/'));
+      console.log(chalk`  {cyan ${protocol}://localhost:${port}/}`);
       console.log();
       return;
     }
@@ -79,7 +83,7 @@ function setupCompiler(port, protocol) {
       'Warning in ' + formatMessage(message)
     );
     if (hasErrors) {
-      console.log(chalk.red('Failed to compile.'));
+      console.log(chalk`{red Failed to compile.}`);
       console.log();
       if (formattedErrors.some(isLikelyASyntaxError)) {
         // If there are any syntax errors, show just them.
@@ -95,7 +99,7 @@ function setupCompiler(port, protocol) {
       return;
     }
     if (hasWarnings) {
-      console.log(chalk.yellow('Compiled with warnings.'));
+      console.log(chalk`{yellow Compiled with warnings.`);
       console.log();
       formattedWarnings.forEach(message => {
         console.log(message);
@@ -103,8 +107,8 @@ function setupCompiler(port, protocol) {
       });
       // Teach some ESLint tricks.
       console.log('You may use special comments to disable some warnings.');
-      console.log('Use ' + chalk.yellow('// eslint-disable-next-line') + ' to ignore the next line.');
-      console.log('Use ' + chalk.yellow('/* eslint-disable */') + ' to ignore all warnings in a file.');
+      console.log(chalk`Use {yellow // eslint-disable-next-line} to ignore the next line.`);
+      console.log(chalk`Use {yellow /* eslint-disable */} to ignore all warnings in a file.`);
     }
   });
 }
@@ -141,12 +145,10 @@ function onProxyError(proxy) {
   return function(err, req, res){
     var host = req.headers && req.headers.host;
     console.log(
-      chalk.red('Proxy error:') + ' Could not proxy request ' + chalk.cyan(req.url) +
-      ' from ' + chalk.cyan(host) + ' to ' + chalk.cyan(proxy) + '.'
+      chalk`{red Proxy error:} Could not proxy request {cyan ${req.url}} from {cyan ${host}} to {cyan ${proxy}}.`
     );
     console.log(
-      'See https://nodejs.org/api/errors.html#errors_common_system_errors for more information (' +
-      chalk.cyan(err.code) + ').'
+      chalk`See https://nodejs.org/api/errors.html#errors_common_system_errors for more information ({cyan ${err.code}}).`
     );
     console.log();
 
@@ -167,9 +169,9 @@ function addMiddleware(devServer) {
   var proxy = process.env.ENGINE_URL || require(paths.appPackageJson).proxy;
   if (proxy) {
     if (typeof proxy !== 'string') {
-      console.log(chalk.red('When specified, "proxy" in package.json must be a string.'));
-      console.log(chalk.red('Instead, the type of "proxy" was "' + typeof proxy + '".'));
-      console.log(chalk.red('Either remove "proxy" from package.json, or make it a string.'));
+      console.log(chalk`{red When specified, "proxy" in package.json must be a string.}`);
+      console.log(chalk`{red Instead, the type of "proxy" was "${typeof proxy}".}`);
+      console.log(chalk`{red Either remove "proxy" from package.json, or make it a string.}`);
       process.exit(1);
     }
 
@@ -257,7 +259,7 @@ function runDevServer(port, protocol) {
     }
 
     clearConsole();
-    console.log(chalk.cyan('Starting server...'));
+    console.log(chalk`{cyan Starting server...}`);
     console.log();
     openBrowser(port, protocol);
   });
@@ -285,8 +287,8 @@ detect(DEFAULT_PORT).then(port => {
 
   clearConsole();
   var question =
-    chalk.yellow('Something is already running on port ' + DEFAULT_PORT + '.') +
-    '\n\nWould you like to run the app on another port instead?';
+    chalk`{yellow Something is already running on port ${DEFAULT_PORT}.}
+          \n\nWould you like to run the app on another port instead?`;
 
   prompt(question, true).then(shouldChangePort => {
     if (shouldChangePort) {
@@ -313,7 +315,7 @@ function getUserInfo (protocol, port) {
    * engine_URL - is oVirt engine URL.
    *
    * If userId will be null, then feature `Options` and SSH Public Key will
-   * be disabled and hidden. 
+   * be disabled and hidden.
    * @type {String}
    */
   var username = readlineSync.question(`oVirt user (${DEFAULT_USER}): `, {
@@ -345,7 +347,7 @@ function getUserInfo (protocol, port) {
       if (body.access_token) {
         const apiRootUrl = `${engineUrl}/api/`
         request(apiRootUrl,
-                { json: true, strictSSL: false, headers: { Authorization: `Bearer ${body.access_token}` } }, 
+                { json: true, strictSSL: false, headers: { Authorization: `Bearer ${body.access_token}` } },
                 (apiRootError, apiRootResponse, apiRootBody) => {
                   let userId = undefined
 
