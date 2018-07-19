@@ -2,7 +2,6 @@ import Api from 'ovirtapi'
 import { persistStateToLocalStorage } from './storage'
 import Selectors from './selectors'
 import AppConfiguration from './config'
-import { flatMap } from './utils'
 
 import vmDisksSagas from './components/VmDisks/sagas'
 import newDiskDialogSagas from './components/NewDiskDialog/sagas'
@@ -144,7 +143,7 @@ function* persistStateSaga () {
 }
 
 function* fetchUnknownIconsForVms ({ vms, os }) {
-  // unique iconIds from all vms or os (if available)
+  // unique iconIds from all VMs or OS (if available)
   const iconsIds = new Set()
   if (vms) {
     vms.map(vm => vm.icons.large.id).forEach(id => iconsIds.add(id))
@@ -232,7 +231,7 @@ function* fetchVmsByPageV42 (action) {
     ? []
     : ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics']
 
-  // TODO: paging: split this call to a loop per up to 25 vms
+  // TODO: paging: split this call to a loop per up to 25 VMs
   const allVms = yield callExternalAction('getVmsByPage', Api.getVmsByPage, action)
   if (allVms && allVms['vm']) { // array
     const internalVms = allVms.vm.map(vm => Api.vmToInternal({ vm, getSubResources: true }))
@@ -600,13 +599,18 @@ function* fetchAllAttachedStorageDomains (action) {
 
   // getting data centers is necessary to get storage domains with statuses
   // so why not to store them when we have them fresh
-  const dataCentersInternal = dataCentersApi.data_center.map(Api.dataCenterToInternal)
+  const dataCentersInternal = dataCentersApi.data_center.map(dataCenter => Api.dataCenterToInternal({ dataCenter }))
   yield put(setDataCenters(dataCentersInternal))
 
-  const storageDomainsApi = flatMap(
-    dataCentersApi.data_center,
-    dataCenterApi => (dataCenterApi.storage_domains && dataCenterApi.storage_domains.storage_domain) || [])
-  const storageDomainsInternal = storageDomainsApi.map(Api.storageDomainToInternal)
+  // collect and convert all from dataCentersApi.data_center[*].storage_domains.storage_domain[*]
+  const storageDomainsInternal = []
+  for (const dataCenter of dataCentersApi.data_center) {
+    const storageDomains = dataCenter.storage_domains && dataCenter.storage_domains.storage_domain
+    if (storageDomains) {
+      storageDomainsInternal.push(
+        ...storageDomains.map(storageDomain => Api.storageDomainToInternal({ storageDomain })))
+    }
+  }
   const storageDomainsMerged = mergeStorageDomains(storageDomainsInternal)
   yield put(setStorageDomains(storageDomainsMerged))
 }
@@ -699,9 +703,12 @@ function* fetchISOStorages (action) {
   // this could fetch just ISO storage domain types
   const storages = yield callExternalAction('getStorages', Api.getStorages, action)
   if (storages && storages['storage_domain']) {
-    const storagesInternal = storages.storage_domain.map(storage => Api.storageToInternal({ storage })).filter(v => v.type === 'iso')
-    yield put(addStorageDomains(storagesInternal))
-    const isoFilesFetches = storagesInternal.map(storageDomain => fetchAllFilesForISO(storageDomain.id))
+    const isoStorageDomains = storages.storage_domain
+      .filter(storageDomain => storageDomain.type === 'iso')
+      .map(storageDomain => Api.storageDomainToInternal({ storageDomain }))
+    yield put(addStorageDomains(isoStorageDomains))
+
+    const isoFilesFetches = isoStorageDomains.map(isoStorageDomain => fetchAllFilesForISO(isoStorageDomain.id))
     yield all(isoFilesFetches)
   }
 }
