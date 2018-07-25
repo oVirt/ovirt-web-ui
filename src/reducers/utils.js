@@ -1,6 +1,6 @@
 import { Map } from 'immutable'
 import { logDebug } from '../helpers'
-import { UPDATE_ICONS } from '../constants'
+import { UPDATE_ICONS, REMOVE_ACTIVE_REQUEST, DELAYED_REMOVE_ACTIVE_REQUEST, ADD_ACTIVE_REQUEST } from '../constants'
 
 /**
  * Takes initial state of the reducer and a map of action handlers and returns a redux-compatible reducer.
@@ -44,7 +44,9 @@ export const actionReducer = (initialState, handlers, verbose) => (state = initi
       }
     }
 
-    logDebug('Reducing action:', actionJson)
+    if (![ ADD_ACTIVE_REQUEST, REMOVE_ACTIVE_REQUEST, DELAYED_REMOVE_ACTIVE_REQUEST ].includes(action.type)) {
+      logDebug('Reducing action:', actionJson)
+    }
   }
 
   if (action.type in handlers) {
