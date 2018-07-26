@@ -1,0 +1,45 @@
+.utilization-card-container > :global(.card-pf-body) {
+  margin-left: -20px;
+  margin-right: -20px;
+  padding-bottom: 0;
+}
+
+.utilization-card-container .grid {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.utilization-card-container :global(.card-pf-utilization) {
+  box-shadow: none;
+  margin-bottom: 0;
+
+  min-height: fit-content;
+  display: flex;
+  flex-direction: column;
+}
+
+.no-data-card-body {
+  flex-grow: 1;
+  padding: 0 10px;
+  margin-bottom: 20px;
+
+  background-color: rgba(0, 0, 0, 0.03);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-data-card-body .no-data-icon {
+  font-size: 32pt;
+  color: #9b9b9b;
+}
+
+.no-data-card-body .no-data-title {
+  font-size: 150%;
+}
+
+.no-data-card-body .no-data-message {
+  text-align: center;
+}

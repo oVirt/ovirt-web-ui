@@ -72,7 +72,7 @@ class BaseCard extends React.Component {
             <CardEditButton tooltip={editTooltip} enabled={editing} onClick={clickEdit} />
           )}
 
-          {children({ isEditing: editing })}
+          {editable ? children({ isEditing: editing }) : children}
         </CardBody>
         {editing && (
           <CardFooter>
@@ -96,7 +96,7 @@ BaseCard.propTypes = {
 
   onCancel: PropTypes.func,
   onSave: PropTypes.func,
-  children: PropTypes.func,
+  children: PropTypes.oneOfType([ PropTypes.func, PropTypes.node ]),
 }
 
 export default BaseCard
