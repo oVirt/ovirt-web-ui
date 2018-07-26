@@ -28,6 +28,7 @@ export * from './dataCenters'
 export * from './pendingTasks'
 export * from './vnicProfiles'
 export * from './activeRequests'
+export * from './console'
 
 export function startSchedulerFixedDelay (delayInSeconds = AppConfiguration.schedulerFixedDelayInSeconds) {
   return {
