@@ -20,6 +20,13 @@ function convertBool (val: ?string): boolean {
   return val ? val.toLowerCase() === 'true' : false
 }
 
+function convertInt (val: ?(number | string), defaultValue: number = Number.NaN): number {
+  if (val) {
+    return typeof val === 'number' ? val : Number.parseInt(val, 10)
+  }
+  return defaultValue
+}
+
 //
 //
 type ApiVmType = Object
@@ -294,8 +301,8 @@ const DiskAttachment = {
       name: disk['name'], // same as `alias`
       status: disk['status'],
 
-      actualSize: disk['actual_size'],
-      provisionedSize: disk['provisioned_size'],
+      actualSize: convertInt(disk['actual_size']),
+      provisionedSize: convertInt(disk['provisioned_size']),
       format: disk['format'],
       storageDomainId:
         disk.storage_domains &&
