@@ -1,5 +1,28 @@
 // @flow
 
+import type {
+  ApiCdRomType, CdRomType,
+  ApiCloudInitType, CloudInitType,
+  ApiClusterType, ClusterType,
+  ApiDataCenterType, DataCenterType,
+  ApiDiskAttachmentType, ApiDiskType, DiskType,
+  ApiHostType, HostType,
+  ApiIconType, IconType,
+  ApiNetworkType, NetworkType,
+  ApiNicType, NicType,
+  ApiOsType, OsType,
+  ApiPoolType, PoolType,
+  ApiSnapshotType, SnapshotType,
+  ApiSshKeyType, SshKeyType,
+  ApiStorageDomainFileType, StorageDomainFileType,
+  ApiStorageDomainType, StorageDomainType,
+  ApiTemplateType, TemplateType,
+  ApiVmConsolesType, VmConsolesType,
+  ApiVmSessionsType, VmSessionsType,
+  ApiVmType, VmType,
+  ApiVnicProfileType, VnicProfileType,
+} from './types'
+
 function vCpusCount ({ cpu }: { cpu: Object }): number {
   if (cpu && cpu.topology) {
     const top = cpu.topology
@@ -29,10 +52,8 @@ function convertInt (val: ?(number | string), defaultValue: number = Number.NaN)
 
 //
 //
-type ApiVmType = Object
-type InternalVmType = Object
 const VM = {
-  toInternal ({ vm, includeSubResources = false }: { vm: ApiVmType, includeSubResources?: boolean }): InternalVmType {
+  toInternal ({ vm, includeSubResources = false }: { vm: ApiVmType, includeSubResources?: boolean }): VmType {
     const parsedVm: Object = {
       name: vm['name'],
       description: vm['description'],
@@ -137,7 +158,7 @@ const VM = {
     return parsedVm
   },
 
-  toApi ({ vm }: { vm: InternalVmType }): ApiVmType {
+  toApi ({ vm }: { vm: VmType }): ApiVmType {
     return {
       name: vm.name,
       description: vm.description,
@@ -198,7 +219,7 @@ const VM = {
 //
 //
 const Template = {
-  toInternal ({ template }: { template: Object}): Object {
+  toInternal ({ template }: { template: ApiTemplateType}): TemplateType {
     const version = {
       name: template.version ? template.version.version_name : undefined,
       number: template.version ? template.version.version_number : undefined,
@@ -234,10 +255,8 @@ const Template = {
 
 //
 //
-type ApiPoolType = Object
-type InternalPoolType = Object
 const Pool = {
-  toInternal ({ pool }: { pool: ApiPoolType}): InternalPoolType {
+  toInternal ({ pool }: { pool: ApiPoolType}): PoolType {
     if (!pool['name']) {
       console.info('Pool.toInternal, pool received without name:', JSON.stringify(pool), pool)
     }
@@ -259,17 +278,13 @@ const Pool = {
     }
   },
 
-  toApi ({ pool }: { pool: InternalPoolType }): ApiPoolType {
-    return {}
-  },
+  toApi: undefined,
 }
 
 //
 //
-type ApiSnapshotType = Object // { description: string }
-type InternalSnapshotType = Object
 const Snapshot = {
-  toInternal ({ snapshot }: { snapshot: ApiSnapshotType }): InternalSnapshotType {
+  toInternal ({ snapshot }: { snapshot: ApiSnapshotType }): SnapshotType {
     return {
       id: snapshot.id,
       description: snapshot.description,
@@ -280,7 +295,7 @@ const Snapshot = {
     }
   },
 
-  toApi ({ snapshot }: { snapshot: InternalSnapshotType }): ApiSnapshotType {
+  toApi ({ snapshot }: { snapshot: SnapshotType }): ApiSnapshotType {
     return {
       description: snapshot.description,
     }
@@ -291,7 +306,7 @@ const Snapshot = {
 //
 // VM -> DiskAttachments.DiskAttachment[] -> Disk
 const DiskAttachment = {
-  toInternal ({ attachment, disk }: { attachment: Object, disk: Object }): Object {
+  toInternal ({ attachment, disk }: { attachment: ApiDiskAttachmentType, disk: ApiDiskType }): DiskType {
     return {
       bootable: convertBool(attachment['bootable']),
       active: convertBool(attachment['active']),
@@ -318,7 +333,7 @@ const DiskAttachment = {
 //
 //
 const DataCenter = {
-  toInternal ({ dataCenter }: { dataCenter: Object }): Object {
+  toInternal ({ dataCenter }: { dataCenter: ApiDataCenterType }): DataCenterType {
     return {
       id: dataCenter.id,
       name: dataCenter.name,
@@ -332,7 +347,7 @@ const DataCenter = {
 //
 //
 const StorageDomain = {
-  toInternal ({ storageDomain }: { storageDomain: Object }): Object {
+  toInternal ({ storageDomain }: { storageDomain: ApiStorageDomainType }): StorageDomainType {
     return {
       id: storageDomain.id,
       name: storageDomain.name,
@@ -353,10 +368,8 @@ const StorageDomain = {
 
 //
 //
-type ApiCdRomType = Object
-type InternalCdRomType = Object
 const CdRom = {
-  toInternal ({ cdrom }: { cdrom: ApiCdRomType }): InternalCdRomType {
+  toInternal ({ cdrom }: { cdrom: ApiCdRomType }): CdRomType {
     return {
       id: cdrom.id,
       file: {
@@ -365,7 +378,7 @@ const CdRom = {
     }
   },
 
-  toApi ({ cdrom }: { cdrom: Object }): Object {
+  toApi ({ cdrom }: { cdrom: CdRomType }): ApiCdRomType {
     return {
       file: {
         id: cdrom.file.id,
@@ -377,7 +390,7 @@ const CdRom = {
 //
 // (only for a Storage Domain type === 'iso')
 const StorageDomainFile = {
-  toInternal ({ file }: { file: Object }): Object {
+  toInternal ({ file }: { file: ApiStorageDomainFileType }): StorageDomainFileType {
     return {
       id: file.id,
       name: file.name,
@@ -390,7 +403,7 @@ const StorageDomainFile = {
 //
 //
 const Cluster = {
-  toInternal ({ cluster }: { cluster: Object }): Object {
+  toInternal ({ cluster }: { cluster: ApiClusterType }): ClusterType {
     return {
       id: cluster.id,
       name: cluster.name,
@@ -414,7 +427,7 @@ const Cluster = {
 //
 //
 const Nic = {
-  toInternal ({ nic }: { nic: Object }): Object {
+  toInternal ({ nic }: { nic: ApiNicType }): NicType {
     return {
       id: nic.id,
       name: nic.name,
@@ -424,7 +437,7 @@ const Nic = {
     }
   },
 
-  toApi ({ nic }: { nic: Object }): Object {
+  toApi ({ nic }: { nic: NicType }): ApiNicType {
     const res = {
       name: nic.name,
       interface: 'virtio',
@@ -442,7 +455,7 @@ const Nic = {
 //
 //
 const VNicProfile = {
-  toInternal ({ vnicProfile }: { vnicProfile: Object }): Object {
+  toInternal ({ vnicProfile }: { vnicProfile: ApiVnicProfileType }): VnicProfileType {
     const vnicProfileInternal = {
       id: vnicProfile.id,
       name: vnicProfile.name,
@@ -465,7 +478,7 @@ const VNicProfile = {
 //
 //
 const Network = {
-  toInternal ({ network }: { network: Object }): Object {
+  toInternal ({ network }: { network: ApiNetworkType }): NetworkType {
     return {
       id: network.id,
       name: network.name,
@@ -478,7 +491,7 @@ const Network = {
 //
 //
 const Host = {
-  toInternal ({ host }: { host: Object }): Object {
+  toInternal ({ host }: { host: ApiHostType }): HostType {
     return {
       id: host.id,
       name: host.name,
@@ -494,7 +507,7 @@ const Host = {
 //
 //
 const OS = {
-  toInternal ({ os }: { os: Object }): Object {
+  toInternal ({ os }: { os: ApiOsType }): OsType {
     return {
       id: os.id,
       name: os.name,
@@ -513,7 +526,7 @@ const OS = {
 //
 //
 const Icon = {
-  toInternal ({ icon }: { icon: Object }): Object {
+  toInternal ({ icon }: { icon: ApiIconType }): IconType {
     return {
       id: icon.id,
       type: icon['media_type'],
@@ -527,7 +540,7 @@ const Icon = {
 //
 //
 const SSHKey = {
-  toInternal ({ sshKey }: { sshKey: Object }): Object {
+  toInternal ({ sshKey }: { sshKey: ApiSshKeyType }): SshKeyType {
     return {
       id: sshKey.id,
       key: sshKey.content,
@@ -540,7 +553,7 @@ const SSHKey = {
 //
 //
 const VmConsoles = {
-  toInternal ({ consoles }: { consoles: Object }): Array<Object> {
+  toInternal ({ consoles }: { consoles: ApiVmConsolesType }): Array<VmConsolesType> {
     return consoles['graphics_console'].map((c: Object): Object => {
       return {
         id: c.id,
@@ -555,7 +568,7 @@ const VmConsoles = {
 //
 //
 const VmSessions = {
-  toInternal ({ sessions }: { sessions: Object }): Object {
+  toInternal ({ sessions }: { sessions: ApiVmSessionsType }): VmSessionsType {
     return sessions['session'].map((c: Object): Object => {
       return {
         id: c.id,
@@ -572,13 +585,8 @@ const VmSessions = {
 
 //
 //
-type CloudInitInternalType = {
-  enabled: boolean,
-  hostName: string,
-  sshAuthorizedKeys: string
-}
 const CloudInit = {
-  toInternal ({ vm }: { vm: Object }): CloudInitInternalType {
+  toInternal ({ vm }: { vm: ApiCloudInitType }): CloudInitType {
     return {
       enabled: !!vm.initialization,
       hostName: (vm.initialization && vm.initialization.host_name) || '',
@@ -612,4 +620,5 @@ export {
   Icon,
   VmConsoles,
   VmSessions,
+  CloudInit,
 }
