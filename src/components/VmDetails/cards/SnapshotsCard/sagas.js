@@ -1,10 +1,10 @@
 import { takeEvery, put } from 'redux-saga/effects'
 
 import { ADD_VM_SNAPSHOT, DELETE_VM_SNAPSHOT, RESTORE_VM_SNAPSHOT } from './constants'
-import Api from '../../ovirtapi'
-import { callExternalAction, delay } from '../../saga/utils'
-import { fetchVmSnapshots, startProgress, stopProgress } from '../../sagas'
-import { addSnapshotRemovalPendingTask, removeSnapshotRemovalPendingTask } from '../../actions'
+import Api from '../../../../ovirtapi'
+import { callExternalAction, delay } from '../../../../saga/utils'
+import { fetchVmSnapshots, startProgress, stopProgress } from '../../../../sagas'
+import { addSnapshotRemovalPendingTask, removeSnapshotRemovalPendingTask } from '../../../../actions'
 
 function* addVmSnapshot (action) {
   const snapshot = yield callExternalAction('addNewSnapshot', Api.addNewSnapshot, action)
@@ -39,7 +39,10 @@ function* deleteVmSnapshot (action) {
 
 function* restoreVmSnapshot (action) {
   yield startProgress({ vmId: action.payload.vmId, name: 'restoreSnapshot' })
-  const result = yield callExternalAction('restoreSnapshot', Api.restoreSnapshot, action)
+  let result = yield callExternalAction('restoreSnapshot', Api.restoreSnapshot, action)
+  if (result && result.status === 'complete') {
+    result = yield callExternalAction('commitSnapshot', Api.commitSnapshot, { payload: { vmId: action.payload.vmId } })
+  }
   yield stopProgress({ vmId: action.payload.vmId, name: 'restoreSnapshot', result })
 }
 

@@ -307,6 +307,7 @@ const Snapshot = {
     return {
       id: snapshot.id,
       description: snapshot.description,
+      vm: snapshot.vm ? VM.toInternal({ vm: snapshot.vm }) : {},
       type: snapshot.snapshot_type,
       date: snapshot.date,
       persistMemoryState: snapshot.persist_memorystate === 'true',

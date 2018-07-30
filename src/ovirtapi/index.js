@@ -226,6 +226,14 @@ const OvirtApi = {
       contentType: 'application/xml',
     })
   },
+  commitSnapshot ({ vmId }: { vmId: string }): Promise<Object> {
+    assertLogin({ methodName: 'commitSnapshot' })
+    return httpPost({
+      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/commitsnapshot`,
+      input: '<action />',
+      contentType: 'application/xml',
+    })
+  },
   snapshot ({ vmId, snapshotId }: { vmId: string, snapshotId: string }): Promise<Object> {
     assertLogin({ methodName: 'snapshot' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots/${snapshotId}` })

@@ -43,6 +43,8 @@ class BaseCard extends React.Component {
     const hasBadge = itemCount !== undefined
     const hasIcon = icon && icon.type && icon.name
 
+    const renderedChildren = React.isValidElement(children) ? React.cloneElement(children, { isEditing: editing }) : children({ isEditing: editing })
+
     const clickEdit = () => {
       this.setState({ edit: true })
     }
@@ -72,7 +74,7 @@ class BaseCard extends React.Component {
             <CardEditButton tooltip={editTooltip} enabled={editing} onClick={clickEdit} />
           )}
 
-          {children({ isEditing: editing })}
+          {renderedChildren}
         </CardBody>
         {editing && (
           <CardFooter>
@@ -96,7 +98,10 @@ BaseCard.propTypes = {
 
   onCancel: PropTypes.func,
   onSave: PropTypes.func,
-  children: PropTypes.func,
+  children: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.node,
+  ]),
 }
 
 export default BaseCard

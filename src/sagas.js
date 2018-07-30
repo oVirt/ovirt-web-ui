@@ -5,7 +5,7 @@ import AppConfiguration from './config'
 
 import vmDisksSagas from './components/VmDisks/sagas'
 import newDiskDialogSagas from './components/NewDiskDialog/sagas'
-import vmSnapshotsSagas from './components/VmSnapshots/sagas'
+import vmSnapshotsSagas from './components/VmDetails/cards/SnapshotsCard/sagas'
 
 import {
   all,
