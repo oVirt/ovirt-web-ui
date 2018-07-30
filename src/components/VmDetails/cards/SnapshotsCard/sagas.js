@@ -2,9 +2,9 @@ import { takeEvery, put } from 'redux-saga/effects'
 
 import { ADD_VM_SNAPSHOT, DELETE_VM_SNAPSHOT, RESTORE_VM_SNAPSHOT } from './constants'
 import Api from 'ovirtapi'
-import { callExternalAction, delay } from '../../saga/utils'
-import { fetchVmSnapshots, startProgress, stopProgress } from '../../sagas'
-import { addSnapshotRemovalPendingTask, removeSnapshotRemovalPendingTask } from '../../actions'
+import { callExternalAction, delay } from '../../../../saga/utils'
+import { fetchVmSnapshots, startProgress, stopProgress } from '../../../../sagas'
+import { addSnapshotRemovalPendingTask, removeSnapshotRemovalPendingTask } from '../../../../actions'
 
 function* addVmSnapshot (action) {
   const snapshot = yield callExternalAction('addNewSnapshot', Api.addNewSnapshot, action)
@@ -23,7 +23,7 @@ function* deleteVmSnapshot (action) {
   }
   yield put(addSnapshotRemovalPendingTask(snapshotId))
   let snapshotRemoved = false
-  for (let delaySec of [ 4, 4, 4, 30, 60 ]) {
+  for (let delaySec of [ 4, 4, 4, 30, 30, 60 ]) {
     const apiSnapshot = yield callExternalAction('snapshot', Api.snapshot, { payload: { snapshotId, vmId } }, true)
     if (apiSnapshot.error && apiSnapshot.error.status === 404) {
       snapshotRemoved = true

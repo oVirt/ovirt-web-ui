@@ -221,7 +221,7 @@ const OvirtApi = {
   deleteSnapshot ({ snapshotId, vmId }: { snapshotId: string, vmId: string }): Promise<Object> {
     assertLogin({ methodName: 'deleteSnapshot' })
     return httpDelete({
-      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots/${snapshotId}`,
+      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots/${snapshotId}?async=false`,
     })
   },
   restoreSnapshot ({ snapshotId, vmId }: { snapshotId: string, vmId: string }): Promise<Object> {
@@ -231,6 +231,18 @@ const OvirtApi = {
       input: '<action />',
       contentType: 'application/xml',
     })
+  },
+  commitSnapshot ({ vmId }: { vmId: string }): Promise<Object> {
+    assertLogin({ methodName: 'commitSnapshot' })
+    return httpPost({
+      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/commitsnapshot`,
+      input: '<action />',
+      contentType: 'application/xml',
+    })
+  },
+  snapshotDisks ({ vmId, snapshotId }: { vmId: string, snapshotId: string }): Promise<Object> {
+    assertLogin({ methodName: 'snapshotDisks' })
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots/${snapshotId}/disks` })
   },
   snapshot ({ vmId, snapshotId }: { vmId: string, snapshotId: string }): Promise<Object> {
     assertLogin({ methodName: 'snapshot' })

@@ -5,7 +5,7 @@ import AppConfiguration from './config'
 
 import vmDisksSagas from './components/VmDisks/sagas'
 import newDiskDialogSagas from './components/NewDiskDialog/sagas'
-import vmSnapshotsSagas from './components/VmSnapshots/sagas'
+import vmSnapshotsSagas from './components/VmDetails/cards/SnapshotsCard/sagas'
 
 import {
   all,
@@ -357,7 +357,12 @@ export function* fetchSingleVm (action) {
       internalVm.sessions = yield fetchVmSessions({ vmId: internalVm.id })
       // TODO: Support <4.2 for snapshots?
     }
-
+    for (let i in internalVm.snapshots) {
+      const disks = yield callExternalAction('snapshotDisks', Api.snapshotDisks, { payload: { vmId, snapshotId: internalVm.snapshots[i].id } }, true)
+      if (disks && disks['disk']) {
+        internalVm.snapshots[i].disks = disks.disk.map((disk) => Api.diskToInternal({ disk, attachment: {} }))
+      }
+    }
     yield put(updateVms({ vms: [internalVm], copySubResources: shallowFetch }))
     yield fetchUnknownIconsForVms({ vms: [internalVm] })
   } else {

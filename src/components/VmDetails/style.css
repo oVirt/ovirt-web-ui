@@ -98,6 +98,36 @@
   flex-shrink: 0;
 }
 
+.snapshot-item {
+  display: table-row;
+}
+
+.snapshot-item span a {
+  margin-left: 5px;
+}
+
+.snapshot-item a {
+  cursor: pointer;
+  color: #333;
+  font-size: 14px;
+}
+
+.snapshot-item > a {
+  margin-right: 5px;
+}
+
+.snapshot-item-actions {
+  display: table-cell;
+}
+
+.snapshot-create a span {
+  margin-right: 5px;
+}
+
+.snapshot-create a {
+  cursor: pointer;
+}
+
 
 /* TODO: Temporary style for filler text. Remove once it isn't needed. */
 .demo-text {
@@ -107,4 +137,62 @@
   text-align: center;
   font-family: 'Comic Sans MS';
   font-weight: bold;
+}
+
+.snapshot-detail-container {
+    display: flex;
+    width: 100%;
+}
+
+.snapshot-detail-container dt {
+    clear: left;
+    float: left;
+    width: 150px;
+    min-height: 26px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: left;
+}
+
+.snapshot-detail-container dd {
+    min-height: 26px;
+    max-width: 5000px;
+    text-overflow: ellipsis;
+    text-align: left;
+}
+
+.snapshot-detail-container dd a {
+    cursor: pointer;
+}
+
+.snapshot-properties {
+    width: 50%;
+    min-width: 300px;
+}
+
+div.popover {
+  min-width: 200px;
+  max-width: 1000px;
+  z-index: 20;
+}
+
+.green {
+  color: #24d011;
+}
+
+.status-icon span {
+  margin-right: 5px;
+}
+
+.snapshot-time {
+  color: #808080;
+  margin-left: 5px;
+}
+
+.snapshot-item span a:disabled {
+  color: #555;
+}
+
+.snapshot-disk-list {
+  display: table;
 }
