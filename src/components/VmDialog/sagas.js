@@ -1,21 +1,24 @@
 import { put, takeEvery, takeLatest } from 'redux-saga/effects'
-import { refresh, getSingleVm } from '../../actions/index'
-import { ADD_NEW_VM, EDIT_VM } from './constants'
-import { setSavedVm } from './actions'
-import Api from '../../ovirtapi'
 
-function* createNewVm (sagas, action) {
-  const result = yield sagas.callExternalAction('addNewVm', Api.addNewVm, action)
+import { ADD_NEW_VM, EDIT_VM } from './constants'
+import Api from '../../ovirtapi'
+import { callExternalAction } from '../../saga/utils'
+import { fetchSingleVm } from '../../sagas'
+import { refresh, getSingleVm } from '../../actions'
+import { setSavedVm } from './actions'
+
+function* createNewVm (action) {
+  const result = yield callExternalAction('addNewVm', Api.addNewVm, action)
   if (!result.error) {
     yield put(refresh({ page: action.payload.page }))
     yield put(setSavedVm({ vm: Api.vmToInternal({ vm: result }) }))
   }
 }
 
-function* editVm (sagas, action) {
-  const result = yield sagas.callExternalAction('editVm', Api.editVm, action)
+function* editVm (action) {
+  const result = yield callExternalAction('editVm', Api.editVm, action)
   if (!result.error) {
-    const result2 = yield sagas.callExternalAction('changeCD', Api.changeCD, {
+    const result2 = yield callExternalAction('changeCD', Api.changeCD, {
       type: 'CHANGE_CD',
       payload: {
         vmId: action.payload.vm.id,
@@ -24,15 +27,13 @@ function* editVm (sagas, action) {
       },
     })
     if (!result2.error) {
-      yield sagas.fetchSingleVm(getSingleVm({ vmId: action.payload.vm.id }))
+      yield fetchSingleVm(getSingleVm({ vmId: action.payload.vm.id }))
       yield put(setSavedVm({ vm: Api.vmToInternal({ vm: result }) }))
     }
   }
 }
 
-export function buildSagas (sagas) {
-  return [
-    takeEvery(ADD_NEW_VM, createNewVm, sagas),
-    takeLatest(EDIT_VM, editVm, sagas),
-  ]
-}
+export default [
+  takeEvery(ADD_NEW_VM, createNewVm),
+  takeLatest(EDIT_VM, editVm),
+]
