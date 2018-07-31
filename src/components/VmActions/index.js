@@ -152,8 +152,9 @@ class VmActions extends React.Component {
           actionDisabled={isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole'])}
           shortTitle={msg.console()}
           tooltip={consoleProtocol}
-          button='btn btn-default'
-          className='pficon pficon-screen'
+
+          className={isOnCard ? 'pficon pficon-screen' : 'btn btn-default'}
+
           vm={vm}
         />
 
