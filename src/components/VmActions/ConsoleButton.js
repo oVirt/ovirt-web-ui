@@ -55,7 +55,6 @@ class ConsoleButton extends React.Component {
       actionDisabled = false,
       shortTitle,
       tooltip = '',
-      button,
       className,
     } = this.props
 
@@ -92,7 +91,7 @@ class ConsoleButton extends React.Component {
 
     if (actionDisabled) {
       return (
-        <button className={`${button} ${style['disabled-button']}`} disabled='disabled' id={`${idPrefix}-disabled`}>
+        <button className={`${className} ${style['disabled-button']}`} disabled='disabled' id={`${idPrefix}-disabled`}>
           <span data-toggle='tooltip' data-placement='left' title={tooltip}>
             {shortTitle}
           </span>
@@ -101,8 +100,8 @@ class ConsoleButton extends React.Component {
     }
 
     return (
-      <span className={style['full-button']}>
-        <a href='#' className={`${button} ${style['link']}`} id={shortTitle} onClick={this.consoleConfirmationAboutToOpen}>
+      <span className={`${style['full-button']}`}>
+        <a href='#' className={`${style['link']} ${className}`} id={shortTitle} onClick={this.consoleConfirmationAboutToOpen}>
           <span data-toggle='tooltip' data-placement='left' title={tooltip}>
             {shortTitle}
           </span>
@@ -120,7 +119,6 @@ ConsoleButton.propTypes = {
   actionDisabled: PropTypes.bool,
   shortTitle: PropTypes.string.isRequired,
   tooltip: PropTypes.string,
-  button: PropTypes.string.isRequired,
   className: PropTypes.string.isRequired,
 
   consoleId: PropTypes.string, // eslint-disable-line react/no-unused-prop-types
