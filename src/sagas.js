@@ -4,6 +4,7 @@ import Selectors from './selectors'
 import AppConfiguration from './config'
 import { flatMap } from './utils'
 
+import vmEditSagas from './components/VmDialog/sagas'
 import vmDisksSagas from './components/VmDisks/sagas'
 import newDiskDialogSagas from './components/NewDiskDialog/sagas'
 import vmSnapshotsSagas from './components/VmSnapshots/sagas'
@@ -834,6 +835,7 @@ export function* rootSaga () {
     takeEvery(DELAYED_REMOVE_ACTIVE_REQUEST, delayedRemoveActiveRequest),
 
     // Sagas from Components
+    ...vmEditSagas,
     ...vmDisksSagas,
     ...newDiskDialogSagas,
     ...vmSnapshotsSagas,
