@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import { getRDP } from '../../actions'
-import { isWindows, hrefWithoutHistory } from '../../helpers'
+import { isWindows } from '../../helpers'
 import { canConsole } from '../../vm-status'
 
 /**
@@ -23,7 +23,7 @@ const WindowsRdpButton = ({ vm, className, config, onRDP }) => {
         href='#'
         key={vm.get('id')} id={`${idPrefix}-rdp`}
         className={className}
-        onClick={hrefWithoutHistory(onRDP(domain, username))}
+        onClick={(e) => { e.preventDefault(); onRDP(domain, username) }}
       >
         RDP
       </a>
