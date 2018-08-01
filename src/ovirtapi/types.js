@@ -6,6 +6,35 @@
 export type ApiVmType = Object
 export type VmType = Object
 
+export type ApiStatisticKindType = "counter" | "gauge"
+export type ApiStatisticTypeType = "decimal" | "integer" | "string"
+export type ApiStatisticUnitType = "bytes" | "bits_per_second" | "bytes_per_second" | "count_per_second" | "seconds" | "percent" | "none"
+export type ApiVmStatisticType = {
+  id: string,
+  name: string,
+  description: string,
+  kind: ApiStatisticKindType,
+  type: ApiStatisticTypeType,
+  unit: ApiStatisticUnitType,
+  values: {
+    value: Array<{
+      datum: number,
+      detail?: string
+    }>
+  }
+}
+
+export type StatisticValueType = {
+  datum: number | Array<number>,
+  unit: ApiStatisticUnitType,
+  description: string
+}
+export type VmStatisticsType = {
+  memory: { [memorySubKey: string]: StatisticValueType },
+  cpu: { [cpuSubKey: string]: StatisticValueType },
+  network: { [networkSubKey: string]: StatisticValueType }
+}
+
 export type ApiTemplateType = Object
 export type TemplateType = Object
 
