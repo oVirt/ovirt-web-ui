@@ -37,10 +37,13 @@ const initialState = Immutable.fromJS({
   notAllPagesLoaded: true,
 })
 
+const EMPTY_MAP = Immutable.fromJS({})
+const EMPTY_ARRAY = Immutable.fromJS([])
+
 const vms = actionReducer(initialState, {
   [UPDATE_VMS] (state, { payload: { vms, copySubResources, page } }) {
-    const emptyMap = Map()
     const updates = {}
+
     vms.forEach(vm => {
       if (!state.getIn(['vms', vm.id])) {
         state = state.set('notAllPagesLoaded', true)
@@ -48,15 +51,16 @@ const vms = actionReducer(initialState, {
       updates[vm.id] = vm
 
       if (copySubResources) {
-        updates[vm.id].disks = state.getIn(['vms', vm.id, 'disks'], emptyMap).toJS()
-        updates[vm.id].consoles = state.getIn(['vms', vm.id, 'consoles'], emptyMap).toJS()
         updates[vm.id].cdrom = state.getIn(['vms', vm.id, 'cdrom'], Immutable.fromJS({ file: { id: '' } })).toJS()
-        updates[vm.id].nics = state.getIn(['vms', vm.id, 'nics'], Immutable.fromJS([])).toJS()
-        updates[vm.id].snapshots = state.getIn(['vms', vm.id, 'snapshots'], Immutable.fromJS([])).toJS()
+        updates[vm.id].consoles = state.getIn(['vms', vm.id, 'consoles'], EMPTY_ARRAY).toJS()
+        updates[vm.id].disks = state.getIn(['vms', vm.id, 'disks'], EMPTY_ARRAY).toJS()
+        updates[vm.id].nics = state.getIn(['vms', vm.id, 'nics'], EMPTY_ARRAY).toJS()
+        updates[vm.id].sessions = state.getIn(['vms', vm.id, 'sessions'], EMPTY_ARRAY).toJS()
+        updates[vm.id].snapshots = state.getIn(['vms', vm.id, 'snapshots'], EMPTY_ARRAY).toJS()
       }
     })
-    const imUpdates = Immutable.fromJS(updates)
-    let st = state.mergeIn(['vms'], imUpdates)
+
+    let st = state.mergeIn(['vms'], Immutable.fromJS(updates))
     if (page) {
       st = st.set('page', page)
     }
@@ -203,7 +207,7 @@ const vms = actionReducer(initialState, {
     return state.set('notAllPagesLoaded', value)
   },
   [LOGOUT] (state) { // see the config() reducer
-    return state.set('vms', Immutable.fromJS({}))
+    return state.set('vms', EMPTY_MAP)
   },
 })
 
