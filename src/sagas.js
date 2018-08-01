@@ -125,6 +125,9 @@ import {
   SUSPEND_VM,
 } from './constants'
 
+const vmFetchAdditionalList =
+  ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics', 'snapshots']
+
 /**
  * Compare the current oVirt version (held in redux) to the given version.
  */
@@ -228,9 +231,7 @@ function* fetchVmsByPage (action) {
 function* fetchVmsByPageV42 (action) {
   const { shallowFetch, page } = action.payload
 
-  action.payload.additional = shallowFetch
-    ? []
-    : ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics']
+  action.payload.additional = shallowFetch ? [] : vmFetchAdditionalList
 
   // TODO: paging: split this call to a loop per up to 25 VMs
   const allVms = yield callExternalAction('getVmsByPage', Api.getVmsByPage, action)
@@ -261,9 +262,9 @@ function* fetchVmsByPageVLower (action) {
     if (!shallowFetch) {
       yield fetchConsoleMetadatas({ vms: internalVms })
       yield fetchDisks({ vms: internalVms })
-      yield fetchVmsSessions({ vms: internalVms })
       yield fetchVmsCDRom({ vms: internalVms })
       yield fetchVmsNics({ vms: internalVms })
+      yield fetchVmsSessions({ vms: internalVms })
       yield fetchVmsSnapshots({ vms: internalVms })
     } else {
       logDebug('getVmsByPage() shallow fetch requested - skipping other resources')
@@ -288,9 +289,7 @@ function* fetchVmsByCountV42 (action) {
   const { shallowFetch } = action.payload
   const fetchedVmIds = []
 
-  action.payload.additional = shallowFetch
-    ? []
-    : ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics']
+  action.payload.additional = shallowFetch ? [] : vmFetchAdditionalList
 
   const allVms = yield callExternalAction('getVmsByCount', Api.getVmsByCount, action)
   if (allVms && allVms['vm']) { // array
@@ -321,9 +320,9 @@ function* fetchVmsByCountVLower (action) {
     if (!shallowFetch) {
       yield fetchConsoleMetadatas({ vms: internalVms })
       yield fetchDisks({ vms: internalVms })
-      yield fetchVmsSessions({ vms: internalVms })
       yield fetchVmsCDRom({ vms: internalVms })
       yield fetchVmsNics({ vms: internalVms })
+      yield fetchVmsSessions({ vms: internalVms })
       yield fetchVmsSnapshots({ vms: internalVms })
     } else {
       logDebug('fetchVmsByCountVLower() shallow fetch requested - skipping other resources')
@@ -339,8 +338,7 @@ export function* fetchSingleVm (action) {
 
   const isOvirtGTE42 = compareVersionToCurrent({ major: 4, minor: 2 })
   if (isOvirtGTE42 && !shallowFetch) {
-    action.payload.additional =
-      ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics', 'snapshots']
+    action.payload.additional = vmFetchAdditionalList
   }
 
   const vm = yield callExternalAction('getVm', Api.getVm, action, true)
@@ -349,14 +347,15 @@ export function* fetchSingleVm (action) {
     internalVm = Api.vmToInternal({ vm, getSubResources: isOvirtGTE42 })
 
     if (!isOvirtGTE42 && !shallowFetch) {
-      internalVm.disks = yield fetchVmDisks({ vmId: internalVm.id })
-      internalVm.consoles = yield fetchConsoleVmMeta({ vmId: internalVm.id })
-      internalVm.sessions = yield fetchVmSessions({ vmId: internalVm.id })
       internalVm.cdrom = yield fetchVmCDRom({ vmId: internalVm.id, running: internalVm.status === 'up' })
+      internalVm.consoles = yield fetchConsoleVmMeta({ vmId: internalVm.id })
+      internalVm.disks = yield fetchVmDisks({ vmId: internalVm.id })
       internalVm.nics = yield fetchVmNics({ vmId: internalVm.id })
+      internalVm.sessions = yield fetchVmSessions({ vmId: internalVm.id })
+      // TODO: Support <4.2 for snapshots?
     }
 
-    yield put(updateVms({ vms: [internalVm] }))
+    yield put(updateVms({ vms: [internalVm], copySubResources: shallowFetch }))
     yield fetchUnknownIconsForVms({ vms: [internalVm] })
   } else {
     if (vm && vm.error && vm.error.status === 404) {
