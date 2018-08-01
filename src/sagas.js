@@ -129,7 +129,7 @@ import {
 } from './constants'
 
 const vmFetchAdditionalList =
-  ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics', 'snapshots']
+  ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics', 'snapshots', 'statistics']
 
 /**
  * Compare the current oVirt version (held in redux) to the given version.
@@ -269,6 +269,7 @@ function* fetchVmsByPageVLower (action) {
       yield fetchVmsNics({ vms: internalVms })
       yield fetchVmsSessions({ vms: internalVms })
       yield fetchVmsSnapshots({ vms: internalVms })
+      // TODO: Support <4.2 for statistics?
     } else {
       logger.log('getVmsByPage() shallow fetch requested - skipping other resources')
     }
@@ -327,6 +328,7 @@ function* fetchVmsByCountVLower (action) {
       yield fetchVmsNics({ vms: internalVms })
       yield fetchVmsSessions({ vms: internalVms })
       yield fetchVmsSnapshots({ vms: internalVms })
+      // TODO: Support <4.2 for statistics?
     } else {
       logger.log('fetchVmsByCountVLower() shallow fetch requested - skipping other resources')
     }
@@ -356,6 +358,7 @@ export function* fetchSingleVm (action) {
       internalVm.nics = yield fetchVmNics({ vmId: internalVm.id })
       internalVm.sessions = yield fetchVmSessions({ vmId: internalVm.id })
       // TODO: Support <4.2 for snapshots?
+      // TODO: Support <4.2 for statistics?
     }
 
     yield put(updateVms({ vms: [internalVm], copySubResources: shallowFetch }))
