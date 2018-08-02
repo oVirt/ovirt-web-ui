@@ -1,65 +1,47 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import { Icon } from 'patternfly-react'
 import style from './style.css'
 
-const Icon = ({ className, tooltip }) => (
-  <span title={tooltip} data-toggle='tooltip' data-placement='left'>
-    <i className={className} />
-  </span>
-)
+/* eslint-disable key-spacing, no-multi-spaces */
+const VM_STATE_TO_ICON = {
+  'up'                : { type: 'pf', name: 'on-running',         tooltip: 'The VM is running.', className: style['green'] },
+  'powering_up'       : { type: 'pf', name: 'in-progress',        tooltip: 'The VM is powering up.' },
+  'down'              : { type: 'pf', name: 'off',                tooltip: 'The VM is down.' },
+  'paused'            : { type: 'pf', name: 'paused',             tooltip: 'The VM is paused.' },
+  'suspended'         : { type: 'pf', name: 'asleep',             tooltip: 'The VM is suspended.' },
+  'powering_down'     : { type: 'pf', name: 'in-progress',        tooltip: 'The VM is going down.' },
+  'not_responding'    : { type: 'pf', name: 'warning-triangle-o', tooltip: 'The VM is not responding.' },
+  'unknown'           : { type: 'pf', name: 'unknown',            tooltip: 'The VM status is unknown.' },
+  'unassigned'        : { type: 'pf', name: 'unknown',            tooltip: 'The VM status is unassigned.' },
+  'migrating'         : { type: 'pf', name: 'migration',          tooltip: 'The VM is being migrated.' },
+  'wait_for_launch'   : { type: 'pf', name: 'pending',            tooltip: 'The VM is scheduled for launch.' },
+  'reboot_in_progress': { type: 'pf', name: 'in-progress',        tooltip: 'The VM is being rebooted.' },
+  'saving_state'      : { type: 'pf', name: 'pending',            tooltip: 'The VM is saving its state.' },
+  'restoring_state'   : { type: 'pf', name: 'in-progress',        tooltip: 'The VM is restoring its state.' },
+  'image_locked'      : { type: 'pf', name: 'locked',             tooltip: 'The VM\'s image is locked' },
 
-Icon.propTypes = {
-  className: PropTypes.string.isRequired,
-  tooltip: PropTypes.string.isRequired,
+  '__default__'       : { type: 'pf', name: 'zone',               tooltip: 'Unknown/unexpected VM state' },
 }
+/* eslint-enable key-spacing, no-multi-spaces */
 
 /**
- * Status-dependant icon for a VM
+ * Status-dependent icon for a VM
  */
-const VmStatusIcon = ({ state }) => {
-  switch (state) {
-    case 'up':
-      return <Icon className={`fa fa-play ${style['green']}`} tooltip='The VM is running.' />
-    case 'powering_up':
-      return <Icon className='fa fa-angle-double-up' tooltip='The VM is powering up.' />
-    case 'down':
-      return <Icon className='fa fa-power-off' tooltip='The VM is down.' />
-    case 'paused':
-      return <Icon className='fa fa-pause' tooltip='The VM is paused.' />
-    case 'suspended':
-      return <Icon className='fa fa-moon-o' tooltip='The VM is suspended.' />
-    case 'powering_down':
-      return <Icon className='fa fa-angle-double-down' tooltip='The VM is going down.' />
-    case 'not_responding':
-      return <Icon className='pficon pficon-warning-triangle-o' tooltip='The VM is not responding.' />
-    case 'unknown':
-      return <Icon className='pficon pficon-help' tooltip='The VM status is unknown.' />
-    case 'unassigned':
-      return <Icon className='pficon pficon-help' tooltip='The VM status is unassigned.' />
-    case 'migrating':
-      return <Icon className='pficon pficon-service' tooltip='The VM is being migrated.' />
-    case 'wait_for_launch':
-      return <Icon className='pficon pficon-service' tooltip='The VM is scheduled for launch.' />
-    case 'reboot_in_progress':
-      return <Icon className='pficon pficon-restart' tooltip='The VM is being rebooted.' />
-    case 'saving_state':
-      return <Icon className='pficon pficon-export' tooltip='The VM is saving its state.' />
-    case 'restoring_state':
-      return <Icon className='pficon pficon-import' tooltip='The VM is restoring its state.' />
-    case 'image_locked':
-      return <Icon className='pficon pficon-volume' tooltip="The VM's image is locked" />
+const VmStatusIcon = ({ state, className = undefined }) => {
+  const iconData = VM_STATE_TO_ICON[state] || VM_STATE_TO_ICON.__default__
+  const classNames =
+    iconData.className && className ? `${iconData.className} ${className}`
+      : iconData.className && !className ? `${iconData.className}`
+        : !iconData.className && className ? `${className}`
+          : undefined
 
-    case undefined: // better not to happen ...
-      console.info(`VmStatusIcon component: VM state is undefined`)
-      return (<div />)
-    default: // better not to happen ...
-      console.info(`VmStatusIcon component: unrecognized VM state '${state}'`)
-      return <Icon className='pficon pficon-zone' tooltip={`The VM state is '${state}'`} />
-  }
+  return <Icon type={iconData.type} name={iconData.name} className={classNames} title={iconData.tooltip} />
 }
 VmStatusIcon.propTypes = {
   state: PropTypes.string.isRequired,
+  className: PropTypes.string,
 }
 
 export default VmStatusIcon
