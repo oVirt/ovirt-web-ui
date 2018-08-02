@@ -49,7 +49,7 @@ make
 make install DESTDIR=%{buildroot}
 
 %files
-%doc README.md 
+%doc README.md
 %license LICENSE
 %{_ovirtwebuidir}
 %{_datarootdir}/ovirt-engine/ovirt-web-ui.war
@@ -57,6 +57,12 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Thu Aug 2 2018 Greg Sheremeta <gshereme@redhat.com> - 1.4.1-1
+  Fixed issues:
+  - 'failed Not found' error with Connect automatically console option bug major [#509](https://github.com/oVirt/ovirt-web-ui/issues/509)
+  - reattach VmDialog's sagas to the root saga so VM edits get saved [#683](https://github.com/oVirt/ovirt-web-ui/pull/683)
+  - VM edits don't save bug [#684](https://github.com/oVirt/ovirt-web-ui/issues/684)
+
 * Mon Jul 16 2018 Marek Libra <mlibra@redhat.com> - 1.4.0-3
 Fixed issues:
 - web-ui about windows7 display？ [#644](https://github.com/oVirt/ovirt-web-ui/issues/644)
