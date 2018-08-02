@@ -10,13 +10,13 @@ class ScrollPositionHistory extends React.Component {
     const scrollTop = loadFromSessionStorage(`${uniquePrefix}-scroll-top`) || 0
 
     // So far, main browser's window is used for scrolling
-    window.document.body.scrollTop = scrollTop
+    window.document.querySelector('#page-body').scrollTop = scrollTop
   }
 
   componentWillUnmount () {
     const { uniquePrefix } = this.props
 
-    const scrollTop = window.document.body.scrollTop
+    const scrollTop = window.document.querySelector('#page-body').scrollTop
     saveToSessionStorage(`${uniquePrefix}-scroll-top`, '' + scrollTop)
   }
 
