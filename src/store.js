@@ -7,9 +7,12 @@ import AppConfiguration from './config'
 import reducers from './reducers'
 
 const composeEnhancers =
-  (process.env.NODE_ENV !== 'production' && window && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
-    actionsBlacklist: ['ADD_ACTIVE_REQUEST', 'REMOVE_ACTIVE_REQUEST', 'DELAYED_REMOVE_ACTIVE_REQUEST'],
-  })) ||
+  (process.env.NODE_ENV !== 'production' &&
+   window &&
+   typeof window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ === 'function' &&
+   window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
+     actionsBlacklist: ['ADD_ACTIVE_REQUEST', 'REMOVE_ACTIVE_REQUEST', 'DELAYED_REMOVE_ACTIVE_REQUEST'],
+   })) ||
   compose
 
 export default function configureStore () {
