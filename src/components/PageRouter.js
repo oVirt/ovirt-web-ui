@@ -79,7 +79,7 @@ class PageRouter extends React.Component {
         <Toolbar>
           {tools}
         </Toolbar>
-        <div className={style['page-router-render-component']}>
+        <div className={style['page-router-render-component']} id='page-body'>
           <RenderComponent route={branch.route} match={branch.match} location={location} history={history} previousPath={previousPath} />
         </div>
       </div>
