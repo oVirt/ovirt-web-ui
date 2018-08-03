@@ -2,7 +2,6 @@ import Api from 'ovirtapi'
 import { persistStateToLocalStorage } from './storage'
 import Selectors from './selectors'
 import AppConfiguration from './config'
-import { flatMap } from './utils'
 
 import vmEditSagas from './components/VmDialog/sagas'
 import vmDisksSagas from './components/VmDisks/sagas'
@@ -126,6 +125,9 @@ import {
   SUSPEND_VM,
 } from './constants'
 
+const vmFetchAdditionalList =
+  ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics.statistics', 'snapshots', 'statistics']
+
 /**
  * Compare the current oVirt version (held in redux) to the given version.
  */
@@ -145,7 +147,7 @@ function* persistStateSaga () {
 }
 
 function* fetchUnknownIconsForVms ({ vms, os }) {
-  // unique iconIds from all vms or os (if available)
+  // unique iconIds from all VMs or OS (if available)
   const iconsIds = new Set()
   if (vms) {
     vms.map(vm => vm.icons.large.id).forEach(id => iconsIds.add(id))
@@ -229,11 +231,9 @@ function* fetchVmsByPage (action) {
 function* fetchVmsByPageV42 (action) {
   const { shallowFetch, page } = action.payload
 
-  action.payload.additional = shallowFetch
-    ? []
-    : ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics']
+  action.payload.additional = shallowFetch ? [] : vmFetchAdditionalList
 
-  // TODO: paging: split this call to a loop per up to 25 vms
+  // TODO: paging: split this call to a loop per up to 25 VMs
   const allVms = yield callExternalAction('getVmsByPage', Api.getVmsByPage, action)
   if (allVms && allVms['vm']) { // array
     const internalVms = allVms.vm.map(vm => Api.vmToInternal({ vm, getSubResources: true }))
@@ -262,10 +262,11 @@ function* fetchVmsByPageVLower (action) {
     if (!shallowFetch) {
       yield fetchConsoleMetadatas({ vms: internalVms })
       yield fetchDisks({ vms: internalVms })
-      yield fetchVmsSessions({ vms: internalVms })
       yield fetchVmsCDRom({ vms: internalVms })
       yield fetchVmsNics({ vms: internalVms })
+      yield fetchVmsSessions({ vms: internalVms })
       yield fetchVmsSnapshots({ vms: internalVms })
+      // TODO: Support <4.2 for statistics?
     } else {
       logDebug('getVmsByPage() shallow fetch requested - skipping other resources')
     }
@@ -289,9 +290,7 @@ function* fetchVmsByCountV42 (action) {
   const { shallowFetch } = action.payload
   const fetchedVmIds = []
 
-  action.payload.additional = shallowFetch
-    ? []
-    : ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics']
+  action.payload.additional = shallowFetch ? [] : vmFetchAdditionalList
 
   const allVms = yield callExternalAction('getVmsByCount', Api.getVmsByCount, action)
   if (allVms && allVms['vm']) { // array
@@ -322,10 +321,11 @@ function* fetchVmsByCountVLower (action) {
     if (!shallowFetch) {
       yield fetchConsoleMetadatas({ vms: internalVms })
       yield fetchDisks({ vms: internalVms })
-      yield fetchVmsSessions({ vms: internalVms })
       yield fetchVmsCDRom({ vms: internalVms })
       yield fetchVmsNics({ vms: internalVms })
+      yield fetchVmsSessions({ vms: internalVms })
       yield fetchVmsSnapshots({ vms: internalVms })
+      // TODO: Support <4.2 for statistics?
     } else {
       logDebug('fetchVmsByCountVLower() shallow fetch requested - skipping other resources')
     }
@@ -340,8 +340,7 @@ export function* fetchSingleVm (action) {
 
   const isOvirtGTE42 = compareVersionToCurrent({ major: 4, minor: 2 })
   if (isOvirtGTE42 && !shallowFetch) {
-    action.payload.additional =
-      ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics', 'snapshots']
+    action.payload.additional = vmFetchAdditionalList
   }
 
   const vm = yield callExternalAction('getVm', Api.getVm, action, true)
@@ -350,14 +349,16 @@ export function* fetchSingleVm (action) {
     internalVm = Api.vmToInternal({ vm, getSubResources: isOvirtGTE42 })
 
     if (!isOvirtGTE42 && !shallowFetch) {
-      internalVm.disks = yield fetchVmDisks({ vmId: internalVm.id })
-      internalVm.consoles = yield fetchConsoleVmMeta({ vmId: internalVm.id })
-      internalVm.sessions = yield fetchVmSessions({ vmId: internalVm.id })
       internalVm.cdrom = yield fetchVmCDRom({ vmId: internalVm.id, running: internalVm.status === 'up' })
+      internalVm.consoles = yield fetchConsoleVmMeta({ vmId: internalVm.id })
+      internalVm.disks = yield fetchVmDisks({ vmId: internalVm.id })
       internalVm.nics = yield fetchVmNics({ vmId: internalVm.id })
+      internalVm.sessions = yield fetchVmSessions({ vmId: internalVm.id })
+      // TODO: Support <4.2 for snapshots?
+      // TODO: Support <4.2 for statistics?
     }
 
-    yield put(updateVms({ vms: [internalVm] }))
+    yield put(updateVms({ vms: [internalVm], copySubResources: shallowFetch }))
     yield fetchUnknownIconsForVms({ vms: [internalVm] })
   } else {
     if (vm && vm.error && vm.error.status === 404) {
@@ -601,13 +602,18 @@ function* fetchAllAttachedStorageDomains (action) {
 
   // getting data centers is necessary to get storage domains with statuses
   // so why not to store them when we have them fresh
-  const dataCentersInternal = dataCentersApi.data_center.map(Api.dataCenterToInternal)
+  const dataCentersInternal = dataCentersApi.data_center.map(dataCenter => Api.dataCenterToInternal({ dataCenter }))
   yield put(setDataCenters(dataCentersInternal))
 
-  const storageDomainsApi = flatMap(
-    dataCentersApi.data_center,
-    dataCenterApi => (dataCenterApi.storage_domains && dataCenterApi.storage_domains.storage_domain) || [])
-  const storageDomainsInternal = storageDomainsApi.map(Api.storageDomainToInternal)
+  // collect and convert all from dataCentersApi.data_center[*].storage_domains.storage_domain[*]
+  const storageDomainsInternal = []
+  for (const dataCenter of dataCentersApi.data_center) {
+    const storageDomains = dataCenter.storage_domains && dataCenter.storage_domains.storage_domain
+    if (storageDomains) {
+      storageDomainsInternal.push(
+        ...storageDomains.map(storageDomain => Api.storageDomainToInternal({ storageDomain })))
+    }
+  }
   const storageDomainsMerged = mergeStorageDomains(storageDomainsInternal)
   yield put(setStorageDomains(storageDomainsMerged))
 }
@@ -700,9 +706,12 @@ function* fetchISOStorages (action) {
   // this could fetch just ISO storage domain types
   const storages = yield callExternalAction('getStorages', Api.getStorages, action)
   if (storages && storages['storage_domain']) {
-    const storagesInternal = storages.storage_domain.map(storage => Api.storageToInternal({ storage })).filter(v => v.type === 'iso')
-    yield put(addStorageDomains(storagesInternal))
-    const isoFilesFetches = storagesInternal.map(storageDomain => fetchAllFilesForISO(storageDomain.id))
+    const isoStorageDomains = storages.storage_domain
+      .filter(storageDomain => storageDomain.type === 'iso')
+      .map(storageDomain => Api.storageDomainToInternal({ storageDomain }))
+    yield put(addStorageDomains(isoStorageDomains))
+
+    const isoFilesFetches = isoStorageDomains.map(isoStorageDomain => fetchAllFilesForISO(isoStorageDomain.id))
     yield all(isoFilesFetches)
   }
 }

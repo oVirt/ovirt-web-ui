@@ -23,15 +23,16 @@ const VmConsoles = ({ vm }) => {
       <dd className={style['console-box']}>
         {
           vmConsoles.map(c => (
-            <ConsoleButton
-              vm={vm}
-              consoleId={c.get('id')}
-              key={c.get('id')}
-              button=''
-              className='pficon pficon-screen'
-              tooltip={`Open ${c.get('protocol').toUpperCase()} console`} // TODO: l10n
-              shortTitle={c.get('protocol').toUpperCase()}
-            />
+            <span className={style['left-delimiter']}>
+              <ConsoleButton
+                vm={vm}
+                consoleId={c.get('id')}
+                key={c.get('id')}
+                className=''
+                tooltip={`Open ${c.get('protocol').toUpperCase()} console`} // TODO: l10n
+                shortTitle={c.get('protocol').toUpperCase()}
+              />
+            </span>
           ))
         }
 

@@ -3,7 +3,8 @@ import React from 'react'
 import AddVmButton from './components/VmDialog/AddVmButton'
 import PageRouter from './components/PageRouter'
 import { VmDetailToolbar, PoolDetailToolbar } from './components/Toolbar'
-import { PoolDetailPage, VmDetailPage, VmDialogPage, VmsPage } from './components/Pages'
+import { PoolDetailsPage, VmDetailsPage, VmEditPage, VmCreatePage, VmsPage } from './components/Pages'
+
 import { msg } from './intl'
 
 /**
@@ -26,29 +27,29 @@ export default function getRoutes (vms) {
         path: '/',
         exact: true,
         component: VmsPage,
-        toolbars: [(match) => (<AddVmButton key='addbutton' id={`route-add-vm`} />)],
+        toolbars: [() => (<AddVmButton key='addbutton' id={`route-add-vm`} />)],
       },
 
       {
         path: '/vm/add',
         exact: true,
-        title: (match) => msg.addNewVm(),
-        component: VmDialogPage,
-        toolbars: [], // Recently not used. When needed, see VmDialog/style.css - .vm-dialog-buttons
+        title: () => msg.addNewVm(),
+        component: VmCreatePage,
+        toolbars: [], // TODO: Recently not used. When needed, see VmDialog/style.css - .vm-dialog-buttons
         closeable: true,
       },
 
       {
         path: '/vm/:id',
-        title: (match) => vms.getIn(['vms', match.params.id, 'name']) || match.params.id,
-        component: VmDetailPage,
+        title: (match, vms) => vms.getIn(['vms', match.params.id, 'name']) || match.params.id,
+        component: VmDetailsPage,
         toolbars: [(match) => (<VmDetailToolbar match={match} key='vmaction' />)],
         routes: [
           {
             path: '/vm/:id/edit',
             title: (match) => msg.edit() || match.params.id,
-            component: VmDialogPage,
-            toolbars: [], // Recently not used. When needed, see VmDialog/style.css - .vm-dialog-buttons
+            component: VmEditPage,
+            toolbars: [], // TODO: Recently not used. When needed, see VmDialog/style.css - .vm-dialog-buttons
             closeable: true,
           },
         ],
@@ -56,8 +57,8 @@ export default function getRoutes (vms) {
 
       {
         path: '/pool/:id',
-        title: (match) => vms.getIn(['pools', match.params.id, 'name']) || match.params.id,
-        component: PoolDetailPage,
+        title: (match, vms) => vms.getIn(['pools', match.params.id, 'name']) || match.params.id,
+        component: PoolDetailsPage,
         toolbars: [(match) => (<PoolDetailToolbar match={match} key='poolaction' />)],
       },
     ],
