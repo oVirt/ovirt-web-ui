@@ -27,15 +27,14 @@ and access the VM Portal at [http://localhost:3000](http://localhost:3000)
 For the most current list of features, please refer to the [Milestones](https://github.com/oVirt/ovirt-web-ui/milestones)
 or [Issues](https://github.com/oVirt/ovirt-web-ui/issues) GitHub sections.
 
-The upcoming milestones:
+Upcoming milestones:
 
-### [v1.4.0](https://github.com/oVirt/ovirt-web-ui/milestone/6)
-The upcoming release shall newly support (among others):
-
-- event-driven data refresh to improve performance
-- Single Sign On oVirt host machine
-- Search by Name
-- Sorting
+### [v1.4.2](https://github.com/oVirt/ovirt-web-ui/milestone/11)
+Highlights:
+ - VM listing (main landing page) redesign!
+ - new PatternFly notifications
+ - snapshots support
+ - bug fixes
 
 
 ## Goals
@@ -142,7 +141,8 @@ For Firefox: [https://addons.mozilla.org/en-us/firefox/addon/remotedev/](https:/
 Please report issues and feature requests to the [GitHub issue tracker](https://github.com/oVirt/ovirt-web-ui/issues).
 
 ## Author(s)
-Please send author(s) any feedback on the project.
-
 - Marek Libra (mlibra@redhat.com)
-
+- Bohdan Iakymets (biakymet@redhat.com)
+- Jakub Niedermertl (jniederm@redhat.com)
+- Scott Dickerson (sdickers@redhat.com)
+- Greg Sheremeta (gshereme@redhat.com)
