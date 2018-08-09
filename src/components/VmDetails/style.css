@@ -1,0 +1,110 @@
+/* ---> GridComponents styles (Grid, Row, Col) */
+.grid-container { /* bootstrap4 .container-fluid (different padding/margins) */
+  width: 100%;
+  padding-right: 25px;
+  padding-left: 25px;
+  margin: 0 auto;
+}
+
+.grid-row { /* bootstrap4 .row */
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -20px;
+  margin-left: -20px;
+}
+
+.grid-column { /* bootstrap4 .col & .col-md */
+  position: relative;
+  width: 100%;
+  min-height: 1px;
+  padding-right: 20px;
+  padding-left: 20px;
+
+  flex: 1 1 0; /* grow shrink basis */
+  max-width: 100%;
+  /*
+    if the component specifies a column span X, it will override
+    flex and max-width so the col takes X/12 columns
+  */
+
+  display: flex;
+  flex-direction: column;
+}
+
+.grid-column[column-content="expand"] > :global(*) {
+  /* all children takes equal amount of available space */
+  flex: 1 0;
+}
+
+/* ---> VmDetailsContainer (index.js) styles */
+.details-container {
+  padding-top: 20px;
+}
+
+/* ---> CardEditButton styles */
+.card-edit-button {
+  float: right;
+  margin-top: 15px;
+  width: 25px;
+  height: 25px;
+  border: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.base-card-body .card-edit-button {
+  margin-top: -5px;
+}
+
+.card-edit-button:hover {
+  text-decoration: none;
+}
+
+.card-edit-button-disabled {
+  color: darkgrey;
+}
+
+.card-edit-button-enabled {
+  color: black;
+}
+
+/* ---> BaseCard styles */
+.base-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.base-card-heading {
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+
+.base-card-title-icon {
+  margin-right: 6px; /* match the left margin on .badge */
+  vertical-align: top;
+}
+
+.base-card-item-count-badge {
+  vertical-align: top;
+}
+
+.base-card-body {
+  flex: 1 0 0;
+}
+
+.base-card-footer {
+  flex-shrink: 0;
+}
+
+
+/* TODO: Temporary style for filler text. Remove once it isn't needed. */
+.demo-text {
+  padding: 5px;
+  color: black;
+  background-color: #00adef;
+  text-align: center;
+  font-family: 'Comic Sans MS';
+  font-weight: bold;
+}
