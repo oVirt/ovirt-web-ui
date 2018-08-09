@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import Immutable from 'immutable'
 
 import { connect } from 'react-redux'
-import { Redirect, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import NavigationPrompt from 'react-router-navigation-prompt'
 import Switch from 'react-bootstrap-switch'
 
@@ -22,12 +22,10 @@ import NavigationConfirmationModal from '../NavigationConfirmationModal'
 import SelectBox from '../SelectBox'
 import VmIcon from '../VmIcon'
 
+import { createVm, editVm } from '../../actions'
+
 import Selectors from '../../selectors'
-
-import { editVm, createVm, setSavedVm } from './actions'
-
-import { MAX_VM_MEMORY_FACTOR } from '../../constants/index'
-
+import { MAX_VM_MEMORY_FACTOR } from '../../constants'
 import { msg } from '../../intl'
 
 const zeroUID = '00000000-0000-0000-0000-000000000000'
@@ -40,7 +38,7 @@ class VmDialog extends React.Component {
     super(props)
 
     this.state = {
-      actionUniqueId: generateUnique('vm-dialog-'),
+      correlationId: '',
 
       id: undefined,
 
@@ -106,10 +104,6 @@ class VmDialog extends React.Component {
     this.setUiError = this.setUiError.bind(this)
   }
 
-  componentWillMount () {
-    this.props.onInit()
-  }
-
   componentDidMount () {
     const vm = this.props.vm
     if (vm) { // 'edit' mode
@@ -149,12 +143,14 @@ class VmDialog extends React.Component {
     setTimeout(() => this.initDefaults(), 0)
   }
 
-  generateActionUniqueId () {
-    const actionUniqueId = generateUnique('vm-dialog-')
-    this.setState({
-      actionUniqueId,
-    })
-    return actionUniqueId
+  static getDerivedStateFromProps (props, state) {
+    // If a user message correlating to the correlationId exists, the add/edit failed and
+    // the state should still be marked as isChanged to prevent page navigation.
+    if (props.userMessages.get('records').find(record => record.getIn([ 'failedAction', 'meta', 'correlationId' ]) === state.correlationId)) {
+      return { isChanged: true }
+    }
+
+    return null
   }
 
   setUiError (name, error) {
@@ -166,24 +162,26 @@ class VmDialog extends React.Component {
   }
 
   submitHandler (e) {
-    const actionUniqueId = this.generateActionUniqueId()
     e.preventDefault()
+    const correlationId = generateUnique('vm-dialog-')
     this.props.vm
-      ? this.props.updateVm(this.composeVm(), actionUniqueId)
-      : this.props.addVm(this.composeVm(), actionUniqueId, this.props.vms.get('page'))
+      ? this.props.updateVm(this.composeVm(), correlationId)
+      : this.props.addVm(this.composeVm(), correlationId)
     this.setState({
       saved: true,
+      isChanged: false,
+      correlationId,
     })
   }
 
   getLatestUserMessage () {
-    const { actionUniqueId } = this.state
+    const { correlationId } = this.state
     const filtered = this.props.userMessages
       .get('records')
-      .filter(record => record.failedAction && record.failedAction.actionUniqueId === actionUniqueId)
+      .filter(record => record.getIn([ 'failedAction', 'meta', 'correlationId' ]) === correlationId)
     const last = filtered.last()
 
-    return last ? last.message : undefined
+    return last && last.get('message')
   }
 
   getMemoryPolicy () {
@@ -424,7 +422,7 @@ class VmDialog extends React.Component {
 
     const template = this.getTemplate(this.state.templateId)
     if (template && template.get('clusterId') && template.get('clusterId') !== clusterId) {
-      this.doChangeTemplateIdTo(zeroUID) // Careful: this.state.clusterId still contains previous clusterId, call setTimeout(fnc, 0) if needed otherwise
+      this.doChangeTemplateIdTo(zeroUID) // Careful: this.state.clusterId still contains previous clusterId, call setTimeout(function, 0) if needed otherwise
     }
 
     // fire external data retrieval here if needed after Cluster change
@@ -513,7 +511,7 @@ class VmDialog extends React.Component {
   }
 
   render () {
-    const { icons, vmDialog, clusters, templates, storages, previousPath } = this.props
+    const { icons, clusters, templates, storages, previousPath } = this.props
     const { bootDevices } = this.state
     const vm = this.props.vm
     const isoStorages = storages.filter(storageDomain => storageDomain.get('type') === 'iso')
@@ -529,10 +527,6 @@ class VmDialog extends React.Component {
         )))
       }
     })
-
-    if (this.state.saved && vmDialog.getIn(['vm', 'id'])) {
-      return (<Redirect to={`/vm/${vmDialog.getIn(['vm', 'id'])}`} />)
-    }
 
     const isEdit = !!vm
     const isUp = (isEdit && isRunning(vm.get('status')))
@@ -810,15 +804,12 @@ VmDialog.propTypes = {
   templates: PropTypes.object.isRequired, // deep immutable, {[id: string]: Template}
   operatingSystems: PropTypes.object.isRequired, // deep immutable, {[id: string]: OperatingSystem}
   userMessages: PropTypes.object.isRequired,
-  vmDialog: PropTypes.object.isRequired,
   icons: PropTypes.object.isRequired,
-  vms: PropTypes.object.isRequired,
   storages: PropTypes.object.isRequired, // deep immutable, {[id: string]: StorageDomain}
   previousPath: PropTypes.string.isRequired,
 
   addVm: PropTypes.func.isRequired,
   updateVm: PropTypes.func.isRequired,
-  onInit: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -827,14 +818,11 @@ export default connect(
     templates: state.templates,
     operatingSystems: state.operatingSystems,
     userMessages: state.userMessages,
-    vmDialog: state.VmDialog,
     icons: state.icons,
-    vms: state.vms,
     storages: state.storageDomains,
   }),
   (dispatch) => ({
-    addVm: (vm, actionUniqueId, page) => dispatch(createVm(vm, actionUniqueId, page)),
-    updateVm: (vm, actionUniqueId) => dispatch(editVm(vm, actionUniqueId)),
-    onInit: () => dispatch(setSavedVm({ vm: null })),
+    addVm: (vm, correlationId) => dispatch(createVm({ vm, transformInput: true, pushToDetailsOnSuccess: true }, { correlationId })),
+    updateVm: (vm, correlationId) => dispatch(editVm({ vm, transformInput: true }, { correlationId })),
   })
 )(VmDialog)

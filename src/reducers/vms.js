@@ -10,6 +10,7 @@ import {
   REMOVE_VMS,
   SET_CHANGED,
   SET_PAGE,
+  SET_VM_ACTION_RESULT,
   SET_VM_CDROM,
   SET_VM_CONSOLES,
   SET_VM_DISKS,
@@ -48,6 +49,7 @@ const vms = actionReducer(initialState, {
         state = state.set('notAllPagesLoaded', true)
       }
       updates[vm.id] = vm
+      updates[vm.id].actionResults = state.getIn(['vms', vm.id, 'actionResults'], EMPTY_MAP).toJS()
 
       if (copySubResources) {
         updates[vm.id].cdrom = state.getIn(['vms', vm.id, 'cdrom'], Immutable.fromJS({ file: { id: '' } })).toJS()
@@ -175,23 +177,22 @@ const vms = actionReducer(initialState, {
     return state
   },
 
-  [FAILED_EXTERNAL_ACTION] (state, { payload }) { // see the userMessages() reducer
-    /* Example:
-     payload = {
-     "message": "[Cannot run VM. There is no host that satisfies current scheduling constraints.<snip>]",
-     "type": 409,
-     "action": {"type": "START_VM", "payload": {"vmId": "083bd87a-bdd6-47ee-b997-2c9eb381cf79"}}
-     }
-     */
-    if (payload.message && payload.action && payload.action.payload) {
-      if (payload.action.payload.vmId) {
-        const vmId = payload.action.payload.vmId
-        if (state.getIn(['vms', vmId])) {
-          return state.setIn(['vms', vmId, 'lastMessage'], payload.shortMessage ? payload.shortMessage : payload.message)
-        } else { // fail, if VM not found
-          logError('API reports an error associated to nonexistent VM. error=', payload, 'vmId=', vmId)
-        }
+  [FAILED_EXTERNAL_ACTION] (state, { payload: { message, shortMessage, type, failedAction } }) {
+    if (message && failedAction && failedAction.payload && failedAction.payload.vmId) {
+      const vmId = failedAction.payload.vmId
+      if (state.getIn(['vms', vmId])) {
+        return state.setIn(['vms', vmId, 'lastMessage'], shortMessage || message)
+      } else {
+        logError(`API reports an error associated to nonexistent VM ${vmId}, error`,
+          { message, shortMessage, type, failedAction })
       }
+    }
+    return state
+  },
+
+  [SET_VM_ACTION_RESULT] (state, { payload: { vmId, correlationId, result } }) {
+    if (state.getIn(['vms', vmId])) {
+      return state.setIn(['vms', vmId, 'actionResults', correlationId], result)
     }
     return state
   },

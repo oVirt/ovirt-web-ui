@@ -3,7 +3,6 @@ import { persistStateToLocalStorage } from './storage'
 import Selectors from './selectors'
 import AppConfiguration from './config'
 
-import vmEditSagas from './components/VmDialog/sagas'
 import vmDisksSagas from './components/VmDisks/sagas'
 import newDiskDialogSagas from './components/NewDiskDialog/sagas'
 import vmSnapshotsSagas from './components/VmSnapshots/sagas'
@@ -33,8 +32,10 @@ import {
   removeMissingVms,
   setVmSessions,
   persistState,
+  setVmActionResult,
 
   getSingleVm,
+  selectVmDetail as selectVmDetailAction,
   setClusters,
   setHosts,
   setTemplates,
@@ -90,9 +91,11 @@ import {
   ADD_VM_NIC,
   CHECK_CONSOLE_IN_USE,
   CHECK_TOKEN_EXPIRED,
+  CREATE_VM,
   DELAYED_REMOVE_ACTIVE_REQUEST,
   DELETE_VM_NIC,
   DOWNLOAD_CONSOLE_VM,
+  EDIT_VM,
   GET_ALL_CLUSTERS,
   GET_ALL_HOSTS,
   GET_ALL_OS,
@@ -548,11 +551,56 @@ function* startPool (action) {
   yield stopProgress({ poolId: action.payload.poolId, name: 'start', result })
 }
 
+export function* createVm (action) {
+  const result = yield callExternalAction('addNewVm', Api.addNewVm, action)
+
+  if (!result.error) {
+    const vmId = result.id
+    yield put(selectVmDetailAction({ vmId }))
+
+    if (action.payload.pushToDetailsOnSuccess) {
+      yield put(push(`/vm/${vmId}`))
+    }
+  }
+
+  return result
+}
+
+export function* editVm (action) {
+  const result = yield callExternalAction('editVm', Api.editVm, action)
+
+  let commitError = result.error
+  if (!commitError && action.payload.vm.cdrom) {
+    const changeCdResult = yield callExternalAction('changeCD', Api.changeCD, {
+      type: 'CHANGE_CD',
+      payload: {
+        vmId: action.payload.vm.id,
+        cdrom: action.payload.vm.cdrom,
+        running: action.payload.vm.status === 'up',
+      },
+    })
+    commitError = changeCdResult.error
+  }
+
+  if (!commitError) {
+    yield put(selectVmDetailAction({ vmId: action.payload.vm.id }))
+  }
+
+  if (action.meta && action.meta.correlationId) {
+    yield put(setVmActionResult({
+      vmId: action.payload.vm.id,
+      correlationId: action.meta.correlationId,
+      result: !commitError,
+    }))
+  }
+}
+
 function* removeVm (action) {
   yield startProgress({ vmId: action.payload.vmId, name: 'remove' })
   const result = yield callExternalAction('remove', Api.remove, action)
 
   if (result.status === 'complete') {
+    // TODO: Remove the VM from the store so we don't see it on the list page!
     yield put(push('/'))
   }
 
@@ -817,6 +865,8 @@ export function* rootSaga () {
     takeEvery(START_VM, startVm),
     takeEvery(SUSPEND_VM, suspendVm),
     takeEvery(START_POOL, startPool),
+    takeEvery(CREATE_VM, createVm),
+    takeEvery(EDIT_VM, editVm),
     takeEvery(REMOVE_VM, removeVm),
 
     takeEvery(CHECK_CONSOLE_IN_USE, getConsoleInUse),
@@ -842,7 +892,6 @@ export function* rootSaga () {
     takeEvery(DELAYED_REMOVE_ACTIVE_REQUEST, delayedRemoveActiveRequest),
 
     // Sagas from Components
-    ...vmEditSagas,
     ...vmDisksSagas,
     ...newDiskDialogSagas,
     ...vmSnapshotsSagas,

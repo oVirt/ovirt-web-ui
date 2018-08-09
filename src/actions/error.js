@@ -11,7 +11,28 @@ export function extractErrorText (exception) {
     : (exception.statusText || 'UNKNOWN')
 }
 
-export function failedExternalAction ({ message, shortMessage, exception, action }) {
+/*flow-include
+export type FailedExternalActionInput = {
+  message: string,
+  shortMessage: string,
+  exception?: Object,
+  failedAction?: Object
+}
+
+export type FailedExternalAction = {
+  type: 'FAILED_EXTERNAL_ACTION',
+  payload: {
+    message: string,
+    failedAction?: Object,
+  } | {
+    message: string,
+    shortMessage: string,
+    type: number | 'ERROR',
+    failedAction: Object
+  }
+}
+*/
+export function failedExternalAction ({ message, shortMessage, exception, failedAction } /*: FailedExternalActionInput */) /*: FailedExternalAction */ {
   if (exception) {
     message = message || extractErrorText(exception)
     message = shortMessage + '\n' + customizeErrorMessage(message)
@@ -24,7 +45,7 @@ export function failedExternalAction ({ message, shortMessage, exception, action
         message,
         shortMessage,
         type,
-        action,
+        failedAction,
       },
     }
   }
@@ -33,7 +54,7 @@ export function failedExternalAction ({ message, shortMessage, exception, action
     type: FAILED_EXTERNAL_ACTION,
     payload: {
       message,
-      action,
+      failedAction,
     },
   }
 }

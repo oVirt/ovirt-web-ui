@@ -1,7 +1,9 @@
 import {
   ADD_VM_NIC,
+  CREATE_VM,
   DELETE_VM_NIC,
   DOWNLOAD_CONSOLE_VM,
+  EDIT_VM,
   GET_RDP_VM,
   GET_VMS_BY_COUNT,
   GET_VMS_BY_PAGE,
@@ -16,6 +18,7 @@ import {
   SET_CHANGED,
   SET_DOMAIN,
   SET_OVIRT_API_VERSION,
+  SET_VM_ACTION_RESULT,
   SET_VM_CDROM,
   SET_VM_CONSOLES,
   SET_VM_DISKS,
@@ -136,6 +139,35 @@ export function suspendVm ({ vmId }) {
   }
 }
 
+export function createVm ({ vm, transformInput = false, pushToDetailsOnSuccess = false }, { correlationId, ...additionalMeta }) {
+  return {
+    type: CREATE_VM,
+    payload: {
+      vm,
+      transformInput,
+      pushToDetailsOnSuccess,
+    },
+    meta: {
+      correlationId,
+      ...additionalMeta,
+    },
+  }
+}
+
+export function editVm ({ vm, transformInput = false }, { correlationId, ...additionalMeta }) {
+  return {
+    type: EDIT_VM,
+    payload: {
+      vm,
+      transformInput,
+    },
+    meta: {
+      correlationId,
+      ...additionalMeta,
+    },
+  }
+}
+
 export function removeVm ({ vmId, force = false, preserveDisks = false }) {
   return {
     type: REMOVE_VM,
@@ -143,6 +175,17 @@ export function removeVm ({ vmId, force = false, preserveDisks = false }) {
       vmId,
       force,
       preserveDisks,
+    },
+  }
+}
+
+export function setVmActionResult ({ vmId, correlationId, result }) {
+  return {
+    type: SET_VM_ACTION_RESULT,
+    payload: {
+      vmId,
+      correlationId,
+      result,
     },
   }
 }

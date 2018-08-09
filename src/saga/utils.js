@@ -13,7 +13,7 @@ import { msg } from '../intl/index'
 import {
   failedExternalAction,
   checkTokenExpired,
-} from '../actions/index'
+} from '../actions'
 
 export const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -39,7 +39,7 @@ export function* callExternalAction (methodName, method, action, canBeMissing = 
       yield put(failedExternalAction({
         exception: e,
         shortMessage,
-        action,
+        failedAction: action,
       }))
     }
     return { error: e }

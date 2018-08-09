@@ -17,7 +17,7 @@ import * as Transforms from './transform'
 
 type VmIdType = { vmId: string }
 type PoolIdType = { poolId: string }
-type VmType = { vm: Object }
+type VmType = { vm: Object, transformInput?: boolean }
 
 const zeroUUID: string = '00000000-0000-0000-0000-000000000000'
 
@@ -159,22 +159,28 @@ const OvirtApi = {
     const url = `${AppConfiguration.applicationContext}/api/operatingsystems`
     return httpGet({ url })
   },
-  addNewVm ({ vm }: VmType): Promise<Object> {
+
+  addNewVm ({ vm, transformInput = false }: VmType): Promise<Object> {
     assertLogin({ methodName: 'addNewVm' })
-    const input = JSON.stringify(OvirtApi.internalVmToOvirt({ vm }))
+    const input = JSON.stringify(transformInput ? OvirtApi.internalVmToOvirt({ vm }) : vm)
     logDebug(`OvirtApi.addNewVm(): ${input}`)
+
     return httpPost({
       url: `${AppConfiguration.applicationContext}/api/vms`,
       input,
     })
   },
-  editVm ({ vm }: VmType): Promise<Object> {
+  editVm ({ vm, transformInput = false }: VmType): Promise<Object> {
     assertLogin({ methodName: 'editVm' })
+    const input = JSON.stringify(transformInput ? OvirtApi.internalVmToOvirt({ vm }) : vm)
+    logDebug(`OvirtApi.editVm(): ${input}`)
+
     return httpPut({
       url: `${AppConfiguration.applicationContext}/api/vms/${vm.id}`,
-      input: JSON.stringify(OvirtApi.internalVmToOvirt({ vm })),
+      input,
     })
   },
+
   start ({ vmId }: VmIdType): Promise<Object> {
     assertLogin({ methodName: 'start' })
     return httpPost({
@@ -416,12 +422,8 @@ const OvirtApi = {
 }
 
 /**
- * @typedef {'general' | '4.2' | '4.1' | '4.0'} OptionVersionType
- */
-/**
- *
  * @param {string} optionName
- * @param {OptionVersionType} version
+ * @param {'general' | '4.2' | '4.1' | '4.0'} version
  * @return {Promise.<?string>} promise of option value if options exists, promise of null otherwise.
  */
 function getOptionWithoutDefault (optionName: string, version: string): Promise<?string> {
