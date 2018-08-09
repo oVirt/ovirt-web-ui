@@ -123,21 +123,9 @@ const VM = {
       },
       bootMenuEnabled: vm.bios && vm.bios.boot_menu && convertBool(vm.bios.boot_menu.enabled),
       cloudInit: CloudInit.toInternal({ vm }),
-
-      // TODO: Should snapshots be part of 'subResources'?
-      snapshots: vm.snapshots && vm.snapshots.snapshot ? vm.snapshots.snapshot.map((snapshot) => Snapshot.toInternal({ snapshot })) : [],
     }
 
     if (includeSubResources) {
-      if (vm.disk_attachments && vm.disk_attachments.disk_attachment) {
-        for (let i in vm.disk_attachments.disk_attachment) {
-          parsedVm.disks.push(DiskAttachment.toInternal({
-            attachment: vm.disk_attachments.disk_attachment[i],
-            disk: vm.disk_attachments.disk_attachment[i].disk,
-          }))
-        }
-      }
-
       if (vm.cdroms && vm.cdroms.cdrom) {
         parsedVm.cdrom = CdRom.toInternal({ cdrom: vm.cdroms.cdrom[0] })
       }
@@ -146,12 +134,26 @@ const VM = {
         parsedVm.consoles = VmConsoles.toInternal({ consoles: vm.graphics_consoles })
       }
 
+      if (vm.disk_attachments && vm.disk_attachments.disk_attachment) {
+        parsedVm.disks = vm.disk_attachments.disk_attachment.map(
+          attachment => DiskAttachment.toInternal({ attachment, disk: attachment.disk })
+        )
+      }
+
+      if (vm.nics && vm.nics.nic) {
+        parsedVm.nics = vm.nics.nic.map(
+          nic => Nic.toInternal({ nic })
+        )
+      }
+
       if (vm.sessions && vm.sessions.session) {
         parsedVm.sessions = VmSessions.toInternal({ sessions: vm.sessions })
       }
 
-      if (vm.nics && vm.nics.nic) {
-        parsedVm.nics = vm.nics.nic.map((nic: Object): Object => Nic.toInternal({ nic }))
+      if (vm.snapshots && vm.snapshots.snapshot) {
+        parsedVm.snapshots = vm.snapshots.snapshot.map(
+          snapshot => Snapshot.toInternal({ snapshot })
+        )
       }
     }
 
@@ -559,7 +561,7 @@ const VmConsoles = {
         id: c.id,
         protocol: c.protocol,
       }
-    }).sort((a: Object, b: Object): number => b.protocol.length - a.protocol.length) // Hack: 'VNC' is shorter then 'SPICE'
+    }).sort((a: Object, b: Object): number => b.protocol.length - a.protocol.length) // Hack: VNC is shorter then SPICE
   },
 
   toApi: undefined,
