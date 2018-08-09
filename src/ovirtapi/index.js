@@ -2,6 +2,8 @@
 import type {
   CdRomType, ApiCdRomType,
   SnapshotType, ApiSnapshotType,
+  NicType,
+  VmType, ApiVmType,
 } from './types'
 
 import logger from '../logger'
@@ -21,7 +23,6 @@ import * as Transforms from './transform'
 
 type VmIdType = { vmId: string }
 type PoolIdType = { poolId: string }
-type VmType = { vm: Object, transformInput?: boolean }
 
 const zeroUUID: string = '00000000-0000-0000-0000-000000000000'
 
@@ -33,7 +34,7 @@ const OvirtApi = {
   // ---- Data transform functions (API -> internal, internal -> API)
   //
   //
-  vmToInternal ({ vm, getSubResources = false }: { vm: Object, getSubResources: boolean }): Object {
+  vmToInternal ({ vm, getSubResources = false }: { vm: ApiVmType, getSubResources: boolean }): VmType {
     return Transforms.VM.toInternal({ vm, includeSubResources: getSubResources })
   },
 
@@ -164,7 +165,7 @@ const OvirtApi = {
     return httpGet({ url })
   },
 
-  addNewVm ({ vm, transformInput = false }: VmType): Promise<Object> {
+  addNewVm ({ vm, transformInput = false }: { vm: Object, transformInput?: boolean }): Promise<Object> {
     assertLogin({ methodName: 'addNewVm' })
     const input = JSON.stringify(transformInput ? OvirtApi.internalVmToOvirt({ vm }) : vm)
     logger.log(`OvirtApi.addNewVm(): ${input}`)
@@ -174,7 +175,7 @@ const OvirtApi = {
       input,
     })
   },
-  editVm ({ vm, transformInput = false }: VmType): Promise<Object> {
+  editVm ({ vm, transformInput = false }: { vm: Object, transformInput?: boolean }): Promise<Object> {
     assertLogin({ methodName: 'editVm' })
     const input = JSON.stringify(transformInput ? OvirtApi.internalVmToOvirt({ vm }) : vm)
     logger.log(`OvirtApi.editVm(): ${input}`)
@@ -325,7 +326,7 @@ const OvirtApi = {
     })
   },
 
-  addNicToVm ({ nic, vmId }: { nic: Object, vmId: string }): Promise<Object> {
+  addNicToVm ({ nic, vmId }: { nic: NicType, vmId: string }): Promise<Object> {
     assertLogin({ methodName: 'addNicToVm' })
     const input = JSON.stringify(OvirtApi.internalNicToOvirt({ nic }))
     logger.log(`OvirtApi.addNicToVm(): ${input}`)

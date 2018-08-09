@@ -472,9 +472,21 @@ const Cluster = {
 //
 const Nic = {
   toInternal ({ nic }: { nic: ApiNicType }): NicType {
+    const ips = (
+      nic.reported_devices &&
+      nic.reported_devices.reported_device &&
+      nic.reported_devices.reported_device.map(device => device.ips.ip).reduce((ips, ipArray) => [...ipArray, ...ips], [])
+    ) || []
+
     return {
       id: nic.id,
       name: nic.name,
+      mac: nic.mac.address,
+      plugged: convertBool(nic.plugged),
+      ips,
+      ipv4: ips.filter(ip => ip.version === 'v4').map(rec => rec.address),
+      ipv6: ips.filter(ip => ip.version === 'v6').map(rec => rec.address),
+
       vnicProfile: {
         id: nic.vnic_profile ? nic.vnic_profile.id : null,
       },
