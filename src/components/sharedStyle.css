@@ -40,6 +40,22 @@
   z-index: 1050;
 }
 
+/* For Toast Notifications */
 .toast-margin-top {
     margin-top: 0;
+}
+
+/* For VM Card List and VM Details Overview Card */
+.operating-system-label {
+  font-size: 10px;
+  height: 18px;
+  padding: 0 6px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #363636;
+  background-color: #ededed;
+  min-width: 100px;
+  margin: -2px -2px 2px auto;
+  float: right;
+  text-align: center;
 }

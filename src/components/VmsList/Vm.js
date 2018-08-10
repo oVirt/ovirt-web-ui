@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link, withRouter } from 'react-router-dom'
 
+import sharedStyle from '../sharedStyle.css'
 import style from './style.css'
 
 import VmActions from '../VmActions'
@@ -29,7 +30,7 @@ const Vm = ({ vm, icons, os, onStart }) => {
     <div className={`col-xs-12 col-sm-6 col-md-4 col-lg-3`}>
       <div className='card-pf card-pf-view card-pf-view-select card-pf-view-single-select'>
         <div>
-          <span className={style['operating-system-label']}>{osName}</span>
+          <span className={sharedStyle['operating-system-label']}>{osName}</span>
         </div>
         <div className='card-pf-body'>
           <div className={`card-pf-top-element ${style['card-icon']}`}>
