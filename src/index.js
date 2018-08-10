@@ -11,9 +11,10 @@ import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { IntlProvider } from 'react-intl'
 
-import './index-nomodules.css'
+// TODO: Look at this WRT patternfly-react CSS!!!!!!!
 import 'patternfly/dist/css/patternfly.css'
 import 'patternfly/dist/css/patternfly-additions.css'
+import './index-nomodules.css'
 import * as branding from './branding'
 
 import { getSelectedMessages, locale } from './intl'
