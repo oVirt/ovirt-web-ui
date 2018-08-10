@@ -11,6 +11,7 @@ import {
   setConsoleOptions,
   setVmConsoles,
   vmActionInProgress,
+  setConsoleIsValid,
 } from '../../actions'
 
 import { callExternalAction } from '../utils'
@@ -58,6 +59,7 @@ export function* downloadVmConsole (action) {
       fileDownload({ data, fileName: `console.vv`, mimeType: 'application/x-virt-viewer' })
     }
   }
+  yield put(setConsoleInUse({ vmId, consoleInUse: null }))
 }
 
 /**
@@ -85,6 +87,7 @@ export function* fetchConsoleVmMeta ({ vmId }) {
  */
 export function* getConsoleInUse (action) {
   let { vmId, usbFilter, userId } = action.payload
+  yield put(setConsoleIsValid({ vmId, isValid: false }))
 
   const sessionsInternal = yield fetchVmSessions({ vmId })
   logDebug(`vmId: ${vmId}, sessions: ${JSON.stringify(sessionsInternal)}`)
@@ -92,9 +95,11 @@ export function* getConsoleInUse (action) {
   if (sessionsInternal && sessionsInternal.find((x) => x.consoleUser && (!userId || x.user.id === userId)) !== undefined) {
     yield put(setConsoleInUse({ vmId, consoleInUse: true }))
   } else {
-    yield put(downloadConsole({ vmId, usbFilter }))
     yield put(setConsoleInUse({ vmId, consoleInUse: false }))
+    yield put(downloadConsole({ vmId, usbFilter }))
+    yield put(setConsoleInUse({ vmId, consoleInUse: null }))
   }
+  yield put(setConsoleIsValid({ vmId, isValid: true }))
 }
 
 // ----- Console Options (per VM) held by `OptionsManager`

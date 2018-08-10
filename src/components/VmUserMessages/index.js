@@ -14,11 +14,11 @@ import { msg } from '../../intl'
 const UserMessage = ({ record, id }) => {
   // TODO: render record.type
   return (
-    <li className={`list-group-item ${style.crop}`} title={record.message} data-toggle='tooltip'>
+    <li className={`list-group-item ${style.crop}`} title={record.get('message')} data-toggle='tooltip'>
       <span>
         <pre className={style['message-box']} id={id}>
-          <Time time={record.time} cssClass={style['usermsg-time']} />
-          {record.message}
+          <Time time={record.get('time')} cssClass={style['usermsg-time']} />
+          {record.get('message')}
         </pre>
       </span>
     </li>
@@ -74,7 +74,7 @@ class VmUserMessages extends React.Component {
     const messagesList = messages.size !== 0
       ? (
         <ul className={`list-group ${style['messages-list']}`}>
-          {messages.map(r => (<UserMessage key={r.time} record={r} id={`${idPrefix}-msg-${idCounter++}`} />))}
+          {messages.map(r => (<UserMessage key={r.get('time')} record={r} id={`${idPrefix}-msg-${idCounter++}`} />))}
         </ul>)
       : (
         <div className={`blank-slate-pf ${style['no-messages']}`}>
