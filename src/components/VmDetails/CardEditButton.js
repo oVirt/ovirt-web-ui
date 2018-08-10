@@ -2,43 +2,49 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {
   Icon,
+  noop,
 } from 'patternfly-react'
 
 import style from './style.css'
 
 /**
- * Render the edit icon/button to enable/disable the editing of the content of a card.
+ * Render the edit icon/button to enable the editing of the content of a card.
+ *
+ * Once enabled, no user interaction can disable it. The containing component will
+ * need other ways to disable/cancel an edit and update this button to be !enabled.
  */
 class CardEditButton extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      enabled: props.enabled,
+      editEnabled: props.editEnabled,
     }
   }
 
   static getDerivedStateFromProps (props, state) {
-    if (state.enabled !== props.enabled) {
-      return { enabled: props.enabled }
+    if (state.editEnabled !== props.editEnabled) {
+      return { editEnabled: props.editEnabled }
     }
 
     return null
   }
 
-  render () {
-    const { tooltip, onClick } = this.props
-    const { enabled } = this.state
+  enableEditHandler = () => {
+    if (!this.state.editEnabled) {
+      this.props.onClick({ editEnabled: true })
+      this.setState({ editEnabled: true })
+    }
+  }
 
-    const classes = `${style['card-edit-button']} ${style[enabled ? 'card-edit-button-enabled' : 'card-edit-button-disabled']}`
-    const myClick = enabled
-      ? () => {}
-      : () => {
-        onClick({ enabled: !enabled })
-        this.setState({ enabled: !enabled })
-      }
+  render () {
+    const { tooltip } = this.props
+    const { editEnabled } = this.state
+
+    const classes = `${style['card-edit-button']} ${style[editEnabled ? 'card-edit-button-enabled' : 'card-edit-button-disabled']}`
+    const myClick = editEnabled ? noop : this.enableEditHandler
 
     return (
-      <a title={tooltip} onClick={myClick} className={classes}>
+      <a title={tooltip} onClick={(e) => { e.preventDefault(); myClick() }} className={classes}>
         <Icon type='pf' name='edit' />
       </a>
     )
@@ -46,13 +52,13 @@ class CardEditButton extends React.Component {
 }
 CardEditButton.propTypes = {
   tooltip: PropTypes.string,
-  enabled: PropTypes.bool,
+  editEnabled: PropTypes.bool,
   onClick: PropTypes.func,
 }
 CardEditButton.defaultProps = {
   tooltip: '',
-  enabled: false,
-  onClick: () => {},
+  editEnabled: false,
+  onClick: noop,
 }
 
 export default CardEditButton

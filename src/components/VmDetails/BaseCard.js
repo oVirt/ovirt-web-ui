@@ -27,33 +27,10 @@ import CardEditButton from './CardEditButton'
  *  - When in edit state, user clicks the __Cancel__ button -> onCancel() is called
  *  - When in edit state, user clicks the __Save__ button -> onSave() is called
  *
- * If any of the event handlers return null, the card will not transition its edit state.
+ * If any of the event handlers return false, the card will not transition its edit state.
  * This allows data validation or async operation completion.
  */
 class BaseCard extends React.Component {
-  static propTypes = {
-    title: PropTypes.string,
-    icon: PropTypes.shape({
-      type: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-    }),
-    itemCount: PropTypes.number,
-
-    editMode: PropTypes.bool,
-    editable: PropTypes.bool,
-    editTooltip: PropTypes.string,
-
-    onStartEdit: PropTypes.func,
-    onCancel: PropTypes.func,
-    onSave: PropTypes.func,
-    children: PropTypes.func,
-  }
-  static defaultProps = {
-    onStartEdit: noop,
-    onCancel: noop,
-    onSave: noop,
-  }
-
   constructor (props) {
     super(props)
     this.state = {
@@ -99,7 +76,7 @@ class BaseCard extends React.Component {
       <Card className={style['base-card']} {...excludeKeys(this.props, this.propTypeKeys)}>
         {hasHeading && (
           <CardHeading className={style['base-card-heading']}>
-            {editable && <CardEditButton tooltip={editTooltip} enabled={editing} onClick={this.clickEdit} />}
+            {editable && <CardEditButton tooltip={editTooltip} editEnabled={editing} onClick={this.clickEdit} />}
             <CardTitle>
               {hasIcon && <Icon type={icon.type} name={icon.name} className={style['base-card-title-icon']} />}
               {title}
@@ -110,7 +87,7 @@ class BaseCard extends React.Component {
 
         <CardBody className={style['base-card-body']}>
           {(!hasHeading && editable) && (
-            <CardEditButton tooltip={editTooltip} enabled={editing} onClick={this.clickEdit} />
+            <CardEditButton tooltip={editTooltip} editEnabled={editing} onClick={this.clickEdit} />
           )}
 
           {children({ isEditing: editing })}
@@ -125,6 +102,28 @@ class BaseCard extends React.Component {
       </Card>
     )
   }
+}
+BaseCard.propTypes = {
+  title: PropTypes.string,
+  icon: PropTypes.shape({
+    type: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+  }),
+  itemCount: PropTypes.number,
+
+  editMode: PropTypes.bool,
+  editable: PropTypes.bool,
+  editTooltip: PropTypes.string,
+
+  onStartEdit: PropTypes.func,
+  onCancel: PropTypes.func,
+  onSave: PropTypes.func,
+  children: PropTypes.func,
+}
+BaseCard.defaultProps = {
+  onStartEdit: noop,
+  onCancel: noop,
+  onSave: noop,
 }
 
 export default BaseCard
