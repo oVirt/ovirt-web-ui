@@ -6,7 +6,6 @@ import { withRouter } from 'react-router-dom'
 import { push } from 'connected-react-router'
 
 import { RouterPropTypeShapes } from '../propTypeShapes'
-import style from './sharedStyle.css'
 import Toolbar from './Toolbar/Toolbar'
 import Breadcrumb from './Breadcrumb'
 
@@ -74,12 +73,12 @@ class PageRouter extends React.Component {
 
     const RenderComponent = branch.route.component
     return (
-      <div className={style['page-router']}>
+      <div id='page-router'>
         <Breadcrumb branches={branches} />
         <Toolbar>
           {tools}
         </Toolbar>
-        <div className={style['page-router-render-component']} id='page-body'>
+        <div id='page-router-render-component'>
           <RenderComponent route={branch.route} match={branch.match} location={location} history={history} previousPath={previousPath} />
         </div>
       </div>

@@ -51,7 +51,7 @@ const VmsList = ({ vms, requestActive }) => {
     el = <NoVmAvailable />
   }
 
-  return el
+  return <div className='route-page-component'>{el}</div>
 }
 VmsList.propTypes = {
   vms: PropTypes.object.isRequired,
