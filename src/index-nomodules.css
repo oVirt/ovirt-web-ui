@@ -86,6 +86,19 @@ body {
   height: 28px;
 }
 
+.card-pf .card-pf-footer {
+  background-color: inherit;
+  padding-top: 10px;
+
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.card-pf .card-pf-footer button {
+  margin-left: 5px;
+  height: 28px;
+  width: 28px;
+}
 
 .bootstrap-switch-container .bootstrap-switch-label {
   height: 27px !important;
