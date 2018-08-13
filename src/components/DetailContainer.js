@@ -5,8 +5,10 @@ import sharedStyle from './sharedStyle.css'
 
 const DetailContainer = ({ children, ...props }) => {
   return (
-    <div className={`container-fluid ${sharedStyle['move-left-detail']} ${sharedStyle['detail-z-index']}`} {...props}>
-      {children}
+    <div className='detail-container'>
+      <div className={`container-fluid ${sharedStyle['move-left-detail']} ${sharedStyle['detail-z-index']}`} {...props}>
+        {children}
+      </div>
     </div>
   )
 }
