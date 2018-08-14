@@ -61,10 +61,6 @@
     z-index: 20;
 }
 
-.full-window {
-/*    height: calc(100vh - 160px);*/
-}
-
 .vm-detail-link {
     color: black;
 }
