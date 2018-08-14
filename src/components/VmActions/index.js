@@ -2,9 +2,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 
 import style from './style.css'
 import { msg } from '../../intl'
+import { RouterPropTypeShapes } from '../../propTypeShapes'
 
 import {
   canRestart,
@@ -194,6 +196,8 @@ class VmActions extends React.Component {
       pool,
       isOnCard = false,
       onRemove,
+      includeLegacyDetails = false,
+      location,
     } = this.props
 
     const isPool = !!pool
@@ -206,10 +210,13 @@ class VmActions extends React.Component {
     if (isOnCard) {
       let filteredActions = actions.filter((action) => !action.actionDisabled).sort((a, b) => a.priority < b.priority ? 1 : 0)
       filteredActions = filteredActions.length === 0 ? [ actions[0] ] : filteredActions
-      return <div className={`actions-line card-pf-items text-center ${style['action-height']}`}><VmDropdownActions id={`${idPrefix}-actions`} actions={filteredActions} /></div>
+
+      return <div className={`actions-line card-pf-items text-center ${style['action-height']}`}>
+        <VmDropdownActions id={`${idPrefix}-actions`} actions={filteredActions} />
+      </div>
     }
 
-    // Actions for toolbars
+    // Actions for the Toolbar
     const removeConfirmation = (
       <ConfirmationModal
         title={msg.remove()}
@@ -221,7 +228,8 @@ class VmActions extends React.Component {
                 <Checkbox
                   checked={this.state.removePreserveDisks}
                   onClick={() => this.setState((s) => { return { removePreserveDisks: !s.removePreserveDisks } })}
-                  label={msg.preserveDisks()} />
+                  label={msg.preserveDisks()}
+                />
               </div>
             )}
           </div>
@@ -234,16 +242,44 @@ class VmActions extends React.Component {
       <div className={`actions-line ${style['left-padding']}`}>
         <EmptyAction state={status} isOnCard={isOnCard} />
 
-        {actions.map(action => <ActionButtonWraper {...action} />)}
+        {actions.map(action => <ActionButtonWraper key={action.id} {...action} />)}
 
         <span className={style['button-spacer']} />
+        {includeLegacyDetails && (
+          <LinkButton
+            isOnCard={isOnCard}
+            shortTitle='Legacy View'
+            tooltip='Legacy View'
+            to={`/vm-legacy/${vm.get('id')}`}
+            button='btn btn-default'
+            className={`pficon pficon-edit ${style['action-link']}`}
+            id={`action-${vm.get('name')}-edit`}
+          />
+        )}
 
-        <LinkButton isOnCard={isOnCard}
+        {location && /vm-legacy/.test(location.pathname) && (
+          <LinkButton
+            isOnCard={isOnCard}
+            shortTitle='View'
+            tooltip='View'
+            to={`/vm/${vm.get('id')}`}
+            button='btn btn-default'
+            className={`pficon pficon-edit ${style['action-link']}`}
+            id={`action-${vm.get('name')}-edit`}
+          />
+        )}
+
+        <LinkButton
+          isOnCard={isOnCard}
           shortTitle={msg.edit()}
-          tooltip={msg.editVm()} to={`/vm/${vm.get('id')}/edit`}
+          tooltip={msg.editVm()}
+          to={`/vm/${vm.get('id')}/edit`}
           button='btn btn-default'
           className={`pficon pficon-edit ${style['action-link']}`}
-          id={`action-${vm.get('name')}-edit`} />
+          id={`action-${vm.get('name')}-edit`}
+        />
+        <span className={style['button-spacer']} />
+
         <ActionButtonWraper
           confirmation={removeConfirmation}
           actionDisabled={isPool || !canRemove(status) || vm.getIn(['actionInProgress', 'remove'])}
@@ -260,6 +296,9 @@ VmActions.propTypes = {
   vm: PropTypes.object.isRequired,
   pool: PropTypes.object,
   isOnCard: PropTypes.bool,
+  includeLegacyDetails: PropTypes.bool,
+
+  location: RouterPropTypeShapes.location.isRequired,
 
   onShutdown: PropTypes.func.isRequired,
   onRestart: PropTypes.func.isRequired,
@@ -270,15 +309,17 @@ VmActions.propTypes = {
   onStartVm: PropTypes.func.isRequired,
 }
 
-export default connect(
-  (state) => ({ }),
-  (dispatch, { vm, pool }) => ({
-    onShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: false })),
-    onRestart: () => dispatch(restartVm({ vmId: vm.get('id'), force: false })),
-    onForceShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: true })),
-    onSuspend: () => dispatch(suspendVm({ vmId: vm.get('id') })),
-    onRemove: ({ preserveDisks, force }) => dispatch(removeVm({ vmId: vm.get('id'), force, preserveDisks })),
-    onStartPool: () => dispatch(startPool({ poolId: pool.get('id') })),
-    onStartVm: () => dispatch(startVm({ vmId: vm.get('id') })),
-  })
-)(VmActions)
+export default withRouter(
+  connect(
+    (state) => ({ }),
+    (dispatch, { vm, pool }) => ({
+      onShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: false })),
+      onRestart: () => dispatch(restartVm({ vmId: vm.get('id'), force: false })),
+      onForceShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: true })),
+      onSuspend: () => dispatch(suspendVm({ vmId: vm.get('id') })),
+      onRemove: ({ preserveDisks, force }) => dispatch(removeVm({ vmId: vm.get('id'), force, preserveDisks })),
+      onStartPool: () => dispatch(startPool({ poolId: pool.get('id') })),
+      onStartVm: () => dispatch(startVm({ vmId: vm.get('id') })),
+    })
+  )(VmActions)
+)

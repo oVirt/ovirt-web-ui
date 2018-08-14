@@ -3,7 +3,7 @@ import React from 'react'
 import AddVmButton from './components/VmDialog/AddVmButton'
 import PageRouter from './components/PageRouter'
 import { VmDetailToolbar, PoolDetailToolbar } from './components/Toolbar'
-import { PoolDetailsPage, VmDetailsPage, VmEditPage, VmCreatePage, VmsPage } from './components/Pages'
+import { PoolDetailsPage, VmDetailsPage, VmEditPage, VmCreatePage, VmsPage, LegacyVmDetailsPage } from './components/Pages'
 
 import { msg } from './intl'
 
@@ -43,7 +43,7 @@ export default function getRoutes (vms) {
         path: '/vm/:id',
         title: (match, vms) => vms.getIn(['vms', match.params.id, 'name']) || match.params.id,
         component: VmDetailsPage,
-        toolbars: [(match) => (<VmDetailToolbar match={match} key='vmaction' />)],
+        toolbars: [(match) => (<VmDetailToolbar match={match} key='vmaction' includeLegacyDetails />)],
         routes: [
           {
             path: '/vm/:id/edit',
@@ -53,6 +53,13 @@ export default function getRoutes (vms) {
             closeable: true,
           },
         ],
+      },
+
+      {
+        path: '/vm-legacy/:id',
+        title: (match, vms) => vms.getIn(['vms', match.params.id, 'name']) || match.params.id,
+        component: LegacyVmDetailsPage,
+        toolbars: [(match) => (<VmDetailToolbar match={match} key='vmaction' />)],
       },
 
       {

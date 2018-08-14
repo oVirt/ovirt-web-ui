@@ -158,7 +158,7 @@ class VmDetail extends Component {
     }
 
     return (
-      <div className={style['main-container']} data-thisisvmdetail>
+      <div className={`detail-container ${style['main-container']}`} data-thisisvmdetail>
         <VmsListNavigation selectedVm={vm} expanded={this.state.vmsNavigationExpanded} toggleExpansion={this.toggleVmsNavExpansion} />
         <div className={style['vm-detail-main']} container='true'>
           <div className={this.state.vmsNavigationExpanded ? style['vms-nav-expanded'] : style['vms-nav-collapsed']}>
