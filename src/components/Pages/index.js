@@ -6,6 +6,7 @@ import { RouterPropTypeShapes } from '../../propTypeShapes'
 import VmDialog from '../VmDialog'
 import VmsList from '../VmsList'
 import VmDetails from '../VmDetails'
+import { default as LegacyVmDetails } from '../VmDetail'
 
 import { selectVmDetail, selectPoolDetail, getIsoStorageDomains, getConsoleOptions } from '../../actions'
 
@@ -15,6 +16,60 @@ import { selectVmDetail, selectPoolDetail, getIsoStorageDomains, getConsoleOptio
 const VmsPage = () => {
   return <VmsList />
 }
+/**
+ * Route component (for PageRouter) to view a VM's details
+ */
+class LegacyVmDetailsPage extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      vmId: undefined,
+    }
+  }
+
+  static getDerivedStateFromProps (props, state) {
+    if (state.vmId !== props.match.params.id) {
+      const vmId = props.match.params.id
+
+      // Assume the VM is not in props.vms, was shallow fetched or is stale.
+      // Force a refresh when it is selected for viewing.
+      props.getConsoleOptions(vmId)
+      props.getVmById(vmId)
+      return { vmId }
+    }
+
+    return null
+  }
+
+  render () {
+    const { vms } = this.props
+    const { vmId } = this.state
+
+    if (vmId && vms.getIn(['vms', vmId])) {
+      return (<LegacyVmDetails vm={vms.getIn(['vms', vmId])} />)
+    }
+
+    // TODO: Add handling for if the fetch runs but fails (FETCH-FAIL), see issue #631
+    console.info(`LegacyVmDetailsPage: VM id cannot be found: ${vmId}`)
+    return null
+  }
+}
+LegacyVmDetailsPage.propTypes = {
+  vms: PropTypes.object.isRequired,
+  match: RouterPropTypeShapes.match.isRequired,
+
+  getVmById: PropTypes.func.isRequired,
+  getConsoleOptions: PropTypes.func.isRequired,
+}
+const LegacyVmDetailsPageConnected = connect(
+  (state) => ({
+    vms: state.vms,
+  }),
+  (dispatch) => ({
+    getVmById: (vmId) => dispatch(selectVmDetail({ vmId })),
+    getConsoleOptions: (vmId) => dispatch(getConsoleOptions({ vmId })),
+  })
+)(LegacyVmDetailsPage)
 
 /**
  * Route component (for PageRouter) to view a VM's details
@@ -207,6 +262,7 @@ const VmEditPageConnected = connect(
 
 export {
   PoolDetailsPageConnected as PoolDetailsPage,
+  LegacyVmDetailsPageConnected as LegacyVmDetailsPage,
   VmDetailsPageConnected as VmDetailsPage,
   VmCreatePageConnected as VmCreatePage,
   VmEditPageConnected as VmEditPage,

@@ -572,7 +572,7 @@ class VmDialog extends React.Component {
       : null
 
     return (
-      <DetailContainer>
+      <div className='detail-container'><DetailContainer>
         <h1 className={style['header']} id={`${idPrefix}-${isEdit ? 'edit' : 'create'}-title`}>
           <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' />
           &nbsp;{dialogHeader}
@@ -783,7 +783,7 @@ class VmDialog extends React.Component {
           </div>
         </form>
 
-      </DetailContainer>
+      </DetailContainer></div>
     )
   }
 }
