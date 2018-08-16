@@ -7,7 +7,8 @@ import { Link } from 'react-router-dom'
 import NavigationPrompt from 'react-router-navigation-prompt'
 import Switch from 'react-bootstrap-switch'
 
-import { logDebug, generateUnique, templateNameRenderer } from '../../helpers'
+import logger from '../../logger'
+import { generateUnique, templateNameRenderer } from '../../helpers'
 import { isRunning, getVmIconId, isValidOsIcon } from '../utils'
 
 import style from './style.css'
@@ -193,7 +194,7 @@ class VmDialog extends React.Component {
       'max': this.state.memory * MAX_VM_MEMORY_FACTOR,
       'guaranteed': Math.round(guaranteed),
     }
-    logDebug('getMemoryPolicy() resulting memory_policy: ', memoryPolicy)
+    logger.log('getMemoryPolicy() resulting memory_policy: ', memoryPolicy)
 
     return memoryPolicy
   }
@@ -465,13 +466,13 @@ class VmDialog extends React.Component {
       const clustersList = clusters.toList()
       const def = (clustersList.filter(item => item.get('name') === defaultClusterName).first()) || clustersList.first()
       stateChange.clusterId = def ? def.get('id') : undefined
-      logDebug(`VmDialog initDefaults(): Setting initial value for clusterId = ${this.state.clusterId} to ${stateChange.clusterId}`)
+      logger.log(`VmDialog initDefaults(): Setting initial value for clusterId = ${this.state.clusterId} to ${stateChange.clusterId}`)
     }
 
     if (!this.getTemplate()) {
       const def = templates.get(zeroUID) || this.props.templates.toList().first()
       stateChange.templateId = def ? def.get('id') : undefined
-      logDebug(`VmDialog initDefaults(): Setting initial value for templateId = ${this.state.templateId} to ${stateChange.templateId}`)
+      logger.log(`VmDialog initDefaults(): Setting initial value for templateId = ${this.state.templateId} to ${stateChange.templateId}`)
     }
 
     if (!this.getOS()) {
@@ -483,7 +484,7 @@ class VmDialog extends React.Component {
           id: os.getIn(['icons', 'large', 'id']),
         }
       }
-      logDebug(`VmDialog initDefaults(): Setting initial value for osId = ${this.state.osId} to ${stateChange.osId}`)
+      logger.log(`VmDialog initDefaults(): Setting initial value for osId = ${this.state.osId} to ${stateChange.osId}`)
     }
 
     this.setState(stateChange)

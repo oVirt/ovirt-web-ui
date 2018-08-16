@@ -1,18 +1,5 @@
 import { Blob } from 'blob-util'
 import { locale as appLocale } from './intl'
-import logger from './logger'
-
-/**
- * Write DEBUG log message to console
- * @param msg
- */
-export const logDebug = logger.log
-
-/**
- * Write ERROR log message to console
- * @param msg
- */
-export const logError = logger.error
 
 // "payload":{"message":"Not Found","shortMessage":"LOGIN failed","type":404,"action":{"type":"LOGIN","payload":{"credentials":{"username":"admin@internal","password":"admi"}}}}}
 export function hidePassword ({ action, param }) {

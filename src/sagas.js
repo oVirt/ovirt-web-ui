@@ -18,7 +18,7 @@ import {
   throttle,
 } from 'redux-saga/effects'
 
-import { logDebug } from './helpers'
+import logger from './logger'
 
 import { push } from 'connected-react-router'
 import {
@@ -179,7 +179,7 @@ function* fetchIcon ({ iconId }) {
 }
 
 function* refreshData (action) {
-  logDebug('refreshData(): ', action.payload)
+  logger.log('refreshData(): ', action.payload)
   const shallowFetch = !!action.payload.shallowFetch
 
   // refresh VMs and remove any that haven't been refreshed
@@ -217,7 +217,7 @@ function* refreshData (action) {
 
   // update counts
   yield put(updateVmsPoolsCount())
-  logDebug('refreshData(): finished')
+  logger.log('refreshData(): finished')
 }
 
 function* fetchVmsByPage (action) {
@@ -270,7 +270,7 @@ function* fetchVmsByPageVLower (action) {
       yield fetchVmsSessions({ vms: internalVms })
       yield fetchVmsSnapshots({ vms: internalVms })
     } else {
-      logDebug('getVmsByPage() shallow fetch requested - skipping other resources')
+      logger.log('getVmsByPage() shallow fetch requested - skipping other resources')
     }
   }
 
@@ -328,7 +328,7 @@ function* fetchVmsByCountVLower (action) {
       yield fetchVmsSessions({ vms: internalVms })
       yield fetchVmsSnapshots({ vms: internalVms })
     } else {
-      logDebug('fetchVmsByCountVLower() shallow fetch requested - skipping other resources')
+      logger.log('fetchVmsByCountVLower() shallow fetch requested - skipping other resources')
     }
   }
 
@@ -813,11 +813,11 @@ let _SchedulerCount = 0
 
 function* schedulerWithFixedDelay (delayInSeconds = AppConfiguration.schedulerFixedDelayInSeconds) {
   const myId = _SchedulerCount++
-  logDebug(`⏰ schedulerWithFixedDelay[${myId}] starting fixed delay scheduler`)
+  logger.log(`⏰ schedulerWithFixedDelay[${myId}] starting fixed delay scheduler`)
 
   let enabled = true
   while (enabled) {
-    logDebug(`⏰ schedulerWithFixedDelay[${myId}] stoppable delay for: ${delayInSeconds}`)
+    logger.log(`⏰ schedulerWithFixedDelay[${myId}] stoppable delay for: ${delayInSeconds}`)
     const { stopped } = yield race({
       stopped: take(STOP_SCHEDULER_FIXED_DELAY),
       fixedDelay: call(delay, (delayInSeconds * 1000)),
@@ -825,9 +825,9 @@ function* schedulerWithFixedDelay (delayInSeconds = AppConfiguration.schedulerFi
 
     if (stopped) {
       enabled = false
-      logDebug(`⏰ schedulerWithFixedDelay[${myId}] scheduler has been stopped`)
+      logger.log(`⏰ schedulerWithFixedDelay[${myId}] scheduler has been stopped`)
     } else {
-      logDebug(`⏰ schedulerWithFixedDelay[${myId}] running after delay of: ${delayInSeconds}`)
+      logger.log(`⏰ schedulerWithFixedDelay[${myId}] running after delay of: ${delayInSeconds}`)
 
       const oVirtVersion = Selectors.getOvirtVersion()
       if (oVirtVersion.get('passed')) {
@@ -837,7 +837,7 @@ function* schedulerWithFixedDelay (delayInSeconds = AppConfiguration.schedulerFi
           page: Selectors.getCurrentPage(),
         }))
       } else {
-        logDebug(`⏰ schedulerWithFixedDelay[${myId}] event skipped since oVirt API version does not match`)
+        logger.log(`⏰ schedulerWithFixedDelay[${myId}] event skipped since oVirt API version does not match`)
       }
     }
   }
