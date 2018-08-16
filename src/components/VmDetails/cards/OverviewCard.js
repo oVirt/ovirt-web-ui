@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
+import sharedStyle from '../../sharedStyle.css'
 import { getOsHumanName, getVmIcon } from '../../utils'
 import { enumMsg } from '../../../intl'
 import { generateUnique } from '../../../helpers'
@@ -128,7 +129,7 @@ class OverviewCard extends React.Component {
         {({ isEditing }) => {
           return (
             <div>
-              <div className={style['os-name-tag']}>{getOsHumanName(vm.getIn(['os', 'type']))}</div>
+              <div className={`${sharedStyle['operating-system-label']} ${style['operating-system-label']}`}>{getOsHumanName(vm.getIn(['os', 'type']))}</div>
 
               <Media>
                 <Media.Left>
