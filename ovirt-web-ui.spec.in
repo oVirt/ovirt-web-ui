@@ -57,6 +57,18 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Fri Aug 17 2018 Greg Sheremeta <gshereme@redhat.com> - 1.4.2-1
+  Fixed issues:
+- Main > InfiniteScroll is broken [#708](https://github.com/oVirt/ovirt-web-ui/issues/708)
+- dev server doesn't work without redux dev tools installed [#688](https://github.com/oVirt/ovirt-web-ui/issues/688)
+- RDP button sends 'console.rdp' to the user at render time instead of onClick event time [#686](https://github.com/oVirt/ovirt-web-ui/issues/686)
+- Redesign notifications [#647](https://github.com/oVirt/ovirt-web-ui/issues/647)
+- cloud-init switch has no function [#642](https://github.com/oVirt/ovirt-web-ui/issues/642)
+- Redesign main page [#641](https://github.com/oVirt/ovirt-web-ui/issues/641)
+- ScrollPositionHistory not working [#416](https://github.com/oVirt/ovirt-web-ui/issues/416)
+- Sort operating systems [#409](https://github.com/oVirt/ovirt-web-ui/issues/409)
+- mobile: VMs in grid view are not all visible on mobile device [#367](https://github.com/oVirt/ovirt-web-ui/issues/367)
+
 * Thu Aug 2 2018 Greg Sheremeta <gshereme@redhat.com> - 1.4.1-1
   Fixed issues:
   - 'failed Not found' error with Connect automatically console option bug major [#509](https://github.com/oVirt/ovirt-web-ui/issues/509)
