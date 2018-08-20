@@ -15,6 +15,10 @@ import {
 
 import * as Transforms from './transform'
 
+import type {
+  ApiSnapshotType,
+} from './types'
+
 type VmIdType = { vmId: string }
 type PoolIdType = { poolId: string }
 type VmType = { vm: Object, transformInput?: boolean }
@@ -209,7 +213,7 @@ const OvirtApi = {
       contentType: 'application/xml',
     })
   },
-  addNewSnapshot ({ vmId, snapshot }: { vmId: string, snapshot: Object }): Promise<Object> {
+  addNewSnapshot ({ vmId, snapshot }: { vmId: string, snapshot: SnapshotType }): Promise<Object> {
     assertLogin({ methodName: 'addNewSnapshot' })
     const input = JSON.stringify(OvirtApi.internalSnapshotToOvirt({ snapshot }))
     logger.log(`OvirtApi.addNewSnapshot(): ${input}`)
@@ -221,7 +225,7 @@ const OvirtApi = {
   deleteSnapshot ({ snapshotId, vmId }: { snapshotId: string, vmId: string }): Promise<Object> {
     assertLogin({ methodName: 'deleteSnapshot' })
     return httpDelete({
-      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots/${snapshotId}?async=false`,
+      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots/${snapshotId}?async=true`,
     })
   },
   restoreSnapshot ({ snapshotId, vmId }: { snapshotId: string, vmId: string }): Promise<Object> {
@@ -232,19 +236,11 @@ const OvirtApi = {
       contentType: 'application/xml',
     })
   },
-  commitSnapshot ({ vmId }: { vmId: string }): Promise<Object> {
-    assertLogin({ methodName: 'commitSnapshot' })
-    return httpPost({
-      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/commitsnapshot`,
-      input: '<action />',
-      contentType: 'application/xml',
-    })
-  },
   snapshotDisks ({ vmId, snapshotId }: { vmId: string, snapshotId: string }): Promise<Object> {
     assertLogin({ methodName: 'snapshotDisks' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots/${snapshotId}/disks` })
   },
-  snapshot ({ vmId, snapshotId }: { vmId: string, snapshotId: string }): Promise<Object> {
+  snapshot ({ vmId, snapshotId }: { vmId: string, snapshotId: string }): Promise<ApiSnapshotType> {
     assertLogin({ methodName: 'snapshot' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots/${snapshotId}` })
   },

@@ -6,11 +6,10 @@ import Immutable from 'immutable'
 import { Icon, MessageDialog } from 'patternfly-react'
 import { msg } from '../../../../intl'
 import { restoreVmSnapshot } from './actions'
-import style from '../../style.css'
+import style from './style.css'
+import { getMinimizedString } from '../../../utils'
 
-const getMinimazedString = (str, maxChar) => (
-  str.length > maxChar ? `${str.substring(0, maxChar - 3)}...` : str
-)
+const MAX_DESCRIPTION_SIZE = 150
 
 class RestoreConfirmationModal extends React.Component {
   constructor (props) {
@@ -28,6 +27,7 @@ class RestoreConfirmationModal extends React.Component {
   close () {
     this.setState({ showModal: false })
   }
+
   handleRestore () {
     this.props.onRestore()
     this.close()
@@ -57,15 +57,14 @@ class RestoreConfirmationModal extends React.Component {
           primaryContent={
             <p
               className='lead'
-              dangerouslySetInnerHTML={{ __html: msg.areYouSureYouWantToRestoreSnapshot({ snapshotName: `"<strong>${getMinimazedString(snapshot.get('description'), 100)}</strong>"` }) }}
+              dangerouslySetInnerHTML={{ __html: msg.areYouSureYouWantToRestoreSnapshot({ snapshotName: `"<strong>${getMinimizedString(snapshot.get('description'), MAX_DESCRIPTION_SIZE)}</strong>"` }) }}
             />}
           secondaryContent={
-            snapshotsThatWillBeDeleted.size
-              ? <p>
-                {msg.nextSnapshotsWillBeDeleted()}
-                {snapshotsThatWillBeDeleted.map((s) => <div key={s.get('date')}>{s.get('description')}</div>)}
-              </p>
-              : null
+            snapshotsThatWillBeDeleted.size > 0 &&
+            <p>
+              {msg.nextSnapshotsWillBeDeleted()}
+              {snapshotsThatWillBeDeleted.map((s) => <div key={s.get('date')}>{s.get('description')}</div>)}
+            </p>
           }
         />
       </React.Fragment>

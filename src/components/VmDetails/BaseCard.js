@@ -76,9 +76,7 @@ class BaseCard extends React.Component {
 
   renderChildren (childProps) {
     const children = this.props.children || noop
-    return typeof children === 'function' ? children(childProps)
-      : React.isValidElement(children) ? React.cloneElement(children, childProps)
-        : children
+    return React.isValidElement(children) ? React.cloneElement(children, childProps) : children(childProps)
   }
 
   render () {

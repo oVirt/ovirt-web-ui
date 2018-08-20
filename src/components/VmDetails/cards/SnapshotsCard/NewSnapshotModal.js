@@ -4,8 +4,9 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { addVmSnapshot } from './actions'
 
-import { Button, Modal, Icon, FormControl, Alert, FormGroup, HelpBlock } from 'patternfly-react'
+import { Button, Modal, Icon, FormControl, Alert, FormGroup, HelpBlock, Form, Col } from 'patternfly-react'
 import { msg } from '../../../../intl'
+import style from './style.css'
 
 class NewSnapshotModal extends Component {
   constructor (props) {
@@ -49,7 +50,7 @@ class NewSnapshotModal extends Component {
           Create Snapshot
         </a>
 
-        <Modal show={this.state.showModal} onHide={this.close} dialogClassName='create-snapshot-container'>
+        <Modal show={this.state.showModal} onHide={this.close} dialogClassName={style['create-snapshot-container']}>
           <Modal.Header>
             <button
               className='close'
@@ -62,12 +63,12 @@ class NewSnapshotModal extends Component {
             <Modal.Title>{ msg.createSnapshot() }</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <form className='form-horizontal'>
-              <div className='col-sm-12'>
+            <Form horizontal>
+              <Col sm={12}>
                 <Alert type='info'>
                   { msg.snapshotInfo() }
                 </Alert>
-              </div>
+              </Col>
               <FormGroup bsClass='form-group col-sm-12 required' validationState={this.state.emptyDescription ? 'error' : null}>
                 <label className='col-sm-3 control-label'>
                   { msg.description() }
@@ -86,7 +87,7 @@ class NewSnapshotModal extends Component {
                   }
                 </div>
               </FormGroup>
-            </form>
+            </Form>
           </Modal.Body>
           <Modal.Footer>
             <Button

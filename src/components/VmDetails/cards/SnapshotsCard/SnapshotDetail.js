@@ -10,7 +10,7 @@ import {
 } from 'patternfly-react'
 import Immutable from 'immutable'
 
-import style from '../../style.css'
+import style from './style.css'
 
 import { msg } from '../../../../intl'
 
@@ -96,7 +96,7 @@ const SnapshotDetail = ({ snapshot, vmId, ...otherProps }) => {
           {msg.template()}
         </dt>
         <dd>
-          {template ? templateNameRenderer(template) : ''}
+          {template && templateNameRenderer(template)}
         </dd>
         <dt>
           {msg.cdromBoot()}
@@ -142,7 +142,11 @@ const SnapshotDetail = ({ snapshot, vmId, ...otherProps }) => {
         </dd>
       </dl>
     </div>
-    <div style={{ textAlign: 'left' }}><RestoreConfirmationModal snapshot={snapshot} vmId={vmId}><Button bsStyle='default'>{ msg.restoreSnapshot() }</Button></RestoreConfirmationModal></div>
+    <div style={{ textAlign: 'left' }}>
+      <RestoreConfirmationModal snapshot={snapshot} vmId={vmId}>
+        <Button bsStyle='default'>{ msg.restoreSnapshot() }</Button>
+      </RestoreConfirmationModal>
+    </div>
   </Popover>
 }
 

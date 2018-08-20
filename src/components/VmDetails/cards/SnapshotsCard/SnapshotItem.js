@@ -9,7 +9,7 @@ import {
   Tooltip,
 } from 'patternfly-react'
 
-import style from '../../style.css'
+import style from './style.css'
 
 import { msg } from '../../../../intl'
 import RestoreConfirmationModal from './RestoreConfirmationModal'
@@ -17,7 +17,10 @@ import DeleteConfirmationModal from '../../../VmModals/DeleteConfirmationModal'
 import SnapshotDetail from './SnapshotDetail'
 import { deleteVmSnapshot } from './actions'
 import { formatDateFromNow } from '../../../../helpers'
+import { getMinimizedString } from '../../../utils'
 import { PendingTaskTypes } from '../../../../reducers/pendingTasks'
+
+const MAX_DESCRIPTION_SIZE = 50
 
 const StatusTooltip = ({ icon, text, id }) => {
   return <OverlayTrigger overlay={<Tooltip id={id}>{text}</Tooltip>} placement='left' trigger={['hover', 'focus']}>
@@ -71,7 +74,8 @@ const SnapshotItem = ({ snapshot, vmId, isEditing, beingDeleted, onSnapshotDelet
   }
   return (
     <div className={style['snapshot-item']}>
-      {statusIcon} {snapshot.get('description')}
+      {statusIcon}
+      {getMinimizedString(snapshot.get('description'), MAX_DESCRIPTION_SIZE)}
       <span className={style['snapshot-time']}>{`(${formatDateFromNow(snapshot.get('date'))})`}</span>
       <span className={style['snapshot-item-actions']}>{ buttons }</span>
     </div>

@@ -12,8 +12,25 @@ export type TemplateType = Object
 export type ApiPoolType = Object
 export type PoolType = Object
 
-export type ApiSnapshotType = Object // { description: string }
-export type SnapshotType = Object
+export type ApiSnapshotType = {
+  id?: string,
+  description: string,
+  vm?: ApiVmType,
+  snapshot_type?: string,
+  date?: number,
+  snapshot_status?: string,
+  persist_memorystate?: string
+}
+export type SnapshotType = {
+  id: string,
+  description: string,
+  vm: VmType | {},
+  type: string,
+  date: number,
+  status: string,
+  persistMemoryState: boolean,
+  isActive: boolean
+}
 
 export type ApiDiskAttachmentType = Object
 export type ApiDiskType = Object

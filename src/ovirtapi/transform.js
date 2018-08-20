@@ -289,12 +289,12 @@ const Pool = {
 const Snapshot = {
   toInternal ({ snapshot }: { snapshot: ApiSnapshotType }): SnapshotType {
     return {
-      id: snapshot.id,
+      id: snapshot.id || '',
       description: snapshot.description,
       vm: snapshot.vm ? VM.toInternal({ vm: snapshot.vm }) : {},
-      type: snapshot.snapshot_type,
-      date: snapshot.date,
-      status: snapshot.snapshot_status,
+      type: snapshot.snapshot_type || '',
+      date: snapshot.date || Date.now(),
+      status: snapshot.snapshot_status || '',
       persistMemoryState: snapshot.persist_memorystate === 'true',
       isActive: snapshot.snapshot_type === 'active',
     }

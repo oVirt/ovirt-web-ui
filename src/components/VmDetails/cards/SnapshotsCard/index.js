@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import BaseCard from '../../BaseCard'
-import style from '../../style.css'
+import style from './style.css'
 
 import NewSnapshotModal from './NewSnapshotModal'
 import SnapshotItem from './SnapshotItem'
@@ -10,7 +10,7 @@ import SnapshotItem from './SnapshotItem'
 const Snapshots = ({ snapshots, vmId }) => {
   const isVmInPreview = !!snapshots.find(snapshot => snapshot.get('status') === 'in_preview')
   return (
-    <div>
+    <React.Fragment>
       {
         !isVmInPreview &&
         <div className={style['snapshot-create']}>
@@ -20,7 +20,7 @@ const Snapshots = ({ snapshots, vmId }) => {
       {snapshots.sort((a, b) => b.get('date') - a.get('date')).map((snapshot) => (
         <SnapshotItem key={snapshot.get('id')} snapshot={snapshot} vmId={vmId} isEditing={!isVmInPreview} />
       ))}
-    </div>
+    </React.Fragment>
   )
 }
 
@@ -33,7 +33,7 @@ Snapshots.propTypes = {
  * List of Snapshots taken of a VM
  */
 const SnapshotsCard = ({ vm }) => {
-  const snapshots = vm.get('snapshots', []).filter((s) => !s.get('isActive')) // TODO: sort as necessary
+  const snapshots = vm.get('snapshots', []).filter((s) => !s.get('isActive'))
 
   return (
     <BaseCard
