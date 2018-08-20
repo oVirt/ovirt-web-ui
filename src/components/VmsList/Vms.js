@@ -50,19 +50,17 @@ class Vms extends React.Component {
         loader={<div key='infinite-scroll-loader' className={style['loaderBox']}><div className={style['loader']} /></div>}
         useWindow={false}
       >
-        <div>
-          <ScrollPositionHistory uniquePrefix='vms-list'>
-            <div className={`container-fluid container-cards-pf ${style['movable-left']} ${style['full-window']}`}>
-              <div className={style['scrollingWrapper']}>
-                <div className='row row-cards-pf'>
-                  {sortedVms.map(vm => <Vm vm={vm} key={vm.get('id')} />)}
-                  {sortedPools.map(pool => <Pool pool={pool} key={pool.get('id')} />)}
-                </div>
-                <div className={style['overlay']} />
+        <ScrollPositionHistory uniquePrefix='vms-list' scrollContainerSelector='#page-router-render-component'>
+          <div className={`container-fluid container-cards-pf ${style['vm-card-list-container']}`}>
+            <div className={style['scrollingWrapper']}>
+              <div className='row row-cards-pf'>
+                {sortedVms.map(vm => <Vm vm={vm} key={vm.get('id')} />)}
+                {sortedPools.map(pool => <Pool pool={pool} key={pool.get('id')} />)}
               </div>
+              <div className={style['overlay']} />
             </div>
-          </ScrollPositionHistory>
-        </div>
+          </div>
+        </ScrollPositionHistory>
       </InfiniteScroll>
     )
   }

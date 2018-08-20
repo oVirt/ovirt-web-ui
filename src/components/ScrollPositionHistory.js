@@ -3,32 +3,37 @@ import PropTypes from 'prop-types'
 
 import { loadFromSessionStorage, saveToSessionStorage } from '../storage'
 
+/*
+ * NOTE: On a page reload, if the scroll position was quite high (the user scrolled
+ *       down quite far), that scroll position will not be available until multiple
+ *       pages of VMs are loaded.  So instead the user will be scrolled to the place
+ *       where the last current loaded VM is rendered.
+ */
 class ScrollPositionHistory extends React.Component {
   componentDidMount () {
-    const { uniquePrefix } = this.props
+    const { uniquePrefix, scrollContainerSelector } = this.props
 
     const scrollTop = loadFromSessionStorage(`${uniquePrefix}-scroll-top`) || 0
-
-    // So far, main browser's window is used for scrolling
-    window.document.querySelector('#page-router-render-component').scrollTop = scrollTop
+    window.document.querySelector(scrollContainerSelector).scrollTop = scrollTop
   }
 
   componentWillUnmount () {
-    const { uniquePrefix } = this.props
+    const { uniquePrefix, scrollContainerSelector } = this.props
 
-    const scrollTop = window.document.querySelector('#page-router-render-component').scrollTop
+    const scrollTop = window.document.querySelector(scrollContainerSelector).scrollTop
     saveToSessionStorage(`${uniquePrefix}-scroll-top`, '' + scrollTop)
   }
 
   render () {
     return (
-      <div>
+      <React.Fragment>
         {this.props.children}
-      </div>
+      </React.Fragment>
     )
   }
 }
 ScrollPositionHistory.propTypes = {
+  scrollContainerSelector: PropTypes.string.isRequired,
   uniquePrefix: PropTypes.string.isRequired,
   children: PropTypes.any,
 }
