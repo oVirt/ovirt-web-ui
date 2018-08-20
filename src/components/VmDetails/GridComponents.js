@@ -9,7 +9,7 @@ import styles from './style.css'
  */
 const Grid = ({ className = '', children, ...props }) => {
   const cn = `${styles['grid-container']} ${className}`
-  return <div className={cn} {...props}>{children}</div>
+  return <div className={cn}>{children}</div>
 }
 Grid.propTypes = {
   children: PropTypes.node.isRequired,
@@ -18,7 +18,7 @@ Grid.propTypes = {
 
 const Row = ({ className = '', children, ...props }) => {
   const cn = `${styles['grid-row']} ${className}`
-  return <div className={cn} {...props}>{children}</div>
+  return <div className={cn}>{children}</div>
 }
 Row.propTypes = {
   children: PropTypes.node.isRequired,
@@ -37,7 +37,6 @@ const Col = ({ className = '', cols = -1, style, children, content = 'expand', .
       column-content={content}
       className={cn}
       style={{ ...col, ...style }}
-      {...props}
     >
       {children}
     </div>
