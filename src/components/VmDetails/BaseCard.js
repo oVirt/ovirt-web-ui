@@ -19,16 +19,28 @@ import CardEditButton from './CardEditButton'
 /**
  * Base VM details card.  Support common layouts and view vs edit modes.
  *
- * Specifying __editMode__ allows the containing component to control the card's
- * edit state.  Leave __editMode__ undefined to allow the card to control itself.
+ * Content of the component may vary based on the edit state of the card. Children
+ * may be a function of the form -
+ *   ({ isEditing }) => ...
  *
- * When the user interacts with the card, the card will fire event handler:
- *  - When in non-edit state, user clicks the __Edit__ icon -> onStartEdit() is called
- *  - When in edit state, user clicks the __Cancel__ button -> onCancel() is called
- *  - When in edit state, user clicks the __Save__ button -> onSave() is called
+ * an element of the form -
+ *   <Element isEditing={true/false} />
  *
- * If any of the event handlers return false, the card will not transition its edit state.
- * This allows data validation or async operation completion.
+ * or any other node type.
+ *
+ * __editMode__ allows the containing component to control the card's edit state.
+ *              Leave it undefined to allow the card to control itself.
+ *
+ * As a user interacts with the card, events are fired. If any of the event
+ * handlers return false, the card will not transition its edit state. This
+ * allows data validation or async operation completion.
+ *
+ *   Events while in non-edit state -
+ *     user clicks the __Edit__ icon -> onStartEdit()
+ *
+ *   Events while in edit state -
+ *     user clicks the __Cancel__ button -> onCancel()
+ *     user clicks the __Save__ button -> onSave()
  */
 class BaseCard extends React.Component {
   constructor (props) {
@@ -37,24 +49,36 @@ class BaseCard extends React.Component {
       edit: props.editMode,
     }
     this.propTypeKeys = Object.keys(BaseCard.propTypes)
+
+    this.clickEdit = this.clickEdit.bind(this)
+    this.clickCancel = this.clickCancel.bind(this)
+    this.clickSave = this.clickSave.bind(this)
+    this.renderChildren = this.renderChildren.bind(this)
   }
 
-  clickEdit = () => {
+  clickEdit () {
     if (this.props.onStartEdit() !== false) {
       this.setState({ edit: true })
     }
   }
 
-  clickCancel = () => {
+  clickCancel () {
     if (this.props.onCancel() !== false) {
       this.setState({ edit: false })
     }
   }
 
-  clickSave = () => {
+  clickSave () {
     if (this.props.onSave() !== false) {
       this.setState({ edit: false })
     }
+  }
+
+  renderChildren (childProps) {
+    const children = this.props.children || noop
+    return typeof children === 'function' ? children(childProps)
+      : React.isValidElement(children) ? React.cloneElement(children, childProps)
+        : children
   }
 
   render () {
@@ -65,13 +89,13 @@ class BaseCard extends React.Component {
       editMode = undefined,
       editable = true,
       editTooltip,
-      children = noop,
     } = this.props
     const editing = editMode === undefined ? this.state.edit : editMode
     const hasHeading = !!title
     const hasBadge = itemCount !== undefined
     const hasIcon = icon && icon.type && icon.name
 
+    const RenderChildren = this.renderChildren
     return (
       <Card className={style['base-card']} {...excludeKeys(this.props, this.propTypeKeys)}>
         {hasHeading && (
@@ -90,7 +114,7 @@ class BaseCard extends React.Component {
             <CardEditButton tooltip={editTooltip} editEnabled={editing} onClick={this.clickEdit} />
           )}
 
-          {children({ isEditing: editing })}
+          <RenderChildren isEditing={editing} />
         </CardBody>
 
         {editing && (
@@ -118,7 +142,7 @@ BaseCard.propTypes = {
   onStartEdit: PropTypes.func,
   onCancel: PropTypes.func,
   onSave: PropTypes.func,
-  children: PropTypes.func,
+  children: PropTypes.oneOfType([ PropTypes.func, PropTypes.node ]).isRequired,
 }
 BaseCard.defaultProps = {
   onStartEdit: noop,
