@@ -8,6 +8,10 @@ import {
 } from '../constants'
 import { actionReducer } from './utils'
 
+/*flow-include
+import type { FailedExternalAction } from '../actions/error'
+*/
+
 function addLogEntry ({ state, message, type = 'ERROR', failedAction }) {
   // TODO: use seq
   return state
@@ -21,14 +25,6 @@ function addLogEntry ({ state, message, type = 'ERROR', failedAction }) {
     })))
 }
 
-/**
- * The UserMessages reducer
- *
- * @param state
- * @param action
- * @returns {*}
- */
-
 const initialState = Immutable.fromJS({
   records: [],
   unread: false,
@@ -36,13 +32,14 @@ const initialState = Immutable.fromJS({
 })
 
 const userMessages = actionReducer(initialState, {
-  [FAILED_EXTERNAL_ACTION] (state, { payload: { message, shortMessage, type, action } }) { // see the vms() reducer
+  // Log external action failures (i.e. AJAX calls) as user messages
+  [FAILED_EXTERNAL_ACTION] (state, { payload: { message, shortMessage, type, failedAction } }/*: FailedExternalAction */) {
     return addLogEntry({
       state,
-      message: message,
+      message,
       shortMessage,
       type,
-      failedAction: action,
+      failedAction,
     })
   },
   [LOGIN_FAILED] (state, { payload: { message, errorCode } }) {
