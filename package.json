@@ -127,7 +127,8 @@
       ".*": "<rootDir>/config/jest/transform.js"
     },
     "setupFiles": [
-      "<rootDir>/config/polyfills.js"
+      "<rootDir>/config/polyfills.js",
+      "<rootDir>/config/jest/chalk.logger.js"
     ],
     "testPathIgnorePatterns": [
       "<rootDir>/(build|docs|node_modules|__tests__/helper|config)/"
