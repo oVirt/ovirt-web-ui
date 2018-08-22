@@ -50,7 +50,7 @@ class VmDetailsContainer extends React.Component {
     const { vm } = this.props
 
     return (
-      <Grid className={`route-page-component ${styles['details-container']}`}>
+      <Grid className={styles['details-container']}>
         <NavigationPrompt when={this.state.anyDirtyEdit}>
           {({ isActive, onConfirm, onCancel }) => (
             <NavigationConfirmationModal show={isActive} onYes={onConfirm} onNo={onCancel} />
