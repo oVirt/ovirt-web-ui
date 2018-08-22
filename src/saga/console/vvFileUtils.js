@@ -1,8 +1,8 @@
-import { logDebug } from '../../helpers'
+import logger from '../../logger'
 
 export function adjustVVFile ({ data, options, usbFilter, isSpice }) {
   // __options__ can either be a plain JS object or ImmutableJS Map
-  logDebug('adjustVVFile options:', options)
+  logger.log('adjustVVFile options:', options)
 
   if (options && ((options.get && options.get('fullscreen')) || options.fullscreen)) {
     data = data.replace(/^fullscreen=0/mg, 'fullscreen=1')
@@ -14,10 +14,10 @@ export function adjustVVFile ({ data, options, usbFilter, isSpice }) {
     text = 'secure-attention=ctrl+alt+end'
   }
   if (data.match(pattern)) {
-    logDebug('secure-attention found, replacing by ', text)
+    logger.log('secure-attention found, replacing by ', text)
     data = data.replace(pattern, text)
   } else {
-    logDebug('secure-attention was not found, inserting ', text)
+    logger.log('secure-attention was not found, inserting ', text)
     data = data.replace(/^\[virt-viewer\]$/mg, `[virt-viewer]\n${text}`) // ending \n is already there
   }
 
@@ -30,6 +30,6 @@ export function adjustVVFile ({ data, options, usbFilter, isSpice }) {
     data = data.replace(/^enable-smartcard=[01]$/mg, `enable-smartcard=${smartcardEnabled ? 1 : 0}`)
   }
 
-  logDebug('adjustVVFile data after adjustment:', data)
+  logger.log('adjustVVFile data after adjustment:', data)
   return data
 }

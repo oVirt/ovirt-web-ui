@@ -1,5 +1,5 @@
 import { Map } from 'immutable'
-import { logDebug } from '../helpers'
+import logger from '../logger'
 import { UPDATE_ICONS, REMOVE_ACTIVE_REQUEST, DELAYED_REMOVE_ACTIVE_REQUEST, ADD_ACTIVE_REQUEST } from '../constants'
 
 /**
@@ -45,7 +45,7 @@ export const actionReducer = (initialState, handlers, verbose) => (state = initi
     }
 
     if (![ ADD_ACTIVE_REQUEST, REMOVE_ACTIVE_REQUEST, DELAYED_REMOVE_ACTIVE_REQUEST ].includes(action.type)) {
-      logDebug('Reducing action:', actionJson)
+      logger.log('Reducing action:', actionJson)
     }
   }
 

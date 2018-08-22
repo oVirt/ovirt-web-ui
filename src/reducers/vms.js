@@ -22,7 +22,7 @@ import {
   UPDATE_VMS,
   VM_ACTION_IN_PROGRESS,
 } from '../constants'
-import { logError } from '../helpers'
+import logger from '../logger'
 import { actionReducer, removeMissingItems } from './utils'
 
 const initialState = Immutable.fromJS({
@@ -80,7 +80,7 @@ const vms = actionReducer(initialState, {
     if (state.getIn(['vms', vmId])) {
       return state.setIn(['vms', vmId, 'disks'], Immutable.fromJS(disks)) // deep immutable
     } else { // fail, if VM not found
-      logError(`vms.setVmDisks() reducer: vmId ${vmId} not found`)
+      logger.error(`vms.setVmDisks() reducer: vmId ${vmId} not found`)
     }
     return state
   },
@@ -88,7 +88,7 @@ const vms = actionReducer(initialState, {
     if (state.getIn(['vms', vmId])) {
       return state.setIn(['vms', vmId, 'cdrom'], Immutable.fromJS(cdrom)) // deep immutable
     } else { // fail, if VM not found
-      logError(`vms.setVmCdrom() reducer: vmId ${vmId} not found`)
+      logger.error(`vms.setVmCdrom() reducer: vmId ${vmId} not found`)
     }
     return state
   },
@@ -97,14 +97,14 @@ const vms = actionReducer(initialState, {
       return state.setIn(['vms', vmId, 'snapshots'], Immutable.fromJS(snapshots)) // deep immutable
     }
 
-    logError(`vms.setVmSnapshots() reducer: vmId ${vmId} not found`)
+    logger.error(`vms.setVmSnapshots() reducer: vmId ${vmId} not found`)
     return state
   },
   [SET_VM_NICS] (state, { payload: { vmId, nics } }) {
     if (state.getIn(['vms', vmId])) {
       return state.setIn(['vms', vmId, 'nics'], Immutable.fromJS(nics)) // deep immutable
     } else { // fail, if VM not found
-      logError(`vms.setVmNics() reducer: vmId ${vmId} not found`)
+      logger.error(`vms.setVmNics() reducer: vmId ${vmId} not found`)
     }
     return state
   },
@@ -183,7 +183,7 @@ const vms = actionReducer(initialState, {
       if (state.getIn(['vms', vmId])) {
         return state.setIn(['vms', vmId, 'lastMessage'], shortMessage || message)
       } else {
-        logError(`API reports an error associated to nonexistent VM ${vmId}, error`,
+        logger.error(`API reports an error associated to nonexistent VM ${vmId}, error`,
           { message, shortMessage, type, failedAction })
       }
     }

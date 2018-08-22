@@ -1,6 +1,6 @@
 // @flow
 
-import { logDebug } from '../helpers'
+import logger from '../logger'
 import Selectors from '../selectors'
 import AppConfiguration from '../config'
 
@@ -163,7 +163,7 @@ const OvirtApi = {
   addNewVm ({ vm, transformInput = false }: VmType): Promise<Object> {
     assertLogin({ methodName: 'addNewVm' })
     const input = JSON.stringify(transformInput ? OvirtApi.internalVmToOvirt({ vm }) : vm)
-    logDebug(`OvirtApi.addNewVm(): ${input}`)
+    logger.log(`OvirtApi.addNewVm(): ${input}`)
 
     return httpPost({
       url: `${AppConfiguration.applicationContext}/api/vms`,
@@ -173,7 +173,7 @@ const OvirtApi = {
   editVm ({ vm, transformInput = false }: VmType): Promise<Object> {
     assertLogin({ methodName: 'editVm' })
     const input = JSON.stringify(transformInput ? OvirtApi.internalVmToOvirt({ vm }) : vm)
-    logDebug(`OvirtApi.editVm(): ${input}`)
+    logger.log(`OvirtApi.editVm(): ${input}`)
 
     return httpPut({
       url: `${AppConfiguration.applicationContext}/api/vms/${vm.id}`,
@@ -212,7 +212,7 @@ const OvirtApi = {
   addNewSnapshot ({ vmId, snapshot }: { vmId: string, snapshot: Object }): Promise<Object> {
     assertLogin({ methodName: 'addNewSnapshot' })
     const input = JSON.stringify(OvirtApi.internalSnapshotToOvirt({ snapshot }))
-    logDebug(`OvirtApi.addNewSnapshot(): ${input}`)
+    logger.log(`OvirtApi.addNewSnapshot(): ${input}`)
     return httpPost({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots`,
       input,
@@ -311,7 +311,7 @@ const OvirtApi = {
   changeCD ({ cdrom, vmId, running }: { cdrom: Object, vmId: string, running: boolean }): Promise<Object> {
     assertLogin({ methodName: 'changeCD' })
     const input = JSON.stringify(OvirtApi.internalCDRomToOvirt({ cdrom }))
-    logDebug(`OvirtApi.changeCD(): ${input}`)
+    logger.log(`OvirtApi.changeCD(): ${input}`)
     return httpPut({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/cdroms/${zeroUUID}?current=${running ? 'true' : 'false'}`,
       input,
@@ -320,7 +320,7 @@ const OvirtApi = {
   addNicToVm ({ nic, vmId }: { nic: Object, vmId: string }): Promise<Object> {
     assertLogin({ methodName: 'addNicToVm' })
     const input = JSON.stringify(OvirtApi.internalNicToOvirt({ nic }))
-    logDebug(`OvirtApi.addNicToVm(): ${input}`)
+    logger.log(`OvirtApi.addNicToVm(): ${input}`)
     return httpPost({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/nics`,
       input,
@@ -443,18 +443,18 @@ function getOptionWithoutDefault (optionName: string, version: string): Promise<
           .map(valueAndVersion => valueAndVersion.value)[0]
       } catch (error) {
         if (error instanceof TypeError) {
-          logDebug(`Response to getting option '${optionName}' has unexpected format:`, response)
+          logger.log(`Response to getting option '${optionName}' has unexpected format:`, response)
         }
         throw error
       }
       if (result === undefined) {
-        logDebug(`Config option '${optionName}' was not found for version '${version}'.`)
+        logger.log(`Config option '${optionName}' was not found for version '${version}'.`)
         return null
       }
       return result
     }, error => {
       if (error.status === 404) {
-        logDebug(`Config option '${optionName}' doesn't exist in any version.`)
+        logger.log(`Config option '${optionName}' doesn't exist in any version.`)
         return null
       }
       throw error

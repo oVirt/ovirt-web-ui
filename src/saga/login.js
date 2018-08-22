@@ -4,7 +4,7 @@ import AppConfiguration from '../config'
 import OptionsManager from '../optionsManager'
 import Selectors from '../selectors'
 
-import { logDebug } from '../helpers'
+import logger from '../logger'
 
 import {
   call,
@@ -69,7 +69,7 @@ export function* login (action) {
   const oVirtMeta = yield callExternalAction('getOvirtApiMeta', Api.getOvirtApiMeta, action)
   const versionOk = yield checkOvirtApiVersion(oVirtMeta)
   if (!versionOk) {
-    console.error('oVirt API version check failed')
+    logger.error('oVirt API version check failed')
     yield put(failedExternalAction({
       message: composeIncompatibleOVirtApiVersionMessage(oVirtMeta),
       shortMessage: 'oVirt API version check failed', // TODO: Localize
@@ -88,22 +88,22 @@ export function* login (action) {
 export function* doCheckTokenExpired (action) {
   try {
     yield call(Api.getOvirtApiMeta, action.payload)
-    console.info('doCheckTokenExpired(): token is still valid') // info level: to pair former HTTP 401 error message with updated information
+    logger.info('doCheckTokenExpired(): token is still valid') // info level: to pair former HTTP 401 error message with updated information
     return
   } catch (error) {
     if (error.status === 401) {
-      console.info('Token expired, going to reload the page')
+      logger.info('Token expired, going to reload the page')
       yield put(showTokenExpiredMessage())
 
       // Reload the page after a delay
       // No matter saga is canceled for whatever reason, the reload must happen, so here comes the ugly setTimeout()
       setTimeout(() => {
-        console.info('======= doCheckTokenExpired() issuing page reload')
+        logger.info('======= doCheckTokenExpired() issuing page reload')
         window.location.href = AppConfiguration.applicationURL
       }, 5 * 1000)
       return
     }
-    console.error('doCheckTokenExpired(): unexpected oVirt API error: ', error)
+    logger.error('doCheckTokenExpired(): unexpected oVirt API error: ', error)
   }
 }
 
@@ -130,7 +130,7 @@ function composeIncompatibleOVirtApiVersionMessage (oVirtMeta) {
  * Backward compatibility of the API is assumed.
  */
 export function compareVersion (actual, required) {
-  logDebug(`compareVersion(), actual=${JSON.stringify(actual)}, required=${JSON.stringify(required)}`)
+  logger.log(`compareVersion(), actual=${JSON.stringify(actual)}, required=${JSON.stringify(required)}`)
 
   if (actual.major >= required.major) {
     if (actual.major === required.major) {
@@ -153,7 +153,7 @@ function* checkOvirtApiVersion (oVirtMeta) {
         oVirtMeta['product_info']['version'] &&
         oVirtMeta['product_info']['version']['major'] &&
         oVirtMeta['product_info']['version']['minor'])) {
-    console.error('Incompatible oVirt API version: ', oVirtMeta)
+    logger.error('Incompatible oVirt API version: ', oVirtMeta)
     yield put(setOvirtApiVersion({ passed: false, ...oVirtMeta }))
     return false
   }

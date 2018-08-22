@@ -3,7 +3,8 @@ import { put } from 'redux-saga/effects'
 import Api from '../../ovirtapi'
 import Selectors from '../../selectors'
 import OptionsManager from '../../optionsManager'
-import { logDebug, fileDownload } from '../../helpers'
+import logger from '../../logger'
+import { fileDownload } from '../../helpers'
 import {
   downloadConsole,
   getConsoleOptions as getConsoleOptionsAction,
@@ -51,7 +52,7 @@ export function* downloadVmConsole (action) {
     if (data.error === undefined) {
       let options = Selectors.getConsoleOptions({ vmId })
       if (!options) {
-        logDebug('downloadVmConsole() console options not yet present, trying to load from local storage')
+        logger.log('downloadVmConsole() console options not yet present, trying to load from local storage')
         options = yield getConsoleOptions(getConsoleOptionsAction({ vmId }))
       }
 
@@ -90,7 +91,7 @@ export function* getConsoleInUse (action) {
   yield put(setConsoleIsValid({ vmId, isValid: false }))
 
   const sessionsInternal = yield fetchVmSessions({ vmId })
-  logDebug(`vmId: ${vmId}, sessions: ${JSON.stringify(sessionsInternal)}`)
+  logger.log(`vmId: ${vmId}, sessions: ${JSON.stringify(sessionsInternal)}`)
 
   if (sessionsInternal && sessionsInternal.find((x) => x.consoleUser && (!userId || x.user.id === userId)) !== undefined) {
     yield put(setConsoleInUse({ vmId, consoleInUse: true }))

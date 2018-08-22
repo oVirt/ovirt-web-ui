@@ -1,6 +1,7 @@
 import $ from 'jquery'
 
-import { setLogDebug, getURLQueryParameterByName } from './helpers'
+import { getURLQueryParameterByName } from './helpers'
+import { setLogDebug } from './logger'
 
 const CONFIG_URL = '/ovirt-engine/web-ui/ovirt-web-ui.config'
 

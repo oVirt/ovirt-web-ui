@@ -1,5 +1,5 @@
 import { saveToLocalStorage, loadFromLocalStorage, removeFromLocalStorage } from './storage'
-import { logDebug } from './helpers'
+import logger from './logger'
 
 export default {
   loadConsoleOptions ({ vmId }) {
@@ -10,7 +10,7 @@ export default {
     try {
       options = (optionsJson && JSON.parse(optionsJson)) || {}
     } catch (e) {
-      logDebug('Unable to parse consoleOptions from local storrage: ', optionsJson)
+      logger.log('Unable to parse consoleOptions from local storage: ', optionsJson)
       options = {}
     }
 

@@ -3,10 +3,8 @@ import {
   put,
 } from 'redux-saga/effects'
 
-import {
-  logDebug,
-  hidePassword,
-} from '../helpers'
+import logger from '../logger'
+import { hidePassword } from '../helpers'
 
 import { msg } from '../intl/index'
 
@@ -19,12 +17,12 @@ export const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 export function* callExternalAction (methodName, method, action, canBeMissing = false) {
   try {
-    logDebug(`External action ${methodName}() starts on ${JSON.stringify(hidePassword({ action }))}`)
+    logger.log(`External action ${methodName}() starts on ${JSON.stringify(hidePassword({ action }))}`)
     const result = yield call(method, action.payload)
     return result
   } catch (e) {
     if (!canBeMissing) {
-      logDebug(`External action exception: ${JSON.stringify(e)}`)
+      logger.log(`External action exception: ${JSON.stringify(e)}`)
 
       if (e.status === 401) { // Unauthorized
         yield put(checkTokenExpired())
@@ -59,7 +57,7 @@ export function* waitTillEqual (leftArg, rightArg, limit) {
     yield delay(20) // in ms
     counter--
 
-    logDebug('waitTillEqual() delay ...')
+    logger.log('waitTillEqual() delay ...')
   }
 
   return false

@@ -1,15 +1,16 @@
 // @flow
-/* eslint-disable import/first */
-
 /**
-  Flow agreement:
-  For simple types, like number, boolean, string and etc.: use lower-case,
-  For complex types, like Object, Array and etc.: use first letter in upper-case
-**/
+ Flow agreement:
+ For simple types, like number, boolean, string and etc.: use lower-case,
+ For complex types, like Object, Array and etc.: use first letter in upper-case
+ **/
+
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { IntlProvider } from 'react-intl'
+
+import logger from './logger'
 
 // TODO: Look at this WRT patternfly-react CSS!!!!!!!
 import 'patternfly/dist/css/patternfly.css'
@@ -22,7 +23,7 @@ import configureStore from './store'
 import Selectors from './selectors'
 import AppConfiguration, { readConfiguration } from './config'
 import { loadStateFromLocalStorage } from './storage'
-import { logDebug, logError, valuesOfObject } from './helpers'
+import { valuesOfObject } from './helpers'
 import { rootSaga } from './sagas'
 import {
   login,
@@ -34,8 +35,6 @@ import {
 import OvirtApi from './ovirtapi'
 
 import App from './App'
-
-// eslint-disable "import/first": off
 
 // Patternfly dependencies
 // jQuery needs to be globally available (webpack.ProvidePlugin can be also used for this)
@@ -67,7 +66,7 @@ function renderApp (store: Object) {
  */
 function fetchToken (): { token: string, username: string, domain: string, userId: string } {
   const userInfo = window.userInfo
-  logDebug(`SSO userInfo: ${JSON.stringify(userInfo)}`)
+  logger.log(`SSO userInfo: ${JSON.stringify(userInfo)}`)
 
   if (userInfo) {
     return {
@@ -91,7 +90,7 @@ function loadPersistedState (store: Object) {
 
   if (icons) {
     const iconsArray = valuesOfObject(icons)
-    console.log(`loadPersistedState: ${iconsArray.length} icons loaded`)
+    logger.log(`loadPersistedState: ${iconsArray.length} icons loaded`)
     store.dispatch(updateIcons({ icons: iconsArray }))
   }
 }
@@ -122,7 +121,7 @@ function initializeApiListener (store: Object) {
 }
 
 function onResourcesLoaded () {
-  console.log(`Current configuration: ${JSON.stringify(AppConfiguration)}`)
+  logger.log(`Current configuration: ${JSON.stringify(AppConfiguration)}`)
 
   addBrandedResources()
 
@@ -140,7 +139,7 @@ function onResourcesLoaded () {
   if (token) {
     store.dispatch(login({ username, token, userId }))
   } else {
-    logError('Missing SSO Token!')
+    logger.error('Missing SSO Token!')
   }
 }
 
