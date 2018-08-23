@@ -1,19 +1,20 @@
-.utilization-card-container > :global(.card-pf-body) {
+.utilization-card .chart-card {
+  box-shadow: none;
   margin-left: -20px;
   margin-right: -20px;
-  padding-bottom: 0;
-}
-
-.utilization-card-container .grid {
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
-.utilization-card-container :global(.card-pf-utilization) {
-  box-shadow: none;
   margin-bottom: 0;
 
+  padding: 0 10px;
+
   min-height: fit-content;
+  display: flex;
+  flex-direction: column;
+}
+
+.utilization-card .chart-card :global(.card-pf-body) {
+  padding-bottom: 0;
+  flex-grow: 1;
+
   display: flex;
   flex-direction: column;
 }
@@ -31,7 +32,8 @@
 
 .no-data-card-body .no-data-icon {
   font-size: 32pt;
-  color: rgba(0, 0, 0, 0.3); /* #9b9b9b; */
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.3);
 }
 
 .no-data-card-body .no-data-title {
@@ -55,10 +57,10 @@
 
 .no-history-chart .no-history-chart-icon {
   font-size: 12pt;
-  color: rgba(0, 0, 0, 0.3); /* #363636; */
+  color: rgba(0, 0, 0, 0.3);
 }
 
 .no-history-chart .no-history-chart-message {
   font-size: 90%;
-  color: rgba(0, 0, 0, 0.65); /* #363636; */
+  color: rgba(0, 0, 0, 0.65);
 }
