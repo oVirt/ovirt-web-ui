@@ -1,0 +1,31 @@
+/*
+ * Styles for the Overview Card
+ */
+
+.operating-system-label {
+  position: absolute;
+  top: 0;
+  right: 10px;
+  margin: auto;
+}
+
+.vm-name {
+  font-size: 150%;
+  margin-bottom: 5px;
+}
+
+.vm-status {
+  margin-bottom: 5px;
+}
+
+.vm-status .vm-status-icon {
+  margin: 2px;
+}
+
+.vm-status .vm-status-text {
+  margin-left: 5px;
+}
+
+.vm-description {
+  white-space: pre-wrap;
+}
