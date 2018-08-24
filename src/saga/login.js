@@ -1,5 +1,5 @@
 import Product from '../version'
-import Api from '../ovirtapi'
+import Api from 'ovirtapi'
 import AppConfiguration from '../config'
 import OptionsManager from '../optionsManager'
 import Selectors from '../selectors'

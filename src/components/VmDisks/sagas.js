@@ -1,7 +1,7 @@
 import { takeEvery, put } from 'redux-saga/effects'
 
 import { REMOVE_DISK } from './constants'
-import Api from '../../ovirtapi'
+import Api from 'ovirtapi'
 import { callExternalAction, delay } from '../../saga/utils'
 import { fetchDisks } from '../../sagas'
 import { addDiskRemovalPendingTask, removeDiskRemovalPendingTask } from '../../actions'
