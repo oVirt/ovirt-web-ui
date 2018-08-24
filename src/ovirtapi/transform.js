@@ -127,7 +127,7 @@ const VM = {
 
     if (includeSubResources) {
       if (vm.cdroms && vm.cdroms.cdrom) {
-        parsedVm.cdrom = CdRom.toInternal({ cdrom: vm.cdroms.cdrom[0] })
+        parsedVm.cdrom = CdRom.toInternal({ cdrom: vm.cdroms.cdrom[0] }) // in oVirt there is always exactly 1 cdrom
       }
 
       if (vm.graphics_consoles && vm.graphics_consoles.graphics_console) {
@@ -374,16 +374,15 @@ const CdRom = {
   toInternal ({ cdrom }: { cdrom: ApiCdRomType }): CdRomType {
     return {
       id: cdrom.id,
-      file: {
-        id: cdrom.file ? cdrom.file.id : '',
-      },
+      fileId: cdrom.file && cdrom.file.id,
     }
   },
 
   toApi ({ cdrom }: { cdrom: CdRomType }): ApiCdRomType {
     return {
+      id: cdrom.id,
       file: {
-        id: cdrom.file.id,
+        id: cdrom.fileId || '', // no fileId == Eject == ''
       },
     }
   },

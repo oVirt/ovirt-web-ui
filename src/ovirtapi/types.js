@@ -26,15 +26,14 @@ export type ApiStorageDomainType = Object
 export type StorageDomainType = Object
 
 export type ApiCdRomType = {
-  id?: string,
+  id: string,
   file?: {
     id: string
   }
 }
 export type CdRomType = {
-  file: {
-    id: string
-  }
+  id: string,
+  fileId?: string
 }
 
 export type ApiStorageDomainFileType = Object

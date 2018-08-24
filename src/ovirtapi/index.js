@@ -1,4 +1,7 @@
 // @flow
+import type {
+  CdRomType, ApiCdRomType,
+} from './types'
 
 import logger from '../logger'
 import Selectors from '../selectors'
@@ -64,8 +67,8 @@ const OvirtApi = {
 
   iconToInternal: Transforms.Icon.toInternal,
 
-  CDRomToInternal: Transforms.CdRom.toInternal,
-  internalCDRomToOvirt: Transforms.CdRom.toApi,
+  cdRomToInternal: Transforms.CdRom.toInternal,
+  internalCdRomToOvirt: Transforms.CdRom.toApi,
 
   SSHKeyToInternal: Transforms.SSHKey.toInternal,
 
@@ -303,20 +306,20 @@ const OvirtApi = {
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/storagedomains/${storageId}/files` })
   },
 
-  getCDRom ({ vmId, running }: { vmId: string, running: boolean }): Promise<Object> {
-    assertLogin({ methodName: 'getCDRom' })
-    return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/cdroms/${zeroUUID}?current=${running ? 'true' : 'false'}` })
+  getCdRom ({ vmId, current = true }: { vmId: string, current?: boolean }): Promise<ApiCdRomType> {
+    assertLogin({ methodName: 'getCdRom' })
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/cdroms/${zeroUUID}?current=${current ? 'true' : 'false'}` })
   },
-
-  changeCD ({ cdrom, vmId, running }: { cdrom: Object, vmId: string, running: boolean }): Promise<Object> {
-    assertLogin({ methodName: 'changeCD' })
-    const input = JSON.stringify(OvirtApi.internalCDRomToOvirt({ cdrom }))
-    logger.log(`OvirtApi.changeCD(): ${input}`)
+  changeCdRom ({ cdrom, vmId, current = true }: { cdrom: CdRomType, vmId: string, current?: boolean }): Promise<ApiCdRomType> {
+    assertLogin({ methodName: 'changeCdRom' })
+    const input = JSON.stringify(OvirtApi.internalCdRomToOvirt({ cdrom }))
+    logger.log(`OvirtApi.changeCdRom(): ${input}`)
     return httpPut({
-      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/cdroms/${zeroUUID}?current=${running ? 'true' : 'false'}`,
+      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/cdroms/${zeroUUID}?current=${current ? 'true' : 'false'}`,
       input,
     })
   },
+
   addNicToVm ({ nic, vmId }: { nic: Object, vmId: string }): Promise<Object> {
     assertLogin({ methodName: 'addNicToVm' })
     const input = JSON.stringify(OvirtApi.internalNicToOvirt({ nic }))
