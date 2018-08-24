@@ -1,6 +1,6 @@
 import { put } from 'redux-saga/effects'
 
-import Api from '../../ovirtapi'
+import Api from 'ovirtapi'
 import Selectors from '../../selectors'
 import OptionsManager from '../../optionsManager'
 import logger from '../../logger'

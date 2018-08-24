@@ -1,7 +1,7 @@
 import { takeEvery, put } from 'redux-saga/effects'
 
 import { ADD_VM_SNAPSHOT, DELETE_VM_SNAPSHOT, RESTORE_VM_SNAPSHOT } from './constants'
-import Api from '../../ovirtapi'
+import Api from 'ovirtapi'
 import { callExternalAction, delay } from '../../saga/utils'
 import { fetchVmSnapshots, startProgress, stopProgress } from '../../sagas'
 import { addSnapshotRemovalPendingTask, removeSnapshotRemovalPendingTask } from '../../actions'
