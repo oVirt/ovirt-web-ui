@@ -304,6 +304,10 @@ export const messages = {
     message: 'Are you sure you want to drop your changes?',
     description: 'Message in the modal dialog opened when a user tried to navigate off an editor page after changes have been made.',
   },
+  globalErrorBoundaryTitle: 'Sorry, VM Portal is currently having some issues.',
+  globalErrorBoundaryDescription: 'Please refresh page or log out and log back in. If the issue persists, please report a bug on ',
+  gitHub: 'GitHub',
+
 }
 
 export type MessageIdType = $Keys<typeof messages>

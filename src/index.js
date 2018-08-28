@@ -34,6 +34,7 @@ import {
 import OvirtApi from './ovirtapi'
 
 import App from './App'
+import GlobalErrorBoundary from './GlobalErrorBoundary'
 
 // eslint-disable "import/first": off
 
@@ -48,11 +49,14 @@ window.combobox = require('patternfly-bootstrap-combobox/js/bootstrap-combobox.j
 
 function renderApp (store: Object) {
   ReactDOM.render(
-    <Provider store={store}>
-      <IntlProvider locale={locale} messages={getSelectedMessages()}>
-        <App history={store.history} />
-      </IntlProvider>
-    </Provider>,
+    <GlobalErrorBoundary>
+      <Provider store={store}>
+        <IntlProvider locale={locale} messages={getSelectedMessages()}>
+          <App history={store.history} />
+        </IntlProvider>
+      </Provider>
+    </GlobalErrorBoundary>,
+
     (document.getElementById('root'): any)
   )
 }
