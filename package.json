@@ -133,7 +133,8 @@
       "<rootDir>/(build|docs|node_modules|__tests__/helper|config)/"
     ],
     "testEnvironment": "jsdom",
-    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(js|jsx)$"
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(js|jsx)$",
+    "testURL": "http://localhost/"
   },
   "eslintConfig": {
     "extends": "./config/eslint.js"

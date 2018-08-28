@@ -35,6 +35,7 @@ import {
 import OvirtApi from './ovirtapi'
 
 import App from './App'
+import GlobalErrorBoundary from './GlobalErrorBoundary'
 
 // Patternfly dependencies
 // jQuery needs to be globally available (webpack.ProvidePlugin can be also used for this)
@@ -47,11 +48,14 @@ window.combobox = require('patternfly-bootstrap-combobox/js/bootstrap-combobox.j
 
 function renderApp (store: Object) {
   ReactDOM.render(
-    <Provider store={store}>
-      <IntlProvider locale={locale} messages={getSelectedMessages()}>
-        <App history={store.history} />
-      </IntlProvider>
-    </Provider>,
+    <GlobalErrorBoundary>
+      <Provider store={store}>
+        <IntlProvider locale={locale} messages={getSelectedMessages()}>
+          <App history={store.history} />
+        </IntlProvider>
+      </Provider>
+    </GlobalErrorBoundary>,
+
     (document.getElementById('root'): any)
   )
 }
