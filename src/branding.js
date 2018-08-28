@@ -17,6 +17,7 @@ export const resourcesUrls = {
   get baseStylesheet (): string { return getBrandedResourceUrl('style.css') },
   get brandStylesheet (): string { return getBrandedResourceUrl('brand.css') },
   get fixedStrings (): string { return getBrandedResourceUrl('fixed-strings.json') },
+  get errorImg (): string { return getBrandedResourceUrl('images/ovirt_lost_map.png') },
 }
 
 export function loadOnce (): Promise<void> {
