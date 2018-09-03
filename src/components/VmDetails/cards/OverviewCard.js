@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import sharedStyle from '../../sharedStyle.css'
-import { getOsHumanName, getVmIcon } from '../../utils'
+import { getOsHumanName, getVmIcon, doesUserCanEditVm } from '../../utils'
 import { enumMsg } from '../../../intl'
 import { generateUnique } from '../../../helpers'
 
@@ -113,7 +113,7 @@ class OverviewCard extends React.Component {
   }
 
   render () {
-    const { vm, icons, operatingSystems } = this.props
+    const { vm, icons, operatingSystems, isEditable } = this.props
     const { isEditing, correlatedMessages } = this.state
 
     const icon = getVmIcon(icons, operatingSystems, vm)
@@ -121,6 +121,7 @@ class OverviewCard extends React.Component {
     return (
       <BaseCard
         editMode={isEditing}
+        editable={isEditable}
         editTooltip={`Edit ${vm.get('id')}`}
         onStartEdit={this.handleCardOnStartEdit}
         onCancel={this.handleCardOnCancel}
@@ -180,6 +181,7 @@ class OverviewCard extends React.Component {
 OverviewCard.propTypes = {
   vm: PropTypes.object,
   onEditChange: PropTypes.func,
+  isEditable: PropTypes.bool,
 
   icons: PropTypes.object.isRequired,
   operatingSystems: PropTypes.object.isRequired, // deep immutable, {[id: string]: OperatingSystem}
@@ -189,10 +191,11 @@ OverviewCard.propTypes = {
 }
 
 export default connect(
-  (state) => ({
+  (state, { vm }) => ({
     icons: state.icons,
     operatingSystems: state.operatingSystems,
     userMessages: state.userMessages,
+    isEditable: doesUserCanEditVm(vm, state.config),
   }),
   (dispatch) => ({
     saveChanges: (minimalVmChanges, correlationId) => dispatch(editVm({ vm: minimalVmChanges }, { correlationId })),

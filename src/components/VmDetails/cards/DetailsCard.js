@@ -1,5 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+
+import { doesUserCanEditVm } from '../../utils'
 
 import BaseCard from '../BaseCard'
 import style from '../style.css'
@@ -8,10 +11,11 @@ import style from '../style.css'
  * Specific information and details of the VM (status, uptime, IP, FQDN
  * host, cluster, data center, template, CD, ??could-init??
  */
-const DetailsCard = ({ vm, onEditChange }) => {
+const DetailsCard = ({ vm, isEditable, onEditChange }) => {
   return (
     <BaseCard
       title='Details'
+      editable={isEditable}
       editTooltip={`Edit details for ${vm.get('id')}`}
       onStartEdit={() => { onEditChange(true) }}
       onCancel={() => { onEditChange(false) }}
@@ -33,7 +37,13 @@ const DetailsCard = ({ vm, onEditChange }) => {
 }
 DetailsCard.propTypes = {
   vm: PropTypes.object.isRequired,
+  isEditable: PropTypes.bool,
   onEditChange: PropTypes.func.isRequired,
 }
 
-export default DetailsCard
+export default connect(
+  (state, { vm }) => ({
+    isEditable: doesUserCanEditVm(vm, state.config),
+  }),
+  (dispatch) => ({})
+)(DetailsCard)

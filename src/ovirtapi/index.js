@@ -150,7 +150,7 @@ const OvirtApi = {
   },
   getAllClusters (): Promise<Object> {
     assertLogin({ methodName: 'getAllClusters' })
-    const url = `${AppConfiguration.applicationContext}/api/clusters`
+    const url = `${AppConfiguration.applicationContext}/api/clusters?follow=permissions.role`
     return httpGet({ url })
   },
   getAllHosts (): Promise<Object> {

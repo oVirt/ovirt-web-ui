@@ -3,13 +3,15 @@ import PropTypes from 'prop-types'
 import Immutable from 'immutable'
 
 import { connect } from 'react-redux'
+import { push } from 'connected-react-router'
+
 import { Link } from 'react-router-dom'
 import NavigationPrompt from 'react-router-navigation-prompt'
 import Switch from 'react-bootstrap-switch'
 
 import logger from '../../logger'
 import { generateUnique, templateNameRenderer } from '../../helpers'
-import { isRunning, getVmIconId, isValidOsIcon } from '../utils'
+import { isRunning, getVmIconId, isValidOsIcon, getFilteredClusters } from '../utils'
 
 import style from './style.css'
 import sharedStyle from '../sharedStyle.css'
@@ -148,6 +150,12 @@ class VmDialog extends React.Component {
     }
 
     return null
+  }
+
+  componentDidUpdate () {
+    if (!this.props.clusters.size && this.props.clusterSize) {
+      this.props.redirectToMainPage()
+    }
   }
 
   setUiError (name, error) {
@@ -505,7 +513,7 @@ class VmDialog extends React.Component {
   }
 
   render () {
-    const { icons, clusters, templates, storages, previousPath } = this.props
+    const { icons, templates, clusters, storages, previousPath } = this.props
     const { bootDevices } = this.state
     const vm = this.props.vm
     const isoStorages = storages.filter(storageDomain => storageDomain.get('type') === 'iso')
@@ -801,14 +809,17 @@ VmDialog.propTypes = {
   icons: PropTypes.object.isRequired,
   storages: PropTypes.object.isRequired, // deep immutable, {[id: string]: StorageDomain}
   previousPath: PropTypes.string.isRequired,
+  clusterSize: PropTypes.number.isRequired,
 
   addVm: PropTypes.func.isRequired,
   updateVm: PropTypes.func.isRequired,
+  redirectToMainPage: PropTypes.func.isRequired,
 }
 
 export default connect(
   (state) => ({
-    clusters: state.clusters,
+    clusters: getFilteredClusters(state.clusters, state.config),
+    clusterSize: state.clusters.size, // this prop is using for check real (without filtering) count of clusters
     templates: state.templates,
     operatingSystems: state.operatingSystems,
     userMessages: state.userMessages,
@@ -818,5 +829,6 @@ export default connect(
   (dispatch) => ({
     addVm: (vm, correlationId) => dispatch(createVm({ vm, transformInput: true, pushToDetailsOnSuccess: true }, { correlationId })),
     updateVm: (vm, correlationId) => dispatch(editVm({ vm, transformInput: true }, { correlationId })),
+    redirectToMainPage: () => dispatch(push('/')),
   })
 )(VmDialog)
