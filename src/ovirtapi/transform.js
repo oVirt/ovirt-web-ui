@@ -119,6 +119,7 @@ const VM = {
       cdrom: {},
       sessions: [],
       nics: [],
+      permissions: [],
       display: {
         smartcardEnabled: vm.display && vm.display.smartcard_enabled && convertBool(vm.display.smartcard_enabled),
       },
@@ -159,6 +160,12 @@ const VM = {
 
       if (vm.statistics && vm.statistics.statistic) {
         parsedVm.statistics = VmStatistics.toInternal({ statistics: vm.statistics.statistic })
+      }
+      if (vm.permissions && vm.permissions.permission) {
+        parsedVm.permissions = vm
+          .permissions.permission.map((permission) =>
+            ({ name: permission.role.name, userId: permission.user.id })
+          )
       }
     }
 
@@ -472,6 +479,9 @@ const Cluster = {
             ? cluster['memory_policy']['over_commit']['percent']
             : 100,
       },
+      permissions: cluster.permissions
+        ? cluster.permissions.permission.map((permission) => ({ name: permission.role.name, userId: permission.user.id }))
+        : [],
     }
   },
 

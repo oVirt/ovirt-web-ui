@@ -133,7 +133,16 @@ import {
 } from './constants'
 
 const vmFetchAdditionalList =
-  ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics', 'snapshots', 'statistics']
+  [
+    'cdroms',
+    'sessions',
+    'disk_attachments.disk',
+    'graphics_consoles',
+    'nics',
+    'snapshots',
+    'statistics',
+    'permissions.role',
+  ]
 
 /**
  * Compare the current oVirt version (held in redux) to the given version.
