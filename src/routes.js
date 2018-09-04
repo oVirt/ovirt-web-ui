@@ -43,7 +43,7 @@ export default function getRoutes (vms) {
         path: '/vm/:id',
         title: (match, vms) => vms.getIn(['vms', match.params.id, 'name']) || match.params.id,
         component: VmDetailsPage,
-        toolbars: [(match) => (<VmDetailToolbar match={match} key='vmaction' includeLegacyDetails />)],
+        toolbars: [(match) => (<VmDetailToolbar match={match} key='vmaction' />)],
         routes: [
           {
             path: '/vm/:id/edit',

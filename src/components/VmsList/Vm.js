@@ -34,14 +34,14 @@ const Vm = ({ vm, icons, os, onStart }) => {
         </div>
         <div className='card-pf-body'>
           <div className={`card-pf-top-element ${style['card-icon']}`}>
-            <Link to={`/vm/${vm.get('id')}`}>
+            <Link to={`/vm-legacy/${vm.get('id')}`}>
               <VmIcon icon={icon} className={style['card-pf-icon']}
                 missingIconClassName='fa fa-birthday-cake card-pf-icon-circle' />
             </Link>
           </div>
 
           <h2 className={`card-pf-title text-center ${style['status-height']}`}>
-            <Link to={`/vm/${vm.get('id')}`} className={style['vm-detail-link']}>
+            <Link to={`/vm-legacy/${vm.get('id')}`} className={style['vm-detail-link']}>
               <p className={`${style['vm-name']} ${style['crop']}`} title={vm.get('name')} data-toggle='tooltip' id={`${idPrefix}-name`}>
                 {vm.get('name')}
               </p>
