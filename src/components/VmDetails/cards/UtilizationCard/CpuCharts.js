@@ -19,10 +19,17 @@ import style from './style.css'
 import NoHistoricData from './NoHistoricData'
 import NoLiveData from './NoLiveData'
 
-const CpuCharts = ({ stats, isRunning }) => {
-  const cpuUsed = stats.cpu['current.guest'].datum
+/**
+ * Render current CPU % utilization as a donut chart and historic % utilization values
+ * as a sparkline. Sparkline vales to go from oldest far left to most current on far
+ * right.
+ */
+const CpuCharts = ({ cpuStats, isRunning }) => {
+  const cpuUsed = cpuStats['current.guest'].datum
   const cpuAvailable = 100 - cpuUsed
-  const history = (stats.cpu['usage.history'] && stats.cpu['usage.history'].datum) || [] // TODO: check the order of values is as expected
+
+  // NOTE: CPU history comes sorted from newest to oldest
+  const history = ((cpuStats['usage.history'] && cpuStats['usage.history'].datum) || []).reverse()
 
   return (
     <UtilizationCard className={style['chart-card']}>
@@ -75,7 +82,7 @@ const CpuCharts = ({ stats, isRunning }) => {
   )
 }
 CpuCharts.propTypes = {
-  stats: PropTypes.object.isRequired,
+  cpuStats: PropTypes.object.isRequired,
   isRunning: PropTypes.bool,
 }
 

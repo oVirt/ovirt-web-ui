@@ -75,7 +75,7 @@ class VmDetailsContainer extends React.Component {
           <Col cols={3}><SnapshotsCard vm={vm} onEditChange={(isEdit, isDirty) => this.handleEditChange('snap', isEdit, isDirty)} /></Col>
         </Row>
         <Row>
-          <Col cols={9}><UtilizationCard vm={vm} onEditChange={(isEdit, isDirty) => this.handleEditChange('util', isEdit, isDirty)} /></Col>
+          <Col cols={9}><UtilizationCard vm={vm} /></Col>
           <Col cols={3}>
             <NicsCard vm={vm} onEditChange={(isEdit, isDirty) => this.handleEditChange('nic', isEdit, isDirty)} />
             <DisksCard vm={vm} onEditChange={(isEdit, isDirty) => this.handleEditChange('disk', isEdit, isDirty)} />

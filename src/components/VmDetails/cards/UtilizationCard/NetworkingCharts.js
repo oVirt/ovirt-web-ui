@@ -19,23 +19,31 @@ import style from './style.css'
 import NoHistoricData from './NoHistoricData'
 import NoLiveData from './NoLiveData'
 
-/*
+/**
+ * Render current Network % utilization as a donut chart and historic % utilization values
+ * as a sparkline. Sparkline vales to go from oldest far left to most current on far
+ * right.
+ *
  * NOTE: This is a single % use value from the statistics pull. Could aggregate the
  *       statistics from the NICs to get different, finer grained details.
  */
-const NetworkingCharts = ({ stats, isRunning }) => {
-  const haveNetworkStats = stats && stats.network && stats.network['current.total']
+const NetworkingCharts = ({ netStats, isRunning }) => {
+  const haveNetworkStats = netStats && netStats['current.total']
 
-  const used = (stats.network['current.total'] && stats.network['current.total'].datum) || 0
+  const used = (netStats['current.total'] && netStats['current.total'].datum) || 0
   const available = 100 - used
-  const history = (stats.network['usage.history'] && stats.network['usage.history'].datum) || []
+
+  // NOTE: Network history comes sorted from newest to oldest
+  const history = ((netStats['usage.history'] && netStats['usage.history'].datum) || []).reverse()
 
   return (
     <UtilizationCard className={style['chart-card']}>
       <CardTitle>Networking</CardTitle>
       <CardBody>
         { !isRunning && <NoLiveData /> }
-        { isRunning && !haveNetworkStats && <NoLiveData message='Network utilization is not currently available for this VM.' />}
+        { isRunning && !haveNetworkStats &&
+          <NoLiveData message='Network utilization is not currently available for this VM.' />
+        }
         { isRunning && haveNetworkStats &&
         <React.Fragment>
           <UtilizationCardDetails>
@@ -82,7 +90,7 @@ const NetworkingCharts = ({ stats, isRunning }) => {
   )
 }
 NetworkingCharts.propTypes = {
-  stats: PropTypes.object.isRequired,
+  netStats: PropTypes.object.isRequired,
   isRunning: PropTypes.bool,
 }
 

@@ -14,7 +14,7 @@ import NoLiveData from './NoLiveData'
 /**
  * VM dashboard style Utilization charts (CPU, Memory, Network, Disk)
  */
-const UtilizationCard = ({ vm, onEditChange }) => {
+const UtilizationCard = ({ vm }) => {
   const stats = vm.has('statistics') ? vm.get('statistics').toJS() : undefined
   const isRunning = [ 'up' ].includes(vm.get('status'))
 
@@ -25,16 +25,28 @@ const UtilizationCard = ({ vm, onEditChange }) => {
       <Grid>
         <Row>
           <Col>
-            { stats.cpu ? <CpuCharts stats={stats} isRunning={isRunning} /> : <NoLiveData message={loadingMessage} /> }
+            { stats.cpu
+              ? <CpuCharts cpuStats={stats.cpu} isRunning={isRunning} />
+              : <NoLiveData message={loadingMessage} />
+            }
           </Col>
           <Col>
-            { stats.memory ? <MemoryCharts stats={stats} isRunning={isRunning} /> : <NoLiveData message={loadingMessage} /> }
+            { stats.memory
+              ? <MemoryCharts memoryStats={stats.memory} isRunning={isRunning} />
+              : <NoLiveData message={loadingMessage} />
+            }
           </Col>
           <Col>
-            { stats.network ? <NetworkingCharts stats={stats} isRunning={isRunning} /> : <NoLiveData message={loadingMessage} /> }
+            { stats.network
+              ? <NetworkingCharts netStats={stats.network} isRunning={isRunning} />
+              : <NoLiveData message={loadingMessage} />
+            }
           </Col>
           <Col>
-            { vm.has('disks') ? <DiskCharts vm={vm} isRunning={isRunning} /> : <NoLiveData message={loadingMessage} /> }
+            { vm.has('disks')
+              ? <DiskCharts vm={vm} isRunning={isRunning} />
+              : <NoLiveData message={loadingMessage} />
+            }
           </Col>
         </Row>
       </Grid>
@@ -43,7 +55,6 @@ const UtilizationCard = ({ vm, onEditChange }) => {
 }
 UtilizationCard.propTypes = {
   vm: PropTypes.object.isRequired,
-  onEditChange: PropTypes.func.isRequired,
 }
 
 export default UtilizationCard

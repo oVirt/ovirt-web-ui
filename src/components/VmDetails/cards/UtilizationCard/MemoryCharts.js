@@ -22,22 +22,28 @@ import style from './style.css'
 import NoHistoricData from './NoHistoricData'
 import NoLiveData from './NoLiveData'
 
-/*
+/**
+ * Render current Memory use (free vs available) as a donut chart and historic use values
+ * as a sparkline. Sparkline vales to go from oldest far left to most current on far
+ * right.
+ *
  * NOTE: If the guest agent is installed in the VM, additional (more accurate?) data
  *       will be available. In future, it may be nice to show the extra detail. The
  *       currently used data should work for VMs with and without the guest agent.
  */
-const MemoryCharts = ({ stats, isRunning }) => {
+const MemoryCharts = ({ memoryStats, isRunning }) => {
   const { unit, value } =
     convertValueMap(
       'B',
       {
-        available: isRunning ? stats.memory.free.datum : stats.memory.installed.datum,
-        total: stats.memory.installed.datum,
-        used: !isRunning ? 0 : stats.memory.installed.datum - stats.memory.free.datum,
+        available: isRunning ? memoryStats.free.datum : memoryStats.installed.datum,
+        total: memoryStats.installed.datum,
+        used: !isRunning ? 0 : memoryStats.installed.datum - memoryStats.free.datum,
       })
   const memory = round(value, 0)
-  const history = (stats.memory['usage.history'] && stats.memory['usage.history'].datum) || []
+
+  // NOTE: Memory history comes sorted from newest to oldest
+  const history = ((memoryStats['usage.history'] && memoryStats['usage.history'].datum) || []).reverse()
 
   return (
     <UtilizationCard className={style['chart-card']}>
@@ -92,7 +98,7 @@ const MemoryCharts = ({ stats, isRunning }) => {
   )
 }
 MemoryCharts.propTypes = {
-  stats: PropTypes.object.isRequired,
+  memoryStats: PropTypes.object.isRequired,
   isRunning: PropTypes.bool,
 }
 
