@@ -5,16 +5,15 @@ import { connect } from 'react-redux'
 import { RouterPropTypeShapes } from '../../propTypeShapes'
 import VmActions from '../VmActions'
 
-const VmDetailToolbar = ({ match, vms, includeLegacyDetails = false }) => {
+const VmDetailToolbar = ({ match, vms }) => {
   if (vms.getIn(['vms', match.params.id])) {
-    return (<VmActions vm={vms.getIn(['vms', match.params.id])} includeLegacyDetails={includeLegacyDetails} />)
+    return (<VmActions vm={vms.getIn(['vms', match.params.id])} />)
   }
   return null
 }
 
 VmDetailToolbar.propTypes = {
   vms: PropTypes.object.isRequired,
-  includeLegacyDetails: PropTypes.bool,
 
   match: RouterPropTypeShapes.match.isRequired,
 }
