@@ -17,6 +17,7 @@ import * as Transforms from './transform'
 
 import type {
   ApiSnapshotType,
+  SnapshotType,
 } from './types'
 
 type VmIdType = { vmId: string }
