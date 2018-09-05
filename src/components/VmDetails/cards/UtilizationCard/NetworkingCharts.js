@@ -28,7 +28,7 @@ import NoLiveData from './NoLiveData'
  *       statistics from the NICs to get different, finer grained details.
  */
 const NetworkingCharts = ({ netStats, isRunning }) => {
-  const haveNetworkStats = netStats && netStats['current.total']
+  const haveNetworkStats = !!netStats['current.total']
 
   const used = (netStats['current.total'] && netStats['current.total'].datum) || 0
   const available = 100 - used
