@@ -20,10 +20,10 @@ Source0:        https://github.com/oVirt/ovirt-web-ui/archive/%{source_basename}
 BuildArch: noarch
 
 # Keep ovirt-engine-{nodejs|nodejs-modules|yarn} at particular version unless tested on higher
-BuildRequires: ovirt-engine-nodejs = 8.0.0
+BuildRequires: ovirt-engine-nodejs = 8.11.4
 BuildRequires: ovirt-engine-yarn = 1.7.0
 
-BuildRequires: ovirt-engine-nodejs-modules >= 1.5.7
+BuildRequires: ovirt-engine-nodejs-modules >= 1.7.3
 
 %description
 This package provides new VM Portal for %{product}, so far as technical preview.
