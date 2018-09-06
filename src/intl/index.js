@@ -16,7 +16,7 @@ import csLocalData from 'react-intl/locale-data/cs'
 import huLocalData from 'react-intl/locale-data/hu'
 import heLocalData from 'react-intl/locale-data/he'
 
-import { messages, type MessageIdType } from './messages'
+import { messages, type MessageIdType, type MessageType } from './messages'
 // expected translations ['de', 'fr', 'es', 'ko', 'it', 'ja', 'pt-BR', 'ru', 'zh-CN']
 import translatedMessages from './translated-messages.json'
 
@@ -122,11 +122,6 @@ export function formatMessage (id: MessageIdType, values: ?Object): string {
   }
   return messageFormat.format(values)
 }
-
-type MessageType = string | {|
-  message: string,
-  description: string
-|}
 
 function removeMessageDescription (messages: { [MessageIdType]: MessageType }): { [MessageIdType]: string } {
   return Object.keys(messages)
