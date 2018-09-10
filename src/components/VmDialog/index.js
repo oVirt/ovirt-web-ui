@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import Immutable from 'immutable'
 
 import { connect } from 'react-redux'
-import { push } from 'connected-react-router'
 
 import { Link } from 'react-router-dom'
 import NavigationPrompt from 'react-router-navigation-prompt'
@@ -150,12 +149,6 @@ class VmDialog extends React.Component {
     }
 
     return null
-  }
-
-  componentDidUpdate () {
-    if (!this.props.clusters.size && this.props.clusterSize) {
-      this.props.redirectToMainPage()
-    }
   }
 
   setUiError (name, error) {
@@ -809,17 +802,14 @@ VmDialog.propTypes = {
   icons: PropTypes.object.isRequired,
   storages: PropTypes.object.isRequired, // deep immutable, {[id: string]: StorageDomain}
   previousPath: PropTypes.string.isRequired,
-  clusterSize: PropTypes.number.isRequired,
 
   addVm: PropTypes.func.isRequired,
   updateVm: PropTypes.func.isRequired,
-  redirectToMainPage: PropTypes.func.isRequired,
 }
 
 export default connect(
   (state) => ({
     clusters: getFilteredClusters(state.clusters, state.config),
-    clusterSize: state.clusters.size, // this prop is using for check real (without filtering) count of clusters
     templates: state.templates,
     operatingSystems: state.operatingSystems,
     userMessages: state.userMessages,
@@ -829,6 +819,5 @@ export default connect(
   (dispatch) => ({
     addVm: (vm, correlationId) => dispatch(createVm({ vm, transformInput: true, pushToDetailsOnSuccess: true }, { correlationId })),
     updateVm: (vm, correlationId) => dispatch(editVm({ vm, transformInput: true }, { correlationId })),
-    redirectToMainPage: () => dispatch(push('/')),
   })
 )(VmDialog)

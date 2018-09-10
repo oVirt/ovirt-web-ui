@@ -32,6 +32,7 @@ import LinkButton from './LinkButton'
 import ConfirmationModal from './ConfirmationModal'
 import ConsoleConfirmationModal from './ConsoleConfirmationModal'
 import Action, { ActionButtonWraper } from './Action'
+import { canUserEditVm } from '../../utils'
 
 const EmptyAction = ({ state, isOnCard }) => {
   if (!canConsole(state) && !canShutdown(state) && !canRestart(state) && !canStart(state)) {
@@ -197,6 +198,7 @@ class VmActions extends React.Component {
       isOnCard = false,
       onRemove,
       location,
+      isEditable,
     } = this.props
 
     const isPool = !!pool
@@ -273,6 +275,7 @@ class VmActions extends React.Component {
           isOnCard={isOnCard}
           shortTitle={msg.edit()}
           tooltip={msg.editVm()}
+          actionDisabled={isEditable}
           to={`/vm/${vm.get('id')}/edit`}
           button='btn btn-default'
           className={`pficon pficon-edit ${style['action-link']}`}
@@ -296,6 +299,7 @@ VmActions.propTypes = {
   vm: PropTypes.object.isRequired,
   pool: PropTypes.object,
   isOnCard: PropTypes.bool,
+  isEditable: PropTypes.bool,
 
   location: RouterPropTypeShapes.location.isRequired,
 
@@ -310,7 +314,9 @@ VmActions.propTypes = {
 
 export default withRouter(
   connect(
-    (state) => ({ }),
+    (state, { vm }) => ({
+      isEditable: canUserEditVm(vm, state.config),
+    }),
     (dispatch, { vm, pool }) => ({
       onShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: false })),
       onRestart: () => dispatch(restartVm({ vmId: vm.get('id'), force: false })),
