@@ -61,7 +61,7 @@ export function getFilteredClusters (clusters: Array<Object>, config: Object): A
   })
 }
 
-export function doesUserCanEditVm (vm: VmType, config: Object): boolean {
+export function canUserEditVm (vm: VmType, config: Object): boolean {
   const userId = config.getIn(['user', 'id'])
   const allowedPermissions = [
     'ClusterAdmin',
