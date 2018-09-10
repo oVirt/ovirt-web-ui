@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import sharedStyle from '../../../sharedStyle.css'
-import { getOsHumanName, getVmIcon, doesUserCanEditVm } from '../../../utils'
+import { getOsHumanName, getVmIcon, canUserEditVm } from '../../../utils'
 import { enumMsg } from '../../../../intl'
 import { generateUnique } from '../../../../helpers'
 
@@ -195,7 +195,7 @@ export default connect(
     icons: state.icons,
     operatingSystems: state.operatingSystems,
     userMessages: state.userMessages,
-    isEditable: doesUserCanEditVm(vm, state.config),
+    isEditable: canUserEditVm(vm, state.config),
   }),
   (dispatch) => ({
     saveChanges: (minimalVmChanges, correlationId) => dispatch(editVm({ vm: minimalVmChanges }, { correlationId })),

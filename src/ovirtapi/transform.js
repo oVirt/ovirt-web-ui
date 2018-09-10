@@ -161,10 +161,14 @@ const VM = {
       if (vm.statistics && vm.statistics.statistic) {
         parsedVm.statistics = VmStatistics.toInternal({ statistics: vm.statistics.statistic })
       }
+
       if (vm.permissions && vm.permissions.permission) {
         parsedVm.permissions = vm
-          .permissions.permission.map((permission) =>
-            ({ name: permission.role.name, userId: permission.user.id })
+          .permissions.permission.map(
+            permission => ({
+              name: permission.role.name,
+              userId: permission.user.id,
+            })
           )
       }
     }
@@ -480,7 +484,10 @@ const Cluster = {
             : 100,
       },
       permissions: cluster.permissions
-        ? cluster.permissions.permission.map((permission) => ({ name: permission.role.name, userId: permission.user.id }))
+        ? cluster.permissions.permission.map(permission => ({
+          name: permission.role.name,
+          userId: permission.user.id,
+        }))
         : [],
     }
   },
