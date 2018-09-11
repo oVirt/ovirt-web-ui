@@ -1,6 +1,7 @@
 // @flow
 import type {
   CdRomType, ApiCdRomType,
+  SnapshotType, ApiSnapshotType,
 } from './types'
 
 import logger from '../logger'
@@ -17,11 +18,6 @@ import {
 } from './transport'
 
 import * as Transforms from './transform'
-
-import type {
-  ApiSnapshotType,
-  SnapshotType,
-} from './types'
 
 type VmIdType = { vmId: string }
 type PoolIdType = { poolId: string }
