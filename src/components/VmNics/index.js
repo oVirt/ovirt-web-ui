@@ -16,22 +16,12 @@ class VmNic extends React.Component {
   constructor (props) {
     super(props)
     this.state = { showDeleteModal: false }
-    this.handleOpenDialog = this.handleOpenDialog.bind(this)
     this.handleDelete = this.handleDelete.bind(this)
-    this.handleClose = this.handleClose.bind(this)
-  }
-
-  handleOpenDialog () {
-    this.setState({ showDeleteModal: true })
   }
 
   handleDelete () {
     this.props.onDelete({ nicId: this.props.nic.get('id') })
     this.handleClose()
-  }
-
-  handleClose () {
-    this.setState({ showDeleteModal: false })
   }
 
   render () {
@@ -64,15 +54,16 @@ class VmNic extends React.Component {
           </span>
           {
             showSettings
-              ? (<Button bsStyle='default' bsSize='small' onClick={this.handleOpenDialog} disabled={isUp}>
-                {msg.delete()}
-              </Button>)
+              ? (<DeleteConfirmationModal trigger={
+                <Button bsStyle='default' bsSize='small' disabled={isUp}>
+                  {msg.delete()}
+                </Button>
+              } onDelete={this.handleDelete}>
+                <p dangerouslySetInnerHTML={{ __html: msg.areYouSureYouWantToDeleteNic({ nicName: `"<strong>${this.props.nic.get('name')}</strong>"` }) }} />
+                <p>{msg.thisOperationCantBeUndone()}</p>
+              </DeleteConfirmationModal>)
               : null
           }
-          <DeleteConfirmationModal show={this.state.showDeleteModal} onDelete={this.handleDelete} onClose={this.handleClose}>
-            <p dangerouslySetInnerHTML={{ __html: msg.areYouSureYouWantToDeleteNic({ nicName: `"<strong>${this.props.nic.get('name')}</strong>"` }) }} />
-            <p>{msg.thisOperationCantBeUndone()}</p>
-          </DeleteConfirmationModal>
         </span>
       </li>
     )

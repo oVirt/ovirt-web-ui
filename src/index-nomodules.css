@@ -152,3 +152,8 @@ body {
 .detail-container {
   background: #fff;
 }
+
+.form-group.required .control-label:after {
+  content:"*";
+  color:red;
+}
