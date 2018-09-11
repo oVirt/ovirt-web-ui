@@ -1,9 +1,7 @@
 // @flow
 import type {
-  CdRomType,
-  ApiCdRomType,
-  ApiSnapshotType,
-  SnapshotType,
+  CdRomType, ApiCdRomType,
+  SnapshotType, ApiSnapshotType,
 } from './types'
 
 import logger from '../logger'
