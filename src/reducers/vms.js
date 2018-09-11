@@ -89,7 +89,7 @@ const vms = actionReducer(initialState, {
     if (state.getIn(['vms', vmId])) {
       return state.setIn(['vms', vmId, 'cdrom'], Immutable.fromJS(cdrom)) // deep immutable
     } else { // fail, if VM not found
-      logger.error(`vms.setVmCdrom() reducer: vmId ${vmId} not found`)
+      logger.error(`vms[${SET_VM_CDROM}] reducer: vmId ${vmId} not found`)
     }
     return state
   },

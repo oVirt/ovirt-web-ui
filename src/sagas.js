@@ -35,7 +35,7 @@ import {
   setVmActionResult,
 
   getSingleVm,
-  selectVmDetail as selectVmDetailAction,
+  selectVmDetail as actionSelectVmDetail,
   setClusters,
   setHosts,
   setTemplates,
@@ -58,11 +58,13 @@ import {
   getPoolsByCount,
   addStorageDomains,
   setStorageDomainsFiles,
-  setVmCDRom,
+  setVmCdRom,
   setVmNics,
   setUSBFilter,
   removeActiveRequest,
   stopSchedulerFixedDelay,
+  getVmCdRom,
+  changeVmCdRom as actionChangeVmCdRom,
 } from './actions'
 
 import {
@@ -89,6 +91,7 @@ import {
 
 import {
   ADD_VM_NIC,
+  CHANGE_VM_CDROM,
   CHECK_CONSOLE_IN_USE,
   CHECK_TOKEN_EXPIRED,
   CREATE_VM,
@@ -243,6 +246,12 @@ function* fetchVmsByPageV42 (action) {
 
     yield put(updateVms({ vms: internalVms, copySubResources: true, page: page }))
     yield fetchUnknownIconsForVms({ vms: internalVms })
+
+    // NOTE: No need to fetch the current=true cdrom info at this point. The cdrom info
+    //       is needed on the VM details page and `fetchSingleVm` is called upon entry
+    //       to the details page. The `fetchSingleVm` fetch includes loading the
+    //       appropriate cdrom info based on the VM's state. See `fetchSingleVm` for more
+    //       details.
   }
 
   yield put(persistState())
@@ -265,7 +274,7 @@ function* fetchVmsByPageVLower (action) {
     if (!shallowFetch) {
       yield fetchConsoleMetadatas({ vms: internalVms })
       yield fetchDisks({ vms: internalVms })
-      yield fetchVmsCDRom({ vms: internalVms })
+      yield fetchVmsCdRom({ vms: internalVms, current: false })
       yield fetchVmsNics({ vms: internalVms })
       yield fetchVmsSessions({ vms: internalVms })
       yield fetchVmsSnapshots({ vms: internalVms })
@@ -302,6 +311,9 @@ function* fetchVmsByCountV42 (action) {
 
     yield put(updateVms({ vms: internalVms, copySubResources: true }))
     yield fetchUnknownIconsForVms({ vms: internalVms })
+
+    // NOTE: No need to fetch the current=true cdrom info at this point. See `fetchVmsByPageV42`
+    //       or `fetchSingleVm` for more details.
   }
 
   yield put(persistState())
@@ -324,7 +336,7 @@ function* fetchVmsByCountVLower (action) {
     if (!shallowFetch) {
       yield fetchConsoleMetadatas({ vms: internalVms })
       yield fetchDisks({ vms: internalVms })
-      yield fetchVmsCDRom({ vms: internalVms })
+      yield fetchVmsCdRom({ vms: internalVms, current: false })
       yield fetchVmsNics({ vms: internalVms })
       yield fetchVmsSessions({ vms: internalVms })
       yield fetchVmsSnapshots({ vms: internalVms })
@@ -351,8 +363,15 @@ export function* fetchSingleVm (action) {
   if (vm && vm.id) {
     internalVm = Api.vmToInternal({ vm, getSubResources: isOvirtGTE42 })
 
+    // If the VM is running, we want to display the current=true cdrom info. Due
+    // to an API restriction, current=true cdrom info cannot currently (Aug-2018)
+    // be accessed via the additional fetch list on the VM. Fetch it directly.
+    if (isOvirtGTE42 && !shallowFetch && internalVm.status === 'up') {
+      internalVm.cdrom = yield fetchVmCdRom({ vmId: internalVm.id, current: true })
+    }
+
     if (!isOvirtGTE42 && !shallowFetch) {
-      internalVm.cdrom = yield fetchVmCDRom({ vmId: internalVm.id, running: internalVm.status === 'up' })
+      internalVm.cdrom = yield fetchVmCdRom({ vmId: internalVm.id, current: internalVm.status === 'up' })
       internalVm.consoles = yield fetchConsoleVmMeta({ vmId: internalVm.id })
       internalVm.disks = yield fetchVmDisks({ vmId: internalVm.id })
       internalVm.nics = yield fetchVmNics({ vmId: internalVm.id })
@@ -432,19 +451,29 @@ function* fetchVmsSessions ({ vms }) {
   })
 }
 
-function* fetchVmCDRom ({ vmId, running }) {
-  const cdrom = yield callExternalAction('getCDRom', Api.getCDRom, { type: 'GET_VM_CDROM', payload: { vmId, running } })
+/*
+ * Fetch a VM's cdrom configuration based on the status of the VM. A running VM's cdrom
+ * info comes from "current=true" while a non-running VM's cdrom info comes from the
+ * next_run/"current=false" API parameter.
+ */
+function* fetchVmCdRom ({ vmId, current }) {
+  const cdrom = yield callExternalAction('getCdRom', Api.getCdRom, getVmCdRom({ vmId, current }))
+
+  let cdromInternal = null
   if (cdrom) {
-    const cdromInternal = Api.CDRomToInternal({ cdrom })
-    return cdromInternal
+    cdromInternal = Api.cdRomToInternal({ cdrom })
   }
-  return null
+  return cdromInternal
 }
 
-function* fetchVmsCDRom ({ vms }) {
+/*
+ * For each given VM, first fetch the appropriate __current__ cdrom info, then push the
+ * info to VM reducers for the redux store.
+ */
+function* fetchVmsCdRom ({ vms, current }) {
   yield * foreach(vms, function* (vm) {
-    const cdromInternal = yield fetchVmCDRom({ vmId: vm.id, running: vm.status === 'up' })
-    yield put(setVmCDRom({ vmId: vm.id, cdrom: cdromInternal }))
+    const cdrom = yield fetchVmCdRom({ vmId: vm.id, current })
+    yield put(setVmCdRom({ vmId: vm.id, cdrom }))
   })
 }
 
@@ -564,7 +593,7 @@ export function* createVm (action) {
 
   if (!result.error) {
     const vmId = result.id
-    yield put(selectVmDetailAction({ vmId }))
+    yield put(actionSelectVmDetail({ vmId }))
 
     if (action.payload.pushToDetailsOnSuccess) {
       yield put(push(`/vm/${vmId}`))
@@ -574,24 +603,33 @@ export function* createVm (action) {
   return result
 }
 
+/*
+ * Edit a VM by pushing (with a full or partial VM definition) VM updates, and if
+ * new cdrom info is provided, change the cdrom as appropriate for the VM's status. A
+ * running VM will have its current=true cdrom updated (to make the change immediate).
+ * A non-running VM will have its current=false cdrom updated (to make the change apply
+ * at next_run).
+ */
 export function* editVm (action) {
-  const result = yield callExternalAction('editVm', Api.editVm, action)
+  const { payload: { vm } } = action
 
-  let commitError = result.error
-  if (!commitError && action.payload.vm.cdrom) {
-    const changeCdResult = yield callExternalAction('changeCD', Api.changeCD, {
-      type: 'CHANGE_CD',
-      payload: {
-        vmId: action.payload.vm.id,
-        cdrom: action.payload.vm.cdrom,
-        running: action.payload.vm.status === 'up',
-      },
-    })
+  const editVmResult = yield callExternalAction('editVm', Api.editVm, action)
+
+  let commitError = editVmResult.error
+  if (!commitError && vm.cdrom) {
+    const isUp = editVmResult && editVmResult.status === 'up'
+    const changeCdResult = yield changeVmCdRom(actionChangeVmCdRom({
+      vmId: vm.id,
+      cdrom: vm.cdrom,
+      current: isUp,
+      updateRedux: false,
+    }))
+
     commitError = changeCdResult.error
   }
 
   if (!commitError) {
-    yield put(selectVmDetailAction({ vmId: action.payload.vm.id }))
+    yield put(actionSelectVmDetail({ vmId: action.payload.vm.id })) // deep fetch and put to VM reducers
   }
 
   if (action.meta && action.meta.correlationId) {
@@ -601,6 +639,27 @@ export function* editVm (action) {
       result: !commitError,
     }))
   }
+}
+
+export function* changeVmCdRom (action) {
+  const result = yield callExternalAction('changeCdRom', Api.changeCdRom, action)
+
+  if (!result.error && action.payload.updateRedux) {
+    yield put(setVmCdRom({
+      vmId: action.payload.vm.id,
+      cdrom: Api.cdRomToInternal(result),
+    }))
+  }
+
+  if (action.meta && action.meta.correlationId) {
+    yield put(setVmActionResult({
+      vmId: action.payload.vm.id,
+      correlationId: action.meta.correlationId,
+      result: !result.error,
+    }))
+  }
+
+  return result
 }
 
 function* removeVm (action) {
@@ -876,6 +935,7 @@ export function* rootSaga () {
     takeEvery(CREATE_VM, createVm),
     takeEvery(EDIT_VM, editVm),
     takeEvery(REMOVE_VM, removeVm),
+    takeEvery(CHANGE_VM_CDROM, changeVmCdRom),
 
     takeEvery(CHECK_CONSOLE_IN_USE, getConsoleInUse),
     takeEvery(DOWNLOAD_CONSOLE_VM, downloadVmConsole),

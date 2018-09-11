@@ -1,10 +1,12 @@
 import {
   ADD_VM_NIC,
+  CHANGE_VM_CDROM,
   CREATE_VM,
   DELETE_VM_NIC,
   DOWNLOAD_CONSOLE_VM,
   EDIT_VM,
   GET_RDP_VM,
+  GET_VM_CDROM,
   GET_VMS_BY_COUNT,
   GET_VMS_BY_PAGE,
   LOGIN_SUCCESSFUL,
@@ -345,7 +347,7 @@ export function setChanged ({ value }) {
   }
 }
 
-export function setVmCDRom ({ cdrom, vmId }) {
+export function setVmCdRom ({ cdrom, vmId }) {
   return {
     type: SET_VM_CDROM,
     payload: {
@@ -353,6 +355,37 @@ export function setVmCDRom ({ cdrom, vmId }) {
       vmId,
     },
   }
+}
+
+export function getVmCdRom ({ vmId, current = true }) {
+  return {
+    type: GET_VM_CDROM,
+    payload: {
+      vmId,
+      current,
+    },
+  }
+}
+
+export function changeVmCdRom ({ cdrom, vmId, updateRedux = true, current = true }, { correlationId, ...additionalMeta } = {}) {
+  const action = {
+    type: CHANGE_VM_CDROM,
+    payload: {
+      cdrom,
+      vmId,
+      updateRedux,
+      current,
+    },
+  }
+
+  if (correlationId) {
+    action.meta = {
+      correlationId,
+      ...additionalMeta,
+    }
+  }
+
+  return action
 }
 
 export function setVmNics ({ vmId, nics }) {
