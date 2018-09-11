@@ -19,6 +19,7 @@ import type {
   ApiTemplateType, TemplateType,
   ApiVmConsolesType, VmConsolesType,
   ApiVmSessionsType, VmSessionsType,
+  ApiVmStatisticType, VmStatisticsType,
   ApiVmType, VmType,
   ApiVnicProfileType, VnicProfileType,
 } from './types'
@@ -156,6 +157,10 @@ const VM = {
           snapshot => Snapshot.toInternal({ snapshot })
         )
       }
+
+      if (vm.statistics && vm.statistics.statistic) {
+        parsedVm.statistics = VmStatistics.toInternal({ statistics: vm.statistics.statistic })
+      }
     }
 
     return parsedVm
@@ -216,6 +221,41 @@ const VM = {
         ? vm.icons.large
         : undefined,
     }
+  },
+}
+
+//
+//
+const VmStatistics = {
+  toInternal ({ statistics }: { statistics: Array<ApiVmStatisticType> }): VmStatisticsType {
+    const base: VmStatisticsType = {
+      memory: {},
+      cpu: {},
+      network: {},
+    }
+
+    for (const stat: ApiVmStatisticType of statistics) {
+      if (stat.kind !== 'gauge') continue
+
+      // no values -> undefined, 1 value -> value.datum, >1 values -> [...values.datum]
+      const datum =
+        stat.values &&
+        stat.values.value &&
+        (stat.values.value.length === 1
+          ? stat.values.value[0].datum
+          : stat.values.value.map(value => value.datum))
+
+      const nameParts = /^(memory|cpu|network)\.(.*)?$/.exec(stat.name)
+      if (nameParts) {
+        base[nameParts[1]][nameParts[2]] = {
+          datum,
+          unit: stat.unit,
+          description: stat.description,
+        }
+      }
+    }
+
+    return base
   },
 }
 

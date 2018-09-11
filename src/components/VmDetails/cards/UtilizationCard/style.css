@@ -1,0 +1,65 @@
+.utilization-card .chart-card {
+  box-shadow: none;
+  margin-left: -20px;
+  margin-right: -20px;
+  margin-bottom: 0;
+
+  padding: 0 10px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.utilization-card .chart-card :global(.card-pf-body) {
+  padding-bottom: 0;
+  flex-grow: 1;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.no-data-card-body {
+  flex-grow: 1;
+  padding: 0 10px;
+  margin-bottom: 20px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-data-card-body .no-data-icon {
+  font-size: 32pt;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.no-data-card-body .no-data-title {
+  font-size: 150%;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.no-data-card-body .no-data-message {
+  text-align: center;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.no-history-chart {
+  height: 60px; /* matches the height of SparklineChart */
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-history-chart .no-history-chart-icon {
+  font-size: 12pt;
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.no-history-chart .no-history-chart-message {
+  font-size: 90%;
+  color: rgba(0, 0, 0, 0.65);
+}
