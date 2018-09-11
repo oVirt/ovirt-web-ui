@@ -5226,7 +5226,7 @@ patternfly-bootstrap-treeview@~2.1.0:
     bootstrap "3.3.x"
     jquery ">= 2.1.x"
 
-patternfly-react@=2.11.1:
+patternfly-react@2.11.1:
   version "2.11.1"
   resolved "https://registry.yarnpkg.com/patternfly-react/-/patternfly-react-2.11.1.tgz#5b0c23d5a289de4a6b7e658fc8d04bb252e8d32b"
   dependencies:
@@ -5247,7 +5247,7 @@ patternfly-react@=2.11.1:
     sortabular "^1.5.1"
     table-resolver "^3.2.0"
 
-patternfly@=3.53.1:
+patternfly@3.53.1:
   version "3.53.1"
   resolved "https://registry.yarnpkg.com/patternfly/-/patternfly-3.53.1.tgz#819b99269e7b9ffe58c974dd37138b9e69ef5b84"
   dependencies:
