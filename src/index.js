@@ -47,12 +47,12 @@ window.patternfly = require('patternfly/dist/js/patternfly')
 window.selectpicker = require('bootstrap-select/js/bootstrap-select.js')
 window.combobox = require('patternfly-bootstrap-combobox/js/bootstrap-combobox.js')
 
-function renderApp (store: Object) {
+function renderApp (store: Object, errorThrower: Object) {
   ReactDOM.render(
     <GlobalErrorBoundary>
       <Provider store={store}>
         <IntlProvider locale={locale} messages={getSelectedMessages()}>
-          <App history={store.history} />
+          <App history={store.history} errorThrower={errorThrower} />
         </IntlProvider>
       </Provider>
     </GlobalErrorBoundary>,
@@ -125,19 +125,33 @@ function initializeApiListener (store: Object) {
   })
 }
 
+class ErrorThrower {
+  errorHandler = null
+  setErrorHandler (errorHandler: Function) {
+    this.errorHandler = errorHandler
+  }
+  throw (error: Object) {
+    if (this.errorHandler != null) {
+      this.errorHandler(error)
+    }
+  }
+}
+
 function onResourcesLoaded () {
   console.log(`Current configuration: ${JSON.stringify(AppConfiguration)}`)
 
   addBrandedResources()
 
   const store = configureStore()
-  store.runSaga(rootSaga)
+  const rootTask = store.runSaga(rootSaga)
+  const errorThrower = new ErrorThrower()
+  rootTask.done.catch(err => errorThrower.throw(err))
   Selectors.init({ store })
   initializeApiListener(store)
   loadPersistedState(store)
 
   // do initial render
-  renderApp(store)
+  renderApp(store, errorThrower)
 
   const { token, username, domain, userId }: { token: string, username: string, domain: string, userId: string } = fetchToken()
   store.dispatch(setDomain({ domain }))
