@@ -22,6 +22,7 @@ import type {
   ApiVmStatisticType, VmStatisticsType,
   ApiVmType, VmType,
   ApiVnicProfileType, VnicProfileType,
+  ApiPermissionsType, PermissionsType,
 } from './types'
 
 function vCpusCount ({ cpu }: { cpu: Object }): number {
@@ -163,13 +164,9 @@ const VM = {
       }
 
       if (vm.permissions && vm.permissions.permission) {
-        parsedVm.permissions = vm
-          .permissions.permission.map(
-            permission => ({
-              name: permission.role.name,
-              userId: permission.user.id,
-            })
-          )
+        parsedVm.permissions = Permissions.toInternal({
+          permissions: vm.permissions,
+        })
       }
     }
 
@@ -468,7 +465,7 @@ const StorageDomainFile = {
 //
 //
 const Cluster = {
-  toInternal ({ cluster }: { cluster: ApiClusterType }): ClusterType {
+  toInternal ({ cluster, permissions }: { cluster: ApiClusterType, permissions: Object }): ClusterType {
     return {
       id: cluster.id,
       name: cluster.name,
@@ -483,11 +480,8 @@ const Cluster = {
             ? cluster['memory_policy']['over_commit']['percent']
             : 100,
       },
-      permissions: cluster.permissions
-        ? cluster.permissions.permission.map(permission => ({
-          name: permission.role.name,
-          userId: permission.user.id,
-        }))
+      permissions: permissions
+        ? Permissions.toInternal({ permissions })
         : [],
     }
   },
@@ -668,6 +662,16 @@ const VmSessions = {
   toApi: undefined,
 }
 
+const Permissions = {
+  toInternal ({ permissions }: { permissions: ApiPermissionsType }): Array<PermissionsType> {
+    return permissions.permission.map(permission => ({
+      name: permission.role.name,
+    }))
+  },
+
+  toApi: undefined,
+}
+
 //
 //
 const CloudInit = {
@@ -706,4 +710,5 @@ export {
   VmConsoles,
   VmSessions,
   CloudInit,
+  Permissions,
 }

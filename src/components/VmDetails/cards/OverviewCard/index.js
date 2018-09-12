@@ -195,7 +195,7 @@ export default connect(
     icons: state.icons,
     operatingSystems: state.operatingSystems,
     userMessages: state.userMessages,
-    isEditable: canUserEditVm(vm, state.config),
+    isEditable: canUserEditVm(vm),
   }),
   (dispatch) => ({
     saveChanges: (minimalVmChanges, correlationId) => dispatch(editVm({ vm: minimalVmChanges }, { correlationId })),

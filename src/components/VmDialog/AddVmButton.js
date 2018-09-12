@@ -25,7 +25,7 @@ AddVmButton.propTypes = {
 
 export default connect(
   (state) => ({
-    isEnabled: !!getFilteredClusters(state.clusters, state.config).size,
+    isEnabled: !!getFilteredClusters(state.clusters).size,
   }),
   (dispatch) => ({})
 )(AddVmButton)

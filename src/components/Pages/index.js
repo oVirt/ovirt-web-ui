@@ -211,7 +211,7 @@ VmCreatePage.propTypes = {
 }
 const VmCreatePageConnected = connect(
   (state) => ({
-    filteredClustersSize: getFilteredClusters(state.clusters, state.config).size,
+    filteredClustersSize: getFilteredClusters(state.clusters).size,
     clusterSize: state.clusters.size, // this prop is using for check real (without filtering) count of clusters
   }),
   (dispatch) => ({
@@ -277,7 +277,7 @@ VmEditPage.propTypes = {
 }
 const VmEditPageConnected = connect(
   (state) => ({
-    filteredClustersSize: getFilteredClusters(state.clusters, state.config).size,
+    filteredClustersSize: getFilteredClusters(state.clusters).size,
     clusterSize: state.clusters.size, // this prop is using for check real (without filtering) count of clusters
     vms: state.vms,
   }),

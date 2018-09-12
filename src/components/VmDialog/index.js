@@ -809,7 +809,7 @@ VmDialog.propTypes = {
 
 export default connect(
   (state) => ({
-    clusters: getFilteredClusters(state.clusters, state.config),
+    clusters: getFilteredClusters(state.clusters),
     templates: state.templates,
     operatingSystems: state.operatingSystems,
     userMessages: state.userMessages,

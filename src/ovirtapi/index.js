@@ -79,6 +79,8 @@ const OvirtApi = {
   snapshotToInternal: Transforms.Snapshot.toInternal,
   internalSnapshotToOvirt: Transforms.Snapshot.toApi,
 
+  permissionsToInternal: Transforms.Permissions.toInternal,
+
   //
   //
   // ---- API interaction functions
@@ -149,10 +151,21 @@ const OvirtApi = {
       (additional && additional.length > 0 ? `?follow=${additional.join(',')}` : '')
     return httpGet({ url })
   },
-  getAllClusters (): Promise<Object> {
+  getAllClusters ({ additional }: { additional: Array<string> }): Promise<Object> {
     assertLogin({ methodName: 'getAllClusters' })
-    const url = `${AppConfiguration.applicationContext}/api/clusters?follow=permissions.role`
+    const url = `${AppConfiguration.applicationContext}/api/clusters` +
+      (additional && additional.length > 0 ? `?follow=${additional.join(',')}` : '')
     return httpGet({ url })
+  },
+  getClusterPermissions ({ clusterId }: Object): Promise<Object> {
+    assertLogin({ methodName: 'getClusterPermissions' })
+    const url = `${AppConfiguration.applicationContext}/api/clusters/${clusterId}/permissions?follow=role`
+    return httpGet({ url, custHeaders: { Filter: true } })
+  },
+  getVmPermissions ({ vmId }: Object): Promise<Object> {
+    assertLogin({ methodName: 'getClusterPermissions' })
+    const url = `${AppConfiguration.applicationContext}/api/vms/${vmId}/permissions?follow=role`
+    return httpGet({ url, custHeaders: { Filter: true } })
   },
   getAllHosts (): Promise<Object> {
     assertLogin({ methodName: 'getAllHosts' })
