@@ -2,10 +2,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import BaseCard from '../BaseCard'
-import { Grid, Row, Col } from '../GridComponents'
+import BaseCard from '../../BaseCard'
+import { Grid, Row, Col } from '../../GridComponents'
 
-import style from './NicsCard.css'
+import style from './style.css'
 
 /**
  * List of NICs connected to a VM
@@ -35,6 +35,7 @@ const NicsCard = ({ vm, vnicProfiles, onEditChange }) => {
       icon={{ type: 'pf', name: 'network' }}
       title='Network Interfaces'
       editTooltip={`Edit NICs for ${vm.get('id')}`}
+      editable={false}
       itemCount={vm.get('nics').size}
       onStartEdit={() => { onEditChange(true) }}
       onCancel={() => { onEditChange(false) }}
@@ -47,7 +48,7 @@ const NicsCard = ({ vm, vnicProfiles, onEditChange }) => {
               <Col style={{ display: 'block' }}>
                 <div>
                   <span>{nic.name}</span>
-                  <span>&nbsp;({nic.vnicProfile.name}/{nic.vnicProfile.network})</span>
+                  <span className={style['vnic-info']}>({nic.vnicProfile.name}/{nic.vnicProfile.network})</span>
                 </div>
                 <Grid>
                   <Row>

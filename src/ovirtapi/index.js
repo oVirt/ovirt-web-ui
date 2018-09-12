@@ -165,7 +165,7 @@ const OvirtApi = {
     return httpGet({ url })
   },
 
-  addNewVm ({ vm, transformInput = false }: { vm: Object, transformInput?: boolean }): Promise<Object> {
+  addNewVm ({ vm, transformInput = false }: { vm: VmType | Object, transformInput: boolean }): Promise<Object> {
     assertLogin({ methodName: 'addNewVm' })
     const input = JSON.stringify(transformInput ? OvirtApi.internalVmToOvirt({ vm }) : vm)
     logger.log(`OvirtApi.addNewVm(): ${input}`)
@@ -175,7 +175,7 @@ const OvirtApi = {
       input,
     })
   },
-  editVm ({ vm, transformInput = false }: { vm: Object, transformInput?: boolean }): Promise<Object> {
+  editVm ({ vm, transformInput = false }: { vm: VmType | Object, transformInput: boolean }): Promise<Object> {
     assertLogin({ methodName: 'editVm' })
     const input = JSON.stringify(transformInput ? OvirtApi.internalVmToOvirt({ vm }) : vm)
     logger.log(`OvirtApi.editVm(): ${input}`)
