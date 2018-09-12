@@ -365,6 +365,9 @@ export function* fetchSingleVm (action) {
   const isOvirtGTE42 = compareVersionToCurrent({ major: 4, minor: 2 })
   if (isOvirtGTE42 && !shallowFetch) {
     action.payload.additional = vmFetchAdditionalList
+    if (Selectors.getFilter()) {
+      action.payload.additional = [...vmFetchAdditionalList, 'permissions.role']
+    }
   }
 
   const vm = yield callExternalAction('getVm', Api.getVm, action, true)
@@ -385,6 +388,7 @@ export function* fetchSingleVm (action) {
       internalVm.disks = yield fetchVmDisks({ vmId: internalVm.id })
       internalVm.nics = yield fetchVmNics({ vmId: internalVm.id })
       internalVm.sessions = yield fetchVmSessions({ vmId: internalVm.id })
+      internalVm.permissions = yield fetchVmPermissions({ vmId: internalVm.id })
       // TODO: Support <4.2 for snapshots?
       // TODO: Support <4.2 for statistics?
     }
@@ -394,6 +398,11 @@ export function* fetchSingleVm (action) {
         internalVm.snapshots[i].disks = disks.disk.map((disk) => Api.diskToInternal({ disk, attachment: {} }))
       }
     }
+
+    if (isOvirtGTE42 && !shallowFetch && !Selectors.getFilter()) {
+      internalVm.permissions = yield fetchVmPermissions({ vmId: internalVm.id })
+    }
+
     yield put(updateVms({ vms: [internalVm], copySubResources: shallowFetch }))
     yield fetchUnknownIconsForVms({ vms: [internalVm] })
   } else {
@@ -692,6 +701,15 @@ export function* fetchVmSessions ({ vmId }) {
   return []
 }
 
+export function* fetchVmPermissions ({ vmId }) {
+  const permissions = yield callExternalAction('getVmPermissions', Api.getVmPermissions, { payload: { vmId } })
+
+  if (permissions && permissions['permission']) {
+    return Api.permissionsToInternal({ permissions })
+  }
+  return []
+}
+
 /**
  * VmDetail is to be rendered.
  */
@@ -762,10 +780,23 @@ function mergeStorageDomains (storageDomainsInternal) {
 }
 
 function* fetchAllClusters (action) {
+  if (Selectors.getFilter()) {
+    action.payload.additional = ['permissions.role']
+  }
   const clusters = yield callExternalAction('getAllClusters', Api.getAllClusters, action)
 
   if (clusters && clusters['cluster']) {
-    const clustersInternal = clusters.cluster.map(cluster => Api.clusterToInternal({ cluster }))
+    let clustersInternal = []
+    if (!Selectors.getFilter()) {
+      clustersInternal = yield all(clusters.cluster.map(cluster => call(function* () {
+        const permissions = yield callExternalAction('getClusterPermissions', Api.getClusterPermissions, { payload: { clusterId: cluster.id } })
+        return Api.clusterToInternal({ cluster, permissions })
+      })))
+    } else {
+      clustersInternal = clusters.cluster.map(cluster =>
+        Api.clusterToInternal({ cluster, permissions: cluster.permissions })
+      )
+    }
     yield put(setClusters(clustersInternal))
   }
 }
