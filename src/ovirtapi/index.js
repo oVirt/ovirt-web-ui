@@ -1,8 +1,8 @@
 // @flow
 import type {
-  CdRomType, ApiCdRomType,
-  SnapshotType, ApiSnapshotType,
+  CdRomType,
   NicType,
+  SnapshotType,
   VmType, ApiVmType,
 } from './types'
 
@@ -258,7 +258,7 @@ const OvirtApi = {
     assertLogin({ methodName: 'snapshotNics' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots/${snapshotId}/nics` })
   },
-  snapshot ({ vmId, snapshotId }: { vmId: string, snapshotId: string }): Promise<ApiSnapshotType> {
+  snapshot ({ vmId, snapshotId }: { vmId: string, snapshotId: string }): Promise<Object> {
     assertLogin({ methodName: 'snapshot' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots/${snapshotId}` })
   },
@@ -333,11 +333,11 @@ const OvirtApi = {
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/storagedomains/${storageId}/files` })
   },
 
-  getCdRom ({ vmId, current = true }: { vmId: string, current?: boolean }): Promise<ApiCdRomType> {
+  getCdRom ({ vmId, current = true }: { vmId: string, current?: boolean }): Promise<Object> {
     assertLogin({ methodName: 'getCdRom' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/cdroms/${zeroUUID}?current=${current ? 'true' : 'false'}` })
   },
-  changeCdRom ({ cdrom, vmId, current = true }: { cdrom: CdRomType, vmId: string, current?: boolean }): Promise<ApiCdRomType> {
+  changeCdRom ({ cdrom, vmId, current = true }: { cdrom: CdRomType, vmId: string, current?: boolean }): Promise<Object> {
     assertLogin({ methodName: 'changeCdRom' })
     const input = JSON.stringify(OvirtApi.internalCdRomToOvirt({ cdrom }))
     logger.log(`OvirtApi.changeCdRom(): ${input}`)
