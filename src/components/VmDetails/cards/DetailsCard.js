@@ -43,7 +43,7 @@ DetailsCard.propTypes = {
 
 export default connect(
   (state, { vm }) => ({
-    isEditable: canUserEditVm(vm, state.config),
+    isEditable: canUserEditVm(vm),
   }),
   (dispatch) => ({})
 )(DetailsCard)

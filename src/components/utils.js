@@ -48,8 +48,7 @@ export function escapeHtml (s: string): string {
   return div.innerHTML
 }
 
-export function getFilteredClusters (clusters: Array<Object>, config: Object): Array<Object> {
-  const userId = config.getIn(['user', 'id'])
+export function getFilteredClusters (clusters: Array<Object>): Array<Object> {
   const allowedPermissions = [
     'VmCreator',
     'PowerUserRole',
@@ -61,14 +60,13 @@ export function getFilteredClusters (clusters: Array<Object>, config: Object): A
   ]
   return clusters.filter((cluster: Object): boolean => {
     const filteredRoles = cluster.get('permissions').filter((role) => (
-      role.get('userId') === userId && allowedPermissions.includes(role.get('name'))
+      allowedPermissions.includes(role.get('name'))
     ))
     return !!filteredRoles.size
   })
 }
 
-export function canUserEditVm (vm: VmType, config: Object): boolean {
-  const userId = config.getIn(['user', 'id'])
+export function canUserEditVm (vm: VmType): boolean {
   const allowedPermissions = [
     'ClusterAdmin',
     'DataCenterAdmin',
@@ -77,7 +75,7 @@ export function canUserEditVm (vm: VmType, config: Object): boolean {
     'SuperUser',
   ]
   const filteredRoles = vm.get('permissions').filter((role) => (
-    role.get('userId') === userId && allowedPermissions.includes(role.get('name'))
+    allowedPermissions.includes(role.get('name'))
   ))
   return !!filteredRoles.size
 }
