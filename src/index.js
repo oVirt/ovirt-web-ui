@@ -35,6 +35,7 @@ import OvirtApi from './ovirtapi'
 
 import App from './App'
 import GlobalErrorBoundary from './GlobalErrorBoundary'
+import RethrowSagaErrorAsReactError from './RethrowSagaErrorAsReactError'
 
 // eslint-disable "import/first": off
 
@@ -47,14 +48,17 @@ window.patternfly = require('patternfly/dist/js/patternfly')
 window.selectpicker = require('bootstrap-select/js/bootstrap-select.js')
 window.combobox = require('patternfly-bootstrap-combobox/js/bootstrap-combobox.js')
 
-function renderApp (store: Object, errorThrower: Object) {
+function renderApp (store: Object, errorBridge: Object) {
   ReactDOM.render(
     <GlobalErrorBoundary>
-      <Provider store={store}>
-        <IntlProvider locale={locale} messages={getSelectedMessages()}>
-          <App history={store.history} errorThrower={errorThrower} />
-        </IntlProvider>
-      </Provider>
+      <React.Fragment>
+        <RethrowSagaErrorAsReactError errorBridge={errorBridge} />
+        <Provider store={store}>
+          <IntlProvider locale={locale} messages={getSelectedMessages()}>
+            <App history={store.history} />
+          </IntlProvider>
+        </Provider>
+      </React.Fragment>
     </GlobalErrorBoundary>,
 
     (document.getElementById('root'): any)
@@ -125,7 +129,7 @@ function initializeApiListener (store: Object) {
   })
 }
 
-class ErrorThrower {
+class SagaErrorBridge {
   errorHandler = null
   setErrorHandler (errorHandler: Function) {
     this.errorHandler = errorHandler
@@ -144,14 +148,14 @@ function onResourcesLoaded () {
 
   const store = configureStore()
   const rootTask = store.runSaga(rootSaga)
-  const errorThrower = new ErrorThrower()
-  rootTask.done.catch(err => errorThrower.throw(err))
+  const sagaErrorBrigde = new SagaErrorBridge()
+  rootTask.done.catch(err => sagaErrorBrigde.throw(err))
   Selectors.init({ store })
   initializeApiListener(store)
   loadPersistedState(store)
 
   // do initial render
-  renderApp(store, errorThrower)
+  renderApp(store, sagaErrorBrigde)
 
   const { token, username, domain, userId }: { token: string, username: string, domain: string, userId: string } = fetchToken()
   store.dispatch(setDomain({ domain }))
