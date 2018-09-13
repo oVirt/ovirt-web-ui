@@ -35,9 +35,9 @@ const NoLogin = () => {
 
 /**
  * Main App component. Wrap the main react-router components together with
- * the various dialogs and error messages that may be needed.
+ * the various dialogs and error messages that may be neded.
  */
-const App = ({ history, config, appReady, errorThrower }) => {
+const App = ({ history, config, appReady }) => {
   if (!config.get('loginToken')) { // login is missing
     return (
       <Grid fluid>
@@ -45,11 +45,6 @@ const App = ({ history, config, appReady, errorThrower }) => {
       </Grid>
     )
   }
-
-  const errorHandler = (error) => {
-    throw error
-  }
-  errorThrower.setErrorHandler(errorHandler())
 
   return (
     <ConnectedRouter history={history}>
@@ -66,10 +61,9 @@ const App = ({ history, config, appReady, errorThrower }) => {
 }
 App.propTypes = {
   history: PropTypes.object.isRequired,
-
   config: PropTypes.object.isRequired,
   appReady: PropTypes.bool.isRequired,
-  errorThrower: PropTypes.object.isRequired,
+
 }
 
 export default connect(
