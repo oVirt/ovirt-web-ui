@@ -157,12 +157,12 @@ const OvirtApi = {
       (additional && additional.length > 0 ? `?follow=${additional.join(',')}` : '')
     return httpGet({ url })
   },
-  getClusterPermissions ({ clusterId }: Object): Promise<Object> {
+  getClusterPermissions ({ clusterId }: { clusterId: string }): Promise<Object> {
     assertLogin({ methodName: 'getClusterPermissions' })
     const url = `${AppConfiguration.applicationContext}/api/clusters/${clusterId}/permissions?follow=role`
     return httpGet({ url, custHeaders: { Filter: true } })
   },
-  getVmPermissions ({ vmId }: Object): Promise<Object> {
+  getVmPermissions ({ vmId }: VmIdType): Promise<Object> {
     assertLogin({ methodName: 'getClusterPermissions' })
     const url = `${AppConfiguration.applicationContext}/api/vms/${vmId}/permissions?follow=role`
     return httpGet({ url, custHeaders: { Filter: true } })
@@ -265,6 +265,10 @@ const OvirtApi = {
   snapshots ({ vmId }: { vmId: string }): Promise<Object> {
     assertLogin({ methodName: 'snapshots' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots` })
+  },
+  groups ({ userId }: { userId: string }): Promise<Object> {
+    assertLogin({ methodName: 'groups' })
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/users/${userId}/groups` })
   },
   icon ({ id }: { id: string }): Promise<Object> {
     assertLogin({ methodName: 'icon' })

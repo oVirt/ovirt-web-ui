@@ -59,6 +59,12 @@ Selectors = {
   getCurrentPage () {
     return getState().vms.get('page')
   },
+  getUserId () {
+    return getState().config.getIn(['user', 'id'])
+  },
+  getUserGroups () {
+    return getState().config.get('userGroups')
+  },
   getVmIds () {
     return getState().vms.get('vms').reduce((vmIds, vm, vmId) => {
       vmIds.push(vmId)

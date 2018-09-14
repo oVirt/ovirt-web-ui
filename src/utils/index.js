@@ -1,6 +1,7 @@
 // @flow
 import { isNumber } from './unit-conversion'
 
+export * from './permissions'
 export * from './round'
 export * from './storage-conversion'
 export { isNumber } from './unit-conversion'

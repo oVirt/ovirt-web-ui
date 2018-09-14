@@ -42,6 +42,7 @@ import {
   setOperatingSystems,
   setStorageDomains,
   setDataCenters,
+  setUserGroups,
   addNetworksToVnicProfiles,
   setVnicProfiles,
   setVmSnapshots,
@@ -112,6 +113,7 @@ import {
   GET_POOLS_BY_PAGE,
   GET_RDP_VM,
   GET_USB_FILTER,
+  GET_USER_GROUPS,
   GET_VMS_BY_COUNT,
   GET_VMS_BY_PAGE,
   LOGIN,
@@ -131,6 +133,8 @@ import {
   SUSPEND_VM,
 } from './constants'
 
+import { canUserEditVm } from './utils'
+
 const vmFetchAdditionalList =
   [
     'cdroms',
@@ -142,6 +146,8 @@ const vmFetchAdditionalList =
     'statistics',
     'permissions.role',
   ]
+
+const EVERYONE_GROUP_ID = 'eee00000-0000-0000-0000-123456789eee'
 
 /**
  * Compare the current oVirt version (held in redux) to the given version.
@@ -365,9 +371,6 @@ export function* fetchSingleVm (action) {
   const isOvirtGTE42 = compareVersionToCurrent({ major: 4, minor: 2 })
   if (isOvirtGTE42 && !shallowFetch) {
     action.payload.additional = vmFetchAdditionalList
-    if (Selectors.getFilter()) {
-      action.payload.additional = [...vmFetchAdditionalList, 'permissions.role']
-    }
   }
 
   const vm = yield callExternalAction('getVm', Api.getVm, action, true)
@@ -393,6 +396,7 @@ export function* fetchSingleVm (action) {
       internalVm.nics = yield fetchVmNics({ vmId: internalVm.id })
       internalVm.sessions = yield fetchVmSessions({ vmId: internalVm.id })
       internalVm.permissions = yield fetchVmPermissions({ vmId: internalVm.id })
+      internalVm.canUserEditVm = canUserEditVm(internalVm.permissions)
       // TODO: Support <4.2 for snapshots?
       // TODO: Support <4.2 for statistics?
     }
@@ -711,7 +715,7 @@ export function* fetchVmPermissions ({ vmId }) {
   const permissions = yield callExternalAction('getVmPermissions', Api.getVmPermissions, { payload: { vmId } })
 
   if (permissions && permissions['permission']) {
-    return Api.permissionsToInternal({ permissions })
+    return Api.permissionsToInternal({ permissions: permissions.permission })
   }
   return []
 }
@@ -786,23 +790,14 @@ function mergeStorageDomains (storageDomainsInternal) {
 }
 
 function* fetchAllClusters (action) {
-  if (Selectors.getFilter()) {
-    action.payload.additional = ['permissions.role']
-  }
+  action.payload.additional = ['permissions.role']
   const clusters = yield callExternalAction('getAllClusters', Api.getAllClusters, action)
 
   if (clusters && clusters['cluster']) {
     let clustersInternal = []
-    if (!Selectors.getFilter()) {
-      clustersInternal = yield all(clusters.cluster.map(cluster => call(function* () {
-        const permissions = yield callExternalAction('getClusterPermissions', Api.getClusterPermissions, { payload: { clusterId: cluster.id } })
-        return Api.clusterToInternal({ cluster, permissions })
-      })))
-    } else {
-      clustersInternal = clusters.cluster.map(cluster =>
-        Api.clusterToInternal({ cluster, permissions: cluster.permissions })
-      )
-    }
+    clustersInternal = clusters.cluster.map(cluster =>
+      Api.clusterToInternal({ cluster })
+    )
     yield put(setClusters(clustersInternal))
   }
 }
@@ -938,6 +933,15 @@ function* fetchAllNetworks () {
   }
 }
 
+function* fetchUserGroups () {
+  const groups = yield callExternalAction('groups', Api.groups, { payload: { userId: Selectors.getUserId() } })
+  if (groups && groups['group']) {
+    const groupsInternal = groups.group.map(group => group.id)
+    groupsInternal.push(EVERYONE_GROUP_ID)
+    yield put(setUserGroups({ groups: groupsInternal }))
+  }
+}
+
 function* delayedRemoveActiveRequest ({ payload: requestId }) {
   yield delay(500)
   yield put(removeActiveRequest(requestId))
@@ -1022,6 +1026,7 @@ export function* rootSaga () {
     takeLatest(GET_ALL_OS, fetchAllOS),
     takeLatest(GET_ALL_HOSTS, fetchAllHosts),
     takeLatest(GET_ALL_VNIC_PROFILES, fetchAllVnicProfiles),
+    takeLatest(GET_USER_GROUPS, fetchUserGroups),
     throttle(100, GET_ISO_STORAGE_DOMAINS, fetchISOStorages),
 
     takeEvery(SELECT_VM_DETAIL, selectVmDetail),

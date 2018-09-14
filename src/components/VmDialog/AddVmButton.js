@@ -4,8 +4,6 @@ import { connect } from 'react-redux'
 
 import { Link } from 'react-router-dom'
 
-import { getFilteredClusters } from '../utils'
-
 import { msg } from '../../intl'
 
 const AddVmButton = ({ id, isEnabled }) => {
@@ -20,12 +18,12 @@ const AddVmButton = ({ id, isEnabled }) => {
 }
 AddVmButton.propTypes = {
   id: PropTypes.string,
-  isEnabled: PropTypes.boolean,
+  isEnabled: PropTypes.bool,
 }
 
 export default connect(
   (state) => ({
-    isEnabled: !!getFilteredClusters(state.clusters).size,
+    isEnabled: state.clusters.find(cluster => cluster.get('canUserUseCluster')) !== undefined,
   }),
   (dispatch) => ({})
 )(AddVmButton)

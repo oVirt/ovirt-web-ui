@@ -2,8 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import { canUserEditVm } from '../../utils'
-
 import BaseCard from '../BaseCard'
 import style from '../style.css'
 
@@ -43,7 +41,7 @@ DetailsCard.propTypes = {
 
 export default connect(
   (state, { vm }) => ({
-    isEditable: canUserEditVm(vm),
+    isEditable: vm.get('canUserEditVm'),
   }),
   (dispatch) => ({})
 )(DetailsCard)
