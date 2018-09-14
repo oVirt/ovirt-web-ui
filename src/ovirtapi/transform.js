@@ -472,11 +472,12 @@ const Cluster = {
 //
 const Nic = {
   toInternal ({ nic }: { nic: ApiNicType }): NicType {
-    const ips = (
-      nic.reported_devices &&
-      nic.reported_devices.reported_device &&
-      nic.reported_devices.reported_device.map(device => device.ips.ip).reduce((ips, ipArray) => [...ipArray, ...ips], [])
-    ) || []
+    const ips =
+      nic.reported_devices && nic.reported_devices.reported_device
+        ? nic.reported_devices.reported_device
+          .map(device => device.ips.ip)
+          .reduce((ips, ipArray) => [...ipArray, ...ips], [])
+        : []
 
     return {
       id: nic.id,
