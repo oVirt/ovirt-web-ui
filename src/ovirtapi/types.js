@@ -115,17 +115,22 @@ export type VmConsolesType = Object
 export type ApiVmSessionsType = Object
 export type VmSessionsType = Object
 
-type PermissionType = {
+export type ApiPermissionType = {
   role: {
-    name: string
+    name: string,
+  },
+  user?: {
+    id: string
+  },
+  group?: {
+    id: string
   }
 }
-export type ApiPermissionsType = {
-  permission: Array<PermissionType>
-}
 
-export type PermissionsType = {
-  name: string
+export type PermissionType = {
+  name: string,
+  userId?: string,
+  groupId?: string
 }
 
 export type ApiCloudInitType = Object

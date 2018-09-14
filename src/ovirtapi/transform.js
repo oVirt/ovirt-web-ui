@@ -22,8 +22,10 @@ import type {
   ApiVmStatisticType, VmStatisticsType,
   ApiVmType, VmType,
   ApiVnicProfileType, VnicProfileType,
-  ApiPermissionsType, PermissionsType,
+  ApiPermissionType, PermissionType,
 } from './types'
+
+import { canUserUseCluster, canUserEditVm } from '../utils'
 
 function vCpusCount ({ cpu }: { cpu: Object }): number {
   if (cpu && cpu.topology) {
@@ -122,6 +124,7 @@ const VM = {
       sessions: [],
       nics: [],
       permissions: [],
+      canUserEditVm: false,
       display: {
         smartcardEnabled: vm.display && vm.display.smartcard_enabled && convertBool(vm.display.smartcard_enabled),
       },
@@ -166,8 +169,9 @@ const VM = {
 
       if (vm.permissions && vm.permissions.permission) {
         parsedVm.permissions = Permissions.toInternal({
-          permissions: vm.permissions,
+          permissions: vm.permissions.permission,
         })
+        parsedVm.canUserEditVm = canUserEditVm(parsedVm.permissions)
       }
     }
 
@@ -455,7 +459,10 @@ const StorageDomainFile = {
 //
 //
 const Cluster = {
-  toInternal ({ cluster, permissions }: { cluster: ApiClusterType, permissions: Object }): ClusterType {
+  toInternal ({ cluster }: { cluster: ApiClusterType }): ClusterType {
+    const permissions = cluster.permissions && cluster.permissions.permission
+      ? Permissions.toInternal({ permissions: cluster.permissions.permission })
+      : []
     return {
       id: cluster.id,
       name: cluster.name,
@@ -470,9 +477,8 @@ const Cluster = {
             ? cluster['memory_policy']['over_commit']['percent']
             : 100,
       },
-      permissions: permissions
-        ? Permissions.toInternal({ permissions })
-        : [],
+      canUserUseCluster: canUserUseCluster(permissions),
+      permissions,
     }
   },
 
@@ -639,9 +645,11 @@ const VmSessions = {
 }
 
 const Permissions = {
-  toInternal ({ permissions }: { permissions: ApiPermissionsType }): Array<PermissionsType> {
-    return permissions.permission.map(permission => ({
+  toInternal ({ permissions }: { permissions: Array<ApiPermissionType> }): Array<PermissionType> {
+    return permissions.map(permission => ({
       name: permission.role.name,
+      userId: permission.user && permission.user.id,
+      groupId: permission.group && permission.group.id,
     }))
   },
 

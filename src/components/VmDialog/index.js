@@ -10,7 +10,7 @@ import Switch from 'react-bootstrap-switch'
 
 import logger from '../../logger'
 import { generateUnique, templateNameRenderer } from '../../helpers'
-import { isRunning, getVmIconId, isValidOsIcon, getFilteredClusters } from '../utils'
+import { isRunning, getVmIconId, isValidOsIcon } from '../utils'
 
 import style from './style.css'
 import sharedStyle from '../sharedStyle.css'
@@ -809,7 +809,7 @@ VmDialog.propTypes = {
 
 export default connect(
   (state) => ({
-    clusters: getFilteredClusters(state.clusters),
+    clusters: state.clusters.filter(cluster => cluster.get('canUserUseCluster')),
     templates: state.templates,
     operatingSystems: state.operatingSystems,
     userMessages: state.userMessages,
