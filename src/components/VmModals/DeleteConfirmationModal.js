@@ -22,12 +22,12 @@ class DeleteConfirmationModal extends React.Component {
   }
 
   render () {
-    const { children, trigger } = this.props
+    const { children, trigger, disabled } = this.props
 
     const icon = <Icon type='pf' name='warning-triangle-o' />
     return (
       <React.Fragment>
-        {React.cloneElement(trigger, { onClick: () => this.setState({ show: true }) })}
+        {React.cloneElement(trigger, { onClick: () => this.setState({ show: true }), disabled })}
         <MessageDialog
           show={this.state.show}
           onHide={this.handleClose}
@@ -46,6 +46,7 @@ class DeleteConfirmationModal extends React.Component {
 
 DeleteConfirmationModal.propTypes = {
   trigger: PropsTypes.node.isRequired,
+  disabled: PropsTypes.bool,
   children: PropsTypes.node.isRequired,
   onDelete: PropsTypes.func.isRequired,
   onClose: PropsTypes.func,

@@ -157,3 +157,9 @@ body {
   content:"*";
   color:red;
 }
+
+a.disabled {
+  color: #8b8d8f !important;
+  cursor: not-allowed !important;
+  text-decoration: none;
+}
