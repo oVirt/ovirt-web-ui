@@ -35,7 +35,6 @@ import OvirtApi from './ovirtapi'
 
 import App from './App'
 import GlobalErrorBoundary from './GlobalErrorBoundary'
-import RethrowSagaErrorAsReactError from './RethrowSagaErrorAsReactError'
 
 // eslint-disable "import/first": off
 
@@ -50,15 +49,12 @@ window.combobox = require('patternfly-bootstrap-combobox/js/bootstrap-combobox.j
 
 function renderApp (store: Object, errorBridge: Object) {
   ReactDOM.render(
-    <GlobalErrorBoundary>
-      <React.Fragment>
-        <RethrowSagaErrorAsReactError errorBridge={errorBridge} />
-        <Provider store={store}>
-          <IntlProvider locale={locale} messages={getSelectedMessages()}>
-            <App history={store.history} />
-          </IntlProvider>
-        </Provider>
-      </React.Fragment>
+    <GlobalErrorBoundary errorBridge={errorBridge}>
+      <Provider store={store}>
+        <IntlProvider locale={locale} messages={getSelectedMessages()}>
+          <App history={store.history} />
+        </IntlProvider>
+      </Provider>
     </GlobalErrorBoundary>,
 
     (document.getElementById('root'): any)
@@ -129,14 +125,15 @@ function initializeApiListener (store: Object) {
   })
 }
 
-class SagaErrorBridge {
-  errorHandler = null
-  setErrorHandler (errorHandler: Function) {
-    this.errorHandler = errorHandler
+function SagaErrorBridge () {
+  let handler = null
+  this.setErrorHandler = (errorHandler) => {
+    handler = errorHandler
   }
-  throw (error: Object) {
-    if (this.errorHandler != null) {
-      this.errorHandler(error)
+
+  this.throw = (err) => {
+    if (handler !== null) {
+      handler(err)
     }
   }
 }

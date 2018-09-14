@@ -9,6 +9,10 @@ class GlobalErrorBoundary extends React.Component {
   constructor (props) {
     super(props)
     this.state = { hasError: false }
+    this.props.errorBridge.setErrorHandler((error) => {
+      this.setState({ hasError: true })
+      console.error(error)
+    })
   }
 
   componentDidCatch (error, info) {
@@ -53,6 +57,7 @@ class GlobalErrorBoundary extends React.Component {
 
 GlobalErrorBoundary.propTypes = {
   children: PropTypes.object.isRequired,
+  errorBridge: PropTypes.object.isRequired,
 }
 
 export default GlobalErrorBoundary
