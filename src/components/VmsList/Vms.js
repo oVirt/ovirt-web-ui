@@ -51,7 +51,7 @@ class Vms extends React.Component {
         useWindow={false}
       >
         <ScrollPositionHistory uniquePrefix='vms-list' scrollContainerSelector='#page-router-render-component'>
-          <div className={`container-fluid container-cards-pf ${style['vm-card-list-container']}`}>
+          <div className={`container-fluid container-cards-pf`}>
             <div className={style['scrollingWrapper']}>
               <div className='row row-cards-pf'>
                 {sortedVms.map(vm => <Vm vm={vm} key={vm.get('id')} />)}
