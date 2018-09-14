@@ -337,6 +337,7 @@ const Snapshot = {
       status: snapshot.snapshot_status || '',
       persistMemoryState: snapshot.persist_memorystate === 'true',
       isActive: snapshot.snapshot_type === 'active',
+      nics: snapshot.nics && snapshot.nics.nic ? snapshot.nics.nic.map((nic) => ({ id: nic.id, name: nic.name })) : [],
     }
   },
 

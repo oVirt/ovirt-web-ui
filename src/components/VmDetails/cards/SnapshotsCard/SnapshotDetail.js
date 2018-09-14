@@ -15,7 +15,7 @@ import style from './style.css'
 import { msg } from '../../../../intl'
 
 import Selectors from '../../../../selectors'
-import { templateNameRenderer, getFormatedDateTime, userFormatOfBytes } from '../../../../helpers'
+import { templateNameRenderer, getFormatedDateTime, userFormatOfBytes, localeCompare } from '../../../../helpers'
 import { getOsHumanName } from '../../../utils'
 import { sortDisksForDisplay } from '../../../VmDisks/utils'
 
@@ -35,13 +35,19 @@ const diskRender = (disk) => {
   </div>
 }
 
+const nicRender = (nic) => {
+  return <div key={nic.get('id')}>
+    {nic.get('name')}
+  </div>
+}
+
 const statusMap = {
   'in_preview': msg.inPreview(),
   'locked': msg.locked(),
   'ok': msg.ok(),
 }
 
-const SnapshotDetail = ({ snapshot, vmId, ...otherProps }) => {
+const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, ...otherProps }) => {
   const template = Selectors.getTemplateById(snapshot.getIn(['vm', 'template', 'id']))
   const time = getFormatedDateTime(snapshot.get('date'))
 
@@ -52,9 +58,27 @@ const SnapshotDetail = ({ snapshot, vmId, ...otherProps }) => {
   const diskToShow = disksToRender.slice(0, 2)
   const additionalDisk = disksToRender.slice(2)
 
+  const nicsToRender = snapshot.get('nics', Immutable.fromJS([])).sort((a, b) => localeCompare(a.get('name'), b.get('name')))
+  const showMoreNics = nicsToRender.size > 2
+  const nicsToShow = nicsToRender.slice(0, 2)
+  const additionalNics = nicsToRender.slice(2)
+
   return <Popover
     id={`snapshot-popover-${snapshot.get('id')}`}
-    title={snapshot.get('description')}
+    title={
+      <div>
+        {snapshot.get('description')}
+        <button
+          type='button'
+          className='close'
+          data-dismiss={`snapshot-popover-${snapshot.get('id')}`}
+          aria-label='Close'
+          onClick={() => document.body.click()} // Hackish way to hide popover, but better solution then create own version of OverlayTrigger or using refs with private methods
+        >
+          <span aria-hidden='true'>&times;</span>
+        </button>
+      </div>
+    }
     bsClass={`${style['popover']} popover`}
     {...otherProps}
   >
@@ -105,10 +129,28 @@ const SnapshotDetail = ({ snapshot, vmId, ...otherProps }) => {
           {snapshot.getIn(['vm', 'cdrom', 'file', 'id']) ? snapshot.getIn(['cdrom', 'file', 'id']) : msg.empty() }
         </dd>
         <dt>
-          {msg.cloudInit()}
+          {msg.nic()}
         </dt>
         <dd>
-          {getStatus(snapshot.getIn(['vm', 'cloudInit', 'enabled']))}
+          <div className={style['snapshot-disk-list']}>
+            {nicsToShow && nicsToShow.map(nicRender)}
+            {
+              showMoreNics &&
+              <OverlayTrigger
+                overlay={<Tooltip id={`snapshot-nic-tooltip-${snapshot.get('id')}`}>
+                  {
+                    additionalNics && additionalNics.map(nicRender)
+                  }
+                </Tooltip>}
+                placement='bottom'
+                trigger='click'
+                rootClose
+                key='info'
+              >
+                <a>Show more</a>
+              </OverlayTrigger>
+            }
+          </div>
         </dd>
         <dt>
           {msg.bootMenu()}
@@ -143,9 +185,14 @@ const SnapshotDetail = ({ snapshot, vmId, ...otherProps }) => {
       </dl>
     </div>
     <div style={{ textAlign: 'left' }}>
-      <RestoreConfirmationModal snapshot={snapshot} vmId={vmId}>
-        <Button bsStyle='default'>{ msg.restoreSnapshot() }</Button>
-      </RestoreConfirmationModal>
+      <RestoreConfirmationModal
+        snapshot={snapshot}
+        vmId={vmId}
+        disabled={restoreDisabled}
+        trigger={
+          <Button bsStyle='default'>{ msg.restoreSnapshot() }</Button>
+        }
+      />
     </div>
   </Popover>
 }
@@ -153,6 +200,7 @@ const SnapshotDetail = ({ snapshot, vmId, ...otherProps }) => {
 SnapshotDetail.propTypes = {
   snapshot: PropTypes.object.isRequired,
   vmId: PropTypes.string.isRequired,
+  restoreDisabled: PropTypes.bool,
 }
 
 export default SnapshotDetail

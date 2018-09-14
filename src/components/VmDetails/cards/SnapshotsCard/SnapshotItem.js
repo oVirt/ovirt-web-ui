@@ -22,6 +22,19 @@ import { PendingTaskTypes } from '../../../../reducers/pendingTasks'
 
 const MAX_DESCRIPTION_SIZE = 50
 
+const SnapshotAction = ({ children, className, disabled, onClick }) => {
+  return <a onClick={!disabled ? onClick : null} className={`${className} ${disabled && 'disabled'}`}>
+    {children}
+  </a>
+}
+
+SnapshotAction.propTypes = {
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string,
+  disabled: PropTypes.bool,
+  onClick: PropTypes.func,
+}
+
 const StatusTooltip = ({ icon, text, id }) => {
   return <OverlayTrigger overlay={<Tooltip id={id}>{text}</Tooltip>} placement='left' trigger={['hover', 'focus']}>
     <a>{icon}</a>
@@ -34,31 +47,62 @@ StatusTooltip.propTypes = {
   id: PropTypes.string.isRequired,
 }
 
-function isSnapshotBeingDeleted (snapshotId, pendingTasks) {
+function isSnapshotDeleted (snapshotId, pendingTasks) {
   return !!pendingTasks.find(task => task.type === PendingTaskTypes.SNAPSHOT_REMOVAL && task.snapshotId === snapshotId)
 }
 
 const SnapshotItem = ({ snapshot, vmId, isEditing, beingDeleted, onSnapshotDelete }) => {
-  let buttons = []
   let statusIcon = null
+  let buttons = []
+
+  // Snapshot actions
+  const isActionsDisabled = beingDeleted || !isEditing || snapshot.get('status') === 'locked'
   if (!snapshot.get('isActive')) {
+    // Info popover
     buttons.push(<OverlayTrigger
-      overlay={<SnapshotDetail key='detail' snapshot={snapshot} vmId={vmId} />}
+      overlay={
+        <SnapshotDetail key='detail' snapshot={snapshot} vmId={vmId} restoreDisabled={isActionsDisabled} />
+      }
       placement='left'
       trigger='click'
       rootClose
       key='info'
     >
-      <a><Icon type='pf' name='info' /></a>
+      <a>
+        <Icon type='pf' name='info' />
+      </a>
     </OverlayTrigger>)
-    if (isEditing && !snapshot.get('isActive') && !beingDeleted) {
-      buttons.push(<RestoreConfirmationModal key='restore' snapshot={snapshot} vmId={vmId} />)
-      buttons.push(<DeleteConfirmationModal key='delete' trigger={<a key='delete'><Icon type='pf' name='delete' /></a>} onDelete={onSnapshotDelete}>
+
+    // Delete and restore actions
+    if (!snapshot.get('isActive')) {
+      buttons.push(<RestoreConfirmationModal
+        key='restore'
+        disabled={isActionsDisabled}
+        snapshot={snapshot}
+        vmId={vmId}
+        trigger={
+          <SnapshotAction key='restore'>
+            <Icon type='fa' name='play-circle' />
+          </SnapshotAction>
+        }
+      />)
+      buttons.push(<DeleteConfirmationModal
+        key='delete'
+        disabled={isActionsDisabled}
+        trigger={
+          <SnapshotAction key='delete'>
+            <Icon type='pf' name='delete' />
+          </SnapshotAction>
+        }
+        onDelete={onSnapshotDelete}
+      >
         <span dangerouslySetInnerHTML={{ __html: msg.areYouSureYouWantToDeleteSnapshot({ snapshotName: `"<strong>${snapshot.get('description')}</strong>"` }) }} />
         <br />
         <span>{msg.thisOperationCantBeUndone()}</span>
       </DeleteConfirmationModal>)
     }
+
+    // Status tooltip
     const tooltipId = `${snapshot.get('id')}_${snapshot.get('status')}`
     switch (snapshot.get('status')) {
       case 'locked':
@@ -92,7 +136,7 @@ SnapshotItem.propTypes = {
 
 export default connect(
   (state, { snapshot }) => ({
-    beingDeleted: isSnapshotBeingDeleted(snapshot.get('id'), state.pendingTasks),
+    beingDeleted: isSnapshotDeleted(snapshot.get('id'), state.pendingTasks),
   }),
   (dispatch, { vmId, snapshot }) => ({
     onSnapshotDelete: () => dispatch(deleteVmSnapshot({ vmId, snapshotId: snapshot.get('id') })),

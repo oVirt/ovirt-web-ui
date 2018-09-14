@@ -48,10 +48,6 @@ div.popover {
   margin-left: 5px;
 }
 
-.snapshot-item span a:disabled {
-  color: #555;
-}
-
 .snapshot-disk-list {
   display: table;
 }
