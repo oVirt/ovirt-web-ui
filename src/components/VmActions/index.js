@@ -32,7 +32,6 @@ import LinkButton from './LinkButton'
 import ConfirmationModal from './ConfirmationModal'
 import ConsoleConfirmationModal from './ConsoleConfirmationModal'
 import Action, { ActionButtonWraper } from './Action'
-import { canUserEditVm } from '../utils'
 
 const EmptyAction = ({ state, isOnCard }) => {
   if (!canConsole(state) && !canShutdown(state) && !canRestart(state) && !canStart(state)) {
@@ -315,7 +314,7 @@ VmActions.propTypes = {
 export default withRouter(
   connect(
     (state, { vm }) => ({
-      isEditable: canUserEditVm(vm),
+      isEditable: vm.get('canUserEditVm') && state.clusters.find(cluster => cluster.get('canUserUseCluster')) !== undefined,
     }),
     (dispatch, { vm, pool }) => ({
       onShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: false })),

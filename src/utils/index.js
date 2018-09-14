@@ -2,6 +2,7 @@
 import { isNumber } from './unit-conversion'
 
 export * from './format'
+export * from './permissions'
 export * from './round'
 export * from './storage-conversion'
 export { isNumber } from './unit-conversion'

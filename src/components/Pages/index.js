@@ -11,7 +11,6 @@ import VmDetails from '../VmDetails'
 import { default as LegacyVmDetails } from '../VmDetail'
 
 import { selectVmDetail, selectPoolDetail, getIsoStorageDomains, getConsoleOptions } from '../../actions'
-import { getFilteredClusters } from '../utils'
 
 /**
  * Route component (for PageRouter) to view the list of VMs and Pools
@@ -182,6 +181,8 @@ const PoolDetailsPageConnected = connect(
   })
 )(PoolDetailsPage)
 
+const canUserUseCluster = (clusters) => clusters.find(cluster => cluster.get('canUserUseCluster')) !== undefined
+
 /**
  * Route component (for PageRouter) to create a new VM
  */
@@ -192,7 +193,7 @@ class VmCreatePage extends React.Component {
   }
 
   componentDidUpdate () {
-    if (!this.props.filteredClustersSize && this.props.clusterSize) {
+    if (!this.props.isFilteredClusters && this.props.clusterSize) {
       this.props.redirectToMainPage()
     }
   }
@@ -204,14 +205,14 @@ class VmCreatePage extends React.Component {
 }
 VmCreatePage.propTypes = {
   previousPath: PropTypes.string.isRequired,
-  filteredClustersSize: PropTypes.number.isRequired,
+  isFilteredClusters: PropTypes.bool,
   clusterSize: PropTypes.number.isRequired,
   getAvailableCDImages: PropTypes.func.isRequired,
   redirectToMainPage: PropTypes.func.isRequired,
 }
 const VmCreatePageConnected = connect(
   (state) => ({
-    filteredClustersSize: getFilteredClusters(state.clusters).size,
+    isFilteredClusters: canUserUseCluster(state.clusters),
     clusterSize: state.clusters.size, // this prop is using for check real (without filtering) count of clusters
   }),
   (dispatch) => ({
@@ -232,7 +233,7 @@ class VmEditPage extends React.Component {
   }
 
   componentDidUpdate () {
-    if (!this.props.filteredClustersSize && this.props.clusterSize) {
+    if (!this.props.isFilteredClusters && this.props.clusterSize) {
       this.props.redirectToMainPage()
     }
   }
@@ -268,7 +269,7 @@ VmEditPage.propTypes = {
   vms: PropTypes.object.isRequired,
   previousPath: PropTypes.string.isRequired,
   match: RouterPropTypeShapes.match.isRequired,
-  filteredClustersSize: PropTypes.number.isRequired, // deep immutable, {[id: string]: Cluster}
+  isFilteredClusters: PropTypes.bool, // deep immutable, {[id: string]: Cluster}
   clusterSize: PropTypes.number.isRequired,
 
   getAvailableCDImages: PropTypes.func.isRequired,
@@ -277,7 +278,7 @@ VmEditPage.propTypes = {
 }
 const VmEditPageConnected = connect(
   (state) => ({
-    filteredClustersSize: getFilteredClusters(state.clusters).size,
+    isFilteredClusters: canUserUseCluster(state.clusters),
     clusterSize: state.clusters.size, // this prop is using for check real (without filtering) count of clusters
     vms: state.vms,
   }),
