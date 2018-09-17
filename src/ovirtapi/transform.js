@@ -38,9 +38,8 @@ function vCpusCount ({ cpu }: { cpu: Object }): number {
   return 0
 }
 
-function convertEpoch (epoch: number, defaultValue: ?string = undefined): ?string {
-  // TODO: improve time conversion
-  return epoch ? new Date(epoch).toUTCString() : defaultValue
+function convertEpoch (epoch: number, defaultValue: ?Date = undefined): ?Date {
+  return epoch ? new Date(epoch) : defaultValue
 }
 
 function convertBool (val: ?string): boolean {
@@ -178,56 +177,66 @@ const VM = {
     return parsedVm
   },
 
+  /*
+   * Convert an internal VmType to the API structure.  The transform handles a **partial**
+   * internal VM object and will only include **available** keys/values in the API
+   * structure output.
+   */
   toApi ({ vm }: { vm: VmType }): ApiVmType {
     return {
+      id: vm.id,
       name: vm.name,
       description: vm.description,
-      id: vm.id,
       type: vm.type,
 
       memory: vm.memory,
-      memory_policy: {
+      memory_policy: vm.memory_policy && {
         max: vm.memory_policy.max,
         guaranteed: vm.memory_policy.guaranteed,
       },
 
-      cpu: {
-        topology: {
+      cpu: vm.cpu && {
+        topology: vm.cpu.topology && {
           cores: vm.cpu.topology.cores,
           sockets: vm.cpu.topology.sockets,
           threads: vm.cpu.topology.threads,
         },
       },
 
-      template: vm.template && vm.template.id ? {
+      template: vm.template && vm.template.id && {
         id: vm.template.id,
-      } : undefined,
+      },
 
-      cluster: vm.cluster && vm.cluster.id ? {
+      cluster: vm.cluster && vm.cluster.id && {
         id: vm.cluster.id,
-      } : undefined,
+      },
 
-      os: vm.os && (vm.os.type || vm.os.bootDevices) ? {
+      os: vm.os && (vm.os.type || vm.os.bootDevices) && {
         type: vm.os.type || undefined,
-        boot: {
+        boot: vm.os.bootDevices && {
           devices: {
             device: vm.os.bootDevices.filter((item) => item !== null),
           },
         },
-      } : undefined,
-
-      bios: {
-        boot_menu: {
-          enabled: vm.bootMenuEnabled,
-        },
       },
 
-      initialization: vm.cloudInit.enabled
+      bios: vm.hasOwnProperty('bootMenuEnabled')
         ? {
-          host_name: vm.cloudInit.hostName,
-          authorized_ssh_keys: vm.cloudInit.sshAuthorizedKeys,
+          boot_menu: {
+            enabled: vm.bootMenuEnabled,
+          },
         }
-        : {},
+        : undefined,
+
+      // NOTE: Disable cloudInit by sending "initialization: {}"
+      initialization: vm.cloudInit && (
+        vm.cloudInit.enabled
+          ? {
+            host_name: vm.cloudInit.hostName,
+            authorized_ssh_keys: vm.cloudInit.sshAuthorizedKeys,
+          }
+          : {}
+      ),
 
       large_icon: vm.icons && vm.icons.large && (vm.icons.large.id || (vm.icons.large.data && vm.icons.large.media_type))
         ? vm.icons.large
@@ -289,6 +298,7 @@ const Template = {
       memory: template.memory,
 
       cpu: {
+        vCPUs: vCpusCount({ cpu: template.cpu }),
         topology: {
           cores: template.cpu.topology.cores,
           sockets: template.cpu.topology.sockets,

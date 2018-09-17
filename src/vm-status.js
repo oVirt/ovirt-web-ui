@@ -21,3 +21,11 @@ export function canConsole (state) {
 export function canRemove (state) {
   return ['down'].includes(state)
 }
+
+export function canChangeCluster (state) {
+  return ['down'].includes(state)
+}
+
+export function canChangeCd (state) {
+  return ['up'].includes(state)
+}

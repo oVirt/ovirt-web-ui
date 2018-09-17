@@ -188,13 +188,15 @@ const OvirtApi = {
       input,
     })
   },
-  editVm ({ vm, transformInput = false }: { vm: VmType | Object, transformInput: boolean }): Promise<Object> {
+  editVm ({ vm, nextRun = false, transformInput = false }: { vm: VmType | Object, nextRun: boolean, transformInput: boolean}): Promise<Object> {
     assertLogin({ methodName: 'editVm' })
     const input = JSON.stringify(transformInput ? OvirtApi.internalVmToOvirt({ vm }) : vm)
-    logger.log(`OvirtApi.editVm(): ${input}`)
+    logger.log(`OvirtApi.editVm(): ${input}`, 'nextRun?', nextRun)
+
+    const suffix = nextRun ? '?next_run=true' : ''
 
     return httpPut({
-      url: `${AppConfiguration.applicationContext}/api/vms/${vm.id}`,
+      url: `${AppConfiguration.applicationContext}/api/vms/${vm.id}${suffix}`,
       input,
     })
   },

@@ -30,6 +30,7 @@ const initialState = Immutable.fromJS({
   administrator: false,
   usbFilter: null,
   userGroups: [],
+  blankTemplateId: '00000000-0000-0000-0000-000000000000', // "engine/api/" -> special_objects.blank_template.id
 })
 
 const config = actionReducer(initialState, {
