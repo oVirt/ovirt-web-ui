@@ -89,7 +89,21 @@ export type ApiClusterType = Object
 export type ClusterType = Object
 
 export type ApiNicType = Object
-export type NicType = Object
+export type NicType = {
+  id: string,
+  name: string,
+  mac: string,
+  plugged: boolean,
+  ips: Array<{
+    address: string,
+    version: 'v4' | 'v6'
+  }>,
+  ipv4: Array<string>,
+  ipv6: Array<string>,
+  vnicProfile: {
+    id: string | null
+  }
+}
 
 export type ApiVnicProfileType = Object
 export type VnicProfileType = Object

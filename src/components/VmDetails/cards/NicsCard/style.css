@@ -1,0 +1,15 @@
+.nics-container {
+  width: auto;
+  margin-left: -15px; /* max is -20px to edge of the containing card */
+  margin-right: -15px;
+}
+
+.vnic-info {
+  padding-left: 5px;
+}
+
+.ip4-container,
+.ip6-container {
+  font-size: 0.7em;
+  padding: 0 10px;
+}
