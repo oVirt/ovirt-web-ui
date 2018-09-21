@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import * as branding from './branding'
 import { msg } from './intl'
-import './error_styles-nomodules.css'
+import styles from './error.css'
 import AppConfiguration from './config'
 
 class GlobalErrorBoundary extends React.Component {
@@ -39,7 +39,7 @@ class GlobalErrorBoundary extends React.Component {
               </a>
             </div>
           </nav>
-          <div className='container text-center globalErrorContainer'>
+          <div className={`container text-center ${styles['globalErrorContainer']}`}>
             <img src={branding.resourcesUrls.errorImg} />
             <h1 className='bolder'>{title}</h1>
             <p className='h4'>{descr}<a href='https://github.com/oVirt/ovirt-web-ui/issues'>{gitHub}</a></p>

@@ -3,6 +3,6 @@
     margin-top: 10%;
 }
 
-.globalErrorContainer a.btn {
+.globalErrorContainer a:global(.btn) {
     margin: 5%;
 }
