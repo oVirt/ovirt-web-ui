@@ -25,7 +25,6 @@ const Snapshots = ({ snapshots, vmId, beingCreated, beingRestored }) => {
     </React.Fragment>
   )
 }
-
 Snapshots.propTypes = {
   snapshots: PropTypes.object.isRequired,
   vmId: PropTypes.string.isRequired,
@@ -37,8 +36,7 @@ const ConnectedSnapshots = connect(
   (state) => ({
     beingCreated: !!state.pendingTasks.find(t => t.type === PendingTaskTypes.SNAPSHOT_ADD),
     beingRestored: !!state.pendingTasks.find(task => task.type === PendingTaskTypes.SNAPSHOT_RESTORE),
-  }),
-  (dispatch) => ({})
+  })
 )(Snapshots)
 
 /**

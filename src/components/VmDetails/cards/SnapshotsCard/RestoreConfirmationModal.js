@@ -38,6 +38,8 @@ class RestoreConfirmationModal extends React.Component {
     const icon = <Icon type='pf' name='warning-triangle-o' />
     const clonedTrigger = React.cloneElement(trigger, { onClick: this.open, disabled })
     const snapshotsThatWillBeDeleted = snapshots.filter((s) => s.get('date') > snapshot.get('date'))
+    const minDescription = getMinimizedString(snapshot.get('description'), MAX_DESCRIPTION_SIZE)
+
     return (
       <React.Fragment>
         {clonedTrigger}
@@ -51,16 +53,18 @@ class RestoreConfirmationModal extends React.Component {
           title={msg.confirmRestore()}
           icon={icon}
           primaryContent={
-            <p
+            <div
               className='lead'
-              dangerouslySetInnerHTML={{ __html: msg.areYouSureYouWantToRestoreSnapshot({ snapshotName: `"<strong>${getMinimizedString(snapshot.get('description'), MAX_DESCRIPTION_SIZE)}</strong>"` }) }}
+              dangerouslySetInnerHTML={{
+                __html: msg.areYouSureYouWantToRestoreSnapshot({ snapshotName: `"<strong>${minDescription}</strong>"` }),
+              }}
             />}
           secondaryContent={
             snapshotsThatWillBeDeleted.size > 0 &&
-            <p>
+            <div>
               {msg.nextSnapshotsWillBeDeleted()}
               {snapshotsThatWillBeDeleted.map((s) => <div key={s.get('date')}>{s.get('description')}</div>)}
-            </p>
+            </div>
           }
         />
       </React.Fragment>

@@ -132,6 +132,10 @@ const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, ...otherProps }) => {
           {msg.nic()}
         </dt>
         <dd>
+          { nicsToRender.size === 0 &&
+            <div className={style['no-nics']}>{msg.noNics()}</div>
+          }
+          { nicsToRender.size > 0 &&
           <div className={style['snapshot-disk-list']}>
             {nicsToShow && nicsToShow.map(nicRender)}
             {
@@ -151,6 +155,7 @@ const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, ...otherProps }) => {
               </OverlayTrigger>
             }
           </div>
+          }
         </dd>
         <dt>
           {msg.bootMenu()}
@@ -162,6 +167,10 @@ const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, ...otherProps }) => {
           {msg.disks()}
         </dt>
         <dd>
+          { disksToRender.size === 0 &&
+            <div className={style['no-disks']}>{msg.noDisks()}</div>
+          }
+          { disksToRender.size > 0 &&
           <div className={style['snapshot-disk-list']}>
             {diskToShow && diskToShow.map(diskRender)}
             {
@@ -181,6 +190,7 @@ const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, ...otherProps }) => {
               </OverlayTrigger>
             }
           </div>
+          }
         </dd>
       </dl>
     </div>
@@ -190,7 +200,7 @@ const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, ...otherProps }) => {
         vmId={vmId}
         disabled={restoreDisabled}
         trigger={
-          <Button bsStyle='default'>{ msg.restoreSnapshot() }</Button>
+          <Button bsStyle='default'>{ msg.snapshotRestore() }</Button>
         }
       />
     </div>

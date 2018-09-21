@@ -4,7 +4,18 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { addVmSnapshot } from './actions'
 
-import { Button, Modal, Icon, FormControl, Alert, FormGroup, HelpBlock, Form, Col } from 'patternfly-react'
+import {
+  Alert,
+  Button,
+  Col,
+  Form,
+  FormControl,
+  FormGroup,
+  HelpBlock,
+  Icon,
+  Modal,
+  noop,
+} from 'patternfly-react'
 import { msg } from '../../../../intl'
 import style from './style.css'
 
@@ -46,9 +57,9 @@ class NewSnapshotModal extends Component {
   render () {
     return (
       <div>
-        <a onClick={!this.props.disabled ? this.open : undefined} className={`${this.props.disabled && 'disabled'}`}>
+        <a onClick={this.props.disabled ? noop : this.open} className={`${this.props.disabled && 'disabled'}`}>
           <Icon type='fa' name='plus' />
-          Create Snapshot
+          { msg.createSnapshot() }
         </a>
 
         <Modal show={this.state.showModal} onHide={this.close} dialogClassName={style['create-snapshot-container']}>

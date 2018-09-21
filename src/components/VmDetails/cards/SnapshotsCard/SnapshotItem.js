@@ -7,6 +7,7 @@ import {
   Icon,
   OverlayTrigger,
   Tooltip,
+  noop,
 } from 'patternfly-react'
 
 import style from './style.css'
@@ -22,16 +23,22 @@ import { PendingTaskTypes } from '../../../../reducers/pendingTasks'
 
 const MAX_DESCRIPTION_SIZE = 50
 
-const SnapshotAction = ({ children, className, disabled, onClick }) => {
-  return <a onClick={!disabled ? onClick : null} className={`${className} ${disabled && 'disabled'}`}>
-    {children}
-  </a>
+const SnapshotAction = ({ children, className, disabled, id, onClick }) => {
+  return (
+    <a
+      id={id}
+      onClick={disabled ? noop : onClick}
+      className={`${className} ${disabled && 'disabled'}`}
+    >
+      {children}
+    </a>
+  )
 }
-
 SnapshotAction.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
   disabled: PropTypes.bool,
+  id: PropTypes.string,
   onClick: PropTypes.func,
 }
 
@@ -40,7 +47,6 @@ const StatusTooltip = ({ icon, text, id }) => {
     <a>{icon}</a>
   </OverlayTrigger>
 }
-
 StatusTooltip.propTypes = {
   icon: PropTypes.node.isRequired,
   text: PropTypes.string.isRequired,
@@ -52,6 +58,7 @@ function isSnapshotDeleted (snapshotId, pendingTasks) {
 }
 
 const SnapshotItem = ({ snapshot, vmId, isEditing, beingDeleted, onSnapshotDelete }) => {
+  const idPrefix = `snapshot-${snapshot.get('id')}`
   let statusIcon = null
   let buttons = []
 
@@ -68,39 +75,45 @@ const SnapshotItem = ({ snapshot, vmId, isEditing, beingDeleted, onSnapshotDelet
       rootClose
       key='info'
     >
-      <a>
-        <Icon type='pf' name='info' />
+      <a id={`${idPrefix}-info`}>
+        <OverlayTrigger placement='left' overlay={<Tooltip id={`${idPrefix}-info-tt`}>{ msg.details() }</Tooltip>}>
+          <Icon type='pf' name='info' />
+        </OverlayTrigger>
       </a>
     </OverlayTrigger>)
 
-    // Delete and restore actions
-    if (!snapshot.get('isActive')) {
-      buttons.push(<RestoreConfirmationModal
-        key='restore'
-        disabled={isActionsDisabled}
-        snapshot={snapshot}
-        vmId={vmId}
-        trigger={
-          <SnapshotAction key='restore'>
+    // Restore action
+    buttons.push(<RestoreConfirmationModal
+      key='restore'
+      disabled={isActionsDisabled}
+      snapshot={snapshot}
+      vmId={vmId}
+      trigger={
+        <SnapshotAction key='restore' id={`${idPrefix}-restore`} >
+          <OverlayTrigger placement='left' overlay={<Tooltip id={`${idPrefix}-restore-tt`}>{ msg.snapshotRestore() }</Tooltip>}>
             <Icon type='fa' name='play-circle' />
-          </SnapshotAction>
-        }
-      />)
-      buttons.push(<DeleteConfirmationModal
-        key='delete'
-        disabled={isActionsDisabled}
-        trigger={
-          <SnapshotAction key='delete'>
+          </OverlayTrigger>
+        </SnapshotAction>
+      }
+    />)
+
+    // Delete action
+    buttons.push(<DeleteConfirmationModal
+      key='delete'
+      disabled={isActionsDisabled}
+      trigger={
+        <SnapshotAction key='delete' id={`${idPrefix}-delete`}>
+          <OverlayTrigger placement='left' overlay={<Tooltip id={`${idPrefix}-delete-tt`}>{ msg.snapshotDelete() }</Tooltip>}>
             <Icon type='pf' name='delete' />
-          </SnapshotAction>
-        }
-        onDelete={onSnapshotDelete}
-      >
-        <span dangerouslySetInnerHTML={{ __html: msg.areYouSureYouWantToDeleteSnapshot({ snapshotName: `"<strong>${snapshot.get('description')}</strong>"` }) }} />
-        <br />
-        <span>{msg.thisOperationCantBeUndone()}</span>
-      </DeleteConfirmationModal>)
-    }
+          </OverlayTrigger>
+        </SnapshotAction>
+      }
+      onDelete={onSnapshotDelete}
+    >
+      <span dangerouslySetInnerHTML={{ __html: msg.areYouSureYouWantToDeleteSnapshot({ snapshotName: `"<strong>${snapshot.get('description')}</strong>"` }) }} />
+      <br />
+      <span>{msg.thisOperationCantBeUndone()}</span>
+    </DeleteConfirmationModal>)
 
     // Status tooltip
     const tooltipId = `${snapshot.get('id')}_${snapshot.get('status')}`
@@ -116,6 +129,7 @@ const SnapshotItem = ({ snapshot, vmId, isEditing, beingDeleted, onSnapshotDelet
         break
     }
   }
+
   return (
     <div className={style['snapshot-item']}>
       {statusIcon}
@@ -125,7 +139,6 @@ const SnapshotItem = ({ snapshot, vmId, isEditing, beingDeleted, onSnapshotDelet
     </div>
   )
 }
-
 SnapshotItem.propTypes = {
   snapshot: PropTypes.object.isRequired,
   vmId: PropTypes.string.isRequired,
