@@ -1,0 +1,20 @@
+.disks-container {
+  width: auto;
+  margin-left: -15px; /* max is -20px to edge of the containing card */
+  margin-right: -15px;
+}
+
+.no-disks {
+  font-style: italic;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.size-info {
+  margin-left: 5px;
+}
+
+.bootable-label {
+  margin-left: 5px;
+  font-size: 75%;
+}
