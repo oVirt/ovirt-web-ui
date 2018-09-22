@@ -138,9 +138,11 @@ const SnapshotItem = ({ snapshot, vmId, isEditing, beingDeleted, onSnapshotDelet
 
   return (
     <div className={style['snapshot-item']}>
-      {statusIcon}
-      {getMinimizedString(snapshot.get('description'), MAX_DESCRIPTION_SIZE)}
-      <span className={style['snapshot-time']}>{`(${formatDateFromNow(snapshot.get('date'))})`}</span>
+      <span className={style['snapshot-item-status']}>{statusIcon}</span>
+      <span className={style['snapshot-item-name']}>
+        {getMinimizedString(snapshot.get('description'), MAX_DESCRIPTION_SIZE)}
+        <span className={style['snapshot-item-time']}>{`(${formatDateFromNow(snapshot.get('date'))})`}</span>
+      </span>
       <span className={style['snapshot-item-actions']}>{ buttons }</span>
     </div>
   )

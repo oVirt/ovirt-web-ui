@@ -43,21 +43,12 @@ div.popover {
   margin-right: 5px;
 }
 
-.snapshot-time {
-  color: #808080;
-  margin-left: 5px;
-}
-
 .snapshot-disk-list {
   display: table;
 }
 
 .snapshot-item {
   display: table-row;
-}
-
-.snapshot-item span a {
-  margin-left: 5px;
 }
 
 .snapshot-item a {
@@ -74,8 +65,28 @@ div.popover {
   margin-right: 5px;
 }
 
+.snapshot-item-status {
+  display: table-cell;
+}
+
+.snapshot-item-name {
+  display: table-cell;
+  padding-left: 5px;
+}
+
+.snapshot-item-time {
+  color: #808080;
+  padding-left: 5px;
+}
+
 .snapshot-item-actions {
   display: table-cell;
+  white-space: nowrap;
+  padding-left: 5px;
+}
+
+.snapshot-item-actions a + a {
+  margin-left: 5px;
 }
 
 .snapshot-create a span {
