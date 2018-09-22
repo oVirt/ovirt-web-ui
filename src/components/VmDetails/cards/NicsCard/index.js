@@ -2,6 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
+import { msg } from '../../../../intl'
+
 import BaseCard from '../../BaseCard'
 import { Grid, Row, Col } from '../../GridComponents'
 
@@ -41,7 +43,11 @@ const NicsCard = ({ vm, vnicProfiles, onEditChange }) => {
       onCancel={() => { onEditChange(false) }}
       onSave={() => { onEditChange(false) }}
     >
-      {({ isEditing }) =>
+      {({ isEditing }) => <React.Fragment>
+        { nicList.length === 0 &&
+          <div className={style['no-nics']}>{msg.noNics()}</div>
+        }
+        { nicList.length > 0 &&
         <Grid className={style['nics-container']}>
           {nicList.map(nic =>
             <Row key={nic.id}>
@@ -72,7 +78,8 @@ const NicsCard = ({ vm, vnicProfiles, onEditChange }) => {
             </Row>
           )}
         </Grid>
-      }
+        }
+      </React.Fragment>}
     </BaseCard>
   )
 }
