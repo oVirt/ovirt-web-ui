@@ -14,8 +14,7 @@ import {
   SparklineChart,
 } from 'patternfly-react'
 
-import { convertValueMap } from '../../../../utils/storage-conversion'
-import { round } from '../../../../utils/round'
+import { convertValueMap, round } from '../../../../utils'
 
 import style from './style.css'
 
