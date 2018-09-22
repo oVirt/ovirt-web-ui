@@ -22,7 +22,10 @@ import type {
   ApiVmStatisticType, VmStatisticsType,
   ApiVmType, VmType,
   ApiVnicProfileType, VnicProfileType,
+  ApiPermissionType, PermissionType,
 } from './types'
+
+import { canUserUseCluster, canUserEditVm } from '../utils'
 
 function vCpusCount ({ cpu }: { cpu: Object }): number {
   if (cpu && cpu.topology) {
@@ -120,6 +123,8 @@ const VM = {
       cdrom: {},
       sessions: [],
       nics: [],
+      permissions: [],
+      canUserEditVm: false,
       display: {
         smartcardEnabled: vm.display && vm.display.smartcard_enabled && convertBool(vm.display.smartcard_enabled),
       },
@@ -160,6 +165,13 @@ const VM = {
 
       if (vm.statistics && vm.statistics.statistic) {
         parsedVm.statistics = VmStatistics.toInternal({ statistics: vm.statistics.statistic })
+      }
+
+      if (vm.permissions && vm.permissions.permission) {
+        parsedVm.permissions = Permissions.toInternal({
+          permissions: vm.permissions.permission,
+        })
+        parsedVm.canUserEditVm = canUserEditVm(parsedVm.permissions)
       }
     }
 
@@ -448,6 +460,9 @@ const StorageDomainFile = {
 //
 const Cluster = {
   toInternal ({ cluster }: { cluster: ApiClusterType }): ClusterType {
+    const permissions = cluster.permissions && cluster.permissions.permission
+      ? Permissions.toInternal({ permissions: cluster.permissions.permission })
+      : []
     return {
       id: cluster.id,
       name: cluster.name,
@@ -462,6 +477,8 @@ const Cluster = {
             ? cluster['memory_policy']['over_commit']['percent']
             : 100,
       },
+      canUserUseCluster: canUserUseCluster(permissions),
+      permissions,
     }
   },
 
@@ -640,6 +657,18 @@ const VmSessions = {
   toApi: undefined,
 }
 
+const Permissions = {
+  toInternal ({ permissions }: { permissions: Array<ApiPermissionType> }): Array<PermissionType> {
+    return permissions.map(permission => ({
+      name: permission.role.name,
+      userId: permission.user && permission.user.id,
+      groupId: permission.group && permission.group.id,
+    }))
+  },
+
+  toApi: undefined,
+}
+
 //
 //
 const CloudInit = {
@@ -678,4 +707,5 @@ export {
   VmConsoles,
   VmSessions,
   CloudInit,
+  Permissions,
 }

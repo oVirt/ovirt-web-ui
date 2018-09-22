@@ -1,10 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+
 import { Link } from 'react-router-dom'
 
 import { msg } from '../../intl'
 
-const AddVmButton = ({ id }) => {
+const AddVmButton = ({ id, isEnabled }) => {
+  if (!isEnabled) {
+    return null
+  }
   return (<div id={id}>
     <Link className='btn btn-primary' to='/vm/add'>
       { msg.addNewVm() }
@@ -13,6 +18,12 @@ const AddVmButton = ({ id }) => {
 }
 AddVmButton.propTypes = {
   id: PropTypes.string,
+  isEnabled: PropTypes.bool,
 }
 
-export default AddVmButton
+export default connect(
+  (state) => ({
+    isEnabled: state.clusters.find(cluster => cluster.get('canUserUseCluster')) !== undefined,
+  }),
+  (dispatch) => ({})
+)(AddVmButton)

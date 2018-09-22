@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import Immutable from 'immutable'
 
 import { connect } from 'react-redux'
+
 import { Link } from 'react-router-dom'
 import NavigationPrompt from 'react-router-navigation-prompt'
 import Switch from 'react-bootstrap-switch'
@@ -505,7 +506,7 @@ class VmDialog extends React.Component {
   }
 
   render () {
-    const { icons, clusters, templates, storages, previousPath } = this.props
+    const { icons, templates, clusters, storages, previousPath } = this.props
     const { bootDevices } = this.state
     const vm = this.props.vm
     const isoStorages = storages.filter(storageDomain => storageDomain.get('type') === 'iso')
@@ -808,7 +809,7 @@ VmDialog.propTypes = {
 
 export default connect(
   (state) => ({
-    clusters: state.clusters,
+    clusters: state.clusters.filter(cluster => cluster.get('canUserUseCluster')),
     templates: state.templates,
     operatingSystems: state.operatingSystems,
     userMessages: state.userMessages,

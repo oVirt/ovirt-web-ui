@@ -129,6 +129,24 @@ export type VmConsolesType = Object
 export type ApiVmSessionsType = Object
 export type VmSessionsType = Object
 
+export type ApiPermissionType = {
+  role: {
+    name: string,
+  },
+  user?: {
+    id: string
+  },
+  group?: {
+    id: string
+  }
+}
+
+export type PermissionType = {
+  name: string,
+  userId?: string,
+  groupId?: string
+}
+
 export type ApiCloudInitType = Object
 export type CloudInitType = {
   enabled: boolean,

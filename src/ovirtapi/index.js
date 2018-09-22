@@ -79,6 +79,8 @@ const OvirtApi = {
   snapshotToInternal: Transforms.Snapshot.toInternal,
   internalSnapshotToOvirt: Transforms.Snapshot.toApi,
 
+  permissionsToInternal: Transforms.Permissions.toInternal,
+
   //
   //
   // ---- API interaction functions
@@ -149,10 +151,21 @@ const OvirtApi = {
       (additional && additional.length > 0 ? `?follow=${additional.join(',')}` : '')
     return httpGet({ url })
   },
-  getAllClusters (): Promise<Object> {
+  getAllClusters ({ additional }: { additional: Array<string> }): Promise<Object> {
     assertLogin({ methodName: 'getAllClusters' })
-    const url = `${AppConfiguration.applicationContext}/api/clusters`
+    const url = `${AppConfiguration.applicationContext}/api/clusters` +
+      (additional && additional.length > 0 ? `?follow=${additional.join(',')}` : '')
     return httpGet({ url })
+  },
+  getClusterPermissions ({ clusterId }: { clusterId: string }): Promise<Object> {
+    assertLogin({ methodName: 'getClusterPermissions' })
+    const url = `${AppConfiguration.applicationContext}/api/clusters/${clusterId}/permissions?follow=role`
+    return httpGet({ url, custHeaders: { Filter: true } })
+  },
+  getVmPermissions ({ vmId }: VmIdType): Promise<Object> {
+    assertLogin({ methodName: 'getClusterPermissions' })
+    const url = `${AppConfiguration.applicationContext}/api/vms/${vmId}/permissions?follow=role`
+    return httpGet({ url, custHeaders: { Filter: true } })
   },
   getAllHosts (): Promise<Object> {
     assertLogin({ methodName: 'getAllHosts' })
@@ -248,6 +261,10 @@ const OvirtApi = {
   snapshots ({ vmId }: { vmId: string }): Promise<Object> {
     assertLogin({ methodName: 'snapshots' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots` })
+  },
+  groups ({ userId }: { userId: string }): Promise<Object> {
+    assertLogin({ methodName: 'groups' })
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/users/${userId}/groups` })
   },
   icon ({ id }: { id: string }): Promise<Object> {
     assertLogin({ methodName: 'icon' })
