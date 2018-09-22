@@ -18,7 +18,7 @@ import DeleteConfirmationModal from '../../../VmModals/DeleteConfirmationModal'
 import SnapshotDetail from './SnapshotDetail'
 import { deleteVmSnapshot } from './actions'
 import { formatDateFromNow } from '../../../../helpers'
-import { getMinimizedString } from '../../../utils'
+import { getMinimizedString, escapeHtml } from '../../../utils'
 import { PendingTaskTypes } from '../../../../reducers/pendingTasks'
 
 const MAX_DESCRIPTION_SIZE = 50
@@ -110,7 +110,13 @@ const SnapshotItem = ({ snapshot, vmId, isEditing, beingDeleted, onSnapshotDelet
       }
       onDelete={onSnapshotDelete}
     >
-      <span dangerouslySetInnerHTML={{ __html: msg.areYouSureYouWantToDeleteSnapshot({ snapshotName: `"<strong>${snapshot.get('description')}</strong>"` }) }} />
+      <span
+        dangerouslySetInnerHTML={{
+          __html: msg.areYouSureYouWantToDeleteSnapshot({
+            snapshotName: `"<strong>${escapeHtml(snapshot.get('description'))}</strong>"`,
+          }),
+        }}
+      />
       <br />
       <span>{msg.thisOperationCantBeUndone()}</span>
     </DeleteConfirmationModal>)

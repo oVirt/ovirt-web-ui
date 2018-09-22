@@ -6,7 +6,7 @@ import Immutable from 'immutable'
 import { Icon, MessageDialog } from 'patternfly-react'
 import { msg } from '../../../../intl'
 import { restoreVmSnapshot } from './actions'
-import { getMinimizedString } from '../../../utils'
+import { getMinimizedString, escapeHtml } from '../../../utils'
 
 const MAX_DESCRIPTION_SIZE = 150
 
@@ -38,7 +38,7 @@ class RestoreConfirmationModal extends React.Component {
     const icon = <Icon type='pf' name='warning-triangle-o' />
     const clonedTrigger = React.cloneElement(trigger, { onClick: this.open, disabled })
     const snapshotsThatWillBeDeleted = snapshots.filter((s) => s.get('date') > snapshot.get('date'))
-    const minDescription = getMinimizedString(snapshot.get('description'), MAX_DESCRIPTION_SIZE)
+    const minDescription = escapeHtml(getMinimizedString(snapshot.get('description'), MAX_DESCRIPTION_SIZE))
 
     return (
       <React.Fragment>
