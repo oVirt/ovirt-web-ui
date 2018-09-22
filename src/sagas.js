@@ -384,6 +384,10 @@ export function* fetchSingleVm (action) {
       if (disks && disks['disk']) {
         internalVm.snapshots[i].disks = disks.disk.map((disk) => Api.diskToInternal({ disk, attachment: {} }))
       }
+      const nics = yield callExternalAction('snapshotNics', Api.snapshotNics, { payload: { vmId, snapshotId: internalVm.snapshots[i].id } }, true)
+      if (nics && nics['nic']) {
+        internalVm.snapshots[i].nics = nics.nic.map((nic) => Api.nicToInternal({ nic }))
+      }
     }
     yield put(updateVms({ vms: [internalVm], copySubResources: shallowFetch }))
     yield fetchUnknownIconsForVms({ vms: [internalVm] })
@@ -809,7 +813,20 @@ export function* fetchVmSnapshots ({ vmId }) {
   let snapshotsInternal = []
 
   if (snapshots && snapshots['snapshot']) {
-    snapshotsInternal = snapshots.snapshot.map(snapshot => Api.snapshotToInternal({ snapshot }))
+    snapshotsInternal = yield all(snapshots.snapshot.map(snapshot =>
+      call(function* () {
+        const snapshotInternal = Api.snapshotToInternal({ snapshot })
+        const disks = yield callExternalAction('snapshotDisks', Api.snapshotDisks, { payload: { vmId, snapshotId: snapshot.id } }, true)
+        if (disks && disks['disk']) {
+          snapshotInternal.disks = disks.disk.map((disk) => Api.diskToInternal({ disk, attachment: {} }))
+        }
+        const nics = yield callExternalAction('snapshotNics', Api.snapshotNics, { payload: { vmId, snapshotId: snapshot.id } }, true)
+        if (nics && nics['nic']) {
+          snapshotInternal.nics = nics.nic.map((nic) => Api.nicToInternal({ nic }))
+        }
+        return snapshotInternal
+      })
+    ))
   }
   yield put(setVmSnapshots({ vmId, snapshots: snapshotsInternal }))
 }
