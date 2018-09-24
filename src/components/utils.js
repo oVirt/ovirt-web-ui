@@ -41,3 +41,9 @@ export function isRunning (status: string): boolean {
 export function getMinimizedString (str: string, maxChar: number): string {
   return str.length > maxChar ? `${str.substring(0, maxChar - 3)}...` : str
 }
+
+export function escapeHtml (s: string): string {
+  var div = document.createElement('div')
+  div.appendChild(document.createTextNode(s))
+  return div.innerHTML
+}

@@ -241,6 +241,10 @@ const OvirtApi = {
     assertLogin({ methodName: 'snapshotDisks' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots/${snapshotId}/disks` })
   },
+  snapshotNics ({ vmId, snapshotId }: { vmId: string, snapshotId: string }): Promise<Object> {
+    assertLogin({ methodName: 'snapshotNics' })
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots/${snapshotId}/nics` })
+  },
   snapshot ({ vmId, snapshotId }: { vmId: string, snapshotId: string }): Promise<ApiSnapshotType> {
     assertLogin({ methodName: 'snapshot' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots/${snapshotId}` })

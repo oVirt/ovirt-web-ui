@@ -4,7 +4,18 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { addVmSnapshot } from './actions'
 
-import { Button, Modal, Icon, FormControl, Alert, FormGroup, HelpBlock, Form, Col } from 'patternfly-react'
+import {
+  Alert,
+  Button,
+  Col,
+  Form,
+  FormControl,
+  FormGroup,
+  HelpBlock,
+  Icon,
+  Modal,
+  noop,
+} from 'patternfly-react'
 import { msg } from '../../../../intl'
 import style from './style.css'
 
@@ -30,7 +41,8 @@ class NewSnapshotModal extends Component {
     this.setState({ description: e.target.value })
   }
 
-  handleSave () {
+  handleSave (e) {
+    e.preventDefault()
     if (this.state.description.trim().length > 0) {
       const snapshot = {
         description: this.state.description,
@@ -45,9 +57,9 @@ class NewSnapshotModal extends Component {
   render () {
     return (
       <div>
-        <a onClick={this.open}>
+        <a onClick={this.props.disabled ? noop : this.open} className={`${this.props.disabled && 'disabled'}`}>
           <Icon type='fa' name='plus' />
-          Create Snapshot
+          { msg.createSnapshot() }
         </a>
 
         <Modal show={this.state.showModal} onHide={this.close} dialogClassName={style['create-snapshot-container']}>
@@ -63,7 +75,7 @@ class NewSnapshotModal extends Component {
             <Modal.Title>{ msg.createSnapshot() }</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <Form horizontal>
+            <Form onSubmit={this.handleSave} horizontal>
               <Col sm={12}>
                 <Alert type='info'>
                   { msg.snapshotInfo() }
@@ -71,7 +83,7 @@ class NewSnapshotModal extends Component {
               </Col>
               <FormGroup bsClass='form-group col-sm-12 required' validationState={this.state.emptyDescription ? 'error' : null}>
                 <label className='col-sm-3 control-label'>
-                  { msg.description() }
+                  { msg.name() }
                 </label>
                 <div className='col-sm-9'>
                   <FormControl
@@ -109,6 +121,7 @@ class NewSnapshotModal extends Component {
 
 NewSnapshotModal.propTypes = {
   vmId: PropTypes.string.isRequired, // eslint-disable-line react/no-unused-prop-types
+  disabled: PropTypes.bool,
   onAdd: PropTypes.func.isRequired,
 }
 

@@ -379,12 +379,19 @@ export function* fetchSingleVm (action) {
       // TODO: Support <4.2 for snapshots?
       // TODO: Support <4.2 for statistics?
     }
-    for (let i in internalVm.snapshots) {
-      const disks = yield callExternalAction('snapshotDisks', Api.snapshotDisks, { payload: { vmId, snapshotId: internalVm.snapshots[i].id } }, true)
-      if (disks && disks['disk']) {
-        internalVm.snapshots[i].disks = disks.disk.map((disk) => Api.diskToInternal({ disk, attachment: {} }))
-      }
+
+    // NOTE: Snapshot Disks and Nics are not currently (Sept-2018) available via
+    //       additional/follow param on the VM/snapshot fetch.  We need to fetch them
+    //       directly.
+    for (const snapshot of internalVm.snapshots) {
+      const follows = yield all([
+        call(fetchVmSnapshotDisks, { vmId: internalVm.id, snapshotId: snapshot.id }),
+        call(fetchVmSnapshotNics, { vmId: internalVm.id, snapshotId: snapshot.id }),
+      ])
+      snapshot.disks = follows[0]
+      snapshot.nics = follows[1]
     }
+
     yield put(updateVms({ vms: [internalVm], copySubResources: shallowFetch }))
     yield fetchUnknownIconsForVms({ vms: [internalVm] })
   } else {
@@ -799,19 +806,48 @@ function* fetchVmNics ({ vmId }) {
 }
 
 function* fetchVmsSnapshots ({ vms }) {
-  yield all(vms.map((vm) => call(function* () {
-    yield fetchVmSnapshots({ vmId: vm.id })
-  })))
+  yield all(vms.map((vm) => call(fetchVmSnapshots, { vmId: vm.id })))
 }
 
 export function* fetchVmSnapshots ({ vmId }) {
   const snapshots = yield callExternalAction('snapshots', Api.snapshots, { type: 'GET_VM_SNAPSHOT', payload: { vmId } })
   let snapshotsInternal = []
 
-  if (snapshots && snapshots['snapshot']) {
+  if (snapshots && snapshots.snapshot) {
     snapshotsInternal = snapshots.snapshot.map(snapshot => Api.snapshotToInternal({ snapshot }))
+
+    // NOTE: Snapshot Disks and Nics are not currently (Sept-2018) available via
+    //       additional/follow param on the snapshot fetch.  We need to fetch them
+    //       directly.
+    for (const snapshot of snapshotsInternal) {
+      const follows = yield all([
+        call(fetchVmSnapshotDisks, { vmId, snapshotId: snapshot.id }),
+        call(fetchVmSnapshotNics, { vmId, snapshotId: snapshot.id }),
+      ])
+      snapshot.disks = follows[0]
+      snapshot.nics = follows[1]
+    }
   }
+
   yield put(setVmSnapshots({ vmId, snapshots: snapshotsInternal }))
+}
+
+function* fetchVmSnapshotDisks ({ vmId, snapshotId }) {
+  const disks = yield callExternalAction('snapshotDisks', Api.snapshotDisks, { payload: { vmId, snapshotId } }, true)
+  let disksInternal = []
+  if (disks && disks.disk) {
+    disksInternal = disks.disk.map(disk => Api.diskToInternal({ disk }))
+  }
+  return disksInternal
+}
+
+function* fetchVmSnapshotNics ({ vmId, snapshotId }) {
+  const nics = yield callExternalAction('snapshotNics', Api.snapshotNics, { payload: { vmId, snapshotId } }, true)
+  let nicsInternal = []
+  if (nics && nics.nic) {
+    nicsInternal = nics.nic.map((nic) => Api.nicToInternal({ nic }))
+  }
+  return nicsInternal
 }
 
 function* fetchISOStorages (action) {

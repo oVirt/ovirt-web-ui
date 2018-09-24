@@ -351,7 +351,7 @@ const Snapshot = {
 //
 // VM -> DiskAttachments.DiskAttachment[] -> Disk
 const DiskAttachment = {
-  toInternal ({ attachment, disk }: { attachment: ApiDiskAttachmentType, disk: ApiDiskType }): DiskType {
+  toInternal ({ attachment = {}, disk }: { attachment?: ApiDiskAttachmentType, disk: ApiDiskType }): DiskType {
     return {
       bootable: convertBool(attachment['bootable']),
       active: convertBool(attachment['active']),
@@ -475,7 +475,7 @@ const Nic = {
     const ips =
       nic.reported_devices && nic.reported_devices.reported_device
         ? nic.reported_devices.reported_device
-          .map(device => device.ips.ip)
+          .map(device => device.ips && device.ips.ip ? device.ips.ip : [])
           .reduce((ips, ipArray) => [...ipArray, ...ips], [])
         : []
 
