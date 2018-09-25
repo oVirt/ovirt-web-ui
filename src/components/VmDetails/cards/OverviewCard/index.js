@@ -2,20 +2,20 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import sharedStyle from '../../sharedStyle.css'
-import { getOsHumanName, getVmIcon } from '../../utils'
-import { enumMsg } from '../../../intl'
-import { generateUnique } from '../../../helpers'
+import sharedStyle from '../../../sharedStyle.css'
+import { getOsHumanName, getVmIcon } from '../../../utils'
+import { enumMsg } from '../../../../intl'
+import { generateUnique } from '../../../../helpers'
 
-import { editVm } from '../../../actions'
+import { editVm } from '../../../../actions'
 
 import { Media } from 'react-bootstrap'
 import { FormControl, Alert } from 'patternfly-react'
 
-import BaseCard from '../BaseCard'
-import VmIcon from '../../VmIcon'
-import VmStatusIcon from '../../VmStatusIcon'
-import style from './OverviewCard.css'
+import BaseCard from '../../BaseCard'
+import VmIcon from '../../../VmIcon'
+import VmStatusIcon from '../../../VmStatusIcon'
+import style from './style.css'
 
 /**
  * Overview of the VM (icon, OS type, name, state, description)
