@@ -63,7 +63,8 @@ class VmUserMessages extends React.Component {
       ? userMessages.get('records').map(r => (
         <UserMessage
           key={`msg-${r.get('time')}`}
-          record={r} id={`${idPrefix}-msg-${r.get('time')}-dropdown`}
+          record={r}
+          id={`${idPrefix}-msg-${r.get('time')}-dropdown`}
           onDismissMessage={() => onDismissMessage(r.get('time'))}
         />
       ))
