@@ -1,0 +1,8 @@
+.globalErrorContainer {
+    width: 40%;
+    margin-top: 10%;
+}
+
+.globalErrorContainer a.btn {
+    margin: 5%;
+}
