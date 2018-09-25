@@ -5,12 +5,21 @@ import { RouterPropTypeShapes } from '../../propTypeShapes'
 
 import { push } from 'connected-react-router'
 
+import { msg } from '../../intl'
+import { canUserUseAnyClusters } from '../../utils'
+
 import VmDialog from '../VmDialog'
 import VmsList from '../VmsList'
 import VmDetails from '../VmDetails'
 import { default as LegacyVmDetails } from '../VmDetail'
 
-import { selectVmDetail, selectPoolDetail, getIsoStorageDomains, getConsoleOptions } from '../../actions'
+import {
+  addUserMessage,
+  selectVmDetail,
+  selectPoolDetail,
+  getIsoStorageDomains,
+  getConsoleOptions,
+} from '../../actions'
 
 /**
  * Route component (for PageRouter) to view the list of VMs and Pools
@@ -18,6 +27,7 @@ import { selectVmDetail, selectPoolDetail, getIsoStorageDomains, getConsoleOptio
 const VmsPage = () => {
   return <VmsList />
 }
+
 /**
  * Route component (for PageRouter) to view a VM's details
  */
@@ -181,8 +191,6 @@ const PoolDetailsPageConnected = connect(
   })
 )(PoolDetailsPage)
 
-const canUserUseCluster = (clusters) => clusters.find(cluster => cluster.get('canUserUseCluster')) !== undefined
-
 /**
  * Route component (for PageRouter) to create a new VM
  */
@@ -193,48 +201,51 @@ class VmCreatePage extends React.Component {
   }
 
   componentDidUpdate () {
-    if (!this.props.isFilteredClusters && this.props.clusterSize) {
+    // If the user cannot create any VMs (not just the one requested), bump them out
+    if (!this.props.canUserCreateVMs) {
       this.props.redirectToMainPage()
+      this.props.addUserMessage(msg.permissionsNoCreateVm())
     }
   }
 
   render () {
+    if (!this.props.canUserCreateVMs) {
+      return null
+    }
+
     const { previousPath } = this.props
     return <VmDialog previousPath={previousPath} />
   }
 }
 VmCreatePage.propTypes = {
+  canUserCreateVMs: PropTypes.bool.isRequired,
   previousPath: PropTypes.string.isRequired,
-  isFilteredClusters: PropTypes.bool,
-  clusterSize: PropTypes.number.isRequired,
   getAvailableCDImages: PropTypes.func.isRequired,
   redirectToMainPage: PropTypes.func.isRequired,
+  addUserMessage: PropTypes.func.isRequired,
 }
 const VmCreatePageConnected = connect(
   (state) => ({
-    isFilteredClusters: canUserUseCluster(state.clusters),
-    clusterSize: state.clusters.size, // this prop is using for check real (without filtering) count of clusters
+    canUserCreateVMs: canUserUseAnyClusters(state.clusters) && state.clusters.size > 0,
   }),
   (dispatch) => ({
     getAvailableCDImages: () => dispatch(getIsoStorageDomains()),
     redirectToMainPage: () => dispatch(push('/')),
+    addUserMessage: (message) => dispatch(addUserMessage({ message })),
   })
 )(VmCreatePage)
 
 /**
  * Route component (for PageRouter) to edit a VM
+ *
+ * Only let a user view the `VmDialog` if they can 1. edit a VM in general (i.e. there
+ * is at least 1 cluster they can use), and 2. edit the specific VM requested.
  */
 class VmEditPage extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       vmId: undefined,
-    }
-  }
-
-  componentDidUpdate () {
-    if (!this.props.isFilteredClusters && this.props.clusterSize) {
-      this.props.redirectToMainPage()
     }
   }
 
@@ -252,12 +263,37 @@ class VmEditPage extends React.Component {
     return null
   }
 
+  componentDidUpdate () {
+    // If the user cannot edit any VMs (not just the one requested), bump them out
+    if (!this.props.canUserEditVMs) {
+      this.props.redirectToMainPage()
+      this.props.addUserMessage(msg.permissionsNoEditVm())
+    }
+  }
+
   render () {
-    const { vms, previousPath } = this.props
+    const {
+      vms,
+      previousPath,
+      canUserEditVMs,
+      redirectToMainPage,
+      addUserMessage,
+    } = this.props
     const { vmId } = this.state
 
+    if (!canUserEditVMs) {
+      return null
+    }
+
     if (vmId && vms.getIn(['vms', vmId])) {
-      return <VmDialog previousPath={previousPath} vm={vms.getIn(['vms', vmId])} />
+      // Verify the user can edit this specific VM
+      if (!vms.getIn(['vms', vmId, 'canUserEditVm'])) {
+        redirectToMainPage()
+        addUserMessage(msg.permissionsNoEditThisVm({ name: vms.getIn(['vms', vmId, 'name']), vmId }))
+        return null
+      } else {
+        return <VmDialog previousPath={previousPath} vm={vms.getIn(['vms', vmId])} />
+      }
     }
 
     // TODO: Add handling for if the fetch runs but fails (FETCH-FAIL), see issue #631
@@ -266,26 +302,26 @@ class VmEditPage extends React.Component {
   }
 }
 VmEditPage.propTypes = {
+  canUserEditVMs: PropTypes.bool.isRequired,
   vms: PropTypes.object.isRequired,
   previousPath: PropTypes.string.isRequired,
   match: RouterPropTypeShapes.match.isRequired,
-  isFilteredClusters: PropTypes.bool, // deep immutable, {[id: string]: Cluster}
-  clusterSize: PropTypes.number.isRequired,
 
   getAvailableCDImages: PropTypes.func.isRequired,
   getVmById: PropTypes.func.isRequired,
   redirectToMainPage: PropTypes.func.isRequired,
+  addUserMessage: PropTypes.func.isRequired,
 }
 const VmEditPageConnected = connect(
   (state) => ({
-    isFilteredClusters: canUserUseCluster(state.clusters),
-    clusterSize: state.clusters.size, // this prop is using for check real (without filtering) count of clusters
+    canUserEditVMs: canUserUseAnyClusters(state.clusters) && state.clusters.size > 0,
     vms: state.vms,
   }),
   (dispatch) => ({
     getAvailableCDImages: () => dispatch(getIsoStorageDomains()),
     getVmById: (vmId) => dispatch(selectVmDetail({ vmId })),
     redirectToMainPage: () => dispatch(push('/')),
+    addUserMessage: (message) => dispatch(addUserMessage({ message })),
   })
 )(VmEditPage)
 

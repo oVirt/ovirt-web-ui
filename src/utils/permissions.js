@@ -1,13 +1,20 @@
 // @flow
 import Selectors from '../selectors'
-import type { PermissionType } from '../ovirtapi/types'
+import type { ClusterType, PermissionType } from '../ovirtapi/types'
 
 function checkPermissions (allowedPermissions: Array<string>, permissions: Array<PermissionType>): boolean {
+  const userFilter = Selectors.getFilter()
+  const userGroups = Selectors.getUserGroups()
+  const userId = Selectors.getUserId()
+
   return permissions.find((role) => (
-    (Selectors.getFilter() || (
-      (role.groupId && Selectors.getUserGroups().includes(role.groupId)) ||
-      (role.userId && role.userId === Selectors.getUserId())
-    )) && allowedPermissions.includes(role.name)
+    (userFilter ||
+      (
+        (role.groupId && userGroups.includes(role.groupId)) ||
+        (role.userId && role.userId === userId)
+      )
+    ) &&
+    allowedPermissions.includes(role.name)
   )) !== undefined
 }
 
@@ -33,4 +40,12 @@ export function canUserEditVm (permissions: Array<PermissionType>): boolean {
     'SuperUser',
   ]
   return checkPermissions(allowedPermissions, permissions)
+}
+
+/*
+ * Return if any of the given clusters are available for use by the cluster (as defined
+ * by `canUserUseCluster` above)
+ */
+export function canUserUseAnyClusters (clusters: Array<ClusterType>): boolean {
+  return clusters.find(cluster => cluster.get('canUserUseCluster')) !== undefined
 }
