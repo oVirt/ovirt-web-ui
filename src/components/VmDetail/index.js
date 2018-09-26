@@ -241,8 +241,11 @@ class VmDetail extends Component {
                   </dt>
                   {noDisks}
                   {disksElement}
-                  <VmNics nics={nics} vmId={vm.get('id')} enableSettings={notPoolOrPoolVm} />
+
+                  <VmNics nics={nics} vm={vm} enableSettings={notPoolOrPoolVm} />
+
                   <VmSnapshots snapshots={snapshots} vm={vm} enableSettings={notPoolOrPoolVm} />
+
                   <dt>
                     <FieldHelp content={msg.bootMenuTooltip()} text={msg.bootMenu()} />
                   </dt>
