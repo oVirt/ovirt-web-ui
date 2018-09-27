@@ -1,5 +1,6 @@
 import Immutable from 'immutable'
 import {
+  ADD_USER_MESSAGE,
   CLEAR_USER_MSGS,
   DISMISS_USER_MSG,
   FAILED_EXTERNAL_ACTION,
@@ -45,6 +46,13 @@ const userMessages = actionReducer(initialState, {
   [LOGIN_FAILED] (state, { payload: { message, errorCode } }) {
     return addLogEntry({ state, message: message, type: errorCode })
   },
+
+  [ADD_USER_MESSAGE] (state, { payload: { message, type = 'INFO' } }) {
+    return addLogEntry({
+      state, message, type,
+    })
+  },
+
   [CLEAR_USER_MSGS] (state) {
     return state.set('unread', false).update('records', records => records.clear())
   },
