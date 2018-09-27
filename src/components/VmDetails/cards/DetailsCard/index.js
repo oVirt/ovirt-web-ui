@@ -72,6 +72,7 @@ function createClusterList (clusters) {
   const clusterList =
     clusters
       .toList()
+      .filter(cluster => cluster.get('canUserUseCluster'))
       .map(cluster => ({
         id: cluster.get('id'),
         value: cluster.get('name'),
@@ -372,7 +373,7 @@ class DetailsCard extends React.Component {
         this.trackUpdates[fieldUpdated] = true
         this.setState({ vm: updates, isDirty: true })
       }
-    } // while
+    } // for
   }
 
   handleCardOnCancel () {
@@ -500,6 +501,10 @@ class DetailsCard extends React.Component {
     const { hosts, clusters, dataCenters, templates } = this.props
     const { vm, isEditing, correlatedMessages, clusterList, isoList, templateList } = this.state
 
+    const canEditDetails =
+      vm.get('canUserEditVm') &&
+      vm.getIn(['pool', 'id']) === undefined
+
     const status = vm.get('status')
     const uptime = formatUptimeDuration({ start: vm.get('startTime') })
 
@@ -551,6 +556,7 @@ class DetailsCard extends React.Component {
       />
       <BaseCard
         title='Details'
+        editable={canEditDetails}
         editMode={isEditing}
         editTooltip={`Edit details for ${vm.get('id')}`}
         onStartEdit={this.handleCardOnStartEdit}
@@ -750,7 +756,7 @@ const DetailsCardConnected = connect(
     userMessages: state.userMessages,
     operatingSystems: state.operatingSystems,
   }),
-  (dispatch, { vm }) => ({
+  (dispatch) => ({
     saveChanges: (minimalVmChanges, restartAfterEdit, nextRun, correlationId) =>
       dispatch(Actions.editVm(
         { vm: minimalVmChanges, transformInput: true, restartAfterEdit, nextRun },
