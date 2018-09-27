@@ -676,8 +676,9 @@ class DetailsCard extends React.Component {
                       {optimizedFor}
                     </FieldRow>
 
-                    {isEditing &&
-                      <FieldRow label={'CPUs'}>
+                    <FieldRow label={'CPUs'}>
+                      {!isEditing && vCpuCount}
+                      {isEditing &&
                         <div>
                           <FormControl
                             className={style['cpu-input']}
@@ -686,10 +687,11 @@ class DetailsCard extends React.Component {
                             onChange={e => this.handleChange('cpu', e.target.value)}
                           />
                         </div>
-                      </FieldRow>
-                    }
-                    {isEditing &&
-                      <FieldRow label={'Memory'}>
+                      }
+                    </FieldRow>
+                    <FieldRow label={'Memory'}>
+                      {!isEditing && `${round(memorySize)} ${memoryUnit}`}
+                      {isEditing &&
                         <div>
                           <FormControl
                             className={style['memory-input']}
@@ -699,8 +701,8 @@ class DetailsCard extends React.Component {
                           />
                           {memoryUnit}
                         </div>
-                      </FieldRow>
-                    }
+                      }
+                    </FieldRow>
                   </Grid>
                 </Col>
               </Row>
