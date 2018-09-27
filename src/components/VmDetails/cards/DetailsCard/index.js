@@ -497,6 +497,10 @@ class DetailsCard extends React.Component {
     const { hosts, clusters, dataCenters, templates } = this.props
     const { vm, isEditing, correlatedMessages, clusterList, isoList, templateList } = this.state
 
+    const canEditDetails =
+      vm.get('canUserEditVm', true) && // TODO: default to true until PR#784 is merged
+      vm.getIn(['pool', 'id']) === undefined
+
     const status = vm.get('status')
     const uptime = formatUptimeDuration({ start: vm.get('startTime') })
 
@@ -548,6 +552,7 @@ class DetailsCard extends React.Component {
       />
       <BaseCard
         title='Details'
+        editable={canEditDetails}
         editMode={isEditing}
         editTooltip={`Edit details for ${vm.get('id')}`}
         onStartEdit={this.handleCardOnStartEdit}
@@ -736,7 +741,7 @@ DetailsCard.propTypes = {
 }
 
 const DetailsCardConnected = connect(
-  (state) => ({
+  (state, { vm }) => ({
     blankTemplateId: state.config.get('blankTemplateId'),
     hosts: state.hosts,
     clusters: state.clusters,
