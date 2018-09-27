@@ -72,6 +72,7 @@ function createClusterList (clusters) {
   const clusterList =
     clusters
       .toList()
+      .filter(cluster => cluster.get('canUserUseCluster'))
       .map(cluster => ({
         id: cluster.get('id'),
         value: cluster.get('name'),
@@ -372,7 +373,7 @@ class DetailsCard extends React.Component {
         this.trackUpdates[fieldUpdated] = true
         this.setState({ vm: updates, isDirty: true })
       }
-    } // while
+    } // for
   }
 
   handleCardOnCancel () {
@@ -498,7 +499,7 @@ class DetailsCard extends React.Component {
     const { vm, isEditing, correlatedMessages, clusterList, isoList, templateList } = this.state
 
     const canEditDetails =
-      vm.get('canUserEditVm', true) && // TODO: default to true until PR#784 is merged
+      vm.get('canUserEditVm') && // NOTE: if PR#784 isn't merged/included, no VMs will be editable
       vm.getIn(['pool', 'id']) === undefined
 
     const status = vm.get('status')
