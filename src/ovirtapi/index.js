@@ -362,7 +362,6 @@ const OvirtApi = {
   addNicToVm ({ nic, vmId }: { nic: NicType, vmId: string }): Promise<Object> {
     assertLogin({ methodName: 'addNicToVm' })
     const input = JSON.stringify(OvirtApi.internalNicToOvirt({ nic }))
-    logger.log(`OvirtApi.addNicToVm(): ${input}`)
     return httpPost({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/nics`,
       input,
@@ -372,6 +371,14 @@ const OvirtApi = {
     assertLogin({ methodName: 'deleteNicFromVm' })
     return httpDelete({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/nics/${nicId}`,
+    })
+  },
+  editNicInVm ({ nic, vmId }: { nic: NicType, vmId: string }): Promise<Object> {
+    assertLogin({ methodName: 'editNicInVm' })
+    const input = JSON.stringify(OvirtApi.internalNicToOvirt({ nic }))
+    return httpPut({
+      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/nics/${nic.id}`,
+      input,
     })
   },
 

@@ -5,6 +5,7 @@ import {
   DELETE_VM_NIC,
   DOWNLOAD_CONSOLE_VM,
   EDIT_VM,
+  EDIT_VM_NIC,
   GET_RDP_VM,
   GET_VM_CDROM,
   GET_VMS_BY_COUNT,
@@ -419,6 +420,16 @@ export function deleteVmNic ({ vmId, nicId }) {
     payload: {
       vmId,
       nicId,
+    },
+  }
+}
+
+export function editVmNic ({ vmId, nic }) {
+  return {
+    type: EDIT_VM_NIC,
+    payload: {
+      vmId,
+      nic,
     },
   }
 }

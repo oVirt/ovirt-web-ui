@@ -101,6 +101,7 @@ import {
   DELETE_VM_NIC,
   DOWNLOAD_CONSOLE_VM,
   EDIT_VM,
+  EDIT_VM_NIC,
   GET_ALL_CLUSTERS,
   GET_ALL_HOSTS,
   GET_ALL_OS,
@@ -549,6 +550,13 @@ function* addVmNic (action) {
 
 function* deleteVmNic (action) {
   yield callExternalAction('deleteNicFromVm', Api.deleteNicFromVm, action)
+
+  const nicsInternal = yield fetchVmNics({ vmId: action.payload.vmId })
+  yield put(setVmNics({ vmId: action.payload.vmId, nics: nicsInternal }))
+}
+
+function* editVmNic (action) {
+  yield callExternalAction('editNicInVm', Api.editNicInVm, action)
 
   const nicsInternal = yield fetchVmNics({ vmId: action.payload.vmId })
   yield put(setVmNics({ vmId: action.payload.vmId, nics: nicsInternal }))
@@ -1041,6 +1049,7 @@ export function* rootSaga () {
     takeEvery(SELECT_VM_DETAIL, selectVmDetail),
     takeEvery(ADD_VM_NIC, addVmNic),
     takeEvery(DELETE_VM_NIC, deleteVmNic),
+    takeEvery(EDIT_VM_NIC, editVmNic),
     takeEvery(GET_CONSOLE_OPTIONS, getConsoleOptions),
     takeEvery(SAVE_CONSOLE_OPTIONS, saveConsoleOptions),
 
