@@ -374,6 +374,7 @@ const OvirtApi = {
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/nics/${nicId}`,
     })
   },
+
   getUSBFilter (): Promise<Object> {
     assertLogin({ methodName: 'getUSBFilter' })
     return httpGet({

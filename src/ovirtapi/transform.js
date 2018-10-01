@@ -520,6 +520,8 @@ const Nic = {
       name: nic.name,
       mac: nic.mac.address,
       plugged: convertBool(nic.plugged),
+      linked: convertBool(nic.linked),
+      interface: nic.interface,
       ips,
       ipv4: ips.filter(ip => ip.version === 'v4').map(rec => rec.address),
       ipv6: ips.filter(ip => ip.version === 'v6').map(rec => rec.address),
@@ -532,11 +534,14 @@ const Nic = {
 
   toApi ({ nic }: { nic: NicType }): ApiNicType {
     const res = {
+      id: nic.id,
       name: nic.name,
-      interface: 'virtio',
+      plugged: nic.plugged,
+      linked: nic.linked,
+      interface: nic.interface,
       vnic_profile: undefined,
     }
-    if (nic.vnicProfile.id) {
+    if (nic.vnicProfile.id !== undefined) {
       res.vnic_profile = {
         id: nic.vnicProfile.id,
       }
@@ -552,9 +557,11 @@ const VNicProfile = {
     const vnicProfileInternal = {
       id: vnicProfile.id,
       name: vnicProfile.name,
+
+      dataCenterId: vnicProfile.network.data_center.id,
       network: {
         id: vnicProfile.network.id,
-        name: null,
+        name: vnicProfile.network.name,
       },
     }
 
