@@ -153,8 +153,18 @@ const OvirtApi = {
   },
   getAllClusters ({ additional }: { additional: Array<string> }): Promise<Object> {
     assertLogin({ methodName: 'getAllClusters' })
-    const url = `${AppConfiguration.applicationContext}/api/clusters` +
-      (additional && additional.length > 0 ? `?follow=${additional.join(',')}` : '')
+
+    let follow
+    if (additional && additional.length > 0) {
+      if (!additional.includes('networks')) {
+        additional.push('networks')
+      }
+      follow = additional.join(',')
+    } else {
+      follow = 'networks'
+    }
+
+    const url = `${AppConfiguration.applicationContext}/api/clusters?follow=${follow}`
     return httpGet({ url })
   },
   getClusterPermissions ({ clusterId }: { clusterId: string }): Promise<Object> {

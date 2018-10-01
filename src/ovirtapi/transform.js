@@ -473,7 +473,8 @@ const Cluster = {
     const permissions = cluster.permissions && cluster.permissions.permission
       ? Permissions.toInternal({ permissions: cluster.permissions.permission })
       : []
-    return {
+
+    const c: Object = {
       id: cluster.id,
       name: cluster.name,
       dataCenterId: cluster.data_center && cluster.data_center.id,
@@ -490,6 +491,13 @@ const Cluster = {
       canUserUseCluster: canUserUseCluster(permissions),
       permissions,
     }
+
+    if (cluster.networks && cluster.networks.network && cluster.networks.network.length > 0) {
+      const networkIds = cluster.networks.network.map(network => network.id)
+      c.networks = networkIds
+    }
+
+    return c
   },
 
   toApi: undefined,

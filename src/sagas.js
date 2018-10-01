@@ -807,6 +807,8 @@ function* fetchAllClusters (action) {
     )
     yield put(setClusters(clustersInternal))
   }
+
+  // TODO: Api.getAllClusters uses 'follows' so it won't work <4.2, add support if needed
 }
 
 function* fetchAllHosts (action) {
