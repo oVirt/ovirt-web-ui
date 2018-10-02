@@ -23,8 +23,9 @@ class GlobalErrorBoundary extends React.Component {
 
   render () {
     const title = msg.globalErrorBoundaryTitle()
-    const descr = msg.globalErrorBoundaryDescription()
-    const gitHub = msg.gitHub()
+    const descr = msg.globalErrorBoundaryDescription({
+      bugUrl: `<a href='https://github.com/oVirt/ovirt-web-ui/issues'>${msg.gitHub()}</a>`,
+    })
     const logOut = msg.logOut()
     const refresh = msg.refresh()
     const refreshUrl = AppConfiguration.applicationURL
@@ -42,7 +43,7 @@ class GlobalErrorBoundary extends React.Component {
           <div className={`container text-center ${styles['globalErrorContainer']}`}>
             <img src={branding.resourcesUrls.errorImg} />
             <h1 className='bolder'>{title}</h1>
-            <p className='h4'>{descr}<a href='https://github.com/oVirt/ovirt-web-ui/issues'>{gitHub}</a></p>
+            <p className='h4' dangerouslySetInnerHTML={{ __html: descr }} />
             <div>
               <a href={refreshUrl} className='btn'>{refresh}</a>
               <a href={logoutUrl} className='btn-primary btn'>{logOut}</a>

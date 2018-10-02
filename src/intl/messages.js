@@ -163,7 +163,7 @@ export const messages: { [messageId: string]: MessageType } = {
   fullyQualifiedDomainName: 'Fully Qualified Domain Name (FQDN) of the virtual machine. Please note, guest agent must be installed within the virtual machine to retrieve this value.',
   gitHub: 'GitHub',
   globalErrorBoundaryTitle: 'Sorry, VM Portal is currently having some issues.',
-  globalErrorBoundaryDescription: 'Please refresh page or log out and log back in. If the issue persists, please report a bug on ',
+  globalErrorBoundaryDescription: 'Please refresh page or log out and log back in. If the issue persists, please report a bug on {bugUrl}',
   groupOfHostsVmCanBeRunningOn: 'Group of hosts the virtual machine can be running on.',
   hdBoot: 'Hard Disk',
   hostConsole: {
