@@ -31,6 +31,7 @@ import {
   getAllHosts,
   getAllOperatingSystems,
   getAllVnicProfiles,
+  getIsoStorageDomains,
 
   downloadConsole,
   getUSBFilter,
@@ -191,6 +192,7 @@ function* initialLoad () {
   yield put(getAllTemplates({ shallowFetch: false }))
   yield put(getAllStorageDomains())
   yield put(getAllVnicProfiles())
+  yield put(getIsoStorageDomains())
 
   yield put(getByPage({ page: 1 })) // first page of VMs list
 }

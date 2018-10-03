@@ -1,8 +1,20 @@
 import {
+  ADD_USER_MESSAGE,
   CLEAR_USER_MSGS,
-  SET_USERMSG_NOTIFIED,
   DISMISS_USER_MSG,
+  SET_USERMSG_NOTIFIED,
 } from '../constants'
+
+export function addUserMessage ({ message, shortMessage, type = '' }) {
+  return {
+    type: ADD_USER_MESSAGE,
+    payload: {
+      message,
+      shortMessage,
+      type,
+    },
+  }
+}
 
 export function clearUserMessages () {
   return {

@@ -58,6 +58,7 @@ const vms = actionReducer(initialState, {
         updates[vm.id].nics = state.getIn(['vms', vm.id, 'nics'], EMPTY_ARRAY).toJS()
         updates[vm.id].sessions = state.getIn(['vms', vm.id, 'sessions'], EMPTY_ARRAY).toJS()
         updates[vm.id].snapshots = state.getIn(['vms', vm.id, 'snapshots'], EMPTY_ARRAY).toJS()
+        updates[vm.id].statistics = state.getIn(['vms', vm.id, 'statistics'], EMPTY_MAP).toJS()
       }
     })
 
@@ -88,7 +89,7 @@ const vms = actionReducer(initialState, {
     if (state.getIn(['vms', vmId])) {
       return state.setIn(['vms', vmId, 'cdrom'], Immutable.fromJS(cdrom)) // deep immutable
     } else { // fail, if VM not found
-      logger.error(`vms.setVmCdrom() reducer: vmId ${vmId} not found`)
+      logger.error(`vms[${SET_VM_CDROM}] reducer: vmId ${vmId} not found`)
     }
     return state
   },

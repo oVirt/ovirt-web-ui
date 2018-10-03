@@ -1,11 +1,15 @@
 // adapted from: https://github.com/oVirt/ovirt-engine-dashboard/blob/master/src/utils/unit-conversion.js
 
+export function isNumber (n) {
+  return !isNaN(parseFloat(n)) && isFinite(n)
+}
+
 export function convertValue (unitTable = [], unit, value, minThreshold = 0.1, maxThreshold = 1024) {
   let newUnit = unit
   let newValue
   if (Array.isArray(value)) {
     newValue = value.slice(0)
-  } else if (!Number.isNaN(value)) {
+  } else if (isNumber(value)) {
     newValue = [ value ]
   } else {
     throw new TypeError('value must be a number or an array')

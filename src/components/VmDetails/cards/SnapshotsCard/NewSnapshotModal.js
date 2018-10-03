@@ -1,7 +1,23 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Button, Modal, Icon, FormControl, Alert, FormGroup, HelpBlock } from 'patternfly-react'
-import { msg } from '../../intl'
+
+import { connect } from 'react-redux'
+import { addVmSnapshot } from './actions'
+
+import {
+  Alert,
+  Button,
+  Col,
+  Form,
+  FormControl,
+  FormGroup,
+  HelpBlock,
+  Icon,
+  Modal,
+  noop,
+} from 'patternfly-react'
+import { msg } from '../../../../intl'
+import style from './style.css'
 
 class NewSnapshotModal extends Component {
   constructor (props) {
@@ -25,7 +41,8 @@ class NewSnapshotModal extends Component {
     this.setState({ description: e.target.value })
   }
 
-  handleSave () {
+  handleSave (e) {
+    e.preventDefault()
     if (this.state.description.trim().length > 0) {
       const snapshot = {
         description: this.state.description,
@@ -40,11 +57,12 @@ class NewSnapshotModal extends Component {
   render () {
     return (
       <div>
-        <Button bsStyle='default' bsSize='small' onClick={this.open}>
-          { msg.newSnapshot() }
-        </Button>
+        <a onClick={this.props.disabled ? noop : this.open} className={`${this.props.disabled && 'disabled'}`}>
+          <Icon type='fa' name='plus' />
+          { msg.createSnapshot() }
+        </a>
 
-        <Modal show={this.state.showModal} onHide={this.close}>
+        <Modal show={this.state.showModal} onHide={this.close} dialogClassName={style['create-snapshot-container']}>
           <Modal.Header>
             <button
               className='close'
@@ -54,13 +72,18 @@ class NewSnapshotModal extends Component {
             >
               <Icon type='pf' name='close' />
             </button>
-            <Modal.Title>{ msg.addNewSnapshot() }</Modal.Title>
+            <Modal.Title>{ msg.createSnapshot() }</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <form className='form-horizontal'>
-              <FormGroup bsClass='form-group col-sm-12' validationState={this.state.emptyDescription ? 'error' : null}>
+            <Form onSubmit={this.handleSave} horizontal>
+              <Col sm={12}>
+                <Alert type='info'>
+                  { msg.snapshotInfo() }
+                </Alert>
+              </Col>
+              <FormGroup bsClass='form-group col-sm-12 required' validationState={this.state.emptyDescription ? 'error' : null}>
                 <label className='col-sm-3 control-label'>
-                  { msg.description() }
+                  { msg.name() }
                 </label>
                 <div className='col-sm-9'>
                   <FormControl
@@ -76,12 +99,7 @@ class NewSnapshotModal extends Component {
                   }
                 </div>
               </FormGroup>
-              <div className='col-sm-12'>
-                <Alert type='info'>
-                  { msg.snapshotInfo() }
-                </Alert>
-              </div>
-            </form>
+            </Form>
           </Modal.Body>
           <Modal.Footer>
             <Button
@@ -92,7 +110,7 @@ class NewSnapshotModal extends Component {
               { msg.cancel() }
             </Button>
             <Button bsStyle='primary' onClick={this.handleSave}>
-              { msg.ok() }
+              { msg.create() }
             </Button>
           </Modal.Footer>
         </Modal>
@@ -102,7 +120,14 @@ class NewSnapshotModal extends Component {
 }
 
 NewSnapshotModal.propTypes = {
+  vmId: PropTypes.string.isRequired, // eslint-disable-line react/no-unused-prop-types
+  disabled: PropTypes.bool,
   onAdd: PropTypes.func.isRequired,
 }
 
-export default NewSnapshotModal
+export default connect(
+  (state) => ({}),
+  (dispatch, { vmId }) => ({
+    onAdd: ({ snapshot }) => dispatch(addVmSnapshot({ vmId, snapshot })),
+  })
+)(NewSnapshotModal)

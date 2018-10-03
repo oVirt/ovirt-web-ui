@@ -19,6 +19,7 @@ import type {
   ApiTemplateType, TemplateType,
   ApiVmConsolesType, VmConsolesType,
   ApiVmSessionsType, VmSessionsType,
+  ApiVmStatisticType, VmStatisticsType,
   ApiVmType, VmType,
   ApiVnicProfileType, VnicProfileType,
 } from './types'
@@ -112,6 +113,7 @@ const VM = {
       },
       disks: [],
       consoles: [],
+      snapshots: [],
       pool: {
         id: vm['vm_pool'] ? vm.vm_pool['id'] : undefined,
       },
@@ -127,7 +129,7 @@ const VM = {
 
     if (includeSubResources) {
       if (vm.cdroms && vm.cdroms.cdrom) {
-        parsedVm.cdrom = CdRom.toInternal({ cdrom: vm.cdroms.cdrom[0] })
+        parsedVm.cdrom = CdRom.toInternal({ cdrom: vm.cdroms.cdrom[0] }) // in oVirt there is always exactly 1 cdrom
       }
 
       if (vm.graphics_consoles && vm.graphics_consoles.graphics_console) {
@@ -154,6 +156,10 @@ const VM = {
         parsedVm.snapshots = vm.snapshots.snapshot.map(
           snapshot => Snapshot.toInternal({ snapshot })
         )
+      }
+
+      if (vm.statistics && vm.statistics.statistic) {
+        parsedVm.statistics = VmStatistics.toInternal({ statistics: vm.statistics.statistic })
       }
     }
 
@@ -215,6 +221,41 @@ const VM = {
         ? vm.icons.large
         : undefined,
     }
+  },
+}
+
+//
+//
+const VmStatistics = {
+  toInternal ({ statistics }: { statistics: Array<ApiVmStatisticType> }): VmStatisticsType {
+    const base: VmStatisticsType = {
+      memory: {},
+      cpu: {},
+      network: {},
+    }
+
+    for (const stat: ApiVmStatisticType of statistics) {
+      if (stat.kind !== 'gauge') continue
+
+      // no values -> undefined, 1 value -> value.datum, >1 values -> [...values.datum]
+      const datum =
+        stat.values &&
+        stat.values.value &&
+        (stat.values.value.length === 1
+          ? stat.values.value[0].datum
+          : stat.values.value.map(value => value.datum))
+
+      const nameParts = /^(memory|cpu|network)\.(.*)?$/.exec(stat.name)
+      if (nameParts) {
+        base[nameParts[1]][nameParts[2]] = {
+          datum,
+          unit: stat.unit,
+          description: stat.description,
+        }
+      }
+    }
+
+    return base
   },
 }
 
@@ -288,10 +329,12 @@ const Pool = {
 const Snapshot = {
   toInternal ({ snapshot }: { snapshot: ApiSnapshotType }): SnapshotType {
     return {
-      id: snapshot.id,
+      id: snapshot.id || '',
       description: snapshot.description,
-      type: snapshot.snapshot_type,
-      date: snapshot.date,
+      vm: snapshot.vm ? VM.toInternal({ vm: snapshot.vm }) : {},
+      type: snapshot.snapshot_type || '',
+      date: snapshot.date || Date.now(),
+      status: snapshot.snapshot_status || '',
       persistMemoryState: snapshot.persist_memorystate === 'true',
       isActive: snapshot.snapshot_type === 'active',
     }
@@ -308,7 +351,7 @@ const Snapshot = {
 //
 // VM -> DiskAttachments.DiskAttachment[] -> Disk
 const DiskAttachment = {
-  toInternal ({ attachment, disk }: { attachment: ApiDiskAttachmentType, disk: ApiDiskType }): DiskType {
+  toInternal ({ attachment = {}, disk }: { attachment?: ApiDiskAttachmentType, disk: ApiDiskType }): DiskType {
     return {
       bootable: convertBool(attachment['bootable']),
       active: convertBool(attachment['active']),
@@ -374,16 +417,15 @@ const CdRom = {
   toInternal ({ cdrom }: { cdrom: ApiCdRomType }): CdRomType {
     return {
       id: cdrom.id,
-      file: {
-        id: cdrom.file ? cdrom.file.id : '',
-      },
+      fileId: cdrom.file && cdrom.file.id,
     }
   },
 
   toApi ({ cdrom }: { cdrom: CdRomType }): ApiCdRomType {
     return {
+      id: cdrom.id,
       file: {
-        id: cdrom.file.id,
+        id: cdrom.fileId || '', // no fileId == Eject == ''
       },
     }
   },
@@ -430,9 +472,22 @@ const Cluster = {
 //
 const Nic = {
   toInternal ({ nic }: { nic: ApiNicType }): NicType {
+    const ips =
+      nic.reported_devices && nic.reported_devices.reported_device
+        ? nic.reported_devices.reported_device
+          .map(device => device.ips && device.ips.ip ? device.ips.ip : [])
+          .reduce((ips, ipArray) => [...ipArray, ...ips], [])
+        : []
+
     return {
       id: nic.id,
       name: nic.name,
+      mac: nic.mac.address,
+      plugged: convertBool(nic.plugged),
+      ips,
+      ipv4: ips.filter(ip => ip.version === 'v4').map(rec => rec.address),
+      ipv6: ips.filter(ip => ip.version === 'v6').map(rec => rec.address),
+
       vnicProfile: {
         id: nic.vnic_profile ? nic.vnic_profile.id : null,
       },

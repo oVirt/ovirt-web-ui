@@ -196,7 +196,6 @@ class VmActions extends React.Component {
       pool,
       isOnCard = false,
       onRemove,
-      includeLegacyDetails = false,
       location,
     } = this.props
 
@@ -245,24 +244,25 @@ class VmActions extends React.Component {
         {actions.map(action => <ActionButtonWraper key={action.id} {...action} />)}
 
         <span className={style['button-spacer']} />
-        {includeLegacyDetails && (
+
+        {location && /vm-legacy/.test(location.pathname) && (
           <LinkButton
             isOnCard={isOnCard}
-            shortTitle='Legacy View'
-            tooltip='Legacy View'
-            to={`/vm-legacy/${vm.get('id')}`}
+            shortTitle='Dashboard View'
+            tooltip='Dashboard View'
+            to={`/vm/${vm.get('id')}`}
             button='btn btn-default'
             className={`pficon pficon-edit ${style['action-link']}`}
             id={`action-${vm.get('name')}-edit`}
           />
         )}
 
-        {location && /vm-legacy/.test(location.pathname) && (
+        {location && /vm\//.test(location.pathname) && (
           <LinkButton
             isOnCard={isOnCard}
-            shortTitle='View'
-            tooltip='View'
-            to={`/vm/${vm.get('id')}`}
+            shortTitle='Normal View'
+            tooltip='Normal View'
+            to={`/vm-legacy/${vm.get('id')}`}
             button='btn btn-default'
             className={`pficon pficon-edit ${style['action-link']}`}
             id={`action-${vm.get('name')}-edit`}
@@ -296,7 +296,6 @@ VmActions.propTypes = {
   vm: PropTypes.object.isRequired,
   pool: PropTypes.object,
   isOnCard: PropTypes.bool,
-  includeLegacyDetails: PropTypes.bool,
 
   location: RouterPropTypeShapes.location.isRequired,
 

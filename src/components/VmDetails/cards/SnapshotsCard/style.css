@@ -1,0 +1,115 @@
+.snapshot-detail-container {
+    display: flex;
+    width: 100%;
+}
+
+.snapshot-detail-container dt {
+    clear: left;
+    float: left;
+    width: 150px;
+    min-height: 26px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: left;
+}
+
+.snapshot-detail-container dd {
+    min-height: 26px;
+    max-width: 5000px;
+    text-overflow: ellipsis;
+    text-align: left;
+}
+
+.snapshot-detail-container dd a {
+    cursor: pointer;
+}
+
+.snapshot-properties {
+    width: 50%;
+    min-width: 300px;
+}
+
+div.popover {
+  min-width: 200px;
+  max-width: 1000px;
+  z-index: 20;
+}
+
+.green {
+  color: #3B9D2E;
+}
+
+.status-icon span {
+  margin-right: 5px;
+}
+
+.snapshot-disk-list {
+  display: table;
+}
+
+.snapshot-item {
+  display: table-row;
+}
+
+.snapshot-item a {
+  cursor: pointer;
+  color: #333;
+  font-size: 14px;
+}
+
+.snapshot-item a :global(.fa-play-circle) {
+  font-size: 16px;
+}
+
+.snapshot-item > a {
+  margin-right: 5px;
+}
+
+.snapshot-item-status {
+  display: table-cell;
+}
+
+.snapshot-item-name {
+  display: table-cell;
+  padding-left: 5px;
+}
+
+.snapshot-item-time {
+  color: #808080;
+  padding-left: 5px;
+}
+
+.snapshot-item-actions {
+  display: table-cell;
+  white-space: nowrap;
+  padding-left: 5px;
+}
+
+.snapshot-item-actions a + a {
+  margin-left: 5px;
+}
+
+.snapshot-create a span {
+  margin-right: 5px;
+}
+
+.snapshot-create a {
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.create-snapshot-container :global(.modal-body) {
+  padding: 0;
+}
+
+.create-snapshot-container :global(.alert) {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.no-nics, .no-disks {
+  font-style: italic;
+  color: rgba(0, 0, 0, 0.65);
+}

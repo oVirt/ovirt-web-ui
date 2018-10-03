@@ -25,7 +25,6 @@ import VmDisks from '../VmDisks'
 import VmIcon from '../VmIcon'
 import VmNics from '../VmNics'
 import VmsListNavigation from '../VmsListNavigation'
-import VmSnapshots from '../VmSnapshots'
 import VmStatus from './VmStatus'
 import { NextRunLabel } from './labels'
 
@@ -112,7 +111,6 @@ class VmDetail extends Component {
     const icon = getVmIcon(icons, operatingSystems, vm)
     const disks = vm.get('disks')
     const nics = vm.get('nics')
-    const snapshots = vm.get('snapshots')
     const osName = getOsHumanName(vm.getIn(['os', 'type']))
     const cluster = Selectors.getClusterById(vm.getIn(['cluster', 'id']))
     const template = Selectors.getTemplateById(vm.getIn(['template', 'id']))
@@ -221,7 +219,7 @@ class VmDetail extends Component {
                   <dt><span className='pficon pficon-storage-domain' />&nbsp;
                     <FieldHelp content={msg.currentlyInsertedIsoInCdDrive()} text={msg.cd()} />
                   </dt>
-                  <dd id={`${idPrefix}-cdrom`}>{vm.getIn(['cdrom', 'file', 'id']) ? vm.getIn(['cdrom', 'file', 'id']) : msg.empty() }</dd>
+                  <dd id={`${idPrefix}-cdrom`}>{vm.getIn(['cdrom', 'fileId']) ? vm.getIn(['cdrom', 'fileId']) : msg.empty() }</dd>
                 </dl>
 
                 <dl className={sharedStyle['vm-properties']}>
@@ -242,7 +240,6 @@ class VmDetail extends Component {
                   {noDisks}
                   {disksElement}
                   <VmNics nics={nics} vmId={vm.get('id')} enableSettings={notPoolOrPoolVm} />
-                  <VmSnapshots snapshots={snapshots} vm={vm} enableSettings={notPoolOrPoolVm} />
                   <dt>
                     <FieldHelp content={msg.bootMenuTooltip()} text={msg.bootMenu()} />
                   </dt>

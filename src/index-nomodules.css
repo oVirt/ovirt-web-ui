@@ -156,3 +156,14 @@ body {
 .detail-container {
   background: #fff;
 }
+
+.form-group.required .control-label:after {
+  content:"*";
+  color:red;
+}
+
+a.disabled {
+  color: #8b8d8f !important;
+  cursor: not-allowed !important;
+  text-decoration: none;
+}

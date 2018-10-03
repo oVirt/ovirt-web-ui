@@ -156,7 +156,7 @@ class PoolDetailsPage extends React.Component {
 
     if (poolId && vms.getIn(['pools', poolId, 'vm'])) {
       // TODO: ux-redesign VmDetails will need to also handle viewing a Pool / Pool (template)? VM
-      return (<VmDetails vm={vms.getIn(['pools', poolId, 'vm'])} pool={vms.getIn(['pools', poolId])} />)
+      return (<LegacyVmDetails vm={vms.getIn(['pools', poolId, 'vm'])} pool={vms.getIn(['pools', poolId])} />)
     }
 
     // TODO: Add handling for if the fetch runs but fails (FETCH-FAIL), see issue #631

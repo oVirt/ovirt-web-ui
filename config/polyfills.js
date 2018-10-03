@@ -1,3 +1,8 @@
+// NOTE: These polyfills are most likely unnecessary for our supported browsers. If verified,
+//       they may be removed and save the space in the bundle.
+
+// TODO: Verify if these polyfills are still necessary.
+
 if (typeof Promise === 'undefined') {
   // Rejection tracking prevents a common issue where React gets into an
   // inconsistent state due to an error, but it gets swallowed by a Promise,

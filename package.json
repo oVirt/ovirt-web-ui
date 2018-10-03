@@ -75,9 +75,9 @@
     "intl-messageformat": "2.2.0",
     "jquery": "=3.2.1",
     "object-assign": "4.1.1",
-    "patternfly": "3.48.1",
+    "patternfly": "3.53.1",
     "patternfly-bootstrap-combobox": "1.1.7",
-    "patternfly-react": "2.4.1",
+    "patternfly-react": "2.11.1",
     "popper.js": "1.14.3",
     "prop-types": "15.6.1",
     "react": "16.4.0",
@@ -127,7 +127,8 @@
       ".*": "<rootDir>/config/jest/transform.js"
     },
     "setupFiles": [
-      "<rootDir>/config/polyfills.js"
+      "<rootDir>/config/polyfills.js",
+      "<rootDir>/config/jest/chalk.logger.js"
     ],
     "testPathIgnorePatterns": [
       "<rootDir>/(build|docs|node_modules|__tests__/helper|config)/"

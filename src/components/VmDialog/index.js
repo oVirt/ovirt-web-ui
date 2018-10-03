@@ -48,9 +48,7 @@ class VmDialog extends React.Component {
       cpus: 1,
       memory: 1024 * 1024 * 1024,
       cdrom: {
-        file: {
-          id: '',
-        },
+        fileId: '',
       },
 
       clusterId: undefined,
@@ -128,9 +126,7 @@ class VmDialog extends React.Component {
         osId: this.getOsIdFromType(vm.getIn(['os', 'type'])),
         bootDevices: resultDevices,
         cdrom: {
-          file: {
-            id: null,
-          },
+          fileId: null,
         },
         bootMenuEnabled: vm.get('bootMenuEnabled'),
         cloudInit: vm.get('cloudInit').toJS(),
@@ -205,8 +201,7 @@ class VmDialog extends React.Component {
    * Structure conforms vmToInternal()
    */
   composeVm () {
-    const os = this.props.operatingSystems
-      .get(this.state.osId)
+    const os = this.props.operatingSystems.get(this.state.osId)
 
     return {
       'id': this.state.id,
@@ -217,9 +212,7 @@ class VmDialog extends React.Component {
       'memory': this.state.memory || 0,
       'memory_policy': this.getMemoryPolicy(),
       'cdrom': {
-        'file': {
-          'id': this.state.cdrom.file.id === null ? '' : this.state.cdrom.file.id,
-        },
+        'fileId': this.state.cdrom.fileId === null ? '' : this.state.cdrom.fileId,
       },
       'os': {
         'type': os ? os.get('name') : null,
@@ -277,7 +270,7 @@ class VmDialog extends React.Component {
   }
 
   onChangeCD (fileId) {
-    this.setState({ cdrom: { file: { id: fileId } }, isChanged: true })
+    this.setState({ cdrom: { fileId }, isChanged: true })
   }
 
   onIntegerChanged ({ value, stateProp, factor = 1 }) {
@@ -449,10 +442,10 @@ class VmDialog extends React.Component {
   }
 
   getCDRomFileId () {
-    if (this.state.cdrom.file.id !== null) {
-      return this.state.cdrom.file.id
+    if (this.state.cdrom.fileId !== null) {
+      return this.state.cdrom.fileId
     } else {
-      return this.props.vm.get('cdrom') ? this.props.vm.getIn(['cdrom', 'file', 'id']) : ''
+      return this.props.vm.getIn(['cdrom', 'fileId']) || ''
     }
   }
 

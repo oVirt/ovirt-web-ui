@@ -1,4 +1,10 @@
 // @flow
+import type {
+  CdRomType, ApiCdRomType,
+  SnapshotType, ApiSnapshotType,
+  NicType,
+  VmType, ApiVmType,
+} from './types'
 
 import logger from '../logger'
 import Selectors from '../selectors'
@@ -17,7 +23,6 @@ import * as Transforms from './transform'
 
 type VmIdType = { vmId: string }
 type PoolIdType = { poolId: string }
-type VmType = { vm: Object, transformInput?: boolean }
 
 const zeroUUID: string = '00000000-0000-0000-0000-000000000000'
 
@@ -29,7 +34,7 @@ const OvirtApi = {
   // ---- Data transform functions (API -> internal, internal -> API)
   //
   //
-  vmToInternal ({ vm, getSubResources = false }: { vm: Object, getSubResources: boolean }): Object {
+  vmToInternal ({ vm, getSubResources = false }: { vm: ApiVmType, getSubResources: boolean }): VmType {
     return Transforms.VM.toInternal({ vm, includeSubResources: getSubResources })
   },
 
@@ -64,8 +69,8 @@ const OvirtApi = {
 
   iconToInternal: Transforms.Icon.toInternal,
 
-  CDRomToInternal: Transforms.CdRom.toInternal,
-  internalCDRomToOvirt: Transforms.CdRom.toApi,
+  cdRomToInternal: Transforms.CdRom.toInternal,
+  internalCdRomToOvirt: Transforms.CdRom.toApi,
 
   SSHKeyToInternal: Transforms.SSHKey.toInternal,
 
@@ -160,7 +165,7 @@ const OvirtApi = {
     return httpGet({ url })
   },
 
-  addNewVm ({ vm, transformInput = false }: VmType): Promise<Object> {
+  addNewVm ({ vm, transformInput = false }: { vm: VmType | Object, transformInput: boolean }): Promise<Object> {
     assertLogin({ methodName: 'addNewVm' })
     const input = JSON.stringify(transformInput ? OvirtApi.internalVmToOvirt({ vm }) : vm)
     logger.log(`OvirtApi.addNewVm(): ${input}`)
@@ -170,7 +175,7 @@ const OvirtApi = {
       input,
     })
   },
-  editVm ({ vm, transformInput = false }: VmType): Promise<Object> {
+  editVm ({ vm, transformInput = false }: { vm: VmType | Object, transformInput: boolean }): Promise<Object> {
     assertLogin({ methodName: 'editVm' })
     const input = JSON.stringify(transformInput ? OvirtApi.internalVmToOvirt({ vm }) : vm)
     logger.log(`OvirtApi.editVm(): ${input}`)
@@ -209,7 +214,7 @@ const OvirtApi = {
       contentType: 'application/xml',
     })
   },
-  addNewSnapshot ({ vmId, snapshot }: { vmId: string, snapshot: Object }): Promise<Object> {
+  addNewSnapshot ({ vmId, snapshot }: { vmId: string, snapshot: SnapshotType }): Promise<Object> {
     assertLogin({ methodName: 'addNewSnapshot' })
     const input = JSON.stringify(OvirtApi.internalSnapshotToOvirt({ snapshot }))
     logger.log(`OvirtApi.addNewSnapshot(): ${input}`)
@@ -221,7 +226,7 @@ const OvirtApi = {
   deleteSnapshot ({ snapshotId, vmId }: { snapshotId: string, vmId: string }): Promise<Object> {
     assertLogin({ methodName: 'deleteSnapshot' })
     return httpDelete({
-      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots/${snapshotId}`,
+      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots/${snapshotId}?async=true`,
     })
   },
   restoreSnapshot ({ snapshotId, vmId }: { snapshotId: string, vmId: string }): Promise<Object> {
@@ -232,7 +237,15 @@ const OvirtApi = {
       contentType: 'application/xml',
     })
   },
-  snapshot ({ vmId, snapshotId }: { vmId: string, snapshotId: string }): Promise<Object> {
+  snapshotDisks ({ vmId, snapshotId }: { vmId: string, snapshotId: string }): Promise<Object> {
+    assertLogin({ methodName: 'snapshotDisks' })
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots/${snapshotId}/disks` })
+  },
+  snapshotNics ({ vmId, snapshotId }: { vmId: string, snapshotId: string }): Promise<Object> {
+    assertLogin({ methodName: 'snapshotNics' })
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots/${snapshotId}/nics` })
+  },
+  snapshot ({ vmId, snapshotId }: { vmId: string, snapshotId: string }): Promise<ApiSnapshotType> {
     assertLogin({ methodName: 'snapshot' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots/${snapshotId}` })
   },
@@ -303,21 +316,21 @@ const OvirtApi = {
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/storagedomains/${storageId}/files` })
   },
 
-  getCDRom ({ vmId, running }: { vmId: string, running: boolean }): Promise<Object> {
-    assertLogin({ methodName: 'getCDRom' })
-    return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/cdroms/${zeroUUID}?current=${running ? 'true' : 'false'}` })
+  getCdRom ({ vmId, current = true }: { vmId: string, current?: boolean }): Promise<ApiCdRomType> {
+    assertLogin({ methodName: 'getCdRom' })
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/cdroms/${zeroUUID}?current=${current ? 'true' : 'false'}` })
   },
-
-  changeCD ({ cdrom, vmId, running }: { cdrom: Object, vmId: string, running: boolean }): Promise<Object> {
-    assertLogin({ methodName: 'changeCD' })
-    const input = JSON.stringify(OvirtApi.internalCDRomToOvirt({ cdrom }))
-    logger.log(`OvirtApi.changeCD(): ${input}`)
+  changeCdRom ({ cdrom, vmId, current = true }: { cdrom: CdRomType, vmId: string, current?: boolean }): Promise<ApiCdRomType> {
+    assertLogin({ methodName: 'changeCdRom' })
+    const input = JSON.stringify(OvirtApi.internalCdRomToOvirt({ cdrom }))
+    logger.log(`OvirtApi.changeCdRom(): ${input}`)
     return httpPut({
-      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/cdroms/${zeroUUID}?current=${running ? 'true' : 'false'}`,
+      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/cdroms/${zeroUUID}?current=${current ? 'true' : 'false'}`,
       input,
     })
   },
-  addNicToVm ({ nic, vmId }: { nic: Object, vmId: string }): Promise<Object> {
+
+  addNicToVm ({ nic, vmId }: { nic: NicType, vmId: string }): Promise<Object> {
     assertLogin({ methodName: 'addNicToVm' })
     const input = JSON.stringify(OvirtApi.internalNicToOvirt({ nic }))
     logger.log(`OvirtApi.addNicToVm(): ${input}`)

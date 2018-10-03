@@ -6,14 +6,60 @@
 export type ApiVmType = Object
 export type VmType = Object
 
+export type ApiStatisticKindType = "counter" | "gauge"
+export type ApiStatisticTypeType = "decimal" | "integer" | "string"
+export type ApiStatisticUnitType = "bytes" | "bits_per_second" | "bytes_per_second" | "count_per_second" | "seconds" | "percent" | "none"
+export type ApiVmStatisticType = {
+  id: string,
+  name: string,
+  description: string,
+  kind: ApiStatisticKindType,
+  type: ApiStatisticTypeType,
+  unit: ApiStatisticUnitType,
+  values: {
+    value: Array<{
+      datum: number,
+      detail?: string
+    }>
+  }
+}
+
+export type StatisticValueType = {
+  datum: number | Array<number>,
+  unit: ApiStatisticUnitType,
+  description: string
+}
+export type VmStatisticsType = {
+  memory: { [memorySubKey: string]: StatisticValueType },
+  cpu: { [cpuSubKey: string]: StatisticValueType },
+  network: { [networkSubKey: string]: StatisticValueType }
+}
+
 export type ApiTemplateType = Object
 export type TemplateType = Object
 
 export type ApiPoolType = Object
 export type PoolType = Object
 
-export type ApiSnapshotType = Object // { description: string }
-export type SnapshotType = Object
+export type ApiSnapshotType = {
+  id?: string,
+  description: string,
+  vm?: ApiVmType,
+  snapshot_type?: string,
+  date?: number,
+  snapshot_status?: string,
+  persist_memorystate?: string
+}
+export type SnapshotType = {
+  id: string,
+  description: string,
+  vm: VmType | {},
+  type: string,
+  date: number,
+  status: string,
+  persistMemoryState: boolean,
+  isActive: boolean
+}
 
 export type ApiDiskAttachmentType = Object
 export type ApiDiskType = Object
@@ -26,15 +72,14 @@ export type ApiStorageDomainType = Object
 export type StorageDomainType = Object
 
 export type ApiCdRomType = {
-  id?: string,
+  id: string,
   file?: {
     id: string
   }
 }
 export type CdRomType = {
-  file: {
-    id: string
-  }
+  id: string,
+  fileId?: string
 }
 
 export type ApiStorageDomainFileType = Object
@@ -44,7 +89,21 @@ export type ApiClusterType = Object
 export type ClusterType = Object
 
 export type ApiNicType = Object
-export type NicType = Object
+export type NicType = {
+  id: string,
+  name: string,
+  mac: string,
+  plugged: boolean,
+  ips: Array<{
+    address: string,
+    version: 'v4' | 'v6'
+  }>,
+  ipv4: Array<string>,
+  ipv6: Array<string>,
+  vnicProfile: {
+    id: string | null
+  }
+}
 
 export type ApiVnicProfileType = Object
 export type VnicProfileType = Object
