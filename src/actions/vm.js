@@ -141,7 +141,7 @@ export function suspendVm ({ vmId }) {
   }
 }
 
-export function createVm ({ vm, transformInput = false, pushToDetailsOnSuccess = false }, { correlationId, ...additionalMeta }) {
+export function createVm ({ vm, transformInput = true, pushToDetailsOnSuccess = false }, { correlationId, ...additionalMeta }) {
   return {
     type: CREATE_VM,
     payload: {
@@ -157,7 +157,7 @@ export function createVm ({ vm, transformInput = false, pushToDetailsOnSuccess =
 }
 
 export function editVm (
-  { vm, transformInput = false, restartAfterEdit = false, nextRun = false },
+  { vm, transformInput = true, restartAfterEdit = false, nextRun = false },
   { correlationId, ...additionalMeta }
 ) {
   return {
