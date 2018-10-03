@@ -35,16 +35,18 @@ class OverviewCard extends React.Component {
 
     this.state = {
       vm: props.vm, // ImmutableJS Map
+
       isEditing: false,
       isDirty: false,
       correlationId: null,
       correlatedMessages: null,
     }
+    this.trackUpdates = {}
 
     this.handleCardOnStartEdit = this.handleCardOnStartEdit.bind(this)
+    this.handleChange = this.handleChange.bind(this)
     this.handleCardOnCancel = this.handleCardOnCancel.bind(this)
     this.handleCardOnSave = this.handleCardOnSave.bind(this)
-    this.handleChange = this.handleChange.bind(this)
   }
 
   static getDerivedStateFromProps (props, state) {
@@ -76,8 +78,38 @@ class OverviewCard extends React.Component {
   }
 
   handleCardOnStartEdit () {
+    this.trackUpdates = {}
     this.setState({ isEditing: true, isDirty: false, correlationId: null, correlatedMessages: null })
     this.props.onEditChange(true)
+  }
+
+  handleChange (fieldName, value) {
+    if (this.state.isEditing && !this.state.isDirty) {
+      this.props.onEditChange(true, true)
+    }
+
+    let updates = this.state.vm
+    // NOTE: The DetailsCard has the possibility of chained updates.  Overview doesn't
+    //       have that need, so there is no __changeQueue__ setup here.
+
+    let fieldUpdated
+    switch (fieldName) {
+      case 'name':
+        // TODO: add name validation?
+        updates = updates.set('name', value)
+        fieldUpdated = 'name'
+        break
+
+      case 'description':
+        updates = updates.set('description', value)
+        fieldUpdated = 'description'
+        break
+    }
+
+    if (updates !== this.state.vm) {
+      this.trackUpdates[fieldUpdated] = true
+      this.setState({ vm: updates, isDirty: true })
+    }
   }
 
   handleCardOnCancel () {
@@ -86,30 +118,35 @@ class OverviewCard extends React.Component {
   }
 
   handleCardOnSave () {
+    if (Object.keys(this.trackUpdates).length === 0) {
+      this.handleCardOnCancel()
+      return
+    }
+
     const { vm: stateVm } = this.state
     const correlationId = generateUnique('OverviewCard-save_')
 
-    const vmUpdates = {
-      id: stateVm.get('id'),
-      name: stateVm.get('name'),
-      description: stateVm.get('description'),
+    // --- Create a partial VM (in the internal format expected by editVm() saga),
+    //     only including the fields that have been updated
+    const vmUpdates = { id: stateVm.get('id') }
+
+    if (this.trackUpdates['name']) {
+      vmUpdates['name'] = stateVm.get('name')
     }
+
+    if (this.trackUpdates['description']) {
+      vmUpdates['description'] = stateVm.get('description')
+    }
+
+    // --- dispatch the save
+    //     saveChanges will add the result of the operation to the vm under the given
+    //     correlationId. So, when the vm prop changes, it can be checked and the edit
+    //     mode controlled based on the result of the dispatch/saga/api call.
+    console.info('saving changes to VM', vmUpdates.id, ', updates:', vmUpdates)
     this.setState({ correlationId })
     this.props.saveChanges(vmUpdates, correlationId)
 
-    // saveChanges will add the result of the operation to the vm under the given correlationId
-    // so when the vm prop changes, the result can be checked and close the edit as needed
-
     return false // componentDidUpdate will swap the BaseCard out of edit mode as appropriate
-  }
-
-  handleChange (fieldName, { target: { value } }) {
-    if (this.state.isEditing && !this.state.isDirty) {
-      this.props.onEditChange(true, true)
-    }
-
-    const newVm = this.state.vm.set(fieldName, value)
-    this.setState({ vm: newVm, isDirty: true })
   }
 
   render () {
@@ -137,36 +174,39 @@ class OverviewCard extends React.Component {
                   <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' />
                 </Media.Left>
                 <Media.Body>
-                  <div className={style['vm-name']}>{isEditing
-                    ? (
-                      <FormControl type='text' value={this.state.vm.get('name')} onChange={e => this.handleChange('name', e)} />
-                    )
-                    : (
-                      <span>{vm.get('name')}</span>
-                    )
-                  }</div>
+                  <div className={style['vm-name']}>
+                    { !isEditing && <span>{vm.get('name')}</span> }
+                    { isEditing &&
+                      <FormControl
+                        type='text'
+                        value={this.state.vm.get('name')}
+                        onChange={e => this.handleChange('name', e.target.value)}
+                      />
+                    }
+                  </div>
 
                   <div className={style['vm-status']}>
                     <VmStatusIcon className={style['vm-status-icon']} state={vm.get('status')} />
                     <span className={style['vm-status-text']}>{enumMsg('VmStatus', vm.get('status'))}</span>
                   </div>
 
-                  <div>{isEditing
-                    ? (
+                  <div>
+                    { !isEditing &&
+                      <div className={style['vm-description']}>{vm.get('description')}</div>
+                    }
+                    { isEditing &&
                       <FormControl
                         componentClass='textarea'
                         rows='5'
                         value={this.state.vm.get('description')}
-                        onChange={e => this.handleChange('description', e)} />
-                    )
-                    : (
-                      <div className={style['vm-description']}>{vm.get('description')}</div>
-                    )
-                  }</div>
+                        onChange={e => this.handleChange('description', e.target.value)}
+                      />
+                    }
+                  </div>
                 </Media.Body>
               </Media>
 
-              {correlatedMessages && correlatedMessages.size > 0 &&
+              { correlatedMessages && correlatedMessages.size > 0 &&
                 correlatedMessages.map((message, key) =>
                   <Alert key={`user-message-${key}`} type='error' style={{ margin: '5px 0 0 0' }}>{message.get('message')}</Alert>
                 )
