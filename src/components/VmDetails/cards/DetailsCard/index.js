@@ -742,7 +742,7 @@ DetailsCard.propTypes = {
 }
 
 const DetailsCardConnected = connect(
-  (state, { vm }) => ({
+  (state) => ({
     blankTemplateId: state.config.get('blankTemplateId'),
     hosts: state.hosts,
     clusters: state.clusters,
@@ -752,7 +752,7 @@ const DetailsCardConnected = connect(
     userMessages: state.userMessages,
     operatingSystems: state.operatingSystems,
   }),
-  (dispatch, { vm }) => ({
+  (dispatch) => ({
     saveChanges: (minimalVmChanges, restartAfterEdit, nextRun, correlationId) =>
       dispatch(Actions.editVm(
         { vm: minimalVmChanges, transformInput: true, restartAfterEdit, nextRun },
