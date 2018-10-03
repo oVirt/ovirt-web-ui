@@ -14,6 +14,11 @@ function getItems (props) {
   return props.sort ? sortedBy(props.items, 'value') : props.items
 }
 
+/*
+ * TODO: Update this to use a patternfly-react component. Probably use a width styled
+ *       __DropdownButton__ with a set of scrolling __MenuItem__s.
+ */
+
 class SelectBox extends React.Component {
   constructor (props) {
     super(props)
@@ -71,7 +76,10 @@ class SelectBox extends React.Component {
 SelectBox.propTypes = {
   /* eslint-disable react/no-unused-prop-types */
   selected: PropTypes.string, // id of a selected item, false-ish for the first item
-  items: PropTypes.array.isRequired, // Array<{ id: string, value: string }>, order matters if sort is false-ish
+  items: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string,
+    value: PropTypes.string,
+  })).isRequired, // Array<{ id: string, value: string }>, order matters if sort is false-ish
   sort: PropTypes.bool, // sorted alphabetically by current locale with { numeric: true } if true
   /* eslint-enable react/no-unused-prop-types */
   onChange: PropTypes.func.isRequired, // (selectedId: string) => any

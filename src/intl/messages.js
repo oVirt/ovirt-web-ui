@@ -222,6 +222,18 @@ export const messages: { [messageId: string]: MessageType } = {
   noNetwork: 'No network',
   noNics: 'no NICs',
   noSnapshots: 'no snapshots',
+  notAvailable: {
+    message: 'N/A',
+    description: 'Displayed when a value is not available in the VM\'s state',
+  },
+  notAvailableUntilRunning: {
+    message: 'This field is only available when the VM is running.',
+    description: 'Tooltip displayed next to \'notAvailable\' for fields that require the VM to be up',
+  },
+  notAvailableUntilRunningAndGuestAgent: {
+    message: 'This field is only available when the VM is running and the guest agent is installed and running.',
+    description: 'Tooltip displayed next to \'notAvailable\' for fields that require the VM to be up and a running guest agent',
+  },
   notEditableForPoolsOrPoolVms: 'Not editable for Pools or pool VMs.',
   noVmAvailable: 'No VM available.',
   noVmAvailableForLoggedUser: 'No VM is available for the logged user.',
@@ -234,6 +246,9 @@ export const messages: { [messageId: string]: MessageType } = {
   optimizedFor: 'Optimized for',
   optionalUserDescriptionOfVm: 'Optional user description of the virtual machine.',
   options: 'Options',
+  permissionsNoCreateVm: 'You do not have the required permissions to create a new VM.',
+  permissionsNoEditVm: 'You do not have the required permissions to edit a VM.',
+  permissionsNoEditThisVm: 'You do not have permissions to edit VM {name} / {vmId}',
   pendingChanges: 'Pending Changes',
   pleaseEnterValidVmName: 'Please enter valid virtual machine name. Only lower-case and upper-case letters, numbers, \'_\', \'-\', \'.\' are allowed.',
   pleaseLogIn: 'Please log in',

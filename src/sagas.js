@@ -42,6 +42,7 @@ import {
   setOperatingSystems,
   setStorageDomains,
   setDataCenters,
+  setUserGroups,
   addNetworksToVnicProfiles,
   setVnicProfiles,
   setVmSnapshots,
@@ -65,6 +66,7 @@ import {
   stopSchedulerFixedDelay,
   getVmCdRom,
   changeVmCdRom as actionChangeVmCdRom,
+  restartVm as actionRestartVm,
 } from './actions'
 
 import {
@@ -112,6 +114,7 @@ import {
   GET_POOLS_BY_PAGE,
   GET_RDP_VM,
   GET_USB_FILTER,
+  GET_USER_GROUPS,
   GET_VMS_BY_COUNT,
   GET_VMS_BY_PAGE,
   LOGIN,
@@ -131,8 +134,21 @@ import {
   SUSPEND_VM,
 } from './constants'
 
+import { canUserEditVm } from './utils'
+
 const vmFetchAdditionalList =
-  ['cdroms', 'sessions', 'disk_attachments.disk', 'graphics_consoles', 'nics', 'snapshots', 'statistics']
+  [
+    'cdroms',
+    'sessions',
+    'disk_attachments.disk',
+    'graphics_consoles',
+    'nics',
+    'snapshots',
+    'statistics',
+    'permissions.role',
+  ]
+
+const EVERYONE_GROUP_ID = 'eee00000-0000-0000-0000-123456789eee'
 
 /**
  * Compare the current oVirt version (held in redux) to the given version.
@@ -370,12 +386,18 @@ export function* fetchSingleVm (action) {
       internalVm.cdrom = yield fetchVmCdRom({ vmId: internalVm.id, current: true })
     }
 
+    if (isOvirtGTE42 && !shallowFetch && !Selectors.getFilter()) {
+      internalVm.permissions = yield fetchVmPermissions({ vmId: internalVm.id })
+    }
+
     if (!isOvirtGTE42 && !shallowFetch) {
       internalVm.cdrom = yield fetchVmCdRom({ vmId: internalVm.id, current: internalVm.status === 'up' })
       internalVm.consoles = yield fetchConsoleVmMeta({ vmId: internalVm.id })
       internalVm.disks = yield fetchVmDisks({ vmId: internalVm.id })
       internalVm.nics = yield fetchVmNics({ vmId: internalVm.id })
       internalVm.sessions = yield fetchVmSessions({ vmId: internalVm.id })
+      internalVm.permissions = yield fetchVmPermissions({ vmId: internalVm.id })
+      internalVm.canUserEditVm = canUserEditVm(internalVm.permissions)
       // TODO: Support <4.2 for snapshots?
       // TODO: Support <4.2 for statistics?
     }
@@ -619,6 +641,7 @@ export function* createVm (action) {
  */
 export function* editVm (action) {
   const { payload: { vm } } = action
+  const vmId = action.payload.vm.id
 
   const editVmResult = yield callExternalAction('editVm', Api.editVm, action)
 
@@ -626,25 +649,30 @@ export function* editVm (action) {
   if (!commitError && vm.cdrom) {
     const isUp = editVmResult && editVmResult.status === 'up'
     const changeCdResult = yield changeVmCdRom(actionChangeVmCdRom({
-      vmId: vm.id,
+      vmId,
       cdrom: vm.cdrom,
       current: isUp,
-      updateRedux: false,
+      updateRedux: false, // the 'actionSelectVmDetail' will fetch the cd-rom update
     }))
 
     commitError = changeCdResult.error
   }
 
   if (!commitError) {
-    yield put(actionSelectVmDetail({ vmId: action.payload.vm.id })) // deep fetch and put to VM reducers
+    // deep fetch refresh the VM with any/all updates applied
+    yield put(actionSelectVmDetail({ vmId }))
   }
 
   if (action.meta && action.meta.correlationId) {
     yield put(setVmActionResult({
-      vmId: action.payload.vm.id,
+      vmId,
       correlationId: action.meta.correlationId,
       result: !commitError,
     }))
+  }
+
+  if (!commitError && action.payload.restartAfterEdit) {
+    yield put(actionRestartVm({ vmId })) // non-blocking restart
   }
 }
 
@@ -686,6 +714,15 @@ export function* fetchVmSessions ({ vmId }) {
 
   if (sessions && sessions['session']) {
     return Api.sessionsToInternal({ sessions })
+  }
+  return []
+}
+
+export function* fetchVmPermissions ({ vmId }) {
+  const permissions = yield callExternalAction('getVmPermissions', Api.getVmPermissions, { payload: { vmId } })
+
+  if (permissions && permissions['permission']) {
+    return Api.permissionsToInternal({ permissions: permissions.permission })
   }
   return []
 }
@@ -760,10 +797,14 @@ function mergeStorageDomains (storageDomainsInternal) {
 }
 
 function* fetchAllClusters (action) {
+  action.payload.additional = ['permissions.role']
   const clusters = yield callExternalAction('getAllClusters', Api.getAllClusters, action)
 
   if (clusters && clusters['cluster']) {
-    const clustersInternal = clusters.cluster.map(cluster => Api.clusterToInternal({ cluster }))
+    let clustersInternal = []
+    clustersInternal = clusters.cluster.map(cluster =>
+      Api.clusterToInternal({ cluster })
+    )
     yield put(setClusters(clustersInternal))
   }
 }
@@ -899,6 +940,15 @@ function* fetchAllNetworks () {
   }
 }
 
+function* fetchUserGroups () {
+  const groups = yield callExternalAction('groups', Api.groups, { payload: { userId: Selectors.getUserId() } })
+  if (groups && groups['group']) {
+    const groupsInternal = groups.group.map(group => group.id)
+    groupsInternal.push(EVERYONE_GROUP_ID)
+    yield put(setUserGroups({ groups: groupsInternal }))
+  }
+}
+
 function* delayedRemoveActiveRequest ({ payload: requestId }) {
   yield delay(500)
   yield put(removeActiveRequest(requestId))
@@ -983,6 +1033,7 @@ export function* rootSaga () {
     takeLatest(GET_ALL_OS, fetchAllOS),
     takeLatest(GET_ALL_HOSTS, fetchAllHosts),
     takeLatest(GET_ALL_VNIC_PROFILES, fetchAllVnicProfiles),
+    takeLatest(GET_USER_GROUPS, fetchUserGroups),
     throttle(100, GET_ISO_STORAGE_DOMAINS, fetchISOStorages),
 
     takeEvery(SELECT_VM_DETAIL, selectVmDetail),

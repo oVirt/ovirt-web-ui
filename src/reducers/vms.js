@@ -59,6 +59,8 @@ const vms = actionReducer(initialState, {
         updates[vm.id].sessions = state.getIn(['vms', vm.id, 'sessions'], EMPTY_ARRAY).toJS()
         updates[vm.id].snapshots = state.getIn(['vms', vm.id, 'snapshots'], EMPTY_ARRAY).toJS()
         updates[vm.id].statistics = state.getIn(['vms', vm.id, 'statistics'], EMPTY_MAP).toJS()
+        updates[vm.id].permissions = state.getIn(['vms', vm.id, 'permissions'], EMPTY_ARRAY).toJS()
+        updates[vm.id].canUserEditVm = state.getIn(['vms', vm.id, 'canUserEditVm'], false)
       }
     })
 

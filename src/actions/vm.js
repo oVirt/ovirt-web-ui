@@ -156,12 +156,17 @@ export function createVm ({ vm, transformInput = false, pushToDetailsOnSuccess =
   }
 }
 
-export function editVm ({ vm, transformInput = false }, { correlationId, ...additionalMeta }) {
+export function editVm (
+  { vm, transformInput = false, restartAfterEdit = false, nextRun = false },
+  { correlationId, ...additionalMeta }
+) {
   return {
     type: EDIT_VM,
     payload: {
       vm,
       transformInput,
+      restartAfterEdit,
+      nextRun,
     },
     meta: {
       correlationId,

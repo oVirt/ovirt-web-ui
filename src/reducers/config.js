@@ -9,6 +9,7 @@ import {
   SET_OVIRT_API_VERSION,
   SET_USB_FILTER,
   SET_USER_FILTER_PERMISSION,
+  SET_USER_GROUPS,
   SHOW_TOKEN_EXPIRED_MSG,
 } from '../constants'
 
@@ -28,6 +29,8 @@ const initialState = Immutable.fromJS({
   isFilterChecked: false,
   administrator: false,
   usbFilter: null,
+  blankTemplateId: '00000000-0000-0000-0000-000000000000', // "engine/api/" -> special_objects.blank_template.id
+  userGroups: [],
 })
 
 const config = actionReducer(initialState, {
@@ -57,6 +60,9 @@ const config = actionReducer(initialState, {
   },
   [SET_USB_FILTER] (state, { payload: { usbFilter } }) {
     return state.set('usbFilter', usbFilter)
+  },
+  [SET_USER_GROUPS] (state, { payload: { groups } }) {
+    return state.set('userGroups', groups)
   },
 }, true)
 

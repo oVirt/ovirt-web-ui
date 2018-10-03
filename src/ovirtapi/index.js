@@ -1,8 +1,8 @@
 // @flow
 import type {
-  CdRomType, ApiCdRomType,
-  SnapshotType, ApiSnapshotType,
+  CdRomType,
   NicType,
+  SnapshotType,
   VmType, ApiVmType,
 } from './types'
 
@@ -79,6 +79,8 @@ const OvirtApi = {
   snapshotToInternal: Transforms.Snapshot.toInternal,
   internalSnapshotToOvirt: Transforms.Snapshot.toApi,
 
+  permissionsToInternal: Transforms.Permissions.toInternal,
+
   //
   //
   // ---- API interaction functions
@@ -149,10 +151,21 @@ const OvirtApi = {
       (additional && additional.length > 0 ? `?follow=${additional.join(',')}` : '')
     return httpGet({ url })
   },
-  getAllClusters (): Promise<Object> {
+  getAllClusters ({ additional }: { additional: Array<string> }): Promise<Object> {
     assertLogin({ methodName: 'getAllClusters' })
-    const url = `${AppConfiguration.applicationContext}/api/clusters`
+    const url = `${AppConfiguration.applicationContext}/api/clusters` +
+      (additional && additional.length > 0 ? `?follow=${additional.join(',')}` : '')
     return httpGet({ url })
+  },
+  getClusterPermissions ({ clusterId }: { clusterId: string }): Promise<Object> {
+    assertLogin({ methodName: 'getClusterPermissions' })
+    const url = `${AppConfiguration.applicationContext}/api/clusters/${clusterId}/permissions?follow=role`
+    return httpGet({ url, custHeaders: { Filter: true } })
+  },
+  getVmPermissions ({ vmId }: VmIdType): Promise<Object> {
+    assertLogin({ methodName: 'getClusterPermissions' })
+    const url = `${AppConfiguration.applicationContext}/api/vms/${vmId}/permissions?follow=role`
+    return httpGet({ url, custHeaders: { Filter: true } })
   },
   getAllHosts (): Promise<Object> {
     assertLogin({ methodName: 'getAllHosts' })
@@ -175,13 +188,15 @@ const OvirtApi = {
       input,
     })
   },
-  editVm ({ vm, transformInput = false }: { vm: VmType | Object, transformInput: boolean }): Promise<Object> {
+  editVm ({ vm, nextRun = false, transformInput = false }: { vm: VmType | Object, nextRun: boolean, transformInput: boolean}): Promise<Object> {
     assertLogin({ methodName: 'editVm' })
     const input = JSON.stringify(transformInput ? OvirtApi.internalVmToOvirt({ vm }) : vm)
-    logger.log(`OvirtApi.editVm(): ${input}`)
+    logger.log(`OvirtApi.editVm(): ${input}`, 'nextRun?', nextRun)
+
+    const suffix = nextRun ? '?next_run=true' : ''
 
     return httpPut({
-      url: `${AppConfiguration.applicationContext}/api/vms/${vm.id}`,
+      url: `${AppConfiguration.applicationContext}/api/vms/${vm.id}${suffix}`,
       input,
     })
   },
@@ -245,13 +260,17 @@ const OvirtApi = {
     assertLogin({ methodName: 'snapshotNics' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots/${snapshotId}/nics` })
   },
-  snapshot ({ vmId, snapshotId }: { vmId: string, snapshotId: string }): Promise<ApiSnapshotType> {
+  snapshot ({ vmId, snapshotId }: { vmId: string, snapshotId: string }): Promise<Object> {
     assertLogin({ methodName: 'snapshot' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots/${snapshotId}` })
   },
   snapshots ({ vmId }: { vmId: string }): Promise<Object> {
     assertLogin({ methodName: 'snapshots' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots` })
+  },
+  groups ({ userId }: { userId: string }): Promise<Object> {
+    assertLogin({ methodName: 'groups' })
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/users/${userId}/groups` })
   },
   icon ({ id }: { id: string }): Promise<Object> {
     assertLogin({ methodName: 'icon' })
@@ -316,11 +335,11 @@ const OvirtApi = {
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/storagedomains/${storageId}/files` })
   },
 
-  getCdRom ({ vmId, current = true }: { vmId: string, current?: boolean }): Promise<ApiCdRomType> {
+  getCdRom ({ vmId, current = true }: { vmId: string, current?: boolean }): Promise<Object> {
     assertLogin({ methodName: 'getCdRom' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/cdroms/${zeroUUID}?current=${current ? 'true' : 'false'}` })
   },
-  changeCdRom ({ cdrom, vmId, current = true }: { cdrom: CdRomType, vmId: string, current?: boolean }): Promise<ApiCdRomType> {
+  changeCdRom ({ cdrom, vmId, current = true }: { cdrom: CdRomType, vmId: string, current?: boolean }): Promise<Object> {
     assertLogin({ methodName: 'changeCdRom' })
     const input = JSON.stringify(OvirtApi.internalCdRomToOvirt({ cdrom }))
     logger.log(`OvirtApi.changeCdRom(): ${input}`)

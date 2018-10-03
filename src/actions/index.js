@@ -4,11 +4,13 @@ import {
   GET_BY_PAGE,
   GET_OPTION,
   GET_USB_FILTER,
+  GET_USER_GROUPS,
   GET_VM,
   PERSIST_STATE,
   SET_ADMINISTRATOR,
   SET_USB_FILTER,
   SET_USER_FILTER_PERMISSION,
+  SET_USER_GROUPS,
   SHOW_TOKEN_EXPIRED_MSG,
   START_SCHEDULER_FIXED_DELAY,
   STOP_SCHEDULER_FIXED_DELAY,
@@ -136,5 +138,21 @@ export function getOption (optionName, version, defaultValue) {
       version,
       defaultValue,
     },
+  }
+}
+
+export function setUserGroups ({ groups }) {
+  return {
+    type: SET_USER_GROUPS,
+    payload: {
+      groups,
+    },
+  }
+}
+
+export function getUserGroups () {
+  return {
+    type: GET_USER_GROUPS,
+    payload: {},
   }
 }

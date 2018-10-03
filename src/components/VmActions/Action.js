@@ -12,7 +12,8 @@ class Action extends React.Component {
     this.handleClose = this.handleClose.bind(this)
   }
 
-  handleOpen () {
+  handleOpen (e) {
+    if (e && e.preventDefault) e.preventDefault()
     this.setState({ showModal: true })
   }
 

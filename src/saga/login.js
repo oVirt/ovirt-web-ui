@@ -31,6 +31,7 @@ import {
   getAllHosts,
   getAllOperatingSystems,
   getAllVnicProfiles,
+  getUserGroups,
   getIsoStorageDomains,
 
   downloadConsole,
@@ -186,6 +187,7 @@ function* autoConnectCheck () {
 }
 
 function* initialLoad () {
+  yield put(getUserGroups())
   yield put(getAllClusters()) // no shallow
   yield put(getAllHosts())
   yield put(getAllOperatingSystems())
