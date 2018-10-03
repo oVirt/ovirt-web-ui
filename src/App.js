@@ -35,7 +35,7 @@ const NoLogin = () => {
 
 /**
  * Main App component. Wrap the main react-router components together with
- * the various dialogs and error messages that may be neded.
+ * the various dialogs and error messages that may be needed.
  */
 const App = ({ history, config, appReady }) => {
   if (!config.get('loginToken')) { // login is missing

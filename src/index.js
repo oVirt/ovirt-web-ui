@@ -144,14 +144,14 @@ function onResourcesLoaded () {
 
   const store = configureStore()
   const rootTask = store.runSaga(rootSaga)
-  const sagaErrorBrigde = new SagaErrorBridge()
-  rootTask.done.catch(err => sagaErrorBrigde.throw(err))
+  const sagaErrorBridge = new SagaErrorBridge()
+  rootTask.done.catch(err => sagaErrorBridge.throw(err))
   Selectors.init({ store })
   initializeApiListener(store)
   loadPersistedState(store)
 
   // do initial render
-  renderApp(store, sagaErrorBrigde)
+  renderApp(store, sagaErrorBridge)
 
   const { token, username, domain, userId }: { token: string, username: string, domain: string, userId: string } = fetchToken()
   store.dispatch(setDomain({ domain }))
