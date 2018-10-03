@@ -7,8 +7,14 @@ class DeleteConfirmationModal extends React.Component {
   constructor (props) {
     super(props)
     this.state = { show: false }
+    this.handleTriggerClick = this.handleTriggerClick.bind(this)
     this.handleClose = this.handleClose.bind(this)
     this.handleDelete = this.handleDelete.bind(this)
+  }
+
+  handleTriggerClick (e) {
+    e.preventDefault()
+    this.setState({ show: true })
   }
 
   handleClose () {
@@ -17,8 +23,8 @@ class DeleteConfirmationModal extends React.Component {
   }
 
   handleDelete () {
-    this.props.onDelete()
     this.setState({ show: false })
+    this.props.onDelete()
   }
 
   render () {
@@ -34,7 +40,7 @@ class DeleteConfirmationModal extends React.Component {
 
     return (
       <React.Fragment>
-        {React.cloneElement(trigger, { onClick: () => this.setState({ show: true }), disabled })}
+        {React.cloneElement(trigger, { onClick: this.handleTriggerClick, disabled })}
         <MessageDialog
           id={id}
           show={this.state.show}
@@ -53,7 +59,6 @@ class DeleteConfirmationModal extends React.Component {
     )
   }
 }
-
 DeleteConfirmationModal.propTypes = {
   id: PropTypes.string.isRequired,
   trigger: PropTypes.node.isRequired,

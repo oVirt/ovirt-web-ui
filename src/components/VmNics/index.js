@@ -89,6 +89,7 @@ const VmNics = function ({ nics, vnicProfiles, onNicAdd, enableSettings, onNicDe
   })
   const nextNicName = nextNicId !== 0 ? `nic${nextNicId}` : 'nic1'
 
+  // TODO: filter this list just like for the NicEditor in the details card
   let renderedNics = nics.sort((a, b) => localeCompare(a.get('name'), b.get('name'))).map(nic => {
     const vnicProfile = vnicProfiles.get(nic.getIn(['vnicProfile', 'id']))
     return (<VmNic nic={nic} vnicProfile={vnicProfile} key={nic.get('id')} onDelete={onNicDelete} />)
@@ -103,7 +104,14 @@ const VmNics = function ({ nics, vnicProfiles, onNicAdd, enableSettings, onNicDe
       label={msg.nic()}
       labelTooltip={msg.nicsTooltip()}
       iconClassname='pficon pficon-container-node'
-      editor={<ExpandableList items={renderedNics} noItemsTitle={msg.noNics()} addItemComponent={nicsModal} idPrefix={idPrefix} />}
+      editor={
+        <ExpandableList
+          items={renderedNics}
+          noItemsTitle={msg.noNics()}
+          addItemComponent={nicsModal}
+          idPrefix={idPrefix}
+        />
+      }
       enableSettings={enableSettings}
     />
   )
