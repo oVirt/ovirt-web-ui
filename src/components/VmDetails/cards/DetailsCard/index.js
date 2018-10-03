@@ -257,12 +257,12 @@ class DetailsCard extends React.Component {
     this.props.onEditChange(true)
   }
 
-  handleChange (fieldName, value, workingVm = this.state.vm) {
+  handleChange (fieldName, value) {
     if (this.state.isEditing && !this.state.isDirty) {
       this.props.onEditChange(true, true)
     }
 
-    let updates = workingVm
+    let updates = this.state.vm
     const changeQueue = [{ fieldName, value }]
     for (let change = changeQueue.shift(); change; change = changeQueue.shift()) {
       console.log('processing change', change)
@@ -403,9 +403,11 @@ class DetailsCard extends React.Component {
 
     const { vm: stateVm } = this.state
     const correlationId = generateUnique('DetailsCard-save_')
-    const vmUpdates = { id: stateVm.get('id') } // partial VM, only include fields to update
 
-    // --- Add the fields that have been edited (internal format expected by editVm() saga) ---
+    // --- Create a partial VM (in the internal format expected by editVm() saga),
+    //     only including the fields that have been updated
+    const vmUpdates = { id: stateVm.get('id') }
+
     if (this.trackUpdates['cluster']) {
       vmUpdates['cluster'] = {
         id: stateVm.getIn([ 'cluster', 'id' ]),
@@ -451,7 +453,8 @@ class DetailsCard extends React.Component {
       }
     }
 
-    console.info('saving changes to VM', stateVm.get('id'), ', updates:', vmUpdates)
+    // ---- dispatch the save
+    console.info('saving changes to VM', vmUpdates.id, ', updates:', vmUpdates)
     this.setState({ correlationId })
     this.props.saveChanges(vmUpdates, this.restartAfterSave, !this.hotPlugNow, correlationId)
 
@@ -571,10 +574,10 @@ class DetailsCard extends React.Component {
                         <VmStatusIcon className={style['vm-status-icon']} state={vm.get('status')} />
                         <span className={style['vm-status-text']}>{enumMsg('VmStatus', vm.get('status'))}</span>
                       </div>
-                      {uptime && <div className={style['vm-uptime']}>(up {uptime})</div>}
+                      { uptime && <div className={style['vm-uptime']}>(up {uptime})</div> }
                     </FieldRow>
                     <FieldRow label={'Host'}>
-                      {hostName || <NotAvailable tooltip={msg.notAvailableUntilRunning()} id='hostname-not-available' />}
+                      { hostName || <NotAvailable tooltip={msg.notAvailableUntilRunning()} id='hostname-not-available' /> }
                     </FieldRow>
                     <FieldRow label={'IP Address'}>
                       <React.Fragment>
@@ -590,17 +593,17 @@ class DetailsCard extends React.Component {
                       </React.Fragment>
                     </FieldRow>
                     <FieldRow label={'FQDN'}>
-                      {fqdn || <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id='fqdn-not-available' />}
+                      { fqdn || <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id='fqdn-not-available' /> }
                     </FieldRow>
                     <FieldRow label={'Cluster'}>
-                      {!isEditing && clusterName}
-                      {isEditing && !canChangeCluster &&
+                      { !isEditing && clusterName }
+                      { isEditing && !canChangeCluster &&
                         <div>
                           {clusterName}
                           <FieldLevelHelp disabled={false} content='Cluster can only be changed when the VM is stopped.' inline />
                         </div>
                       }
-                      {isEditing && canChangeCluster &&
+                      { isEditing && canChangeCluster &&
                         <SelectBox
                           idPrefix='vm-cluster'
                           items={clusterList.filter(cluster => cluster.datacenter === dataCenterId)}
@@ -610,8 +613,8 @@ class DetailsCard extends React.Component {
                       }
                     </FieldRow>
                     <FieldRow label={'Data Center'}>
-                      {!isEditing && dataCenterName}
-                      {isEditing &&
+                      { !isEditing && dataCenterName }
+                      { isEditing &&
                         <div>
                           {dataCenterName}
                           <FieldLevelHelp disabled={false} content='Data Center cannot be changed directly. It correlates with the Cluster.' inline />
@@ -623,8 +626,8 @@ class DetailsCard extends React.Component {
                 <Col className={style['fields-column']}>
                   <Grid>
                     <FieldRow label={'Template'}>
-                      {!isEditing && templateName}
-                      {isEditing &&
+                      { !isEditing && templateName }
+                      { isEditing &&
                         <SelectBox
                           idPrefix='vm-template'
                           items={templateList}
@@ -634,14 +637,14 @@ class DetailsCard extends React.Component {
                       }
                     </FieldRow>
                     <FieldRow label={isEditing ? 'Change CD' : 'CD'}>
-                      {!isEditing && cdImageName}
-                      {isEditing && !canChangeCd && (
+                      { !isEditing && cdImageName }
+                      { isEditing && !canChangeCd &&
                         <div>
                           {cdImageName}
                           <FieldLevelHelp disabled={false} content='CD can only be changed when the VM is running' inline />
                         </div>
-                      )}
-                      {isEditing && canChangeCd && (
+                      }
+                      { isEditing && canChangeCd &&
                         <SelectBox
                           idPrefix='vm-cdrom'
                           items={[
@@ -654,7 +657,7 @@ class DetailsCard extends React.Component {
                           selected={cdImageId}
                           onChange={(selectedId) => { this.handleChange('cdrom', selectedId) }}
                         />
-                      )}
+                      }
                     </FieldRow>
                     <FieldRow label={'Clout-Init'}>
                       <div className={style['cloud-init-field']}>
@@ -662,20 +665,21 @@ class DetailsCard extends React.Component {
                         {couldInitEnabled ? 'On' : 'Off'}
                       </div>
                     </FieldRow>
-                    <FieldRow label={'Boot Menu'}>{
-                      isEditing ? (
+                    <FieldRow label={'Boot Menu'}>
+                      { isEditing &&
                         <Switch
                           bsSize='mini'
                           value={bootMenuEnabled}
                           onChange={(e, state) => { this.handleChange('bootMenuEnabled', state) }}
                         />
-                      ) : (
+                      }
+                      { !isEditing &&
                         <div className={style['boot-menu-field']}>
                           {bootMenuEnabled ? <Icon type='pf' name='on' /> : <Icon type='pf' name='off' />}
                           {bootMenuEnabled ? 'On' : 'Off'}
                         </div>
-                      )
-                    }</FieldRow>
+                      }
+                    </FieldRow>
                     <FieldRow label={'Console'}><ConsoleList vm={vm} /></FieldRow>
 
                     <FieldRow label={'Optimized For'}>
@@ -683,8 +687,8 @@ class DetailsCard extends React.Component {
                     </FieldRow>
 
                     <FieldRow label={'CPUs'}>
-                      {!isEditing && vCpuCount}
-                      {isEditing &&
+                      { !isEditing && vCpuCount }
+                      { isEditing &&
                         <div>
                           <FormControl
                             className={style['cpu-input']}
@@ -696,8 +700,8 @@ class DetailsCard extends React.Component {
                       }
                     </FieldRow>
                     <FieldRow label={'Memory'}>
-                      {!isEditing && `${round(memorySize)} ${memoryUnit}`}
-                      {isEditing &&
+                      { !isEditing && `${round(memorySize)} ${memoryUnit}` }
+                      { isEditing &&
                         <div>
                           <FormControl
                             className={style['memory-input']}
@@ -714,7 +718,7 @@ class DetailsCard extends React.Component {
               </Row>
             </Grid>
 
-            {correlatedMessages && correlatedMessages.size > 0 &&
+            { correlatedMessages && correlatedMessages.size > 0 &&
               correlatedMessages.map((message, key) =>
                 <Alert key={`user-message-${key}`} type='error' style={{ margin: '5px 0 0 0' }}>{message.get('message')}</Alert>
               )
