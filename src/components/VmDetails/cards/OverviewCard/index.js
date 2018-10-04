@@ -142,7 +142,6 @@ class OverviewCard extends React.Component {
     //     saveChanges will add the result of the operation to the vm under the given
     //     correlationId. So, when the vm prop changes, it can be checked and the edit
     //     mode controlled based on the result of the dispatch/saga/api call.
-    console.info('saving changes to VM', vmUpdates.id, ', updates:', vmUpdates)
     this.setState({ correlationId })
     this.props.saveChanges(vmUpdates, correlationId)
 
@@ -167,7 +166,9 @@ class OverviewCard extends React.Component {
         {({ isEditing }) => {
           return (
             <div>
-              <div className={`${sharedStyle['operating-system-label']} ${style['operating-system-label']}`}>{getOsHumanName(vm.getIn(['os', 'type']))}</div>
+              <div className={`${sharedStyle['operating-system-label']} ${style['operating-system-label']}`}>
+                {getOsHumanName(vm.getIn(['os', 'type']))}
+              </div>
 
               <Media>
                 <Media.Left>
@@ -208,7 +209,9 @@ class OverviewCard extends React.Component {
 
               { correlatedMessages && correlatedMessages.size > 0 &&
                 correlatedMessages.map((message, key) =>
-                  <Alert key={`user-message-${key}`} type='error' style={{ margin: '5px 0 0 0' }}>{message.get('message')}</Alert>
+                  <Alert key={`user-message-${key}`} type='error' style={{ margin: '5px 0 0 0' }}>
+                    {message.get('message')}
+                  </Alert>
                 )
               }
             </div>
