@@ -76,7 +76,7 @@ class VmUserMessages extends React.Component {
     return (
       <li className='dropdown'>
         <a className='dropdown-toggle nav-item-iconic' href='#' title={msg.messages()} onClick={hrefWithoutHistory(this.handleToggle)} id={`${idPrefix}-toggle`}>
-          <i className='fa fa-bell' />
+          <i className={`fa fa-bell ${style['usermessages-icon']}`} />
           {badgeElement}
           <span className='caret' id={`${idPrefix}-caret`} />
         </a>

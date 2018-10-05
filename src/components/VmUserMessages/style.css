@@ -3,3 +3,8 @@
     padding: 26px 0 0 0;
     background-color: #fff;
 }
+
+.usermessages-icon {
+    float: left;
+    padding-right: calc(4px + 3px); /* Got it from '.navbar-pf-vertical .nav .nav-item-iconic > .pficon-user' to make it more visual similar */
+}
