@@ -153,13 +153,20 @@ body {
   background: #fff;
 }
 
-.form-group.required .control-label:after {
-  content:"*";
-  color:red;
+.form-group.required .control-label:before {
+  content: "* ";
+  color: red;
 }
 
 a.disabled {
   color: #8b8d8f !important;
   cursor: not-allowed !important;
   text-decoration: none;
+}
+
+/* patch patternfly expand-collapse section header icon so any icons used will match spacing */
+.fields-section-header-pf .field-section-toggle-pf-icon {
+  cursor: pointer;
+  font-size: 14px;
+  width: 14px;
 }
