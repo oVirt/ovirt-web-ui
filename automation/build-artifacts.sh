@@ -9,13 +9,20 @@ else
 fi
 
 # Clean and then create the artifacts directory:
-pwd
 rm -rf exported-artifacts
 mkdir -p exported-artifacts
-ls -lart
 rm -rf tmp.repos
 rm -f ./*tar.gz
-ls -lart
+
+# Resolve the release version (is this a snapshot build?)
+version_release="$(grep -m1 VERSION_RELEASE configure.ac | cut -d ' ' -f2 | sed 's/[][)]//g')"
+if [[ "${version_release}" == "0" ]]; then
+    date="$(date --utc +%Y%m%d)"
+    commit="$(git log -1 --pretty=format:%h)"
+    version_release="0.${date}git${commit}"
+    # update configure.ac with this
+    sed -i -r "s/define\(\[VERSION_RELEASE\], \[0\]\)/define([VERSION_RELEASE], [${version_release}])/" configure.ac
+fi
 
 # The "build.packages.force" file contains BuildRequires packages
 # to be installed using their latest version.
