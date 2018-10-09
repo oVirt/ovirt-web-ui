@@ -32,14 +32,14 @@ const NIC_INTERFACES = [
   },
   {
     id: 'virtio',
-    value: enumMsg('NicInterface', 'VirtIO'),
+    value: enumMsg('NicInterface', 'virtio'),
   },
 ]
 const NIC_INTERFACE_DEFAULT = 'virtio'
 const NIC_INTERFACE_CANT_CHANGE = [ 'pci_passthrough' ]
 
-const LabelCol = ({ children, ...rest }) => {
-  return <Col componentClass={ControlLabel} {...rest}>
+const LabelCol = ({ children, ...props }) => {
+  return <Col componentClass={ControlLabel} {...props}>
     { children }
   </Col>
 }
@@ -256,14 +256,14 @@ class NicEditor extends Component {
                     defaultChecked={this.state.linked}
                     onChange={() => { this.changeLinked(true) }}
                   >
-                    Up <NicLinkStateIcon linkState idSuffix='up' showTooltip={false} />
+                    { msg.nicEditorLinkStateUp() } <NicLinkStateIcon linkState idSuffix='up' showTooltip={false} />
                   </Radio>
                   <Radio
                     name='nic-link-state-group'
                     defaultChecked={!this.state.linked}
                     onChange={() => { this.changeLinked(false) }}
                   >
-                    Down <NicLinkStateIcon idSuffix='down' showTooltip={false} />
+                    { msg.nicEditorLinkStateDown() } <NicLinkStateIcon idSuffix='down' showTooltip={false} />
                   </Radio>
                 </Col>
               </FormGroup>
