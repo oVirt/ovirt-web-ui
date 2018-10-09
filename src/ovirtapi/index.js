@@ -154,14 +154,12 @@ const OvirtApi = {
   getAllClusters ({ additional }: { additional: Array<string> }): Promise<Object> {
     assertLogin({ methodName: 'getAllClusters' })
 
-    let follow
+    let follow = 'network'
     if (additional && additional.length > 0) {
       if (!additional.includes('networks')) {
         additional.push('networks')
       }
       follow = additional.join(',')
-    } else {
-      follow = 'networks'
     }
 
     const url = `${AppConfiguration.applicationContext}/api/clusters?follow=${follow}`
