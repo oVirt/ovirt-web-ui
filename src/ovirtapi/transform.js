@@ -699,6 +699,7 @@ const Permissions = {
       name: permission.role.name,
       userId: permission.user && permission.user.id,
       groupId: permission.group && permission.group.id,
+      permits: permission.role.permits ? permission.role.permits.permit.map(permit => ({ name: permit.name })) : [],
     }))
   },
 

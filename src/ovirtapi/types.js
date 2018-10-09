@@ -134,6 +134,9 @@ export type VmSessionsType = Object
 export type ApiPermissionType = {
   role: {
     name: string,
+    permits: {
+      permit: Array<Object>
+    }
   },
   user?: {
     id: string
@@ -143,10 +146,15 @@ export type ApiPermissionType = {
   }
 }
 
+export type PermitsType = {
+  name: string
+}
+
 export type PermissionType = {
   name: string,
   userId?: string,
-  groupId?: string
+  groupId?: string,
+  permits: Array<PermitsType>
 }
 
 export type ApiCloudInitType = Object

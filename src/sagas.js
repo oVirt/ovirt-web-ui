@@ -146,7 +146,7 @@ const vmFetchAdditionalList =
     'nics',
     'snapshots',
     'statistics',
-    'permissions.role',
+    'permissions.role.permits',
   ]
 
 const EVERYONE_GROUP_ID = 'eee00000-0000-0000-0000-123456789eee'
@@ -805,7 +805,7 @@ function mergeStorageDomains (storageDomainsInternal) {
 }
 
 function* fetchAllClusters (action) {
-  action.payload.additional = ['permissions.role']
+  action.payload.additional = ['permissions.role.permits']
   const clusters = yield callExternalAction('getAllClusters', Api.getAllClusters, action)
 
   if (clusters && clusters['cluster']) {

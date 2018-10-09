@@ -2,7 +2,7 @@
 import Selectors from '../selectors'
 import type { ClusterType, PermissionType } from '../ovirtapi/types'
 
-function checkPermissions (allowedPermissions: Array<string>, permissions: Array<PermissionType>): boolean {
+function checkPermissions (permission: string, permissions: Array<PermissionType>): boolean {
   const userFilter = Selectors.getFilter()
   const userGroups = Selectors.getUserGroups()
   const userId = Selectors.getUserId()
@@ -14,32 +14,16 @@ function checkPermissions (allowedPermissions: Array<string>, permissions: Array
         (role.userId && role.userId === userId)
       )
     ) &&
-    allowedPermissions.includes(role.name)
+    role.permits.find((permit) => permit.name === permission) !== undefined
   )) !== undefined
 }
 
 export function canUserUseCluster (permissions: Array<PermissionType>): boolean {
-  const allowedPermissions = [
-    'VmCreator',
-    'PowerUserRole',
-    'ClusterAdmin',
-    'DataCenterAdmin',
-    'UserVmManager',
-    'UserVmRunTimeManager',
-    'SuperUser',
-  ]
-  return checkPermissions(allowedPermissions, permissions)
+  return checkPermissions('create_vm', permissions)
 }
 
 export function canUserEditVm (permissions: Array<PermissionType>): boolean {
-  const allowedPermissions = [
-    'ClusterAdmin',
-    'DataCenterAdmin',
-    'UserVmManager',
-    'UserVmRunTimeManager',
-    'SuperUser',
-  ]
-  return checkPermissions(allowedPermissions, permissions)
+  return checkPermissions('edit_vm_properties', permissions)
 }
 
 /*
