@@ -1,4 +1,5 @@
 make
 autoconf
 automake
+git
 yum
