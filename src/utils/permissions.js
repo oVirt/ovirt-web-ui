@@ -2,44 +2,16 @@
 import Selectors from '../selectors'
 import type { ClusterType, PermissionType } from '../ovirtapi/types'
 
-function checkPermissions (allowedPermissions: Array<string>, permissions: Array<PermissionType>): boolean {
-  const userFilter = Selectors.getFilter()
-  const userGroups = Selectors.getUserGroups()
-  const userId = Selectors.getUserId()
-
-  return permissions.find((role) => (
-    (userFilter ||
-      (
-        (role.groupId && userGroups.includes(role.groupId)) ||
-        (role.userId && role.userId === userId)
-      )
-    ) &&
-    allowedPermissions.includes(role.name)
-  )) !== undefined
+function checkUserPermit (permit: string, permits: Set<string>): boolean {
+  return permits.has(permit)
 }
 
-export function canUserUseCluster (permissions: Array<PermissionType>): boolean {
-  const allowedPermissions = [
-    'VmCreator',
-    'PowerUserRole',
-    'ClusterAdmin',
-    'DataCenterAdmin',
-    'UserVmManager',
-    'UserVmRunTimeManager',
-    'SuperUser',
-  ]
-  return checkPermissions(allowedPermissions, permissions)
+export function canUserUseCluster (permits: Set<string>): boolean {
+  return checkUserPermit('create_vm', permits)
 }
 
-export function canUserEditVm (permissions: Array<PermissionType>): boolean {
-  const allowedPermissions = [
-    'ClusterAdmin',
-    'DataCenterAdmin',
-    'UserVmManager',
-    'UserVmRunTimeManager',
-    'SuperUser',
-  ]
-  return checkPermissions(allowedPermissions, permissions)
+export function canUserEditVm (permits: Set<string>): boolean {
+  return checkUserPermit('edit_vm_properties', permits)
 }
 
 /*
@@ -48,4 +20,21 @@ export function canUserEditVm (permissions: Array<PermissionType>): boolean {
  */
 export function canUserUseAnyClusters (clusters: Array<ClusterType>): boolean {
   return clusters.find(cluster => cluster.get('canUserUseCluster')) !== undefined
+}
+
+export function getUserPermits (permissions: Array<PermissionType>): Set<string> {
+  const userFilter = Selectors.getFilter()
+  const userGroups = Selectors.getUserGroups()
+  const userId = Selectors.getUserId()
+  let permits = []
+  permissions.forEach((role) => {
+    if (userFilter ||
+      (
+        (role.groupId && userGroups.includes(role.groupId)) ||
+        (role.userId && role.userId === userId)
+      )) {
+      role.permits.map((permit) => permit.name).forEach((permit) => permits.push(permit))
+    }
+  })
+  return new Set(permits)
 }
