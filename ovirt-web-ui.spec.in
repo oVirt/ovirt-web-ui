@@ -20,8 +20,8 @@ Source0:        https://github.com/oVirt/ovirt-web-ui/archive/%{source_basename}
 BuildArch: noarch
 
 # Keep ovirt-engine-{nodejs|nodejs-modules|yarn} at particular version unless tested on higher
-BuildRequires: ovirt-engine-nodejs = 8.0.0
-BuildRequires: ovirt-engine-yarn = 1.7.0
+BuildRequires: ovirt-engine-nodejs >= 8.0.0
+BuildRequires: ovirt-engine-yarn >= 1.7.0
 
 BuildRequires: ovirt-engine-nodejs-modules >= 1.5.7
 
@@ -57,7 +57,7 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
-* Wed Sep 4 2018 Greg Sheremeta <gshereme@redhat.com> - 1.4.3-1
+* Wed Sep 5 2018 Greg Sheremeta <gshereme@redhat.com> - 1.4.3-1
   Fixed issues:
 - ux-redesign: make old Normal View the default when clicking a VM [#751](https://github.com/oVirt/ovirt-web-ui/issues/751)
 
