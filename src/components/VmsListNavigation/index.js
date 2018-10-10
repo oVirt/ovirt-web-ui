@@ -41,7 +41,7 @@ const VmsListNavigation = ({ selectedVm, vms, expanded, toggleExpansion, loadAno
 
       return (
         <li role='presentation' className={style['item']} key={vm.get('id')}>
-          <Link to={`/vm-legacy/${vm.get('id')}`} className={style['item-link']}>
+          <Link to={`/vm/${vm.get('id')}`} className={style['item-link']}>
             <span className={style['item-text']} id={`${idPrefix}-item-${vm.get('name')}`}>{vm.get('name')}</span>
           </Link>
         </li>
