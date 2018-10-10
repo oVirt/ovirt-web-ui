@@ -1,5 +1,5 @@
 import React from 'react'
-import PropsTypes from 'prop-types'
+import PropTypes from 'prop-types'
 import { MessageDialog, Icon } from 'patternfly-react'
 import { msg } from '../../intl'
 
@@ -22,9 +22,16 @@ class DeleteConfirmationModal extends React.Component {
   }
 
   render () {
-    const { children, trigger, disabled } = this.props
+    const { children, trigger, disabled, severity = 'normal' } = this.props
 
-    const icon = <Icon type='pf' name='warning-triangle-o' />
+    const primary = Array.isArray(children) ? children[0] : children
+    const secondary = Array.isArray(children) ? children.slice(1) : undefined
+
+    const icon = severity === 'normal'
+      ? <Icon type='pf' name='warning-triangle-o' />
+      : <Icon type='pf' name='error-circle-o' />
+    const primaryButtonStyle = severity === 'normal' ? 'primary' : 'danger'
+
     return (
       <React.Fragment>
         {React.cloneElement(trigger, { onClick: () => this.setState({ show: true }), disabled })}
@@ -33,11 +40,13 @@ class DeleteConfirmationModal extends React.Component {
           onHide={this.handleClose}
           primaryAction={this.handleDelete}
           secondaryAction={this.handleClose}
+          primaryActionButtonBsStyle={primaryButtonStyle}
           primaryActionButtonContent={msg.delete()}
           secondaryActionButtonContent={msg.cancel()}
           title={msg.confirmDelete()}
           icon={icon}
-          primaryContent={<p className='lead'>{ children }</p>}
+          primaryContent={<div className='lead'>{primary}</div>}
+          secondaryContent={secondary}
         />
       </React.Fragment>
     )
@@ -45,11 +54,12 @@ class DeleteConfirmationModal extends React.Component {
 }
 
 DeleteConfirmationModal.propTypes = {
-  trigger: PropsTypes.node.isRequired,
-  disabled: PropsTypes.bool,
-  children: PropsTypes.node.isRequired,
-  onDelete: PropsTypes.func.isRequired,
-  onClose: PropsTypes.func,
+  trigger: PropTypes.node.isRequired,
+  disabled: PropTypes.bool,
+  children: PropTypes.node.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onClose: PropTypes.func,
+  severity: PropTypes.oneOf([ 'normal', 'danger' ]),
 }
 
 export default DeleteConfirmationModal

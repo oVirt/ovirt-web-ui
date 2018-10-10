@@ -110,15 +110,14 @@ const SnapshotItem = ({ snapshot, vmId, isEditing, beingDeleted, onSnapshotDelet
       }
       onDelete={onSnapshotDelete}
     >
-      <span
+      <div
         dangerouslySetInnerHTML={{
           __html: msg.areYouSureYouWantToDeleteSnapshot({
             snapshotName: `"<strong>${escapeHtml(snapshot.get('description'))}</strong>"`,
           }),
         }}
       />
-      <br />
-      <span>{msg.thisOperationCantBeUndone()}</span>
+      <div>{msg.thisOperationCantBeUndone()}</div>
     </DeleteConfirmationModal>)
 
     // Status tooltip

@@ -52,17 +52,18 @@ class VmNic extends React.Component {
               text={text}
               container={null} />
           </span>
-          {
-            showSettings
-              ? (<DeleteConfirmationModal trigger={
+          { showSettings &&
+            <DeleteConfirmationModal
+              trigger={
                 <Button bsStyle='default' bsSize='small' disabled={isUp}>
                   {msg.delete()}
                 </Button>
-              } onDelete={this.handleDelete}>
-                <p dangerouslySetInnerHTML={{ __html: msg.areYouSureYouWantToDeleteNic({ nicName: `"<strong>${this.props.nic.get('name')}</strong>"` }) }} />
-                <p>{msg.thisOperationCantBeUndone()}</p>
-              </DeleteConfirmationModal>)
-              : null
+              }
+              onDelete={this.handleDelete}
+            >
+              <p dangerouslySetInnerHTML={{ __html: msg.areYouSureYouWantToDeleteNic({ nicName: `"<strong>${this.props.nic.get('name')}</strong>"` }) }} />
+              <p>{msg.thisOperationCantBeUndone()}</p>
+            </DeleteConfirmationModal>
           }
         </span>
       </li>
