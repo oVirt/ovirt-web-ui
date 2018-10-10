@@ -24,7 +24,7 @@ import NoLiveData from './NoLiveData'
  * as a sparkline. Sparkline vales to go from oldest far left to most current on far
  * right.
  */
-const CpuCharts = ({ cpuStats, isRunning }) => {
+const CpuCharts = ({ cpuStats, isRunning, id }) => {
   const cpuUsed = cpuStats['current.guest'].datum
   const cpuAvailable = 100 - cpuUsed
 
@@ -32,22 +32,22 @@ const CpuCharts = ({ cpuStats, isRunning }) => {
   const history = ((cpuStats['usage.history'] && cpuStats['usage.history'].datum) || []).reverse()
 
   return (
-    <UtilizationCard className={style['chart-card']}>
+    <UtilizationCard className={style['chart-card']} id={id}>
       <CardTitle>CPU</CardTitle>
       <CardBody>
-        { !isRunning && <NoLiveData /> }
+        { !isRunning && <NoLiveData id={`${id}-no-live-data`} /> }
         { isRunning &&
         <React.Fragment>
           <UtilizationCardDetails>
-            <UtilizationCardDetailsCount>{cpuAvailable}%</UtilizationCardDetailsCount>
+            <UtilizationCardDetailsCount id={`${id}-available`}>{cpuAvailable}%</UtilizationCardDetailsCount>
             <UtilizationCardDetailsDesc>
               <UtilizationCardDetailsLine1>Available</UtilizationCardDetailsLine1>
-              <UtilizationCardDetailsLine2>of 100%</UtilizationCardDetailsLine2>
+              <UtilizationCardDetailsLine2 id={`${id}-total`}>of 100%</UtilizationCardDetailsLine2>
             </UtilizationCardDetailsDesc>
           </UtilizationCardDetails>
 
           <DonutChart
-            id='donut-chart-cpu'
+            id={`${id}-donut-chart`}
             data={{
               columns: [
                 ['% Used', cpuUsed],
@@ -65,10 +65,10 @@ const CpuCharts = ({ cpuStats, isRunning }) => {
             }}
           />
 
-          { history.length === 0 && <NoHistoricData /> }
+          { history.length === 0 && <NoHistoricData id={`${id}-no-historic-data`} /> }
           { history.length > 0 &&
             <SparklineChart
-              id='line-chart-cpu'
+              id={`${id}-line-chart`}
               data={{
                 columns: [['%', ...history]],
                 type: 'area',
@@ -82,6 +82,7 @@ const CpuCharts = ({ cpuStats, isRunning }) => {
   )
 }
 CpuCharts.propTypes = {
+  id: PropTypes.string.isRequired,
   cpuStats: PropTypes.object.isRequired,
   isRunning: PropTypes.bool,
 }

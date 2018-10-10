@@ -30,7 +30,7 @@ class Button extends React.Component {
 
     return (
       <span className={style['full-button']}>
-        <a href='#' onClick={handleClick} className={`${className} ${style['link']}`} id={shortTitle}>
+        <a href='#' onClick={handleClick} className={`${className} ${style['link']}`} id={id}>
           <span data-toggle='tooltip' data-placement='left' title={tooltip} id={`${id}-title`}>
             {shortTitle}
           </span>

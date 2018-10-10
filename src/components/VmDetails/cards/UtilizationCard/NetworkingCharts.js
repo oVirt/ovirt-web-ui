@@ -27,7 +27,7 @@ import NoLiveData from './NoLiveData'
  * NOTE: This is a single % use value from the statistics pull. Could aggregate the
  *       statistics from the NICs to get different, finer grained details.
  */
-const NetworkingCharts = ({ netStats, isRunning }) => {
+const NetworkingCharts = ({ netStats, isRunning, id }) => {
   const haveNetworkStats = !!netStats['current.total']
 
   const used = (netStats['current.total'] && netStats['current.total'].datum) || 0
@@ -37,17 +37,17 @@ const NetworkingCharts = ({ netStats, isRunning }) => {
   const history = ((netStats['usage.history'] && netStats['usage.history'].datum) || []).reverse()
 
   return (
-    <UtilizationCard className={style['chart-card']}>
+    <UtilizationCard className={style['chart-card']} id={id}>
       <CardTitle>Networking</CardTitle>
       <CardBody>
-        { !isRunning && <NoLiveData /> }
+        { !isRunning && <NoLiveData id={`${id}-no-live-data`} /> }
         { isRunning && !haveNetworkStats &&
-          <NoLiveData message='Network utilization is not currently available for this VM.' />
+          <NoLiveData id={`${id}-no-live-data`} message='Network utilization is not currently available for this VM.' />
         }
         { isRunning && haveNetworkStats &&
         <React.Fragment>
           <UtilizationCardDetails>
-            <UtilizationCardDetailsCount>{available}%</UtilizationCardDetailsCount>
+            <UtilizationCardDetailsCount id={`${id}-available`}>{available}%</UtilizationCardDetailsCount>
             <UtilizationCardDetailsDesc>
               <UtilizationCardDetailsLine1>Available</UtilizationCardDetailsLine1>
               <UtilizationCardDetailsLine2>of 100%</UtilizationCardDetailsLine2>
@@ -55,7 +55,7 @@ const NetworkingCharts = ({ netStats, isRunning }) => {
           </UtilizationCardDetails>
 
           <DonutChart
-            id='donut-chart-network'
+            id={`${id}-donut-chart`}
             data={{
               columns: [
                 [`% Used`, used],
@@ -73,10 +73,10 @@ const NetworkingCharts = ({ netStats, isRunning }) => {
             }}
           />
 
-          { history.length === 0 && <NoHistoricData /> }
+          { history.length === 0 && <NoHistoricData id={`${id}-no-historic-data`} /> }
           { history.length > 0 &&
             <SparklineChart
-              id='line-chart-network'
+              id={`${id}-line-chart`}
               data={{
                 columns: [['%', ...history]],
                 type: 'area',
@@ -90,6 +90,7 @@ const NetworkingCharts = ({ netStats, isRunning }) => {
   )
 }
 NetworkingCharts.propTypes = {
+  id: PropTypes.string.isRequired,
   netStats: PropTypes.object.isRequired,
   isRunning: PropTypes.bool,
 }

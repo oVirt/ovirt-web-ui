@@ -67,7 +67,7 @@ class VmDropdownActions extends React.Component {
           id={id}
         >
           { actionsCopy.slice(1).map(action => <Action key={action.shortTitle} confirmation={action.confirmation}>
-            <MenuItem onClick={action.onClick}>
+            <MenuItem id={action.id} onClick={action.onClick}>
               {action.shortTitle}
             </MenuItem>
           </Action>) }
@@ -105,6 +105,7 @@ class VmActions extends React.Component {
     let {
       vm,
       pool,
+      idPrefix = `vmaction-${vm.get('name')}`,
       onStartVm,
       onStartPool,
       onShutdown,
@@ -139,7 +140,6 @@ class VmActions extends React.Component {
       confirm={{ title: msg.yes(), onClick: () => onRestart() }} />)
     const consoleConfirmation = (<ConsoleConfirmationModal vm={vm} />)
 
-    const idPrefix = `vmaction-${vm.get('name')}`
     const actions = [
       {
         priority: 0,
@@ -195,6 +195,7 @@ class VmActions extends React.Component {
       vm,
       pool,
       isOnCard = false,
+      idPrefix = `vmaction-${vm.get('name')}`,
       onRemove,
       location,
       isEditable,
@@ -203,16 +204,17 @@ class VmActions extends React.Component {
     const isPool = !!pool
     const status = vm.get('status')
 
-    const idPrefix = `vmaction-${vm.get('name')}`
     const actions = this.getDefaultActions()
+
+    idPrefix = `${idPrefix}-actions`
 
     // Actions for Card
     if (isOnCard) {
       let filteredActions = actions.filter((action) => !action.actionDisabled).sort((a, b) => a.priority < b.priority ? 1 : 0)
       filteredActions = filteredActions.length === 0 ? [ actions[0] ] : filteredActions
 
-      return <div className={`actions-line card-pf-items text-center ${style['action-height']}`}>
-        <VmDropdownActions id={`${idPrefix}-actions`} actions={filteredActions} />
+      return <div className={`actions-line card-pf-items text-center ${style['action-height']}`} id={idPrefix}>
+        <VmDropdownActions id={`${idPrefix}-dropdown`} actions={filteredActions} />
       </div>
     }
 
@@ -239,7 +241,7 @@ class VmActions extends React.Component {
       />)
 
     return (
-      <div className={`actions-line ${style['left-padding']}`}>
+      <div className={`actions-line ${style['left-padding']}`} id={idPrefix}>
         <EmptyAction state={status} isOnCard={isOnCard} />
 
         {actions.map(action => <ActionButtonWraper key={action.id} {...action} />)}
@@ -299,6 +301,7 @@ VmActions.propTypes = {
   pool: PropTypes.object,
   isOnCard: PropTypes.bool,
   isEditable: PropTypes.bool,
+  idPrefix: PropTypes.string,
 
   location: RouterPropTypeShapes.location.isRequired,
 

@@ -10,7 +10,7 @@ import ConsoleConfirmationModal from '../../../VmActions/ConsoleConfirmationModa
 import WindowsRdpButton from '../../../VmActions/WindowsRdpButton'
 import style from './style.css'
 
-const ConsoleList = ({ vm }) => {
+const ConsoleList = ({ vm, idPrefix }) => {
   const spiceConsole = vm.get('consoles').find(console => console.get('protocol') === 'spice')
   const vncConsole = vm.get('consoles').find(console => console.get('protocol') === 'vnc')
   const hasRdp = isWindows(vm.getIn(['os', 'type']))
@@ -18,9 +18,9 @@ const ConsoleList = ({ vm }) => {
   return !canConsole(vm.get('status'))
     ? (
       <div className={style['console-list-inactive']}>
-        { spiceConsole && <span className={style['console-link']}>SPICE</span> }
-        { vncConsole && <span className={style['console-link']}>VNC</span> }
-        { hasRdp && <span className={style['console-link']}>RDP</span> }
+        { spiceConsole && <span className={style['console-link']} id={`${idPrefix}-spice`}>SPICE</span> }
+        { vncConsole && <span className={style['console-link']} id={`${idPrefix}-vnc`}>VNC</span> }
+        { hasRdp && <span className={style['console-link']} id={`${idPrefix}-rdp`}>RDP</span> }
       </div>
     )
     : (
@@ -28,22 +28,23 @@ const ConsoleList = ({ vm }) => {
         { spiceConsole &&
           <span className={style['console-link']}>
             <Action confirmation={<ConsoleConfirmationModal vm={vm} consoleId={spiceConsole.get('id')} />}>
-              <a href='#'>SPICE</a>
+              <a href='#' id={`${idPrefix}-spice`}>SPICE</a>
             </Action>
           </span>
         }
         { vncConsole &&
           <span className={style['console-link']}>
             <Action confirmation={<ConsoleConfirmationModal vm={vm} consoleId={vncConsole.get('id')} />}>
-              <a href='#'>VNC</a>
+              <a href='#' id={`${idPrefix}-vnc`}>VNC</a>
             </Action>
           </span>
         }
-        { hasRdp && <WindowsRdpButton vm={vm} className={style['console-link']} /> }
+        { hasRdp && <WindowsRdpButton vm={vm} className={style['console-link']} id={`${idPrefix}-rdp`} /> }
       </div>
     )
 }
 ConsoleList.propTypes = {
+  idPrefix: PropTypes.string.isRequired,
   vm: PropTypes.object.isRequired,
 }
 

@@ -17,12 +17,13 @@ Grid.propTypes = {
   style: PropTypes.object,
 }
 
-const Row = ({ className = '', children, style, ...props }) => {
+const Row = ({ className = '', children, style, id }) => {
   const cn = `${styles['grid-row']} ${className}`
-  return <div className={cn} style={style}>{children}</div>
+  return <div className={cn} style={style} id={id}>{children}</div>
 }
 Row.propTypes = {
   children: PropTypes.node.isRequired,
+  id: PropTypes.string,
   className: PropTypes.string,
   style: PropTypes.object,
 }
@@ -39,6 +40,7 @@ const Col = ({ className = '', cols = -1, style, children, content = 'expand', .
       column-content={content}
       className={cn}
       style={{ ...col, ...style }}
+      {...props}
     >
       {children}
     </div>

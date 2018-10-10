@@ -89,6 +89,7 @@ class BaseCard extends React.Component {
       editMode = undefined,
       editable = true,
       editTooltip,
+      idPrefix = '',
     } = this.props
     const editing = editMode === undefined ? this.state.edit : editMode
     const hasHeading = !!title
@@ -97,10 +98,10 @@ class BaseCard extends React.Component {
 
     const RenderChildren = this.renderChildren
     return (
-      <Card className={style['base-card']} {...excludeKeys(this.props, this.propTypeKeys)}>
+      <Card className={style['base-card']} id={`${idPrefix}-card`} {...excludeKeys(this.props, this.propTypeKeys)}>
         {hasHeading && (
           <CardHeading className={style['base-card-heading']}>
-            {editable && <CardEditButton tooltip={editTooltip} editEnabled={editing} onClick={this.clickEdit} />}
+            {editable && <CardEditButton tooltip={editTooltip} editEnabled={editing} onClick={this.clickEdit} id={`${idPrefix}-button-edit`} />}
             <CardTitle>
               {hasIcon && <Icon type={icon.type} name={icon.name} className={style['base-card-title-icon']} />}
               {title}
@@ -111,7 +112,7 @@ class BaseCard extends React.Component {
 
         <CardBody className={style['base-card-body']}>
           {(!hasHeading && editable) && (
-            <CardEditButton tooltip={editTooltip} editEnabled={editing} onClick={this.clickEdit} />
+            <CardEditButton tooltip={editTooltip} editEnabled={editing} onClick={this.clickEdit} id={`${idPrefix}-button-edit`} />
           )}
 
           <RenderChildren isEditing={editing} />
@@ -119,8 +120,8 @@ class BaseCard extends React.Component {
 
         {editing && (
           <CardFooter className={style['base-card-footer']}>
-            <Button bsStyle='primary' onClick={this.clickSave}><Icon type='fa' name='check' /></Button>
-            <Button onClick={this.clickCancel}><Icon type='pf' name='close' /></Button>
+            <Button bsStyle='primary' onClick={this.clickSave} id={`${idPrefix}-button-save`}><Icon type='fa' name='check' /></Button>
+            <Button onClick={this.clickCancel} id={`${idPrefix}-button-cancel`}><Icon type='pf' name='close' /></Button>
           </CardFooter>
         )}
       </Card>
@@ -134,6 +135,7 @@ BaseCard.propTypes = {
     name: PropTypes.string.isRequired,
   }),
   itemCount: PropTypes.number,
+  idPrefix: PropTypes.string,
 
   editMode: PropTypes.bool,
   editable: PropTypes.bool,

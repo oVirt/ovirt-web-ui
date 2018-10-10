@@ -57,8 +57,7 @@ function isSnapshotDeleted (snapshotId, pendingTasks) {
   return !!pendingTasks.find(task => task.type === PendingTaskTypes.SNAPSHOT_REMOVAL && task.snapshotId === snapshotId)
 }
 
-const SnapshotItem = ({ snapshot, vmId, isEditing, beingDeleted, onSnapshotDelete }) => {
-  const idPrefix = `snapshot-${snapshot.get('id')}`
+const SnapshotItem = ({ snapshot, vmId, isEditing, id, beingDeleted, onSnapshotDelete }) => {
   let statusIcon = null
   let buttons = []
 
@@ -68,15 +67,15 @@ const SnapshotItem = ({ snapshot, vmId, isEditing, beingDeleted, onSnapshotDelet
     // Info popover
     buttons.push(<OverlayTrigger
       overlay={
-        <SnapshotDetail key='detail' snapshot={snapshot} vmId={vmId} restoreDisabled={isActionsDisabled} />
+        <SnapshotDetail key='detail' id={`${id}-info-popover`} snapshot={snapshot} vmId={vmId} restoreDisabled={isActionsDisabled} />
       }
       placement='left'
       trigger='click'
       rootClose
       key='info'
     >
-      <a id={`${idPrefix}-info`}>
-        <OverlayTrigger placement='left' overlay={<Tooltip id={`${idPrefix}-info-tt`}>{ msg.details() }</Tooltip>}>
+      <a id={`${id}-info`}>
+        <OverlayTrigger placement='left' overlay={<Tooltip id={`${id}-info-tt`}>{ msg.details() }</Tooltip>}>
           <Icon type='pf' name='info' />
         </OverlayTrigger>
       </a>
@@ -88,9 +87,10 @@ const SnapshotItem = ({ snapshot, vmId, isEditing, beingDeleted, onSnapshotDelet
       disabled={isActionsDisabled}
       snapshot={snapshot}
       vmId={vmId}
+      id={`${id}-restore-modal`}
       trigger={
-        <SnapshotAction key='restore' id={`${idPrefix}-restore`} >
-          <OverlayTrigger placement='left' overlay={<Tooltip id={`${idPrefix}-restore-tt`}>{ msg.snapshotRestore() }</Tooltip>}>
+        <SnapshotAction key='restore' id={`${id}-restore`} >
+          <OverlayTrigger placement='left' overlay={<Tooltip id={`${id}-restore-tt`}>{ msg.snapshotRestore() }</Tooltip>}>
             <Icon type='fa' name='play-circle' />
           </OverlayTrigger>
         </SnapshotAction>
@@ -101,9 +101,10 @@ const SnapshotItem = ({ snapshot, vmId, isEditing, beingDeleted, onSnapshotDelet
     buttons.push(<DeleteConfirmationModal
       key='delete'
       disabled={isActionsDisabled}
+      id={`${id}-delete-modal`}
       trigger={
-        <SnapshotAction key='delete' id={`${idPrefix}-delete`}>
-          <OverlayTrigger placement='left' overlay={<Tooltip id={`${idPrefix}-delete-tt`}>{ msg.snapshotDelete() }</Tooltip>}>
+        <SnapshotAction key='delete' id={`${id}-delete`}>
+          <OverlayTrigger placement='left' overlay={<Tooltip id={`${id}-delete-tt`}>{ msg.snapshotDelete() }</Tooltip>}>
             <Icon type='pf' name='delete' />
           </OverlayTrigger>
         </SnapshotAction>
@@ -121,7 +122,7 @@ const SnapshotItem = ({ snapshot, vmId, isEditing, beingDeleted, onSnapshotDelet
     </DeleteConfirmationModal>)
 
     // Status tooltip
-    const tooltipId = `${snapshot.get('id')}_${snapshot.get('status')}`
+    const tooltipId = `${id}-status-icon-${snapshot.get('status')}`
     switch (snapshot.get('status')) {
       case 'locked':
         statusIcon = <StatusTooltip icon={<Icon type='pf' name='locked' />} text={msg.locked()} id={tooltipId} />
@@ -136,19 +137,20 @@ const SnapshotItem = ({ snapshot, vmId, isEditing, beingDeleted, onSnapshotDelet
   }
 
   return (
-    <div className={style['snapshot-item']}>
-      <span className={style['snapshot-item-status']}>{statusIcon}</span>
-      <span className={style['snapshot-item-name']}>
+    <div className={style['snapshot-item']} id={id}>
+      <span className={style['snapshot-item-status']} id={`${id}-status-icon`}>{statusIcon}</span>
+      <span className={style['snapshot-item-name']} id={`${id}-description`}>
         {getMinimizedString(snapshot.get('description'), MAX_DESCRIPTION_SIZE)}
-        <span className={style['snapshot-item-time']}>{`(${formatDateFromNow(snapshot.get('date'))})`}</span>
+        <span className={style['snapshot-item-time']} id={`${id}-time`}>{`(${formatDateFromNow(snapshot.get('date'))})`}</span>
       </span>
-      <span className={style['snapshot-item-actions']}>{ buttons }</span>
+      <span className={style['snapshot-item-actions']} id={`${id}-actions`}>{ buttons }</span>
     </div>
   )
 }
 SnapshotItem.propTypes = {
   snapshot: PropTypes.object.isRequired,
   vmId: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired,
   isEditing: PropTypes.bool,
   beingDeleted: PropTypes.bool,
   onSnapshotDelete: PropTypes.func.isRequired,

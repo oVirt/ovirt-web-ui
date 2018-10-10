@@ -79,7 +79,7 @@ class OptionsDialog extends React.Component {
     }
     return (
       <React.Fragment>
-        <a href='#' onClick={this.handleModalOpen}>{msg.options()}</a>
+        <a id='usermenu-options' href='#' onClick={this.handleModalOpen}>{msg.options()}</a>
         { this.state.openModal &&
           <Modal onHide={() => this.setState({ openModal: false })} show>
             <Modal.Header>

@@ -30,7 +30,7 @@ import NoLiveData from './NoLiveData'
  *       will be available. In future, it may be nice to show the extra detail. The
  *       currently used data should work for VMs with and without the guest agent.
  */
-const MemoryCharts = ({ memoryStats, isRunning }) => {
+const MemoryCharts = ({ memoryStats, isRunning, id }) => {
   const { unit, value } =
     convertValueMap(
       'B',
@@ -45,22 +45,22 @@ const MemoryCharts = ({ memoryStats, isRunning }) => {
   const history = ((memoryStats['usage.history'] && memoryStats['usage.history'].datum) || []).reverse()
 
   return (
-    <UtilizationCard className={style['chart-card']}>
+    <UtilizationCard className={style['chart-card']} id={id}>
       <CardTitle>Memory</CardTitle>
       <CardBody>
-        { !isRunning && <NoLiveData /> }
+        { !isRunning && <NoLiveData id={`${id}-no-live-data`} /> }
         { isRunning &&
         <React.Fragment>
           <UtilizationCardDetails>
-            <UtilizationCardDetailsCount>{round(memory.available, 0)}</UtilizationCardDetailsCount>
+            <UtilizationCardDetailsCount id={`${id}-available`}>{round(memory.available, 0)}</UtilizationCardDetailsCount>
             <UtilizationCardDetailsDesc>
               <UtilizationCardDetailsLine1>Available</UtilizationCardDetailsLine1>
-              <UtilizationCardDetailsLine2>of {round(memory.total, 0)} {unit}</UtilizationCardDetailsLine2>
+              <UtilizationCardDetailsLine2 id={`${id}-total`}>of {round(memory.total, 0)} {unit}</UtilizationCardDetailsLine2>
             </UtilizationCardDetailsDesc>
           </UtilizationCardDetails>
 
           <DonutChart
-            id='donut-chart-memory'
+            id={`${id}-donut-chart`}
             data={{
               columns: [
                 [`${unit} Used`, memory.used],
@@ -81,7 +81,7 @@ const MemoryCharts = ({ memoryStats, isRunning }) => {
           { history.length === 0 && <NoHistoricData /> }
           { history.length > 0 &&
             <SparklineChart
-              id='line-chart-memory'
+              id={`${id}-line-chart`}
               data={{
                 columns: [
                   ['%', ...history],
@@ -97,6 +97,7 @@ const MemoryCharts = ({ memoryStats, isRunning }) => {
   )
 }
 MemoryCharts.propTypes = {
+  id: PropTypes.string.isRequired,
   memoryStats: PropTypes.object.isRequired,
   isRunning: PropTypes.bool,
 }

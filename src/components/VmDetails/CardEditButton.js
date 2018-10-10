@@ -37,14 +37,14 @@ class CardEditButton extends React.Component {
   }
 
   render () {
-    const { tooltip } = this.props
+    const { tooltip, id } = this.props
     const { editEnabled } = this.state
 
     const classes = `${style['card-edit-button']} ${style[editEnabled ? 'card-edit-button-enabled' : 'card-edit-button-disabled']}`
     const myClick = editEnabled ? noop : this.enableEditHandler
 
     return (
-      <a title={tooltip} onClick={(e) => { e.preventDefault(); myClick() }} className={classes}>
+      <a title={tooltip} onClick={(e) => { e.preventDefault(); myClick() }} className={classes} id={id}>
         <Icon type='pf' name='edit' />
       </a>
     )
@@ -53,6 +53,7 @@ class CardEditButton extends React.Component {
 CardEditButton.propTypes = {
   tooltip: PropTypes.string,
   editEnabled: PropTypes.bool,
+  id: PropTypes.string.isRequired,
   onClick: PropTypes.func,
 }
 CardEditButton.defaultProps = {

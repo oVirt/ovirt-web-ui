@@ -32,7 +32,7 @@ const DisksCard = ({ vm, onEditChange }) => {
     })
     .toJS()
 
-  console.info('disksList', disksList)
+  const idPrefix = 'vmdetail-disks'
 
   return (
     <BaseCard
@@ -40,6 +40,7 @@ const DisksCard = ({ vm, onEditChange }) => {
       title='Disks'
       editTooltip={`Edit Disks for ${vm.get('id')}`}
       editable={false}
+      idPrefix={idPrefix}
       itemCount={disksList.length}
       onStartEdit={() => { onEditChange(true) }}
       onCancel={() => { onEditChange(false) }}
@@ -47,17 +48,17 @@ const DisksCard = ({ vm, onEditChange }) => {
     >
       {({ isEditing }) => <React.Fragment>
         { disksList.length === 0 &&
-          <div className={style['no-disks']}>{msg.noDisks()}</div>
+          <div className={style['no-disks']} id={`${idPrefix}-no-disks`}>{msg.noDisks()}</div>
         }
         { disksList.length > 0 &&
         <Grid classname={style['disks-container']}>
-          {disksList.map(disk =>
-            <Row key={disk.id}>
+          {disksList.map((disk, index) =>
+            <Row key={disk.id} id={`${idPrefix}-${disk.name}-${index}`}>
               <Col>
                 <div>
-                  <span>{disk.name}</span>
-                  <span className={style['size-info']}>({disk.size.value} {disk.size.unit})</span>
-                  { disk.bootable && <Label bsStyle='info' className={style['bootable-label']}>bootable</Label> }
+                  <span id={`${idPrefix}-${disk.name}-${index}-name`}>{disk.name}</span>
+                  <span className={style['size-info']} id={`${idPrefix}-${disk.name}-${index}-info`}>({disk.size.value} {disk.size.unit})</span>
+                  { disk.bootable && <Label bsStyle='info' className={style['bootable-label']} id={`${idPrefix}-${disk.name}-${index}-bootable`}>bootable</Label> }
                 </div>
               </Col>
             </Row>
