@@ -12,17 +12,11 @@ const NextRunChangeConfirmationModal = ({ show, onCancel, onSave, onSaveAndResta
   return <MessageDialog
     show={show}
     onHide={onCancel}
-    title='Configuration Change on Restart'
+    title={msg.nextRunConfirmTitle()}
     icon={<Icon type='pf' name='warning-triangle-o' />}
 
-    primaryContent={<div className='lead'>
-      Some Configuration Changes Will Be Applied on Restart
-    </div>}
-    secondaryContent={<div>
-      Some configuration changes will not be able to take effect until the
-      Virtual Machine is restarted next.  A power cycle needs to take place to
-      pick up this new configuration.
-    </div>}
+    primaryContent={<div className='lead'>{msg.nextRunConfirmContent()}</div>}
+    secondaryContent={<div>{msg.nextRunConfirmContentDetail()}</div>}
 
     accessibleName='prompt-next-run'
     accessibleDescription='next-run-configuration-change-will-be-applied-on-restart'
@@ -31,8 +25,10 @@ const NextRunChangeConfirmationModal = ({ show, onCancel, onSave, onSaveAndResta
     primaryActionButtonContent=''
     footer={<React.Fragment>
       <Button onClick={onCancel}>{msg.cancel()}</Button>
-      <Button onClick={onSave}>Save Changes</Button>
-      <Button bsStyle='primary' onClick={onSaveAndRestart}>Save Changes and Restart</Button>
+      <Button onClick={onSave}>{msg.nextRunConfirmActionSave()}</Button>
+      <Button bsStyle='primary' onClick={onSaveAndRestart}>
+        {msg.nextRunConfrimActionSaveRestart()}
+      </Button>
     </React.Fragment>}
   />
 }

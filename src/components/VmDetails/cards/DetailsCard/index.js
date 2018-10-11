@@ -25,13 +25,14 @@ import {
   FormControl,
   Icon,
   OverlayTrigger,
-  Switch,
   Tooltip,
 } from 'patternfly-react'
-import VmStatusIcon from '../../../VmStatusIcon'
+import Switch from '../../../Switch'
 import SelectBox from '../../../SelectBox'
-import { Grid, Row, Col } from '../../GridComponents'
+import VmStatusIcon from '../../../VmStatusIcon'
 import BaseCard from '../../BaseCard'
+import { Grid, Row, Col } from '../../GridComponents'
+
 import style from './style.css'
 
 import ConsoleList from './ConsoleList'
@@ -454,7 +455,6 @@ class DetailsCard extends React.Component {
     }
 
     // ---- dispatch the save
-    console.info('saving changes to VM', vmUpdates.id, ', updates:', vmUpdates)
     this.setState({ correlationId })
     this.props.saveChanges(vmUpdates, this.restartAfterSave, !this.hotPlugNow, correlationId)
 
@@ -555,10 +555,10 @@ class DetailsCard extends React.Component {
         onApplyNow={this.handleHotPlugOnApplyNow}
       />
       <BaseCard
-        title='Details'
+        title={msg.cardTitleDetails()}
         editable={canEditDetails}
         editMode={isEditing}
-        editTooltip={`Edit details for ${vm.get('id')}`}
+        editTooltip={msg.cardTooltipEditDetails({ vmId: vm.get('id') })}
         onStartEdit={this.handleCardOnStartEdit}
         onCancel={this.handleCardOnCancel}
         onSave={this.handleCardOnSave}
@@ -569,17 +569,17 @@ class DetailsCard extends React.Component {
               <Row>
                 <Col className={style['fields-column']}>
                   <Grid>
-                    <FieldRow label={'Status'}>
+                    <FieldRow label={msg.status()}>
                       <div className={style['vm-status']}>
                         <VmStatusIcon className={style['vm-status-icon']} state={vm.get('status')} />
                         <span className={style['vm-status-text']}>{enumMsg('VmStatus', vm.get('status'))}</span>
                       </div>
                       { uptime && <div className={style['vm-uptime']}>(up {uptime})</div> }
                     </FieldRow>
-                    <FieldRow label={'Host'}>
+                    <FieldRow label={msg.host()}>
                       { hostName || <NotAvailable tooltip={msg.notAvailableUntilRunning()} id='hostname-not-available' /> }
                     </FieldRow>
-                    <FieldRow label={'IP Address'}>
+                    <FieldRow label={msg.ipAddress()}>
                       <React.Fragment>
                         { ip4Addresses.length === 0 && ip6Addresses.length === 0 &&
                           <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id='ip-addresses-not-available' />
@@ -592,15 +592,15 @@ class DetailsCard extends React.Component {
                         }
                       </React.Fragment>
                     </FieldRow>
-                    <FieldRow label={'FQDN'}>
+                    <FieldRow label={msg.fqdn()}>
                       { fqdn || <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id='fqdn-not-available' /> }
                     </FieldRow>
-                    <FieldRow label={'Cluster'}>
+                    <FieldRow label={msg.cluster()}>
                       { !isEditing && clusterName }
                       { isEditing && !canChangeCluster &&
                         <div>
                           {clusterName}
-                          <FieldLevelHelp disabled={false} content='Cluster can only be changed when the VM is stopped.' inline />
+                          <FieldLevelHelp disabled={false} content={msg.clusterCanOnlyChangeWhenVmStopped()} inline />
                         </div>
                       }
                       { isEditing && canChangeCluster &&
@@ -612,12 +612,12 @@ class DetailsCard extends React.Component {
                         />
                       }
                     </FieldRow>
-                    <FieldRow label={'Data Center'}>
+                    <FieldRow label={msg.dataCenter()}>
                       { !isEditing && dataCenterName }
                       { isEditing &&
                         <div>
                           {dataCenterName}
-                          <FieldLevelHelp disabled={false} content='Data Center cannot be changed directly. It correlates with the Cluster.' inline />
+                          <FieldLevelHelp disabled={false} content={msg.dataCenterChangesWithCluster()} inline />
                         </div>
                       }
                     </FieldRow>
@@ -625,7 +625,7 @@ class DetailsCard extends React.Component {
                 </Col>
                 <Col className={style['fields-column']}>
                   <Grid>
-                    <FieldRow label={'Template'}>
+                    <FieldRow label={msg.template()}>
                       { !isEditing && templateName }
                       { isEditing &&
                         <SelectBox
@@ -636,12 +636,12 @@ class DetailsCard extends React.Component {
                         />
                       }
                     </FieldRow>
-                    <FieldRow label={isEditing ? 'Change CD' : 'CD'}>
+                    <FieldRow label={isEditing ? msg.changeCd() : msg.cd()}>
                       { !isEditing && cdImageName }
                       { isEditing && !canChangeCd &&
                         <div>
                           {cdImageName}
-                          <FieldLevelHelp disabled={false} content='CD can only be changed when the VM is running' inline />
+                          <FieldLevelHelp disabled={false} content={msg.cdCanOnlyChangeWhenVmRunning()} inline />
                         </div>
                       }
                       { isEditing && canChangeCd &&
@@ -659,13 +659,13 @@ class DetailsCard extends React.Component {
                         />
                       }
                     </FieldRow>
-                    <FieldRow label={'Clout-Init'}>
+                    <FieldRow label={msg.cloudInit()}>
                       <div className={style['cloud-init-field']}>
                         {couldInitEnabled ? <Icon type='pf' name='on' /> : <Icon type='pf' name='off' />}
-                        {couldInitEnabled ? 'On' : 'Off'}
+                        {enumMsg('Switch', couldInitEnabled ? 'on' : 'off')}
                       </div>
                     </FieldRow>
-                    <FieldRow label={'Boot Menu'}>
+                    <FieldRow label={msg.bootMenu()}>
                       { isEditing &&
                         <Switch
                           bsSize='mini'
@@ -676,17 +676,17 @@ class DetailsCard extends React.Component {
                       { !isEditing &&
                         <div className={style['boot-menu-field']}>
                           {bootMenuEnabled ? <Icon type='pf' name='on' /> : <Icon type='pf' name='off' />}
-                          {bootMenuEnabled ? 'On' : 'Off'}
+                          {enumMsg('Switch', bootMenuEnabled ? 'on' : 'off')}
                         </div>
                       }
                     </FieldRow>
-                    <FieldRow label={'Console'}><ConsoleList vm={vm} /></FieldRow>
+                    <FieldRow label={msg.console()}><ConsoleList vm={vm} /></FieldRow>
 
-                    <FieldRow label={'Optimized For'}>
+                    <FieldRow label={msg.optimizedFor()}>
                       {optimizedFor}
                     </FieldRow>
 
-                    <FieldRow label={'CPUs'}>
+                    <FieldRow label={msg.cpus()}>
                       { !isEditing && vCpuCount }
                       { isEditing &&
                         <div>
@@ -699,7 +699,7 @@ class DetailsCard extends React.Component {
                         </div>
                       }
                     </FieldRow>
-                    <FieldRow label={'Memory'}>
+                    <FieldRow label={msg.memory()}>
                       { !isEditing && `${round(memorySize)} ${memoryUnit}` }
                       { isEditing &&
                         <div>

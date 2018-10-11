@@ -12,16 +12,11 @@ const HotPlugChangeConfirmationModal = ({ show, onCancel, onApplyLater, onApplyN
   return <MessageDialog
     show={show}
     onHide={onCancel}
-    title='Apply Changes'
+    title={msg.hotPlugConfirmTitle()}
     icon={<Icon type='pf' name='warning-triangle-o' />}
 
-    primaryContent={<div className='lead'>
-      Apply Changes Now with Hot Plug
-    </div>}
-    secondaryContent={<div>
-      Applying the changes to CPU and/or Memory can be done right now but it requires
-      doing a hot plug.  You can choose to apply these changes after a restart instead.
-    </div>}
+    primaryContent={<div className='lead'>{msg.hotPlugConfirmContent()}</div>}
+    secondaryContent={<div>{msg.hotPlugConfirmContentDetail()}</div>}
 
     accessibleName='prompt-hot-plug'
     accessibleDescription='hot-plug-configuration-change-will-be-applied-now'
@@ -30,8 +25,8 @@ const HotPlugChangeConfirmationModal = ({ show, onCancel, onApplyLater, onApplyN
     primaryActionButtonContent=''
     footer={<React.Fragment>
       <Button onClick={onCancel}>{msg.cancel()}</Button>
-      <Button onClick={onApplyLater}>Apply after Restart</Button>
-      <Button bsStyle='primary' onClick={onApplyNow}>Apply Changes Now</Button>
+      <Button onClick={onApplyLater}>{msg.hotPlugConfirmApplyAfterRestart()}</Button>
+      <Button bsStyle='primary' onClick={onApplyNow}>{msg.hotPlugConfirmApplyNow()}</Button>
     </React.Fragment>}
   />
 }
