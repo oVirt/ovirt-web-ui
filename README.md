@@ -29,11 +29,9 @@ or [Issues](https://github.com/oVirt/ovirt-web-ui/issues) GitHub sections.
 
 Upcoming milestones:
 
-### [v1.4.2](https://github.com/oVirt/ovirt-web-ui/milestone/11)
+### [v1.4.4](https://github.com/oVirt/ovirt-web-ui/milestone/13)
 Highlights:
- - VM listing (main landing page) redesign!
- - new PatternFly notifications
- - snapshots support
+ - Enhanced error handling
  - bug fixes
 
 
