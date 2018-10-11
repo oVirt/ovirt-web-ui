@@ -35,6 +35,7 @@ import {
 import OvirtApi from './ovirtapi'
 
 import App from './App'
+import GlobalErrorBoundary from './GlobalErrorBoundary'
 
 // Patternfly dependencies
 // jQuery needs to be globally available (webpack.ProvidePlugin can be also used for this)
@@ -45,13 +46,16 @@ window.patternfly = require('patternfly/dist/js/patternfly')
 window.selectpicker = require('bootstrap-select/js/bootstrap-select.js')
 window.combobox = require('patternfly-bootstrap-combobox/js/bootstrap-combobox.js')
 
-function renderApp (store: Object) {
+function renderApp (store: Object, errorBridge: Object) {
   ReactDOM.render(
-    <Provider store={store}>
-      <IntlProvider locale={locale} messages={getSelectedMessages()}>
-        <App history={store.history} />
-      </IntlProvider>
-    </Provider>,
+    <GlobalErrorBoundary errorBridge={errorBridge}>
+      <Provider store={store}>
+        <IntlProvider locale={locale} messages={getSelectedMessages()}>
+          <App history={store.history} />
+        </IntlProvider>
+      </Provider>
+    </GlobalErrorBoundary>,
+
     (document.getElementById('root'): any)
   )
 }
@@ -120,19 +124,34 @@ function initializeApiListener (store: Object) {
   })
 }
 
+function SagaErrorBridge () {
+  let handler = null
+  this.setErrorHandler = (errorHandler) => {
+    handler = errorHandler
+  }
+
+  this.throw = (err) => {
+    if (handler !== null) {
+      handler(err)
+    }
+  }
+}
+
 function onResourcesLoaded () {
   logger.log(`Current configuration: ${JSON.stringify(AppConfiguration)}`)
 
   addBrandedResources()
 
   const store = configureStore()
-  store.runSaga(rootSaga)
+  const rootTask = store.runSaga(rootSaga)
+  const sagaErrorBridge = new SagaErrorBridge()
+  rootTask.done.catch(err => sagaErrorBridge.throw(err))
   Selectors.init({ store })
   initializeApiListener(store)
   loadPersistedState(store)
 
   // do initial render
-  renderApp(store)
+  renderApp(store, sagaErrorBridge)
 
   const { token, username, domain, userId }: { token: string, username: string, domain: string, userId: string } = fetchToken()
   store.dispatch(setDomain({ domain }))
