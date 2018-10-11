@@ -61,9 +61,9 @@ const App = ({ history, config, appReady }) => {
 }
 App.propTypes = {
   history: PropTypes.object.isRequired,
-
   config: PropTypes.object.isRequired,
   appReady: PropTypes.bool.isRequired,
+
 }
 
 export default connect(

@@ -57,6 +57,10 @@ body {
  *         gets shorter or a scrollbar is added to the page
  */
 
+.navbar {
+  min-height: 62px;
+}
+
 .navbar-pf-vertical {
   flex-shrink: 0;
 }
