@@ -66,6 +66,7 @@ import {
   stopSchedulerFixedDelay,
   getVmCdRom,
   changeVmCdRom as actionChangeVmCdRom,
+  restartVm as actionRestartVm,
 } from './actions'
 
 import {
@@ -640,6 +641,7 @@ export function* createVm (action) {
  */
 export function* editVm (action) {
   const { payload: { vm } } = action
+  const vmId = action.payload.vm.id
 
   const editVmResult = yield callExternalAction('editVm', Api.editVm, action)
 
@@ -647,25 +649,30 @@ export function* editVm (action) {
   if (!commitError && vm.cdrom) {
     const isUp = editVmResult && editVmResult.status === 'up'
     const changeCdResult = yield changeVmCdRom(actionChangeVmCdRom({
-      vmId: vm.id,
+      vmId,
       cdrom: vm.cdrom,
       current: isUp,
-      updateRedux: false,
+      updateRedux: false, // the 'actionSelectVmDetail' will fetch the cd-rom update
     }))
 
     commitError = changeCdResult.error
   }
 
   if (!commitError) {
-    yield put(actionSelectVmDetail({ vmId: action.payload.vm.id })) // deep fetch and put to VM reducers
+    // deep fetch refresh the VM with any/all updates applied
+    yield put(actionSelectVmDetail({ vmId }))
   }
 
   if (action.meta && action.meta.correlationId) {
     yield put(setVmActionResult({
-      vmId: action.payload.vm.id,
+      vmId,
       correlationId: action.meta.correlationId,
       result: !commitError,
     }))
+  }
+
+  if (!commitError && action.payload.restartAfterEdit) {
+    yield put(actionRestartVm({ vmId })) // non-blocking restart
   }
 }
 
