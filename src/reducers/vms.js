@@ -18,6 +18,7 @@ import {
   SET_VM_SESSIONS,
   SET_VM_SNAPSHOTS,
   UPDATE_POOLS,
+  UPDATE_VM_SNAPSHOT,
   UPDATE_VMPOOLS_COUNT,
   UPDATE_VM_DISK,
   UPDATE_VMS,
@@ -109,6 +110,22 @@ const vms = actionReducer(initialState, {
   [SET_VM_SNAPSHOTS] (state, { payload: { vmId, snapshots } }) {
     if (state.getIn(['vms', vmId])) {
       return state.setIn(['vms', vmId, 'snapshots'], Immutable.fromJS(snapshots)) // deep immutable
+    }
+
+    logger.error(`vms.setVmSnapshots() reducer: vmId ${vmId} not found`)
+    return state
+  },
+  [UPDATE_VM_SNAPSHOT] (state, { payload: { vmId, snapshot } }) {
+    if (state.getIn(['vms', vmId])) {
+      const snapshotForUpdate = state.getIn(['vms', vmId, 'snapshots']).findIndex((s) => s.get('id') === snapshot.id)
+      if (snapshotForUpdate > -1) {
+        return state.updateIn(['vms', vmId, 'snapshots', snapshotForUpdate], (s) => s
+          .set('description', snapshot.description)
+          .set('type', snapshot.type)
+          .set('status', snapshot.status)
+          .set('persistMemoryState', snapshot.persistMemoryState)) // deep immutable
+      }
+      return state
     }
 
     logger.error(`vms.setVmSnapshots() reducer: vmId ${vmId} not found`)
