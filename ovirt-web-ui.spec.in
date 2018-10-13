@@ -57,6 +57,9 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Sat Oct 13 2018 Greg Sheremeta <gshereme@redhat.com> - 1.4.4-2
+- respin (1.4.4-1 had incorrect sources)
+
 * Thu Oct 11 2018 Greg Sheremeta <gshereme@redhat.com> - 1.4.4-1
   Fixed issues:
 - Fix use of VmNics in VmDetail such that Nic operations work again [BZ1631149](https://bugzilla.redhat.com/show_bug.cgi?id=1631149)
