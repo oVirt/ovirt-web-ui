@@ -19,7 +19,7 @@ If you install oVirt 4.1+ using dnf, VM Portal will automatically be included. Y
 
 You can also run it standalone and connect to any oVirt 4.0+ setup using docker by running:
 
-    docker run --rm -it -e ENGINE_URL=https://[ENGINE.FQDN]/ovirt-engine -p 3000:3000 mareklibra/ovirt-web-ui
+    docker run --rm -it -e ENGINE_URL=https://[ENGINE.FQDN]/ovirt-engine -p 3000:3000 ovirtwebui/ovirt-web-ui
 
 and access the VM Portal at [http://localhost:3000](http://localhost:3000)
 
@@ -70,20 +70,20 @@ The latest ovirt-web-ui RPM can be found in the [Copr build system](https://copr
 
 ### Quick run using Docker
 
-A prebuilt docker image `mareklibra/ovirt-web-ui` is available for standalone usage
+A prebuilt docker image `ovirtwebui/ovirt-web-ui` is available for standalone usage
 **with a running oVirt engine instance**.
 
 Just specify where your oVirt engine is running, using one of the following examples:
 
   - **Latest released version** (see [Releases](https://github.com/oVirt/ovirt-web-ui/releases)):
 
-    `docker run --rm -it -e ENGINE_URL=https://[OVIRT.ENGINE.FQDN]/ovirt-engine/ -p 3000:3000 mareklibra/ovirt-web-ui:latest`
+    `docker run --rm -it -e ENGINE_URL=https://[OVIRT.ENGINE.FQDN]/ovirt-engine/ -p 3000:3000 ovirtwebui/ovirt-web-ui:latest`
 
   - **Most recent image**, built from master branch:
 
-    `docker rmi mareklibra/ovirt-web-ui:master`
+    `docker rmi ovirtwebui/ovirt-web-ui:master`
 
-    `docker run --rm -it -e ENGINE_URL=https://[OVIRT.ENGINE.FQDN]/ovirt-engine/ -p 3000:3000 mareklibra/ovirt-web-ui:master`
+    `docker run --rm -it -e ENGINE_URL=https://[OVIRT.ENGINE.FQDN]/ovirt-engine/ -p 3000:3000 ovirtwebui/ovirt-web-ui:master`
 
 
 Wait until the application is ready:
