@@ -135,7 +135,9 @@ export type ApiPermissionType = {
   role: {
     name: string,
     permits: {
-      permit: Array<Object>
+      permit: Array<{
+        name: string
+      }>
     }
   },
   user?: {
@@ -146,15 +148,13 @@ export type ApiPermissionType = {
   }
 }
 
-export type PermitsType = {
-  name: string
-}
-
 export type PermissionType = {
   name: string,
   userId?: string,
   groupId?: string,
-  permits: Array<PermitsType>
+  permits: Array<{
+    name: string
+  }>
 }
 
 export type ApiCloudInitType = Object

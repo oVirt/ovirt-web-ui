@@ -135,7 +135,7 @@ import {
   SUSPEND_VM,
 } from './constants'
 
-import { canUserEditVm } from './utils'
+import { canUserEditVm, getUserPermits } from './utils'
 
 const vmFetchAdditionalList =
   [
@@ -388,7 +388,7 @@ export function* fetchSingleVm (action) {
     }
 
     if (isOvirtGTE42 && !shallowFetch && !Selectors.getFilter()) {
-      internalVm.permissions = yield fetchVmPermissions({ vmId: internalVm.id })
+      internalVm.permits = getUserPermits(yield fetchVmPermissions({ vmId: internalVm.id }))
     }
 
     if (!isOvirtGTE42 && !shallowFetch) {
@@ -397,8 +397,8 @@ export function* fetchSingleVm (action) {
       internalVm.disks = yield fetchVmDisks({ vmId: internalVm.id })
       internalVm.nics = yield fetchVmNics({ vmId: internalVm.id })
       internalVm.sessions = yield fetchVmSessions({ vmId: internalVm.id })
-      internalVm.permissions = yield fetchVmPermissions({ vmId: internalVm.id })
-      internalVm.canUserEditVm = canUserEditVm(internalVm.permissions)
+      internalVm.permits = getUserPermits(yield fetchVmPermissions({ vmId: internalVm.id }))
+      internalVm.canUserEditVm = canUserEditVm(internalVm.permits)
       // TODO: Support <4.2 for snapshots?
       // TODO: Support <4.2 for statistics?
     }
