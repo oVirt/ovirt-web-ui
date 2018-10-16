@@ -122,7 +122,7 @@ const VM = {
       cdrom: {},
       sessions: [],
       nics: [],
-      permits: [],
+      permits: new Set(),
       canUserEditVm: false,
       display: {
         smartcardEnabled: vm.display && vm.display.smartcard_enabled && convertBool(vm.display.smartcard_enabled),
@@ -482,8 +482,7 @@ const Cluster = {
   toInternal ({ cluster }: { cluster: ApiClusterType }): ClusterType {
     const permits = cluster.permissions && cluster.permissions.permission
       ? getUserPermits(Permissions.toInternal({ permissions: cluster.permissions.permission }))
-      : []
-
+      : new Set()
     const c: Object = {
       id: cluster.id,
       name: cluster.name,

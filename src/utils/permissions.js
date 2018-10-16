@@ -2,15 +2,15 @@
 import Selectors from '../selectors'
 import type { ClusterType, PermissionType } from '../ovirtapi/types'
 
-function checkUserPermit (permit: string, permits: Array<string>): boolean {
-  return permits.includes(permit)
+function checkUserPermit (permit: string, permits: Set<string>): boolean {
+  return permits.has(permit)
 }
 
-export function canUserUseCluster (permits: Array<string>): boolean {
+export function canUserUseCluster (permits: Set<string>): boolean {
   return checkUserPermit('create_vm', permits)
 }
 
-export function canUserEditVm (permits: Array<string>): boolean {
+export function canUserEditVm (permits: Set<string>): boolean {
   return checkUserPermit('edit_vm_properties', permits)
 }
 
@@ -22,7 +22,7 @@ export function canUserUseAnyClusters (clusters: Array<ClusterType>): boolean {
   return clusters.find(cluster => cluster.get('canUserUseCluster')) !== undefined
 }
 
-export function getUserPermits (permissions: Array<PermissionType>): Array<string> {
+export function getUserPermits (permissions: Array<PermissionType>): Set<string> {
   const userFilter = Selectors.getFilter()
   const userGroups = Selectors.getUserGroups()
   const userId = Selectors.getUserId()
@@ -36,5 +36,5 @@ export function getUserPermits (permissions: Array<PermissionType>): Array<strin
       permits = [...permits, ...role.permits.map((permit) => permit.name)]
     }
   })
-  return permits
+  return new Set(permits)
 }
