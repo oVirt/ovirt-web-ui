@@ -33,14 +33,22 @@ class VmDisk extends React.PureComponent {
   }
 
   render () {
-    const idPrefix = `vmdisk-${this.props.disk.get('name')}`
-    const bootable = this.props.disk.get('bootable') ? (<span className={'label label-info ' + style['smaller']} id={`${idPrefix}-bootable`}>Bootable</span>) : ''
-    const inactive = this.props.disk.get('active') ? '' : (<span className={'label label-info ' + style['smaller']} id={`${idPrefix}-inactive`}>Inactive</span>)
+    const { disk, edit, beingDeleted } = this.props
 
-    const provSize = userFormatOfBytes(this.props.disk.get('provisionedSize'))
-    const actSize = userFormatOfBytes(this.props.disk.get('actualSize'), provSize.suffix)
+    const idPrefix = `vmdisk-${disk.get('name')}`
+    const bootable = disk.get('bootable') ? (<span className={'label label-info ' + style['smaller']} id={`${idPrefix}-bootable`}>Bootable</span>) : ''
+    const inactive = disk.get('active') ? '' : (<span className={'label label-info ' + style['smaller']} id={`${idPrefix}-inactive`}>Inactive</span>)
 
-    const capacityInfoContent = (
+    const isLun = disk.get('type') === 'lun'
+    const lunSize = userFormatOfBytes(disk.get('lunSize'))
+    const provSize = userFormatOfBytes(disk.get('provisionedSize'))
+    const actSize = userFormatOfBytes(disk.get('actualSize'), provSize.suffix)
+
+    const capacityInfoContent = isLun ? (
+      <div id={`${idPrefix}-capacity-info`}>
+        Size: {lunSize.str}
+      </div>
+    ) : (
       <div id={`${idPrefix}-capacity-info`}>
         Used: {actSize.str}
         <br />
@@ -48,19 +56,24 @@ class VmDisk extends React.PureComponent {
       </div>
     )
 
-    const text = (
+    const text = isLun ? (
+      <span className={style['light']} id={`${idPrefix}-capacity`}>
+        ({lunSize.str})
+      </span>
+    ) : (
       <span className={style['light']} id={`${idPrefix}-capacity`}>
         ({actSize.rounded}/{provSize.str} used)
       </span>
     )
 
-    const capacityInfo = (<FieldHelp
+    const capacityInfo = <FieldHelp
       title={msg.diskCapacity()}
       content={capacityInfoContent}
       text={text}
-      container={null} />)
+      container={null}
+    />
 
-    const deleteButton = this.props.edit && !this.props.beingDeleted && (
+    const deleteButton = edit && !beingDeleted && (
       <button className='btn btn-default' onClick={this.onDeleteButton}>{msg.delete()}</button>
     )
 
@@ -76,7 +89,7 @@ class VmDisk extends React.PureComponent {
           <Modal.Title>{msg.confirmDelete()}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p dangerouslySetInnerHTML={{ __html: msg.areYouSureYouWantToDeleteDisk({ diskName: `"<strong>${this.props.disk.get('name')}</strong>"` }) }} />
+          <p dangerouslySetInnerHTML={{ __html: msg.areYouSureYouWantToDeleteDisk({ diskName: `"<strong>${disk.get('name')}</strong>"` }) }} />
           <p>{msg.thisOperationCantBeUndone()}</p>
         </Modal.Body>
         <Modal.Footer>
@@ -86,9 +99,7 @@ class VmDisk extends React.PureComponent {
       </Modal>
     )
 
-    const name = this.props.beingDeleted
-      ? (<del>{this.props.disk.get('name')}</del>)
-      : this.props.disk.get('name')
+    const name = beingDeleted ? (<del>{disk.get('name')}</del>) : disk.get('name')
 
     return (
       <li>

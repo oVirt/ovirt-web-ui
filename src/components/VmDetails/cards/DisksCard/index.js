@@ -19,7 +19,8 @@ import style from './style.css'
 const DisksCard = ({ vm, onEditChange }) => {
   const disksList = sortDisksForDisplay(vm.get('disks'))
     .map(disk => {
-      const { unit, value } = convertValue('B', disk.get('provisionedSize'))
+      const size = disk.get('type') === 'lun' ? disk.get('lunSize') : disk.get('provisionedSize')
+      const { unit, value } = convertValue('B', size)
       return {
         id: disk.get('id'),
         name: disk.get('name'),
