@@ -135,7 +135,7 @@ import {
   SUSPEND_VM,
 } from './constants'
 
-import { canUserEditVm, getUserPermits, canUserUseCluster } from './utils'
+import { canUserEditVm, getUserPermits, canUserUseCluster, canUserUseVnicProfile } from './utils'
 
 const vmFetchAdditionalList =
   [
@@ -152,6 +152,7 @@ const vmFetchAdditionalList =
 const EVERYONE_GROUP_ID = 'eee00000-0000-0000-0000-123456789eee'
 
 const CLUSTER_TYPE = 'Cluster'
+const VNIC_PROFILE_TYPE = 'VnicProfile'
 
 /**
  * Compare the current oVirt version (held in redux) to the given version.
@@ -946,7 +947,16 @@ function* fetchUSBFilter (action) {
 function* fetchAllVnicProfiles (action) {
   const vnicProfiles = yield callExternalAction('getAllVnicProfiles', Api.getAllVnicProfiles, action)
   if (vnicProfiles && vnicProfiles['vnic_profile']) {
-    const vnicProfilesInternal = vnicProfiles.vnic_profile.map(vnicProfile => Api.vnicProfileToInternal({ vnicProfile }))
+    // Temporary solution, till bug will be fixed https://bugzilla.redhat.com/show_bug.cgi?id=1639784
+    const vnicProfilesInternal = (yield all(
+      vnicProfiles.vnic_profile
+        .map(function* (vnicProfile) {
+          const vnicProfileInternal = Api.vnicProfileToInternal({ vnicProfile })
+          vnicProfileInternal.permits = yield fetchPermits({ entityType: VNIC_PROFILE_TYPE, id: vnicProfile.id })
+          vnicProfileInternal.canUserUseProfile = canUserUseVnicProfile(vnicProfileInternal.permits)
+          return vnicProfileInternal
+        })
+    ))
     yield put(setVnicProfiles({ vnicProfiles: vnicProfilesInternal }))
     if (!compareVersionToCurrent({ major: 4, minor: 2 })) {
       yield fetchAllNetworks()

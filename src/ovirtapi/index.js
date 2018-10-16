@@ -170,6 +170,11 @@ const OvirtApi = {
     const url = `${AppConfiguration.applicationContext}/api/clusters/${id}/permissions?follow=role.permits`
     return httpGet({ url, custHeaders: { Filter: true } })
   },
+  getVnicProfilePermissions ({ id }: { id: string }): Promise<Object> {
+    assertLogin({ methodName: 'getVnicProfilePermissions' })
+    const url = `${AppConfiguration.applicationContext}/api/vnicprofiles/${id}/permissions?follow=role.permits`
+    return httpGet({ url, custHeaders: { Filter: true } })
+  },
   getVmPermissions ({ vmId }: VmIdType): Promise<Object> {
     assertLogin({ methodName: 'getClusterPermissions' })
     const url = `${AppConfiguration.applicationContext}/api/vms/${vmId}/permissions?follow=role`
@@ -456,7 +461,7 @@ const OvirtApi = {
 
   getAllVnicProfiles (): Promise<Object> {
     assertLogin({ methodName: 'getVnicProfiles' })
-    return httpGet({ url: `${AppConfiguration.applicationContext}/api/vnicprofiles?follow=network` })
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/vnicprofiles?follow=network,permissions.role.permits` })
   },
 
   getVmsNic ({ vmId }: { vmId: string }): Promise<Object> {

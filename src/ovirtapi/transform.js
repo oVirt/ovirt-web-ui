@@ -25,7 +25,7 @@ import type {
   ApiPermissionType, PermissionType,
 } from './types'
 
-import { canUserUseCluster, canUserEditVm, getUserPermits } from '../utils'
+import { canUserUseCluster, canUserEditVm, getUserPermits, canUserUseVnicProfile } from '../utils'
 
 function vCpusCount ({ cpu }: { cpu: Object }): number {
   if (cpu && cpu.topology) {
@@ -571,11 +571,21 @@ const VNicProfile = {
       network: {
         id: vnicProfile.network.id,
         name: vnicProfile.network.name,
+        dataCenterId: vnicProfile.network.data_center && vnicProfile.network.data_center.id,
       },
+      canUserUseProfile: false,
+      permits: new Set(),
     }
 
     if (vnicProfile.network.name) {
       vnicProfileInternal.network.name = vnicProfile.network.name
+    }
+
+    if (vnicProfile.permissions && vnicProfile.permissions.permission) {
+      vnicProfileInternal.permits = getUserPermits(Permissions.toInternal({
+        permissions: vnicProfile.permissions.permission,
+      }))
+      vnicProfileInternal.canUserUseProfile = canUserUseVnicProfile(vnicProfileInternal.permits)
     }
 
     return vnicProfileInternal
