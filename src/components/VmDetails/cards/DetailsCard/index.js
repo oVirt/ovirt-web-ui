@@ -121,13 +121,14 @@ function rephraseVmType (vmType) {
 /*
  * Render a label plus children as a single grid row with 2 columns.
  */
-const FieldRow = ({ label, children }) => (
+const FieldRow = ({ label, children, id }) => (
   <Row className={style['field-row']}>
     <Col cols={5} className={style['col-label']}>{label}</Col>
-    <Col cols={7} className={style['col-data']}>{children}</Col>
+    <Col cols={7} className={style['col-data']} id={id}>{children}</Col>
   </Row>
 )
 FieldRow.propTypes = {
+  id: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
 }
@@ -501,6 +502,8 @@ class DetailsCard extends React.Component {
     const { hosts, clusters, dataCenters, templates } = this.props
     const { vm, isEditing, correlatedMessages, clusterList, isoList, templateList } = this.state
 
+    const idPrefix = 'vmdetail-details'
+
     const canEditDetails =
       vm.get('canUserEditVm') &&
       vm.getIn(['pool', 'id']) === undefined
@@ -558,6 +561,7 @@ class DetailsCard extends React.Component {
         title={msg.cardTitleDetails()}
         editable={canEditDetails}
         editMode={isEditing}
+        idPrefix={idPrefix}
         editTooltip={msg.cardTooltipEditDetails({ vmId: vm.get('id') })}
         onStartEdit={this.handleCardOnStartEdit}
         onCancel={this.handleCardOnCancel}
@@ -569,33 +573,33 @@ class DetailsCard extends React.Component {
               <Row>
                 <Col className={style['fields-column']}>
                   <Grid>
-                    <FieldRow label={msg.status()}>
+                    <FieldRow label={msg.status()} id={`${idPrefix}-status`}>
                       <div className={style['vm-status']}>
                         <VmStatusIcon className={style['vm-status-icon']} state={vm.get('status')} />
                         <span className={style['vm-status-text']}>{enumMsg('VmStatus', vm.get('status'))}</span>
                       </div>
-                      { uptime && <div className={style['vm-uptime']}>(up {uptime})</div> }
+                      { uptime && <div className={style['vm-uptime']} id={`${idPrefix}-uptime`}>(up {uptime})</div> }
                     </FieldRow>
-                    <FieldRow label={msg.host()}>
-                      { hostName || <NotAvailable tooltip={msg.notAvailableUntilRunning()} id='hostname-not-available' /> }
+                    <FieldRow label={msg.host()} id={`${idPrefix}-host`}>
+                      { hostName || <NotAvailable tooltip={msg.notAvailableUntilRunning()} id={`${idPrefix}-host-not-available`} /> }
                     </FieldRow>
-                    <FieldRow label={msg.ipAddress()}>
+                    <FieldRow label={msg.ipAddress()} id={`${idPrefix}-ip`}>
                       <React.Fragment>
                         { ip4Addresses.length === 0 && ip6Addresses.length === 0 &&
-                          <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id='ip-addresses-not-available' />
+                          <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id={`${idPrefix}-ip-not-available`} />
                         }
                         { ip4Addresses.length > 0 &&
-                          ip4Addresses.map((ip4, index) => <div key={`ip4-${index}`}>{ip4}</div>)
+                          ip4Addresses.map((ip4, index) => <div key={`ip4-${index}`} id={`${idPrefix}-ip-ipv4-${index}`}>{ip4}</div>)
                         }
                         { ip6Addresses.length > 0 &&
-                          ip6Addresses.map((ip4, index) => <div key={`ip4-${index}`}>{ip4}</div>)
+                          ip6Addresses.map((ip4, index) => <div key={`ip4-${index}`} id={`${idPrefix}-ip-ipv6-${index}`}>{ip4}</div>)
                         }
                       </React.Fragment>
                     </FieldRow>
-                    <FieldRow label={msg.fqdn()}>
-                      { fqdn || <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id='fqdn-not-available' /> }
+                    <FieldRow label={msg.fqdn()} id={`${idPrefix}-fqdn`}>
+                      { fqdn || <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id={`${idPrefix}-fqdn-not-available`} /> }
                     </FieldRow>
-                    <FieldRow label={msg.cluster()}>
+                    <FieldRow label={msg.cluster()} id={`${idPrefix}-cluster`}>
                       { !isEditing && clusterName }
                       { isEditing && !canChangeCluster &&
                         <div>
@@ -605,14 +609,14 @@ class DetailsCard extends React.Component {
                       }
                       { isEditing && canChangeCluster &&
                         <SelectBox
-                          idPrefix='vm-cluster'
+                          id={`${idPrefix}-cluster-edit`}
                           items={clusterList.filter(cluster => cluster.datacenter === dataCenterId)}
                           selected={clusterId}
                           onChange={(selectedId) => { this.handleChange('cluster', selectedId) }}
                         />
                       }
                     </FieldRow>
-                    <FieldRow label={msg.dataCenter()}>
+                    <FieldRow label={msg.dataCenter()} id={`${idPrefix}-data-center`}>
                       { !isEditing && dataCenterName }
                       { isEditing &&
                         <div>
@@ -625,18 +629,18 @@ class DetailsCard extends React.Component {
                 </Col>
                 <Col className={style['fields-column']}>
                   <Grid>
-                    <FieldRow label={msg.template()}>
+                    <FieldRow label={msg.template()} id={`${idPrefix}-template`}>
                       { !isEditing && templateName }
                       { isEditing &&
                         <SelectBox
-                          idPrefix='vm-template'
+                          id={`${idPrefix}-template-edit`}
                           items={templateList}
                           selected={templateId}
                           onChange={(selectedId) => { this.handleChange('template', selectedId) }}
                         />
                       }
                     </FieldRow>
-                    <FieldRow label={isEditing ? msg.changeCd() : msg.cd()}>
+                    <FieldRow label={isEditing ? msg.changeCd() : msg.cd()} id={`${idPrefix}-cdrom`}>
                       { !isEditing && cdImageName }
                       { isEditing && !canChangeCd &&
                         <div>
@@ -646,7 +650,7 @@ class DetailsCard extends React.Component {
                       }
                       { isEditing && canChangeCd &&
                         <SelectBox
-                          idPrefix='vm-cdrom'
+                          id={`${idPrefix}-cd-edit`}
                           items={[
                             { id: '', value: `[${msg.empty()}]` },
                             ...isoList.map(isoFile => ({
@@ -659,15 +663,16 @@ class DetailsCard extends React.Component {
                         />
                       }
                     </FieldRow>
-                    <FieldRow label={msg.cloudInit()}>
+                    <FieldRow label={msg.cloudInit()} id={`${idPrefix}-cloud-init`}>
                       <div className={style['cloud-init-field']}>
                         {couldInitEnabled ? <Icon type='pf' name='on' /> : <Icon type='pf' name='off' />}
                         {enumMsg('Switch', couldInitEnabled ? 'on' : 'off')}
                       </div>
                     </FieldRow>
-                    <FieldRow label={msg.bootMenu()}>
+                    <FieldRow label={msg.bootMenu()} id={`${idPrefix}-boot-menu`}>
                       { isEditing &&
                         <Switch
+                          id={`${idPrefix}-boot-menu-edit`}
                           bsSize='mini'
                           value={bootMenuEnabled}
                           onChange={(e, state) => { this.handleChange('bootMenuEnabled', state) }}
@@ -680,17 +685,18 @@ class DetailsCard extends React.Component {
                         </div>
                       }
                     </FieldRow>
-                    <FieldRow label={msg.console()}><ConsoleList vm={vm} /></FieldRow>
+                    <FieldRow label={msg.console()} id={`${idPrefix}-console`}><ConsoleList idPrefix={`${idPrefix}-console`} vm={vm} /></FieldRow>
 
-                    <FieldRow label={msg.optimizedFor()}>
+                    <FieldRow label={msg.optimizedFor()} id={`${idPrefix}-optimized`}>
                       {optimizedFor}
                     </FieldRow>
 
-                    <FieldRow label={msg.cpus()}>
+                    <FieldRow label={msg.cpus()} id={`${idPrefix}-cpus`}>
                       { !isEditing && vCpuCount }
                       { isEditing &&
                         <div>
                           <FormControl
+                            id={`${idPrefix}-cpus-edit`}
                             className={style['cpu-input']}
                             type='number'
                             value={vCpuCount}
@@ -699,11 +705,12 @@ class DetailsCard extends React.Component {
                         </div>
                       }
                     </FieldRow>
-                    <FieldRow label={msg.memory()}>
+                    <FieldRow label={msg.memory()} id={`${idPrefix}-memory`}>
                       { !isEditing && `${round(memorySize)} ${memoryUnit}` }
                       { isEditing &&
                         <div>
                           <FormControl
+                            id={`${idPrefix}-memory-edit`}
                             className={style['memory-input']}
                             type='number'
                             value={round(memorySize)}

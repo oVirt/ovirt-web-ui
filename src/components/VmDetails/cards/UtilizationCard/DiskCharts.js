@@ -26,7 +26,7 @@ import NoLiveData from './NoLiveData'
  * NOTE: File system usage data from the guest agent is not currently (Aug, 2018) available
  *       via REST. Storage allocation is being used instead.
  */
-const DiskCharts = ({ vm, isRunning, ...props }) => {
+const DiskCharts = ({ vm, isRunning, id, ...props }) => {
   const hasDisks = vm.get('disks').size > 0
 
   let actualSize = 0
@@ -43,24 +43,24 @@ const DiskCharts = ({ vm, isRunning, ...props }) => {
   const total = round(disks.provisionedSize, 1)
 
   return (
-    <UtilizationCard className={style['chart-card']}>
+    <UtilizationCard className={style['chart-card']} id={id}>
       <CardTitle>Disk <span style={{ fontSize: '55%', verticalAlign: 'super' }}>(storage allocations)</span></CardTitle>
       <CardBody>
         { !hasDisks &&
-          <NoLiveData message='This VM has no attached disks.' />
+          <NoLiveData id={`${id}-no-live-data`} message='This VM has no attached disks.' />
         }
         { hasDisks &&
         <React.Fragment>
           <UtilizationCardDetails>
-            <UtilizationCardDetailsCount>{available}</UtilizationCardDetailsCount>
+            <UtilizationCardDetailsCount id={`${id}-available`}>{available}</UtilizationCardDetailsCount>
             <UtilizationCardDetailsDesc>
               <UtilizationCardDetailsLine1>Available</UtilizationCardDetailsLine1>
-              <UtilizationCardDetailsLine2>of {total} {unit} Provisioned</UtilizationCardDetailsLine2>
+              <UtilizationCardDetailsLine2 id={`${id}-total`}>of {total} {unit} Provisioned</UtilizationCardDetailsLine2>
             </UtilizationCardDetailsDesc>
           </UtilizationCardDetails>
 
           <DonutChart
-            id='donut-chart-disk'
+            id={`${id}-donut-chart`}
             data={{
               columns: [
                 [`${unit} allocated`, used],
@@ -86,6 +86,7 @@ const DiskCharts = ({ vm, isRunning, ...props }) => {
   )
 }
 DiskCharts.propTypes = {
+  id: PropTypes.string.isRequired,
   vm: PropTypes.object.isRequired,
   isRunning: PropTypes.bool,
 }

@@ -55,20 +55,25 @@ class NewSnapshotModal extends Component {
   }
 
   render () {
+    const { idPrefix } = this.props
+
+    let modalId = `${idPrefix}-modal`
+
     return (
       <div>
-        <a onClick={this.props.disabled ? noop : this.open} className={`${this.props.disabled && 'disabled'}`}>
+        <a onClick={this.props.disabled ? noop : this.open} id={`${idPrefix}-button`} className={`${this.props.disabled && 'disabled'}`}>
           <Icon type='fa' name='plus' />
           { msg.createSnapshot() }
         </a>
 
-        <Modal show={this.state.showModal} onHide={this.close} dialogClassName={style['create-snapshot-container']}>
+        <Modal show={this.state.showModal} onHide={this.close} dialogClassName={style['create-snapshot-container']} id={modalId}>
           <Modal.Header>
             <button
               className='close'
               onClick={this.close}
               aria-hidden='true'
               aria-label='Close'
+              id={`${modalId}-close`}
             >
               <Icon type='pf' name='close' />
             </button>
@@ -90,6 +95,7 @@ class NewSnapshotModal extends Component {
                     type='text'
                     value={this.state.description}
                     onChange={this.handleDescriptionChange}
+                    id={`${modalId}-description-edit`}
                   />
                   {
                     this.state.emptyDescription &&
@@ -106,10 +112,11 @@ class NewSnapshotModal extends Component {
               bsStyle='default'
               className='btn-cancel'
               onClick={this.close}
+              id={`${modalId}-cancel`}
             >
               { msg.cancel() }
             </Button>
-            <Button bsStyle='primary' onClick={this.handleSave}>
+            <Button bsStyle='primary' onClick={this.handleSave} id={`${modalId}-create`}>
               { msg.create() }
             </Button>
           </Modal.Footer>
@@ -121,6 +128,7 @@ class NewSnapshotModal extends Component {
 
 NewSnapshotModal.propTypes = {
   vmId: PropTypes.string.isRequired, // eslint-disable-line react/no-unused-prop-types
+  idPrefix: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   onAdd: PropTypes.func.isRequired,
 }

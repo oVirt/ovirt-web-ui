@@ -7,8 +7,8 @@ import style from './style.css'
 /*
  * Replaces a `SparklineChart` in the Charts cards when historic data isn't available.
  */
-const NoHistoricData = ({ message }) => (
-  <div className={style['no-history-chart']}>
+const NoHistoricData = ({ message, id }) => (
+  <div className={style['no-history-chart']} id={id}>
     <div className={style['no-history-chart-icon']}>
       <Icon type='pf' name='info' />
     </div>
@@ -18,6 +18,7 @@ const NoHistoricData = ({ message }) => (
   </div>
 )
 NoHistoricData.propTypes = {
+  id: PropTypes.string.isRequired,
   message: PropTypes.string,
 }
 

@@ -27,7 +27,7 @@ const Vm = ({ vm, icons, os, onStart }) => {
   const icon = getVmIcon(icons, os, vm)
 
   return (
-    <div className={`col-xs-12 col-sm-6 col-md-4 col-lg-3`}>
+    <div className={`col-xs-12 col-sm-6 col-md-4 col-lg-3`} id={`${idPrefix}-box`}>
       <div className='card-pf card-pf-view card-pf-view-select card-pf-view-single-select'>
         <div>
           <span className={sharedStyle['operating-system-label']}>{osName}</span>
@@ -51,7 +51,7 @@ const Vm = ({ vm, icons, os, onStart }) => {
             </p>
           </h2>
 
-          <VmActions isOnCard vm={vm} onStart={onStart} />
+          <VmActions isOnCard vm={vm} onStart={onStart} idPrefix={idPrefix} />
         </div>
       </div>
     </div>

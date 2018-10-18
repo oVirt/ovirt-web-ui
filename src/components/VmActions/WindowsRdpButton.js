@@ -9,19 +9,19 @@ import { canConsole } from '../../vm-status'
 /**
  * Button to send a RDP connection file to the user for a Windows VM.
  */
-const WindowsRdpButton = ({ vm, className, config, onRDP }) => {
+const WindowsRdpButton = ({ vm, className, config, onRDP, id }) => {
   const isWindowsVM = isWindows(vm.getIn(['os', 'type']))
 
   let component = null
   if (isWindowsVM && canConsole(vm.get('status'))) {
-    const idPrefix = `consoleaction-${vm.get('name')}`
     const domain = config.get('domain')
     const username = config.getIn([ 'user', 'name' ])
 
     component = (
       <a
+        id={id}
         href='#'
-        key={vm.get('id')} id={`${idPrefix}-rdp`}
+        key={vm.get('id')}
         className={className}
         onClick={(e) => { e.preventDefault(); onRDP(domain, username) }}
       >
@@ -33,6 +33,7 @@ const WindowsRdpButton = ({ vm, className, config, onRDP }) => {
   return component
 }
 WindowsRdpButton.propTypes = {
+  id: PropTypes.string.isRequired,
   vm: PropTypes.object.isRequired,
   className: PropTypes.string.isRequired,
 

@@ -45,24 +45,23 @@ class SelectBox extends React.Component {
   }
 
   render () {
-    let { idPrefix } = this.props
+    let { id } = this.props
 
     const selectedItem = this.state.items.find(item => item.id === this.state.selected)
 
-    let idCounter = 0
     return (
-      <div style={{ width: '100%' }}>
+      <div style={{ width: '100%' }} id={id}>
         <div className='dropdown'>
-          <button className={`btn btn-default dropdown-toggle ${style['dropdown-button']}`} type='button' data-toggle='dropdown' id={`${idPrefix}-button-toggle`}>
-            <span className={style['dropdown-button-text']} id={`${idPrefix}-button-text`}>
+          <button className={`btn btn-default dropdown-toggle ${style['dropdown-button']}`} type='button' data-toggle='dropdown' id={`${id}-button-toggle`}>
+            <span className={style['dropdown-button-text']} id={`${id}-button-text`}>
               {selectedItem ? selectedItem.value : NOBREAK_SPACE}
             </span>
-            <span className='caret' id={`${idPrefix}-button-caret`} />
+            <span className='caret' id={`${id}-button-caret`} />
           </button>
           <ul className={`dropdown-menu ${style['dropdown']}`} role='menu'>
             {this.state.items.map(item => (
               <li role='presentation' className={item.id === this.state.selected ? 'selected' : ''} key={item.id}>
-                <a role='menuitem' tabIndex='-1' onClick={this.handleChange(item.id)} id={`${idPrefix}-${idCounter++}`}>
+                <a role='menuitem' tabIndex='-1' onClick={this.handleChange(item.id)} id={`${id}-item-${item.value}`}>
                   {item.value}
                 </a>
               </li>
@@ -83,7 +82,7 @@ SelectBox.propTypes = {
   sort: PropTypes.bool, // sorted alphabetically by current locale with { numeric: true } if true
   /* eslint-enable react/no-unused-prop-types */
   onChange: PropTypes.func.isRequired, // (selectedId: string) => any
-  idPrefix: PropTypes.string.isRequired,
+  id: PropTypes.string,
 }
 
 export default SelectBox

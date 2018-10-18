@@ -27,16 +27,16 @@ function getStatus (status) {
     : <span className={style['status-icon']}><Icon type='pf' name='off' />{msg.off()}</span>
 }
 
-const diskRender = (disk) => {
+const diskRender = (idPrefix, disk, index) => {
   const provSize = userFormatOfBytes(disk.get('provisionedSize'))
   const actSize = userFormatOfBytes(disk.get('actualSize'), provSize.suffix)
-  return <div key={disk.get('id')}>
+  return <div key={disk.get('id')} id={`${idPrefix}-${disk.get('name')}-${index}`}>
     {`${disk.get('name')} (${actSize.str} used / ${provSize.str})`}
   </div>
 }
 
-const nicRender = (nic) => {
-  return <div key={nic.get('id')}>
+const nicRender = (idPrefix, nic) => {
+  return <div key={nic.get('id')} id={`${idPrefix}-${nic.get('name')}`}>
     {nic.get('name')}
   </div>
 }
@@ -47,7 +47,7 @@ const statusMap = {
   'ok': msg.ok(),
 }
 
-const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, ...otherProps }) => {
+const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, id, ...otherProps }) => {
   const template = Selectors.getTemplateById(snapshot.getIn(['vm', 'template', 'id']))
   const time = getFormatedDateTime(snapshot.get('date'))
 
@@ -64,14 +64,14 @@ const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, ...otherProps }) => {
   const additionalNics = nicsToRender.slice(2)
 
   return <Popover
-    id={`snapshot-popover-${snapshot.get('id')}`}
+    id={id}
     title={
       <div>
         {snapshot.get('description')}
         <button
+          id={`${id}-close`}
           type='button'
           className='close'
-          data-dismiss={`snapshot-popover-${snapshot.get('id')}`}
           aria-label='Close'
           onClick={() => document.body.click()} // Hackish way to hide popover, but better solution then create own version of OverlayTrigger or using refs with private methods
         >
@@ -87,31 +87,31 @@ const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, ...otherProps }) => {
         <dt>
           {msg.created()}
         </dt>
-        <dd>
+        <dd id={`${id}-created`}>
           {`${time.time} ${time.date}`}
         </dd>
         <dt>
           {msg.operatingSystem()}
         </dt>
-        <dd>
+        <dd id={`${id}-os`}>
           {getOsHumanName(snapshot.getIn(['vm', 'os', 'type']))}
         </dd>
         <dt>
           {msg.memory()}
         </dt>
-        <dd>
+        <dd id={`${id}-memory`}>
           {userFormatOfBytes(snapshot.getIn(['vm', 'memory', 'total'])).str} {snapshotMemoryState}
         </dd>
         <dt>
           {msg.cpus()}
         </dt>
-        <dd>
+        <dd id={`${id}-cpus`}>
           {snapshot.getIn(['vm', 'cpu', 'vCPUs'])}
         </dd>
         <dt>
           {msg.status()}
         </dt>
-        <dd>
+        <dd id={`${id}-status`}>
           {statusMap[snapshot.get('status')]}
         </dd>
       </dl>
@@ -119,31 +119,31 @@ const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, ...otherProps }) => {
         <dt>
           {msg.template()}
         </dt>
-        <dd>
+        <dd id={`${id}-template`}>
           {template && templateNameRenderer(template)}
         </dd>
         <dt>
           {msg.cdromBoot()}
         </dt>
-        <dd>
+        <dd id={`${id}-cdrom`}>
           {snapshot.getIn(['vm', 'cdrom', 'file', 'id']) ? snapshot.getIn(['cdrom', 'file', 'id']) : msg.empty() }
         </dd>
         <dt>
           {msg.nic()}
         </dt>
-        <dd>
+        <dd id={`${id}-nics`}>
           { nicsToRender.size === 0 &&
-            <div className={style['no-nics']}>{msg.noNics()}</div>
+            <div className={style['no-nics']} id={`${id}-no-nics`}>{msg.noNics()}</div>
           }
           { nicsToRender.size > 0 &&
           <div className={style['snapshot-disk-list']}>
-            {nicsToShow && nicsToShow.map(nicRender)}
+            {nicsToShow && nicsToShow.map(nicRender.bind(null, `${id}-nics`))}
             {
               showMoreNics &&
               <OverlayTrigger
                 overlay={<Tooltip id={`snapshot-nic-tooltip-${snapshot.get('id')}`}>
                   {
-                    additionalNics && additionalNics.map(nicRender)
+                    additionalNics && additionalNics.map(nicRender.bind(null, `${id}-nics`))
                   }
                 </Tooltip>}
                 placement='bottom'
@@ -160,25 +160,25 @@ const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, ...otherProps }) => {
         <dt>
           {msg.bootMenu()}
         </dt>
-        <dd>
+        <dd id={`${id}-boot-menu`}>
           {getStatus(snapshot.getIn(['vm', 'bootMenuEnabled']))}
         </dd>
         <dt>
           {msg.disks()}
         </dt>
-        <dd>
+        <dd id={`${id}-disks`}>
           { disksToRender.size === 0 &&
-            <div className={style['no-disks']}>{msg.noDisks()}</div>
+            <div className={style['no-disks']} id={`${id}-no-disks`}>{msg.noDisks()}</div>
           }
           { disksToRender.size > 0 &&
           <div className={style['snapshot-disk-list']}>
-            {diskToShow && diskToShow.map(diskRender)}
+            {diskToShow && diskToShow.map(diskRender.bind(null, `${id}-disks`))}
             {
               showMoreDisks &&
               <OverlayTrigger
                 overlay={<Tooltip id={`snapshot-disk-tooltip-${snapshot.get('id')}`}>
                   {
-                    additionalDisk && additionalDisk.map(diskRender)
+                    additionalDisk && additionalDisk.map(diskRender.bind(null, `${id}-disks`))
                   }
                 </Tooltip>}
                 placement='bottom'
@@ -197,10 +197,11 @@ const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, ...otherProps }) => {
     <div style={{ textAlign: 'left' }}>
       <RestoreConfirmationModal
         snapshot={snapshot}
+        id={`${id}-restore-modal`}
         vmId={vmId}
         disabled={restoreDisabled}
         trigger={
-          <Button bsStyle='default'>{ msg.snapshotRestore() }</Button>
+          <Button bsStyle='default' id={`${id}-restore`}>{ msg.snapshotRestore() }</Button>
         }
       />
     </div>
@@ -208,6 +209,7 @@ const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, ...otherProps }) => {
 }
 
 SnapshotDetail.propTypes = {
+  id: PropTypes.string.isRequired,
   snapshot: PropTypes.object.isRequired,
   vmId: PropTypes.string.isRequired,
   restoreDisabled: PropTypes.bool,

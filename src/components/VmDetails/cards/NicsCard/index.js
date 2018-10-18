@@ -32,12 +32,15 @@ const NicsCard = ({ vm, vnicProfiles, onEditChange }) => {
   const ip4Label = 'IPv4'
   const ip6Label = 'IPv6'
 
+  const idPrefix = 'vmdetail-nics'
+
   return (
     <BaseCard
       icon={{ type: 'pf', name: 'network' }}
       title='Network Interfaces'
       editTooltip={`Edit NICs for ${vm.get('id')}`}
       editable={false}
+      idPrefix={idPrefix}
       itemCount={vm.get('nics').size}
       onStartEdit={() => { onEditChange(true) }}
       onCancel={() => { onEditChange(false) }}
@@ -45,27 +48,27 @@ const NicsCard = ({ vm, vnicProfiles, onEditChange }) => {
     >
       {({ isEditing }) => <React.Fragment>
         { nicList.length === 0 &&
-          <div className={style['no-nics']}>{msg.noNics()}</div>
+          <div className={style['no-nics']} id={`${idPrefix}-no-nics`}>{msg.noNics()}</div>
         }
         { nicList.length > 0 &&
         <Grid className={style['nics-container']}>
           {nicList.map(nic =>
-            <Row key={nic.id}>
+            <Row key={nic.id} id={`${idPrefix}-${nic.name}`}>
               <Col style={{ display: 'block' }}>
                 <div>
-                  <span>{nic.name}</span>
-                  <span className={style['vnic-info']}>({nic.vnicProfile.name}/{nic.vnicProfile.network})</span>
+                  <span id={`${idPrefix}-${nic.name}-name`}>{nic.name}</span>
+                  <span className={style['vnic-info']} id={`${idPrefix}-${nic.name}-vnic-info`}>({nic.vnicProfile.name}/{nic.vnicProfile.network})</span>
                 </div>
                 <Grid>
                   <Row>
-                    <Col cols={6} className={style['ip4-container']}>
+                    <Col cols={6} className={style['ip4-container']} id={`${idPrefix}-${nic.name}-ipv4`}>
                       { nic.ipv4.length > 0 &&
                         <div>
                           {nic.ipv4.map(ip4 => <div key={`${nic.id}-${ip4}`}>{ip4Label}: {ip4}</div>)}
                         </div>
                       }
                     </Col>
-                    <Col cols={6} className={style['ip6-container']}>
+                    <Col cols={6} className={style['ip6-container']} id={`${idPrefix}-${nic.name}-ipv6`}>
                       { nic.ipv6.length > 0 &&
                         <div>
                           {nic.ipv6.map(ip6 => <div key={`${nic.id}-${ip6}`}>{ip6Label}: {ip6}</div>)}

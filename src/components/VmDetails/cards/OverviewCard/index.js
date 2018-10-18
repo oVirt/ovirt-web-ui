@@ -154,11 +154,14 @@ class OverviewCard extends React.Component {
 
     const icon = getVmIcon(icons, operatingSystems, vm)
 
+    const idPrefix = 'vmdetail-overview'
+
     return (
       <BaseCard
         editMode={isEditing}
         editable={isEditable}
         editTooltip={`Edit ${vm.get('id')}`}
+        idPrefix={idPrefix}
         onStartEdit={this.handleCardOnStartEdit}
         onCancel={this.handleCardOnCancel}
         onSave={this.handleCardOnSave}
@@ -166,7 +169,7 @@ class OverviewCard extends React.Component {
         {({ isEditing }) => {
           return (
             <div>
-              <div className={`${sharedStyle['operating-system-label']} ${style['operating-system-label']}`}>
+              <div id={`${idPrefix}-os-label`} className={`${sharedStyle['operating-system-label']} ${style['operating-system-label']}`}>
                 {getOsHumanName(vm.getIn(['os', 'type']))}
               </div>
 
@@ -176,9 +179,10 @@ class OverviewCard extends React.Component {
                 </Media.Left>
                 <Media.Body>
                   <div className={style['vm-name']}>
-                    { !isEditing && <span>{vm.get('name')}</span> }
+                    { !isEditing && <span id={`${idPrefix}-name`}>{vm.get('name')}</span> }
                     { isEditing &&
                       <FormControl
+                        id={`${idPrefix}-name-edit`}
                         type='text'
                         value={this.state.vm.get('name')}
                         onChange={e => this.handleChange('name', e.target.value)}
@@ -186,17 +190,18 @@ class OverviewCard extends React.Component {
                     }
                   </div>
 
-                  <div className={style['vm-status']}>
+                  <div className={style['vm-status']} id={`${idPrefix}-status`}>
                     <VmStatusIcon className={style['vm-status-icon']} state={vm.get('status')} />
-                    <span className={style['vm-status-text']}>{enumMsg('VmStatus', vm.get('status'))}</span>
+                    <span className={style['vm-status-text']} id={`${idPrefix}-status-value`}>{enumMsg('VmStatus', vm.get('status'))}</span>
                   </div>
 
                   <div>
                     { !isEditing &&
-                      <div className={style['vm-description']}>{vm.get('description')}</div>
+                      <div id={`${idPrefix}-description`} className={style['vm-description']}>{vm.get('description')}</div>
                     }
                     { isEditing &&
                       <FormControl
+                        id={`${idPrefix}-description-edit`}
                         componentClass='textarea'
                         rows='5'
                         value={this.state.vm.get('description')}
@@ -209,7 +214,7 @@ class OverviewCard extends React.Component {
 
               { correlatedMessages && correlatedMessages.size > 0 &&
                 correlatedMessages.map((message, key) =>
-                  <Alert key={`user-message-${key}`} type='error' style={{ margin: '5px 0 0 0' }}>
+                  <Alert key={`user-message-${key}`} type='error' style={{ margin: '5px 0 0 0' }} id={`${idPrefix}-alert`}>
                     {message.get('message')}
                   </Alert>
                 )

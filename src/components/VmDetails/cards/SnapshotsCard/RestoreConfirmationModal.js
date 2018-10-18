@@ -33,7 +33,7 @@ class RestoreConfirmationModal extends React.Component {
   }
 
   render () {
-    const { snapshot, trigger, snapshots, disabled } = this.props
+    const { snapshot, trigger, snapshots, disabled, id } = this.props
 
     const icon = <Icon type='pf' name='warning-triangle-o' />
     const clonedTrigger = React.cloneElement(trigger, { onClick: this.open, disabled })
@@ -44,6 +44,7 @@ class RestoreConfirmationModal extends React.Component {
       <React.Fragment>
         {clonedTrigger}
         <MessageDialog
+          id={id}
           show={this.state.showModal}
           onHide={this.close}
           primaryAction={this.handleRestore}
@@ -54,6 +55,7 @@ class RestoreConfirmationModal extends React.Component {
           icon={icon}
           primaryContent={
             <div
+              id={`${id}-lead`}
               className='lead'
               dangerouslySetInnerHTML={{
                 __html: msg.areYouSureYouWantToRestoreSnapshot({ snapshotName: `"<strong>${minDescription}</strong>"` }),
@@ -61,7 +63,7 @@ class RestoreConfirmationModal extends React.Component {
             />}
           secondaryContent={
             snapshotsThatWillBeDeleted.size > 0 &&
-            <div>
+            <div id={`${id}-secondary`}>
               {msg.nextSnapshotsWillBeDeleted()}
               {snapshotsThatWillBeDeleted.map((s) => <div key={s.get('date')}>{s.get('description')}</div>)}
             </div>
@@ -75,6 +77,7 @@ class RestoreConfirmationModal extends React.Component {
 RestoreConfirmationModal.propTypes = {
   snapshot: PropsTypes.object.isRequired,
   vmId: PropsTypes.string.isRequired, // eslint-disable-line react/no-unused-prop-types
+  id: PropsTypes.string.isRequired,
   snapshots: PropsTypes.object.isRequired,
   trigger: PropsTypes.node.isRequired,
   disabled: PropsTypes.bool,
