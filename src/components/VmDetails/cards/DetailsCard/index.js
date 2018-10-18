@@ -759,7 +759,7 @@ const DetailsCardConnected = connect(
   (dispatch) => ({
     saveChanges: (minimalVmChanges, restartAfterEdit, nextRun, correlationId) =>
       dispatch(Actions.editVm(
-        { vm: minimalVmChanges, transformInput: true, restartAfterEdit, nextRun },
+        { vm: minimalVmChanges, restartAfterEdit, nextRun },
         { correlationId }
       )),
   })

@@ -801,7 +801,7 @@ export default connect(
     storages: state.storageDomains,
   }),
   (dispatch) => ({
-    addVm: (vm, correlationId) => dispatch(createVm({ vm, transformInput: true, pushToDetailsOnSuccess: true }, { correlationId })),
-    updateVm: (vm, correlationId) => dispatch(editVm({ vm, transformInput: true }, { correlationId })),
+    addVm: (vm, correlationId) => dispatch(createVm({ vm, pushToDetailsOnSuccess: true }, { correlationId })),
+    updateVm: (vm, correlationId) => dispatch(editVm({ vm }, { correlationId })),
   })
 )(VmDialog)
