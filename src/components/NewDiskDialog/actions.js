@@ -2,26 +2,11 @@
 /* eslint-disable flowtype/require-return-type */
 
 import {
-  CREATE_DISK_FOR_VM,
   CLEAN_NEW_DISK_DIALOG_SUBTREE,
   SET_NEW_DISK_DIALOG_PROGRESS_INDICATOR,
   SET_NEW_DISK_DIALOG_ERROR_TEXT,
   SET_NEW_DISK_DIALOG_DONE,
 } from './constants'
-
-export function createDiskForVm (sizeB: string, alias: string, storageDomainId: string, iface: string, vmId: string) {
-  return {
-    type: CREATE_DISK_FOR_VM,
-    payload: {
-      sizeB,
-      alias,
-      storageDomainId,
-      vmId,
-      iface,
-      active: true,
-    },
-  }
-}
 
 export function cleanNewDiskDialogSubtree () {
   return {

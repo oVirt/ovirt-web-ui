@@ -1,6 +1,7 @@
 // @flow
 import type {
   CdRomType,
+  DiskType,
   NicType,
   SnapshotType,
   VmType, ApiVmType,
@@ -37,6 +38,8 @@ const OvirtApi = {
   vmToInternal ({ vm, getSubResources = false }: { vm: ApiVmType, getSubResources: boolean }): VmType {
     return Transforms.VM.toInternal({ vm, includeSubResources: getSubResources })
   },
+
+  Transforms: Transforms,
 
   internalVmToOvirt: Transforms.VM.toApi,
 
@@ -389,34 +392,46 @@ const OvirtApi = {
       },
     })
   },
+
+  // async operation
   removeDisk (diskId: string): Promise<Object> {
     assertLogin({ methodName: 'removeDisk' })
     const url = `${AppConfiguration.applicationContext}/api/disks/${diskId}?async=true`
     return httpDelete({ url })
   },
-  addDiskAttachment ({ sizeB, storageDomainId, alias, vmId, iface }: { sizeB: string, storageDomainId: string, alias: string, vmId: string, iface: string }): Promise<Object> {
+
+  // async operation
+  addDiskAttachment ({ vmId, newDisk }: { vmId: string, newDisk: DiskType }): Promise<Object> {
     assertLogin({ methodName: 'addDiskAttachment' })
-    const payload = {
-      interface: iface,
-      disk: {
-        provisioned_size: sizeB,
-        format: 'cow',
-        storage_domains: {
-          storage_domain: [
-            {
-              id: storageDomainId,
-            },
-          ],
-        },
-        alias,
-      },
-    }
+
+    const payload = Transforms.DiskAttachment.toApi({ disk: newDisk })
     const input = JSON.stringify(payload)
+
     return httpPost({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/diskattachments`,
       input,
     })
   },
+
+  // disk update is async
+  // http://ovirt.github.io/ovirt-engine-api-model/master/#services/disk/methods/update
+  updateDiskAttachment ({ vmId, disk }: { vmId: string, disk: DiskType }): Promise<Object> {
+    assertLogin({ methodName: 'updateDiskAttachment' })
+
+    const attachmentId = disk.attachmentId
+    if (!attachmentId) {
+      throw new Error('DiskType.attachmentId is required to update the disk')
+    }
+
+    const payload = Transforms.DiskAttachment.toApi({ disk })
+    const input = JSON.stringify(payload)
+
+    return httpPut({
+      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/diskattachments/${attachmentId}`,
+      input,
+    })
+  },
+
   saveSSHKey ({ key, userId, sshId }: { key: string, userId: string, sshId: ?string }): Promise<Object> {
     assertLogin({ methodName: 'saveSSHKey' })
     const input = JSON.stringify({ content: key })
