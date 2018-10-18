@@ -22,7 +22,7 @@ export const resourcesUrls = {
 
 export function loadOnce (): Promise<void> {
   if (!loaded) {
-    loaded = fetch(resourcesUrls.fixedStrings)
+    loaded = fetch(resourcesUrls.fixedStrings, { credentials: 'include' })
       .then(body => body.json())
       .then(json => {
         fixedStrings = Object.freeze(json)
