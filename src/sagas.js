@@ -135,7 +135,7 @@ import {
   SUSPEND_VM,
 } from './constants'
 
-import { canUserEditVm, getUserPermits } from './utils'
+import { canUserEditVm, getUserPermits, canUserUseCluster } from './utils'
 
 const vmFetchAdditionalList =
   [
@@ -150,6 +150,8 @@ const vmFetchAdditionalList =
   ]
 
 const EVERYONE_GROUP_ID = 'eee00000-0000-0000-0000-123456789eee'
+
+const CLUSTER_TYPE = 'Cluster'
 
 /**
  * Compare the current oVirt version (held in redux) to the given version.
@@ -804,15 +806,25 @@ function mergeStorageDomains (storageDomainsInternal) {
   return mergedStorageDomains
 }
 
+function* fetchPermits ({ entityType, id }) {
+  const permissions = yield callExternalAction(`get${entityType}Permissions`, Api[`get${entityType}Permissions`], { payload: { id } })
+  return getUserPermits(Api.permissionsToInternal({ permissions: permissions.permission }))
+}
+
 function* fetchAllClusters (action) {
-  action.payload.additional = ['permissions.role.permits']
   const clusters = yield callExternalAction('getAllClusters', Api.getAllClusters, action)
 
   if (clusters && clusters['cluster']) {
-    let clustersInternal = []
-    clustersInternal = clusters.cluster.map(cluster =>
-      Api.clusterToInternal({ cluster })
-    )
+    // Temporary solution, till bug will be fixed https://bugzilla.redhat.com/show_bug.cgi?id=1639784
+    let clustersInternal = (yield all(
+      clusters.cluster
+        .map(function* (cluster) {
+          const clusterInternal = Api.clusterToInternal({ cluster })
+          clusterInternal.permits = yield fetchPermits({ entityType: CLUSTER_TYPE, id: cluster.id })
+          clusterInternal.canUserUseCluster = canUserUseCluster(clusterInternal.permits)
+          return clusterInternal
+        })
+    ))
     yield put(setClusters(clustersInternal))
   }
 
