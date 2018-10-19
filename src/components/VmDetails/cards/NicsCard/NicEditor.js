@@ -103,7 +103,7 @@ class NicEditor extends Component {
         id: undefined,
         name: this.props.nextNicName,
         vnicProfileId: EMPTY_ID,
-        interface: 'virtio',
+        interface: NIC_INTERFACE_DEFAULT,
         linked: true,
       })
     }
@@ -127,8 +127,8 @@ class NicEditor extends Component {
     return nic
   }
 
-  changeName (value) {
-    this.setState({ name: value })
+  changeName (event) {
+    this.setState({ name: event.target.value })
   }
 
   changeVnicProfile (value) {
@@ -191,13 +191,12 @@ class NicEditor extends Component {
         <Modal.Body>
 
           <Form horizontal>
-            <FormGroup controlId='nic-name' className='required'>
+            <FormGroup controlId={`${modalId}-name`} className='required'>
               <LabelCol sm={3}>
                 { msg.nicEditorNameLabel() }
               </LabelCol>
               <Col sm={9}>
                 <FormControl
-                  id={`${modalId}-name`}
                   type='text'
                   defaultValue={this.state.name}
                   onChange={this.changeName}
@@ -205,7 +204,7 @@ class NicEditor extends Component {
               </Col>
             </FormGroup>
 
-            <FormGroup controlId='nic-vnic-profile' className='required'>
+            <FormGroup controlId={`${modalId}-vnic-profile`} className='required'>
               <LabelCol sm={3}>
                 { msg.vnicProfile() }
               </LabelCol>
@@ -220,7 +219,7 @@ class NicEditor extends Component {
             </FormGroup>
 
             <ExpandCollapseSection id='nic-edit-advanced-options' sectionHeader={msg.advancedOptions()}>
-              <FormGroup controlId='nic-type'>
+              <FormGroup controlId={`${modalId}-interface`}>
                 <LabelCol sm={3}>
                   { msg.nicEditorInterfaceLabel() }
                   { !canChangeInterface &&
@@ -241,14 +240,14 @@ class NicEditor extends Component {
                     <SelectBox
                       id={`${modalId}-interface`}
                       items={NIC_INTERFACES}
-                      selected={NIC_INTERFACE_DEFAULT}
+                      selected={this.state.interface}
                       onChange={this.changeInterface}
                     />
                   }
                 </Col>
               </FormGroup>
 
-              <FormGroup controlId='nic-link-state'>
+              <FormGroup controlId='nic-link-state-group'>
                 <LabelCol sm={3}>
                   { msg.nicEditorLinkStateLabel() }
                 </LabelCol>
