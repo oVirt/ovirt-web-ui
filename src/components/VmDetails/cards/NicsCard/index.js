@@ -101,6 +101,7 @@ class NicsCard extends React.Component {
   render () {
     const { vm, vnicProfiles, onEditChange } = this.props
 
+    const idPrefix = 'vmdetail-nics'
     const canEditTheCard =
       vm.get('canUserEditVm') &&
       vm.getIn(['pool', 'id']) === undefined
@@ -135,6 +136,7 @@ class NicsCard extends React.Component {
         title={msg.nic()}
         editTooltip={msg.nicCardEditTooltip({ vmId: vm.get('id') })}
         editable={canEditTheCard}
+        idPrefix={idPrefix}
         itemCount={vm.get('nics').size}
         onStartEdit={() => { onEditChange(true) }}
         onCancel={() => { onEditChange(false) }}
@@ -143,19 +145,21 @@ class NicsCard extends React.Component {
         {({ isEditing }) =>
           <Grid className={style['nics-container']}>
             { isEditing && canCreateNic &&
-              <Row key={`${vm.get('id')}-nic-add`}>
+              <Row key={`${idPrefix}-new`} id={`${idPrefix}-new`}>
                 <Col>
                   <NicEditor
+                    idPrefix={`${idPrefix}-new`}
                     nextNicName={this.state.nextNicName}
                     vnicProfileList={this.state.filteredVnicList}
                     onSave={this.onCreateConfirm}
                     trigger={
                       <div className={itemStyle['create-block']}>
-                        <a href='#' id='nic-create-action'>
+                        <a href='#' id={`${idPrefix}-new-button`}>
                           <Icon className={itemStyle['create-icon']} type='fa' name='plus' />
                           <span className={itemStyle['create-text']} >{msg.nicActionCreateNew()}</span>
                         </a>
                       </div>
+
                     }
                   />
                 </Col>
@@ -165,14 +169,15 @@ class NicsCard extends React.Component {
             { nicList.length === 0 &&
               <Row>
                 <Col>
-                  <div className={itemStyle['no-items']}>{msg.noNics()}</div>
+                  <div className={itemStyle['no-items']} id={`${idPrefix}-no-nics`}>{msg.noNics()}</div>
                 </Col>
               </Row>
             }
             { nicList.length > 0 && nicList.map(nic =>
-              <Row key={nic.id}>
+              <Row key={nic.id} id={`${idPrefix}-${nic.name}`}>
                 <Col style={{ display: 'block' }}>
                   <NicListItem
+                    idPrefix={`${idPrefix}-${nic.name}`}
                     nic={nic}
                     vmStatus={vmStatus}
                     vnicProfileList={this.state.filteredVnicList}

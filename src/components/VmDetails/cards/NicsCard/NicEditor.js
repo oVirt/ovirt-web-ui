@@ -150,7 +150,8 @@ class NicEditor extends Component {
   }
 
   render () {
-    const { trigger, vmStatus, vnicProfileList } = this.props
+    const { idPrefix, trigger, vmStatus, vnicProfileList } = this.props
+    const modalId = idPrefix + '-modal'
 
     const createMode = !this.props.nic
 
@@ -179,12 +180,12 @@ class NicEditor extends Component {
       {React.cloneElement(trigger, { onClick: this.open })}
 
       <Modal
-        id='modal-add-nic-to-vm'
+        id={modalId}
         show={this.state.showModal}
         onHide={this.close}
       >
         <Modal.Header>
-          <Modal.CloseButton onClick={this.close} />
+          <Modal.CloseButton onClick={this.close} id={`${modalId}-button-close`} />
           <Modal.Title>{createMode ? msg.addNewNic() : msg.editNic()}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -196,6 +197,7 @@ class NicEditor extends Component {
               </LabelCol>
               <Col sm={9}>
                 <FormControl
+                  id={`${modalId}-name`}
                   type='text'
                   defaultValue={this.state.name}
                   onChange={this.changeName}
@@ -209,7 +211,7 @@ class NicEditor extends Component {
               </LabelCol>
               <Col sm={9}>
                 <SelectBox
-                  idPrefix='nic-vnic-profiles-select'
+                  id={`${modalId}-vnic-profile`}
                   items={vnicList}
                   selected={this.state.vnicProfileId}
                   onChange={this.changeVnicProfile}
@@ -231,13 +233,13 @@ class NicEditor extends Component {
                 </LabelCol>
                 <Col sm={9}>
                   { !canChangeInterface &&
-                    <div className={style['editor-value-text']}>
+                    <div className={style['editor-value-text']} id={`${modalId}-interface`}>
                       { nicInterface ? nicInterface.value : 'N/A' }
                     </div>
                   }
                   { canChangeInterface &&
                     <SelectBox
-                      idPrefix='nic-type-select'
+                      id={`${modalId}-interface`}
                       items={NIC_INTERFACES}
                       selected={NIC_INTERFACE_DEFAULT}
                       onChange={this.changeInterface}
@@ -252,6 +254,7 @@ class NicEditor extends Component {
                 </LabelCol>
                 <Col sm={9}>
                   <Radio
+                    id={`${modalId}-link-state-on`}
                     name='nic-link-state-group'
                     defaultChecked={this.state.linked}
                     onChange={() => { this.changeLinked(true) }}
@@ -259,6 +262,7 @@ class NicEditor extends Component {
                     { msg.nicEditorLinkStateUp() } <NicLinkStateIcon linkState idSuffix='up' showTooltip={false} />
                   </Radio>
                   <Radio
+                    id={`${modalId}-link-state-off`}
                     name='nic-link-state-group'
                     defaultChecked={!this.state.linked}
                     onChange={() => { this.changeLinked(false) }}
@@ -273,6 +277,7 @@ class NicEditor extends Component {
         </Modal.Body>
         <Modal.Footer>
           <Button
+            id={`${modalId}-button-cancel`}
             bsStyle='default'
             className='btn-cancel'
             onClick={this.close}
@@ -280,6 +285,7 @@ class NicEditor extends Component {
             { msg.cancel() }
           </Button>
           <Button
+            id={`${modalId}-button-ok`}
             bsStyle='primary'
             onClick={this.handleSave}>
             { msg.ok() }
@@ -290,6 +296,7 @@ class NicEditor extends Component {
   }
 }
 NicEditor.propTypes = {
+  idPrefix: PropTypes.string.isRequired,
   nic: PropTypes.object,
   vmStatus: PropTypes.string,
   nextNicName: PropTypes.string,

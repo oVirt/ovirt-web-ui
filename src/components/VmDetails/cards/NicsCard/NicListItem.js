@@ -18,7 +18,7 @@ import NicLinkStateIcon from './NicLinkStateIcon'
  * If _edit_ then render the appropriate action buttons linked to provided
  * handler functions.
  */
-const NicListItem = ({ nic, vmStatus, vnicProfileList, isEditing, onEdit, onDelete }) => {
+const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEdit, onDelete }) => {
   const canEdit = !!onEdit
   const canDelete = !!onDelete
 
@@ -31,22 +31,24 @@ const NicListItem = ({ nic, vmStatus, vnicProfileList, isEditing, onEdit, onDele
     {/* Details Column - take the rest of the space */}
     <span className={itemStyle['item-row-info']}>
       <div>
-        {nic.name}
-        { nic.vnicProfile.id
-          ? <span className={style['vnic-info']}>({nic.vnicProfile.name}/{nic.vnicProfile.network})</span>
-          : <span className={style['vnic-info']}>[{msg.nicNoVnicAssigned()}]</span>
-        }
+        <span id={`${idPrefix}-name`}>{nic.name}</span>
+        <span className={style['vnic-info']} id={`${idPrefix}-vnic-info`}>
+          { nic.vnicProfile.id
+            ? `(${nic.vnicProfile.name}/${nic.vnicProfile.network})`
+            : `[${msg.nicNoVnicAssigned()}]`
+          }
+        </span>
       </div>
       <Grid>
         <Row>
-          <Col cols={6} className={style['ip4-container']}>
+          <Col cols={6} className={style['ip4-container']} id={`${idPrefix}-ipv4`}>
             { nic.ipv4.length > 0 &&
               <div>
                 {nic.ipv4.map(ip4 => <div key={`${nic.id}-${ip4}`}>{msg.nicIP4()}: {ip4}</div>)}
               </div>
             }
           </Col>
-          <Col cols={6} className={style['ip6-container']}>
+          <Col cols={6} className={style['ip6-container']} id={`${idPrefix}-ipv6`}>
             { nic.ipv6.length > 0 &&
               <div>
                 {nic.ipv6.map(ip6 => <div key={`${nic.id}-${ip6}`}>{msg.nicIP6()}: {ip6}</div>)}
@@ -59,19 +61,20 @@ const NicListItem = ({ nic, vmStatus, vnicProfileList, isEditing, onEdit, onDele
 
     {/* Actions Column (if edit) - content width, no wrapping */}
     { isEditing &&
-    <span className={itemStyle['item-row-actions']}>
+    <span className={itemStyle['item-row-actions']} id={`${idPrefix}-actions`}>
       { canEdit &&
         <NicEditor
+          idPrefix={`${idPrefix}-edit`}
           nic={nic}
           vmStatus={vmStatus}
           vnicProfileList={vnicProfileList}
           onSave={onEdit}
           trigger={
             <OverlayTrigger
-              overlay={<Tooltip id={`nic-edit-tooltip-${nic.id}`}>{msg.nicEditTooltip()}</Tooltip>}
+              overlay={<Tooltip id={`${idPrefix}-edit-tooltip`}>{msg.nicEditTooltip()}</Tooltip>}
               placement='left'
             >
-              <a id={`nic-edit-action-${nic.id}`} className={itemStyle['item-action']}>
+              <a id={`${idPrefix}-edit-action`} className={itemStyle['item-action']}>
                 <Icon type='pf' name='edit' />
               </a>
             </OverlayTrigger>
@@ -80,13 +83,13 @@ const NicListItem = ({ nic, vmStatus, vnicProfileList, isEditing, onEdit, onDele
       }
       { !canEdit &&
         <OverlayTrigger
-          overlay={<Tooltip id={`nic-edit-tooltip-${nic.id}`}>{msg.nicEditDisabledTooltip()}</Tooltip>}
+          overlay={<Tooltip id={`${idPrefix}-edit-tooltip-disabled`}>{msg.nicEditDisabledTooltip()}</Tooltip>}
           placement='left'
         >
           <Icon
             type='pf'
             name='edit'
-            id={`nic-edit-action-${nic.id}`}
+            id={`${idPrefix}-edit-action-disabled`}
             className={`${itemStyle['item-action']} ${itemStyle['item-action-disabled']}`}
           />
         </OverlayTrigger>
@@ -94,13 +97,14 @@ const NicListItem = ({ nic, vmStatus, vnicProfileList, isEditing, onEdit, onDele
 
       { canDelete &&
         <DeleteConfirmationModal
-          onDelete={() => { onDelete(nic) }}
+          id={`${idPrefix}-delete-modal`}
+          onDelete={() => { onDelete(nic.id) }}
           trigger={
             <OverlayTrigger
-              overlay={<Tooltip id={`nic-delete-tooltip-${nic.id}`}>{msg.nicDeleteTooltip()}</Tooltip>}
+              overlay={<Tooltip id={`${idPrefix}-delete-tooltip`}>{msg.nicDeleteTooltip()}</Tooltip>}
               placement='left'
             >
-              <a id={`nic-delete-action-${nic.id}`} className={itemStyle['item-action']}>
+              <a id={`${idPrefix}-delete-action`} className={itemStyle['item-action']}>
                 <Icon type='pf' name='delete' />
               </a>
             </OverlayTrigger>
@@ -117,13 +121,13 @@ const NicListItem = ({ nic, vmStatus, vnicProfileList, isEditing, onEdit, onDele
       }
       { !canDelete &&
         <OverlayTrigger
-          overlay={<Tooltip id={`nic-delete-tooltip-${nic.id}`}>{msg.nicDeleteDisabledTooltip()}</Tooltip>}
+          overlay={<Tooltip id={`${idPrefix}-delete-tooltip-disabled`}>{msg.nicDeleteDisabledTooltip()}</Tooltip>}
           placement='left'
         >
           <Icon
             type='pf'
             name='delete'
-            id={`nic-delete-action-${nic.id}`}
+            id={`${idPrefix}-delete-action-disabled`}
             className={`${itemStyle['item-action']} ${itemStyle['item-action-disabled']}`}
           />
         </OverlayTrigger>
@@ -133,6 +137,7 @@ const NicListItem = ({ nic, vmStatus, vnicProfileList, isEditing, onEdit, onDele
   </div>
 }
 NicListItem.propTypes = {
+  idPrefix: PropTypes.string.isRequired,
   nic: PropTypes.object.isRequired,
   vmStatus: PropTypes.string.isRequired,
   vnicProfileList: PropTypes.object.isRequired,
