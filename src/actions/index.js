@@ -7,7 +7,10 @@ import {
   GET_USER_GROUPS,
   GET_VM,
   PERSIST_STATE,
+  REFRESH_DETAIL_PAGE,
+  REFRESH_DIALOG_PAGE,
   SET_ADMINISTRATOR,
+  SET_CURRENT_PAGE,
   SET_USB_FILTER,
   SET_USER_FILTER_PERMISSION,
   SET_USER_GROUPS,
@@ -85,6 +88,16 @@ export function setAdministrator (administrator) {
   }
 }
 
+export function setCurrentPage ({ type, vmId }) {
+  return {
+    type: SET_CURRENT_PAGE,
+    payload: {
+      type,
+      vmId,
+    },
+  }
+}
+
 export function checkTokenExpired () {
   return {
     type: CHECK_TOKEN_EXPIRED,
@@ -154,5 +167,23 @@ export function getUserGroups () {
   return {
     type: GET_USER_GROUPS,
     payload: {},
+  }
+}
+
+export function refreshDetailPage ({ vmId }) {
+  return {
+    type: REFRESH_DETAIL_PAGE,
+    payload: {
+      vmId,
+    },
+  }
+}
+
+export function refreshDialogPage ({ vmId }) {
+  return {
+    type: REFRESH_DIALOG_PAGE,
+    payload: {
+      vmId,
+    },
   }
 }

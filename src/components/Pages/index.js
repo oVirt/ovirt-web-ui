@@ -15,10 +15,9 @@ import { default as LegacyVmDetails } from '../VmDetail'
 
 import {
   addUserMessage,
-  selectVmDetail,
   selectPoolDetail,
-  getIsoStorageDomains,
-  getConsoleOptions,
+  refreshDetailPage,
+  refreshDialogPage,
 } from '../../actions'
 
 /**
@@ -45,8 +44,7 @@ class LegacyVmDetailsPage extends React.Component {
 
       // Assume the VM is not in props.vms, was shallow fetched or is stale.
       // Force a refresh when it is selected for viewing.
-      props.getConsoleOptions(vmId)
-      props.getVmById(vmId)
+      props.refreshPage(vmId)
       return { vmId }
     }
 
@@ -70,16 +68,14 @@ LegacyVmDetailsPage.propTypes = {
   vms: PropTypes.object.isRequired,
   match: RouterPropTypeShapes.match.isRequired,
 
-  getVmById: PropTypes.func.isRequired,
-  getConsoleOptions: PropTypes.func.isRequired,
+  refreshPage: PropTypes.func.isRequired,
 }
 const LegacyVmDetailsPageConnected = connect(
   (state) => ({
     vms: state.vms,
   }),
   (dispatch) => ({
-    getVmById: (vmId) => dispatch(selectVmDetail({ vmId })),
-    getConsoleOptions: (vmId) => dispatch(getConsoleOptions({ vmId })),
+    refreshPage: (vmId) => dispatch(refreshDetailPage({ vmId })),
   })
 )(LegacyVmDetailsPage)
 
@@ -100,8 +96,7 @@ class VmDetailsPage extends React.Component {
 
       // Assume the VM is not in props.vms, was shallow fetched or is stale.
       // Force a refresh when it is selected for viewing.
-      props.getConsoleOptions(vmId)
-      props.getVmById(vmId)
+      props.refreshPage(vmId)
       return { vmId }
     }
 
@@ -125,16 +120,14 @@ VmDetailsPage.propTypes = {
   vms: PropTypes.object.isRequired,
   match: RouterPropTypeShapes.match.isRequired,
 
-  getVmById: PropTypes.func.isRequired,
-  getConsoleOptions: PropTypes.func.isRequired,
+  refreshPage: PropTypes.func.isRequired,
 }
 const VmDetailsPageConnected = connect(
   (state) => ({
     vms: state.vms,
   }),
   (dispatch) => ({
-    getVmById: (vmId) => dispatch(selectVmDetail({ vmId })),
-    getConsoleOptions: (vmId) => dispatch(getConsoleOptions({ vmId })),
+    refreshPage: (vmId) => dispatch(refreshDetailPage({ vmId })),
   })
 )(VmDetailsPage)
 
@@ -197,7 +190,7 @@ const PoolDetailsPageConnected = connect(
 class VmCreatePage extends React.Component {
   constructor (props) {
     super(props)
-    props.getAvailableCDImages()
+    props.refreshDialogPage()
   }
 
   componentDidUpdate () {
@@ -221,7 +214,7 @@ VmCreatePage.propTypes = {
   canUserCreateVMs: PropTypes.bool.isRequired,
   previousPath: PropTypes.string.isRequired,
 
-  getAvailableCDImages: PropTypes.func.isRequired,
+  refreshDialogPage: PropTypes.func.isRequired,
   redirectToMainPage: PropTypes.func.isRequired,
   addUserMessage: PropTypes.func.isRequired,
 }
@@ -230,7 +223,7 @@ const VmCreatePageConnected = connect(
     canUserCreateVMs: canUserUseAnyClusters(state.clusters) && state.clusters.size > 0,
   }),
   (dispatch) => ({
-    getAvailableCDImages: () => dispatch(getIsoStorageDomains()),
+    refreshPage: () => dispatch(refreshDialogPage({})),
     redirectToMainPage: () => dispatch(push('/')),
     addUserMessage: (message) => dispatch(addUserMessage({ message })),
   })
@@ -256,8 +249,7 @@ class VmEditPage extends React.Component {
 
       // Assume the VM is not in props.vms, was shallow fetched or is stale.
       // Force a refresh when it is selected for editing.
-      props.getAvailableCDImages()
-      props.getVmById(vmId)
+      props.refreshPage(vmId)
       return { vmId }
     }
 
@@ -308,8 +300,6 @@ VmEditPage.propTypes = {
   previousPath: PropTypes.string.isRequired,
   match: RouterPropTypeShapes.match.isRequired,
 
-  getAvailableCDImages: PropTypes.func.isRequired,
-  getVmById: PropTypes.func.isRequired,
   redirectToMainPage: PropTypes.func.isRequired,
   addUserMessage: PropTypes.func.isRequired,
 }
@@ -319,8 +309,7 @@ const VmEditPageConnected = connect(
     vms: state.vms,
   }),
   (dispatch) => ({
-    getAvailableCDImages: () => dispatch(getIsoStorageDomains()),
-    getVmById: (vmId) => dispatch(selectVmDetail({ vmId })),
+    refreshPage: (vmId) => dispatch(refreshDialogPage({ vmId })),
     redirectToMainPage: () => dispatch(push('/')),
     addUserMessage: (message) => dispatch(addUserMessage({ message })),
   })

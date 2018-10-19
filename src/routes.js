@@ -6,6 +6,7 @@ import { VmDetailToolbar, PoolDetailToolbar } from './components/Toolbar'
 import { PoolDetailsPage, VmDetailsPage, VmEditPage, VmCreatePage, VmsPage, LegacyVmDetailsPage } from './components/Pages'
 
 import { msg } from './intl'
+import { MAIN_PAGE, DETAIL_PAGE, DIALOG_PAGE } from './constants'
 
 /**
  * Function get vms object, and return routes object
@@ -28,6 +29,7 @@ export default function getRoutes (vms) {
         exact: true,
         component: VmsPage,
         toolbars: [() => (<AddVmButton key='addbutton' id={`route-add-vm`} />)],
+        type: MAIN_PAGE,
       },
 
       {
@@ -37,6 +39,7 @@ export default function getRoutes (vms) {
         component: VmCreatePage,
         toolbars: [], // TODO: Recently not used. When needed, see VmDialog/style.css - .vm-dialog-buttons
         closeable: true,
+        type: DIALOG_PAGE,
       },
 
       {
@@ -51,8 +54,10 @@ export default function getRoutes (vms) {
             component: VmEditPage,
             toolbars: [], // TODO: Recently not used. When needed, see VmDialog/style.css - .vm-dialog-buttons
             closeable: true,
+            type: DIALOG_PAGE,
           },
         ],
+        type: DETAIL_PAGE,
       },
 
       {
@@ -60,6 +65,7 @@ export default function getRoutes (vms) {
         title: (match, vms) => vms.getIn(['vms', match.params.id, 'name']) || match.params.id,
         component: LegacyVmDetailsPage,
         toolbars: [(match) => (<VmDetailToolbar match={match} key='vmaction' />)],
+        type: DETAIL_PAGE,
       },
 
       {
@@ -67,6 +73,7 @@ export default function getRoutes (vms) {
         title: (match, vms) => vms.getIn(['pools', match.params.id, 'name']) || match.params.id,
         component: PoolDetailsPage,
         toolbars: [(match) => (<PoolDetailToolbar match={match} key='poolaction' />)],
+        type: DETAIL_PAGE,
       },
     ],
   }]

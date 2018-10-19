@@ -122,6 +122,8 @@ import {
   LOGOUT,
   PERSIST_STATE,
   REFRESH_DATA,
+  REFRESH_DETAIL_PAGE,
+  REFRESH_DIALOG_PAGE,
   REMOVE_VM,
   RESTART_VM,
   SAVE_CONSOLE_OPTIONS,
@@ -133,6 +135,10 @@ import {
   START_VM,
   STOP_SCHEDULER_FIXED_DELAY,
   SUSPEND_VM,
+
+  DETAIL_PAGE,
+  DIALOG_PAGE,
+  MAIN_PAGE,
 } from './constants'
 
 import { canUserEditVm } from './utils'
@@ -198,8 +204,7 @@ function* fetchIcon ({ iconId }) {
   }
 }
 
-function* refreshData (action) {
-  logger.log('refreshData(): ', action.payload)
+export function* refreshMainPage (action) {
   const shallowFetch = !!action.payload.shallowFetch
 
   // refresh VMs and remove any that haven't been refreshed
@@ -237,6 +242,39 @@ function* refreshData (action) {
 
   // update counts
   yield put(updateVmsPoolsCount())
+}
+
+export function* refreshDetailPage ({ payload: { vmId } }) {
+  yield selectVmDetail({ payload: { vmId } })
+  yield getConsoleOptions({ payload: { vmId } })
+}
+
+export function* refreshDialogPage ({ payload: { vmId } }) {
+  if (vmId) {
+    yield selectVmDetail({ payload: { vmId } })
+  }
+  yield fetchISOStorages()
+}
+
+const pagesRefreshers = {
+  [MAIN_PAGE]: refreshMainPage,
+  [DETAIL_PAGE]: refreshDetailPage,
+  [DIALOG_PAGE]: refreshDialogPage,
+}
+
+function* refreshData (action) {
+  logger.log('refreshData(): ', action.payload)
+
+  const currentPage = Selectors.getPortalPage()
+
+  if (currentPage.type === undefined) {
+    yield pagesRefreshers[MAIN_PAGE](action)
+  } else {
+    yield pagesRefreshers[currentPage.type]({
+      payload: Object.assign({ vmId: currentPage.vmId }, action.payload),
+    })
+  }
+
   logger.log('refreshData(): finished')
 }
 
@@ -1021,6 +1059,8 @@ export function* rootSaga () {
     throttle(100, GET_VMS_BY_COUNT, fetchVmsByCount),
     throttle(100, GET_POOLS_BY_COUNT, fetchPoolsByCount),
     throttle(100, GET_POOLS_BY_PAGE, fetchPoolsByPage),
+    throttle(100, REFRESH_DETAIL_PAGE, refreshDetailPage),
+    throttle(100, REFRESH_DIALOG_PAGE, refreshDialogPage),
     takeLatest(PERSIST_STATE, persistStateSaga),
 
     takeEvery(SHUTDOWN_VM, shutdownVm),
