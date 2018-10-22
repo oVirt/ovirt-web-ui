@@ -12,10 +12,12 @@ import { PendingTaskTypes } from '../../../../reducers/pendingTasks'
 
 const Snapshots = ({ snapshots, vmId, idPrefix, beingCreated, beingDeleted, beingRestored }) => {
   const isVmInPreview = !!snapshots.find(snapshot => snapshot.get('status') === 'in_preview')
+  const isVmLocked = !!snapshots.find(snapshot => snapshot.get('status') === 'locked')
+  const isActionDisabled = isVmInPreview || beingCreated || beingRestored || beingDeleted || isVmLocked
   return (
     <React.Fragment>
       <div className={style['snapshot-create']}>
-        <NewSnapshotModal vmId={vmId} disabled={isVmInPreview || beingCreated || beingRestored || beingDeleted} idPrefix={`${idPrefix}-new-snapshot`} />
+        <NewSnapshotModal vmId={vmId} disabled={isActionDisabled} idPrefix={`${idPrefix}-new-snapshot`} />
       </div>
       {
         snapshots.sort((a, b) => b.get('date') - a.get('date')).map((snapshot) => (
@@ -24,7 +26,7 @@ const Snapshots = ({ snapshots, vmId, idPrefix, beingCreated, beingDeleted, bein
             id={`${idPrefix}-${snapshot.get('description').replace(/[\s]+/g, '_')}`}
             snapshot={snapshot}
             vmId={vmId}
-            isEditing={!isVmInPreview && !beingRestored && !beingDeleted && !beingCreated}
+            isEditing={!isActionDisabled}
           />
         ))
       }
@@ -41,7 +43,7 @@ Snapshots.propTypes = {
 }
 
 const ConnectedSnapshots = connect(
-  (state) => ({
+  (state, { snapshots }) => ({
     beingCreated: !!state.pendingTasks.find(t => t.type === PendingTaskTypes.SNAPSHOT_ADD),
     beingRestored: !!state.pendingTasks.find(task => task.type === PendingTaskTypes.SNAPSHOT_RESTORE),
     beingDeleted: !!state.pendingTasks.find(task => task.type === PendingTaskTypes.SNAPSHOT_REMOVAL),
