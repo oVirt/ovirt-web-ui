@@ -33,8 +33,13 @@ const DiskCharts = ({ vm, isRunning, id, ...props }) => {
   let provisionedSize = 0
 
   vm.get('disks').forEach(disk => {
-    actualSize += disk.get('actualSize')
-    provisionedSize += disk.get('provisionedSize')
+    if (disk.get('type') === 'lun') {
+      actualSize += disk.get('lunSize')
+      provisionedSize += disk.get('lunSize')
+    } else {
+      actualSize += disk.get('actualSize')
+      provisionedSize += disk.get('provisionedSize')
+    }
   })
 
   const { unit, value: disks } = convertValueMap('B', { actualSize, provisionedSize })
@@ -54,7 +59,7 @@ const DiskCharts = ({ vm, isRunning, id, ...props }) => {
           <UtilizationCardDetails>
             <UtilizationCardDetailsCount id={`${id}-available`}>{available}</UtilizationCardDetailsCount>
             <UtilizationCardDetailsDesc>
-              <UtilizationCardDetailsLine1>Available</UtilizationCardDetailsLine1>
+              <UtilizationCardDetailsLine1>Unallocated</UtilizationCardDetailsLine1>
               <UtilizationCardDetailsLine2 id={`${id}-total`}>of {total} {unit} Provisioned</UtilizationCardDetailsLine2>
             </UtilizationCardDetailsDesc>
           </UtilizationCardDetails>

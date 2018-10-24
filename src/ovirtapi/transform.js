@@ -380,13 +380,23 @@ const DiskAttachment = {
       iface: attachment['interface'],
 
       id: disk.id,
-      name: disk['name'], // same as `alias`
-      status: disk['status'],
+      name: disk['name'],
+      type: disk['storage_type'], // [ image | lun | cinder ]
+
+      format: disk['format'], // only for [ images | cinder ]
+      status: disk['status'], // [ illegal | locked | ok ] but only for [ images | cinder ]
+      sparse: convertBool(disk.sparse),
 
       actualSize: convertInt(disk['actual_size']),
       provisionedSize: convertInt(disk['provisioned_size']),
-      format: disk['format'],
-      storageDomainId:
+      lunSize:
+        disk.lun_storage &&
+        disk.lun_storage.logical_units &&
+        disk.lun_storage.logical_units.logical_unit &&
+        disk.lun_storage.logical_units.logical_unit[0] &&
+        convertInt(disk.lun_storage.logical_units.logical_unit[0].size),
+
+      storageDomainId: // only for image | cinder
         disk.storage_domains &&
         disk.storage_domains.storage_domain &&
         disk.storage_domains.storage_domain[0] &&
