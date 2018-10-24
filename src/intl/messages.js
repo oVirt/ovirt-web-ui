@@ -412,7 +412,7 @@ export const messages: { [messageId: string]: MessageType } = {
   vnicProfileEmpty: '<Empty>',
   yearsShort: 'y',
   yes: 'Yes',
-  youHaveNoAllowedVnicProfiles: 'You have no permissions to use vNIC Profiles.',
+  youHaveNoAllowedVnicProfiles: 'You cannot create or edit NICs because you do not have permission to use any vNIC Profiles in the VM\'s Data Center.',
 }
 
 export type MessageIdType = $Keys<typeof messages>

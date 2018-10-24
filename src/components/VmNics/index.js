@@ -130,10 +130,13 @@ VmNics.propTypes = {
 }
 
 export default connect(
-  (state, { vm }) => ({
-    vnicProfiles: state.vnicProfiles.filter(vnicProfile => state.clusters.getIn([vm.getIn(['cluster', 'id']), 'dataCenterId']) === vnicProfile.getIn(['network', 'dataCenterId'])),
-    canUserUseAnyVnicProfile: canUserUseAnyVnicProfile(state.vnicProfiles, state.clusters.getIn([vm.getIn(['cluster', 'id']), 'dataCenterId'])),
-  }),
+  (state, { vm }) => {
+    const dataCenterId = state.clusters.getIn([vm.getIn(['cluster', 'id']), 'dataCenterId'])
+    return {
+      vnicProfiles: state.vnicProfiles.filter(vnicProfile => dataCenterId === vnicProfile.getIn(['network', 'dataCenterId'])),
+      canUserUseAnyVnicProfile: canUserUseAnyVnicProfile(state.vnicProfiles, dataCenterId),
+    }
+  },
 
   (dispatch, { vm }) => ({
     onNicAdd: ({ nic }) => dispatch(addVmNic({ vmId: vm.get('id'), nic })),

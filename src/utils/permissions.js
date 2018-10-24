@@ -19,7 +19,7 @@ export function canUserUseVnicProfile (permits: Set<string>): boolean {
 }
 
 /*
- * Return if any of the given clusters are available for use by the cluster (as defined
+ * Return if any of the given clusters are available for use by the user (as defined
  * by `canUserUseCluster` above)
  */
 export function canUserUseAnyClusters (clusters: Array<ClusterType>): boolean {
@@ -27,8 +27,8 @@ export function canUserUseAnyClusters (clusters: Array<ClusterType>): boolean {
 }
 
 /*
- * Return if any of the given clusters are available for use by the cluster (as defined
- * by `canUserUseCluster` above)
+ * Return if any of the given vNIC Profiles are available for use by the user (as defined
+ * by `canUserUseVnicProfile` above)
  */
 export function canUserUseAnyVnicProfile (vnicProfiles: Array<VnicProfileType>, dataCenterId: string): boolean {
   return vnicProfiles.find(vnicProfile =>
