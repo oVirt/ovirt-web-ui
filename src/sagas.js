@@ -49,6 +49,7 @@ import {
 
   getSinglePool,
   removeMissingPools,
+  selectPoolDetail as actionSelectPoolDetail,
   removePools,
   updatePools,
   updateVmsPoolsCount,
@@ -59,6 +60,8 @@ import {
   getPoolsByCount,
   addStorageDomains,
   setStorageDomainsFiles,
+  getIsoStorageDomains,
+  getConsoleOptions as actionGetConsoleOptions,
   setVmCdRom,
   setVmNics,
   setUSBFilter,
@@ -67,6 +70,8 @@ import {
   getVmCdRom,
   changeVmCdRom as actionChangeVmCdRom,
   restartVm as actionRestartVm,
+
+  setCurrentPage,
 } from './actions'
 
 import {
@@ -93,6 +98,7 @@ import {
 
 import {
   ADD_VM_NIC,
+  CHANGE_PAGE,
   CHANGE_VM_CDROM,
   CHECK_CONSOLE_IN_USE,
   CHECK_TOKEN_EXPIRED,
@@ -122,8 +128,6 @@ import {
   LOGOUT,
   PERSIST_STATE,
   REFRESH_DATA,
-  REFRESH_DETAIL_PAGE,
-  REFRESH_DIALOG_PAGE,
   REMOVE_VM,
   RESTART_VM,
   SAVE_CONSOLE_OPTIONS,
@@ -139,6 +143,7 @@ import {
   DETAIL_PAGE,
   DIALOG_PAGE,
   MAIN_PAGE,
+  POOL_PAGE,
 } from './constants'
 
 import { canUserEditVm } from './utils'
@@ -204,12 +209,12 @@ function* fetchIcon ({ iconId }) {
   }
 }
 
-export function* refreshMainPage (action) {
-  const shallowFetch = !!action.payload.shallowFetch
+export function* refreshMainPage ({ shallowFetch, page }) {
+  shallowFetch = !!shallowFetch
 
   // refresh VMs and remove any that haven't been refreshed
   const fetchedVmIds = yield fetchVmsByCount(getVmsByCount({
-    count: action.payload.page * AppConfiguration.pageLimit,
+    count: page * AppConfiguration.pageLimit,
     shallowFetch,
   }))
 
@@ -226,7 +231,7 @@ export function* refreshMainPage (action) {
 
   // refresh Pools and remove any that haven't been refreshed
   const fetchedPoolIds = yield fetchPoolsByCount(getPoolsByCount({
-    count: action.payload.page * AppConfiguration.pageLimit,
+    count: page * AppConfiguration.pageLimit,
   }))
 
   const fetchedDirectlyPoolIds =
@@ -244,38 +249,50 @@ export function* refreshMainPage (action) {
   yield put(updateVmsPoolsCount())
 }
 
-export function* refreshDetailPage ({ payload: { vmId } }) {
-  yield selectVmDetail({ payload: { vmId } })
-  yield getConsoleOptions({ payload: { vmId } })
+function* refreshDetailPage ({ id }) {
+  yield selectVmDetail(actionSelectVmDetail({ vmId: id }))
+  yield getConsoleOptions(actionGetConsoleOptions({ vmId: id }))
 }
 
-export function* refreshDialogPage ({ payload: { vmId } }) {
-  if (vmId) {
-    yield selectVmDetail({ payload: { vmId } })
+function* refreshDialogPage ({ id }) {
+  if (id) {
+    yield selectVmDetail(actionSelectVmDetail({ vmId: id }))
   }
-  yield fetchISOStorages()
+  yield fetchISOStorages(getIsoStorageDomains())
+}
+
+function* refreshPoolPage ({ id }) {
+  yield selectPoolDetail(actionSelectPoolDetail({ poolId: id }))
 }
 
 const pagesRefreshers = {
   [MAIN_PAGE]: refreshMainPage,
   [DETAIL_PAGE]: refreshDetailPage,
   [DIALOG_PAGE]: refreshDialogPage,
+  [POOL_PAGE]: refreshPoolPage,
 }
 
 function* refreshData (action) {
-  logger.log('refreshData(): ', action.payload)
+  console.log('refreshData(): ', action.payload)
 
   const currentPage = Selectors.getPortalPage()
 
   if (currentPage.type === undefined) {
-    yield pagesRefreshers[MAIN_PAGE](action)
+    yield pagesRefreshers[MAIN_PAGE](action.payload)
   } else {
-    yield pagesRefreshers[currentPage.type]({
-      payload: Object.assign({ vmId: currentPage.vmId }, action.payload),
-    })
+    yield pagesRefreshers[currentPage.type](Object.assign({ id: currentPage.id }, action.payload))
   }
 
-  logger.log('refreshData(): finished')
+  console.log('refreshData(): finished')
+}
+
+function* changePage (action) {
+  yield put(setCurrentPage(action.payload))
+  yield refreshData(refresh({
+    quiet: true,
+    shallowFetch: true,
+    page: Selectors.getCurrentPage(),
+  }))
 }
 
 function* fetchVmsByPage (action) {
@@ -1059,8 +1076,7 @@ export function* rootSaga () {
     throttle(100, GET_VMS_BY_COUNT, fetchVmsByCount),
     throttle(100, GET_POOLS_BY_COUNT, fetchPoolsByCount),
     throttle(100, GET_POOLS_BY_PAGE, fetchPoolsByPage),
-    throttle(100, REFRESH_DETAIL_PAGE, refreshDetailPage),
-    throttle(100, REFRESH_DIALOG_PAGE, refreshDialogPage),
+    takeLatest(CHANGE_PAGE, changePage),
     takeLatest(PERSIST_STATE, persistStateSaga),
 
     takeEvery(SHUTDOWN_VM, shutdownVm),

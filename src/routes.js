@@ -6,7 +6,7 @@ import { VmDetailToolbar, PoolDetailToolbar } from './components/Toolbar'
 import { PoolDetailsPage, VmDetailsPage, VmEditPage, VmCreatePage, VmsPage, LegacyVmDetailsPage } from './components/Pages'
 
 import { msg } from './intl'
-import { MAIN_PAGE, DETAIL_PAGE, DIALOG_PAGE } from './constants'
+import { MAIN_PAGE, DETAIL_PAGE, DIALOG_PAGE, POOL_PAGE } from './constants'
 
 /**
  * Function get vms object, and return routes object
@@ -73,7 +73,7 @@ export default function getRoutes (vms) {
         title: (match, vms) => vms.getIn(['pools', match.params.id, 'name']) || match.params.id,
         component: PoolDetailsPage,
         toolbars: [(match) => (<PoolDetailToolbar match={match} key='poolaction' />)],
-        type: DETAIL_PAGE,
+        type: POOL_PAGE,
       },
     ],
   }]

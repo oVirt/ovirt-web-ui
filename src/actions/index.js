@@ -1,5 +1,6 @@
 import AppConfiguration from '../config'
 import {
+  CHANGE_PAGE,
   CHECK_TOKEN_EXPIRED,
   GET_BY_PAGE,
   GET_OPTION,
@@ -7,8 +8,6 @@ import {
   GET_USER_GROUPS,
   GET_VM,
   PERSIST_STATE,
-  REFRESH_DETAIL_PAGE,
-  REFRESH_DIALOG_PAGE,
   SET_ADMINISTRATOR,
   SET_CURRENT_PAGE,
   SET_USB_FILTER,
@@ -88,12 +87,22 @@ export function setAdministrator (administrator) {
   }
 }
 
-export function setCurrentPage ({ type, vmId }) {
+export function setCurrentPage ({ type, id }) {
   return {
     type: SET_CURRENT_PAGE,
     payload: {
       type,
-      vmId,
+      id,
+    },
+  }
+}
+
+export function changePage ({ type, id }) {
+  return {
+    type: CHANGE_PAGE,
+    payload: {
+      type,
+      id,
     },
   }
 }
@@ -167,23 +176,5 @@ export function getUserGroups () {
   return {
     type: GET_USER_GROUPS,
     payload: {},
-  }
-}
-
-export function refreshDetailPage ({ vmId }) {
-  return {
-    type: REFRESH_DETAIL_PAGE,
-    payload: {
-      vmId,
-    },
-  }
-}
-
-export function refreshDialogPage ({ vmId }) {
-  return {
-    type: REFRESH_DIALOG_PAGE,
-    payload: {
-      vmId,
-    },
   }
 }
