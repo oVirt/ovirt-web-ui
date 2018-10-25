@@ -45,7 +45,7 @@ class SelectBox extends React.Component {
   }
 
   render () {
-    let { id } = this.props
+    const { id } = this.props
 
     const selectedItem = this.state.items.find(item => item.id === this.state.selected)
 

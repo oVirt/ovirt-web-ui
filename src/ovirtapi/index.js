@@ -153,8 +153,16 @@ const OvirtApi = {
   },
   getAllClusters ({ additional }: { additional: Array<string> }): Promise<Object> {
     assertLogin({ methodName: 'getAllClusters' })
-    const url = `${AppConfiguration.applicationContext}/api/clusters` +
-      (additional && additional.length > 0 ? `?follow=${additional.join(',')}` : '')
+
+    let follow = 'network'
+    if (additional && additional.length > 0) {
+      if (!additional.includes('networks')) {
+        additional.push('networks')
+      }
+      follow = additional.join(',')
+    }
+
+    const url = `${AppConfiguration.applicationContext}/api/clusters?follow=${follow}`
     return httpGet({ url })
   },
   getClusterPermissions ({ clusterId }: { clusterId: string }): Promise<Object> {
@@ -352,7 +360,6 @@ const OvirtApi = {
   addNicToVm ({ nic, vmId }: { nic: NicType, vmId: string }): Promise<Object> {
     assertLogin({ methodName: 'addNicToVm' })
     const input = JSON.stringify(OvirtApi.internalNicToOvirt({ nic }))
-    logger.log(`OvirtApi.addNicToVm(): ${input}`)
     return httpPost({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/nics`,
       input,
@@ -364,6 +371,15 @@ const OvirtApi = {
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/nics/${nicId}`,
     })
   },
+  editNicInVm ({ nic, vmId }: { nic: NicType, vmId: string }): Promise<Object> {
+    assertLogin({ methodName: 'editNicInVm' })
+    const input = JSON.stringify(OvirtApi.internalNicToOvirt({ nic }))
+    return httpPut({
+      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/nics/${nic.id}`,
+      input,
+    })
+  },
+
   getUSBFilter (): Promise<Object> {
     assertLogin({ methodName: 'getUSBFilter' })
     return httpGet({

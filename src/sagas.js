@@ -101,6 +101,7 @@ import {
   DELETE_VM_NIC,
   DOWNLOAD_CONSOLE_VM,
   EDIT_VM,
+  EDIT_VM_NIC,
   GET_ALL_CLUSTERS,
   GET_ALL_HOSTS,
   GET_ALL_OS,
@@ -554,6 +555,13 @@ function* deleteVmNic (action) {
   yield put(setVmNics({ vmId: action.payload.vmId, nics: nicsInternal }))
 }
 
+function* editVmNic (action) {
+  yield callExternalAction('editNicInVm', Api.editNicInVm, action)
+
+  const nicsInternal = yield fetchVmNics({ vmId: action.payload.vmId })
+  yield put(setVmNics({ vmId: action.payload.vmId, nics: nicsInternal }))
+}
+
 export function* startProgress ({ vmId, poolId, name }) {
   if (vmId) {
     yield put(vmActionInProgress({ vmId, name, started: true }))
@@ -807,6 +815,8 @@ function* fetchAllClusters (action) {
     )
     yield put(setClusters(clustersInternal))
   }
+
+  // TODO: Api.getAllClusters uses 'follows' so it won't work <4.2, add support if needed
 }
 
 function* fetchAllHosts (action) {
@@ -1039,6 +1049,7 @@ export function* rootSaga () {
     takeEvery(SELECT_VM_DETAIL, selectVmDetail),
     takeEvery(ADD_VM_NIC, addVmNic),
     takeEvery(DELETE_VM_NIC, deleteVmNic),
+    takeEvery(EDIT_VM_NIC, editVmNic),
     takeEvery(GET_CONSOLE_OPTIONS, getConsoleOptions),
     takeEvery(SAVE_CONSOLE_OPTIONS, saveConsoleOptions),
 

@@ -46,7 +46,7 @@ class BaseCard extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      edit: props.editMode,
+      edit: props.editMode || false,
     }
     this.propTypeKeys = Object.keys(BaseCard.propTypes)
 

@@ -94,6 +94,8 @@ export type NicType = {
   name: string,
   mac: string,
   plugged: boolean,
+  linked: boolean,
+  interface: 'e1000' | 'pci_passthrough' | 'rtl8139' | 'rtl8139_virtio' | 'virtio',
   ips: Array<{
     address: string,
     version: 'v4' | 'v6'
