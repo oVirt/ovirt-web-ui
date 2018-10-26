@@ -266,6 +266,7 @@ const VmStatistics = {
         unit: 'seconds',
         description: 'Elapsed VM runtime (default to 0)',
       },
+      disks: {},
     }
 
     for (const stat: ApiVmStatisticType of statistics) {
@@ -277,14 +278,17 @@ const VmStatistics = {
       if (stat.kind !== 'gauge') continue
 
       // no values -> undefined, 1 value -> value.datum, >1 values -> [...values.datum]
+      // ?disks.usage -> {detail...}
       const datum =
         stat.values &&
         stat.values.value &&
-        (stat.values.value.length === 1
-          ? stat.values.value[0].datum
-          : stat.values.value.map(value => value.datum))
+        (stat.name === 'disks.usage'
+          ? JSON.parse(stat.values.value[0].detail || 'null')
+          : stat.values.value.length === 1
+            ? stat.values.value[0].datum
+            : stat.values.value.map(value => value.datum))
 
-      const nameParts = /^(memory|cpu|network)\.(.*)?$/.exec(stat.name)
+      const nameParts = /^(memory|cpu|network|disks)\.(.*)?$/.exec(stat.name)
       if (nameParts) {
         base[nameParts[1]][nameParts[2]] = {
           datum,

@@ -67,3 +67,25 @@
 .utilization-card :global(.c3-tooltip-container) {
   white-space: nowrap;
 }
+
+.disk-fs-list {
+  display: table;
+  border-spacing: 10px 0;
+}
+
+.disk-fs-list .disk-fs-box {
+  display: table-row;
+}
+
+.disk-fs-list .disk-fs-box > div {
+  display: table-cell;
+  vertical-align: top;
+}
+
+.disk-fs-box .disk-fs-bar {
+  min-width: 100px;
+}
+
+.disk-fs-box .disk-fs-used {
+  margin-left: 10px;
+}

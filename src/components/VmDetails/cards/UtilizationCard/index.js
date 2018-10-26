@@ -45,8 +45,8 @@ const UtilizationCard = ({ vm }) => {
             }
           </Col>
           <Col>
-            { vm.has('disks')
-              ? <DiskCharts vm={vm} isRunning={isRunning} id={`${idPrefix}-disk`} />
+            { vm.has('disks') && stats.disks
+              ? <DiskCharts vm={vm} diskStats={stats.disks} isRunning={isRunning} id={`${idPrefix}-disk`} />
               : <NoLiveData message={loadingMessage} id={`${idPrefix}-disk-no-data`} />
             }
           </Col>
