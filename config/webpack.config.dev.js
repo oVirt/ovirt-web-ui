@@ -91,6 +91,9 @@ module.exports = {
         test: /\.(js|jsx)$/,
         loader: 'eslint',
         include: paths.appSrc,
+        options: {
+          failOnError: true,
+        }
       },
     ],
     loaders: [
