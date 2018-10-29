@@ -1,20 +1,52 @@
+/* for DisksCard */
 .disks-container {
   width: auto;
-  margin-left: -15px; /* max is -20px to edge of the containing card */
-  margin-right: -15px;
+  margin-left: -20px; /* max is -20px to edge of the containing card */
+  margin-right: -20px;
 }
 
-.no-disks {
-  font-style: italic;
-  text-align: center;
-  color: rgba(0, 0, 0, 0.65);
+/* for DiskRow (not already in itemListStyle.css */
+.state-icon {
+  font-size: 14px;
+}
+
+.state-icon-active {
+  color: #3f9c35;
+}
+
+.state-icon-inactive {
+  color: red;
+}
+
+.state-icon-locked {
+  color: black;
+}
+
+.name-info {
+  max-width: 250px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .size-info {
   margin-left: 5px;
 }
 
-.bootable-label {
+.disk-label {
   margin-left: 5px;
   font-size: 75%;
+}
+
+/* for DiskImageEditor */
+.editor-modal {
+  width: 700px;
+}
+
+.editor-field-help {
+  margin-right: -7px;
+}
+
+.editor-field-read-only {
+  padding-top: 5px;
 }

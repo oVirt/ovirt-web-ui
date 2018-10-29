@@ -39,8 +39,6 @@ const OvirtApi = {
     return Transforms.VM.toInternal({ vm, includeSubResources: getSubResources })
   },
 
-  Transforms: Transforms,
-
   internalVmToOvirt: Transforms.VM.toApi,
 
   poolToInternal: Transforms.Pool.toInternal,
@@ -401,10 +399,10 @@ const OvirtApi = {
   },
 
   // async operation
-  addDiskAttachment ({ vmId, newDisk }: { vmId: string, newDisk: DiskType }): Promise<Object> {
+  addDiskAttachment ({ vmId, disk }: { vmId: string, disk: DiskType }): Promise<Object> {
     assertLogin({ methodName: 'addDiskAttachment' })
 
-    const payload = Transforms.DiskAttachment.toApi({ disk: newDisk })
+    const payload = Transforms.DiskAttachment.toApi({ disk })
     const input = JSON.stringify(payload)
 
     return httpPost({

@@ -8,12 +8,12 @@ import {
   EDIT_VM_DISK,
 } from '../constants'
 
-export function createDiskForVm ({ vmId, newDisk }: { vmId: string, newDisk: DiskType }) {
+export function createDiskForVm ({ vmId, disk }: { vmId: string, disk: DiskType }) {
   return {
     type: CREATE_DISK_FOR_VM,
     payload: {
       vmId,
-      newDisk,
+      disk,
     },
   }
 }
