@@ -6,7 +6,7 @@ import { VmDetailToolbar, PoolDetailToolbar } from './components/Toolbar'
 import { PoolDetailsPage, VmDetailsPage, VmEditPage, VmCreatePage, VmsPage, LegacyVmDetailsPage } from './components/Pages'
 
 import { msg } from './intl'
-import { MAIN_PAGE, DETAIL_PAGE, DIALOG_PAGE, POOL_PAGE } from './constants'
+import { DETAIL_PAGE_TYPE, DIALOG_PAGE_TYPE, MAIN_PAGE_TYPE, POOL_PAGE_TYPE } from './constants'
 
 /**
  * Function get vms object, and return routes object
@@ -29,7 +29,7 @@ export default function getRoutes (vms) {
         exact: true,
         component: VmsPage,
         toolbars: [() => (<AddVmButton key='addbutton' id={`route-add-vm`} />)],
-        type: MAIN_PAGE,
+        type: MAIN_PAGE_TYPE,
       },
 
       {
@@ -39,7 +39,7 @@ export default function getRoutes (vms) {
         component: VmCreatePage,
         toolbars: [], // TODO: Recently not used. When needed, see VmDialog/style.css - .vm-dialog-buttons
         closeable: true,
-        type: DIALOG_PAGE,
+        type: DIALOG_PAGE_TYPE,
       },
 
       {
@@ -54,10 +54,10 @@ export default function getRoutes (vms) {
             component: VmEditPage,
             toolbars: [], // TODO: Recently not used. When needed, see VmDialog/style.css - .vm-dialog-buttons
             closeable: true,
-            type: DIALOG_PAGE,
+            type: DIALOG_PAGE_TYPE,
           },
         ],
-        type: DETAIL_PAGE,
+        type: DETAIL_PAGE_TYPE,
       },
 
       {
@@ -65,7 +65,7 @@ export default function getRoutes (vms) {
         title: (match, vms) => vms.getIn(['vms', match.params.id, 'name']) || match.params.id,
         component: LegacyVmDetailsPage,
         toolbars: [(match) => (<VmDetailToolbar match={match} key='vmaction' />)],
-        type: DETAIL_PAGE,
+        type: DETAIL_PAGE_TYPE,
       },
 
       {
@@ -73,7 +73,7 @@ export default function getRoutes (vms) {
         title: (match, vms) => vms.getIn(['pools', match.params.id, 'name']) || match.params.id,
         component: PoolDetailsPage,
         toolbars: [(match) => (<PoolDetailToolbar match={match} key='poolaction' />)],
-        type: POOL_PAGE,
+        type: POOL_PAGE_TYPE,
       },
     ],
   }]

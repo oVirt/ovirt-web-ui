@@ -140,10 +140,10 @@ import {
   STOP_SCHEDULER_FIXED_DELAY,
   SUSPEND_VM,
 
-  DETAIL_PAGE,
-  DIALOG_PAGE,
-  MAIN_PAGE,
-  POOL_PAGE,
+  DETAIL_PAGE_TYPE,
+  DIALOG_PAGE_TYPE,
+  MAIN_PAGE_TYPE,
+  POOL_PAGE_TYPE,
 } from './constants'
 
 import { canUserEditVm } from './utils'
@@ -266,19 +266,19 @@ function* refreshPoolPage ({ id }) {
 }
 
 const pagesRefreshers = {
-  [MAIN_PAGE]: refreshMainPage,
-  [DETAIL_PAGE]: refreshDetailPage,
-  [DIALOG_PAGE]: refreshDialogPage,
-  [POOL_PAGE]: refreshPoolPage,
+  [MAIN_PAGE_TYPE]: refreshMainPage,
+  [DETAIL_PAGE_TYPE]: refreshDetailPage,
+  [DIALOG_PAGE_TYPE]: refreshDialogPage,
+  [POOL_PAGE_TYPE]: refreshPoolPage,
 }
 
 function* refreshData (action) {
   console.log('refreshData(): ', action.payload)
 
-  const currentPage = Selectors.getPortalPage()
+  const currentPage = Selectors.getCurrentPage()
 
   if (currentPage.type === undefined) {
-    yield pagesRefreshers[MAIN_PAGE](action.payload)
+    yield pagesRefreshers[MAIN_PAGE_TYPE](action.payload)
   } else {
     yield pagesRefreshers[currentPage.type](Object.assign({ id: currentPage.id }, action.payload))
   }
@@ -291,7 +291,7 @@ function* changePage (action) {
   yield refreshData(refresh({
     quiet: true,
     shallowFetch: true,
-    page: Selectors.getCurrentPage(),
+    page: Selectors.getCurrentFetchPage(),
   }))
 }
 
@@ -1052,7 +1052,7 @@ function* schedulerWithFixedDelay (delayInSeconds = AppConfiguration.schedulerFi
         yield refreshData(refresh({
           quiet: true,
           shallowFetch: true,
-          page: Selectors.getCurrentPage(),
+          page: Selectors.getCurrentFetchPage(),
         }))
       } else {
         logger.log(`⏰ schedulerWithFixedDelay[${myId}] event skipped since oVirt API version does not match`)
