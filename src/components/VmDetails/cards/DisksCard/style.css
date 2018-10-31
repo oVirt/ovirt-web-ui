@@ -29,6 +29,11 @@
   overflow: hidden;
 }
 
+.name-info-deleting {
+  color: rgba(0, 0, 0, 0.65);
+  font-style: italic;
+}
+
 .size-info {
   margin-left: 5px;
 }

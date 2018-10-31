@@ -93,6 +93,7 @@ export const messages: { [messageId: string]: MessageType } = {
   diskEditDisabledTooltip: 'Cannot edit the Disk at this time',
   diskEditTooltip: 'Edit',
   diskEditorAliasLabel: 'Name',
+  diskEditorDiskDeletingTooltip: 'The disk is being deleted.',
   diskEditorFormatCantChangeHelp: 'Disk type cannot be changed after it has been created.',
   diskEditorFormatLabel: 'Disk Type',
   diskEditorFormatNotAvailable: 'N/A',

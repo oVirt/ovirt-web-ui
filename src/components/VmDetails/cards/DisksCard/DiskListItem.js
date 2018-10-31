@@ -59,9 +59,21 @@ const DiskListItem = ({
 
     {/* Details Column - take the rest of the space */}
     <div className={itemStyle['item-row-info']}>
-      <span id={`${idPrefix}-name`} className={style['name-info']}>
-        {view.name}
-      </span>
+      { isDiskBeingDeleted &&
+        <OverlayTrigger
+          overlay={<Tooltip id={`${idPrefix}-name-info-deleting-tooltip`}>{msg.diskEditorDiskDeletingTooltip()}</Tooltip>}
+          placement='top'
+        >
+          <span id={`${idPrefix}-name`} className={`${style['name-info']} ${style['name-info-deleting']}`}>
+            {view.name}
+          </span>
+        </OverlayTrigger>
+      }
+      { !isDiskBeingDeleted &&
+        <span id={`${idPrefix}-name`} className={style['name-info']}>
+          {view.name}
+        </span>
+      }
       <span id={`${idPrefix}-size`} className={style['size-info']}>
         ({view.size.value} {view.size.unit})
       </span>
