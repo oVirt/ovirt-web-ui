@@ -1,4 +1,9 @@
-import { SET_CONSOLE_IN_USE, CHECK_CONSOLE_IN_USE, SET_CONSOLE_VALID } from '../constants'
+import {
+  SET_CONSOLE_IN_USE,
+  CHECK_CONSOLE_IN_USE,
+  DOWNLOAD_CONSOLE_VM,
+  SET_CONSOLE_LOGON,
+} from '../constants'
 
 export function setConsoleInUse ({ vmId, consoleInUse }) {
   return {
@@ -10,23 +15,37 @@ export function setConsoleInUse ({ vmId, consoleInUse }) {
   }
 }
 
-export function setConsoleIsValid ({ vmId, isValid }) {
+export function setConsoleLogon ({ vmId, isLogon }) {
   return {
-    type: SET_CONSOLE_VALID,
+    type: SET_CONSOLE_LOGON,
     payload: {
       vmId,
-      isValid,
+      isLogon,
     },
   }
 }
 
-export function checkConsoleInUse ({ vmId, usbFilter, userId }) {
+export function checkConsoleInUse ({ vmId, usbFilter, userId, hasGuestAgent }) {
   return {
     type: CHECK_CONSOLE_IN_USE,
     payload: {
       vmId,
       usbFilter,
       userId,
+      hasGuestAgent,
+    },
+  }
+}
+
+export function downloadConsole ({ vmId, consoleId, usbFilter, hasGuestAgent, force }) {
+  return {
+    type: DOWNLOAD_CONSOLE_VM,
+    payload: {
+      vmId,
+      consoleId,
+      usbFilter,
+      hasGuestAgent,
+      force,
     },
   }
 }

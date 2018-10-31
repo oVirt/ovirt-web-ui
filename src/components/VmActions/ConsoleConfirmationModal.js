@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import ConfirmationModal from './ConfirmationModal'
 
-import { downloadConsole, checkConsoleInUse, setConsoleInUse } from '../../actions/index'
+import { downloadConsole, checkConsoleInUse, setConsoleInUse, setConsoleLogon } from '../../actions/index'
 
 import { msg } from '../../intl'
 
@@ -31,8 +31,9 @@ class ConsoleConfirmationModal extends React.Component {
     this.props.onClose()
   }
 
-  onConsoleDownload () {
-    this.props.onDownloadConsole({ usbFilter: this.props.config.get('usbFilter') })
+  onConsoleDownload (force) {
+    return () =>
+      this.props.onDownloadConsole({ usbFilter: this.props.config.get('usbFilter'), force })
   }
 
   render () {
@@ -41,6 +42,18 @@ class ConsoleConfirmationModal extends React.Component {
       consoles,
       show,
     } = this.props
+
+    if (consoles.getIn(['vms', vm.get('id'), 'isLogon']) === false) {
+      return (
+        <ConfirmationModal
+          show
+          onClose={this.onConsoleConfirmationClose}
+          title={msg.console()}
+          body={msg.cantLogonToConsole()}
+          confirm={{ title: msg.yes(), onClick: this.onConsoleDownload(true) }}
+        />
+      )
+    }
 
     if (!show || !consoles.getIn(['vms', vm.get('id'), 'consoleInUse'])) {
       return null
@@ -52,7 +65,7 @@ class ConsoleConfirmationModal extends React.Component {
         show={show}
         title={msg.console()}
         body={msg.consoleInUseContinue()}
-        confirm={{ title: msg.yes(), onClick: this.onConsoleDownload }}
+        confirm={{ title: msg.yes(), onClick: this.onConsoleDownload() }}
       />
     )
   }
@@ -76,8 +89,11 @@ export default connect(
     consoles: state.consoles,
   }),
   (dispatch, { vm, consoleId }) => ({
-    onCheckConsoleSessionInUse: ({ usbFilter, userId }) => dispatch(checkConsoleInUse({ vmId: vm.get('id'), usbFilter, userId })),
-    onConsoleSessionConfirmaClose: () => dispatch(setConsoleInUse({ vmId: vm.get('id'), consoleInUse: null })),
-    onDownloadConsole: ({ usbFilter }) => dispatch(downloadConsole({ vmId: vm.get('id'), usbFilter, consoleId })),
+    onCheckConsoleSessionInUse: ({ usbFilter, userId }) => dispatch(checkConsoleInUse({ vmId: vm.get('id'), usbFilter, userId, hasGuestAgent: vm.get('ssoGuestAgent') })),
+    onConsoleSessionConfirmaClose: () => {
+      dispatch(setConsoleInUse({ vmId: vm.get('id'), consoleInUse: null }))
+      dispatch(setConsoleLogon({ vmId: vm.get('id'), isLogon: null }))
+    },
+    onDownloadConsole: ({ usbFilter, force }) => dispatch(downloadConsole({ vmId: vm.get('id'), usbFilter, consoleId, hasGuestAgent: vm.get('ssoGuestAgent'), force })),
   })
 )(ConsoleConfirmationModal)

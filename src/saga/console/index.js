@@ -9,10 +9,10 @@ import {
   downloadConsole,
   getConsoleOptions as getConsoleOptionsAction,
   setConsoleInUse,
+  setConsoleLogon,
   setConsoleOptions,
   setVmConsoles,
   vmActionInProgress,
-  setConsoleIsValid,
 } from '../../actions'
 
 import { callExternalAction } from '../utils'
@@ -26,10 +26,19 @@ import RDPBuilder from './rdpBuilder'
  * Push a virt-viewer connection file (__console.vv__) to connect a user to a VM's console
  */
 export function* downloadVmConsole (action) {
-  let { vmId, consoleId, usbFilter } = action.payload
+  let { vmId, consoleId, usbFilter, hasGuestAgent, force } = action.payload
 
   let isSpice = false
 
+  if (hasGuestAgent && !force) {
+    let result = yield callExternalAction('vmLogon', Api.vmLogon, { payload: { vmId } }, true)
+    if (!result || result.status !== 'complete') {
+      yield put(setConsoleLogon({ vmId, isLogon: false }))
+      return
+    }
+  }
+
+  yield put(setConsoleLogon({ vmId, isLogon: true }))
   if (!consoleId) {
     yield put(vmActionInProgress({ vmId, name: 'getConsole', started: true }))
     const consolesInternal = yield fetchConsoleVmMeta({ vmId })
@@ -87,9 +96,7 @@ export function* fetchConsoleVmMeta ({ vmId }) {
  * Check the consoleUser sessions on a VM and
  */
 export function* getConsoleInUse (action) {
-  let { vmId, usbFilter, userId } = action.payload
-  yield put(setConsoleIsValid({ vmId, isValid: false }))
-
+  let { vmId, usbFilter, userId, hasGuestAgent } = action.payload
   const sessionsInternal = yield fetchVmSessions({ vmId })
   logger.log(`vmId: ${vmId}, sessions: ${JSON.stringify(sessionsInternal)}`)
 
@@ -97,10 +104,9 @@ export function* getConsoleInUse (action) {
     yield put(setConsoleInUse({ vmId, consoleInUse: true }))
   } else {
     yield put(setConsoleInUse({ vmId, consoleInUse: false }))
-    yield put(downloadConsole({ vmId, usbFilter }))
+    yield put(downloadConsole({ vmId, usbFilter, hasGuestAgent }))
     yield put(setConsoleInUse({ vmId, consoleInUse: null }))
   }
-  yield put(setConsoleIsValid({ vmId, isValid: true }))
 }
 
 // ----- Console Options (per VM) held by `OptionsManager`

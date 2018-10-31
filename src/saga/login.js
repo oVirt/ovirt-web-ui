@@ -181,7 +181,7 @@ function* autoConnectCheck () {
     } else if (vm && vm.id && vm.status !== 'down') {
       const internalVm = Api.vmToInternal({ vm })
       yield put(updateVms({ vms: [internalVm] }))
-      yield downloadVmConsole(downloadConsole({ vmId }))
+      yield downloadVmConsole(downloadConsole({ vmId, hasGuestAgent: internalVm.ssoGuestAgent }))
     }
   }
 }

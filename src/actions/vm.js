@@ -3,7 +3,6 @@ import {
   CHANGE_VM_CDROM,
   CREATE_VM,
   DELETE_VM_NIC,
-  DOWNLOAD_CONSOLE_VM,
   EDIT_VM,
   EDIT_VM_NIC,
   GET_RDP_VM,
@@ -119,17 +118,6 @@ export function startVm ({ vmId }) {
     type: START_VM,
     payload: {
       vmId,
-    },
-  }
-}
-
-export function downloadConsole ({ vmId, consoleId, usbFilter }) {
-  return {
-    type: DOWNLOAD_CONSOLE_VM,
-    payload: {
-      vmId,
-      consoleId,
-      usbFilter,
     },
   }
 }
