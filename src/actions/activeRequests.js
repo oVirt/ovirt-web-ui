@@ -2,7 +2,7 @@ import {
   ADD_ACTIVE_REQUEST,
   REMOVE_ACTIVE_REQUEST,
   DELAYED_REMOVE_ACTIVE_REQUEST,
-} from '../constants'
+} from 'app-constants'
 
 export function addActiveRequest (requestId) {
   return {

@@ -1,7 +1,7 @@
 import { Set } from 'immutable'
 
 import { actionReducer } from './utils'
-import { ADD_ACTIVE_REQUEST, REMOVE_ACTIVE_REQUEST } from '../constants'
+import { ADD_ACTIVE_REQUEST, REMOVE_ACTIVE_REQUEST } from 'app-constants'
 
 const initialState = Set()
 

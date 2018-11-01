@@ -1,4 +1,4 @@
-import { FAILED_EXTERNAL_ACTION, LOGIN_FAILED } from '../constants'
+import { FAILED_EXTERNAL_ACTION, LOGIN_FAILED } from 'app-constants'
 
 function customizeErrorMessage (message) {
   const result = message.replace('Vm ', 'VM ')

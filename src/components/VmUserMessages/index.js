@@ -7,9 +7,9 @@ import { Notification, NotificationDrawer, MenuItem, Icon, Button } from 'patter
 
 import style from './style.css'
 
-import { clearUserMessages, dismissUserMessage } from '../../actions'
-import { hrefWithoutHistory, getFormatedDateTime } from '../../helpers'
-import { msg } from '../../intl'
+import { clearUserMessages, dismissUserMessage } from 'actions'
+import { hrefWithoutHistory, getFormatedDateTime } from 'helpers'
+import { msg } from 'app-intl'
 
 const UserMessage = ({ record, id, onDismissMessage }) => {
   const time = getFormatedDateTime(record.get('time'))

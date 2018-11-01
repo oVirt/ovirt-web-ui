@@ -13,7 +13,7 @@ import {
   DonutChart,
 } from 'patternfly-react'
 
-import { convertValueMap, round } from '../../../../utils'
+import { convertValueMap, round } from 'utils'
 
 import style from './style.css'
 

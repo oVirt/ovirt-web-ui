@@ -1,7 +1,7 @@
 import {
   GET_ALL_OS,
   SET_OPERATING_SYSTEMS,
-} from '../constants'
+} from 'app-constants'
 
 /**
  * @param {Array<OperatingSystem>} operatingSystems

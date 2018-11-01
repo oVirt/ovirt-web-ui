@@ -1,7 +1,7 @@
 import { fromJS } from 'immutable'
 
-import { arrayToMap } from '../helpers'
-import { SET_OPERATING_SYSTEMS } from '../constants'
+import { arrayToMap } from 'helpers'
+import { SET_OPERATING_SYSTEMS } from 'app-constants'
 import { actionReducer } from './utils'
 
 const initialState = fromJS({})

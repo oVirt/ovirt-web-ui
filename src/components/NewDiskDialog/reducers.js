@@ -1,6 +1,6 @@
 import { fromJS } from 'immutable'
 
-import { actionReducer } from '../../reducers/utils'
+import { actionReducer } from 'reducers/utils.js'
 import {
   CLEAN_NEW_DISK_DIALOG_SUBTREE,
   SET_NEW_DISK_DIALOG_DONE,

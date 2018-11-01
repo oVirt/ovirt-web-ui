@@ -1,5 +1,5 @@
 import { Map } from 'immutable'
-import { UPDATE_ICONS } from '../constants'
+import { UPDATE_ICONS } from 'app-constants'
 import { actionReducer } from './utils'
 
 const initialState = Map()

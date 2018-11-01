@@ -11,7 +11,7 @@ import {
   removeSnapshotRestorePendingTask,
   addSnapshotAddPendingTask,
   removeSnapshotAddPendingTask,
-} from '../../../../actions'
+} from 'actions'
 
 function* addVmSnapshot (action) {
   yield put(addSnapshotAddPendingTask())

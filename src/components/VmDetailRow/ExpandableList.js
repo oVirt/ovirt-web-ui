@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { msg } from '../../intl'
+import { msg } from 'app-intl'
 
 import style from './style.css'
 

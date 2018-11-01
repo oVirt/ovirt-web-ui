@@ -123,7 +123,12 @@
     "moduleNameMapper": {
       "^.+\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/config/jest/FileStub.js",
       "^.+\\.css$": "<rootDir>/config/jest/CSSStub.js",
-      "ovirtapi": "<rootDir>/src/mock/ovirtapi.mock.js"
+      "ovirtapi": "<rootDir>/src/mock/ovirtapi.mock.js",
+      "app-intl": "<rootDir>/src/intl/index.js",
+      "actions": "<rootDir>/src/actions/index.js",
+      "reducers(.*)$": "<rootDir>/src/reducers/$1",
+      "app-constants": "<rootDir>/src/constants/index.js",
+      "helpers": "<rootDir>/src/helpers.js"
     },
     "transform": {
       ".*": "<rootDir>/config/jest/transform.js"

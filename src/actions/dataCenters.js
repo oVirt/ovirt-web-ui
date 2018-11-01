@@ -2,7 +2,7 @@
 
 import {
   SET_DATA_CENTERS,
-} from '../constants'
+} from 'app-constants'
 
 export function setDataCenters (dataCenters: Array<Object>): Object {
   return {

@@ -6,7 +6,7 @@ import {
   FAILED_EXTERNAL_ACTION,
   LOGIN_FAILED,
   SET_USERMSG_NOTIFIED,
-} from '../constants'
+} from 'app-constants'
 import { actionReducer } from './utils'
 
 /*flow-include

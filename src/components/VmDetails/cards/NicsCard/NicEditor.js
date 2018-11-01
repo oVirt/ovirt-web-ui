@@ -16,7 +16,7 @@ import SelectBox from '../../../SelectBox'
 import ExpandCollapseSection from '../../../ExpandCollapseSection'
 import NicLinkStateIcon from './NicLinkStateIcon'
 
-import { msg, enumMsg } from '../../../../intl'
+import { msg, enumMsg } from 'app-intl'
 import style from './style.css'
 
 const EMPTY_ID = ''

@@ -1,7 +1,7 @@
 import {
   GET_ALL_HOSTS,
   SET_HOSTS,
-} from '../constants'
+} from 'app-constants'
 
 export function setHosts (hosts) {
   return {

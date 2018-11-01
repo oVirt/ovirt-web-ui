@@ -3,12 +3,12 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Modal } from 'patternfly-react'
 
-import { createDiskForVm } from '../../actions'
+import { createDiskForVm } from '_/actions'
 import { cleanNewDiskDialogSubtree } from './actions'
 
-import { msg } from '../../intl'
+import { msg } from 'app-intl'
 import SelectBox from '../SelectBox'
-import { flatMap, parseGbToBytes } from '../../utils'
+import { flatMap, parseGbToBytes } from 'utils'
 import style from './style.css'
 
 class NewDiskDialog extends React.Component {

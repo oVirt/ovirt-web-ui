@@ -1,5 +1,5 @@
 import { Blob } from 'blob-util'
-import { locale as appLocale, msg } from './intl'
+import { locale as appLocale, msg } from 'app-intl'
 
 // "payload":{"message":"Not Found","shortMessage":"LOGIN failed","type":404,"action":{"type":"LOGIN","payload":{"credentials":{"username":"admin@internal","password":"admi"}}}}}
 export function hidePassword ({ action, param }) {

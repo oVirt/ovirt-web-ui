@@ -1,6 +1,6 @@
 import { Map } from 'immutable'
 import logger from '../logger'
-import { UPDATE_ICONS, REMOVE_ACTIVE_REQUEST, DELAYED_REMOVE_ACTIVE_REQUEST, ADD_ACTIVE_REQUEST } from '../constants'
+import { UPDATE_ICONS, REMOVE_ACTIVE_REQUEST, DELAYED_REMOVE_ACTIVE_REQUEST, ADD_ACTIVE_REQUEST } from 'app-constants'
 
 /**
  * Takes initial state of the reducer and a map of action handlers and returns a redux-compatible reducer.

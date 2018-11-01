@@ -1,5 +1,5 @@
 /* eslint-env jest */
-import { formatDateFromNow } from './helpers'
+import { formatDateFromNow } from 'helpers'
 
 describe('testing formating from now date', function () {
   const nowDate = Date.now()

@@ -1,5 +1,5 @@
 import Immutable from 'immutable'
-import { SET_CONSOLE_OPTIONS } from '../constants'
+import { SET_CONSOLE_OPTIONS } from 'app-constants'
 import { actionReducer } from './utils'
 
 function setOptions ({ state, type, options }) {

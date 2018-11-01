@@ -4,10 +4,10 @@ import { connect } from 'react-redux'
 
 import sharedStyle from '../../../sharedStyle.css'
 import { getOsHumanName, getVmIcon } from '../../../utils'
-import { enumMsg } from '../../../../intl'
-import { generateUnique } from '../../../../helpers'
+import { enumMsg } from 'app-intl'
+import { generateUnique } from 'helpers'
 
-import { editVm } from '../../../../actions'
+import { editVm } from 'actions'
 
 import { Media } from 'react-bootstrap'
 import { FormControl, Alert } from 'patternfly-react'

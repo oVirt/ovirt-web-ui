@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import AppConfiguration from '../../config'
-import { msg } from '../../intl'
+import { msg } from 'app-intl'
 import { canDeleteDisk } from '../../vm-status'
 
 import style from './style.css'
@@ -13,9 +13,9 @@ import sharedStyle from '../sharedStyle.css'
 import {
   getConsoleOptions,
   saveConsoleOptions,
-} from '../../actions'
+} from 'actions'
 
-import { templateNameRenderer, userFormatOfBytes } from '../../helpers'
+import { templateNameRenderer, userFormatOfBytes } from 'helpers'
 
 import ConsoleOptions from '../ConsoleOptions'
 import DetailContainer from '../DetailContainer'

@@ -4,7 +4,7 @@ import Api from 'ovirtapi'
 import Selectors from '../../selectors'
 import OptionsManager from '../../optionsManager'
 import logger from '../../logger'
-import { fileDownload } from '../../helpers'
+import { fileDownload } from 'helpers'
 import {
   downloadConsole,
   getConsoleOptions as getConsoleOptionsAction,
@@ -13,7 +13,7 @@ import {
   setVmConsoles,
   vmActionInProgress,
   setConsoleIsValid,
-} from '../../actions'
+} from 'actions'
 
 import { callExternalAction } from '../utils'
 import { fetchVmSessions } from '../../sagas'

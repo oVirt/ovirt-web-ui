@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import { TimedToastNotification, ToastNotificationList } from 'patternfly-react'
-import { setNotificationNotified } from '../actions'
+import { setNotificationNotified } from 'actions'
 
 import style from './sharedStyle.css'
 

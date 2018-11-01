@@ -1,7 +1,7 @@
 import {
   GET_ALL_CLUSTERS,
   SET_CLUSTERS,
-} from '../constants'
+} from 'app-constants'
 
 export function setClusters (clusters) {
   return {

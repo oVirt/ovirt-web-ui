@@ -2,7 +2,7 @@ import {
   GET_CONSOLE_OPTIONS,
   SAVE_CONSOLE_OPTIONS,
   SET_CONSOLE_OPTIONS,
-} from '../constants'
+} from 'app-constants'
 
 export function setConsoleOptions ({ vmId, options }) {
   return {

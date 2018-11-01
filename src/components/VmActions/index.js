@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
 import style from './style.css'
-import { msg } from '../../intl'
+import { msg } from 'app-intl'
 import { RouterPropTypeShapes } from '../../propTypeShapes'
 
 import {
@@ -24,7 +24,7 @@ import {
   startPool,
   startVm,
   removeVm,
-} from '../../actions'
+} from 'actions'
 
 import { SplitButton, MenuItem } from 'patternfly-react'
 import Checkbox from '../Checkbox'

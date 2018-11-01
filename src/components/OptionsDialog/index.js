@@ -11,7 +11,7 @@ import {
   saveSSHKey,
 } from './actions'
 
-import { msg } from '../../intl'
+import { msg } from 'app-intl'
 
 class OptionsDialog extends React.Component {
   constructor (props) {

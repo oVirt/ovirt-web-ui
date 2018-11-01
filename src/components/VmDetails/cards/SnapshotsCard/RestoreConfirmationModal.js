@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import Immutable from 'immutable'
 
 import { Icon, MessageDialog } from 'patternfly-react'
-import { msg } from '../../../../intl'
+import { msg } from 'app-intl'
 import { restoreVmSnapshot } from './actions'
 import { getMinimizedString, escapeHtml } from '../../../utils'
 

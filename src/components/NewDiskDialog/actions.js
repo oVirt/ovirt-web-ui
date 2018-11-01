@@ -6,7 +6,7 @@ import {
   SET_NEW_DISK_DIALOG_PROGRESS_INDICATOR,
   SET_NEW_DISK_DIALOG_ERROR_TEXT,
   SET_NEW_DISK_DIALOG_DONE,
-} from './constants'
+} from 'app-constants'
 
 export function cleanNewDiskDialogSubtree () {
   return {

@@ -6,7 +6,7 @@ import {
   GET_ISO_STORAGE_DOMAINS,
   SET_STORAGE_DOMAIN_FILES,
   SET_STORAGE_DOMAINS,
-} from '../constants'
+} from 'app-constants'
 
 export function getAllStorageDomains (): Object {
   return {

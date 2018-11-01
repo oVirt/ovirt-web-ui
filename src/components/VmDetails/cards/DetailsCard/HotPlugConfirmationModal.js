@@ -6,7 +6,7 @@ import {
   Icon,
   noop,
 } from 'patternfly-react'
-import { msg } from '../../../../intl'
+import { msg } from 'app-intl'
 
 const HotPlugChangeConfirmationModal = ({ show, onCancel, onApplyLater, onApplyNow }) => {
   return <MessageDialog

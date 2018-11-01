@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { MessageDialog, Icon } from 'patternfly-react'
-import { msg } from '../../intl'
+import { msg } from 'app-intl'
 
 class DeleteConfirmationModal extends React.Component {
   constructor (props) {

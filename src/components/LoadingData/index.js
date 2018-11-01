@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
 
-import { msg } from '../../intl'
+import { msg } from 'app-intl'
 import style from './style.css'
 
 /**
