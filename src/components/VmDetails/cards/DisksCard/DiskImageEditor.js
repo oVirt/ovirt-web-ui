@@ -236,6 +236,7 @@ class DiskImageEditor extends Component {
         <Modal.Body>
 
           <Form horizontal>
+            {/* Alias */}
             <FormGroup controlId={`${idPrefix}-alias`} className={createMode && 'required'}>
               <LabelCol sm={3}>
                 { msg.diskEditorAliasLabel() }
@@ -249,6 +250,7 @@ class DiskImageEditor extends Component {
               </Col>
             </FormGroup>
 
+            {/* Size Display (for edit mode) */}
             { !createMode &&
             <FormGroup controlId={`${idPrefix}-size-info`}>
               <LabelCol sm={3}>
@@ -269,10 +271,21 @@ class DiskImageEditor extends Component {
             </FormGroup>
             }
 
+            {/* Size Editor (initial size for create, expand by size for edit) */}
             { (createMode || isImage) &&
             <FormGroup controlId={`${idPrefix}-size`} className={createMode && 'required'}>
               <LabelCol sm={3}>
-                { createMode ? msg.diskEditorSizeLabel() : msg.diskEditorResizeLabel() }
+                { createMode &&
+                  <React.Fragment>
+                    {msg.diskEditorSizeLabel()}
+                    <FieldLevelHelp
+                      inline
+                      content={msg.diskEditorSizeCreateHelp()}
+                      buttonClass={style['editor-field-help']}
+                    />
+                  </React.Fragment>
+                }
+                { !createMode && msg.diskEditorResizeLabel() }
               </LabelCol>
               <Col sm={9}>
                 { (createMode || isImage) &&
@@ -291,16 +304,19 @@ class DiskImageEditor extends Component {
             </FormGroup>
             }
 
+            {/* Storage Domain */}
             <FormGroup controlId={`${idPrefix}-storage-domain`} className={createMode && 'required'}>
               <LabelCol sm={3}>
                 { msg.diskEditorStorageDomainLabel() }
-                { !createMode &&
-                  <FieldLevelHelp
-                    inline
-                    content={msg.diskEditorStorageDomainCantChangeHelp()}
-                    buttonClass={style['editor-field-help']}
-                  />
-                }
+                <FieldLevelHelp
+                  inline
+                  content={
+                    createMode
+                      ? msg.diskEditorStorageDomainCreateHelp()
+                      : msg.diskEditorStorageDomainCantChangeHelp()
+                  }
+                  buttonClass={style['editor-field-help']}
+                />
               </LabelCol>
               <Col sm={9}>
                 { createMode &&
@@ -327,16 +343,19 @@ class DiskImageEditor extends Component {
               </Col>
             </FormGroup>
 
+            {/* Disk Format */}
             <FormGroup controlId={`${idPrefix}-format`} className={createMode && 'required'}>
               <LabelCol sm={3}>
                 { msg.diskEditorFormatLabel() }
-                { !createMode &&
-                  <FieldLevelHelp
-                    inline
-                    content={msg.diskEditorFormatCantChangeHelp()}
-                    buttonClass={style['editor-field-help']}
-                  />
-                }
+                <FieldLevelHelp
+                  inline
+                  content={
+                    createMode
+                      ? msg.diskEditorFormatCreateHelp()
+                      : msg.diskEditorFormatCantChangeHelp()
+                  }
+                  buttonClass={style['editor-field-help']}
+                />
               </LabelCol>
               <Col sm={9}>
                 { createMode &&
