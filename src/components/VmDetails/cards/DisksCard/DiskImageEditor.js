@@ -288,18 +288,11 @@ class DiskImageEditor extends Component {
                 { !createMode && msg.diskEditorResizeLabel() }
               </LabelCol>
               <Col sm={9}>
-                { (createMode || isImage) &&
-                  <FormControl
-                    type='number'
-                    value={this.state.size}
-                    onChange={this.changeSize}
-                  />
-                }
-                { !createMode && !isImage &&
-                  <div id={`${idPrefix}-size-edit`} className={style['editor-field-read-only']}>
-                    {this.state.size} GiB
-                  </div>
-                }
+                <FormControl
+                  type='number'
+                  value={this.state.size}
+                  onChange={this.changeSize}
+                />
               </Col>
             </FormGroup>
             }
