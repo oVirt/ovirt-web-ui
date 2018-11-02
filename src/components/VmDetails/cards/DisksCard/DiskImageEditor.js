@@ -252,7 +252,7 @@ class DiskImageEditor extends Component {
 
             {/* Size Display (for edit mode) */}
             { !createMode &&
-            <FormGroup controlId={`${idPrefix}-size-info`}>
+            <FormGroup controlId={`${idPrefix}-size`}>
               <LabelCol sm={3}>
                 { msg.diskEditorSizeLabel() }
                 { !isImage &&
@@ -264,7 +264,7 @@ class DiskImageEditor extends Component {
                 }
               </LabelCol>
               <Col sm={9}>
-                <div id={`${idPrefix}-size-info`} className={style['editor-field-read-only']}>
+                <div id={`${idPrefix}-size`} className={style['editor-field-read-only']}>
                   { diskSize / 1024 ** 3 }
                 </div>
               </Col>
@@ -273,7 +273,7 @@ class DiskImageEditor extends Component {
 
             {/* Size Editor (initial size for create, expand by size for edit) */}
             { (createMode || isImage) &&
-            <FormGroup controlId={`${idPrefix}-size`} className={createMode && 'required'}>
+            <FormGroup controlId={`${idPrefix}-size-edit`} className={createMode && 'required'}>
               <LabelCol sm={3}>
                 { createMode &&
                   <React.Fragment>
@@ -296,7 +296,7 @@ class DiskImageEditor extends Component {
                   />
                 }
                 { !createMode && !isImage &&
-                  <div id={`${idPrefix}-size-readonly`} className={style['editor-field-read-only']}>
+                  <div id={`${idPrefix}-size-edit`} className={style['editor-field-read-only']}>
                     {this.state.size} GiB
                   </div>
                 }
@@ -328,7 +328,7 @@ class DiskImageEditor extends Component {
                   />
                 }
                 { !createMode && !isDirectLUN &&
-                  <div id={`${idPrefix}-storage-domain-readonly`} className={style['editor-field-read-only']}>
+                  <div id={`${idPrefix}-storage-domain`} className={style['editor-field-read-only']}>
                     {
                       this.props.storageDomains.getIn([this.state.storageDomain, 'name']) ||
                       msg.diskEditorStorageDomainNotAvailable()
@@ -336,7 +336,7 @@ class DiskImageEditor extends Component {
                   </div>
                 }
                 { isDirectLUN &&
-                  <div id={`${idPrefix}-storage-domain-readonly`} className={style['editor-field-read-only']}>
+                  <div id={`${idPrefix}-storage-domain`} className={style['editor-field-read-only']}>
                     { msg.diskEditorStorageDomainNotAvailable() }
                   </div>
                 }
@@ -370,13 +370,13 @@ class DiskImageEditor extends Component {
                   />
                 }
                 { !createMode && !isDirectLUN &&
-                  <div id={`${idPrefix}-format-readonly`} className={style['editor-field-read-only']}>
+                  <div id={`${idPrefix}-format`} className={style['editor-field-read-only']}>
                     { this.state.format === 'raw' && msg.diskEditorFormatOptionRaw() }
                     { this.state.format === 'cow' && msg.diskEditorFormatOptionCow() }
                   </div>
                 }
                 { isDirectLUN &&
-                  <div id={`${idPrefix}-format-readonly`} className={style['editor-field-read-only']}>
+                  <div id={`${idPrefix}-format`} className={style['editor-field-read-only']}>
                     { msg.diskEditorFormatNotAvailable() }
                   </div>
                 }
