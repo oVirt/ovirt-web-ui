@@ -244,6 +244,10 @@ const OvirtApi = {
     assertLogin({ methodName: 'icon' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/icons/${id}` })
   },
+  diskattachment ({ vmId, attachmentId }: { vmId: string, attachmentId: string}): Promise<Object> {
+    assertLogin({ methodName: 'diskattachments' })
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/diskattachments/${attachmentId}?follow=disk` })
+  },
   diskattachments ({ vmId }: VmIdType): Promise<Object> {
     assertLogin({ methodName: 'diskattachments' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/diskattachments` })
