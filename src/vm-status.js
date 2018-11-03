@@ -21,3 +21,7 @@ export function canConsole (state) {
 export function canRemove (state) {
   return ['down'].includes(state)
 }
+
+export function canDeleteDisk (state) {
+  return ['down'].includes(state)
+}

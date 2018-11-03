@@ -61,7 +61,7 @@ class VmDisk extends React.PureComponent {
       text={text}
       container={null} />)
 
-    const deleteButton = this.props.edit && !this.props.beingDeleted && (
+    const deleteButton = this.props.edit && this.props.allowDelete && !this.props.beingDeleted && (
       <button className='btn btn-default' onClick={this.onDeleteButton}>{msg.delete()}</button>
     )
 
@@ -112,6 +112,7 @@ class VmDisk extends React.PureComponent {
 VmDisk.propTypes = {
   disk: PropTypes.object.isRequired,
   edit: PropTypes.bool.isRequired,
+  allowDelete: PropTypes.bool.isRequired,
   beingDeleted: PropTypes.bool.isRequired,
   removeFunction: PropTypes.func.isRequired, // (diskId: string) => any,
 }
@@ -120,7 +121,7 @@ function isDiskBeingDeleted (diskId, pendingTasks) {
   return !!pendingTasks.find(task => task.type === PendingTaskTypes.DISK_REMOVAL && task.diskId === diskId)
 }
 
-const VmDiskConnected = connect(
+export default connect(
   (state, { disk }) => ({
     beingDeleted: isDiskBeingDeleted(disk.get('id'), state.pendingTasks),
   }),
@@ -128,11 +129,3 @@ const VmDiskConnected = connect(
     removeFunction: (diskId) => dispatch(removeDisk({ diskId, vmToRefreshId: vmId })),
   })
 )(VmDisk)
-
-VmDiskConnected.propTypes = {
-  disk: PropTypes.object.isRequired, // deep immutable.js
-  edit: PropTypes.bool.isRequired,
-  vmId: PropTypes.string.isRequired,
-}
-
-export default VmDiskConnected
