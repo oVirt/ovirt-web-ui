@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 
 import AppConfiguration from '../../config'
 import { msg } from '../../intl'
+import { canDeleteDisk } from '../../vm-status'
 
 import style from './style.css'
 import sharedStyle from '../sharedStyle.css'
@@ -115,7 +116,12 @@ class VmDetail extends Component {
     const cluster = Selectors.getClusterById(vm.getIn(['cluster', 'id']))
     const template = Selectors.getTemplateById(vm.getIn(['template', 'id']))
 
-    const disksElement = (<VmDisks disks={disks} vmId={vm.get('id')} edit={this.state.editDisks} />)
+    const disksElement = <VmDisks
+      disks={disks}
+      vmId={vm.get('id')}
+      edit={this.state.editDisks}
+      allowDelete={canDeleteDisk(vm.get('status'))}
+    />
 
     const diskEditAllowed = !isPool && !isPoolVm
     const pencilIcon = (<i className={`pficon pficon-edit`} />)
