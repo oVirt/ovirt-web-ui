@@ -168,6 +168,8 @@ class NewDiskDialog extends React.Component {
       type: 'image',
       format: 'cow',
       sparse: true,
+      active: true,
+      bootable: false,
       provisionedSize: sizeB,
       storageDomainId: this.state.storageDomainId,
     })
@@ -300,13 +302,14 @@ const NewDiskDialogConnected = connect(
     clusters: state.clusters.toJS(),
     storageDomains: state.storageDomains.toJS(),
     dataCenters: state.dataCenters.toJS(),
+
     errorText: state.NewDiskDialog.get('errorText'),
     showProgressIndicator: !!state.NewDiskDialog.get('showProgressIndicator'),
     done: state.NewDiskDialog.get('done'),
   }),
   (dispatch, { vmId }) => ({
     cleanStoreSubtreeFunction: () => dispatch(cleanNewDiskDialogSubtree()),
-    createDiskFunction: (newDisk) => dispatch(createDiskForVm({ vmId, newDisk })),
+    createDiskFunction: (disk) => dispatch(createDiskForVm({ vmId, disk })),
   }),
 )(NewDiskDialog)
 
