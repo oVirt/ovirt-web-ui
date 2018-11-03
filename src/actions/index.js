@@ -30,6 +30,7 @@ export * from './vnicProfiles'
 export * from './activeRequests'
 export * from './console'
 export * from './userMessages'
+export * from './disks'
 
 export function startSchedulerFixedDelay (delayInSeconds = AppConfiguration.schedulerFixedDelayInSeconds) {
   return {

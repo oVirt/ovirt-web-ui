@@ -3,8 +3,7 @@ import { persistStateToLocalStorage } from './storage'
 import Selectors from './selectors'
 import AppConfiguration from './config'
 
-import vmDisksSagas from './components/VmDisks/sagas'
-import newDiskDialogSagas from './components/NewDiskDialog/sagas'
+import vmDisksSagas from './saga/disks'
 import vmSnapshotsSagas from './components/VmSnapshots/sagas'
 
 import {
@@ -893,7 +892,6 @@ export function* rootSaga () {
 
     // Sagas from Components
     ...vmDisksSagas,
-    ...newDiskDialogSagas,
     ...vmSnapshotsSagas,
   ])
 }

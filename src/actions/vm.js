@@ -29,6 +29,7 @@ import {
   START_VM,
   SUSPEND_VM,
   UPDATE_ICONS,
+  UPDATE_VM_DISK,
   UPDATE_VMS,
   VM_ACTION_IN_PROGRESS,
 } from '../constants'
@@ -279,6 +280,16 @@ export function setVmDisks ({ vmId, disks }) {
     payload: {
       vmId,
       disks,
+    },
+  }
+}
+
+export function updateVmDisk ({ vmId, disk }) {
+  return {
+    type: UPDATE_VM_DISK,
+    payload: {
+      vmId,
+      disk,
     },
   }
 }

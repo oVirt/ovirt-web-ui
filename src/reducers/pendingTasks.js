@@ -25,19 +25,26 @@ export const PendingTaskTypes = {
 const initialState = fromJS([])
 
 export default actionReducer(initialState, {
-  [ADD_DISK_REMOVAL_PENDING_TASK] (pendingTasks, { payload }) {
-    const existingTask = pendingTasks.find(task =>
-      task.type === PendingTaskTypes.DISK_REMOVAL && task.diskId === payload)
+  [ADD_DISK_REMOVAL_PENDING_TASK] (pendingTasks, { payload: { diskId } }) {
+    const existingTask = pendingTasks.find(
+      task => task.type === PendingTaskTypes.DISK_REMOVAL && task.diskId === diskId
+    )
     if (existingTask) {
       return pendingTasks
     }
-    return pendingTasks.push(payload)
+    return pendingTasks.push({
+      type: PendingTaskTypes.DISK_REMOVAL,
+      started: new Date(),
+      diskId,
+    })
   },
-  [REMOVE_DISK_REMOVAL_PENDING_TASK] (pendingTasks, { payload }) {
+  [REMOVE_DISK_REMOVAL_PENDING_TASK] (pendingTasks, { payload: { diskId } }) {
     const index = pendingTasks.findKey(
-      task => task.type === PendingTaskTypes.DISK_REMOVAL && task.diskId === payload.diskId)
+      task => task.type === PendingTaskTypes.DISK_REMOVAL && task.diskId === diskId
+    )
     return pendingTasks.delete(index)
   },
+
   [ADD_SNAPSHOT_REMOVAL_PENDING_TASK] (pendingTasks, { payload }) {
     const existingTask = pendingTasks.find(task =>
       task.type === PendingTaskTypes.SNAPSHOT_REMOVAL && task.snapshotId === payload)

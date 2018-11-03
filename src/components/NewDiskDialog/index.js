@@ -3,7 +3,9 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Modal } from 'patternfly-react'
 
-import { createDiskForVm, cleanNewDiskDialogSubtree } from './actions'
+import { createDiskForVm } from '../../actions'
+import { cleanNewDiskDialogSubtree } from './actions'
+
 import { msg } from '../../intl'
 import SelectBox from '../SelectBox'
 import { flatMap, parseGbToBytes } from '../../utils'
@@ -51,7 +53,7 @@ class NewDiskDialog extends React.Component {
   }
 
   /**
-   * active in VM's datacenter, data type
+   * active in VM's data center, data type
    */
   getSuitableStorageDomains () {
     const dataCenterId = this.getDataCenterId()
@@ -160,7 +162,15 @@ class NewDiskDialog extends React.Component {
     }
     const sizeB = String(this.getSizeBytes())
     const iface = this.getInterface()
-    this.props.createDiskFunction(sizeB, this.state.alias, this.state.storageDomainId, iface)
+    this.props.createDiskFunction({
+      name: this.state.alias,
+      iface,
+      type: 'image',
+      format: 'cow',
+      sparse: true,
+      provisionedSize: sizeB,
+      storageDomainId: this.state.storageDomainId,
+    })
   }
 
   render () {
@@ -295,9 +305,8 @@ const NewDiskDialogConnected = connect(
     done: state.NewDiskDialog.get('done'),
   }),
   (dispatch, { vmId }) => ({
-    createDiskFunction:
-      (sizeB, alias, storageDomainId, iface) => dispatch(createDiskForVm(sizeB, alias, storageDomainId, iface, vmId)),
     cleanStoreSubtreeFunction: () => dispatch(cleanNewDiskDialogSubtree()),
+    createDiskFunction: (newDisk) => dispatch(createDiskForVm({ vmId, newDisk })),
   }),
 )(NewDiskDialog)
 

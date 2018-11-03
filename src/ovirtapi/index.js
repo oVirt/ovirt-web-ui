@@ -341,34 +341,27 @@ const OvirtApi = {
       },
     })
   },
+
+  // async operation
   removeDisk (diskId: string): Promise<Object> {
     assertLogin({ methodName: 'removeDisk' })
     const url = `${AppConfiguration.applicationContext}/api/disks/${diskId}?async=true`
     return httpDelete({ url })
   },
-  addDiskAttachment ({ sizeB, storageDomainId, alias, vmId, iface }: { sizeB: string, storageDomainId: string, alias: string, vmId: string, iface: string }): Promise<Object> {
+
+  // async operation
+  addDiskAttachment ({ vmId, disk }: { vmId: string, disk: Object }): Promise<Object> {
     assertLogin({ methodName: 'addDiskAttachment' })
-    const payload = {
-      interface: iface,
-      disk: {
-        provisioned_size: sizeB,
-        format: 'cow',
-        storage_domains: {
-          storage_domain: [
-            {
-              id: storageDomainId,
-            },
-          ],
-        },
-        alias,
-      },
-    }
+
+    const payload = Transforms.DiskAttachment.toApi({ disk })
     const input = JSON.stringify(payload)
+
     return httpPost({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/diskattachments`,
       input,
     })
   },
+
   saveSSHKey ({ key, userId, sshId }: { key: string, userId: string, sshId: ?string }): Promise<Object> {
     assertLogin({ methodName: 'saveSSHKey' })
     const input = JSON.stringify({ content: key })
