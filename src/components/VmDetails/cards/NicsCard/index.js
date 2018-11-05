@@ -28,8 +28,8 @@ function filterVnicProfiles (vm, clusters, vnicProfiles) {
   return vnicProfiles
     .filter(vnic =>
       vnic.get('dataCenterId') === dataCenterId &&
-      clusterNetworks.contains(vnic.getIn(['network', 'id'])) &&
-      vnic.get('canUserUseProfile')
+      clusterNetworks.contains(vnic.getIn(['network', 'id']))
+      // TODO: Admins can use any, may need permission checks for users
     )
     .toList()
 }
@@ -107,7 +107,7 @@ class NicsCard extends React.Component {
       vm.getIn(['pool', 'id']) === undefined
 
     const vmStatus = vm.get('status')
-    const canCreateNic = this.state.filteredVnicList.size > 0
+    const canCreateNic = true // TODO: True for admins, may need permission checks for users
 
     const showNicIPs = vm.get('status') === 'up'
     const nicList = vm.get('nics')

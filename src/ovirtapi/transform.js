@@ -25,7 +25,7 @@ import type {
   ApiPermissionType, PermissionType,
 } from './types'
 
-import { canUserUseCluster, canUserEditVm, getUserPermits, canUserUseVnicProfile } from '../utils'
+import { canUserUseCluster, canUserEditVm } from '../utils'
 
 function vCpusCount ({ cpu }: { cpu: Object }): number {
   if (cpu && cpu.topology) {
@@ -122,7 +122,7 @@ const VM = {
       cdrom: {},
       sessions: [],
       nics: [],
-      permits: new Set(),
+      permissions: [],
       canUserEditVm: false,
       display: {
         smartcardEnabled: vm.display && vm.display.smartcard_enabled && convertBool(vm.display.smartcard_enabled),
@@ -167,10 +167,10 @@ const VM = {
       }
 
       if (vm.permissions && vm.permissions.permission) {
-        parsedVm.permits = getUserPermits(Permissions.toInternal({
+        parsedVm.permissions = Permissions.toInternal({
           permissions: vm.permissions.permission,
-        }))
-        parsedVm.canUserEditVm = canUserEditVm(parsedVm.permits)
+        })
+        parsedVm.canUserEditVm = canUserEditVm(parsedVm.permissions)
       }
     }
 
@@ -480,9 +480,10 @@ const StorageDomainFile = {
 //
 const Cluster = {
   toInternal ({ cluster }: { cluster: ApiClusterType }): ClusterType {
-    const permits = cluster.permissions && cluster.permissions.permission
-      ? getUserPermits(Permissions.toInternal({ permissions: cluster.permissions.permission }))
-      : new Set()
+    const permissions = cluster.permissions && cluster.permissions.permission
+      ? Permissions.toInternal({ permissions: cluster.permissions.permission })
+      : []
+
     const c: Object = {
       id: cluster.id,
       name: cluster.name,
@@ -497,8 +498,8 @@ const Cluster = {
             ? cluster['memory_policy']['over_commit']['percent']
             : 100,
       },
-      canUserUseCluster: canUserUseCluster(permits),
-      permits,
+      canUserUseCluster: canUserUseCluster(permissions),
+      permissions,
     }
 
     if (cluster.networks && cluster.networks.network && cluster.networks.network.length > 0) {
@@ -571,21 +572,11 @@ const VNicProfile = {
       network: {
         id: vnicProfile.network.id,
         name: vnicProfile.network.name,
-        dataCenterId: vnicProfile.network.data_center && vnicProfile.network.data_center.id,
       },
-      canUserUseProfile: false,
-      permits: new Set(),
     }
 
     if (vnicProfile.network.name) {
       vnicProfileInternal.network.name = vnicProfile.network.name
-    }
-
-    if (vnicProfile.permissions && vnicProfile.permissions.permission) {
-      vnicProfileInternal.permits = getUserPermits(Permissions.toInternal({
-        permissions: vnicProfile.permissions.permission,
-      }))
-      vnicProfileInternal.canUserUseProfile = canUserUseVnicProfile(vnicProfileInternal.permits)
     }
 
     return vnicProfileInternal
@@ -708,7 +699,6 @@ const Permissions = {
       name: permission.role.name,
       userId: permission.user && permission.user.id,
       groupId: permission.group && permission.group.id,
-      permits: permission.role.permits ? permission.role.permits.permit.map(permit => ({ name: permit.name })) : [],
     }))
   },
 
