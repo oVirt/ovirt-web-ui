@@ -8,7 +8,6 @@ import { msg } from '../../intl'
 import FieldHelp from '../FieldHelp'
 import VmDetailRow, { ExpandableList } from '../VmDetailRow'
 import { localeCompare } from '../../helpers'
-import { canUserUseAnyVnicProfile } from '../../utils'
 
 import NewNicModal from './NewNicModal'
 import style from './style.css'
@@ -79,7 +78,7 @@ VmNic.propTypes = {
   onDelete: PropTypes.func.isRequired,
 }
 
-const VmNics = function ({ nics, vnicProfiles, onNicAdd, enableSettings, onNicDelete, canUserUseAnyVnicProfile }) {
+const VmNics = function ({ nics, vnicProfiles, onNicAdd, enableSettings, onNicDelete }) {
   let nextNicId = 0
   nics.forEach((value) => {
     const valueNum = value.get('name').match(/nic(\d+)/)
@@ -98,7 +97,7 @@ const VmNics = function ({ nics, vnicProfiles, onNicAdd, enableSettings, onNicDe
 
   const idPrefix = `vmnics-`
 
-  const nicsModal = <NewNicModal vnicProfiles={vnicProfiles.filter(vnicProfile => vnicProfile.get('canUserUseProfile'))} nextNicName={nextNicName} onAdd={onNicAdd} />
+  const nicsModal = <NewNicModal vnicProfiles={vnicProfiles} nextNicName={nextNicName} onAdd={onNicAdd} />
 
   return (
     <VmDetailRow
@@ -113,8 +112,7 @@ const VmNics = function ({ nics, vnicProfiles, onNicAdd, enableSettings, onNicDe
           idPrefix={idPrefix}
         />
       }
-      enableSettings={enableSettings && canUserUseAnyVnicProfile}
-      disableMessage={!canUserUseAnyVnicProfile && msg.youHaveNoAllowedVnicProfiles()}
+      enableSettings={enableSettings}
     />
   )
 }
@@ -122,7 +120,6 @@ const VmNics = function ({ nics, vnicProfiles, onNicAdd, enableSettings, onNicDe
 VmNics.propTypes = {
   vm: PropTypes.object.isRequired, // eslint-disable-line react/no-unused-prop-types
   nics: PropTypes.object.isRequired,
-  canUserUseAnyVnicProfile: PropTypes.bool,
   vnicProfiles: PropTypes.object.isRequired,
   enableSettings: PropTypes.bool,
   onNicAdd: PropTypes.func.isRequired,
@@ -130,13 +127,9 @@ VmNics.propTypes = {
 }
 
 export default connect(
-  (state, { vm }) => {
-    const dataCenterId = state.clusters.getIn([vm.getIn(['cluster', 'id']), 'dataCenterId'])
-    return {
-      vnicProfiles: state.vnicProfiles.filter(vnicProfile => dataCenterId === vnicProfile.getIn(['network', 'dataCenterId'])),
-      canUserUseAnyVnicProfile: canUserUseAnyVnicProfile(state.vnicProfiles, dataCenterId),
-    }
-  },
+  (state) => ({
+    vnicProfiles: state.vnicProfiles,
+  }),
 
   (dispatch, { vm }) => ({
     onNicAdd: ({ nic }) => dispatch(addVmNic({ vmId: vm.get('id'), nic })),
