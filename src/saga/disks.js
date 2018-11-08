@@ -2,7 +2,7 @@ import { takeEvery, put } from 'redux-saga/effects'
 
 import { CREATE_DISK_FOR_VM, REMOVE_DISK, EDIT_VM_DISK } from '../constants'
 import Api from 'ovirtapi'
-import { callExternalAction, delay } from './utils'
+import { callExternalAction, delay, delayInMsSteps } from './utils'
 import { fetchDisks } from '../sagas'
 
 import {
@@ -89,7 +89,7 @@ function* waitForDiskToBeUnlocked (vmId, attachmentId) {
 function* waitForDiskAttachment (vmId, attachmentId, test, canBeMissing = false) {
   let metTest = false
 
-  for (let i = 1; !metTest && i < 20; i++) {
+  for (let delayMs of delayInMsSteps()) {
     const apiDiskAttachment = yield callExternalAction(
       'diskattachment',
       Api.diskattachment,
@@ -107,9 +107,9 @@ function* waitForDiskAttachment (vmId, attachmentId, test, canBeMissing = false)
 
     if (test(apiDiskAttachment)) {
       metTest = true
+      break
     } else {
-      const delayMs = Math.log2(i + 1) * 2000
-      yield delay(delayMs) // gradually wait a bit longer each time
+      yield delay(delayMs)
     }
   }
 
