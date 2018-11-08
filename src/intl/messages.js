@@ -43,7 +43,7 @@ export const messages: { [messageId: string]: MessageType } = {
   bootSequence: 'Boot Sequence',
   bootSequenceTooltip: 'Device order in which VM will search OS for running.',
   cancel: 'Cancel',
-  cantLogonToConsole: 'Can\'t logon to console. Do you want to continue?',
+  cantLogonToConsole: 'SSO logon to the VM\'s console failed. Do you want to continue without SSO?',
   cardTitleDetails: 'Details',
   cardTooltipEditDetails: 'Edit details for {vmId}',
   cd: 'CD',

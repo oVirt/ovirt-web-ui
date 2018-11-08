@@ -31,9 +31,8 @@ class ConsoleConfirmationModal extends React.Component {
     this.props.onClose()
   }
 
-  onConsoleDownload (force) {
-    return () =>
-      this.props.onDownloadConsole({ usbFilter: this.props.config.get('usbFilter'), force })
+  onConsoleDownload (force = false) {
+    this.props.onDownloadConsole({ usbFilter: this.props.config.get('usbFilter'), force })
   }
 
   render () {
@@ -50,7 +49,7 @@ class ConsoleConfirmationModal extends React.Component {
           onClose={this.onConsoleConfirmationClose}
           title={msg.console()}
           body={msg.cantLogonToConsole()}
-          confirm={{ title: msg.yes(), onClick: this.onConsoleDownload(true) }}
+          confirm={{ title: msg.yes(), onClick: () => this.onConsoleDownload(true) }}
         />
       )
     }
@@ -65,7 +64,7 @@ class ConsoleConfirmationModal extends React.Component {
         show={show}
         title={msg.console()}
         body={msg.consoleInUseContinue()}
-        confirm={{ title: msg.yes(), onClick: this.onConsoleDownload() }}
+        confirm={{ title: msg.yes(), onClick: () => this.onConsoleDownload() }}
       />
     )
   }
