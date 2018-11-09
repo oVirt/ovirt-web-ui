@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {
-  patternfly,
   CardTitle,
   CardBody,
   UtilizationCard,
@@ -14,7 +13,9 @@ import {
   SparklineChart,
 } from 'patternfly-react'
 
+import { donutMemoryTooltipContents } from '../../../utils'
 import { convertValueMap, round } from '../../../../utils'
+import { userFormatOfBytes } from '../../../../helpers'
 
 import style from './style.css'
 
@@ -31,14 +32,17 @@ import NoLiveData from './NoLiveData'
  *       currently used data should work for VMs with and without the guest agent.
  */
 const MemoryCharts = ({ memoryStats, isRunning, id }) => {
+  const available = isRunning ? memoryStats.free.datum : memoryStats.installed.datum
+  const used = !isRunning ? 0 : memoryStats.installed.datum - memoryStats.free.datum
+
   const { unit, value } =
     convertValueMap(
       'B',
       {
-        available: isRunning ? memoryStats.free.datum : memoryStats.installed.datum,
+        available,
         total: memoryStats.installed.datum,
-        used: !isRunning ? 0 : memoryStats.installed.datum - memoryStats.free.datum,
       })
+  const usedFormated = userFormatOfBytes(used)
   const memory = round(value, 0)
 
   // NOTE: Memory history comes sorted from newest to oldest
@@ -63,18 +67,18 @@ const MemoryCharts = ({ memoryStats, isRunning, id }) => {
             id={`${id}-donut-chart`}
             data={{
               columns: [
-                [`${unit} Used`, memory.used],
-                [`${unit} Available`, memory.available],
+                [`Used`, used],
+                [`Available`, available],
               ],
               order: null,
             }}
             title={{
-              primary: `${round(memory.used, 0)}`,
-              secondary: `${unit} Used`,
+              primary: `${usedFormated.rounded}`,
+              secondary: `${usedFormated.suffix} Used`,
             }}
             tooltip={{
               show: true,
-              contents: patternfly.pfDonutTooltipContents,
+              contents: donutMemoryTooltipContents,
             }}
           />
 

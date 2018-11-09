@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {
-  patternfly,
   CardTitle,
   CardBody,
   UtilizationCard,
@@ -13,7 +12,9 @@ import {
   DonutChart,
 } from 'patternfly-react'
 
+import { donutMemoryTooltipContents } from '../../../utils'
 import { convertValueMap, round } from '../../../../utils'
+import { userFormatOfBytes } from '../../../../helpers'
 
 import style from './style.css'
 
@@ -42,9 +43,10 @@ const DiskCharts = ({ vm, isRunning, id, ...props }) => {
     }
   })
 
-  const { unit, value: disks } = convertValueMap('B', { actualSize, provisionedSize })
-  const used = round(disks.actualSize, 1)
-  const available = round(disks.provisionedSize - disks.actualSize, 1)
+  const { unit, value: disks } = convertValueMap('B', { availableSize: provisionedSize - actualSize, provisionedSize })
+
+  const usedFormated = userFormatOfBytes(actualSize)
+  const available = round(disks.availableSize, 1)
   const total = round(disks.provisionedSize, 1)
 
   return (
@@ -68,18 +70,18 @@ const DiskCharts = ({ vm, isRunning, id, ...props }) => {
             id={`${id}-donut-chart`}
             data={{
               columns: [
-                [`${unit} allocated`, used],
-                [`${unit} unallocated`, available],
+                [`allocated`, actualSize],
+                [`unallocated`, provisionedSize - actualSize],
               ],
               order: null,
             }}
             title={{
-              primary: `${used}`,
-              secondary: `${unit} Allocated`,
+              primary: `${round(usedFormated.number, 0)}`,
+              secondary: `${usedFormated.suffix} Allocated`,
             }}
             tooltip={{
               show: true,
-              contents: patternfly.pfDonutTooltipContents,
+              contents: donutMemoryTooltipContents,
             }}
           />
 
