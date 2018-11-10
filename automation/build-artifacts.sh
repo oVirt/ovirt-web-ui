@@ -18,7 +18,7 @@ rm -f ./*tar.gz
 version_release="$(grep -m1 VERSION_RELEASE configure.ac | cut -d ' ' -f2 | sed 's/[][)]//g')"
 if [[ "${version_release}" == "0" ]]; then
     date="$(date --utc +%Y%m%d)"
-    commit="$(git log -1 --pretty=format:%h)"
+    commit="$(git log --no-merges -1 --pretty=format:%h)"
     version_release="0.${date}git${commit}"
     # update configure.ac with this
     sed -i -r "s/define\(\[VERSION_RELEASE\], \[0\]\)/define([VERSION_RELEASE], [${version_release}])/" configure.ac
