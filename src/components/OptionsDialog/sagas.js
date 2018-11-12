@@ -1,15 +1,16 @@
 import { put, takeEvery } from 'redux-saga/effects'
 import { SAVE_SSH_KEY, GET_SSH_KEY } from './constants'
 import { setSSHKey, setUnloaded } from './actions'
+import { callExternalAction } from '_/saga/utils'
 import Api from '_/ovirtapi'
 
-function* saveSSHKey (sagas, action) {
-  yield sagas.callExternalAction('saveSSHKey', Api.saveSSHKey, action)
+function* saveSSHKey (action) {
+  yield callExternalAction('saveSSHKey', Api.saveSSHKey, action)
 }
 
-function* getSSHKey (sagas, action) {
+function* getSSHKey (action) {
   yield put(setUnloaded())
-  const result = yield sagas.callExternalAction('getSSHKey', Api.getSSHKey, action)
+  const result = yield callExternalAction('getSSHKey', Api.getSSHKey, action)
   if (result.error) {
     return
   }
@@ -20,9 +21,7 @@ function* getSSHKey (sagas, action) {
   }
 }
 
-export function buildSagas (sagas) {
-  return [
-    takeEvery(SAVE_SSH_KEY, saveSSHKey, sagas),
-    takeEvery(GET_SSH_KEY, getSSHKey, sagas),
-  ]
-}
+export default [
+  takeEvery(SAVE_SSH_KEY, saveSSHKey),
+  takeEvery(GET_SSH_KEY, getSSHKey),
+]

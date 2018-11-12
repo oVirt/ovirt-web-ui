@@ -5,6 +5,7 @@ import AppConfiguration from './config'
 
 import vmDisksSagas from './saga/disks'
 import vmSnapshotsSagas from './components/VmDetails/cards/SnapshotsCard/sagas'
+import optionsDialogSagas from './components/OptionsDialog/sagas'
 
 import {
   all,
@@ -1126,5 +1127,6 @@ export function* rootSaga () {
     // Sagas from Components
     ...vmDisksSagas,
     ...vmSnapshotsSagas,
+    ...optionsDialogSagas,
   ])
 }
