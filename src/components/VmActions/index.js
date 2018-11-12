@@ -24,7 +24,7 @@ import {
   startPool,
   startVm,
   removeVm,
-} from 'actions'
+} from 'app-actions'
 
 import { SplitButton, MenuItem } from 'patternfly-react'
 import Checkbox from '../Checkbox'

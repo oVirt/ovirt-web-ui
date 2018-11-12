@@ -125,10 +125,10 @@
       "^.+\\.css$": "<rootDir>/config/jest/CSSStub.js",
       "ovirtapi": "<rootDir>/src/mock/ovirtapi.mock.js",
       "app-intl": "<rootDir>/src/intl/index.js",
-      "actions": "<rootDir>/src/actions/index.js",
-      "reducers(.*)$": "<rootDir>/src/reducers/$1",
+      "app-actions": "<rootDir>/src/actions/index.js",
+      "app-reducers(.*)$": "<rootDir>/src/reducers/$1",
       "app-constants": "<rootDir>/src/constants/index.js",
-      "helpers": "<rootDir>/src/helpers.js"
+      "app-helpers": "<rootDir>/src/helpers.js"
     },
     "transform": {
       ".*": "<rootDir>/config/jest/transform.js"

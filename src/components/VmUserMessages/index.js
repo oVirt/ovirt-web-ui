@@ -7,8 +7,8 @@ import { Notification, NotificationDrawer, MenuItem, Icon, Button } from 'patter
 
 import style from './style.css'
 
-import { clearUserMessages, dismissUserMessage } from 'actions'
-import { hrefWithoutHistory, getFormatedDateTime } from 'helpers'
+import { clearUserMessages, dismissUserMessage } from 'app-actions'
+import { hrefWithoutHistory, getFormatedDateTime } from 'app-helpers'
 import { msg } from 'app-intl'
 
 const UserMessage = ({ record, id, onDismissMessage }) => {

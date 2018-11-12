@@ -17,7 +17,7 @@ import RestoreConfirmationModal from './RestoreConfirmationModal'
 import DeleteConfirmationModal from '../../../VmModals/DeleteConfirmationModal'
 import SnapshotDetail from './SnapshotDetail'
 import { deleteVmSnapshot } from './actions'
-import { formatDateFromNow } from 'helpers'
+import { formatDateFromNow } from 'app-helpers'
 import { getMinimizedString, escapeHtml } from '../../../utils'
 
 const MAX_DESCRIPTION_SIZE = 50

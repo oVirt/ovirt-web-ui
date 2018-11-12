@@ -8,7 +8,7 @@ import style from './style.css'
 
 import NewSnapshotModal from './NewSnapshotModal'
 import SnapshotItem from './SnapshotItem'
-import { PendingTaskTypes } from 'reducers/pendingTasks'
+import { PendingTaskTypes } from 'app-reducers/pendingTasks'
 
 const Snapshots = ({ snapshots, vmId, idPrefix, beingCreated, beingDeleted, beingRestored }) => {
   const isVmInPreview = !!snapshots.find(snapshot => snapshot.get('status') === 'in_preview')

@@ -12,7 +12,7 @@ import {
   REMOVE_SNAPSHOT_RESTORE_PENDING_TASK,
 } from 'app-constants'
 
-import { PendingTaskTypes } from 'reducers/pendingTasks'
+import { PendingTaskTypes } from 'app-reducers/pendingTasks'
 
 export function addDiskRemovalPendingTask (diskId: string) {
   return {

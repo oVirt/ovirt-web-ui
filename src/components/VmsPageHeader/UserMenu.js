@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
 
-import { logout } from 'actions'
+import { logout } from 'app-actions'
 
 import { msg } from 'app-intl'
 import AboutDialog from '../About'

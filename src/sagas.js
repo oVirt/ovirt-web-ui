@@ -70,7 +70,7 @@ import {
   changeVmCdRom as actionChangeVmCdRom,
   restartVm as actionRestartVm,
   setCurrentPage,
-} from './actions'
+} from 'app-actions'
 
 import {
   callExternalAction,
@@ -137,16 +137,12 @@ import {
   START_VM,
   STOP_SCHEDULER_FIXED_DELAY,
   SUSPEND_VM,
-<<<<<<< HEAD
 
   DETAIL_PAGE_TYPE,
   DIALOG_PAGE_TYPE,
   MAIN_PAGE_TYPE,
   POOL_PAGE_TYPE,
-} from './constants'
-=======
 } from 'app-constants'
->>>>>>> Added aliases for the most used files, to avoid long paths.
 
 import { canUserEditVm, getUserPermits, canUserUseCluster } from './utils'
 

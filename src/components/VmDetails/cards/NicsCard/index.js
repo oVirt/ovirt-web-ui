@@ -4,8 +4,8 @@ import { connect } from 'react-redux'
 import { Icon } from 'patternfly-react'
 
 import { msg } from 'app-intl'
-import { isNumber } from 'utils'
-import { addVmNic, deleteVmNic, editVmNic } from 'actions'
+import { isNumber } from 'app-utils'
+import { addVmNic, deleteVmNic, editVmNic } from 'app-actions'
 
 import BaseCard from '../../BaseCard'
 import { Grid, Row, Col } from '../../GridComponents'

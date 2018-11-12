@@ -39,7 +39,7 @@ import {
   getSingleVm,
 
   updateVms,
-} from 'actions'
+} from 'app-actions'
 
 import {
   callExternalAction,

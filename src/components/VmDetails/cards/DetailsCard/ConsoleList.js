@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import { canConsole } from '../../../../vm-status'
-import { isWindows } from 'helpers'
+import { isWindows } from 'app-helpers'
 
 import Action from '../../../VmActions/Action'
 import ConsoleConfirmationModal from '../../../VmActions/ConsoleConfirmationModal'

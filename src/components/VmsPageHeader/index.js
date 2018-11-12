@@ -5,9 +5,9 @@ import { connect } from 'react-redux'
 
 import VmUserMessages from '../VmUserMessages'
 import UserMenu from './UserMenu'
-import { hrefWithoutHistory } from 'helpers'
+import { hrefWithoutHistory } from 'app-helpers'
 
-import { refresh } from 'actions'
+import { refresh } from 'app-actions'
 import * as branding from '../../branding'
 
 /**

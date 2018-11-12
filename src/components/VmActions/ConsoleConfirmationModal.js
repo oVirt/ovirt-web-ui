@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import ConfirmationModal from './ConfirmationModal'
 
-import { downloadConsole, checkConsoleInUse, setConsoleInUse } from 'actions'
+import { downloadConsole, checkConsoleInUse, setConsoleInUse } from 'app-actions'
 
 import { msg } from 'app-intl'
 

@@ -7,7 +7,7 @@ import style from './style.css'
 import Vm from './Vm'
 import Pool from './Pool'
 import ScrollPositionHistory from '../ScrollPositionHistory'
-import { getByPage } from 'actions'
+import { getByPage } from 'app-actions'
 import InfiniteScroll from 'react-infinite-scroller'
 
 /**

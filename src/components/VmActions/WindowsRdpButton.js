@@ -2,8 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import { getRDP } from 'actions'
-import { isWindows } from 'helpers'
+import { getRDP } from 'app-actions'
+import { isWindows } from 'app-helpers'
 import { canConsole } from '../../vm-status'
 
 /**

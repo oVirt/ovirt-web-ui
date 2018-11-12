@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { isWindows } from 'helpers'
+import { isWindows } from 'app-helpers'
 import { ActionButtonWraper } from '../VmActions/Action'
 import ConsoleConfirmationModal from '../VmActions/ConsoleConfirmationModal'
 import { canConsole } from '../../vm-status'

@@ -2,7 +2,7 @@ import { fromJS } from 'immutable'
 
 import { SET_HOSTS } from 'app-constants'
 import { actionReducer } from './utils'
-import { arrayToMap } from 'helpers'
+import { arrayToMap } from 'app-helpers'
 
 const initialState = fromJS({})
 

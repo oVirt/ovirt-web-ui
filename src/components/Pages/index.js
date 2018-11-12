@@ -6,14 +6,14 @@ import { RouterPropTypeShapes } from '../../propTypeShapes'
 import { push } from 'connected-react-router'
 
 import { msg } from 'app-intl'
-import { canUserUseAnyClusters } from 'utils'
+import { canUserUseAnyClusters } from 'app-utils'
 
 import VmDialog from '../VmDialog'
 import VmsList from '../VmsList'
 import VmDetails from '../VmDetails'
 import { default as LegacyVmDetails } from '../VmDetail'
 
-import { addUserMessage } from 'actions'
+import { addUserMessage } from 'app-actions'
 
 /**
  * Route component (for PageRouter) to view the list of VMs and Pools

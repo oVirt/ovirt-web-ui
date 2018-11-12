@@ -11,7 +11,7 @@ import VmActions from '../VmActions'
 import VmIcon from '../VmIcon'
 import VmStatusIcon from '../VmStatusIcon'
 
-import { startPool } from 'actions'
+import { startPool } from 'app-actions'
 
 import { getOsHumanName } from '../utils'
 import { enumMsg } from 'app-intl'

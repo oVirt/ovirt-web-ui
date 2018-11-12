@@ -23,7 +23,7 @@ import configureStore from './store'
 import Selectors from './selectors'
 import AppConfiguration, { readConfiguration } from './config'
 import { loadStateFromLocalStorage } from './storage'
-import { valuesOfObject } from 'helpers'
+import { valuesOfObject } from 'app-helpers'
 import { rootSaga } from './sagas'
 import {
   login,
@@ -31,7 +31,7 @@ import {
   setDomain,
   addActiveRequest,
   delayedRemoveActiveRequest,
-} from 'actions'
+} from 'app-actions'
 import OvirtApi from './ovirtapi'
 
 import App from './App'

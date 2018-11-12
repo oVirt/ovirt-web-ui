@@ -6,7 +6,7 @@ import {
   SET_STORAGE_DOMAINS,
 } from 'app-constants'
 import { actionReducer } from './utils'
-import { arrayToMap } from 'helpers'
+import { arrayToMap } from 'app-helpers'
 
 const initialState = fromJS({})
 

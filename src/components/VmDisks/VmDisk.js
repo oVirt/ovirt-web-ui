@@ -3,13 +3,13 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Modal } from 'patternfly-react'
 
-import { userFormatOfBytes } from 'helpers'
+import { userFormatOfBytes } from 'app-helpers'
 import { removeDisk } from '_/actions'
 
 import FieldHelp from '../FieldHelp/index'
 import { msg } from 'app-intl'
 import style from './style.css'
-import { PendingTaskTypes } from 'reducers/pendingTasks'
+import { PendingTaskTypes } from 'app-reducers/pendingTasks'
 
 class VmDisk extends React.PureComponent {
   constructor (props) {

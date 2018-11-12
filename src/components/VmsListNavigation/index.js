@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { getByPage } from 'actions'
+import { getByPage } from 'app-actions'
 import InfiniteScroll from 'react-infinite-scroller'
 import naturalCompare from 'string-natural-compare'
 

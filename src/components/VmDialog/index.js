@@ -9,7 +9,7 @@ import NavigationPrompt from 'react-router-navigation-prompt'
 import Switch from 'react-bootstrap-switch'
 
 import logger from '../../logger'
-import { generateUnique, templateNameRenderer } from 'helpers'
+import { generateUnique, templateNameRenderer } from 'app-helpers'
 import { isRunning, getVmIconId, isValidOsIcon, isVmNameValid } from '../utils'
 
 import style from './style.css'
@@ -24,7 +24,7 @@ import NavigationConfirmationModal from '../NavigationConfirmationModal'
 import SelectBox from '../SelectBox'
 import VmIcon from '../VmIcon'
 
-import { createVm, editVm } from 'actions'
+import { createVm, editVm } from 'app-actions'
 
 import Selectors from '../../selectors'
 import { MAX_VM_MEMORY_FACTOR } from 'app-constants'

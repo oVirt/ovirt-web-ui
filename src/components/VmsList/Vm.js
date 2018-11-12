@@ -11,7 +11,7 @@ import VmActions from '../VmActions'
 import VmIcon from '../VmIcon'
 import VmStatusIcon from '../VmStatusIcon'
 
-import { startVm } from 'actions'
+import { startVm } from 'app-actions'
 
 import { getOsHumanName, getVmIcon } from '../utils'
 import { enumMsg } from 'app-intl'

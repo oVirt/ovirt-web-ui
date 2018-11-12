@@ -2,16 +2,16 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import * as Actions from 'actions'
+import * as Actions from 'app-actions'
 import { MAX_VM_MEMORY_FACTOR } from 'app-constants'
-import { generateUnique, localeCompare } from 'helpers'
+import { generateUnique, localeCompare } from 'app-helpers'
 import { msg, enumMsg } from 'app-intl'
 import {
   formatUptimeDuration,
   convertValue,
   isNumber,
   round,
-} from 'utils'
+} from 'app-utils'
 import {
   canChangeCluster as vmCanChangeCluster,
   canChangeCd as vmCanChangeCd,

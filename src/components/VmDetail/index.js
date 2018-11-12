@@ -13,9 +13,9 @@ import sharedStyle from '../sharedStyle.css'
 import {
   getConsoleOptions,
   saveConsoleOptions,
-} from 'actions'
+} from 'app-actions'
 
-import { templateNameRenderer, userFormatOfBytes } from 'helpers'
+import { templateNameRenderer, userFormatOfBytes } from 'app-helpers'
 
 import ConsoleOptions from '../ConsoleOptions'
 import DetailContainer from '../DetailContainer'

@@ -1,6 +1,6 @@
 
 import { locale as appLocale } from 'app-intl'
-import { localeCompare } from 'helpers'
+import { localeCompare } from 'app-helpers'
 
 /*
  * Sort an Immutable List of Maps (set of disks) for display on the VmDisks list.

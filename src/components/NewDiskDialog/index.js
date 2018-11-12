@@ -8,7 +8,7 @@ import { cleanNewDiskDialogSubtree } from './actions'
 
 import { msg } from 'app-intl'
 import SelectBox from '../SelectBox'
-import { flatMap, parseGbToBytes } from 'utils'
+import { flatMap, parseGbToBytes } from 'app-utils'
 import style from './style.css'
 
 class NewDiskDialog extends React.Component {
