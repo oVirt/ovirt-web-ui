@@ -43,7 +43,7 @@ Snapshots.propTypes = {
 }
 
 const ConnectedSnapshots = connect(
-  (state, { snapshots }) => ({
+  (state) => ({
     beingCreated: !!state.pendingTasks.find(t => t.type === PendingTaskTypes.SNAPSHOT_ADD),
     beingRestored: !!state.pendingTasks.find(task => task.type === PendingTaskTypes.SNAPSHOT_RESTORE),
     beingDeleted: !!state.pendingTasks.find(task => task.type === PendingTaskTypes.SNAPSHOT_REMOVAL),
