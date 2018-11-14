@@ -2,7 +2,7 @@ import { takeEvery, put } from 'redux-saga/effects'
 
 import { CREATE_DISK_FOR_VM, REMOVE_DISK, EDIT_VM_DISK } from '../constants'
 import Api from 'ovirtapi'
-import { callExternalAction, delay } from './utils'
+import { callExternalAction, delay, delayInMsSteps } from './utils'
 import { fetchDisks } from '../sagas'
 
 import {
@@ -43,10 +43,10 @@ function* removeDisk (action) {
   }
 
   yield put(addDiskRemovalPendingTask(diskId))
-  const diskRemoved = yield waitForDisk(
+  const diskRemoved = yield waitForDiskAttachment(
     vmToRefreshId,
     diskId,
-    apiDisk => apiDisk.error && apiDisk.error.status === 404,
+    attachment => attachment.error && attachment.error.status === 404,
     true
   )
   yield put(removeDiskRemovalPendingTask(diskId))
@@ -77,25 +77,39 @@ function* editDiskOnVm (action) {
   yield fetchDisks({ vms: [ { id: vmId } ] })
 }
 
-function* waitForDiskToBeUnlocked (vmId, diskId) {
-  return yield waitForDisk(vmId, diskId, disk => disk.status && disk.status !== 'locked')
+function* waitForDiskToBeUnlocked (vmId, attachmentId) {
+  return yield waitForDiskAttachment(
+    vmId,
+    attachmentId,
+    attachment => attachment.disk && attachment.disk.status && attachment.disk.status !== 'locked',
+  )
 }
 
 // TODO: drop polling in favor of events (see https://github.com/oVirt/ovirt-web-ui/pull/390)
-function* waitForDisk (vmId, diskId, test, canBeMissing = false) {
+function* waitForDiskAttachment (vmId, attachmentId, test, canBeMissing = false) {
   let metTest = false
 
-  for (let i = 1; !metTest && i < 20; i++) {
-    const apiDisk = yield callExternalAction('disk', Api.disk, { payload: { diskId } }, canBeMissing)
-    const edited = Api.diskToInternal({ disk: apiDisk })
-    if (vmId) {
-      yield put(updateVmDisk({ vmId, disk: edited }))
+  for (let delayMs of delayInMsSteps()) {
+    const apiDiskAttachment = yield callExternalAction(
+      'diskattachment',
+      Api.diskattachment,
+      { payload: { vmId, attachmentId } },
+      canBeMissing
+    )
+
+    if (!apiDiskAttachment.error) {
+      const apiDisk = apiDiskAttachment.disk
+      const edited = Api.diskToInternal({ attachment: apiDiskAttachment, disk: apiDisk })
+      if (vmId) {
+        yield put(updateVmDisk({ vmId, disk: edited }))
+      }
     }
 
-    if (test(apiDisk)) {
+    if (test(apiDiskAttachment)) {
       metTest = true
+      break
     } else {
-      yield delay(Math.log2(i) * 2000) // gradually wait a bit longer each time
+      yield delay(delayMs)
     }
   }
 
