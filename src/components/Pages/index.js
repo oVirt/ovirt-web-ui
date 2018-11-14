@@ -13,13 +13,7 @@ import VmsList from '../VmsList'
 import VmDetails from '../VmDetails'
 import { default as LegacyVmDetails } from '../VmDetail'
 
-import {
-  addUserMessage,
-  selectVmDetail,
-  selectPoolDetail,
-  getIsoStorageDomains,
-  getConsoleOptions,
-} from '../../actions'
+import { addUserMessage } from '../../actions'
 
 /**
  * Route component (for PageRouter) to view the list of VMs and Pools
@@ -43,10 +37,6 @@ class LegacyVmDetailsPage extends React.Component {
     if (state.vmId !== props.match.params.id) {
       const vmId = props.match.params.id
 
-      // Assume the VM is not in props.vms, was shallow fetched or is stale.
-      // Force a refresh when it is selected for viewing.
-      props.getConsoleOptions(vmId)
-      props.getVmById(vmId)
       return { vmId }
     }
 
@@ -69,18 +59,12 @@ class LegacyVmDetailsPage extends React.Component {
 LegacyVmDetailsPage.propTypes = {
   vms: PropTypes.object.isRequired,
   match: RouterPropTypeShapes.match.isRequired,
-
-  getVmById: PropTypes.func.isRequired,
-  getConsoleOptions: PropTypes.func.isRequired,
 }
 const LegacyVmDetailsPageConnected = connect(
   (state) => ({
     vms: state.vms,
   }),
-  (dispatch) => ({
-    getVmById: (vmId) => dispatch(selectVmDetail({ vmId })),
-    getConsoleOptions: (vmId) => dispatch(getConsoleOptions({ vmId })),
-  })
+  (dispatch) => ({})
 )(LegacyVmDetailsPage)
 
 /**
@@ -97,11 +81,6 @@ class VmDetailsPage extends React.Component {
   static getDerivedStateFromProps (props, state) {
     if (state.vmId !== props.match.params.id) {
       const vmId = props.match.params.id
-
-      // Assume the VM is not in props.vms, was shallow fetched or is stale.
-      // Force a refresh when it is selected for viewing.
-      props.getConsoleOptions(vmId)
-      props.getVmById(vmId)
       return { vmId }
     }
 
@@ -124,18 +103,12 @@ class VmDetailsPage extends React.Component {
 VmDetailsPage.propTypes = {
   vms: PropTypes.object.isRequired,
   match: RouterPropTypeShapes.match.isRequired,
-
-  getVmById: PropTypes.func.isRequired,
-  getConsoleOptions: PropTypes.func.isRequired,
 }
 const VmDetailsPageConnected = connect(
   (state) => ({
     vms: state.vms,
   }),
-  (dispatch) => ({
-    getVmById: (vmId) => dispatch(selectVmDetail({ vmId })),
-    getConsoleOptions: (vmId) => dispatch(getConsoleOptions({ vmId })),
-  })
+  (dispatch) => ({})
 )(VmDetailsPage)
 
 /**
@@ -153,9 +126,6 @@ class PoolDetailsPage extends React.Component {
     if (state.poolId !== props.match.params.id) {
       const poolId = props.match.params.id
 
-      // Assume the Pool is not in props.pools, was shallow fetched or is stale.
-      // Force a refresh when it is selected for viewing.
-      props.getPoolById(poolId)
       return { poolId }
     }
 
@@ -179,27 +149,18 @@ class PoolDetailsPage extends React.Component {
 PoolDetailsPage.propTypes = {
   vms: PropTypes.object.isRequired,
   match: RouterPropTypeShapes.match.isRequired,
-
-  getPoolById: PropTypes.func.isRequired,
 }
 const PoolDetailsPageConnected = connect(
   (state) => ({
     vms: state.vms,
   }),
-  (dispatch) => ({
-    getPoolById: (poolId) => dispatch(selectPoolDetail({ poolId })),
-  })
+  (dispatch) => ({})
 )(PoolDetailsPage)
 
 /**
  * Route component (for PageRouter) to create a new VM
  */
 class VmCreatePage extends React.Component {
-  constructor (props) {
-    super(props)
-    props.getAvailableCDImages()
-  }
-
   componentDidUpdate () {
     // If the user cannot create any VMs (not just the one requested), bump them out
     if (!this.props.canUserCreateVMs) {
@@ -221,7 +182,6 @@ VmCreatePage.propTypes = {
   canUserCreateVMs: PropTypes.bool.isRequired,
   previousPath: PropTypes.string.isRequired,
 
-  getAvailableCDImages: PropTypes.func.isRequired,
   redirectToMainPage: PropTypes.func.isRequired,
   addUserMessage: PropTypes.func.isRequired,
 }
@@ -230,7 +190,6 @@ const VmCreatePageConnected = connect(
     canUserCreateVMs: canUserUseAnyClusters(state.clusters) && state.clusters.size > 0,
   }),
   (dispatch) => ({
-    getAvailableCDImages: () => dispatch(getIsoStorageDomains()),
     redirectToMainPage: () => dispatch(push('/')),
     addUserMessage: (message) => dispatch(addUserMessage({ message })),
   })
@@ -254,10 +213,6 @@ class VmEditPage extends React.Component {
     if (state.vmId !== props.match.params.id) {
       const vmId = props.match.params.id
 
-      // Assume the VM is not in props.vms, was shallow fetched or is stale.
-      // Force a refresh when it is selected for editing.
-      props.getAvailableCDImages()
-      props.getVmById(vmId)
       return { vmId }
     }
 
@@ -308,8 +263,6 @@ VmEditPage.propTypes = {
   previousPath: PropTypes.string.isRequired,
   match: RouterPropTypeShapes.match.isRequired,
 
-  getAvailableCDImages: PropTypes.func.isRequired,
-  getVmById: PropTypes.func.isRequired,
   redirectToMainPage: PropTypes.func.isRequired,
   addUserMessage: PropTypes.func.isRequired,
 }
@@ -319,8 +272,6 @@ const VmEditPageConnected = connect(
     vms: state.vms,
   }),
   (dispatch) => ({
-    getAvailableCDImages: () => dispatch(getIsoStorageDomains()),
-    getVmById: (vmId) => dispatch(selectVmDetail({ vmId })),
     redirectToMainPage: () => dispatch(push('/')),
     addUserMessage: (message) => dispatch(addUserMessage({ message })),
   })

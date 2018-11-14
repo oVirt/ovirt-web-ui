@@ -5,6 +5,7 @@ import {
   LOGIN_SUCCESSFUL,
   LOGOUT,
   SET_ADMINISTRATOR,
+  SET_CURRENT_PAGE,
   SET_DOMAIN,
   SET_OVIRT_API_VERSION,
   SET_USB_FILTER,
@@ -30,6 +31,7 @@ const initialState = Immutable.fromJS({
   administrator: false,
   usbFilter: null,
   userGroups: [],
+  currentPage: {},
   blankTemplateId: '00000000-0000-0000-0000-000000000000', // "engine/api/" -> special_objects.blank_template.id
 })
 
@@ -63,6 +65,9 @@ const config = actionReducer(initialState, {
   },
   [SET_USER_GROUPS] (state, { payload: { groups } }) {
     return state.set('userGroups', groups)
+  },
+  [SET_CURRENT_PAGE] (state, { payload }) {
+    return state.set('currentPage', Object.assign({}, payload))
   },
 }, true)
 

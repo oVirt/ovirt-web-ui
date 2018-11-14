@@ -1,5 +1,6 @@
 import AppConfiguration from '../config'
 import {
+  CHANGE_PAGE,
   CHECK_TOKEN_EXPIRED,
   GET_BY_PAGE,
   GET_OPTION,
@@ -8,6 +9,7 @@ import {
   GET_VM,
   PERSIST_STATE,
   SET_ADMINISTRATOR,
+  SET_CURRENT_PAGE,
   SET_USB_FILTER,
   SET_USER_FILTER_PERMISSION,
   SET_USER_GROUPS,
@@ -82,6 +84,26 @@ export function setAdministrator (administrator) {
     type: SET_ADMINISTRATOR,
     payload: {
       administrator,
+    },
+  }
+}
+
+export function setCurrentPage ({ type, id }) {
+  return {
+    type: SET_CURRENT_PAGE,
+    payload: {
+      type,
+      id,
+    },
+  }
+}
+
+export function changePage ({ type, id }) {
+  return {
+    type: CHANGE_PAGE,
+    payload: {
+      type,
+      id,
     },
   }
 }

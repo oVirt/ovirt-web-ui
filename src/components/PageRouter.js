@@ -8,6 +8,7 @@ import { push } from 'connected-react-router'
 import { RouterPropTypeShapes } from '../propTypeShapes'
 import Toolbar from './Toolbar/Toolbar'
 import Breadcrumb from './Breadcrumb'
+import { changePage } from '../actions'
 
 const findExactOrOnlyMatch = (branches) => {
   return branches.length === 1 ? branches[0] : branches.find(branch => branch.match.isExact) || null
@@ -42,7 +43,7 @@ class PageRouter extends React.Component {
     document.removeEventListener('keyup', this.handleKeyUp)
   }
 
-  static getDerivedStateFromProps ({ location, route }, { currentPath, previousPath }) {
+  static getDerivedStateFromProps ({ location, route, currentPage, onChangePage }, { currentPath, previousPath }) {
     const newPath = location.pathname
     const updates = {}
 
@@ -55,6 +56,7 @@ class PageRouter extends React.Component {
       if (currentPath && (previousPath !== currentPath)) {
         updates.previousPath = currentPath
       }
+      onChangePage(updates.branch.route.type, updates.branch.match.params.id)
     }
 
     return Object.keys(updates).length > 0 ? updates : null
@@ -91,8 +93,10 @@ PageRouter.propTypes = {
   location: RouterPropTypeShapes.location.isRequired,
   history: RouterPropTypeShapes.history.isRequired,
   route: PropTypes.object.isRequired,
+  currentPage: PropTypes.object.isRequired,
 
   navigationHandler: PropTypes.func.isRequired,
+  onChangePage: PropTypes.func.isRequired,
 }
 
 /*
@@ -100,9 +104,12 @@ PageRouter.propTypes = {
  */
 export default withRouter(
   connect(
-    undefined,
+    state => ({
+      currentPage: state.config.get('currentPage'),
+    }),
     dispatch => ({
       navigationHandler: (newPath) => dispatch(push(newPath)),
+      onChangePage: (type, id) => dispatch(changePage({ type, id })),
     })
   )(PageRouter)
 )
