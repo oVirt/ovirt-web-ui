@@ -154,7 +154,7 @@ const OvirtApi = {
   getAllClusters ({ additional }: { additional: Array<string> }): Promise<Object> {
     assertLogin({ methodName: 'getAllClusters' })
 
-    let follow = 'network'
+    let follow = 'networks'
     if (additional && additional.length > 0) {
       if (!additional.includes('networks')) {
         additional.push('networks')
