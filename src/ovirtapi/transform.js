@@ -53,6 +53,13 @@ function convertInt (val: ?(number | string), defaultValue: number = Number.NaN)
   return defaultValue
 }
 
+function cleanUndefined (obj: Object): Object {
+  for (let key in obj) {
+    if (obj[key] === undefined) delete obj[key]
+  }
+  return obj
+}
+
 //
 //
 const VM = {
@@ -373,18 +380,19 @@ const Snapshot = {
 //
 // VM -> DiskAttachments.DiskAttachment[] -> Disk
 const DiskAttachment = {
-  toInternal ({ attachment = {}, disk }: { attachment?: ApiDiskAttachmentType, disk: ApiDiskType }): DiskType {
-    return {
-      bootable: convertBool(attachment['bootable']),
-      active: convertBool(attachment['active']),
-      iface: attachment['interface'],
+  toInternal ({ attachment, disk }: { attachment?: ApiDiskAttachmentType, disk: ApiDiskType }): DiskType {
+    return cleanUndefined({
+      attachmentId: attachment && attachment['id'],
+      active: attachment && convertBool(attachment['active']),
+      bootable: attachment && convertBool(attachment['bootable']),
+      iface: attachment && attachment['interface'],
 
       id: disk.id,
-      name: disk['name'],
+      name: disk['alias'],
       type: disk['storage_type'], // [ image | lun | cinder ]
 
-      format: disk['format'], // only for [ images | cinder ]
-      status: disk['status'], // [ illegal | locked | ok ] but only for [ images | cinder ]
+      format: disk['format'], // [ cow | raw ] only for types [ images | cinder ]
+      status: disk['status'], // [ illegal | locked | ok ] only for types [ images | cinder ]
       sparse: convertBool(disk.sparse),
 
       actualSize: convertInt(disk['actual_size']),
@@ -396,15 +404,45 @@ const DiskAttachment = {
         disk.lun_storage.logical_units.logical_unit[0] &&
         convertInt(disk.lun_storage.logical_units.logical_unit[0].size),
 
-      storageDomainId: // only for image | cinder
+      storageDomainId: // only for types [ image | cinder ]
         disk.storage_domains &&
         disk.storage_domains.storage_domain &&
         disk.storage_domains.storage_domain[0] &&
         disk.storage_domains.storage_domain[0].id,
-    }
+    })
   },
 
-  toApi: undefined,
+  // NOTE: This will only work if disk.type == "image"
+  toApi ({ disk }: { disk: DiskType }): ApiDiskAttachmentType {
+    // if (disk.type !== 'image') throw Error('Only image type disks can be converted to API data')
+
+    return {
+      // disk_attachment part
+      id: disk.attachmentId,
+      active: disk.active,
+      bootable: disk.bootable,
+      interface: disk.iface,
+
+      // disk part
+      disk: {
+        id: disk.id,
+        alias: disk.name,
+
+        storage_type: 'image',
+        format: disk.format || (disk.sparse && disk.sparse ? 'cow' : 'raw'),
+        sparse: disk.sparse,
+        provisioned_size: disk.provisionedSize,
+
+        storage_domains: disk.storageDomainId && {
+          storage_domain: [
+            {
+              id: disk.storageDomainId,
+            },
+          ],
+        },
+      },
+    }
+  },
 }
 
 //

@@ -17,26 +17,39 @@
   font-size: 14px;
 }
 
-/* for a single item row */
+/* for a single item row (containing exactly a -status, -info and -actions) */
 .item-row {
-  display: table-row;
   width: 100%;
+
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: baseline;
 }
 
 .item-row .item-row-status {
-  display: table-cell;
+  flex: 0 0;
 }
 
 .item-row .item-row-info {
-  display: table-cell;
-  width: 100%;
+  flex: 1;
   padding-left: 5px;
+
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+
+.item-row .item-row-info.no-status {
+  padding-left: 0px;
 }
 
 .item-row .item-row-actions {
-  display: table-cell;
-  white-space: nowrap;
+  flex: 0 0;
   padding-left: 5px;
+
+  white-space: nowrap;
 }
 
 .item-row .item-row-actions .item-action {

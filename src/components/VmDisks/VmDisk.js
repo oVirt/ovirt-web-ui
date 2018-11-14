@@ -1,14 +1,15 @@
 import React from 'react'
-import { userFormatOfBytes } from '../../helpers'
 import PropTypes from 'prop-types'
-import { Modal } from 'patternfly-react'
 import { connect } from 'react-redux'
+import { Modal } from 'patternfly-react'
+
+import { removeDisk } from '../../actions'
+import { PendingTaskTypes } from '../../reducers/pendingTasks'
+import { userFormatOfBytes } from '../../helpers'
+import { msg } from '../../intl'
 
 import FieldHelp from '../FieldHelp/index'
-import { msg } from '../../intl'
-import { removeDisk } from './actions'
 import style from './style.css'
-import { PendingTaskTypes } from '../../reducers/pendingTasks'
 
 class VmDisk extends React.PureComponent {
   constructor (props) {
@@ -135,7 +136,7 @@ const VmDiskConnected = connect(
     beingDeleted: isDiskBeingDeleted(disk.get('id'), state.pendingTasks),
   }),
   (dispatch, { vmId }) => ({
-    removeFunction: (diskId) => dispatch(removeDisk(diskId, vmId)),
+    removeFunction: (diskId) => dispatch(removeDisk({ diskId, vmToRefreshId: vmId })),
   })
 )(VmDisk)
 
