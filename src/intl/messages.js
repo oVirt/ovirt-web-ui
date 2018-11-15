@@ -40,6 +40,7 @@ export const messages: { [messageId: string]: MessageType } = {
   bootMenu: 'Boot Menu',
   bootMenuTooltip: 'Boot menu allows to select bootable device. It is accessible from a console.',
   bootMenuWarning: 'All changes will take effect after reboot only.',
+  bootOrder: 'Boot Order',
   bootSequence: 'Boot Sequence',
   bootSequenceTooltip: 'Device order in which VM will search OS for running.',
   cancel: 'Cancel',
