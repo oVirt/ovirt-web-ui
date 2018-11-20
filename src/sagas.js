@@ -145,7 +145,7 @@ import {
   POOL_PAGE_TYPE,
 } from './constants'
 
-import { canUserEditVm } from './utils'
+import { canUserEditVm, getUserPermits, canUserUseCluster } from './utils'
 
 const vmFetchAdditionalList =
   [
@@ -156,10 +156,12 @@ const vmFetchAdditionalList =
     'nics',
     'snapshots',
     'statistics',
-    'permissions.role',
+    'permissions.role.permits',
   ]
 
 const EVERYONE_GROUP_ID = 'eee00000-0000-0000-0000-123456789eee'
+
+const CLUSTER_TYPE = 'Cluster'
 
 /**
  * Compare the current oVirt version (held in redux) to the given version.
@@ -442,7 +444,7 @@ export function* fetchSingleVm (action) {
     }
 
     if (isOvirtGTE42 && !shallowFetch && !Selectors.getFilter()) {
-      internalVm.permissions = yield fetchVmPermissions({ vmId: internalVm.id })
+      internalVm.permits = getUserPermits(yield fetchVmPermissions({ vmId: internalVm.id }))
     }
 
     if (!isOvirtGTE42 && !shallowFetch) {
@@ -451,8 +453,8 @@ export function* fetchSingleVm (action) {
       internalVm.disks = yield fetchVmDisks({ vmId: internalVm.id })
       internalVm.nics = yield fetchVmNics({ vmId: internalVm.id })
       internalVm.sessions = yield fetchVmSessions({ vmId: internalVm.id })
-      internalVm.permissions = yield fetchVmPermissions({ vmId: internalVm.id })
-      internalVm.canUserEditVm = canUserEditVm(internalVm.permissions)
+      internalVm.permits = getUserPermits(yield fetchVmPermissions({ vmId: internalVm.id }))
+      internalVm.canUserEditVm = canUserEditVm(internalVm.permits)
       // TODO: Support <4.2 for snapshots?
       // TODO: Support <4.2 for statistics?
     }
@@ -858,15 +860,25 @@ function mergeStorageDomains (storageDomainsInternal) {
   return mergedStorageDomains
 }
 
+function* fetchPermits ({ entityType, id }) {
+  const permissions = yield callExternalAction(`get${entityType}Permissions`, Api[`get${entityType}Permissions`], { payload: { id } })
+  return getUserPermits(Api.permissionsToInternal({ permissions: permissions.permission }))
+}
+
 function* fetchAllClusters (action) {
-  action.payload.additional = ['permissions.role']
   const clusters = yield callExternalAction('getAllClusters', Api.getAllClusters, action)
 
   if (clusters && clusters['cluster']) {
-    let clustersInternal = []
-    clustersInternal = clusters.cluster.map(cluster =>
-      Api.clusterToInternal({ cluster })
-    )
+    // Temporary solution, till bug will be fixed https://bugzilla.redhat.com/show_bug.cgi?id=1639784
+    let clustersInternal = (yield all(
+      clusters.cluster
+        .map(function* (cluster) {
+          const clusterInternal = Api.clusterToInternal({ cluster })
+          clusterInternal.permits = yield fetchPermits({ entityType: CLUSTER_TYPE, id: cluster.id })
+          clusterInternal.canUserUseCluster = canUserUseCluster(clusterInternal.permits)
+          return clusterInternal
+        })
+    ))
     yield put(setClusters(clustersInternal))
   }
 

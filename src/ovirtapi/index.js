@@ -166,9 +166,9 @@ const OvirtApi = {
     const url = `${AppConfiguration.applicationContext}/api/clusters?follow=${follow}`
     return httpGet({ url })
   },
-  getClusterPermissions ({ clusterId }: { clusterId: string }): Promise<Object> {
+  getClusterPermissions ({ id }: { id: string }): Promise<Object> {
     assertLogin({ methodName: 'getClusterPermissions' })
-    const url = `${AppConfiguration.applicationContext}/api/clusters/${clusterId}/permissions?follow=role`
+    const url = `${AppConfiguration.applicationContext}/api/clusters/${id}/permissions?follow=role.permits`
     return httpGet({ url, custHeaders: { Filter: true } })
   },
   getVmPermissions ({ vmId }: VmIdType): Promise<Object> {
