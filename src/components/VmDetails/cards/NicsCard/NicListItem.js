@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { msg } from 'app-intl'
+import { msg } from '_/intl'
 import { escapeHtml } from '../../../utils'
 import { Grid, Row, Col } from '../../GridComponents'
 import itemStyle from '../../itemListStyle.css'

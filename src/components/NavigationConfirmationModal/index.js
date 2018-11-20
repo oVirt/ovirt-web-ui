@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Modal, Button, Alert } from 'patternfly-react'
-import { msg } from 'app-intl'
+import { msg } from '_/intl'
 
 const NavigationConfirmationModal = ({ show, onYes, onNo }) => {
   const idPrefix = 'close-dialog-confim'

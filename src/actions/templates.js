@@ -1,7 +1,7 @@
 import {
   GET_ALL_TEMPLATES,
   SET_TEMPLATES,
-} from 'app-constants'
+} from '_/constants'
 
 /**
  * @param {Array<Object>} templates

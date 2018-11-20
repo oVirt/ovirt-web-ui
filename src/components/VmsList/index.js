@@ -6,7 +6,7 @@ import { withRouter } from 'react-router-dom'
 
 import { Grid } from 'patternfly-react'
 import Vms from './Vms'
-import { msg } from 'app-intl'
+import { msg } from '_/intl'
 
 /**
  * Component displayed when VMs or Pools exist but the data is still loading.

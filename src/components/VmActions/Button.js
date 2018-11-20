@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import style from './style.css'
 
-import { hrefWithoutHistory } from 'app-helpers'
+import { hrefWithoutHistory } from '_/helpers'
 
 class Button extends React.Component {
   render () {

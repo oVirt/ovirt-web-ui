@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
-import { msg } from 'app-intl'
+import { msg } from '_/intl'
 import VmDisk from './VmDisk'
 import style from './style.css'
 import NewDiskDialog from '../NewDiskDialog'

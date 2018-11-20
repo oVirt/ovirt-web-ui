@@ -2,7 +2,7 @@ import {
   ADD_NETWORKS_TO_VNIC_PROFILES,
   SET_VNIC_PROFILES,
   GET_ALL_VNIC_PROFILES,
-} from 'app-constants'
+} from '_/constants'
 
 export function setVnicProfiles ({ vnicProfiles }) {
   return {

@@ -2,8 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import { canConsole } from '../../../../vm-status'
-import { isWindows } from 'app-helpers'
+import { canConsole } from '_/vm-status'
+import { isWindows } from '_/helpers'
 
 import Action from '../../../VmActions/Action'
 import ConsoleConfirmationModal from '../../../VmActions/ConsoleConfirmationModal'

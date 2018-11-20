@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 
 import { Link } from 'react-router-dom'
 
-import { msg } from 'app-intl'
+import { msg } from '_/intl'
 
 const AddVmButton = ({ id, isEnabled }) => {
   if (!isEnabled) {

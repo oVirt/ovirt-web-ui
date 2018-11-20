@@ -6,7 +6,7 @@ import {
   Icon,
   noop,
 } from 'patternfly-react'
-import { msg } from 'app-intl'
+import { msg } from '_/intl'
 
 const NextRunChangeConfirmationModal = ({ show, onCancel, onSave, onSaveAndRestart }) => {
   return <MessageDialog

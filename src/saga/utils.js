@@ -4,14 +4,14 @@ import {
 } from 'redux-saga/effects'
 
 import logger from '../logger'
-import { hidePassword } from 'app-helpers'
+import { hidePassword } from '_/helpers'
 
-import { msg } from 'app-intl'
+import { msg } from '_/intl'
 
 import {
   failedExternalAction,
   checkTokenExpired,
-} from 'app-actions'
+} from '_/actions'
 
 export const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 

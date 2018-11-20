@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { formatTwoDigits } from 'app-helpers'
+import { formatTwoDigits } from '_/helpers'
 
 const Time = ({ time, cssClass, id }) => {
   const t = new Date(time)

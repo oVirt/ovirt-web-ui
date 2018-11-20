@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "allowSyntheticDefaultImports": false,
+    "baseUrl": "./",
+    "paths": {
+      "ovirtapi": ["src/ovirtapi/index.js"],
+      "app-intl": ["src/intl/index.js"],
+      "app-actions": ["src/actions/index.js"],
+      "app-reducers/*": ["src/reducers/*"],
+      "app-constants": ["src/constants/index.js"],
+      "app-helpers": ["src/helpers.js"]
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+}

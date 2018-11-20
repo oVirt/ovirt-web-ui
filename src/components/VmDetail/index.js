@@ -3,9 +3,9 @@ import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
 
-import AppConfiguration from '../../config'
-import { msg } from 'app-intl'
-import { canDeleteDisk } from '../../vm-status'
+import AppConfiguration from '_/config'
+import { msg } from '_/intl'
+import { canDeleteDisk } from '_/vm-status'
 
 import style from './style.css'
 import sharedStyle from '../sharedStyle.css'
@@ -13,9 +13,9 @@ import sharedStyle from '../sharedStyle.css'
 import {
   getConsoleOptions,
   saveConsoleOptions,
-} from 'app-actions'
+} from '_/actions'
 
-import { templateNameRenderer, userFormatOfBytes } from 'app-helpers'
+import { templateNameRenderer, userFormatOfBytes } from '_/helpers'
 
 import ConsoleOptions from '../ConsoleOptions'
 import DetailContainer from '../DetailContainer'
@@ -29,7 +29,7 @@ import VmsListNavigation from '../VmsListNavigation'
 import VmStatus from './VmStatus'
 import { NextRunLabel } from './labels'
 
-import Selectors from '../../selectors'
+import Selectors from '_/selectors'
 import { getOsHumanName, getVmIcon } from '../utils'
 
 function rephraseVmType (vmType) {

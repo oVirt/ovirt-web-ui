@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import { Icon, OverlayTrigger, Tooltip } from 'patternfly-react'
 
-import { msg } from 'app-intl'
+import { msg } from '_/intl'
 import style from './style.css'
 
 const nicLinkInfoSettings = {

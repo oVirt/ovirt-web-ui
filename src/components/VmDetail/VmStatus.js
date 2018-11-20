@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import VmStatusIcon from '../VmStatusIcon'
 import FieldHelp from '../FieldHelp'
 
-import { msg, enumMsg } from 'app-intl'
+import { msg, enumMsg } from '_/intl'
 
 import HostConsole, { hasUserHostConsoleAccess, CockpitAHREF } from '../HostConsole/index'
 

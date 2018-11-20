@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { sortedBy } from 'app-helpers'
+import { sortedBy } from '_/helpers'
 
 import style from './sharedStyle.css'
 

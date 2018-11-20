@@ -22,7 +22,7 @@ import {
   UPDATE_VM_DISK,
   UPDATE_VMS,
   VM_ACTION_IN_PROGRESS,
-} from 'app-constants'
+} from '_/constants'
 import logger from '../logger'
 import { actionReducer, removeMissingItems } from './utils'
 

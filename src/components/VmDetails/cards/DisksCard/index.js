@@ -4,8 +4,8 @@ import { connect } from 'react-redux'
 
 import { createDiskForVm, editDiskOnVm, removeDisk } from '../../../../actions'
 
-import { msg } from 'app-intl'
-import { isNumber } from 'app-utils'
+import { msg } from '_/intl'
+import { isNumber } from '_/utils'
 import { sortDisksForDisplay } from '../../../VmDisks/utils'
 import { maskForElementId } from '../../../utils'
 

@@ -12,12 +12,12 @@ import {
 
 import style from './style.css'
 
-import { msg } from 'app-intl'
+import { msg } from '_/intl'
 import RestoreConfirmationModal from './RestoreConfirmationModal'
 import DeleteConfirmationModal from '../../../VmModals/DeleteConfirmationModal'
 import SnapshotDetail from './SnapshotDetail'
 import { deleteVmSnapshot } from './actions'
-import { formatDateFromNow } from 'app-helpers'
+import { formatDateFromNow } from '_/helpers'
 import { getMinimizedString, escapeHtml } from '../../../utils'
 
 const MAX_DESCRIPTION_SIZE = 50

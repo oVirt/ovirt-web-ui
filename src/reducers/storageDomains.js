@@ -4,9 +4,9 @@ import {
   ADD_STORAGE_DOMAINS,
   SET_STORAGE_DOMAIN_FILES,
   SET_STORAGE_DOMAINS,
-} from 'app-constants'
+} from '_/constants'
 import { actionReducer } from './utils'
-import { arrayToMap } from 'app-helpers'
+import { arrayToMap } from '_/helpers'
 
 const initialState = fromJS({})
 

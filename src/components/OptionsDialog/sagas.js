@@ -1,7 +1,7 @@
 import { put, takeEvery } from 'redux-saga/effects'
 import { SAVE_SSH_KEY, GET_SSH_KEY } from './constants'
 import { setSSHKey, setUnloaded } from './actions'
-import Api from 'ovirtapi'
+import Api from '_/ovirtapi'
 
 function* saveSSHKey (sagas, action) {
   yield sagas.callExternalAction('saveSSHKey', Api.saveSSHKey, action)

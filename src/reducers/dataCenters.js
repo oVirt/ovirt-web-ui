@@ -1,6 +1,6 @@
 import { fromJS } from 'immutable'
 
-import { SET_DATA_CENTERS } from 'app-constants'
+import { SET_DATA_CENTERS } from '_/constants'
 import { actionReducer } from './utils'
 
 const initialState = fromJS([])

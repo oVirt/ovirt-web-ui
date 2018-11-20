@@ -3,9 +3,9 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Icon } from 'patternfly-react'
 
-import { msg } from 'app-intl'
-import { isNumber } from 'app-utils'
-import { addVmNic, deleteVmNic, editVmNic } from 'app-actions'
+import { msg } from '_/intl'
+import { isNumber } from '_/utils'
+import { addVmNic, deleteVmNic, editVmNic } from '_/actions'
 
 import BaseCard from '../../BaseCard'
 import { Grid, Row, Col } from '../../GridComponents'
