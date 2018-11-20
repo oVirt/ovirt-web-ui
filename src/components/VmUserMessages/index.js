@@ -84,14 +84,16 @@ class VmUserMessages extends React.Component {
           <NotificationDrawer.Title onCloseClick={this.handleToggle} onExpandClick={this.handleExpand} />
           <NotificationDrawer.PanelBody className={style['panel-body']}>
             {messagesList}
-            { messagesCount > 0 && <NotificationDrawer.PanelAction>
-              <NotificationDrawer.PanelActionLink data-toggle='clear-all'>
-                <Button bsStyle='link' onClick={onClearMessages}>
-                  <Icon type='pf' name='close' />
-                  { msg.clearAll() }
-                </Button>
-              </NotificationDrawer.PanelActionLink>
-            </NotificationDrawer.PanelAction> }
+            { messagesCount > 0 &&
+              <NotificationDrawer.PanelAction>
+                <NotificationDrawer.PanelActionLink data-toggle='clear-all'>
+                  <Button bsStyle='link' onClick={onClearMessages}>
+                    <Icon type='pf' name='close' />
+                    { msg.clearAll() }
+                  </Button>
+                </NotificationDrawer.PanelActionLink>
+              </NotificationDrawer.PanelAction>
+            }
           </NotificationDrawer.PanelBody>
         </NotificationDrawer>
       </li>
