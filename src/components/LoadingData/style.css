@@ -1,11 +1,30 @@
-.loading-data {
-    max-width: 10em;
-    position: fixed;
-    z-index: 2000;
-    padding: 2px;
-    top: 2.4em;
-    margin-left: 50%;
-    border-color: #ecc89e;
-    min-width: 100px;
-    text-align: center;
+.loading-data-container-inline,
+.loading-data-container-fixed {
+  display: inline-flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+
+  /* Alert type='warning' styles (border color: #ec7a08 is PF, #ecc89e is original) */
+  border: 1px solid #ecc89e;
+  background-color: #fdf2e5;
+  color: #363636;
+  padding: 8px;
+}
+
+.loading-data-container-fixed {
+  position: fixed;
+  top: 45px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  z-index: 2000;
+
+  padding: 11px;
+}
+
+.loading-data-message {
+  margin-left: 11px;
+  font-style: italic;
+  font-weight: bold;
 }
