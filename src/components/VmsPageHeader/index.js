@@ -49,6 +49,6 @@ export default connect(
     page: state.vms.get('page'), // number of pages to request refresh
   }),
   (dispatch) => ({
-    onRefresh: (page) => dispatch(refresh({ quiet: false, shallowFetch: false, page })),
+    onRefresh: (page) => dispatch(refresh({ shallowFetch: false, page })),
   })
 )(VmsPageHeader)

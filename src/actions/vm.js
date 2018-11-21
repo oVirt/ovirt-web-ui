@@ -63,13 +63,14 @@ export function setDomain ({ domain }) {
 /**
  * I.e. the Refresh button is clicked or scheduler event occurred (polling)
  */
-export function refresh ({ page, quiet = false, shallowFetch = false }) {
+export function refresh ({ page, shallowFetch = false, onNavigation = false, onSchedule = false }) {
   return {
     type: REFRESH_DATA,
     payload: {
-      quiet,
-      shallowFetch,
       page,
+      shallowFetch,
+      onNavigation,
+      onSchedule,
     },
   }
 }

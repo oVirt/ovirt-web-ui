@@ -285,6 +285,7 @@ const OvirtApi = {
     assertLogin({ methodName: 'icon' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/icons/${id}` })
   },
+
   diskattachment ({ vmId, attachmentId }: { vmId: string, attachmentId: string}): Promise<Object> {
     assertLogin({ methodName: 'diskattachment' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/diskattachments/${attachmentId}?follow=disk` })
@@ -297,6 +298,7 @@ const OvirtApi = {
     assertLogin({ methodName: 'disk' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/disks/${diskId}` })
   },
+
   consoles ({ vmId }: VmIdType): Promise<Object> {
     assertLogin({ methodName: 'consoles' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/graphicsconsoles` })
@@ -323,22 +325,22 @@ const OvirtApi = {
     const url = `${AppConfiguration.applicationContext}/api/vmpools/;max=${AppConfiguration.pageLimit}?search=SORTBY NAME ASC page ${page}`
     return httpGet({ url })
   },
-
   getPoolsByCount ({ count }: { count: number }): Promise<Object> {
     assertLogin({ methodName: 'getPoolsByCount' })
     const url = `${AppConfiguration.applicationContext}/api/vmpools/;max=${count}`
     return httpGet({ url })
   },
-
   getPool ({ poolId }: PoolIdType): Promise<Object> {
     assertLogin({ methodName: 'getPool' })
     const url = `${AppConfiguration.applicationContext}/api/vmpools/${poolId}`
     return httpGet({ url })
   },
+
   sessions ({ vmId }: VmIdType): Promise<Object> {
     assertLogin({ methodName: 'sessions' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/sessions` })
   },
+
   getStorages (): Promise<Object> {
     assertLogin({ methodName: 'getStorages' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/storagedomains` })
@@ -346,6 +348,13 @@ const OvirtApi = {
   getStorageFiles ({ storageId }: { storageId: string }): Promise<Object> {
     assertLogin({ methodName: 'getStorageFiles' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/storagedomains/${storageId}/files` })
+  },
+  getIsoImages (): Promise<Object> {
+    assertLogin({ methodName: 'getIsoImages' })
+    const search = 'disk_type=image and disk_content_type=iso'
+    return httpGet({
+      url: `${AppConfiguration.applicationContext}/api/disks?search=${encodeURIComponent(search)}`,
+    })
   },
 
   getCdRom ({ vmId, current = true }: { vmId: string, current?: boolean }): Promise<Object> {

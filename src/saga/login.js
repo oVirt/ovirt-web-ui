@@ -24,15 +24,15 @@ import {
   setAdministrator,
   getOption,
 
-  getByPage,
-  getAllTemplates,
-  getAllStorageDomains,
   getAllClusters,
   getAllHosts,
   getAllOperatingSystems,
+  getAllStorageDomains,
+  getAllTemplates,
   getAllVnicProfiles,
+  getByPage,
+  getIsoFiles,
   getUserGroups,
-  getIsoStorageDomains,
 
   downloadConsole,
   getUSBFilter,
@@ -188,15 +188,22 @@ function* autoConnectCheck () {
 
 function* initialLoad () {
   yield put(getUserGroups())
-  yield put(getAllClusters()) // no shallow
-  yield put(getAllHosts())
+
+  // no requirements
   yield put(getAllOperatingSystems())
   yield put(getAllTemplates({ shallowFetch: false }))
+  yield put(getAllHosts())
   yield put(getAllStorageDomains())
-  yield put(getAllVnicProfiles())
-  yield put(getIsoStorageDomains())
 
-  yield put(getByPage({ page: 1 })) // first page of VMs list
+  // requires user groups to be in redux store for authorization checks
+  yield put(getAllClusters())
+  yield put(getAllVnicProfiles())
+
+  // requires storage domains to be in redux store
+  yield put(getIsoFiles())
+
+  // --- store is populated with user & system info, now pull VMs and Pools
+  yield put(getByPage({ page: 1 }))
 }
 
 function* fetchPermissionWithoutFilter () {
