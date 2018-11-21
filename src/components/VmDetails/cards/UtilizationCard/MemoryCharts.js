@@ -14,7 +14,7 @@ import {
 } from 'patternfly-react'
 
 import { donutMemoryTooltipContents } from '../../../utils'
-import { convertValueMap, round } from '../../../../utils'
+import { round } from '../../../../utils'
 import { userFormatOfBytes } from '../../../../helpers'
 
 import style from './style.css'
@@ -35,15 +35,9 @@ const MemoryCharts = ({ memoryStats, isRunning, id }) => {
   const available = isRunning ? memoryStats.free.datum : memoryStats.installed.datum
   const used = !isRunning ? 0 : memoryStats.installed.datum - memoryStats.free.datum
 
-  const { unit, value } =
-    convertValueMap(
-      'B',
-      {
-        available,
-        total: memoryStats.installed.datum,
-      })
   const usedFormated = userFormatOfBytes(used)
-  const memory = round(value, 0)
+  const availableFormated = userFormatOfBytes(available)
+  const totalFormated = userFormatOfBytes(memoryStats.installed.datum)
 
   // NOTE: Memory history comes sorted from newest to oldest
   const history = ((memoryStats['usage.history'] && memoryStats['usage.history'].datum) || []).reverse()
@@ -56,10 +50,12 @@ const MemoryCharts = ({ memoryStats, isRunning, id }) => {
         { isRunning &&
         <React.Fragment>
           <UtilizationCardDetails>
-            <UtilizationCardDetailsCount id={`${id}-available`}>{round(memory.available, 0)}</UtilizationCardDetailsCount>
+            <UtilizationCardDetailsCount id={`${id}-available`}>
+              {round(availableFormated.number, 0)}  {availableFormated.suffix !== totalFormated.suffix && availableFormated.suffix}
+            </UtilizationCardDetailsCount>
             <UtilizationCardDetailsDesc>
               <UtilizationCardDetailsLine1>Available</UtilizationCardDetailsLine1>
-              <UtilizationCardDetailsLine2 id={`${id}-total`}>of {round(memory.total, 0)} {unit}</UtilizationCardDetailsLine2>
+              <UtilizationCardDetailsLine2 id={`${id}-total`}>of {round(totalFormated.number, 0)} {totalFormated.suffix}</UtilizationCardDetailsLine2>
             </UtilizationCardDetailsDesc>
           </UtilizationCardDetails>
 

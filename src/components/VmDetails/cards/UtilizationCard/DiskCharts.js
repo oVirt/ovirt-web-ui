@@ -13,7 +13,7 @@ import {
 } from 'patternfly-react'
 
 import { donutMemoryTooltipContents } from '../../../utils'
-import { convertValueMap, round } from '../../../../utils'
+import { round } from '../../../../utils'
 import { userFormatOfBytes } from '../../../../helpers'
 
 import style from './style.css'
@@ -43,11 +43,9 @@ const DiskCharts = ({ vm, isRunning, id, ...props }) => {
     }
   })
 
-  const { unit, value: disks } = convertValueMap('B', { availableSize: provisionedSize - actualSize, provisionedSize })
-
   const usedFormated = userFormatOfBytes(actualSize)
-  const available = round(disks.availableSize, 1)
-  const total = round(disks.provisionedSize, 1)
+  const availableFormated = userFormatOfBytes(provisionedSize - actualSize)
+  const totalFormated = userFormatOfBytes(provisionedSize)
 
   return (
     <UtilizationCard className={style['chart-card']} id={id}>
@@ -59,10 +57,12 @@ const DiskCharts = ({ vm, isRunning, id, ...props }) => {
         { hasDisks &&
         <React.Fragment>
           <UtilizationCardDetails>
-            <UtilizationCardDetailsCount id={`${id}-available`}>{available}</UtilizationCardDetailsCount>
+            <UtilizationCardDetailsCount id={`${id}-available`}>
+              {round(availableFormated.number, 1)} {availableFormated.suffix !== totalFormated.suffix && availableFormated.suffix}
+            </UtilizationCardDetailsCount>
             <UtilizationCardDetailsDesc>
               <UtilizationCardDetailsLine1>Unallocated</UtilizationCardDetailsLine1>
-              <UtilizationCardDetailsLine2 id={`${id}-total`}>of {total} {unit} Provisioned</UtilizationCardDetailsLine2>
+              <UtilizationCardDetailsLine2 id={`${id}-total`}>of {round(totalFormated.number, 1)} {totalFormated.suffix} Provisioned</UtilizationCardDetailsLine2>
             </UtilizationCardDetailsDesc>
           </UtilizationCardDetails>
 
