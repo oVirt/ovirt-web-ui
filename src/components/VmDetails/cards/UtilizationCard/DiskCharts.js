@@ -10,9 +10,10 @@ import {
   UtilizationCardDetailsLine1,
   UtilizationCardDetailsLine2,
   UtilizationBar,
+  DonutChart,
 } from 'patternfly-react'
 
-import { round } from '_/utils'
+import { round, convertValueMap } from '_/utils'
 import { donutMemoryTooltipContents } from '_/components/utils'
 import { userFormatOfBytes } from '_/helpers'
 
@@ -77,40 +78,63 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
     }
   })
 
+  const usedFormated = userFormatOfBytes(actualSize)
   const availableFormated = userFormatOfBytes(provisionedSize - actualSize)
   const totalFormated = userFormatOfBytes(provisionedSize)
 
   return (
     <UtilizationCard className={style['chart-card']} id={id}>
-      <CardTitle>Disk <span style={{ fontSize: '55%', verticalAlign: 'super' }}>(storage allocations)</span></CardTitle>
+      <CardTitle>Disk</CardTitle>
       <CardBody>
-        { !diskDetails && isRunning &&
-          <NoLiveData id={`${id}-no-live-data`} message='It seems that no guest agent is configurated on VM.' />
-        }
         { !diskDetails && !isRunning &&
           <NoLiveData id={`${id}-no-live-data`} />
         }
-        { diskDetails &&
-        <React.Fragment>
-          <UtilizationCardDetails>
-            <UtilizationCardDetailsCount id={`${id}-available`}>
-              {round(availableFormated.number, 1)} {availableFormated.suffix !== totalFormated.suffix && availableFormated.suffix}
-            </UtilizationCardDetailsCount>
-            <UtilizationCardDetailsDesc>
-              <UtilizationCardDetailsLine1>Unallocated</UtilizationCardDetailsLine1>
-              <UtilizationCardDetailsLine2 id={`${id}-total`}>of {round(totalFormated.number, 1)} {totalFormated.suffix} Provisioned</UtilizationCardDetailsLine2>
-            </UtilizationCardDetailsDesc>
-          </UtilizationCardDetails>
-          <div className={style['disk-fs-list']}>
-            {
-              diskDetails.map((disk) =>
-                <DiskBar path={disk.path} total={parseInt(disk.total)} used={parseInt(disk.used)} />
-              )
+        { isRunning && vm.get('disks').size === 0 &&
+          <NoLiveData id={`${id}-no-live-data`} message='It looks like no disk is attached to VM.' />
+        }
+        { isRunning && vm.get('disks').size > 0 &&
+          <React.Fragment>
+            <UtilizationCardDetails>
+              <UtilizationCardDetailsCount id={`${id}-available`}>
+                {round(availableFormated.number, 1)} {availableFormated.suffix !== totalFormated.suffix && availableFormated.suffix}
+              </UtilizationCardDetailsCount>
+              <UtilizationCardDetailsDesc>
+                <UtilizationCardDetailsLine1>Unallocated</UtilizationCardDetailsLine1>
+                <UtilizationCardDetailsLine2 id={`${id}-total`}>of {round(totalFormated.number, 1)} {totalFormated.suffix} Provisioned</UtilizationCardDetailsLine2>
+              </UtilizationCardDetailsDesc>
+            </UtilizationCardDetails>
+            { !diskDetails &&
+              <DonutChart
+                id={`${id}-donut-chart`}
+                data={{
+                  columns: [
+                    [`allocated`, actualSize],
+                    [`unallocated`, provisionedSize - actualSize],
+                  ],
+                  order: null,
+                }}
+                title={{
+                  primary: `${round(usedFormated.number, 0)}`,
+                  secondary: `${usedFormated.suffix} Allocated`,
+                }}
+                tooltip={{
+                  show: true,
+                  contents: donutMemoryTooltipContents,
+                }}
+              />
             }
-          </div>
-          {/* Disks don't have historic data but stub the space so the card stretches like the others */}
-          <EmptyBlock />
-        </React.Fragment>
+            { diskDetails &&
+              <div className={style['disk-fs-list']}>
+                {
+                  diskDetails.map((disk) =>
+                    <DiskBar key={disk.path} path={disk.path} total={disk.total} used={disk.used} />
+                  )
+                }
+              </div>
+            }
+            {/* Disks don't have historic data but stub the space so the card stretches like the others */}
+            <EmptyBlock />
+          </React.Fragment>
         }
       </CardBody>
     </UtilizationCard>

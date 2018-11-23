@@ -279,15 +279,23 @@ const VmStatistics = {
 
       // no values -> undefined, 1 value -> value.datum, >1 values -> [...values.datum]
       // ?disks.usage -> {detail...}
-      const datum =
+      let datum: any =
         stat.values &&
         stat.values.value &&
         (stat.name === 'disks.usage'
-          ? JSON.parse(stat.values.value[0].detail || 'null')
+          ? stat.values.value[0].detail || null
           : stat.values.value.length === 1
             ? stat.values.value[0].datum
             : stat.values.value.map(value => value.datum))
 
+      if (stat.name === 'disks.usage' && datum !== null) {
+        datum = JSON.parse(datum)
+        datum = datum.map(data => {
+          data.total = convertInt(data.total)
+          data.used = convertInt(data.used)
+          return data
+        })
+      }
       const nameParts = /^(memory|cpu|network|disks)\.(.*)?$/.exec(stat.name)
       if (nameParts) {
         base[nameParts[1]][nameParts[2]] = {

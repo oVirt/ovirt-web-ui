@@ -18,7 +18,7 @@ const NoLiveData = ({ title, message, id }) => (
       { title || 'No Data Available' }
     </div>
     <div className={style['no-data-message']}>
-      { message || 'Utilization data is only available for a running VM.' }
+      { message || 'Utilization data is only available when the VM is running.' }
     </div>
   </div>
 )
