@@ -815,12 +815,12 @@ class DetailsCard extends React.Component {
             </Grid>
             {/* Advanced options */}
             { isEditing && <ExpandCollapseSection id={`${idPrefix}-advanced-options`} sectionHeader={msg.advancedOptions()}>
-              <Grid>
+              <Grid className={style['details-container']}>
                 <Row>
                   {/* First column */}
                   <Col className={style['fields-column']}>
                     <Grid>
-                      <div className={style['nested-container']}>
+                      <div>
                         <FieldRow label={msg.cloudInit()} id={`${idPrefix}-cloud-init`}>
                           <Switch
                             id={`${idPrefix}-cloud-init-edit`}
@@ -884,7 +884,7 @@ class DetailsCard extends React.Component {
                           {msg.bootOrder()}
                         </ControlLabel>
                         <FieldLevelHelp content={msg.bootSequenceTooltip()} inline />
-                        <Col>
+                        <Col style={{ paddingRight: '15px' }}>
                           <FormGroup>
                             <ControlLabel>
                               {msg.firstDevice()}
