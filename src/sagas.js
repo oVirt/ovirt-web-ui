@@ -248,7 +248,7 @@ function* refreshDetailPage ({ id, onNavigation, onSchedule }) {
   yield selectVmDetail(actionSelectVmDetail({ vmId: id }))
   yield getConsoleOptions(actionGetConsoleOptions({ vmId: id }))
 
-  // Load ISO images on manual refresh click
+  // Load ISO images on manual refresh click only
   if (!onNavigation && !onSchedule) {
     yield fetchIsoFiles(getIsoFiles())
   }
@@ -259,8 +259,8 @@ function* refreshDialogPage ({ id, onNavigation, onSchedule }) {
     yield selectVmDetail(actionSelectVmDetail({ vmId: id }))
   }
 
-  // Load ISO images when navigating to the page or manual refresh click
-  if (onNavigation || (!onNavigation && !onSchedule)) {
+  // Load ISO images on manual refresh click only
+  if (!onNavigation && !onSchedule) {
     yield fetchIsoFiles(getIsoFiles())
   }
 }
