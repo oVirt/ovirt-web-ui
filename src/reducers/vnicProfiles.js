@@ -3,7 +3,7 @@ import { actionReducer } from './utils'
 import {
   ADD_NETWORKS_TO_VNIC_PROFILES,
   SET_VNIC_PROFILES,
-} from '../constants'
+} from '_/constants'
 
 const initialState = fromJS({})
 

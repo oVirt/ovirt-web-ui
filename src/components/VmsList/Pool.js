@@ -11,10 +11,10 @@ import VmActions from '../VmActions'
 import VmIcon from '../VmIcon'
 import VmStatusIcon from '../VmStatusIcon'
 
-import { startPool } from '../../actions'
+import { startPool } from '_/actions'
 
 import { getOsHumanName } from '../utils'
-import { enumMsg } from '../../intl'
+import { enumMsg } from '_/intl'
 
 /**
  * Single icon-card in the list for a Pool

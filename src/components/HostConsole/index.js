@@ -3,8 +3,8 @@ import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
 
-import AppConfiguration from '../../config'
-import { msg } from './../../intl'
+import AppConfiguration from '_/config'
+import { msg } from '_/intl'
 
 import style from './style.css'
 

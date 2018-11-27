@@ -1,6 +1,6 @@
 import React from 'react'
 import { Switch as PfSwitch } from 'patternfly-react'
-import { enumMsg } from '../intl'
+import { enumMsg } from '_/intl'
 
 const Switch = (props) =>
   <PfSwitch

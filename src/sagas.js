@@ -1,4 +1,4 @@
-import Api from 'ovirtapi'
+import Api from '_/ovirtapi'
 import { persistStateToLocalStorage } from './storage'
 import Selectors from './selectors'
 import AppConfiguration from './config'
@@ -69,9 +69,8 @@ import {
   getVmCdRom,
   changeVmCdRom as actionChangeVmCdRom,
   restartVm as actionRestartVm,
-
   setCurrentPage,
-} from './actions'
+} from '_/actions'
 
 import {
   callExternalAction,
@@ -143,7 +142,7 @@ import {
   DIALOG_PAGE_TYPE,
   MAIN_PAGE_TYPE,
   POOL_PAGE_TYPE,
-} from './constants'
+} from '_/constants'
 
 import { canUserEditVm, getUserPermits, canUserUseCluster } from './utils'
 

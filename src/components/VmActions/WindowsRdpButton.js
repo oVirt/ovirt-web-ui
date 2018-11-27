@@ -2,9 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import { getRDP } from '../../actions'
-import { isWindows } from '../../helpers'
-import { canConsole } from '../../vm-status'
+import { getRDP } from '_/actions'
+import { isWindows } from '_/helpers'
+import { canConsole } from '_/vm-status'
 
 /**
  * Button to send a RDP connection file to the user for a Windows VM.

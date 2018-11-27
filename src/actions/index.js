@@ -16,7 +16,7 @@ import {
   SHOW_TOKEN_EXPIRED_MSG,
   START_SCHEDULER_FIXED_DELAY,
   STOP_SCHEDULER_FIXED_DELAY,
-} from '../constants'
+} from '_/constants'
 
 export * from './error'
 export * from './vm'

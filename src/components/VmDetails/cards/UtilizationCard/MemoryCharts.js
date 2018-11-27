@@ -14,7 +14,7 @@ import {
   SparklineChart,
 } from 'patternfly-react'
 
-import { convertValueMap, round } from '../../../../utils'
+import { convertValueMap, round } from '_/utils'
 
 import style from './style.css'
 

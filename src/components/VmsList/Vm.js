@@ -11,10 +11,10 @@ import VmActions from '../VmActions'
 import VmIcon from '../VmIcon'
 import VmStatusIcon from '../VmStatusIcon'
 
-import { startVm } from '../../actions/index'
+import { startVm } from '_/actions'
 
 import { getOsHumanName, getVmIcon } from '../utils'
-import { enumMsg } from '../../intl'
+import { enumMsg } from '_/intl'
 
 /**
  * Single icon-card in the list for a VM

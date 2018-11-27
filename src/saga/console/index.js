@@ -1,10 +1,10 @@
 import { put } from 'redux-saga/effects'
 
-import Api from 'ovirtapi'
+import Api from '_/ovirtapi'
 import Selectors from '../../selectors'
 import OptionsManager from '../../optionsManager'
 import logger from '../../logger'
-import { fileDownload } from '../../helpers'
+import { fileDownload } from '_/helpers'
 import {
   downloadConsole,
   getConsoleOptions as getConsoleOptionsAction,
@@ -13,7 +13,7 @@ import {
   setVmConsoles,
   vmActionInProgress,
   setConsoleIsValid,
-} from '../../actions'
+} from '_/actions'
 
 import { callExternalAction } from '../utils'
 import { fetchVmSessions } from '../../sagas'

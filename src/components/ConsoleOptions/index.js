@@ -5,7 +5,7 @@ import Switch from 'react-bootstrap-switch'
 
 import style from './style.css'
 import FieldHelp from '../FieldHelp/index'
-import { msg } from '../../intl'
+import { msg } from '_/intl'
 
 class ConsoleOptions extends React.Component {
   constructor (props) {

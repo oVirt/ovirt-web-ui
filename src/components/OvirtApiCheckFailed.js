@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
 import Product from '../version'
-import { msg } from '../intl'
+import { msg } from '_/intl'
 import { fixedStrings } from '../branding'
 import ErrorAlert from './ErrorAlert'
 

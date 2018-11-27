@@ -18,12 +18,12 @@ import 'patternfly/dist/css/patternfly-additions.css'
 import './index-nomodules.css'
 import * as branding from './branding'
 
-import { getSelectedMessages, locale } from './intl'
+import { getSelectedMessages, locale } from '_/intl'
 import configureStore from './store'
 import Selectors from './selectors'
 import AppConfiguration, { readConfiguration } from './config'
 import { loadStateFromLocalStorage } from './storage'
-import { valuesOfObject } from './helpers'
+import { valuesOfObject } from '_/helpers'
 import { rootSaga } from './sagas'
 import {
   login,
@@ -31,7 +31,7 @@ import {
   setDomain,
   addActiveRequest,
   delayedRemoveActiveRequest,
-} from './actions'
+} from '_/actions'
 import OvirtApi from './ovirtapi'
 
 import App from './App'

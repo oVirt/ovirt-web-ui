@@ -15,7 +15,7 @@ import ToastNotifications from './components/ToastNotifications'
 import getRoutes from './routes'
 import AppConfiguration from './config'
 import { fixedStrings } from './branding'
-import { msg } from './intl'
+import { msg } from '_/intl'
 
 /**
  * Login (token) to Engine is missing.
