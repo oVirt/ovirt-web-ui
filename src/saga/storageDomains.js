@@ -1,4 +1,4 @@
-import Api from 'ovirtapi'
+import Api from '_/ovirtapi'
 import { all, put, select, takeLatest, throttle } from 'redux-saga/effects'
 import { callExternalAction } from './utils'
 
@@ -6,11 +6,11 @@ import {
   setDataCenters,
   setStorageDomains,
   setStorageDomainsFiles,
-} from '../actions'
+} from '_/actions'
 import {
   GET_ALL_STORAGE_DOMAINS,
   GET_ISO_FILES,
-} from '../constants'
+} from '_/constants'
 
 /**
  * Fetch all data centers and attached storage domains.  By fetching the storage domains
