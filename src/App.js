@@ -50,10 +50,10 @@ const App = ({ history, config, appReady }) => {
     <ConnectedRouter history={history}>
       <div id='app-container'>
         <VmsPageHeader title={fixedStrings.BRAND_NAME + ' ' + msg.vmPortal()} />
-        { appReady && renderRoutes(getRoutes()) }
-        <LoadingData />
         <OvirtApiCheckFailed />
         <TokenExpired />
+        { appReady && renderRoutes(getRoutes()) }
+        <LoadingData />
         <ToastNotifications />
       </div>
     </ConnectedRouter>
