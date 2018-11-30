@@ -12,7 +12,7 @@ import {
   SET_USER_FILTER_PERMISSION,
   SET_USER_GROUPS,
   SHOW_TOKEN_EXPIRED_MSG,
-} from '../constants'
+} from '_/constants'
 
 const initialState = Immutable.fromJS({
   loginToken: undefined,

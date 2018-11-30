@@ -15,7 +15,7 @@ import ToastNotifications from './components/ToastNotifications'
 import getRoutes from './routes'
 import AppConfiguration from './config'
 import { fixedStrings } from './branding'
-import { msg } from './intl'
+import { msg } from '_/intl'
 
 /**
  * Login (token) to Engine is missing.
@@ -50,10 +50,10 @@ const App = ({ history, config, appReady }) => {
     <ConnectedRouter history={history}>
       <div id='app-container'>
         <VmsPageHeader title={fixedStrings.BRAND_NAME + ' ' + msg.vmPortal()} />
-        { appReady && renderRoutes(getRoutes()) }
-        <LoadingData />
         <OvirtApiCheckFailed />
         <TokenExpired />
+        { appReady && renderRoutes(getRoutes()) }
+        <LoadingData />
         <ToastNotifications />
       </div>
     </ConnectedRouter>

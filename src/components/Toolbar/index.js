@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import { RouterPropTypeShapes } from '../../propTypeShapes'
+import { RouterPropTypeShapes } from '_/propTypeShapes'
 import VmActions from '../VmActions'
 
 const VmDetailToolbar = ({ match, vms }) => {

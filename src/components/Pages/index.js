@@ -1,19 +1,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { RouterPropTypeShapes } from '../../propTypeShapes'
+import { RouterPropTypeShapes } from '_/propTypeShapes'
 
 import { push } from 'connected-react-router'
 
-import { msg } from '../../intl'
-import { canUserUseAnyClusters } from '../../utils'
+import { msg } from '_/intl'
+import { canUserUseAnyClusters } from '_/utils'
 
 import VmDialog from '../VmDialog'
 import VmsList from '../VmsList'
 import VmDetails from '../VmDetails'
 import { default as LegacyVmDetails } from '../VmDetail'
 
-import { addUserMessage } from '../../actions'
+import { addUserMessage } from '_/actions'
 
 /**
  * Route component (for PageRouter) to view the list of VMs and Pools

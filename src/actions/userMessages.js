@@ -3,7 +3,7 @@ import {
   CLEAR_USER_MSGS,
   DISMISS_USER_MSG,
   SET_USERMSG_NOTIFIED,
-} from '../constants'
+} from '_/constants'
 
 export function addUserMessage ({ message, shortMessage, type = '' }) {
   return {

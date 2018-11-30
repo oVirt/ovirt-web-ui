@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { msg } from '../../intl'
+import { msg } from '_/intl'
 import FieldHelp from '../FieldHelp'
 import ExpandableList from './ExpandableList'
 
@@ -13,7 +13,7 @@ class VmDetailRow extends Component {
   }
 
   render () {
-    const { label, labelTooltip, iconClassname, editor, enableSettings } = this.props
+    const { label, labelTooltip, iconClassname, editor, enableSettings, disableMessage } = this.props
 
     const pencilIcon = (<i className={`pficon pficon-edit`} />)
 
@@ -27,7 +27,7 @@ class VmDetailRow extends Component {
       </small>
     ) : (
       <small>
-        <FieldHelp content={msg.notEditableForPoolsOrPoolVms()} text={pencilIcon} />
+        <FieldHelp content={disableMessage || msg.notEditableForPoolsOrPoolVms()} text={pencilIcon} />
       </small>
     )
 
@@ -60,6 +60,7 @@ VmDetailRow.propTypes = {
   iconClassname: PropTypes.string.isRequired,
   editor: PropTypes.node.isRequired,
   enableSettings: PropTypes.bool,
+  disableMessage: PropTypes.string,
 }
 
 export default VmDetailRow

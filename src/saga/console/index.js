@@ -1,10 +1,10 @@
 import { put } from 'redux-saga/effects'
 
-import Api from 'ovirtapi'
+import Api from '_/ovirtapi'
 import Selectors from '../../selectors'
 import OptionsManager from '../../optionsManager'
 import logger from '../../logger'
-import { fileDownload } from '../../helpers'
+import { fileDownload } from '_/helpers'
 import {
   downloadConsole,
   getConsoleOptions as getConsoleOptionsAction,
@@ -13,7 +13,7 @@ import {
   setConsoleOptions,
   setVmConsoles,
   vmActionInProgress,
-} from '../../actions'
+} from '_/actions'
 
 import { callExternalAction } from '../utils'
 import { fetchVmSessions } from '../../sagas'
@@ -93,14 +93,18 @@ export function* fetchConsoleVmMeta ({ vmId }) {
 }
 
 /**
- * Check the consoleUser sessions on a VM and
+ * Check the sessions on a VM and if someone other then the given user has an open
+ * console, flag the console as "in use" requiring manual confirmation to open the
+ * console (which will disconnect the other user's existing session).
  */
 export function* getConsoleInUse (action) {
   let { vmId, usbFilter, userId, hasGuestAgent } = action.payload
   const sessionsInternal = yield fetchVmSessions({ vmId })
-  logger.log(`vmId: ${vmId}, sessions: ${JSON.stringify(sessionsInternal)}`)
+  const consoleUsers = sessionsInternal && sessionsInternal
+    .filter(session => session.consoleUser)
+    .map(session => session.user)
 
-  if (sessionsInternal && sessionsInternal.find((x) => x.consoleUser && (!userId || x.user.id === userId)) !== undefined) {
+  if (consoleUsers.length > 0 && consoleUsers.find(user => user.id === userId) === undefined) {
     yield put(setConsoleInUse({ vmId, consoleInUse: true }))
   } else {
     yield put(setConsoleInUse({ vmId, consoleInUse: false }))

@@ -7,9 +7,9 @@ import { Notification, NotificationDrawer, MenuItem, Icon, Button } from 'patter
 
 import style from './style.css'
 
-import { clearUserMessages, dismissUserMessage } from '../../actions'
-import { hrefWithoutHistory, getFormatedDateTime } from '../../helpers'
-import { msg } from '../../intl'
+import { clearUserMessages, dismissUserMessage } from '_/actions'
+import { hrefWithoutHistory, getFormatedDateTime } from '_/helpers'
+import { msg } from '_/intl'
 
 const UserMessage = ({ record, id, onDismissMessage }) => {
   const time = getFormatedDateTime(record.get('time'))
@@ -84,14 +84,16 @@ class VmUserMessages extends React.Component {
           <NotificationDrawer.Title onCloseClick={this.handleToggle} onExpandClick={this.handleExpand} />
           <NotificationDrawer.PanelBody className={style['panel-body']}>
             {messagesList}
-            <NotificationDrawer.PanelAction>
-              <NotificationDrawer.PanelActionLink data-toggle='clear-all'>
-                <Button bsStyle='link' onClick={onClearMessages} disabled={!messagesCount}>
-                  <Icon type='pf' name='close' />
-                  { msg.clearAll() }
-                </Button>
-              </NotificationDrawer.PanelActionLink>
-            </NotificationDrawer.PanelAction>
+            { messagesCount > 0 &&
+              <NotificationDrawer.PanelAction>
+                <NotificationDrawer.PanelActionLink data-toggle='clear-all'>
+                  <Button bsStyle='link' onClick={onClearMessages}>
+                    <Icon type='pf' name='close' />
+                    { msg.clearAll() }
+                  </Button>
+                </NotificationDrawer.PanelActionLink>
+              </NotificationDrawer.PanelAction>
+            }
           </NotificationDrawer.PanelBody>
         </NotificationDrawer>
       </li>

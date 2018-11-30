@@ -1,7 +1,7 @@
 import React from 'react'
 import PropsTypes from 'prop-types'
 import { Modal, Icon } from 'patternfly-react'
-import { msg } from '../../intl'
+import { msg } from '_/intl'
 
 const btnPropType = PropsTypes.shape({
   title: PropsTypes.string,

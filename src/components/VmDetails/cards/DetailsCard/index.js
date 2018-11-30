@@ -2,20 +2,20 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import * as Actions from '../../../../actions'
-import { MAX_VM_MEMORY_FACTOR } from '../../../../constants'
-import { generateUnique, localeCompare } from '../../../../helpers'
-import { msg, enumMsg } from '../../../../intl'
+import * as Actions from '_/actions'
+import { MAX_VM_MEMORY_FACTOR } from '_/constants'
+import { generateUnique, localeCompare } from '_/helpers'
+import { msg, enumMsg } from '_/intl'
 import {
   formatUptimeDuration,
   convertValue,
   isNumber,
   round,
-} from '../../../../utils'
+} from '_/utils'
 import {
   canChangeCluster as vmCanChangeCluster,
   canChangeCd as vmCanChangeCd,
-} from '../../../../vm-status'
+} from '_/vm-status'
 
 import { isValidOsIcon } from '../../../utils'
 

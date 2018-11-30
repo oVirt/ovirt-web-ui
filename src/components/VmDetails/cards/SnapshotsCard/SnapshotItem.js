@@ -12,14 +12,13 @@ import {
 
 import style from './style.css'
 
-import { msg } from '../../../../intl'
+import { msg } from '_/intl'
 import RestoreConfirmationModal from './RestoreConfirmationModal'
 import DeleteConfirmationModal from '../../../VmModals/DeleteConfirmationModal'
 import SnapshotDetail from './SnapshotDetail'
 import { deleteVmSnapshot } from './actions'
-import { formatDateFromNow } from '../../../../helpers'
+import { formatDateFromNow } from '_/helpers'
 import { getMinimizedString, escapeHtml } from '../../../utils'
-import { PendingTaskTypes } from '../../../../reducers/pendingTasks'
 
 const MAX_DESCRIPTION_SIZE = 50
 
@@ -53,16 +52,12 @@ StatusTooltip.propTypes = {
   id: PropTypes.string.isRequired,
 }
 
-function isSnapshotDeleted (snapshotId, pendingTasks) {
-  return !!pendingTasks.find(task => task.type === PendingTaskTypes.SNAPSHOT_REMOVAL && task.snapshotId === snapshotId)
-}
-
-const SnapshotItem = ({ snapshot, vmId, isEditing, id, beingDeleted, onSnapshotDelete }) => {
+const SnapshotItem = ({ snapshot, vmId, isEditing, id, onSnapshotDelete }) => {
   let statusIcon = null
   let buttons = []
 
   // Snapshot actions
-  const isActionsDisabled = beingDeleted || !isEditing || snapshot.get('status') === 'locked'
+  const isActionsDisabled = !isEditing || snapshot.get('status') === 'locked'
   if (!snapshot.get('isActive')) {
     // Info popover
     buttons.push(<OverlayTrigger
@@ -152,14 +147,11 @@ SnapshotItem.propTypes = {
   vmId: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
   isEditing: PropTypes.bool,
-  beingDeleted: PropTypes.bool,
   onSnapshotDelete: PropTypes.func.isRequired,
 }
 
 export default connect(
-  (state, { snapshot }) => ({
-    beingDeleted: isSnapshotDeleted(snapshot.get('id'), state.pendingTasks),
-  }),
+  (state) => ({ }),
   (dispatch, { vmId, snapshot }) => ({
     onSnapshotDelete: () => dispatch(deleteVmSnapshot({ vmId, snapshotId: snapshot.get('id') })),
   })

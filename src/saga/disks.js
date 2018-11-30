@@ -1,7 +1,7 @@
 import { takeEvery, put } from 'redux-saga/effects'
 
 import { CREATE_DISK_FOR_VM, REMOVE_DISK, EDIT_VM_DISK } from '../constants'
-import Api from 'ovirtapi'
+import Api from '../ovirtapi'
 import { callExternalAction, delay, delayInMsSteps } from './utils'
 import { fetchDisks } from '../sagas'
 

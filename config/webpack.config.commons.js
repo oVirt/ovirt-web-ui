@@ -1,4 +1,5 @@
 var process = require('process')
+var paths = require('./paths')
 
 var FlowBabelWebpackPlugin = require('flow-babel-webpack-plugin');
 
@@ -19,4 +20,10 @@ exports.addFlowBabelWebpackPlugin = function (webpackConfig) {
     return
   }
   console.warn(`Current environment (platform=${process.platform}, architecture=${process.arch}) is not supported by Flow type checker. Flow types will not be checked.`)
+}
+
+exports.commonAliases = function () {
+  return {
+    '_': `${paths.appSrc}`
+  }
 }

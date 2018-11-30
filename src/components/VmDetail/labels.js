@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import FieldHelp from '../FieldHelp/index'
-import { msg } from '../../intl'
+import { msg } from '_/intl'
 
 import style from './style.css'
 

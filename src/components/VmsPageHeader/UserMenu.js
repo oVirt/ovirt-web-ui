@@ -3,9 +3,9 @@ import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
 
-import { logout } from '../../actions/index'
+import { logout } from '_/actions'
 
-import { msg } from '../../intl'
+import { msg } from '_/intl'
 import AboutDialog from '../About'
 import OptionsDialog from '../OptionsDialog'
 
