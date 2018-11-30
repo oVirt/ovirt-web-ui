@@ -89,8 +89,3 @@
   width: 40%;
   display: inline-block;
 }
-
-.nested-container {
-  margin-left: -20px; /* max is -20px to edge of the containing card */
-  margin-right: -20px;
-}

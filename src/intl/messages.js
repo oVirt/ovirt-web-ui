@@ -324,6 +324,7 @@ export const messages: { [messageId: string]: MessageType } = {
   noDisks: 'no disks',
   noError: 'No error',
   noMessages: 'There are no notifications to display.',
+  noneItem: '[None]',
   noNetwork: 'No network',
   noNics: 'no NICs',
   noSnapshots: 'no snapshots',
