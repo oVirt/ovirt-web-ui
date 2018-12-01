@@ -1,4 +1,9 @@
-import { SET_CONSOLE_IN_USE, CHECK_CONSOLE_IN_USE, SET_CONSOLE_VALID } from '_/constants'
+import {
+  CHECK_CONSOLE_IN_USE,
+  DOWNLOAD_CONSOLE_VM, 
+  SET_CONSOLE_IN_USE,
+  SET_CONSOLE_LOGON,
+} from '_/constants'
 
 export function setConsoleInUse ({ vmId, consoleInUse }) {
   return {
