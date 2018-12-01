@@ -1,5 +1,5 @@
 import Immutable from 'immutable'
-import { SET_CONSOLE_IN_USE, SET_CONSOLE_VALID } from '_/constants'
+import { SET_CONSOLE_IN_USE, SET_CONSOLE_LOGON } from '_/constants'
 
 import { actionReducer } from './utils'
 
