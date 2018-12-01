@@ -56,7 +56,7 @@ Selectors = {
   getConsoleOptions ({ vmId }) {
     return getState().options.getIn(['options', 'consoleOptions', vmId])
   },
-  getCurrentPage () {
+  getCurrentFetchPage () {
     return getState().vms.get('page')
   },
   getUserId () {
@@ -64,6 +64,9 @@ Selectors = {
   },
   getUserGroups () {
     return getState().config.get('userGroups')
+  },
+  getCurrentPage () {
+    return getState().config.get('currentPage')
   },
   getVmIds () {
     return getState().vms.get('vms').reduce((vmIds, vm, vmId) => {

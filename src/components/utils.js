@@ -126,3 +126,10 @@ export function escapeHtml (s: string): string {
   div.appendChild(document.createTextNode(s))
   return div.innerHTML
 }
+
+/**
+ * Given a name, mask all spaces and non-alphanumeric characters as '_'.
+ */
+export function maskForElementId (name: string): string {
+  return name && name.replace(/[\W\s]+/g, '_')
+}

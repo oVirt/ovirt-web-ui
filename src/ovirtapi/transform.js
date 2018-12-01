@@ -25,7 +25,7 @@ import type {
   ApiPermissionType, PermissionType,
 } from './types'
 
-import { canUserUseCluster, canUserEditVm } from '../utils'
+import { canUserUseCluster, canUserEditVm, getUserPermits, canUserUseVnicProfile } from '../utils'
 
 function vCpusCount ({ cpu }: { cpu: Object }): number {
   if (cpu && cpu.topology) {
@@ -51,6 +51,13 @@ function convertInt (val: ?(number | string), defaultValue: number = Number.NaN)
     return typeof val === 'number' ? val : Number.parseInt(val, 10)
   }
   return defaultValue
+}
+
+function cleanUndefined (obj: Object): Object {
+  for (let key in obj) {
+    if (obj[key] === undefined) delete obj[key]
+  }
+  return obj
 }
 
 //
@@ -122,7 +129,7 @@ const VM = {
       cdrom: {},
       sessions: [],
       nics: [],
-      permissions: [],
+      permits: new Set(),
       canUserEditVm: false,
       display: {
         smartcardEnabled: vm.display && vm.display.smartcard_enabled && convertBool(vm.display.smartcard_enabled),
@@ -167,10 +174,10 @@ const VM = {
       }
 
       if (vm.permissions && vm.permissions.permission) {
-        parsedVm.permissions = Permissions.toInternal({
+        parsedVm.permits = getUserPermits(Permissions.toInternal({
           permissions: vm.permissions.permission,
-        })
-        parsedVm.canUserEditVm = canUserEditVm(parsedVm.permissions)
+        }))
+        parsedVm.canUserEditVm = canUserEditVm(parsedVm.permits)
       }
     }
 
@@ -373,18 +380,19 @@ const Snapshot = {
 //
 // VM -> DiskAttachments.DiskAttachment[] -> Disk
 const DiskAttachment = {
-  toInternal ({ attachment = {}, disk }: { attachment?: ApiDiskAttachmentType, disk: ApiDiskType }): DiskType {
-    return {
-      bootable: convertBool(attachment['bootable']),
-      active: convertBool(attachment['active']),
-      iface: attachment['interface'],
+  toInternal ({ attachment, disk }: { attachment?: ApiDiskAttachmentType, disk: ApiDiskType }): DiskType {
+    return cleanUndefined({
+      attachmentId: attachment && attachment['id'],
+      active: attachment && convertBool(attachment['active']),
+      bootable: attachment && convertBool(attachment['bootable']),
+      iface: attachment && attachment['interface'],
 
       id: disk.id,
-      name: disk['name'],
+      name: disk['alias'],
       type: disk['storage_type'], // [ image | lun | cinder ]
 
-      format: disk['format'], // only for [ images | cinder ]
-      status: disk['status'], // [ illegal | locked | ok ] but only for [ images | cinder ]
+      format: disk['format'], // [ cow | raw ] only for types [ images | cinder ]
+      status: disk['status'], // [ illegal | locked | ok ] only for types [ images | cinder ]
       sparse: convertBool(disk.sparse),
 
       actualSize: convertInt(disk['actual_size']),
@@ -396,15 +404,45 @@ const DiskAttachment = {
         disk.lun_storage.logical_units.logical_unit[0] &&
         convertInt(disk.lun_storage.logical_units.logical_unit[0].size),
 
-      storageDomainId: // only for image | cinder
+      storageDomainId: // only for types [ image | cinder ]
         disk.storage_domains &&
         disk.storage_domains.storage_domain &&
         disk.storage_domains.storage_domain[0] &&
         disk.storage_domains.storage_domain[0].id,
-    }
+    })
   },
 
-  toApi: undefined,
+  // NOTE: This will only work if disk.type == "image"
+  toApi ({ disk }: { disk: DiskType }): ApiDiskAttachmentType {
+    // if (disk.type !== 'image') throw Error('Only image type disks can be converted to API data')
+
+    return {
+      // disk_attachment part
+      id: disk.attachmentId,
+      active: disk.active,
+      bootable: disk.bootable,
+      interface: disk.iface,
+
+      // disk part
+      disk: {
+        id: disk.id,
+        alias: disk.name,
+
+        storage_type: 'image',
+        format: disk.format || (disk.sparse && disk.sparse ? 'cow' : 'raw'),
+        sparse: disk.sparse,
+        provisioned_size: disk.provisionedSize,
+
+        storage_domains: disk.storageDomainId && {
+          storage_domain: [
+            {
+              id: disk.storageDomainId,
+            },
+          ],
+        },
+      },
+    }
+  },
 }
 
 //
@@ -480,10 +518,9 @@ const StorageDomainFile = {
 //
 const Cluster = {
   toInternal ({ cluster }: { cluster: ApiClusterType }): ClusterType {
-    const permissions = cluster.permissions && cluster.permissions.permission
-      ? Permissions.toInternal({ permissions: cluster.permissions.permission })
-      : []
-
+    const permits = cluster.permissions && cluster.permissions.permission
+      ? getUserPermits(Permissions.toInternal({ permissions: cluster.permissions.permission }))
+      : new Set()
     const c: Object = {
       id: cluster.id,
       name: cluster.name,
@@ -498,8 +535,8 @@ const Cluster = {
             ? cluster['memory_policy']['over_commit']['percent']
             : 100,
       },
-      canUserUseCluster: canUserUseCluster(permissions),
-      permissions,
+      canUserUseCluster: canUserUseCluster(permits),
+      permits,
     }
 
     if (cluster.networks && cluster.networks.network && cluster.networks.network.length > 0) {
@@ -572,11 +609,21 @@ const VNicProfile = {
       network: {
         id: vnicProfile.network.id,
         name: vnicProfile.network.name,
+        dataCenterId: vnicProfile.network.data_center && vnicProfile.network.data_center.id,
       },
+      canUserUseProfile: false,
+      permits: new Set(),
     }
 
     if (vnicProfile.network.name) {
       vnicProfileInternal.network.name = vnicProfile.network.name
+    }
+
+    if (vnicProfile.permissions && vnicProfile.permissions.permission) {
+      vnicProfileInternal.permits = getUserPermits(Permissions.toInternal({
+        permissions: vnicProfile.permissions.permission,
+      }))
+      vnicProfileInternal.canUserUseProfile = canUserUseVnicProfile(vnicProfileInternal.permits)
     }
 
     return vnicProfileInternal
@@ -699,6 +746,7 @@ const Permissions = {
       name: permission.role.name,
       userId: permission.user && permission.user.id,
       groupId: permission.group && permission.group.id,
+      permits: permission.role.permits ? permission.role.permits.permit.map(permit => ({ name: permit.name })) : [],
     }))
   },
 

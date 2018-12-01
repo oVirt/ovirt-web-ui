@@ -1,14 +1,15 @@
 import React from 'react'
-import { userFormatOfBytes } from '../../helpers'
 import PropTypes from 'prop-types'
-import { Modal } from 'patternfly-react'
 import { connect } from 'react-redux'
+import { Modal } from 'patternfly-react'
+
+import { userFormatOfBytes } from '_/helpers'
+import { removeDisk } from '_/actions'
 
 import FieldHelp from '../FieldHelp/index'
-import { msg } from '../../intl'
-import { removeDisk } from './actions'
+import { msg } from '_/intl'
 import style from './style.css'
-import { PendingTaskTypes } from '../../reducers/pendingTasks'
+import { PendingTaskTypes } from '_/reducers/pendingTasks'
 
 class VmDisk extends React.PureComponent {
   constructor (props) {
@@ -33,7 +34,7 @@ class VmDisk extends React.PureComponent {
   }
 
   render () {
-    const { disk, edit, beingDeleted } = this.props
+    const { disk, edit, allowDelete, beingDeleted } = this.props
 
     const idPrefix = `vmdisk-${disk.get('name')}`
     const bootable = disk.get('bootable') ? (<span className={'label label-info ' + style['smaller']} id={`${idPrefix}-bootable`}>Bootable</span>) : ''
@@ -73,7 +74,7 @@ class VmDisk extends React.PureComponent {
       container={null}
     />
 
-    const deleteButton = edit && !beingDeleted && (
+    const deleteButton = edit && allowDelete && !beingDeleted && (
       <button className='btn btn-default' onClick={this.onDeleteButton}>{msg.delete()}</button>
     )
 
@@ -122,6 +123,7 @@ class VmDisk extends React.PureComponent {
 VmDisk.propTypes = {
   disk: PropTypes.object.isRequired,
   edit: PropTypes.bool.isRequired,
+  allowDelete: PropTypes.bool.isRequired,
   beingDeleted: PropTypes.bool.isRequired,
   removeFunction: PropTypes.func.isRequired, // (diskId: string) => any,
 }
@@ -130,19 +132,11 @@ function isDiskBeingDeleted (diskId, pendingTasks) {
   return !!pendingTasks.find(task => task.type === PendingTaskTypes.DISK_REMOVAL && task.diskId === diskId)
 }
 
-const VmDiskConnected = connect(
+export default connect(
   (state, { disk }) => ({
     beingDeleted: isDiskBeingDeleted(disk.get('id'), state.pendingTasks),
   }),
   (dispatch, { vmId }) => ({
-    removeFunction: (diskId) => dispatch(removeDisk(diskId, vmId)),
+    removeFunction: (diskId) => dispatch(removeDisk({ diskId, vmToRefreshId: vmId })),
   })
 )(VmDisk)
-
-VmDiskConnected.propTypes = {
-  disk: PropTypes.object.isRequired, // deep immutable.js
-  edit: PropTypes.bool.isRequired,
-  vmId: PropTypes.string.isRequired,
-}
-
-export default VmDiskConnected

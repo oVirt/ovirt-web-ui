@@ -4,14 +4,14 @@ import {
 } from 'redux-saga/effects'
 
 import logger from '../logger'
-import { hidePassword } from '../helpers'
+import { hidePassword } from '_/helpers'
 
-import { msg } from '../intl/index'
+import { msg } from '_/intl'
 
 import {
   failedExternalAction,
   checkTokenExpired,
-} from '../actions'
+} from '_/actions'
 
 export const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -93,5 +93,20 @@ export function* foreach (array, fn, context) {
 
   for (;i < length; i++) {
     yield * fn.call(context, array[i], i, array)
+  }
+}
+
+/**
+ * Generate a series of `count` numbers in a `2000 * log2` progression for use as a series
+ * of millisecond delays. This is useful for progressively waiting a bit longer between
+ * REST polling calls.
+ *
+ * @param {number} count Number of steps to generate, default to 20
+ * @param {number} msMultiplier Millisecond multiplier at each step (each step will be at least
+ *                              this big), default to 2000
+ */
+export function* delayInMsSteps (count = 20, msMultiplier = 2000) {
+  for (let i = 2; i < (count + 2); i++) {
+    yield Math.round(Math.log2(i) * msMultiplier)
   }
 }

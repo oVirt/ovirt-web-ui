@@ -16,7 +16,7 @@ import {
   Modal,
   noop,
 } from 'patternfly-react'
-import { msg } from '../../../../intl'
+import { msg } from '_/intl'
 import style from './style.css'
 
 class NewSnapshotModal extends Component {

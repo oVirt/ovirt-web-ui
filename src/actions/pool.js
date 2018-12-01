@@ -8,7 +8,7 @@ import {
   START_POOL,
   UPDATE_POOLS,
   UPDATE_VMPOOLS_COUNT,
-} from '../constants'
+} from '_/constants'
 
 export function getPoolsByPage ({ page }) {
   return {

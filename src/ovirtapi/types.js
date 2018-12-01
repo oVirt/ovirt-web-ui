@@ -63,7 +63,31 @@ export type SnapshotType = {
 
 export type ApiDiskAttachmentType = Object
 export type ApiDiskType = Object
-export type DiskType = Object
+export type DiskInterfaceType = "ide" | "sata" | "virtio" | "virtio_scsi"
+export type DiskTypeType = "image" | "cinder" | "lun"
+export type DiskType = {
+  // attachment part
+  attachmentId?: string,
+  active?: boolean,
+  bootable?: boolean,
+  iface?: DiskInterfaceType,
+
+  // disk part
+  id?: string,
+  name: string, // aka alias
+  status?: "illegal" | "locked" | "ok", // for type = [ "image" | "cinder" ]
+  type: DiskTypeType,
+
+  // disk parts for type = "image"
+  format?: "cow" | "raw", // if sparse then "cow" else "raw"
+  sparse?: boolean,
+  actualSize?: number,
+  provisionedSize?: number,
+  storageDomainId?: string,
+
+  // disk parts for type = "lun"
+  lunSize?: number
+}
 
 export type ApiDataCenterType = Object
 export type DataCenterType = Object
@@ -134,6 +158,11 @@ export type VmSessionsType = Object
 export type ApiPermissionType = {
   role: {
     name: string,
+    permits: {
+      permit: Array<{
+        name: string
+      }>
+    }
   },
   user?: {
     id: string
@@ -146,7 +175,10 @@ export type ApiPermissionType = {
 export type PermissionType = {
   name: string,
   userId?: string,
-  groupId?: string
+  groupId?: string,
+  permits: Array<{
+    name: string
+  }>
 }
 
 export type ApiCloudInitType = Object

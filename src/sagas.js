@@ -1,11 +1,11 @@
-import Api from 'ovirtapi'
+import Api from '_/ovirtapi'
 import { persistStateToLocalStorage } from './storage'
 import Selectors from './selectors'
 import AppConfiguration from './config'
 
-import vmDisksSagas from './components/VmDisks/sagas'
-import newDiskDialogSagas from './components/NewDiskDialog/sagas'
+import vmDisksSagas from './saga/disks'
 import vmSnapshotsSagas from './components/VmDetails/cards/SnapshotsCard/sagas'
+import optionsDialogSagas from './components/OptionsDialog/sagas'
 
 import {
   all,
@@ -49,6 +49,7 @@ import {
 
   getSinglePool,
   removeMissingPools,
+  selectPoolDetail as actionSelectPoolDetail,
   removePools,
   updatePools,
   updateVmsPoolsCount,
@@ -59,6 +60,8 @@ import {
   getPoolsByCount,
   addStorageDomains,
   setStorageDomainsFiles,
+  getIsoStorageDomains,
+  getConsoleOptions as actionGetConsoleOptions,
   setVmCdRom,
   setVmNics,
   setUSBFilter,
@@ -67,7 +70,8 @@ import {
   getVmCdRom,
   changeVmCdRom as actionChangeVmCdRom,
   restartVm as actionRestartVm,
-} from './actions'
+  setCurrentPage,
+} from '_/actions'
 
 import {
   callExternalAction,
@@ -93,6 +97,7 @@ import {
 
 import {
   ADD_VM_NIC,
+  CHANGE_PAGE,
   CHANGE_VM_CDROM,
   CHECK_CONSOLE_IN_USE,
   CHECK_TOKEN_EXPIRED,
@@ -133,9 +138,14 @@ import {
   START_VM,
   STOP_SCHEDULER_FIXED_DELAY,
   SUSPEND_VM,
-} from './constants'
 
-import { canUserEditVm } from './utils'
+  DETAIL_PAGE_TYPE,
+  DIALOG_PAGE_TYPE,
+  MAIN_PAGE_TYPE,
+  POOL_PAGE_TYPE,
+} from '_/constants'
+
+import { canUserEditVm, getUserPermits, canUserUseCluster, canUserUseVnicProfile } from './utils'
 
 const vmFetchAdditionalList =
   [
@@ -146,10 +156,13 @@ const vmFetchAdditionalList =
     'nics',
     'snapshots',
     'statistics',
-    'permissions.role',
+    'permissions.role.permits',
   ]
 
 const EVERYONE_GROUP_ID = 'eee00000-0000-0000-0000-123456789eee'
+
+const CLUSTER_TYPE = 'Cluster'
+const VNIC_PROFILE_TYPE = 'VnicProfile'
 
 /**
  * Compare the current oVirt version (held in redux) to the given version.
@@ -198,13 +211,12 @@ function* fetchIcon ({ iconId }) {
   }
 }
 
-function* refreshData (action) {
-  logger.log('refreshData(): ', action.payload)
-  const shallowFetch = !!action.payload.shallowFetch
+export function* refreshMainPage ({ shallowFetch, page }) {
+  shallowFetch = !!shallowFetch
 
   // refresh VMs and remove any that haven't been refreshed
   const fetchedVmIds = yield fetchVmsByCount(getVmsByCount({
-    count: action.payload.page * AppConfiguration.pageLimit,
+    count: page * AppConfiguration.pageLimit,
     shallowFetch,
   }))
 
@@ -221,7 +233,7 @@ function* refreshData (action) {
 
   // refresh Pools and remove any that haven't been refreshed
   const fetchedPoolIds = yield fetchPoolsByCount(getPoolsByCount({
-    count: action.payload.page * AppConfiguration.pageLimit,
+    count: page * AppConfiguration.pageLimit,
   }))
 
   const fetchedDirectlyPoolIds =
@@ -237,7 +249,52 @@ function* refreshData (action) {
 
   // update counts
   yield put(updateVmsPoolsCount())
-  logger.log('refreshData(): finished')
+}
+
+function* refreshDetailPage ({ id }) {
+  yield selectVmDetail(actionSelectVmDetail({ vmId: id }))
+  yield getConsoleOptions(actionGetConsoleOptions({ vmId: id }))
+}
+
+function* refreshDialogPage ({ id }) {
+  if (id) {
+    yield selectVmDetail(actionSelectVmDetail({ vmId: id }))
+  }
+  yield fetchISOStorages(getIsoStorageDomains())
+}
+
+function* refreshPoolPage ({ id }) {
+  yield selectPoolDetail(actionSelectPoolDetail({ poolId: id }))
+}
+
+const pagesRefreshers = {
+  [MAIN_PAGE_TYPE]: refreshMainPage,
+  [DETAIL_PAGE_TYPE]: refreshDetailPage,
+  [DIALOG_PAGE_TYPE]: refreshDialogPage,
+  [POOL_PAGE_TYPE]: refreshPoolPage,
+}
+
+function* refreshData (action) {
+  console.log('refreshData(): ', action.payload)
+
+  const currentPage = Selectors.getCurrentPage()
+
+  if (currentPage.type === undefined) {
+    yield pagesRefreshers[MAIN_PAGE_TYPE](action.payload)
+  } else {
+    yield pagesRefreshers[currentPage.type](Object.assign({ id: currentPage.id }, action.payload))
+  }
+
+  console.log('refreshData(): finished')
+}
+
+function* changePage (action) {
+  yield put(setCurrentPage(action.payload))
+  yield refreshData(refresh({
+    quiet: true,
+    shallowFetch: true,
+    page: Selectors.getCurrentFetchPage(),
+  }))
 }
 
 function* fetchVmsByPage (action) {
@@ -388,7 +445,7 @@ export function* fetchSingleVm (action) {
     }
 
     if (isOvirtGTE42 && !shallowFetch && !Selectors.getFilter()) {
-      internalVm.permissions = yield fetchVmPermissions({ vmId: internalVm.id })
+      internalVm.permits = getUserPermits(yield fetchVmPermissions({ vmId: internalVm.id }))
     }
 
     if (!isOvirtGTE42 && !shallowFetch) {
@@ -397,8 +454,8 @@ export function* fetchSingleVm (action) {
       internalVm.disks = yield fetchVmDisks({ vmId: internalVm.id })
       internalVm.nics = yield fetchVmNics({ vmId: internalVm.id })
       internalVm.sessions = yield fetchVmSessions({ vmId: internalVm.id })
-      internalVm.permissions = yield fetchVmPermissions({ vmId: internalVm.id })
-      internalVm.canUserEditVm = canUserEditVm(internalVm.permissions)
+      internalVm.permits = getUserPermits(yield fetchVmPermissions({ vmId: internalVm.id }))
+      internalVm.canUserEditVm = canUserEditVm(internalVm.permits)
       // TODO: Support <4.2 for snapshots?
       // TODO: Support <4.2 for statistics?
     }
@@ -804,15 +861,25 @@ function mergeStorageDomains (storageDomainsInternal) {
   return mergedStorageDomains
 }
 
+function* fetchPermits ({ entityType, id }) {
+  const permissions = yield callExternalAction(`get${entityType}Permissions`, Api[`get${entityType}Permissions`], { payload: { id } })
+  return getUserPermits(Api.permissionsToInternal({ permissions: permissions.permission }))
+}
+
 function* fetchAllClusters (action) {
-  action.payload.additional = ['permissions.role']
   const clusters = yield callExternalAction('getAllClusters', Api.getAllClusters, action)
 
   if (clusters && clusters['cluster']) {
-    let clustersInternal = []
-    clustersInternal = clusters.cluster.map(cluster =>
-      Api.clusterToInternal({ cluster })
-    )
+    // Temporary solution, till bug will be fixed https://bugzilla.redhat.com/show_bug.cgi?id=1639784
+    let clustersInternal = (yield all(
+      clusters.cluster
+        .map(function* (cluster) {
+          const clusterInternal = Api.clusterToInternal({ cluster })
+          clusterInternal.permits = yield fetchPermits({ entityType: CLUSTER_TYPE, id: cluster.id })
+          clusterInternal.canUserUseCluster = canUserUseCluster(clusterInternal.permits)
+          return clusterInternal
+        })
+    ))
     yield put(setClusters(clustersInternal))
   }
 
@@ -934,7 +1001,16 @@ function* fetchUSBFilter (action) {
 function* fetchAllVnicProfiles (action) {
   const vnicProfiles = yield callExternalAction('getAllVnicProfiles', Api.getAllVnicProfiles, action)
   if (vnicProfiles && vnicProfiles['vnic_profile']) {
-    const vnicProfilesInternal = vnicProfiles.vnic_profile.map(vnicProfile => Api.vnicProfileToInternal({ vnicProfile }))
+    // Temporary solution, till bug will be fixed https://bugzilla.redhat.com/show_bug.cgi?id=1639784
+    const vnicProfilesInternal = (yield all(
+      vnicProfiles.vnic_profile
+        .map(function* (vnicProfile) {
+          const vnicProfileInternal = Api.vnicProfileToInternal({ vnicProfile })
+          vnicProfileInternal.permits = yield fetchPermits({ entityType: VNIC_PROFILE_TYPE, id: vnicProfile.id })
+          vnicProfileInternal.canUserUseProfile = canUserUseVnicProfile(vnicProfileInternal.permits)
+          return vnicProfileInternal
+        })
+    ))
     yield put(setVnicProfiles({ vnicProfiles: vnicProfilesInternal }))
     if (!compareVersionToCurrent({ major: 4, minor: 2 })) {
       yield fetchAllNetworks()
@@ -997,7 +1073,7 @@ function* schedulerWithFixedDelay (delayInSeconds = AppConfiguration.schedulerFi
         yield refreshData(refresh({
           quiet: true,
           shallowFetch: true,
-          page: Selectors.getCurrentPage(),
+          page: Selectors.getCurrentFetchPage(),
         }))
       } else {
         logger.log(`⏰ schedulerWithFixedDelay[${myId}] event skipped since oVirt API version does not match`)
@@ -1021,6 +1097,7 @@ export function* rootSaga () {
     throttle(100, GET_VMS_BY_COUNT, fetchVmsByCount),
     throttle(100, GET_POOLS_BY_COUNT, fetchPoolsByCount),
     throttle(100, GET_POOLS_BY_PAGE, fetchPoolsByPage),
+    takeLatest(CHANGE_PAGE, changePage),
     takeLatest(PERSIST_STATE, persistStateSaga),
 
     takeEvery(SHUTDOWN_VM, shutdownVm),
@@ -1059,7 +1136,7 @@ export function* rootSaga () {
 
     // Sagas from Components
     ...vmDisksSagas,
-    ...newDiskDialogSagas,
     ...vmSnapshotsSagas,
+    ...optionsDialogSagas,
   ])
 }

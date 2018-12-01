@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import * as branding from './branding'
-import { msg } from './intl'
+import { msg } from '_/intl'
 import styles from './error.css'
 import AppConfiguration from './config'
 

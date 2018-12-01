@@ -29,3 +29,7 @@ export function canChangeCluster (state) {
 export function canChangeCd (state) {
   return ['up'].includes(state)
 }
+
+export function canDeleteDisk (state) {
+  return ['down'].includes(state)
+}

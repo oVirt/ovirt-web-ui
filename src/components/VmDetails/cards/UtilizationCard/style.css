@@ -63,3 +63,7 @@
   font-size: 90%;
   color: rgba(0, 0, 0, 0.65);
 }
+
+.utilization-card :global(.c3-tooltip-container) {
+  white-space: nowrap;
+}

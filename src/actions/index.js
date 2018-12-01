@@ -1,5 +1,6 @@
 import AppConfiguration from '../config'
 import {
+  CHANGE_PAGE,
   CHECK_TOKEN_EXPIRED,
   GET_BY_PAGE,
   GET_OPTION,
@@ -8,13 +9,14 @@ import {
   GET_VM,
   PERSIST_STATE,
   SET_ADMINISTRATOR,
+  SET_CURRENT_PAGE,
   SET_USB_FILTER,
   SET_USER_FILTER_PERMISSION,
   SET_USER_GROUPS,
   SHOW_TOKEN_EXPIRED_MSG,
   START_SCHEDULER_FIXED_DELAY,
   STOP_SCHEDULER_FIXED_DELAY,
-} from '../constants'
+} from '_/constants'
 
 export * from './error'
 export * from './vm'
@@ -32,6 +34,7 @@ export * from './vnicProfiles'
 export * from './activeRequests'
 export * from './console'
 export * from './userMessages'
+export * from './disks'
 
 export function startSchedulerFixedDelay (delayInSeconds = AppConfiguration.schedulerFixedDelayInSeconds) {
   return {
@@ -81,6 +84,26 @@ export function setAdministrator (administrator) {
     type: SET_ADMINISTRATOR,
     payload: {
       administrator,
+    },
+  }
+}
+
+export function setCurrentPage ({ type, id }) {
+  return {
+    type: SET_CURRENT_PAGE,
+    payload: {
+      type,
+      id,
+    },
+  }
+}
+
+export function changePage ({ type, id }) {
+  return {
+    type: CHANGE_PAGE,
+    payload: {
+      type,
+      id,
     },
   }
 }

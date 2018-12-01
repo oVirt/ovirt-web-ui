@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Button, Modal, Icon } from 'patternfly-react'
 import SelectBox from '../SelectBox'
-import { msg } from '../../intl'
+import { msg } from '_/intl'
 
 const EMPTY_ID = ''
 

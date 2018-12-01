@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
-import { msg } from '../../intl'
+import { msg } from '_/intl'
 import VmDisk from './VmDisk'
 import style from './style.css'
 import NewDiskDialog from '../NewDiskDialog'
@@ -19,7 +19,7 @@ class VmDisks extends Component {
   }
 
   render () {
-    const { disks, edit, vmId } = this.props
+    const { disks, edit, allowDelete, vmId } = this.props
 
     if (!edit && (!disks || disks.isEmpty())) {
       return null
@@ -66,7 +66,8 @@ class VmDisks extends Component {
             disk={disk}
             key={disk.get('id')}
             vmId={vmId}
-            edit={edit} />)}
+            edit={edit}
+            allowDelete={allowDelete} />)}
         </ul>
         {moreButton}
         {newButton}
@@ -79,6 +80,7 @@ VmDisks.propTypes = {
   disks: PropTypes.object, // deep immutable.js array
   vmId: PropTypes.string.isRequired,
   edit: PropTypes.bool.isRequired,
+  allowDelete: PropTypes.bool.isRequired,
 }
 
 export default VmDisks

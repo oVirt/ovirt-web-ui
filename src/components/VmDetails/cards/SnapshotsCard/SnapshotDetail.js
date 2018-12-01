@@ -12,10 +12,10 @@ import Immutable from 'immutable'
 
 import style from './style.css'
 
-import { msg } from '../../../../intl'
+import { msg } from '_/intl'
 
 import Selectors from '../../../../selectors'
-import { templateNameRenderer, getFormatedDateTime, userFormatOfBytes, localeCompare } from '../../../../helpers'
+import { templateNameRenderer, getFormatedDateTime, userFormatOfBytes, localeCompare } from '_/helpers'
 import { getOsHumanName } from '../../../utils'
 import { sortDisksForDisplay } from '../../../VmDisks/utils'
 

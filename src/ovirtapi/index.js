@@ -1,6 +1,7 @@
 // @flow
 import type {
   CdRomType,
+  DiskType,
   NicType,
   SnapshotType,
   VmType, ApiVmType,
@@ -154,7 +155,7 @@ const OvirtApi = {
   getAllClusters ({ additional }: { additional: Array<string> }): Promise<Object> {
     assertLogin({ methodName: 'getAllClusters' })
 
-    let follow = 'network'
+    let follow = 'networks'
     if (additional && additional.length > 0) {
       if (!additional.includes('networks')) {
         additional.push('networks')
@@ -165,9 +166,14 @@ const OvirtApi = {
     const url = `${AppConfiguration.applicationContext}/api/clusters?follow=${follow}`
     return httpGet({ url })
   },
-  getClusterPermissions ({ clusterId }: { clusterId: string }): Promise<Object> {
+  getClusterPermissions ({ id }: { id: string }): Promise<Object> {
     assertLogin({ methodName: 'getClusterPermissions' })
-    const url = `${AppConfiguration.applicationContext}/api/clusters/${clusterId}/permissions?follow=role`
+    const url = `${AppConfiguration.applicationContext}/api/clusters/${id}/permissions?follow=role.permits`
+    return httpGet({ url, custHeaders: { Filter: true } })
+  },
+  getVnicProfilePermissions ({ id }: { id: string }): Promise<Object> {
+    assertLogin({ methodName: 'getVnicProfilePermissions' })
+    const url = `${AppConfiguration.applicationContext}/api/vnicprofiles/${id}/permissions?follow=role.permits`
     return httpGet({ url, custHeaders: { Filter: true } })
   },
   getVmPermissions ({ vmId }: VmIdType): Promise<Object> {
@@ -284,6 +290,10 @@ const OvirtApi = {
     assertLogin({ methodName: 'icon' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/icons/${id}` })
   },
+  diskattachment ({ vmId, attachmentId }: { vmId: string, attachmentId: string}): Promise<Object> {
+    assertLogin({ methodName: 'diskattachment' })
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/diskattachments/${attachmentId}?follow=disk` })
+  },
   diskattachments ({ vmId }: VmIdType): Promise<Object> {
     assertLogin({ methodName: 'diskattachments' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/diskattachments` })
@@ -389,34 +399,46 @@ const OvirtApi = {
       },
     })
   },
+
+  // async operation
   removeDisk (diskId: string): Promise<Object> {
     assertLogin({ methodName: 'removeDisk' })
     const url = `${AppConfiguration.applicationContext}/api/disks/${diskId}?async=true`
     return httpDelete({ url })
   },
-  addDiskAttachment ({ sizeB, storageDomainId, alias, vmId, iface }: { sizeB: string, storageDomainId: string, alias: string, vmId: string, iface: string }): Promise<Object> {
+
+  // async operation
+  addDiskAttachment ({ vmId, disk }: { vmId: string, disk: DiskType }): Promise<Object> {
     assertLogin({ methodName: 'addDiskAttachment' })
-    const payload = {
-      interface: iface,
-      disk: {
-        provisioned_size: sizeB,
-        format: 'cow',
-        storage_domains: {
-          storage_domain: [
-            {
-              id: storageDomainId,
-            },
-          ],
-        },
-        alias,
-      },
-    }
+
+    const payload = Transforms.DiskAttachment.toApi({ disk })
     const input = JSON.stringify(payload)
+
     return httpPost({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/diskattachments`,
       input,
     })
   },
+
+  // disk update is async
+  // http://ovirt.github.io/ovirt-engine-api-model/master/#services/disk/methods/update
+  updateDiskAttachment ({ vmId, disk }: { vmId: string, disk: DiskType }): Promise<Object> {
+    assertLogin({ methodName: 'updateDiskAttachment' })
+
+    const attachmentId = disk.attachmentId
+    if (!attachmentId) {
+      throw new Error('DiskType.attachmentId is required to update the disk')
+    }
+
+    const payload = Transforms.DiskAttachment.toApi({ disk })
+    const input = JSON.stringify(payload)
+
+    return httpPut({
+      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/diskattachments/${attachmentId}`,
+      input,
+    })
+  },
+
   saveSSHKey ({ key, userId, sshId }: { key: string, userId: string, sshId: ?string }): Promise<Object> {
     assertLogin({ methodName: 'saveSSHKey' })
     const input = JSON.stringify({ content: key })
@@ -456,7 +478,7 @@ const OvirtApi = {
 
   getAllVnicProfiles (): Promise<Object> {
     assertLogin({ methodName: 'getVnicProfiles' })
-    return httpGet({ url: `${AppConfiguration.applicationContext}/api/vnicprofiles?follow=network` })
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/vnicprofiles?follow=network,permissions.role.permits` })
   },
 
   getVmsNic ({ vmId }: { vmId: string }): Promise<Object> {

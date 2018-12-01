@@ -10,16 +10,14 @@ import {
   REMOVE_SNAPSHOT_ADD_PENDING_TASK,
   REMOVE_SNAPSHOT_REMOVAL_PENDING_TASK,
   REMOVE_SNAPSHOT_RESTORE_PENDING_TASK,
-} from '../constants'
+} from '_/constants'
 
-import { PendingTaskTypes } from '../reducers/pendingTasks'
+import { PendingTaskTypes } from '_/reducers/pendingTasks'
 
 export function addDiskRemovalPendingTask (diskId: string) {
   return {
     type: ADD_DISK_REMOVAL_PENDING_TASK,
     payload: {
-      type: PendingTaskTypes.DISK_REMOVAL,
-      started: new Date(),
       diskId,
     },
   }
@@ -28,7 +26,9 @@ export function addDiskRemovalPendingTask (diskId: string) {
 export function removeDiskRemovalPendingTask (diskId: string) {
   return {
     type: REMOVE_DISK_REMOVAL_PENDING_TASK,
-    payload: { diskId },
+    payload: {
+      diskId,
+    },
   }
 }
 

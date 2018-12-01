@@ -1,9 +1,9 @@
 import { takeEvery, put } from 'redux-saga/effects'
 
 import { ADD_VM_SNAPSHOT, DELETE_VM_SNAPSHOT, RESTORE_VM_SNAPSHOT } from './constants'
-import Api from 'ovirtapi'
-import { callExternalAction, delay } from '../../../../saga/utils'
-import { fetchVmSnapshots, startProgress, stopProgress } from '../../../../sagas'
+import Api from '_/ovirtapi'
+import { callExternalAction, delay } from '_/saga/utils'
+import { fetchVmSnapshots, startProgress, stopProgress } from '_/sagas'
 import {
   addSnapshotRemovalPendingTask,
   removeSnapshotRemovalPendingTask,
@@ -11,7 +11,7 @@ import {
   removeSnapshotRestorePendingTask,
   addSnapshotAddPendingTask,
   removeSnapshotAddPendingTask,
-} from '../../../../actions'
+} from '_/actions'
 
 function* addVmSnapshot (action) {
   yield put(addSnapshotAddPendingTask())

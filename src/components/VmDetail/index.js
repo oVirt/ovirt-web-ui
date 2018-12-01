@@ -3,8 +3,9 @@ import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
 
-import AppConfiguration from '../../config'
-import { msg } from '../../intl'
+import AppConfiguration from '_/config'
+import { msg } from '_/intl'
+import { canDeleteDisk } from '_/vm-status'
 
 import style from './style.css'
 import sharedStyle from '../sharedStyle.css'
@@ -12,9 +13,9 @@ import sharedStyle from '../sharedStyle.css'
 import {
   getConsoleOptions,
   saveConsoleOptions,
-} from '../../actions'
+} from '_/actions'
 
-import { templateNameRenderer, userFormatOfBytes } from '../../helpers'
+import { templateNameRenderer, userFormatOfBytes } from '_/helpers'
 
 import ConsoleOptions from '../ConsoleOptions'
 import DetailContainer from '../DetailContainer'
@@ -28,7 +29,7 @@ import VmsListNavigation from '../VmsListNavigation'
 import VmStatus from './VmStatus'
 import { NextRunLabel } from './labels'
 
-import Selectors from '../../selectors'
+import Selectors from '_/selectors'
 import { getOsHumanName, getVmIcon } from '../utils'
 
 function rephraseVmType (vmType) {
@@ -115,7 +116,12 @@ class VmDetail extends Component {
     const cluster = Selectors.getClusterById(vm.getIn(['cluster', 'id']))
     const template = Selectors.getTemplateById(vm.getIn(['template', 'id']))
 
-    const disksElement = (<VmDisks disks={disks} vmId={vm.get('id')} edit={this.state.editDisks} />)
+    const disksElement = <VmDisks
+      disks={disks}
+      vmId={vm.get('id')}
+      edit={this.state.editDisks}
+      allowDelete={canDeleteDisk(vm.get('status'))}
+    />
 
     const diskEditAllowed = !isPool && !isPoolVm
     const pencilIcon = (<i className={`pficon pficon-edit`} />)

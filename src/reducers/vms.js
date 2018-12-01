@@ -19,9 +19,10 @@ import {
   SET_VM_SNAPSHOTS,
   UPDATE_POOLS,
   UPDATE_VMPOOLS_COUNT,
+  UPDATE_VM_DISK,
   UPDATE_VMS,
   VM_ACTION_IN_PROGRESS,
-} from '../constants'
+} from '_/constants'
 import logger from '../logger'
 import { actionReducer, removeMissingItems } from './utils'
 
@@ -87,6 +88,16 @@ const vms = actionReducer(initialState, {
     }
     return state
   },
+  [UPDATE_VM_DISK] (state, { payload: { vmId, disk } }) {
+    if (state.getIn(['vms', vmId])) {
+      const existing = state.getIn(['vms', vmId, 'disks']).findEntry(d => d.get('id') === disk.id)
+      if (existing) {
+        state = state.mergeDeepIn(['vms', vmId, 'disks', existing[0]], Immutable.fromJS(disk))
+      }
+    }
+    return state
+  },
+
   [SET_VM_CDROM] (state, { payload: { vmId, cdrom } }) {
     if (state.getIn(['vms', vmId])) {
       return state.setIn(['vms', vmId, 'cdrom'], Immutable.fromJS(cdrom)) // deep immutable

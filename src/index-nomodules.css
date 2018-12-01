@@ -174,3 +174,7 @@ a.disabled {
   font-size: 14px;
   width: 14px;
 }
+
+.drawer-pf.drawer-alt-pf.drawer-pf-notifications {
+  z-index: 101;
+}

@@ -3,9 +3,9 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import ConfirmationModal from './ConfirmationModal'
 
-import { downloadConsole, checkConsoleInUse, setConsoleInUse } from '../../actions/index'
+import { downloadConsole, checkConsoleInUse, setConsoleInUse } from '_/actions'
 
-import { msg } from '../../intl'
+import { msg } from '_/intl'
 
 class ConsoleConfirmationModal extends React.Component {
   constructor (props) {

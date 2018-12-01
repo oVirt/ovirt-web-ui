@@ -5,10 +5,10 @@ import { connect } from 'react-redux'
 
 import VmUserMessages from '../VmUserMessages'
 import UserMenu from './UserMenu'
-import { hrefWithoutHistory } from '../../helpers'
+import { hrefWithoutHistory } from '_/helpers'
 
-import { refresh } from '../../actions/vm'
-import * as branding from '../../branding'
+import { refresh } from '_/actions'
+import * as branding from '_/branding'
 
 /**
  * Main application header on top of the page

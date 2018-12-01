@@ -3,10 +3,11 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Modal } from 'patternfly-react'
 
-import { createDiskForVm, cleanNewDiskDialogSubtree } from './actions'
-import { msg } from '../../intl'
+import { createDiskForVm } from '_/actions'
+import { cleanNewDiskDialogSubtree } from './actions'
+import { msg } from '_/intl'
 import SelectBox from '../SelectBox'
-import { flatMap, parseGbToBytes } from '../../utils'
+import { flatMap, parseGbToBytes } from '_/utils'
 import style from './style.css'
 
 class NewDiskDialog extends React.Component {
@@ -51,7 +52,7 @@ class NewDiskDialog extends React.Component {
   }
 
   /**
-   * active in VM's datacenter, data type
+   * active in VM's data center, data type
    */
   getSuitableStorageDomains () {
     const dataCenterId = this.getDataCenterId()
@@ -160,7 +161,17 @@ class NewDiskDialog extends React.Component {
     }
     const sizeB = String(this.getSizeBytes())
     const iface = this.getInterface()
-    this.props.createDiskFunction(sizeB, this.state.alias, this.state.storageDomainId, iface)
+    this.props.createDiskFunction({
+      name: this.state.alias,
+      iface,
+      type: 'image',
+      format: 'cow',
+      sparse: true,
+      active: true,
+      bootable: false, // TODO: if it is the first disk, make it bootable, else not
+      provisionedSize: sizeB,
+      storageDomainId: this.state.storageDomainId,
+    })
   }
 
   render () {
@@ -290,14 +301,14 @@ const NewDiskDialogConnected = connect(
     clusters: state.clusters.toJS(),
     storageDomains: state.storageDomains.toJS(),
     dataCenters: state.dataCenters.toJS(),
+
     errorText: state.NewDiskDialog.get('errorText'),
     showProgressIndicator: !!state.NewDiskDialog.get('showProgressIndicator'),
     done: state.NewDiskDialog.get('done'),
   }),
   (dispatch, { vmId }) => ({
-    createDiskFunction:
-      (sizeB, alias, storageDomainId, iface) => dispatch(createDiskForVm(sizeB, alias, storageDomainId, iface, vmId)),
     cleanStoreSubtreeFunction: () => dispatch(cleanNewDiskDialogSubtree()),
+    createDiskFunction: (disk) => dispatch(createDiskForVm({ vmId, disk })),
   }),
 )(NewDiskDialog)
 

@@ -13,9 +13,9 @@ import {
   SparklineChart,
 } from 'patternfly-react'
 
-import { donutMemoryTooltipContents } from '../../../utils'
-import { round } from '../../../../utils'
-import { userFormatOfBytes } from '../../../../helpers'
+import { round } from '_/utils'
+import { donutMemoryTooltipContents } from '_/components/utils'
+import { userFormatOfBytes } from '_/helpers'
 
 import style from './style.css'
 

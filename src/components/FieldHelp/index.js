@@ -5,7 +5,7 @@ import $ from 'jquery'
 
 import { Popover, OverlayTrigger } from 'react-bootstrap'
 
-import { msg } from '../../intl'
+import { msg } from '_/intl'
 import style from './style.css'
 
 /**
