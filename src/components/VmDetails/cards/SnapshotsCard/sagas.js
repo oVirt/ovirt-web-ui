@@ -11,6 +11,7 @@ import {
   removeSnapshotRestorePendingTask,
   addSnapshotAddPendingTask,
   removeSnapshotAddPendingTask,
+  updateVmSnapshot,
 } from '_/actions'
 
 function* addVmSnapshot (action) {
@@ -40,11 +41,15 @@ function* deleteVmSnapshot (action) {
   }
   yield put(addSnapshotRemovalPendingTask(snapshotId))
   let snapshotRemoved = false
+  yield fetchVmSnapshots({ vmId })
   for (let delaySec of [ 4, 4, 4, 30, 30, 60 ]) {
-    const apiSnapshot = yield callExternalAction('snapshot', Api.snapshot, { payload: { snapshotId, vmId } }, true)
-    if (apiSnapshot.error && apiSnapshot.error.status === 404) {
+    const snapshot = yield callExternalAction('snapshot', Api.snapshot, { payload: { snapshotId, vmId } }, true)
+    if (snapshot.error && snapshot.error.status === 404) {
       snapshotRemoved = true
       break
+    } else {
+      const snapshotInternal = Api.snapshotToInternal({ snapshot })
+      yield put(updateVmSnapshot({ vmId, snapshot: snapshotInternal }))
     }
     yield delay(delaySec * 1000)
   }

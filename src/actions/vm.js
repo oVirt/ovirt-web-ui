@@ -34,6 +34,7 @@ import {
   UPDATE_ICONS,
   UPDATE_VM_DISK,
   UPDATE_VMS,
+  UPDATE_VM_SNAPSHOT,
   VM_ACTION_IN_PROGRESS,
 } from '_/constants'
 
@@ -441,6 +442,16 @@ export function editVmNic ({ vmId, nic }) {
     payload: {
       vmId,
       nic,
+    },
+  }
+}
+
+export function updateVmSnapshot ({ vmId, snapshot }) {
+  return {
+    type: UPDATE_VM_SNAPSHOT,
+    payload: {
+      vmId,
+      snapshot,
     },
   }
 }
