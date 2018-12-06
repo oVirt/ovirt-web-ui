@@ -312,6 +312,13 @@ const OvirtApi = {
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/graphicsconsoles/${consoleId}`,
       custHeaders: { Accept: 'application/x-virt-viewer', Filter: Selectors.getFilter() } })
   },
+  vmLogon ({ vmId }: { vmId: string }): Promise<Object> {
+    assertLogin({ methodName: 'vmLogon' })
+    return httpPost({
+      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/logon`,
+      input: JSON.stringify({}),
+    })
+  },
   checkFilter (): Promise<Object> {
     assertLogin({ methodName: 'checkFilter' })
     return httpGet({
