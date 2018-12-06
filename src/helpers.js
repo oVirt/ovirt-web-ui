@@ -1,4 +1,3 @@
-import { Blob } from 'blob-util'
 import { locale as appLocale } from './intl'
 
 // "payload":{"message":"Not Found","shortMessage":"LOGIN failed","type":404,"action":{"type":"LOGIN","payload":{"credentials":{"username":"admin@internal","password":"admi"}}}}}
@@ -46,8 +45,9 @@ export function fileDownload ({ data, fileName = 'myFile.dat', mimeType = 'appli
   if (data) {
     const a = document.createElement('a')
 
-    if (navigator.msSaveBlob) { // IE10
-      return navigator.msSaveBlob(new Blob([data], { mimeType }), fileName)
+    if (navigator.msSaveBlob) { // IE10 & IE11
+      const saveBlob = new Blob([data], { type: mimeType })
+      return navigator.msSaveBlob(saveBlob, fileName)
     } else if ('download' in a) { // html5 A[download]
       a.href = `data:${mimeType},${encodeURIComponent(data)}`
       a.setAttribute('download', fileName)
