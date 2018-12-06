@@ -196,27 +196,37 @@ module.exports = {
     ]
   },
   plugins: [
-    new CopyWebpackPlugin([{
-      from: 'src/ovirt-web-ui.config',
-    }, {
-      from: 'branding',
-      to: 'branding',
-      toType: 'dir'
-    }]),
+    new CopyWebpackPlugin([
+      {
+        from: 'src/ovirt-web-ui.config',
+      },
+      {
+        from: 'branding',
+        to: 'branding',
+        toType: 'dir'
+      }
+    ]),
+
     // Generates an `index.html` file with the <script> injected.
     new HtmlWebpackPlugin({
+      filename: 'index.html',
       inject: true,
-      template: paths.appHtml,
+      template: `!!handlebars!${paths.appHtml}`,
+      jspSSO: false,
     }),
+
     // Makes some environment variables available to the JS code, for example:
     // if (process.env.NODE_ENV === 'development') { ... }. See `env.js`.
     new webpack.DefinePlugin(env),
+
     // This is necessary to emit hot updates (currently CSS only):
     new webpack.HotModuleReplacementPlugin(),
+
     // Watcher doesn't work well if you mistype casing in a path so we use
     // a plugin that prints an error when you attempt to do this.
     // See https://github.com/facebookincubator/create-react-app/issues/240
     new CaseSensitivePathsPlugin(),
+
     // If you require a missing module and then `npm install` it, you still have
     // to restart the development server for Webpack to discover it. This plugin
     // makes the discovery automatic so you don't have to restart.
@@ -224,11 +234,13 @@ module.exports = {
     new WatchMissingNodeModulesPlugin(paths.appNodeModules),
 
     //global jquery is provided to any webpack modules
-    /*new webpack.ProvidePlugin({
+    /*
+    new webpack.ProvidePlugin({
       $: "jquery",
       jQuery: "jquery",
       "window.jQuery": "jquery"
-    })*/
+    })
+    */
   ],
   // Some libraries import Node modules but don't use them in the browser.
   // Tell Webpack to provide empty mocks for them so importing them works.

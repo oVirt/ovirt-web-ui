@@ -37,7 +37,6 @@ EXTRA_DIST = \
 	index.jsp.template \
 	yarn.lock \
 	.flowconfig
-	
 
 DISTCLEANFILES = $(PACKAGE)-$(VERSION).tar.gz \
 	aclocal.m4 \
@@ -53,7 +52,7 @@ DISTCLEANDIRS = autom4te.cache \
 	dockerbuild
 
 TMPREPOS = tmp.repos
-RPMBUILD_ARGS := 
+RPMBUILD_ARGS :=
 RPMBUILD_ARGS += --define="_topdir `pwd`/$(TMPREPOS)"
 RPMBUILD_ARGS += $(if $(RELEASE_SUFFIX), --define="release_suffix $$RELEASE_SUFFIX")
 
@@ -89,9 +88,6 @@ all: ovirt-web-ui
 ovirt-web-ui:
 	$(YARN) run build
 	cp -rpv packaging/* build/
-	cp index.jsp build/
-	awk 'BEGIN{getline l < "index.jsp.template"}/<div id="replace_with_index_jsp_template"><\/div>/{gsub("<div id=\"replace_with_index_jsp_template\"></div>",l)}1' build/index.html >> build/index.jsp
-	rm build/index.html
 	mv build/static build/index.jsp build/ovirt-web-ui.config build/ovirt-web-ui.war/
 
 install-data-local:
@@ -101,11 +97,10 @@ install-data-local:
 	cp -rpv build/ovirt-web-ui.war $(DESTDIR)$(USER_PORTAL_DIR)
 	cp -rpvT build/branding $(DESTDIR)$(USER_PORTAL_DIR)/branding/ovirt
 	cp -rpv build/etc/* $(DESTDIR)$(sysconfdir)
-	echo "ln -s" $(DESTDIR)$(USER_PORTAL_DIR)/ovirt-web-ui.war $(DESTDIR)$(OVIRT_ENGINE_DIR)/ovirt-web-ui.war
-	ln -sf ../ovirt-web-ui/ovirt-web-ui.war $(DESTDIR)$(OVIRT_ENGINE_DIR)/ovirt-web-ui.war
+	ln -sf $(DESTDIR)$(USER_PORTAL_DIR)/ovirt-web-ui.war $(DESTDIR)$(OVIRT_ENGINE_DIR)/ovirt-web-ui.war
 	ln -sfr $(DESTDIR)$(USER_PORTAL_DIR)/branding/ovirt $(DESTDIR)$(sysconfdir)/ovirt-web-ui/branding/00-ovirt.brand
 
-check-local: 
+check-local:
 	$(YARN) test
 
 # vim: ts=2
