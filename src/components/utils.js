@@ -1,6 +1,9 @@
 // @flow
 import Selectors from '../selectors'
+import { patternfly } from 'patternfly-react'
 
+import { round } from '../utils/round'
+import { userFormatOfBytes } from '../helpers'
 /**
  * @param osName guest OS code name, e.g. 'rhel_7x64'
  * @return human friendly guest OS name, e.g. 'Red Hat Enterprise Linux 7.x x64'
@@ -34,6 +37,14 @@ export function getVmIconId (operatingSystems: Array<Object>, vm: Object): Objec
 
 export function isRunning (status: string): boolean {
   return ['wait_for_launch', 'up', 'powering_up', 'powering_down', 'migrating', 'paused'].includes(status)
+}
+
+export function donutMemoryTooltipContents (d: Array<Object>, defaultTitleFormat: Function, defaultValueFormat: Function, color: Function): string {
+  const formated = userFormatOfBytes(d[0].value)
+  const d2 = [Object.assign({}, d[0])]
+  d2[0].value = round(formated.number, 1)
+  d2[0].name = `${formated.suffix} ${d[0].name}`
+  return patternfly.pfDonutTooltipContents(d2, defaultTitleFormat, defaultValueFormat, color)
 }
 
 /**
