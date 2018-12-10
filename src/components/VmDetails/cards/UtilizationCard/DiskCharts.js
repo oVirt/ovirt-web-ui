@@ -20,6 +20,7 @@ import { userFormatOfBytes } from '_/helpers'
 import style from './style.css'
 
 import NoLiveData from './NoLiveData'
+import NoHistoricData from './NoHistoricData'
 
 const EmptyBlock = () => (
   <div className={style['no-history-chart']} />
@@ -63,7 +64,7 @@ DiskBar.propTypes = {
  *       via REST. Storage allocation is being used instead.
  */
 const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
-  const diskDetails = diskStats['usage'].datum
+  const diskDetails = diskStats && diskStats['usage'] && diskStats['usage'].datum
 
   let actualSize = 0
   let provisionedSize = 0
@@ -86,13 +87,10 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
     <UtilizationCard className={style['chart-card']} id={id}>
       <CardTitle>Disk</CardTitle>
       <CardBody>
-        { !diskDetails && !isRunning &&
-          <NoLiveData id={`${id}-no-live-data`} />
-        }
-        { isRunning && vm.get('disks').size === 0 &&
+        { vm.get('disks').size === 0 &&
           <NoLiveData id={`${id}-no-live-data`} message='It looks like no disk is attached to VM.' />
         }
-        { isRunning && vm.get('disks').size > 0 &&
+        { vm.get('disks').size > 0 &&
           <React.Fragment>
             <UtilizationCardDetails>
               <UtilizationCardDetailsCount id={`${id}-available`}>
@@ -123,7 +121,7 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
                 }}
               />
             }
-            { diskDetails &&
+            { isRunning && diskDetails &&
               <div className={style['disk-fs-list']}>
                 {
                   diskDetails.map((disk) =>
@@ -132,8 +130,16 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
                 }
               </div>
             }
-            {/* Disks don't have historic data but stub the space so the card stretches like the others */}
-            <EmptyBlock />
+            { isRunning && !diskDetails &&
+              <NoHistoricData message='It looks like no guest agent is configured on the VM.' />
+            }
+            {/*
+                Disks don't have historic data but stub the space so the card stretches like the others,
+                thus if message above doesn't show, need to insert EmptyBlock
+              */}
+            { !(isRunning && !diskDetails) &&
+              <EmptyBlock />
+            }
           </React.Fragment>
         }
       </CardBody>
@@ -143,7 +149,7 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
 DiskCharts.propTypes = {
   id: PropTypes.string.isRequired,
   vm: PropTypes.object.isRequired,
-  diskStats: PropTypes.object.isRequired,
+  diskStats: PropTypes.object,
   isRunning: PropTypes.bool,
 }
 
