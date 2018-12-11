@@ -3194,7 +3194,7 @@ gzip-size@3.0.0:
   dependencies:
     duplexer "^0.1.1"
 
-handlebars-loader@^1.7.0:
+handlebars-loader@1.7.0:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/handlebars-loader/-/handlebars-loader-1.7.0.tgz#4f750bc62c350fb922e52d8564d667887e909723"
   integrity sha512-tfS3n+PrDB2gnDnrx0/DGvdb4wF4JqV7CEiVof3RymOIWYrcmD+ZiaXTlZ/f7fZ7+aQPEv6JRG0HS7nTlyvGlQ==
