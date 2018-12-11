@@ -12,6 +12,7 @@ import { Grid, Row, Col } from '../../GridComponents'
 
 import itemStyle from '../../itemListStyle.css'
 import style from './style.css'
+import baseStyle from '../../style.css'
 import NicEditor from './NicEditor'
 import NicListItem from './NicListItem'
 
@@ -137,6 +138,7 @@ class NicsCard extends React.Component {
         editTooltip={msg.nicCardEditTooltip({ vmId: vm.get('id') })}
         editable={canEditTheCard}
         idPrefix={idPrefix}
+        className={baseStyle['cell-card']}
         itemCount={vm.get('nics').size}
         onStartEdit={() => { onEditChange(true) }}
         onCancel={() => { onEditChange(false) }}
