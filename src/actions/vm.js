@@ -166,12 +166,11 @@ export function editVm (
   }
 }
 
-export function removeVm ({ vmId, force = false, preserveDisks = false }) {
+export function removeVm ({ vmId, preserveDisks = false }) {
   return {
     type: REMOVE_VM,
     payload: {
       vmId,
-      force,
       preserveDisks,
     },
   }

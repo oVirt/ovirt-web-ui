@@ -236,8 +236,7 @@ class VmActions extends React.Component {
             )}
           </div>
         }
-        confirm={{ title: msg.yes(), onClick: () => onRemove({ force: false, preserveDisks: this.state.removePreserveDisks }) }}
-        extra={{ title: msg.force(), onClick: () => onRemove({ force: true, preserveDisks: this.state.removePreserveDisks }) }}
+        confirm={{ title: msg.yes(), onClick: () => onRemove({ preserveDisks: this.state.removePreserveDisks }) }}
       />)
 
     return (
@@ -324,7 +323,7 @@ export default withRouter(
       onRestart: () => dispatch(restartVm({ vmId: vm.get('id'), force: false })),
       onForceShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: true })),
       onSuspend: () => dispatch(suspendVm({ vmId: vm.get('id') })),
-      onRemove: ({ preserveDisks, force }) => dispatch(removeVm({ vmId: vm.get('id'), force, preserveDisks })),
+      onRemove: ({ preserveDisks }) => dispatch(removeVm({ vmId: vm.get('id'), preserveDisks })),
       onStartPool: () => dispatch(startPool({ poolId: pool.get('id') })),
       onStartVm: () => dispatch(startVm({ vmId: vm.get('id') })),
     })
