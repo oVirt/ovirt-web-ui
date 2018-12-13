@@ -15,7 +15,7 @@ import {
 
 import { round, convertValueMap } from '_/utils'
 import { donutMemoryTooltipContents } from '_/components/utils'
-import { userFormatOfBytes } from '_/helpers'
+import { userFormatOfBytes, isWindows } from '_/helpers'
 
 import style from './style.css'
 
@@ -25,8 +25,7 @@ import NoHistoricData from './NoHistoricData'
 const EmptyBlock = () => (
   <div className={style['no-history-chart']} />
 )
-
-const DiskBar = ({ path, total, used }) => {
+const DiskBar = ({ path, total, used, isVmWindows }) => {
   const { unit, value } =
     convertValueMap(
       'B',
@@ -38,7 +37,7 @@ const DiskBar = ({ path, total, used }) => {
   const thresholdWarning = 70
   const usedInPercent = round(used / total * 100, 0)
   return <div className={style['disk-fs-box']}>
-    <div className={style['disk-fs-name']}>{path}</div>
+    <div className={style['disk-fs-name']}>{ isVmWindows ? path.toUpperCase() : path }</div>
     <div className={style['disk-fs-bar']}>
       <UtilizationBar
         now={usedInPercent}
@@ -54,6 +53,7 @@ DiskBar.propTypes = {
   path: PropTypes.string.isRequired,
   total: PropTypes.number.isRequired,
   used: PropTypes.number.isRequired,
+  isVmWindows: PropTypes.bool,
 }
 
 /*
@@ -82,6 +82,8 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
   const usedFormated = userFormatOfBytes(actualSize)
   const availableFormated = userFormatOfBytes(provisionedSize - actualSize)
   const totalFormated = userFormatOfBytes(provisionedSize)
+
+  const isVmWindows = isWindows(vm.getIn(['os', 'type']))
 
   return (
     <UtilizationCard className={style['chart-card']} id={id}>
@@ -125,7 +127,7 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
               <div className={style['disk-fs-list']}>
                 {
                   diskDetails.map((disk) =>
-                    <DiskBar key={disk.path} path={disk.path} total={disk.total} used={disk.used} />
+                    <DiskBar key={disk.path} path={disk.path} total={disk.total} used={disk.used} isVmWindows={isVmWindows} />
                   )
                 }
               </div>
