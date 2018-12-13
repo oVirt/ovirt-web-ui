@@ -21,7 +21,7 @@ import style from './style.css'
 import NoLiveData from './NoLiveData'
 
 const EmptyBlock = () => (
-  <div className={style['empty-block']} />
+  <div className={style['no-history-chart']} />
 )
 
 /*
@@ -89,7 +89,7 @@ const DiskCharts = ({ vm, isRunning, id, ...props }) => {
             }}
           />
 
-          {/* Disks don't have historic data */}
+          {/* Disks don't have historic data but stub the space so the card stretches like the others */}
           <EmptyBlock />
         </React.Fragment>
         }
