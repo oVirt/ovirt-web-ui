@@ -279,7 +279,10 @@ class DetailsCard extends React.Component {
       this.setState({ templateList: createTemplateList(this.props.templates) }) // eslint-disable-line react/no-did-update-set-state
     }
 
-    if (prevProps.operatingSystems !== this.props.operatingSystems) {
+    if (prevProps.operatingSystems !== this.props.operatingSystems ||
+      prevProps.clusters !== this.props.clusters ||
+      prevProps.vm.getIn(['cluster', 'id']) !== this.props.vm.getIn(['cluster', 'id'])
+    ) {
       const clusterId = this.props.vm.getIn(['cluster', 'id'])
       const cluster = this.props.clusters && this.props.clusters.get(clusterId)
       const architecture = cluster && cluster.get('architecture')
@@ -369,9 +372,9 @@ class DetailsCard extends React.Component {
                 { fieldName: 'cpu', value: template.getIn(['cpu', 'vCPUs']) },
                 { fieldName: 'bootMenuEnabled', value: template.get('bootMenuEnabled') },
                 { fieldName: 'os', value: templateOs && templateOs.get('id') },
-                { fieldName: 'cloudInitEnabled', value: template && template.getIn(['cloudInit', 'enabled']) },
-                { fieldName: 'cloudInitHostName', value: template && template.getIn(['cloudInit', 'hostName']) },
-                { fieldName: 'cloudInitSshAuthorizedKeys', value: template && template.getIn(['cloudInit', 'sshAuthorizedKeys']) },
+                { fieldName: 'cloudInitEnabled', value: template.getIn(['cloudInit', 'enabled']) },
+                { fieldName: 'cloudInitHostName', value: template.getIn(['cloudInit', 'hostName']) },
+                { fieldName: 'cloudInitSshAuthorizedKeys', value: template.getIn(['cloudInit', 'sshAuthorizedKeys']) },
               )
             }
           }
@@ -415,9 +418,11 @@ class DetailsCard extends React.Component {
         case 'bootDevices':
           const copiedDevices = updates.getIn(['os', 'bootDevices'], DEFAULT_BOOT_DEVICES).toJS()
           copiedDevices[additionalArgs.device] = value
+
           for (let i = additionalArgs.device + 1; i < copiedDevices.length; i++) {
             copiedDevices[i] = copiedDevices[i] === value ? null : copiedDevices[i]
           }
+
           updates = updates.setIn(['os', 'bootDevices'], List(copiedDevices))
           fieldUpdated = 'bootDevices'
           this.nextRunUpdates['bootDevices'] = true
