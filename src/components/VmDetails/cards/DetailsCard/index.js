@@ -5,9 +5,8 @@ import { List } from 'immutable'
 
 import * as Actions from '_/actions'
 import { MAX_VM_MEMORY_FACTOR } from '_/constants'
-import { generateUnique, localeCompare } from '_/helpers'
+import { generateUnique, localeCompare, filterOsByArchitecture } from '_/helpers'
 import { msg, enumMsg } from '_/intl'
-import Selectors from '_/selectors'
 
 import {
   formatUptimeDuration,
@@ -114,9 +113,12 @@ function createTemplateList (templates) {
  * Return a normalized and sorted list of OS ready for use in a __SelectBox__ from
  * the Map of provided templates.
  */
-function createOsList (architecture) {
+function createOsList (vm, clusters, operatingSystems) {
+  const clusterId = vm.getIn(['cluster', 'id'])
+  const cluster = clusters && clusters.get(clusterId)
+  const architecture = cluster && cluster.get('architecture')
   const osList =
-    Selectors.getOperatingSystemsByArchitecture(architecture)
+    filterOsByArchitecture(operatingSystems, architecture)
       .toList()
       .map(os => (
         {
@@ -193,11 +195,6 @@ const DEFAULT_BOOT_DEVICES = List(['hd', null])
 class DetailsCard extends React.Component {
   constructor (props) {
     super(props)
-
-    const clusterId = props.vm.getIn(['cluster', 'id'])
-    const cluster = props.clusters && props.clusters.get(clusterId)
-    const architecture = cluster && cluster.get('architecture')
-
     this.state = {
       vm: props.vm, // ImmutableJS Map
 
@@ -212,7 +209,7 @@ class DetailsCard extends React.Component {
       isoList: createIsoList(props.storageDomains),
       clusterList: createClusterList(props.clusters),
       templateList: createTemplateList(props.templates),
-      osList: createOsList(architecture),
+      osList: createOsList(props.vm, props.clusters, props.operatingSystems),
     }
     this.trackUpdates = {}
     this.hotPlugUpdates = {}
@@ -283,10 +280,7 @@ class DetailsCard extends React.Component {
       prevProps.clusters !== this.props.clusters ||
       prevProps.vm.getIn(['cluster', 'id']) !== this.props.vm.getIn(['cluster', 'id'])
     ) {
-      const clusterId = this.props.vm.getIn(['cluster', 'id'])
-      const cluster = this.props.clusters && this.props.clusters.get(clusterId)
-      const architecture = cluster && cluster.get('architecture')
-      this.setState({ osList: createOsList(architecture) }) // eslint-disable-line react/no-did-update-set-state
+      this.setState({ osList: createOsList(this.props.vm, this.props.clusters, this.props.operatingSystems) }) // eslint-disable-line react/no-did-update-set-state
     }
   }
 

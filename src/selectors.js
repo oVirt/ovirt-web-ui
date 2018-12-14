@@ -1,7 +1,6 @@
 import { Exception } from './exceptions'
 
-const PPC_64 = 'ppc64'
-const S390X = 's390x'
+import { filterOsByArchitecture } from '_/helpers'
 
 let Selectors = {}
 Selectors = {
@@ -31,15 +30,7 @@ Selectors = {
       os.get('name') === name)
   },
   getOperatingSystemsByArchitecture (architecture) {
-    return getState().operatingSystems.filter(os => {
-      const osName = os.get('name')
-      if (architecture === PPC_64 || architecture === S390X) {
-        return osName.includes(architecture)
-      } else {
-        // default to x64_86 for others (x64_86, undefined - all architectures)
-        return !osName.includes(PPC_64) && !osName.includes(S390X)
-      }
-    })
+    return filterOsByArchitecture(getState().operatingSystems, architecture)
   },
   getClusterById (clusterId) {
     return getState().clusters.get(clusterId)
