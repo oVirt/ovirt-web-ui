@@ -16,8 +16,6 @@
 
   display: flex;
   flex-direction: column;
-
-  justify-content: space-around;
 }
 
 .no-data-card-body {
@@ -68,8 +66,4 @@
 
 .utilization-card :global(.c3-tooltip-container) {
   white-space: nowrap;
-}
-
-.full-height {
-  height: 100%;
 }

@@ -24,8 +24,8 @@ const UtilizationCard = ({ vm }) => {
 
   return (
     <BaseCard className={style['utilization-card']} title='Utilization' editable={false} idPrefix={idPrefix}>
-      <Grid className={style['full-height']}>
-        <Row className={style['full-height']}>
+      <Grid>
+        <Row>
           <Col>
             { stats.cpu
               ? <CpuCharts cpuStats={stats.cpu} isRunning={isRunning} id={`${idPrefix}-cpu`} />
