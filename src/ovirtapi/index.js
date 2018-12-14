@@ -127,7 +127,7 @@ const OvirtApi = {
       input: '{}',
     })
   },
-  remove ({ vmId, force, preserveDisks }: { vmId: string, force: boolean, preserveDisks: boolean }): Promise<Object> {
+  remove ({ vmId, preserveDisks }: { vmId: string, preserveDisks: boolean }): Promise<Object> {
     assertLogin({ methodName: 'remove' })
     let url = `${AppConfiguration.applicationContext}/api/vms/${vmId}`
     if (preserveDisks) {
@@ -137,7 +137,6 @@ const OvirtApi = {
       url,
       custHeaders: {
         'Accept': 'application/json',
-        force: !!force,
       },
     })
   },
