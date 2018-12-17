@@ -206,13 +206,16 @@ module.exports = {
       to: 'branding',
       toType: 'dir'
     }]),
+
     // Generates an `index.html` file with the <script> injected.
     new HtmlWebpackPlugin({
+      filename: 'index.jsp',
       inject: true,
-      template: paths.appHtml,
+      template: `!!handlebars!${paths.appHtml}`,
+      jspSSO: true,
       minify: {
         removeComments: true,
-        collapseWhitespace: true,
+        collapseWhitespace: false,
         removeRedundantAttributes: true,
         useShortDoctype: true,
         removeEmptyAttributes: true,
@@ -223,15 +226,19 @@ module.exports = {
         minifyURLs: true,
       },
     }),
+
     // Makes some environment variables available to the JS code, for example:
     // if (process.env.NODE_ENV === 'production') { ... }. See `env.js`.
     // It is absolutely essential that NODE_ENV was set to production here.
     // Otherwise React will be compiled in the very slow development mode.
     new webpack.DefinePlugin(env),
+
     // This helps ensure the builds are consistent if source hasn't changed:
     new webpack.optimize.OccurrenceOrderPlugin(),
+
     // Try to dedupe duplicated modules, if any:
     new webpack.optimize.DedupePlugin(),
+
     // Minify the code.
     new webpack.optimize.UglifyJsPlugin({
       compress: {
@@ -246,6 +253,7 @@ module.exports = {
         screw_ie8: true,
       },
     }),
+
     // Note: this won't work without ExtractTextPlugin.extract(..) in `loaders`.
     new ExtractTextPlugin('static/css/[name].[contenthash:8].css'),
   ],

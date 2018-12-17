@@ -373,6 +373,11 @@ function getUserInfo (protocol, port) {
   });
 }
 
+/*
+ * Setup `env` with SSO userInfo so the `webpack.DefinePlugin` can push it to the
+ * webpack bundle to be read by the login code.  In build/prod mode, the `index.jsp`
+ * will push the SSO info to the window on the server side.
+ */
 function injectUserInfo (userInfo) {
   env['window.userInfo'] = JSON.stringify(userInfo);
 }
