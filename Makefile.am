@@ -32,9 +32,7 @@ EXTRA_DIST = \
 	scripts \
 	packaging \
 	package.json \
-	index.html \
-  index.jsp \
-	index.jsp.template \
+	static \
 	yarn.lock \
 	.flowconfig
 
