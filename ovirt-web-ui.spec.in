@@ -65,7 +65,7 @@ make install DESTDIR=%{buildroot}
 - Fix use of VmNics in VmDetail such that Nic operations work again [BZ1631149](https://bugzilla.redhat.com/show_bug.cgi?id=1631149)
 - implement ErrorBoundary to prevent white screen crash [#729](https://github.com/oVirt/ovirt-web-ui/issues/729)
 
-* Wed Sep 5 2018 Greg Sheremeta <gshereme@redhat.com> - 1.4.3-1
+* Tue Sep 5 2018 Greg Sheremeta <gshereme@redhat.com> - 1.4.3-1
   Fixed issues:
 - ux-redesign: make old Normal View the default when clicking a VM [#751](https://github.com/oVirt/ovirt-web-ui/issues/751)
 
