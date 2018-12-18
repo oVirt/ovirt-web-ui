@@ -27,8 +27,14 @@ missing
 ovirt-web-ui.spec
 tmp.repos/
 /ovirt-web-ui-*.tar.gz
+
 # intl related
 /extra
 /.zanata-cache/
 
-
+# mock_runner
+.bash_history
+.node-gyp/
+exported-artifacts/
+rpmbuild/
+mocker-*.cfg
