@@ -95,7 +95,7 @@ install-data-local:
 	cp -rpv build/ovirt-web-ui.war $(DESTDIR)$(USER_PORTAL_DIR)
 	cp -rpvT build/branding $(DESTDIR)$(USER_PORTAL_DIR)/branding/ovirt
 	cp -rpv build/etc/* $(DESTDIR)$(sysconfdir)
-	ln -sf $(DESTDIR)$(USER_PORTAL_DIR)/ovirt-web-ui.war $(DESTDIR)$(OVIRT_ENGINE_DIR)/ovirt-web-ui.war
+	ln -sfr $(DESTDIR)$(USER_PORTAL_DIR)/ovirt-web-ui.war $(DESTDIR)$(OVIRT_ENGINE_DIR)/ovirt-web-ui.war
 	ln -sfr $(DESTDIR)$(USER_PORTAL_DIR)/branding/ovirt $(DESTDIR)$(sysconfdir)/ovirt-web-ui/branding/00-ovirt.brand
 
 check-local:
