@@ -90,6 +90,7 @@ class BaseCard extends React.Component {
       editable = true,
       editTooltip,
       idPrefix = '',
+      className = '',
     } = this.props
     const editing = editMode === undefined ? this.state.edit : editMode
     const hasHeading = !!title
@@ -98,7 +99,7 @@ class BaseCard extends React.Component {
 
     const RenderChildren = this.renderChildren
     return (
-      <Card className={style['base-card']} id={`${idPrefix}-card`} {...excludeKeys(this.props, this.propTypeKeys)}>
+      <Card className={`${style['base-card']} ${className}`} id={`${idPrefix}-card`} {...excludeKeys(this.props, this.propTypeKeys)}>
         {hasHeading && (
           <CardHeading className={style['base-card-heading']}>
             {editable && <CardEditButton tooltip={editTooltip} editEnabled={editing} onClick={this.clickEdit} id={`${idPrefix}-button-edit`} />}
@@ -136,6 +137,7 @@ BaseCard.propTypes = {
   }),
   itemCount: PropTypes.number,
   idPrefix: PropTypes.string,
+  className: PropTypes.string,
 
   editMode: PropTypes.bool,
   editable: PropTypes.bool,

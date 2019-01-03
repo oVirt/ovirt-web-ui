@@ -20,6 +20,10 @@ import style from './style.css'
 
 import NoLiveData from './NoLiveData'
 
+const EmptyBlock = () => (
+  <div className={style['no-history-chart']} />
+)
+
 /*
  * Disks, but intended to be in terms of guest agent reported data (file system viewpoint),
  * not in terms of storage allocation (infrastructure viewpoint - like dashboard/webadmin).
@@ -85,7 +89,8 @@ const DiskCharts = ({ vm, isRunning, id, ...props }) => {
             }}
           />
 
-          {/* Disks don't have historic data */}
+          {/* Disks don't have historic data but stub the space so the card stretches like the others */}
+          <EmptyBlock />
         </React.Fragment>
         }
       </CardBody>

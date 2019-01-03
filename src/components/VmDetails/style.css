@@ -97,3 +97,7 @@
 .base-card-footer {
   flex-shrink: 0;
 }
+
+div.base-card.cell-card {
+  flex-basis: auto;
+}

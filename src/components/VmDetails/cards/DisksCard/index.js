@@ -16,6 +16,7 @@ import DiskImageEditor from './DiskImageEditor'
 import DiskListItem from './DiskListItem'
 
 import itemStyle from '../../itemListStyle.css'
+import baseStyle from '../../style.css'
 import style from './style.css'
 
 function filterStorageDomains (vm, clusters, storageDomains) {
@@ -143,6 +144,7 @@ class DisksCard extends React.Component {
         editTooltip={msg.disksCardEditTooltip({ vmId: vm.get('id') })}
         editable={canEditTheCard}
         itemCount={diskList.size}
+        className={baseStyle['cell-card']}
         onStartEdit={() => { onEditChange(true) }}
         onCancel={() => { onEditChange(false) }}
         onSave={() => { onEditChange(false) }}
