@@ -2,6 +2,8 @@
 import moment from 'moment'
 import 'moment-duration-format'
 
+const TWO_MINUTES = 2 * 60 * 1000
+
 export function formatUptimeDuration (
   {
     interval,
@@ -26,9 +28,10 @@ export function formatUptimeDuration (
     return defaultValue
   }
 
-  // (up for 0 days, 0 hours, 1 minute, 37 seconds)
   const formatted: string = moment.duration(durationInMS).format(
-    'd __, h __, m __, s __'
+    durationInMS < TWO_MINUTES
+      ? 'd __, h __, m __, s __'
+      : 'd __, h __, m __'
   )
   return formatted
 }
