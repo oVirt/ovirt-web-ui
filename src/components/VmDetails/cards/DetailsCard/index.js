@@ -9,7 +9,6 @@ import { generateUnique, localeCompare, filterOsByArchitecture } from '_/helpers
 import { msg, enumMsg } from '_/intl'
 
 import {
-  formatUptimeDuration,
   convertValue,
   isNumber,
   round,
@@ -33,7 +32,6 @@ import {
 } from 'patternfly-react'
 import Switch from '../../../Switch'
 import SelectBox from '../../../SelectBox'
-import VmStatusIcon from '../../../VmStatusIcon'
 import BaseCard from '../../BaseCard'
 import { Grid, Row, Col } from '../../GridComponents'
 
@@ -603,11 +601,6 @@ class DetailsCard extends React.Component {
       vm.get('canUserEditVm') &&
       vm.getIn(['pool', 'id']) === undefined
 
-    // Status
-    const status = vm.get('status')
-    const uptime = formatUptimeDuration({ start: vm.get('startTime') })
-
-    // Host Name
     const hostName = hosts && hosts.getIn([vm.get('hostId'), 'name'])
 
     // IP Addresses
@@ -697,13 +690,6 @@ class DetailsCard extends React.Component {
               <Row>
                 <Col className={style['fields-column']}>
                   <Grid>
-                    <FieldRow label={msg.status()} id={`${idPrefix}-status`}>
-                      <div className={style['vm-status']}>
-                        <VmStatusIcon className={style['vm-status-icon']} state={vm.get('status')} />
-                        <span className={style['vm-status-text']}>{enumMsg('VmStatus', vm.get('status'))}</span>
-                      </div>
-                      { uptime && <div className={style['vm-uptime']} id={`${idPrefix}-uptime`}>(up {uptime})</div> }
-                    </FieldRow>
                     <FieldRow label={msg.host()} id={`${idPrefix}-host`}>
                       { hostName || <NotAvailable tooltip={msg.notAvailableUntilRunning()} id={`${idPrefix}-host-not-available`} /> }
                     </FieldRow>

@@ -26,6 +26,9 @@ export function formatUptimeDuration (
     return defaultValue
   }
 
-  const formatted: string = moment.duration(durationInMS).format('d [days], h:mm')
+  // (up for 0 days, 0 hours, 1 minute, 37 seconds)
+  const formatted: string = moment.duration(durationInMS).format(
+    'd __, h __, m __, s __'
+  )
   return formatted
 }

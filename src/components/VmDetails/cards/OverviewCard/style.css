@@ -26,6 +26,13 @@
   margin-left: 5px;
 }
 
+.vm-uptime {
+  color: rgba(0, 0, 0, 0.65);
+  font-style: italic;
+
+  padding-left: 15px;
+}
+
 .vm-description {
   white-space: pre-wrap;
 }

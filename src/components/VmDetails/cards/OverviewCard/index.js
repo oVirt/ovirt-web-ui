@@ -3,10 +3,10 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import sharedStyle from '../../../sharedStyle.css'
-import { getOsHumanName, getVmIcon } from '../../../utils'
+import { getOsHumanName, getVmIcon } from '_/components/utils'
 import { enumMsg } from '_/intl'
 import { generateUnique } from '_/helpers'
-
+import { formatUptimeDuration } from '_/utils'
 import { editVm } from '_/actions'
 
 import { Media } from 'react-bootstrap'
@@ -152,8 +152,8 @@ class OverviewCard extends React.Component {
     const { vm, icons, operatingSystems, isEditable } = this.props
     const { isEditing, correlatedMessages } = this.state
 
+    const uptime = formatUptimeDuration({ start: vm.get('startTime') })
     const icon = getVmIcon(icons, operatingSystems, vm)
-
     const idPrefix = 'vmdetail-overview'
 
     return (
@@ -194,6 +194,9 @@ class OverviewCard extends React.Component {
                     <VmStatusIcon className={style['vm-status-icon']} state={vm.get('status')} />
                     <span className={style['vm-status-text']} id={`${idPrefix}-status-value`}>{enumMsg('VmStatus', vm.get('status'))}</span>
                   </div>
+                  { uptime &&
+                    <div className={style['vm-uptime']} id={`${idPrefix}-uptime`}>(up {uptime})</div>
+                  }
 
                   <div>
                     { !isEditing &&
