@@ -1,5 +1,8 @@
 import { locale as appLocale, msg } from '_/intl'
 
+const PPC_64 = 'ppc64'
+const S390X = 's390x'
+
 // "payload":{"message":"Not Found","shortMessage":"LOGIN failed","type":404,"action":{"type":"LOGIN","payload":{"credentials":{"username":"admin@internal","password":"admi"}}}}}
 export function hidePassword ({ action, param }) {
   if (action) {
@@ -211,4 +214,16 @@ export function formatDateFromNow (d) {
   } while (divitions[currentIndex] <= elapsed && currentIndex < suffixes.length)
 
   return msg.timeAgo({ time: `${elapsed}${suffix}` })
+}
+
+export function filterOsByArchitecture (operatingSystems, architecture) {
+  return operatingSystems.filter(os => {
+    const osName = os.get('name')
+    if (architecture === PPC_64 || architecture === S390X) {
+      return osName.includes(architecture)
+    } else {
+      // default to x64_86 for others (x64_86, undefined - all architectures)
+      return !osName.includes(PPC_64) && !osName.includes(S390X)
+    }
+  })
 }

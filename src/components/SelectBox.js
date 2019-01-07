@@ -53,7 +53,7 @@ class SelectBox extends React.Component {
       <div style={{ width: '100%' }} id={id}>
         <div className='dropdown'>
           <button className={`btn btn-default dropdown-toggle ${style['dropdown-button']}`} type='button' data-toggle='dropdown' id={`${id}-button-toggle`}>
-            <span className={style['dropdown-button-text']} id={`${id}-button-text`}>
+            <span className={style['dropdown-button-text']} id={`${id}-button-text`} title={selectedItem && selectedItem.value}>
               {selectedItem ? selectedItem.value : NOBREAK_SPACE}
             </span>
             <span className='caret' id={`${id}-button-caret`} />

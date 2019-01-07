@@ -1,11 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import { List } from 'immutable'
 
 import * as Actions from '_/actions'
 import { MAX_VM_MEMORY_FACTOR } from '_/constants'
-import { generateUnique, localeCompare } from '_/helpers'
+import { generateUnique, localeCompare, filterOsByArchitecture } from '_/helpers'
 import { msg, enumMsg } from '_/intl'
+
 import {
   formatUptimeDuration,
   convertValue,
@@ -26,6 +28,8 @@ import {
   Icon,
   OverlayTrigger,
   Tooltip,
+  ControlLabel,
+  FormGroup,
 } from 'patternfly-react'
 import Switch from '../../../Switch'
 import SelectBox from '../../../SelectBox'
@@ -38,6 +42,8 @@ import style from './style.css'
 import ConsoleList from './ConsoleList'
 import HotPlugChangeConfirmationModal from './HotPlugConfirmationModal'
 import NextRunChangeConfirmationModal from './NextRunChangeConfirmationModal'
+
+import ExpandCollapseSection from '../../../ExpandCollapseSection'
 
 /*
  * Return a normalized list of iso files from the set of provided storage domains.
@@ -103,6 +109,29 @@ function createTemplateList (templates) {
   return templateList
 }
 
+/*
+ * Return a normalized and sorted list of OS ready for use in a __SelectBox__ from
+ * the Map of provided templates.
+ */
+function createOsList (vm, clusters, operatingSystems) {
+  const clusterId = vm.getIn(['cluster', 'id'])
+  const cluster = clusters && clusters.get(clusterId)
+  const architecture = cluster && cluster.get('architecture')
+  const osList =
+    filterOsByArchitecture(operatingSystems, architecture)
+      .toList()
+      .map(os => (
+        {
+          id: os.get('id'),
+          value: os.get('description'),
+        }
+      ))
+      .sort((a, b) => localeCompare(a.value, b.value))
+      .toJS()
+
+  return osList
+}
+
 function rephraseVmType (vmType) {
   const types = {
     'desktop': msg.vmType_desktop(),
@@ -156,6 +185,8 @@ NotAvailable.propTypes = {
   id: PropTypes.string.isRequired,
 }
 
+const DEFAULT_BOOT_DEVICES = List(['hd', null])
+
 /*
  * Specific information and details of the VM (status/up-time, data center, cluster,
  * host, template, IP addresses, FQDN, CD, consoles, memory, CPUs, cloud-init, boot menu,
@@ -164,7 +195,6 @@ NotAvailable.propTypes = {
 class DetailsCard extends React.Component {
   constructor (props) {
     super(props)
-
     this.state = {
       vm: props.vm, // ImmutableJS Map
 
@@ -179,6 +209,7 @@ class DetailsCard extends React.Component {
       isoList: createIsoList(props.storageDomains),
       clusterList: createClusterList(props.clusters),
       templateList: createTemplateList(props.templates),
+      osList: createOsList(props.vm, props.clusters, props.operatingSystems),
     }
     this.trackUpdates = {}
     this.hotPlugUpdates = {}
@@ -197,6 +228,8 @@ class DetailsCard extends React.Component {
     this.handleHotPlugOnCancel = this.handleHotPlugOnCancel.bind(this)
     this.handleHotPlugOnApplyLater = this.handleHotPlugOnApplyLater.bind(this)
     this.handleHotPlugOnApplyNow = this.handleHotPlugOnApplyNow.bind(this)
+
+    this.updateOs = this.updateOs.bind(this)
   }
 
   static getDerivedStateFromProps (props, state) {
@@ -242,6 +275,13 @@ class DetailsCard extends React.Component {
     if (prevProps.templates !== this.props.templates) {
       this.setState({ templateList: createTemplateList(this.props.templates) }) // eslint-disable-line react/no-did-update-set-state
     }
+
+    if (prevProps.operatingSystems !== this.props.operatingSystems ||
+      prevProps.clusters !== this.props.clusters ||
+      prevProps.vm.getIn(['cluster', 'id']) !== this.props.vm.getIn(['cluster', 'id'])
+    ) {
+      this.setState({ osList: createOsList(this.props.vm, this.props.clusters, this.props.operatingSystems) }) // eslint-disable-line react/no-did-update-set-state
+    }
   }
 
   handleCardOnStartEdit () {
@@ -259,7 +299,31 @@ class DetailsCard extends React.Component {
     this.props.onEditChange(true)
   }
 
-  handleChange (fieldName, value) {
+  updateOs (updates, os) {
+    if (os) {
+      const operatingSystems = this.props.operatingSystems
+      updates = updates.mergeDeep({
+        os: {
+          type: os.get('name'),
+        },
+      })
+
+      const osIconId = os.getIn(['icons', 'large', 'id'])
+      const currentOsIconId = updates.getIn(['icons', 'large', 'id'])
+      if (currentOsIconId && isValidOsIcon(operatingSystems, currentOsIconId)) {
+        updates = updates.mergeDeep({
+          icons: {
+            large: {
+              id: osIconId,
+            },
+          },
+        })
+      }
+    }
+    return updates
+  }
+
+  handleChange (fieldName, value, additionalArgs) {
     if (this.state.isEditing && !this.state.isDirty) {
       this.props.onEditChange(true, true)
     }
@@ -293,40 +357,19 @@ class DetailsCard extends React.Component {
           {
             const template = this.props.templates.get(value)
             if (template) {
+              const templateOsType = template.getIn(['os', 'type'], 'other')
+              const templateOs = this.props.operatingSystems.find(os => os.get('type') === templateOsType)
+
               // fields that are editable on the card
               changeQueue.push(
                 { fieldName: 'memory', value: template.get('memory') / (1024 ** 3) }, // input assumed to be GiB
                 { fieldName: 'cpu', value: template.getIn(['cpu', 'vCPUs']) },
                 { fieldName: 'bootMenuEnabled', value: template.get('bootMenuEnabled') },
+                { fieldName: 'os', value: templateOs && templateOs.get('id') },
+                { fieldName: 'cloudInitEnabled', value: template.getIn(['cloudInit', 'enabled']) },
+                { fieldName: 'cloudInitHostName', value: template.getIn(['cloudInit', 'hostName']) },
+                { fieldName: 'cloudInitSshAuthorizedKeys', value: template.getIn(['cloudInit', 'sshAuthorizedKeys']) },
               )
-
-              // fields that need to be changed but are not on the card
-              const operatingSystems = this.props.operatingSystems
-              const osType = template.getIn(['os', 'type'], 'other')
-              const templateOs = operatingSystems.find(os => os.get('name') === osType)
-              if (templateOs) {
-                updates = updates.mergeDeep({
-                  os: {
-                    type: osType,
-                  },
-                })
-
-                const templateOsIconId = templateOs.getIn(['icons', 'large', 'id'])
-                const currentOsIconId = updates.getIn(['icons', 'large', 'id'])
-                if (currentOsIconId && isValidOsIcon(operatingSystems, currentOsIconId)) {
-                  updates = updates.mergeDeep({
-                    icons: {
-                      large: {
-                        id: templateOsIconId,
-                      },
-                    },
-                  })
-                }
-              }
-
-              // TODO: When could-init editing is added, make this look like the other followup changes
-              const cloudInit = template.get('cloudInit').toJS()
-              updates = updates.set('cloudInit', cloudInit)
             }
           }
           break
@@ -342,6 +385,41 @@ class DetailsCard extends React.Component {
           this.nextRunUpdates['bootMenuEnabled'] = true
           // TODO? If the switch gets changed twice and it's back to its original state,
           //       should it get flagged as a change?
+          break
+
+        case 'cloudInitEnabled':
+          updates = updates.setIn(['cloudInit', 'enabled'], value)
+          fieldUpdated = 'cloudInit'
+          break
+
+        case 'cloudInitHostName':
+          updates = updates.setIn(['cloudInit', 'hostName'], value)
+          fieldUpdated = 'cloudInit'
+          break
+
+        case 'cloudInitSshAuthorizedKeys':
+          updates = updates.setIn(['cloudInit', 'sshAuthorizedKeys'], value)
+          fieldUpdated = 'cloudInit'
+          break
+
+        case 'os':
+          fieldUpdated = 'os'
+          const operatingSystems = this.props.operatingSystems
+          const os = operatingSystems.find(os => os.get('id') === value)
+          updates = this.updateOs(updates, os)
+          break
+
+        case 'bootDevices':
+          const copiedDevices = updates.getIn(['os', 'bootDevices'], DEFAULT_BOOT_DEVICES).toJS()
+          copiedDevices[additionalArgs.device] = value
+
+          for (let i = additionalArgs.device + 1; i < copiedDevices.length; i++) {
+            copiedDevices[i] = copiedDevices[i] === value ? null : copiedDevices[i]
+          }
+
+          updates = updates.setIn(['os', 'bootDevices'], List(copiedDevices))
+          fieldUpdated = 'bootDevices'
+          this.nextRunUpdates['bootDevices'] = true
           break
 
         case 'cpu':
@@ -436,10 +514,27 @@ class DetailsCard extends React.Component {
       vmUpdates['bootMenuEnabled'] = stateVm.get('bootMenuEnabled')
     }
 
+    if (this.trackUpdates['cloudInit']) {
+      vmUpdates['cloudInit'] = stateVm.get('cloudInit').toJS()
+    }
+
+    if (this.trackUpdates['bootDevices']) {
+      vmUpdates['os'] = {
+        bootDevices: stateVm.getIn(['os', 'bootDevices']).toJS(),
+      }
+    }
+
     if (this.trackUpdates['cpu']) {
       vmUpdates['cpu'] = {
         topology: stateVm.getIn(['cpu', 'topology']).toJS(),
       }
+    }
+
+    if (this.trackUpdates['os']) {
+      if (!vmUpdates['os']) {
+        vmUpdates['os'] = {}
+      }
+      vmUpdates['os'].type = stateVm.getIn(['os', 'type'])
     }
 
     if (this.trackUpdates['memory']) {
@@ -499,7 +594,7 @@ class DetailsCard extends React.Component {
   }
 
   render () {
-    const { hosts, clusters, dataCenters, templates } = this.props
+    const { hosts, clusters, dataCenters, templates, operatingSystems } = this.props
     const { vm, isEditing, correlatedMessages, clusterList, isoList, templateList } = this.state
 
     const idPrefix = 'vmdetail-details'
@@ -508,39 +603,67 @@ class DetailsCard extends React.Component {
       vm.get('canUserEditVm') &&
       vm.getIn(['pool', 'id']) === undefined
 
+    // Status
     const status = vm.get('status')
     const uptime = formatUptimeDuration({ start: vm.get('startTime') })
 
+    // Host Name
     const hostName = hosts && hosts.getIn([vm.get('hostId'), 'name'])
 
+    // IP Addresses
     const ip4Addresses = !vm.has('nics') ? [] : vm.get('nics').reduce((ipSet, nic) => [...ipSet, ...nic.get('ipv4')], [])
     const ip6Addresses = !vm.has('nics') ? [] : vm.get('nics').reduce((ipSet, nic) => [...ipSet, ...nic.get('ipv6')], [])
 
+    // FQDN
     const fqdn = vm.get('fqdn')
 
+    // Cluster
     const canChangeCluster = vmCanChangeCluster(status)
     const clusterId = vm.getIn(['cluster', 'id'])
-    const clusterName = (clusters && clusters.getIn([clusterId, 'name'])) || msg.notAvailable()
+    const cluster = clusters && clusters.get(clusterId)
+    const clusterName = (cluster && cluster.get('name')) || msg.notAvailable()
 
+    // Data Center
     const dataCenterId = (clusters && clusters.getIn([clusterId, 'dataCenterId']))
     const dataCenter = dataCenters && dataCenters.find(v => v.id === dataCenterId)
     const dataCenterName = (dataCenter && dataCenter.name) || msg.notAvailable()
 
+    // Template
     const templateId = vm.getIn(['template', 'id'])
     const templateName = (templates && templates.getIn([templateId, 'name'])) || msg.notAvailable()
 
+    // CD
     const canChangeCd = vmCanChangeCd(status)
     const cdImageId = vm.getIn(['cdrom', 'fileId'])
     const cdImage = isoList.find(iso => iso.file.id === cdImageId)
     const cdImageName = (cdImage && cdImage.file.name) || `[${msg.empty()}]`
 
-    const couldInitEnabled = vm.getIn(['cloudInit', 'enabled'])
+    // Cloud-Init
+    const cloudInitEnabled = vm.getIn(['cloudInit', 'enabled'])
+    const cloudInitHostName = vm.getIn(['cloudInit', 'hostName'])
+    const cloudInitSshAuthorizedKeys = vm.getIn(['cloudInit', 'sshAuthorizedKeys'])
 
+    // Boot Menu
     const bootMenuEnabled = vm.get('bootMenuEnabled')
 
+    // Optimized for
     const optimizedFor = rephraseVmType(vm.get('type'))
 
+    // VCPU
     const vCpuCount = vm.getIn(['cpu', 'vCPUs'])
+
+    // Boot devices
+    const allowedBootDevices = ['hd', 'network', 'cdrom']
+    const FIRST_DEVICE = 0
+    const SECOND_DEVICE = 1
+    const bootDevices = [
+      vm.getIn(['os', 'bootDevices', FIRST_DEVICE], DEFAULT_BOOT_DEVICES.get(FIRST_DEVICE)),
+      vm.getIn(['os', 'bootDevices', SECOND_DEVICE], DEFAULT_BOOT_DEVICES.get(SECOND_DEVICE)),
+    ]
+
+    // Operation System
+    const osType = vm.getIn(['os', 'type'])
+    const osId = operatingSystems.find(os => os.get('name') === osType).get('id')
 
     const { unit: memoryUnit, value: memorySize } = convertValue('B', vm.getIn(['memory', 'total']))
 
@@ -569,6 +692,7 @@ class DetailsCard extends React.Component {
       >
         {({ isEditing }) =>
           <React.Fragment>
+            {/* Regular options */}
             <Grid className={style['details-container']}>
               <Row>
                 <Col className={style['fields-column']}>
@@ -665,25 +789,15 @@ class DetailsCard extends React.Component {
                     </FieldRow>
                     <FieldRow label={msg.cloudInit()} id={`${idPrefix}-cloud-init`}>
                       <div className={style['cloud-init-field']}>
-                        {couldInitEnabled ? <Icon type='pf' name='on' /> : <Icon type='pf' name='off' />}
-                        {enumMsg('Switch', couldInitEnabled ? 'on' : 'off')}
+                        {cloudInitEnabled ? <Icon type='pf' name='on' /> : <Icon type='pf' name='off' />}
+                        {enumMsg('Switch', cloudInitEnabled ? 'on' : 'off')}
                       </div>
                     </FieldRow>
-                    <FieldRow label={msg.bootMenu()} id={`${idPrefix}-boot-menu`}>
-                      { isEditing &&
-                        <Switch
-                          id={`${idPrefix}-boot-menu-edit`}
-                          bsSize='mini'
-                          value={bootMenuEnabled}
-                          onChange={(e, state) => { this.handleChange('bootMenuEnabled', state) }}
-                        />
-                      }
-                      { !isEditing &&
-                        <div className={style['boot-menu-field']}>
-                          {bootMenuEnabled ? <Icon type='pf' name='on' /> : <Icon type='pf' name='off' />}
-                          {enumMsg('Switch', bootMenuEnabled ? 'on' : 'off')}
-                        </div>
-                      }
+                    <FieldRow label={msg.bootMenu()} id={`${idPrefix}-boot-menu-readonly`}>
+                      <div className={style['boot-menu-field']}>
+                        {bootMenuEnabled ? <Icon type='pf' name='on' /> : <Icon type='pf' name='off' />}
+                        {enumMsg('Switch', bootMenuEnabled ? 'on' : 'off')}
+                      </div>
                     </FieldRow>
                     <FieldRow label={msg.console()} id={`${idPrefix}-console`}><ConsoleList idPrefix={`${idPrefix}-console`} vm={vm} /></FieldRow>
 
@@ -724,6 +838,106 @@ class DetailsCard extends React.Component {
                 </Col>
               </Row>
             </Grid>
+            {/* Advanced options */}
+            { isEditing && <ExpandCollapseSection id={`${idPrefix}-advanced-options`} sectionHeader={msg.advancedOptions()}>
+              <Grid className={style['details-container']}>
+                <Row>
+                  {/* First column */}
+                  <Col className={style['fields-column']}>
+                    <Grid>
+                      <FieldRow label={msg.cloudInit()} id={`${idPrefix}-cloud-init`}>
+                        <Switch
+                          id={`${idPrefix}-cloud-init-edit`}
+                          bsSize='mini'
+                          handleWidth={30}
+                          value={cloudInitEnabled}
+                          onChange={(e, state) => { this.handleChange('cloudInitEnabled', state) }}
+                        />
+                      </FieldRow>
+                      { cloudInitEnabled && <div style={{ marginTop: '15px' }}>
+                        <FormGroup controlId={`${idPrefix}-cloud-init-hostname`}>
+                          <ControlLabel>
+                            {msg.hostName()}
+                          </ControlLabel>
+                          <FormControl
+                            type='text'
+                            value={cloudInitHostName}
+                            onChange={e => this.handleChange('cloudInitHostName', e.target.value)}
+                          />
+                        </FormGroup>
+                        <FormGroup controlId={`${idPrefix}-cloud-init-ssh`}>
+                          <ControlLabel>
+                            {msg.sshAuthorizedKeys()}
+                          </ControlLabel>
+                          <FormControl
+                            componentClass='textarea'
+                            value={cloudInitSshAuthorizedKeys}
+                            onChange={e => this.handleChange('cloudInitSshAuthorizedKeys', e.target.value)}
+                          />
+                        </FormGroup>
+                      </div> }
+                    </Grid>
+                  </Col>
+                  {/* Second column */}
+                  <Col className={style['fields-column']}>
+                    <Grid>
+                      <FieldRow label={msg.operatingSystem()} id={`${idPrefix}-os`}>
+                        <SelectBox
+                          id={`${idPrefix}-os-edit`}
+                          items={this.state.osList}
+                          selected={osId}
+                          onChange={(selectedId) => { this.handleChange('os', selectedId) }}
+                        />
+                      </FieldRow>
+                      <FieldRow label={msg.bootMenu()} id={`${idPrefix}-boot-menu`}>
+                        <Switch
+                          id={`${idPrefix}-boot-menu-edit`}
+                          handleWidth={30}
+                          bsSize='mini'
+                          value={bootMenuEnabled}
+                          onChange={(e, state) => { this.handleChange('bootMenuEnabled', state) }}
+                        />
+                      </FieldRow>
+                      <Row className={style['field-row']}>
+                        <Col cols={12} className={style['col-label']}>
+                          <div>
+                            <span>{msg.bootOrder()}</span>
+                            <FieldLevelHelp content={msg.bootSequenceTooltip()} inline />
+                          </div>
+                        </Col>
+                      </Row>
+                      <FieldRow label={msg.firstDevice()} id={`${idPrefix}-boot-order-first-device`}>
+                        <SelectBox
+                          id={`${idPrefix}-boot-order-first-device-edit`}
+                          items={allowedBootDevices.map(item => ({
+                            id: item,
+                            value: msg[`${item}Boot`](),
+                          }))}
+                          selected={bootDevices[FIRST_DEVICE]}
+                          onChange={(selectedId) => { this.handleChange('bootDevices', selectedId, { device: FIRST_DEVICE }) }}
+                        />
+                      </FieldRow>
+                      <FieldRow label={msg.secondDevice()} id={`${idPrefix}-boot-order-second-device`}>
+                        <SelectBox
+                          id={`${idPrefix}-boot-order-second-device-edit`}
+                          items={[
+                            { id: null, value: msg.noneItem() },
+                            ...allowedBootDevices
+                              .filter(item => item !== bootDevices[FIRST_DEVICE])
+                              .map(item => ({
+                                id: item,
+                                value: msg[`${item}Boot`](),
+                              })),
+                          ]}
+                          selected={bootDevices[SECOND_DEVICE]}
+                          onChange={(selectedId) => { this.handleChange('bootDevices', selectedId, { device: SECOND_DEVICE }) }}
+                        />
+                      </FieldRow>
+                    </Grid>
+                  </Col>
+                </Row>
+              </Grid>
+            </ExpandCollapseSection> }
 
             { correlatedMessages && correlatedMessages.size > 0 &&
               correlatedMessages.map((message, key) =>
