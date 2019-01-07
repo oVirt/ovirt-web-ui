@@ -127,6 +127,7 @@ export const messages: { [messageId: string]: MessageType } = {
   disksCardEditTooltip: 'Edit Disks for {vmName}',
   diskSizeHasToBeAPositiveInteger: 'Disk size has to be a positive integer.',
   displayAll: 'Display all',
+  updateCloudInit: 'Do you want update Cloud-init hostname on new VM name?',
   edit: 'Edit',
   editDisk: 'Edit Disk',
   editNic: 'Edit NIC',

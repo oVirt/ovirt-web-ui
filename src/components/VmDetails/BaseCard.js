@@ -91,6 +91,7 @@ class BaseCard extends React.Component {
       editTooltip,
       idPrefix = '',
       className = '',
+      disableSaveButton = false,
     } = this.props
     const editing = editMode === undefined ? this.state.edit : editMode
     const hasHeading = !!title
@@ -121,7 +122,9 @@ class BaseCard extends React.Component {
 
         {editing && (
           <CardFooter className={style['base-card-footer']}>
-            <Button bsStyle='primary' onClick={this.clickSave} id={`${idPrefix}-button-save`}><Icon type='fa' name='check' /></Button>
+            <Button disabled={disableSaveButton} bsStyle='primary' onClick={this.clickSave} id={`${idPrefix}-button-save`}>
+              <Icon type='fa' name='check' />
+            </Button>
             <Button onClick={this.clickCancel} id={`${idPrefix}-button-cancel`}><Icon type='pf' name='close' /></Button>
           </CardFooter>
         )}
@@ -141,6 +144,7 @@ BaseCard.propTypes = {
 
   editMode: PropTypes.bool,
   editable: PropTypes.bool,
+  disableSaveButton: PropTypes.bool,
   editTooltip: PropTypes.string,
 
   onStartEdit: PropTypes.func,
