@@ -601,6 +601,9 @@ class DetailsCard extends React.Component {
       vm.get('canUserEditVm') &&
       vm.getIn(['pool', 'id']) === undefined
 
+    const status = vm.get('status')
+
+    // Host Name
     const hostName = hosts && hosts.getIn([vm.get('hostId'), 'name'])
 
     // IP Addresses
