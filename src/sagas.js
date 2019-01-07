@@ -4,6 +4,7 @@ import Selectors from './selectors'
 import AppConfiguration from './config'
 
 import vmDisksSagas from './saga/disks'
+import storageDomainSagas, { fetchIsoFiles } from './saga/storageDomains'
 import vmSnapshotsSagas from './components/VmDetails/cards/SnapshotsCard/sagas'
 import optionsDialogSagas from './components/OptionsDialog/sagas'
 
@@ -40,8 +41,6 @@ import {
   setHosts,
   setTemplates,
   setOperatingSystems,
-  setStorageDomains,
-  setDataCenters,
   setUserGroups,
   addNetworksToVnicProfiles,
   setVnicProfiles,
@@ -58,9 +57,7 @@ import {
   refresh,
   getVmsByCount,
   getPoolsByCount,
-  addStorageDomains,
-  setStorageDomainsFiles,
-  getIsoStorageDomains,
+  getIsoFiles,
   getConsoleOptions as actionGetConsoleOptions,
   setVmCdRom,
   setVmNics,
@@ -110,12 +107,10 @@ import {
   GET_ALL_CLUSTERS,
   GET_ALL_HOSTS,
   GET_ALL_OS,
-  GET_ALL_STORAGE_DOMAINS,
   GET_ALL_TEMPLATES,
   GET_ALL_VNIC_PROFILES,
   GET_BY_PAGE,
   GET_CONSOLE_OPTIONS,
-  GET_ISO_STORAGE_DOMAINS,
   GET_POOLS_BY_COUNT,
   GET_POOLS_BY_PAGE,
   GET_RDP_VM,
@@ -251,16 +246,25 @@ export function* refreshMainPage ({ shallowFetch, page }) {
   yield put(updateVmsPoolsCount())
 }
 
-function* refreshDetailPage ({ id }) {
+function* refreshDetailPage ({ id, onNavigation, onSchedule }) {
   yield selectVmDetail(actionSelectVmDetail({ vmId: id }))
   yield getConsoleOptions(actionGetConsoleOptions({ vmId: id }))
+
+  // Load ISO images on manual refresh click only
+  if (!onNavigation && !onSchedule) {
+    yield fetchIsoFiles(getIsoFiles())
+  }
 }
 
-function* refreshDialogPage ({ id }) {
+function* refreshDialogPage ({ id, onNavigation, onSchedule }) {
   if (id) {
     yield selectVmDetail(actionSelectVmDetail({ vmId: id }))
   }
-  yield fetchISOStorages(getIsoStorageDomains())
+
+  // Load ISO images on manual refresh click only
+  if (!onNavigation && !onSchedule) {
+    yield fetchIsoFiles(getIsoFiles())
+  }
 }
 
 function* refreshPoolPage ({ id }) {
@@ -288,10 +292,13 @@ function* refreshData (action) {
   console.log('refreshData(): finished')
 }
 
+/**
+ * Change the current page type (based on `routes.js`) at the time of navigation to the page.
+ */
 function* changePage (action) {
   yield put(setCurrentPage(action.payload))
   yield refreshData(refresh({
-    quiet: true,
+    onNavigation: true,
     shallowFetch: true,
     page: Selectors.getCurrentFetchPage(),
   }))
@@ -812,55 +819,6 @@ function* fetchAllTemplates (action) {
   }
 }
 
-/**
- * Storage domain not attached to any data center won't be fetched.
- */
-function* fetchAllAttachedStorageDomains (action) {
-  Object.assign(action, { payload: { additional: [ 'storage_domains' ] } })
-  const dataCentersApi = yield callExternalAction('getAllDataCenters', Api.getAllDataCenters, action)
-  if (!dataCentersApi || !dataCentersApi.data_center) {
-    return
-  }
-
-  // getting data centers is necessary to get storage domains with statuses
-  // so why not to store them when we have them fresh
-  const dataCentersInternal = dataCentersApi.data_center.map(dataCenter => Api.dataCenterToInternal({ dataCenter }))
-  yield put(setDataCenters(dataCentersInternal))
-
-  // collect and convert all from dataCentersApi.data_center[*].storage_domains.storage_domain[*]
-  const storageDomainsInternal = []
-  for (const dataCenter of dataCentersApi.data_center) {
-    const storageDomains = dataCenter.storage_domains && dataCenter.storage_domains.storage_domain
-    if (storageDomains) {
-      storageDomainsInternal.push(
-        ...storageDomains.map(storageDomain => Api.storageDomainToInternal({ storageDomain })))
-    }
-  }
-  const storageDomainsMerged = mergeStorageDomains(storageDomainsInternal)
-  yield put(setStorageDomains(storageDomainsMerged))
-}
-
-/**
- * @param {Array<StorageDomainInternal>} storageDomainsInternal list of all storage domains.
- *                                       It may contain single storage multiple times with status for different data
- *                                       center.
- * @return {Array<StorageDomainInternal>} List of storage domains with merged statuses. Each storage domain from input
- *                                        is listed exactly once.
- */
-function mergeStorageDomains (storageDomainsInternal) {
-  const idToStorageDomain = storageDomainsInternal.reduce((accum, storageDomain) => {
-    const existingStorageDomain = accum[storageDomain.id]
-    if (!existingStorageDomain) {
-      accum[storageDomain.id] = storageDomain
-      return accum
-    }
-    Object.assign(existingStorageDomain.statusPerDataCenter, storageDomain.statusPerDataCenter)
-    return accum
-  }, {})
-  const mergedStorageDomains = Object.values(idToStorageDomain)
-  return mergedStorageDomains
-}
-
 function* fetchPermits ({ entityType, id }) {
   const permissions = yield callExternalAction(`get${entityType}Permissions`, Api[`get${entityType}Permissions`], { payload: { id } })
   return getUserPermits(Api.permissionsToInternal({ permissions: permissions.permission }))
@@ -968,29 +926,6 @@ function* fetchVmSnapshotNics ({ vmId, snapshotId }) {
   return nicsInternal
 }
 
-function* fetchISOStorages (action) {
-  // If https://bugzilla.redhat.com/show_bug.cgi?id=1436403 was implemented,
-  // this could fetch just ISO storage domain types
-  const storages = yield callExternalAction('getStorages', Api.getStorages, action)
-  if (storages && storages['storage_domain']) {
-    const isoStorageDomains = storages.storage_domain
-      .filter(storageDomain => storageDomain.type === 'iso')
-      .map(storageDomain => Api.storageDomainToInternal({ storageDomain }))
-    yield put(addStorageDomains(isoStorageDomains))
-
-    const isoFilesFetches = isoStorageDomains.map(isoStorageDomain => fetchAllFilesForISO(isoStorageDomain.id))
-    yield all(isoFilesFetches)
-  }
-}
-
-function* fetchAllFilesForISO (storageDomainId) {
-  const files = yield callExternalAction('getStorageFiles', Api.getStorageFiles, { payload: { storageId: storageDomainId } })
-  if (files && files['file']) {
-    const filesInternal = files.file.map(file => Api.fileToInternal({ file }))
-    yield put(setStorageDomainsFiles(storageDomainId, filesInternal))
-  }
-}
-
 function* fetchUSBFilter (action) {
   const usbFilter = yield callExternalAction('getUSBFilter', Api.getUSBFilter, action)
   if (usbFilter) {
@@ -1071,7 +1006,7 @@ function* schedulerWithFixedDelay (delayInSeconds = AppConfiguration.schedulerFi
       const oVirtVersion = Selectors.getOvirtVersion()
       if (oVirtVersion.get('passed')) {
         yield refreshData(refresh({
-          quiet: true,
+          onSchedule: true,
           shallowFetch: true,
           page: Selectors.getCurrentFetchPage(),
         }))
@@ -1087,6 +1022,8 @@ export function* rootSaga () {
     takeEvery(LOGIN, login),
     takeEvery(LOGOUT, logout),
     takeLatest(CHECK_TOKEN_EXPIRED, doCheckTokenExpired),
+    takeEvery(GET_USB_FILTER, fetchUSBFilter),
+    takeEvery(DELAYED_REMOVE_ACTIVE_REQUEST, delayedRemoveActiveRequest),
 
     takeEvery(START_SCHEDULER_FIXED_DELAY, startSchedulerWithFixedDelay),
     // STOP_SCHEDULER_FIXED_DELAY is taken by `schedulerWithFixedDelay()`
@@ -1104,11 +1041,12 @@ export function* rootSaga () {
     takeEvery(RESTART_VM, restartVm),
     takeEvery(START_VM, startVm),
     takeEvery(SUSPEND_VM, suspendVm),
-    takeEvery(START_POOL, startPool),
     takeEvery(CREATE_VM, createVm),
     takeEvery(EDIT_VM, editVm),
     takeEvery(REMOVE_VM, removeVm),
     takeEvery(CHANGE_VM_CDROM, changeVmCdRom),
+
+    takeEvery(START_POOL, startPool),
 
     takeEvery(CHECK_CONSOLE_IN_USE, getConsoleInUse),
     takeEvery(DOWNLOAD_CONSOLE_VM, downloadVmConsole),
@@ -1116,12 +1054,10 @@ export function* rootSaga () {
 
     takeLatest(GET_ALL_CLUSTERS, fetchAllClusters),
     takeLatest(GET_ALL_TEMPLATES, fetchAllTemplates),
-    takeLatest(GET_ALL_STORAGE_DOMAINS, fetchAllAttachedStorageDomains),
     takeLatest(GET_ALL_OS, fetchAllOS),
     takeLatest(GET_ALL_HOSTS, fetchAllHosts),
     takeLatest(GET_ALL_VNIC_PROFILES, fetchAllVnicProfiles),
     takeLatest(GET_USER_GROUPS, fetchUserGroups),
-    throttle(100, GET_ISO_STORAGE_DOMAINS, fetchISOStorages),
 
     takeEvery(SELECT_VM_DETAIL, selectVmDetail),
     takeEvery(ADD_VM_NIC, addVmNic),
@@ -1131,11 +1067,10 @@ export function* rootSaga () {
     takeEvery(SAVE_CONSOLE_OPTIONS, saveConsoleOptions),
 
     takeEvery(SELECT_POOL_DETAIL, selectPoolDetail),
-    takeEvery(GET_USB_FILTER, fetchUSBFilter),
-    takeEvery(DELAYED_REMOVE_ACTIVE_REQUEST, delayedRemoveActiveRequest),
 
     // Sagas from Components
     ...vmDisksSagas,
+    ...storageDomainSagas,
     ...vmSnapshotsSagas,
     ...optionsDialogSagas,
   ])

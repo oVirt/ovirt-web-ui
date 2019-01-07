@@ -509,12 +509,10 @@ class VmDialog extends React.Component {
     const { icons, templates, clusters, storages, previousPath } = this.props
     const { bootDevices } = this.state
     const vm = this.props.vm
-    const isoStorages = storages.filter(storageDomain => storageDomain.get('type') === 'iso')
     const idPrefix = `vmdialog-${vm ? vm.get('name') : '_new'}`
 
-    let files = [{ id: '', value: '[Eject]' }]
-
-    isoStorages.toList().forEach(storageDomain => {
+    const files = [{ id: '', value: '[Eject]' }]
+    storages.toList().forEach(storageDomain => {
       const fileList = storageDomain.get('files')
       if (fileList) {
         files.push(...fileList.map(item => (

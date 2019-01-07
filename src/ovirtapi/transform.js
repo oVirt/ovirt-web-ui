@@ -469,6 +469,9 @@ const StorageDomain = {
       name: storageDomain.name,
       type: storageDomain.type,
 
+      availableSpace: convertInt(storageDomain.available),
+      usedSpace: convertInt(storageDomain.used),
+
       /*
        * status and data_center properties are only returned when storage domain accessed through
        * "/datacenters/{id}/storagedomains" not when accessed through "/storagedomains"

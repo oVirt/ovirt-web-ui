@@ -1,9 +1,8 @@
 // @flow
 
 import {
-  ADD_STORAGE_DOMAINS,
   GET_ALL_STORAGE_DOMAINS,
-  GET_ISO_STORAGE_DOMAINS,
+  GET_ISO_FILES,
   SET_STORAGE_DOMAIN_FILES,
   SET_STORAGE_DOMAINS,
 } from '_/constants'
@@ -14,9 +13,9 @@ export function getAllStorageDomains (): Object {
   }
 }
 
-export function getIsoStorageDomains (): Object {
+export function getIsoFiles (): Object {
   return {
-    type: GET_ISO_STORAGE_DOMAINS,
+    type: GET_ISO_FILES,
   }
 }
 
@@ -24,13 +23,6 @@ export function setStorageDomains (storageDomains: Array<Object>): Object {
   return {
     type: SET_STORAGE_DOMAINS,
     payload: { storageDomains },
-  }
-}
-
-export function addStorageDomains (storageDomains: Array<Object>): Object {
-  return {
-    type: ADD_STORAGE_DOMAINS,
-    payload: storageDomains,
   }
 }
 
