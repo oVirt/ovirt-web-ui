@@ -261,9 +261,19 @@ const VmStatistics = {
       memory: {},
       cpu: {},
       network: {},
+      elapsedUptime: {
+        datum: 0,
+        unit: 'seconds',
+        description: 'Elapsed VM runtime (default to 0)',
+      },
     }
 
     for (const stat: ApiVmStatisticType of statistics) {
+      if (stat.name === 'elapsed.time') {
+        base.elapsedUptime.datum = stat.values.value[0].datum
+        base.elapsedUptime.description = stat.description
+      }
+
       if (stat.kind !== 'gauge') continue
 
       // no values -> undefined, 1 value -> value.datum, >1 values -> [...values.datum]

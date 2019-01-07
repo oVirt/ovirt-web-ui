@@ -25,28 +25,6 @@
 }
 
 /*
- * For the status field
- */
-.vm-status {
-  margin-bottom: 0;
-}
-
-.vm-status .vm-status-icon {
-  margin: 2px;
-}
-
-.vm-status .vm-status-text {
-  margin-left: 5px;
-}
-
-.vm-uptime {
-  color: rgba(0, 0, 0, 0.65);
-  font-style: italic;
-
-  padding-left: 15px;
-}
-
-/*
  * For the console field
  */
 .console-list-active {
