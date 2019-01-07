@@ -178,3 +178,36 @@ a.disabled {
 .drawer-pf.drawer-alt-pf.drawer-pf-notifications {
   z-index: 101;
 }
+
+.unsupported-browser-container {
+  flex-grow: 1;
+  background: #131313;
+  color: white;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.unsupported-browser-box {
+  text-align: center;
+}
+
+.unsupported-browser-box h2 {
+  margin-bottom: 80px;
+  font-weight: bold;
+}
+
+.browser-suggestions {
+  background: #202020;
+  padding-bottom: 30px;
+  padding-top: 30px;
+}
+
+.browser-suggestions h4 {
+  font-weight: bold;
+}
+
+.browser-suggestions ul {
+  display: inline-block;
+  text-align: left;
+}

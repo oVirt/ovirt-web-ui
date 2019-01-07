@@ -33,11 +33,35 @@ const NoLogin = () => {
   )
 }
 
+const UnsupportedBrowser = () => (
+  <div className='unsupported-browser-container'>
+    <div className='unsupported-browser-box'>
+      <h2>
+        {msg.ieNotSupported()}
+        <br />
+        {msg.useBrowserBelow()}
+      </h2>
+      <div className='browser-suggestions'>
+        <h4>{msg.freeBrowsers()}</h4>
+        <ul>
+          <li><a href='https://www.mozilla.org/firefox/new/'>Mozilla Firefox</a></li>
+          <li><a href='https://www.microsoft.com/en-us/windows/microsoft-edge'>Microsoft Edge</a></li>
+          <li><a href='https://www.google.com/chrome/'>Google Chrome</a></li>
+          <li><a href='https://www.apple.com/safari/'>Apple Safari</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+)
+
 /**
  * Main App component. Wrap the main react-router components together with
  * the various dialogs and error messages that may be needed.
  */
 const App = ({ history, config, appReady }) => {
+  if ((navigator.userAgent.indexOf('MSIE') !== -1) || (!!document.documentMode === true)) {
+    return <UnsupportedBrowser />
+  }
   if (!config.get('loginToken')) { // login is missing
     return (
       <Grid fluid>
