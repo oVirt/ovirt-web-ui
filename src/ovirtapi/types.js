@@ -32,7 +32,8 @@ export type StatisticValueType = {
 export type VmStatisticsType = {
   memory: { [memorySubKey: string]: StatisticValueType },
   cpu: { [cpuSubKey: string]: StatisticValueType },
-  network: { [networkSubKey: string]: StatisticValueType }
+  network: { [networkSubKey: string]: StatisticValueType },
+  elapsedUptime: StatisticValueType
 }
 
 export type ApiTemplateType = Object
