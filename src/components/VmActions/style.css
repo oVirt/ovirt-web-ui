@@ -17,19 +17,20 @@
 }
 
 .action-link {
-	color: #363636;
+    color: #363636;
 }
 
 .link {
-	height: 27px;
+    height: 27px;
 }
 
 .disabled-button {
-	line-height: 21px;
+    line-height: 21px;
+    margin-left: 5px;
 }
 
 .full-button {
-	display: inline-block;
+    display: inline-block;
     text-align: center;
     margin-left: 5px;
 }
@@ -39,7 +40,7 @@
 }
 
 .button-spacer {
-    width: 10px;
+    width: 5px; /* match .full-button left margin */
     display: inline-block;
 }
 
