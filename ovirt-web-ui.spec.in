@@ -1,7 +1,4 @@
 # Used for rpm-packaging of pre-bundled application with already resolved JS dependencies
-%global _ovirtwebuidir %{_datarootdir}/ovirt-web-ui
-%global _ovirt_engine_conf %{_datarootdir}/ovirt-engine/services/ovirt-engine/ovirt-engine.conf
-%global _ovirt_engine_ear_application_xml %{_datarootdir}/ovirt-engine/engine.ear/META-INF/application.xml
 %global product oVirt
 
 %global use_rhev %( test -z @RHEV@ && echo 1 || echo 0)
@@ -23,10 +20,10 @@ BuildArch: noarch
 BuildRequires: ovirt-engine-nodejs >= 8.0.0
 BuildRequires: ovirt-engine-yarn >= 1.7.0
 
-BuildRequires: ovirt-engine-nodejs-modules >= 1.5.7
+BuildRequires: ovirt-engine-nodejs-modules >= 1.8.2
 
 %description
-This package provides new VM Portal for %{product}, so far as technical preview.
+This package provides the VM Portal for %{product}.
 
 %prep
 # Use the ovirt-engine nodejs installation
@@ -51,7 +48,7 @@ make install DESTDIR=%{buildroot}
 %files
 %doc README.md
 %license LICENSE
-%{_ovirtwebuidir}
+%{_datarootdir}/ovirt-web-ui
 %{_datarootdir}/ovirt-engine/ovirt-web-ui.war
 %{_sysconfdir}/ovirt-engine/engine.conf.d/50-ovirt-web-ui.conf
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
@@ -65,7 +62,7 @@ make install DESTDIR=%{buildroot}
 - Fix use of VmNics in VmDetail such that Nic operations work again [BZ1631149](https://bugzilla.redhat.com/show_bug.cgi?id=1631149)
 - implement ErrorBoundary to prevent white screen crash [#729](https://github.com/oVirt/ovirt-web-ui/issues/729)
 
-* Wed Sep 5 2018 Greg Sheremeta <gshereme@redhat.com> - 1.4.3-1
+* Tue Sep 5 2018 Greg Sheremeta <gshereme@redhat.com> - 1.4.3-1
   Fixed issues:
 - ux-redesign: make old Normal View the default when clicking a VM [#751](https://github.com/oVirt/ovirt-web-ui/issues/751)
 
