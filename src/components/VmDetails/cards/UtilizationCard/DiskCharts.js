@@ -9,20 +9,52 @@ import {
   UtilizationCardDetailsDesc,
   UtilizationCardDetailsLine1,
   UtilizationCardDetailsLine2,
+  UtilizationBar,
   DonutChart,
 } from 'patternfly-react'
 
-import { round } from '_/utils'
+import { round, convertValueMap } from '_/utils'
 import { donutMemoryTooltipContents } from '_/components/utils'
-import { userFormatOfBytes } from '_/helpers'
+import { userFormatOfBytes, isWindows } from '_/helpers'
 
 import style from './style.css'
 
 import NoLiveData from './NoLiveData'
+import NoHistoricData from './NoHistoricData'
 
 const EmptyBlock = () => (
   <div className={style['no-history-chart']} />
 )
+const DiskBar = ({ path, total, used, isVmWindows }) => {
+  const { unit, value } =
+    convertValueMap(
+      'B',
+      {
+        total: total,
+        used: used,
+      })
+  const thresholdError = 90
+  const thresholdWarning = 70
+  const usedInPercent = round(used / total * 100, 0)
+  return <div className={style['disk-fs-box']}>
+    <div className={style['disk-fs-name']}>{ isVmWindows ? path.toUpperCase() : path }</div>
+    <div className={style['disk-fs-bar']}>
+      <UtilizationBar
+        now={usedInPercent}
+        thresholdWarning={thresholdWarning}
+        thresholdError={thresholdError}
+      />
+      <div className={style['disk-fs-used']}><strong>{round(value.used, 0)} of {round(value.total, 0)} {unit}</strong> Used</div>
+    </div>
+  </div>
+}
+
+DiskBar.propTypes = {
+  path: PropTypes.string.isRequired,
+  total: PropTypes.number.isRequired,
+  used: PropTypes.number.isRequired,
+  isVmWindows: PropTypes.bool,
+}
 
 /*
  * Disks, but intended to be in terms of guest agent reported data (file system viewpoint),
@@ -31,8 +63,8 @@ const EmptyBlock = () => (
  * NOTE: File system usage data from the guest agent is not currently (Aug, 2018) available
  *       via REST. Storage allocation is being used instead.
  */
-const DiskCharts = ({ vm, isRunning, id, ...props }) => {
-  const hasDisks = vm.get('disks').size > 0
+const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
+  const diskDetails = diskStats && diskStats['usage'] && diskStats['usage'].datum
 
   let actualSize = 0
   let provisionedSize = 0
@@ -51,47 +83,66 @@ const DiskCharts = ({ vm, isRunning, id, ...props }) => {
   const availableFormated = userFormatOfBytes(provisionedSize - actualSize)
   const totalFormated = userFormatOfBytes(provisionedSize)
 
+  const isVmWindows = isWindows(vm.getIn(['os', 'type']))
+
   return (
     <UtilizationCard className={style['chart-card']} id={id}>
-      <CardTitle>Disk <span style={{ fontSize: '55%', verticalAlign: 'super' }}>(storage allocations)</span></CardTitle>
+      <CardTitle>Disk</CardTitle>
       <CardBody>
-        { !hasDisks &&
-          <NoLiveData id={`${id}-no-live-data`} message='This VM has no attached disks.' />
+        { vm.get('disks').size === 0 &&
+          <NoLiveData id={`${id}-no-live-data`} message='It looks like no disk is attached to VM.' />
         }
-        { hasDisks &&
-        <React.Fragment>
-          <UtilizationCardDetails>
-            <UtilizationCardDetailsCount id={`${id}-available`}>
-              {round(availableFormated.number, 1)} {availableFormated.suffix !== totalFormated.suffix && availableFormated.suffix}
-            </UtilizationCardDetailsCount>
-            <UtilizationCardDetailsDesc>
-              <UtilizationCardDetailsLine1>Unallocated</UtilizationCardDetailsLine1>
-              <UtilizationCardDetailsLine2 id={`${id}-total`}>of {round(totalFormated.number, 1)} {totalFormated.suffix} Provisioned</UtilizationCardDetailsLine2>
-            </UtilizationCardDetailsDesc>
-          </UtilizationCardDetails>
-
-          <DonutChart
-            id={`${id}-donut-chart`}
-            data={{
-              columns: [
-                [`allocated`, actualSize],
-                [`unallocated`, provisionedSize - actualSize],
-              ],
-              order: null,
-            }}
-            title={{
-              primary: `${round(usedFormated.number, 0)}`,
-              secondary: `${usedFormated.suffix} Allocated`,
-            }}
-            tooltip={{
-              show: true,
-              contents: donutMemoryTooltipContents,
-            }}
-          />
-
-          {/* Disks don't have historic data but stub the space so the card stretches like the others */}
-          <EmptyBlock />
-        </React.Fragment>
+        { vm.get('disks').size > 0 &&
+          <React.Fragment>
+            <UtilizationCardDetails>
+              <UtilizationCardDetailsCount id={`${id}-available`}>
+                {round(availableFormated.number, 1)} {availableFormated.suffix !== totalFormated.suffix && availableFormated.suffix}
+              </UtilizationCardDetailsCount>
+              <UtilizationCardDetailsDesc>
+                <UtilizationCardDetailsLine1>Unallocated</UtilizationCardDetailsLine1>
+                <UtilizationCardDetailsLine2 id={`${id}-total`}>of {round(totalFormated.number, 1)} {totalFormated.suffix} Provisioned</UtilizationCardDetailsLine2>
+              </UtilizationCardDetailsDesc>
+            </UtilizationCardDetails>
+            { !diskDetails &&
+              <DonutChart
+                id={`${id}-donut-chart`}
+                data={{
+                  columns: [
+                    [`allocated`, actualSize],
+                    [`unallocated`, provisionedSize - actualSize],
+                  ],
+                  order: null,
+                }}
+                title={{
+                  primary: `${round(usedFormated.number, 0)}`,
+                  secondary: `${usedFormated.suffix} Allocated`,
+                }}
+                tooltip={{
+                  show: true,
+                  contents: donutMemoryTooltipContents,
+                }}
+              />
+            }
+            { isRunning && diskDetails &&
+              <div className={style['disk-fs-list']}>
+                {
+                  diskDetails.map((disk) =>
+                    <DiskBar key={disk.path} path={disk.path} total={disk.total} used={disk.used} isVmWindows={isVmWindows} />
+                  )
+                }
+              </div>
+            }
+            { isRunning && !diskDetails &&
+              <NoHistoricData message='It looks like no guest agent is configured on the VM.' />
+            }
+            {/*
+                Disks don't have historic data but stub the space so the card stretches like the others,
+                thus if message above doesn't show, need to insert EmptyBlock
+              */}
+            { !(isRunning && !diskDetails) &&
+              <EmptyBlock />
+            }
+          </React.Fragment>
         }
       </CardBody>
     </UtilizationCard>
@@ -100,6 +151,7 @@ const DiskCharts = ({ vm, isRunning, id, ...props }) => {
 DiskCharts.propTypes = {
   id: PropTypes.string.isRequired,
   vm: PropTypes.object.isRequired,
+  diskStats: PropTypes.object,
   isRunning: PropTypes.bool,
 }
 
