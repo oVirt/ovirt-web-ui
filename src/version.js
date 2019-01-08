@@ -1,7 +1,7 @@
 const Product = {
   name: 'oVirt Basic Portal',
-  version: '1.4.5',
-  release: '1',
+  version: '1.4.6',
+  release: '0',
 
   ovirtApiVersionRequired: {
     major: 4,
