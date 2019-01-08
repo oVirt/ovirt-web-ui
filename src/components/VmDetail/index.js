@@ -25,7 +25,6 @@ import VmConsoles from './VmConsoles'
 import VmDisks from '../VmDisks'
 import VmIcon from '../VmIcon'
 import VmNics from '../VmNics'
-import VmsListNavigation from '../VmsListNavigation'
 import VmStatus from './VmStatus'
 import { NextRunLabel } from './labels'
 
@@ -163,7 +162,6 @@ class VmDetail extends Component {
 
     return (
       <div className={`detail-container ${style['main-container']}`} data-thisisvmdetail>
-        <VmsListNavigation selectedVm={vm} expanded={this.state.vmsNavigationExpanded} toggleExpansion={this.toggleVmsNavExpansion} />
         <div className={style['vm-detail-main']} container='true'>
           <div className={this.state.vmsNavigationExpanded ? style['vms-nav-expanded'] : style['vms-nav-collapsed']}>
             <DetailContainer>
