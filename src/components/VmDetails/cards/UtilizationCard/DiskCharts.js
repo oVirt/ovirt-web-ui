@@ -44,8 +44,8 @@ const DiskBar = ({ path, total, used, isVmWindows }) => {
         thresholdWarning={thresholdWarning}
         thresholdError={thresholdError}
       />
+      <div className={style['disk-fs-used']}><strong>{round(value.used, 0)} of {round(value.total, 0)} {unit}</strong> Used</div>
     </div>
-    <div className={style['disk-fs-used']}><strong>{round(value.used, 0)} of {round(value.total, 0)} {unit}</strong> Used</div>
   </div>
 }
 

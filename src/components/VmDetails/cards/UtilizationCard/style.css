@@ -86,6 +86,15 @@
   min-width: 100px;
 }
 
+.disk-fs-box .disk-fs-bar :global(.progress) {
+  margin-bottom: 5px;
+}
+
 .disk-fs-box .disk-fs-used {
-  margin-left: 10px;
+  margin-bottom: 10px;
+}
+
+.disk-fs-name {
+  word-wrap: break-word;
+  max-width: 80px;
 }
