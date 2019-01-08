@@ -54,6 +54,10 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Tue Jan 8 2019 Greg Sheremeta <gshereme@redhat.com> - 1.4.5-1
+  Fixed issues:
+- [BZ#1644970] web-ui does not load on IE11 [#869](https://github.com/oVirt/ovirt-web-ui/issues/869)
+
 * Sat Oct 13 2018 Greg Sheremeta <gshereme@redhat.com> - 1.4.4-2
 - respin (1.4.4-1 had incorrect sources)
 
