@@ -227,6 +227,7 @@ export const messages: { [messageId: string]: MessageType } = {
   firstDeviceTooltip: 'First device in order.',
   force: 'Force',
   fqdn: { message: 'FQDN', description: 'Label for the VM guest agent reported full qualified domain name' },
+  freeBrowsers: 'Free browsers:',
   fullScreen: 'Fullscreen',
   fullyQualifiedDomainName: 'Fully Qualified Domain Name (FQDN) of the virtual machine. Please note, guest agent must be installed within the virtual machine to retrieve this value.',
   gitHub: 'GitHub',
@@ -254,6 +255,7 @@ export const messages: { [messageId: string]: MessageType } = {
   icon: 'Icon',
   ifVmIsRunningClickToAccessItsGraphicsConsole: 'If the virtual machine is running, click the protocol name to access its Graphical Console.',
   inPreview: 'In Preview',
+  ieNotSupported: 'Internet Explorer is not a supported browser.',
   ipAddress: { message: 'IP Address', description: 'Label for IP addresses reported by VM guest agent' },
   isPersistMemorySnapshot: 'Content of the memory of the virtual machine is included in the snapshot.',
   less: {
@@ -437,6 +439,7 @@ export const messages: { [messageId: string]: MessageType } = {
   upload: 'Upload',
   uploadIconFilesizeTooLarge: 'Image size should be {maxIconSize} KiB or less.',
   uploadIconNotImage: 'Icon should be an image.',
+  useBrowserBelow: 'Please use one of the browsers below.',
   useCtrlAltEnd: 'Use Ctrl+Alt+End',
   virtualMachines: 'Virtual Machines',
   vmHasPendingConfigurationChanges: 'The virtual machine has pending configuration changes. To take effect, please reboot the virtual machine.',
