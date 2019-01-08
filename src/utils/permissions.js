@@ -18,6 +18,10 @@ export function canUserUseVnicProfile (permits: Set<string>): boolean {
   return checkUserPermit('configure_vm_network', permits)
 }
 
+export function canUserManipulateSnapshots (permits: Set<string>): boolean {
+  return checkUserPermit('manipulate_vm_snapshots', permits)
+}
+
 /*
  * Return if any of the given clusters are available for use by the user (as defined
  * by `canUserUseCluster` above)

@@ -25,7 +25,13 @@ import type {
   ApiPermissionType, PermissionType,
 } from './types'
 
-import { canUserUseCluster, canUserEditVm, getUserPermits, canUserUseVnicProfile } from '../utils'
+import {
+  canUserUseCluster,
+  canUserEditVm,
+  getUserPermits,
+  canUserUseVnicProfile,
+  canUserManipulateSnapshots,
+} from '../utils'
 
 function vCpusCount ({ cpu }: { cpu: Object }): number {
   if (cpu && cpu.topology) {
@@ -131,6 +137,7 @@ const VM = {
       nics: [],
       permits: new Set(),
       canUserEditVm: false,
+      canUserManipulateSnapshots: false,
       ssoGuestAgent: vm.sso.methods && vm.sso.methods.method && vm.sso.methods.method.length > 0 && vm.sso.methods.method.findIndex(method => method.id === 'guest_agent') > -1,
       display: {
         smartcardEnabled: vm.display && vm.display.smartcard_enabled && convertBool(vm.display.smartcard_enabled),
@@ -179,6 +186,7 @@ const VM = {
           permissions: vm.permissions.permission,
         }))
         parsedVm.canUserEditVm = canUserEditVm(parsedVm.permits)
+        parsedVm.canUserManipulateSnapshots = canUserManipulateSnapshots(parsedVm.permits)
       }
     }
 

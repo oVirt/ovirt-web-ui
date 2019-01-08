@@ -10,15 +10,23 @@ import NewSnapshotModal from './NewSnapshotModal'
 import SnapshotItem from './SnapshotItem'
 import { PendingTaskTypes } from '_/reducers/pendingTasks'
 
-const Snapshots = ({ snapshots, vmId, idPrefix, beingCreated, beingDeleted, beingRestored }) => {
+const Snapshots = ({
+  snapshots,
+  vmId,
+  idPrefix,
+  beingCreated,
+  beingDeleted,
+  beingRestored,
+  canUserManipulateSnapshot,
+}) => {
   const isVmInPreview = !!snapshots.find(snapshot => snapshot.get('status') === 'in_preview')
   const isVmLocked = !!snapshots.find(snapshot => snapshot.get('status') === 'locked')
-  const isActionDisabled = isVmInPreview || beingCreated || beingRestored || beingDeleted || isVmLocked
+  const isActionDisabled = isVmInPreview || beingCreated || beingRestored || beingDeleted || isVmLocked || !canUserManipulateSnapshot
   return (
     <React.Fragment>
-      <div className={style['snapshot-create']}>
+      { canUserManipulateSnapshot && <div className={style['snapshot-create']}>
         <NewSnapshotModal vmId={vmId} disabled={isActionDisabled} idPrefix={`${idPrefix}-new-snapshot`} />
-      </div>
+      </div> }
       {
         snapshots.sort((a, b) => b.get('date') - a.get('date')).map((snapshot) => (
           <SnapshotItem
@@ -27,6 +35,7 @@ const Snapshots = ({ snapshots, vmId, idPrefix, beingCreated, beingDeleted, bein
             snapshot={snapshot}
             vmId={vmId}
             isEditing={!isActionDisabled}
+            hideActions={!canUserManipulateSnapshot}
           />
         ))
       }
@@ -40,6 +49,7 @@ Snapshots.propTypes = {
   beingCreated: PropTypes.bool,
   beingRestored: PropTypes.bool,
   beingDeleted: PropTypes.bool,
+  canUserManipulateSnapshot: PropTypes.bool,
 }
 
 const ConnectedSnapshots = connect(
@@ -65,7 +75,7 @@ const SnapshotsCard = ({ vm }) => {
       idPrefix={idPrefix}
       editable={false}
     >
-      <ConnectedSnapshots snapshots={snapshots} vmId={vm.get('id')} idPrefix={idPrefix} />
+      <ConnectedSnapshots snapshots={snapshots} vmId={vm.get('id')} canUserManipulateSnapshot={vm.get('canUserManipulateSnapshots')} idPrefix={idPrefix} />
     </BaseCard>
   )
 }
