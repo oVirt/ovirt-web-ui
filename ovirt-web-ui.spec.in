@@ -54,6 +54,10 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Wed Jan 9 2019 Greg Sheremeta <gshereme@redhat.com> - 1.5.0-1
+ - Redesign of VM Edit / Dashboard view complete
+ - Fixed several issues
+
 * Tue Sep 4 2018 Greg Sheremeta <gshereme@redhat.com> - 1.4.3-1
   Fixed issues:
 - ux-redesign: make old Normal View the default when clicking a VM [#751](https://github.com/oVirt/ovirt-web-ui/issues/751)
