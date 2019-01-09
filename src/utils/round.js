@@ -23,3 +23,11 @@ export function round (number, precision = 0) {
 
   return rounded
 }
+
+export function floor (number, precision = 0) {
+  const factor = Math.pow(10, precision)
+  const temp = number * factor
+  let rounded = Math.floor(temp)
+  rounded = rounded / factor
+  return rounded
+}
