@@ -28,7 +28,6 @@ import {
 
 import { SplitButton, MenuItem } from 'patternfly-react'
 import Checkbox from '../Checkbox'
-import LinkButton from './LinkButton'
 import ConfirmationModal from './ConfirmationModal'
 import ConsoleConfirmationModal from './ConsoleConfirmationModal'
 import Action, { ActionButtonWraper } from './Action'
@@ -197,8 +196,6 @@ class VmActions extends React.Component {
       isOnCard = false,
       idPrefix = `vmaction-${vm.get('name')}`,
       onRemove,
-      location,
-      isEditable,
     } = this.props
 
     const isPool = !!pool
@@ -244,44 +241,6 @@ class VmActions extends React.Component {
         <EmptyAction state={status} isOnCard={isOnCard} />
 
         {actions.map(action => <ActionButtonWraper key={action.id} {...action} />)}
-
-        <span className={style['button-spacer']} />
-
-        {location && /vm-legacy/.test(location.pathname) && (
-          <LinkButton
-            isOnCard={isOnCard}
-            shortTitle='Dashboard View'
-            tooltip='Dashboard View'
-            to={`/vm/${vm.get('id')}`}
-            button='btn btn-default'
-            className={`pficon pficon-edit ${style['action-link']}`}
-            id={`action-${vm.get('name')}-edit`}
-          />
-        )}
-
-        {location && /vm\//.test(location.pathname) && (
-          <LinkButton
-            isOnCard={isOnCard}
-            shortTitle='Normal View'
-            tooltip='Normal View'
-            to={`/vm-legacy/${vm.get('id')}`}
-            button='btn btn-default'
-            className={`pficon pficon-edit ${style['action-link']}`}
-            id={`action-${vm.get('name')}-edit`}
-          />
-        )}
-
-        <LinkButton
-          isOnCard={isOnCard}
-          shortTitle={msg.edit()}
-          tooltip={msg.editVm()}
-          actionDisabled={!isEditable}
-          to={`/vm/${vm.get('id')}/edit`}
-          button='btn btn-default'
-          className={`pficon pficon-edit ${style['action-link']}`}
-          id={`action-${vm.get('name')}-edit`}
-        />
-        <span className={style['button-spacer']} />
 
         <ActionButtonWraper
           confirmation={removeConfirmation}

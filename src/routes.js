@@ -3,7 +3,7 @@ import React from 'react'
 import AddVmButton from './components/VmDialog/AddVmButton'
 import PageRouter from './components/PageRouter'
 import { VmDetailToolbar, PoolDetailToolbar } from './components/Toolbar'
-import { PoolDetailsPage, VmDetailsPage, VmEditPage, VmCreatePage, VmsPage, LegacyVmDetailsPage } from './components/Pages'
+import { PoolDetailsPage, VmDetailsPage, VmCreatePage, VmsPage } from './components/Pages'
 
 import { msg } from '_/intl'
 import { DETAIL_PAGE_TYPE, DIALOG_PAGE_TYPE, MAIN_PAGE_TYPE, POOL_PAGE_TYPE } from '_/constants'
@@ -37,7 +37,7 @@ export default function getRoutes (vms) {
         exact: true,
         title: () => msg.addNewVm(),
         component: VmCreatePage,
-        toolbars: [], // TODO: Recently not used. When needed, see VmDialog/style.css - .vm-dialog-buttons
+        toolbars: [], // TODO: When needed, see VmDialog/style.css - .vm-dialog-buttons
         closeable: true,
         type: DIALOG_PAGE_TYPE,
       },
@@ -46,24 +46,6 @@ export default function getRoutes (vms) {
         path: '/vm/:id',
         title: (match, vms) => vms.getIn(['vms', match.params.id, 'name']) || match.params.id,
         component: VmDetailsPage,
-        toolbars: [(match) => (<VmDetailToolbar match={match} key='vmaction' />)],
-        routes: [
-          {
-            path: '/vm/:id/edit',
-            title: (match) => msg.edit() || match.params.id,
-            component: VmEditPage,
-            toolbars: [], // TODO: Recently not used. When needed, see VmDialog/style.css - .vm-dialog-buttons
-            closeable: true,
-            type: DIALOG_PAGE_TYPE,
-          },
-        ],
-        type: DETAIL_PAGE_TYPE,
-      },
-
-      {
-        path: '/vm-legacy/:id',
-        title: (match, vms) => vms.getIn(['vms', match.params.id, 'name']) || match.params.id,
-        component: LegacyVmDetailsPage,
         toolbars: [(match) => (<VmDetailToolbar match={match} key='vmaction' />)],
         type: DETAIL_PAGE_TYPE,
       },
