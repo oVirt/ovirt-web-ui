@@ -26,10 +26,9 @@ function filterStorageDomains (vm, clusters, storageDomains) {
   return storageDomains
     .filter(sd =>
       sd.get('type') === 'data' &&
-      sd.getIn(['statusPerDataCenter', dataCenterId]) === 'active'
-    )
-    // TODO: Add storage domain permission/permit checking and filtering as necessary.
-    .toList()
+      sd.getIn(['statusPerDataCenter', dataCenterId]) === 'active' &&
+      sd.get('canUserUseDomain')
+    ).toList()
 }
 
 function suggestDiskName (vm) {
@@ -127,12 +126,11 @@ class DisksCard extends React.Component {
 
     const idPrefix = 'vmdetail-disks'
     const canEditTheCard =
-      vm.get('canUserEditVm') &&
+      vm.get('canUserEditVmStorage') &&
       vm.getIn(['pool', 'id']) === undefined
 
-    const canCreateDisks = true // TODO: Better creation condition / Permission check?
-    const canDeleteDisks = vm.get('status') === 'down' // TODO: Permission check?
-    const canEditDisks = true // TODO: Better edit conditions / Permission check?
+    const canCreateDisks = filteredStorageDomainList.size > 0
+    const canDeleteDisks = vm.get('status') === 'down'
 
     const diskList = sortDisksForDisplay(vm.get('disks')) // ImmutableJS List()
 
@@ -142,9 +140,9 @@ class DisksCard extends React.Component {
         icon={{ type: 'pf', name: 'storage-domain' }}
         title={msg.disks()}
         editTooltip={msg.disksCardEditTooltip({ vmName: vm.get('name') })}
-        editable={canEditTheCard}
         itemCount={diskList.size}
         className={baseStyle['cell-card']}
+        editable={canEditTheCard}
         onStartEdit={() => { onEditChange(true) }}
         onCancel={() => { onEditChange(false) }}
         onSave={() => { onEditChange(false) }}
@@ -192,7 +190,6 @@ class DisksCard extends React.Component {
                     storageDomainList={filteredStorageDomainList}
                     isEditing={isEditing}
                     canDeleteDisks={canDeleteDisks}
-                    canEditDisks={canEditDisks}
                     onEdit={this.onEditConfirm}
                     onDelete={this.onDeleteConfirm}
                   />

@@ -1,6 +1,8 @@
 import Api from '_/ovirtapi'
 import { all, put, select, takeLatest, throttle } from 'redux-saga/effects'
-import { callExternalAction } from './utils'
+import { callExternalAction, fetchPermits, PermissionsType } from './utils'
+
+import { canUserUseStorageDomain } from '_/utils'
 
 import {
   setDataCenters,
@@ -35,7 +37,19 @@ export function* fetchDataCentersAndStorageDomains (action) {
     const storageDomains = dataCenter.storage_domains && dataCenter.storage_domains.storage_domain
     if (storageDomains) {
       storageDomainsInternal.push(
-        ...storageDomains.map(storageDomain => Api.storageDomainToInternal({ storageDomain })))
+        ...(
+          yield all(
+            storageDomains.map(
+              function* (storageDomain) {
+                let storageDomainInternal = Api.storageDomainToInternal({ storageDomain })
+                storageDomainInternal.permits = yield fetchPermits({ entityType: PermissionsType.STORAGE_DOMAIN_TYPE, id: storageDomain.id })
+                storageDomainInternal.canUserUseDomain = canUserUseStorageDomain(storageDomainInternal.permits)
+                return storageDomainInternal
+              }
+            )
+          )
+        )
+      )
     }
   }
 

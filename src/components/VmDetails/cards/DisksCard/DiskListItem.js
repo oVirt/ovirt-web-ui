@@ -30,7 +30,7 @@ function isDiskBeingDeleted (diskId, pendingTasks) {
  */
 const DiskListItem = ({
   idPrefix, vm, disk, storageDomainList,
-  isEditing, isDiskBeingDeleted, canDeleteDisks, canEditDisks,
+  isEditing, isDiskBeingDeleted, canDeleteDisks,
   onEdit, onDelete,
 }) => {
   const size = disk.get('type') === 'lun' ? disk.get('lunSize') : disk.get('provisionedSize')
@@ -49,7 +49,7 @@ const DiskListItem = ({
   }
 
   const canDelete = canDeleteDisks && !isDiskBeingDeleted && !isLocked
-  const canEdit = canEditDisks && !isDiskBeingDeleted && !isLocked
+  const canEdit = !isDiskBeingDeleted && !isLocked && disk.get('canUserEditDisk')
 
   return <div className={itemStyle['item-row']}>
     {/* No Disk Status Column (could be the disk's active/inactive status) */}
@@ -172,7 +172,6 @@ DiskListItem.propTypes = {
   isEditing: PropTypes.bool.isRequired,
   isDiskBeingDeleted: PropTypes.bool.isRequired,
   canDeleteDisks: PropTypes.bool.isRequired,
-  canEditDisks: PropTypes.bool.isRequired,
 
   onEdit: PropTypes.func,
   onDelete: PropTypes.func,
