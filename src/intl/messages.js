@@ -363,7 +363,7 @@ export const messages: { [messageId: string]: MessageType } = {
   permissionsNoEditVm: 'You do not have the required permissions to edit a VM.',
   permissionsNoEditThisVm: 'You do not have permissions to edit VM {name} / {vmId}',
   pendingChanges: 'Pending Changes',
-  pleaseEnterValidVmName: 'Please enter valid virtual machine name. Only lower-case and upper-case letters, numbers, \'_\', \'-\', \'.\' are allowed.',
+  pleaseEnterValidVmName: 'Please enter a valid virtual machine name. Only lower-case and upper-case letters, numbers, and \'_\',\'-\',\'.\' are allowed.',
   pleaseLogIn: 'Please log in',
   pleaseLogInTripleDot: 'Please log in ...',
   preserveDisks: 'Preserve disks',

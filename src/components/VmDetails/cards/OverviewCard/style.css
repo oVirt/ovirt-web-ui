@@ -44,4 +44,9 @@
 .vm-checkbox {
   font-size: 12px;
   line-height: 20px;
+  padding-left: 10px;
+}
+
+.vm-checkbox :global(.bootstrap-switch) {
+  margin-right: 10px;
 }
