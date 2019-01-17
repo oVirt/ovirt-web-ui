@@ -42,11 +42,20 @@
 }
 
 .vm-checkbox {
-  font-size: 12px;
+  font-size: 10px;
   line-height: 20px;
   padding-left: 10px;
 }
 
 .vm-checkbox :global(.bootstrap-switch) {
   margin-right: 10px;
+}
+
+.vm-checkbox :global(.bootstrap-switch-container .bootstrap-switch-label) {
+  height: 20px !important;
+}
+
+.vm-checkbox :global(.bootstrap-switch.bootstrap-switch-mini .bootstrap-switch-handle-on),
+.vm-checkbox :global(.bootstrap-switch.bootstrap-switch-mini .bootstrap-switch-handle-off) {
+  line-height: 1;
 }

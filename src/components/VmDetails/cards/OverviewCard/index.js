@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import sharedStyle from '../../../sharedStyle.css'
-import { getOsHumanName, getVmIcon, isVmNameValid } from '_/components/utils'
+import { getOsHumanName, getVmIcon, isVmNameValid, isHostNameValid } from '_/components/utils'
 import { enumMsg, msg } from '_/intl'
 import { generateUnique } from '_/helpers'
 import { formatUptimeDuration } from '_/utils'
@@ -43,6 +43,7 @@ class OverviewCard extends React.Component {
 
       nameError: false,
       updateCloudInit: true,
+      disableHostnameToggle: false,
     }
     this.trackUpdates = {}
 
@@ -122,6 +123,10 @@ class OverviewCard extends React.Component {
         updates = updates.set('name', value)
         fieldUpdated = 'name'
         newState.nameError = !isVmNameValid(value)
+        newState.disableHostnameToggle = !isHostNameValid(value)
+        if (newState.disableHostnameToggle) {
+          newState.updateCloudInit = false
+        }
         break
 
       case 'description':
@@ -186,7 +191,7 @@ class OverviewCard extends React.Component {
 
   render () {
     const { vm, icons, operatingSystems, isEditable } = this.props
-    const { isEditing, correlatedMessages, nameError, updateCloudInit } = this.state
+    const { isEditing, correlatedMessages, nameError, updateCloudInit, disableHostnameToggle } = this.state
 
     const elapsedUptime = vm.getIn(['statistics', 'elapsedUptime', 'datum'], 0)
     const uptime = elapsedUptime <= 0
@@ -245,8 +250,12 @@ class OverviewCard extends React.Component {
                           id={`${idPrefix}-cloud-init`}
                           value={updateCloudInit}
                           onChange={(e, state) => this.setState({ updateCloudInit: state })}
+                          disabled={disableHostnameToggle}
                         />
-                        {msg.updateCloudInit()}
+                        { !disableHostnameToggle
+                          ? msg.updateCloudInit()
+                          : msg.cannotUpdateCloudInitHostname()
+                        }
                       </div>
                     }
                   </div>

@@ -44,6 +44,7 @@ export const messages: { [messageId: string]: MessageType } = {
   bootSequence: 'Boot Sequence',
   bootSequenceTooltip: 'Device order in which VM will search OS for running.',
   cancel: 'Cancel',
+  cannotUpdateCloudInitHostname: 'VM name is not valid hostname, thus hostname can\'t be updated.',
   cantLogonToConsole: 'Single sign on failed. Please check to see if the guest agent is running on your virtual machine. Contact your administrator if the problem continues.',
   cardTitleDetails: 'Details',
   cardTooltipEditDetails: 'Edit details for {vmName}',
