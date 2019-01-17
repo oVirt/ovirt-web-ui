@@ -4,7 +4,8 @@ const chalk = require('chalk');
 const paths = require('../../config/paths');
 
 function checkRequiredFiles() {
-  const filesPathToCheck = [paths.appHtml, paths.appIndexJs];
+  const filesPathToCheck = [paths.appHtml, paths.appIndexJs, paths.appVersionJs];
+
   filesPathToCheck.forEach(filePath => {
     try {
       fs.accessSync(filePath, fs.F_OK);

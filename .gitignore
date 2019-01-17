@@ -15,6 +15,7 @@ npm-debug.log
 .idea
 .vscode/
 
+# automake.sh / automake / autoconfig generated files
 Makefile
 Makefile.in
 aclocal.m4
@@ -26,6 +27,7 @@ install-sh
 missing
 ovirt-web-ui.spec
 tmp.repos/
+src/version.js
 /ovirt-web-ui-*.tar.gz
 
 # intl related
