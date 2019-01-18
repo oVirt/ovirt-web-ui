@@ -35,4 +35,5 @@ module.exports = {
   appVersionJs: resolveApp('src/version.js'),
   ownNodeModules: resolveApp('node_modules'),
   nodePaths: nodePaths,
+  novmc: resolveApp('node_modules/@novnc/novnc')
 }

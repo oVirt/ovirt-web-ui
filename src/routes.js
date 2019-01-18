@@ -2,8 +2,8 @@ import React from 'react'
 
 import AddVmButton from './components/VmDialog/AddVmButton'
 import PageRouter from './components/PageRouter'
-import { VmDetailToolbar, PoolDetailToolbar } from './components/Toolbar'
-import { PoolDetailsPage, VmDetailsPage, VmCreatePage, VmsPage } from './components/Pages'
+import { VmDetailToolbar, PoolDetailToolbar, VmConsoleToolbar } from './components/Toolbar'
+import { PoolDetailsPage, VmDetailsPage, VmCreatePage, VmsPage, VmConsolePage } from './components/Pages'
 
 import { msg } from '_/intl'
 import { DETAIL_PAGE_TYPE, DIALOG_PAGE_TYPE, MAIN_PAGE_TYPE, POOL_PAGE_TYPE } from '_/constants'
@@ -48,6 +48,15 @@ export default function getRoutes (vms) {
         component: VmDetailsPage,
         toolbars: [(match) => (<VmDetailToolbar match={match} key='vmaction' />)],
         type: DETAIL_PAGE_TYPE,
+        routes: [
+          {
+            path: '/vm/:id/console/:console_id',
+            title: (match) => match.params.console_id,
+            component: VmConsolePage,
+            closeable: true,
+            toolbars: [(match) => (<VmConsoleToolbar match={match} />)],
+          },
+        ],
       },
 
       {

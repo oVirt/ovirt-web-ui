@@ -92,6 +92,7 @@ import {
   getRDPVm,
   fetchConsoleVmMeta,
   getConsoleInUse,
+  openVmConsole,
 } from './console'
 
 import {
@@ -122,6 +123,7 @@ import {
   GET_VMS_BY_PAGE,
   LOGIN,
   LOGOUT,
+  OPEN_CONSOLE_VM,
   PERSIST_STATE,
   REFRESH_DATA,
   REMOVE_VM,
@@ -1066,6 +1068,7 @@ export function* rootSaga () {
 
     takeEvery(CHECK_CONSOLE_IN_USE, getConsoleInUse),
     takeEvery(DOWNLOAD_CONSOLE_VM, downloadVmConsole),
+    takeEvery(OPEN_CONSOLE_VM, openVmConsole),
     takeEvery(GET_RDP_VM, getRDPVm),
 
     takeLatest(GET_ALL_CLUSTERS, fetchAllClusters),

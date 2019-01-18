@@ -206,6 +206,20 @@
     lodash "^4.17.11"
     to-fast-properties "^2.0.0"
 
+"@novnc/novnc@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@novnc/novnc/-/novnc-1.0.0.tgz#76b0e89e6f8738ca8154195baf5b8e6a80bc9105"
+
+"@patternfly/react-console@1.4.6":
+  version "1.4.6"
+  resolved "https://registry.yarnpkg.com/@patternfly/react-console/-/react-console-1.4.6.tgz#19ce32cf6a618ca91cd1917d31eba211a5e5c299"
+  dependencies:
+    "@novnc/novnc" "^1.0.0"
+    classnames "^2.2.5"
+    patternfly "^3.52.1"
+    patternfly-react "^2.20.3"
+    xterm "^3.3.0"
+
 "@types/c3@^0.6.0":
   version "0.6.3"
   resolved "https://registry.yarnpkg.com/@types/c3/-/c3-0.6.3.tgz#4b1ab77ec7bbc7abb2125d09b884004ff6d21b5b"
@@ -3172,8 +3186,8 @@ flow-babel-webpack-plugin@1.1.1:
     lodash.merge "^4.6.0"
 
 "flow-bin@>=0.44.2 <1":
-  version "0.93.0"
-  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.93.0.tgz#9192a08d88db2a8da0ff55e42420f44539791430"
+  version "0.94.0"
+  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.94.0.tgz#b5d58fe7559705b73a18229f97edfc3ab6ffffcb"
 
 follow-redirects@^1.0.0:
   version "1.7.0"
@@ -5572,7 +5586,7 @@ patternfly-bootstrap-treeview@~2.1.0:
     bootstrap "3.4.x"
     jquery ">= 2.1.x"
 
-patternfly-react@2.29.15:
+patternfly-react@2.29.15, patternfly-react@^2.20.3:
   version "2.29.15"
   resolved "https://registry.yarnpkg.com/patternfly-react/-/patternfly-react-2.29.15.tgz#621c92b02b899e3d5645717130d6cf782601badc"
   dependencies:
@@ -5628,7 +5642,7 @@ patternfly@3.58.0:
     patternfly-bootstrap-combobox "~1.1.7"
     patternfly-bootstrap-treeview "~2.1.0"
 
-patternfly@^3.58.0:
+patternfly@^3.52.1, patternfly@^3.58.0:
   version "3.59.1"
   resolved "https://registry.yarnpkg.com/patternfly/-/patternfly-3.59.1.tgz#4adea89223e7386551bc9560ad5bed99e37df904"
   dependencies:
@@ -6489,8 +6503,8 @@ readable-stream@^2.0.1, readable-stream@^2.0.2, readable-stream@^2.0.6, readable
     util-deprecate "~1.0.1"
 
 readable-stream@^3.1.1:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-3.1.1.tgz#ed6bbc6c5ba58b090039ff18ce670515795aeb06"
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-3.2.0.tgz#de17f229864c120a9f56945756e4f32c4045245d"
   dependencies:
     inherits "^2.0.3"
     string_decoder "^1.1.1"
@@ -7944,6 +7958,10 @@ xml-char-classes@^1.0.0:
 xml-name-validator@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/xml-name-validator/-/xml-name-validator-3.0.0.tgz#6ae73e06de4d8c6e47f9fb181f78d648ad457c6a"
+
+xterm@^3.3.0:
+  version "3.11.0"
+  resolved "https://registry.yarnpkg.com/xterm/-/xterm-3.11.0.tgz#2c10da3e965db9170430aa7b68f8965de3ff004d"
 
 "y18n@^3.2.1 || ^4.0.0":
   version "4.0.0"
