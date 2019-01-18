@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 
 import { RouterPropTypeShapes } from '_/propTypeShapes'
 import VmActions from '../VmActions'
+import { VmConsoleSelector } from '../Pages'
 
 const VmDetailToolbar = ({ match, vms }) => {
   if (vms.getIn(['vms', match.params.id])) {
@@ -42,7 +43,26 @@ const PoolDetailToolbarConnected = connect(
   })
 )(PoolDetailToolbar)
 
+const VmConsoleToolbar = ({ match, vms }) => {
+  if (vms.getIn(['vms', match.params.id])) {
+    return <VmConsoleSelector vmId={match.params.id} id='console-selector' consoleId={match.params.console_id} />
+  }
+  return <div />
+}
+
+VmConsoleToolbar.propTypes = {
+  vms: PropTypes.object.isRequired,
+  match: RouterPropTypeShapes.match.isRequired,
+}
+
+const VmConsoleToolbarConncted = connect(
+  (state) => ({
+    vms: state.vms,
+  })
+)(VmConsoleToolbar)
+
 export {
   VmDetailToolbarConnected as VmDetailToolbar,
   PoolDetailToolbarConnected as PoolDetailToolbar,
+  VmConsoleToolbarConncted as VmConsoleToolbar,
 }

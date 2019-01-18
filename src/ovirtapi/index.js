@@ -313,6 +313,25 @@ const OvirtApi = {
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/graphicsconsoles/${consoleId}`,
       custHeaders: { Accept: 'application/x-virt-viewer', Filter: Selectors.getFilter() } })
   },
+
+  consoleProxyTicket ({ vmId, consoleId }: { vmId: string, consoleId: string }): Promise<Object> {
+    assertLogin({ methodName: 'consoleProxyTicket' })
+    const input = JSON.stringify({ async: false })
+    return httpPost({
+      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/graphicsconsoles/${consoleId}/proxyticket`,
+      input,
+    })
+  },
+
+  consoleTicket ({ vmId, consoleId }: {vmId: string, consoleId: string}): Promise<Object> {
+    assertLogin({ methodName: 'consoleTicket' })
+    const input = JSON.stringify({ async: false })
+    return httpPost({
+      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/graphicsconsoles/${consoleId}/ticket`,
+      input,
+    })
+  },
+
   vmLogon ({ vmId }: { vmId: string }): Promise<Object> {
     assertLogin({ methodName: 'vmLogon' })
     return httpPost({

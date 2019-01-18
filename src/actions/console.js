@@ -1,9 +1,11 @@
 import {
-  CHECK_CONSOLE_IN_USE,
-  DOWNLOAD_CONSOLE_VM,
   SET_CONSOLE_IN_USE,
+  CHECK_CONSOLE_IN_USE,
   SET_CONSOLE_LOGON,
-} from '_/constants'
+  SET_CONSOLE_TICKETS,
+  DOWNLOAD_CONSOLE_VM,
+  SET_ACTIVE_CONSOLE,
+} from '../constants'
 
 export function setConsoleInUse ({ vmId, consoleInUse }) {
   return {
@@ -37,6 +39,16 @@ export function checkConsoleInUse ({ vmId, usbFilter, userId, hasGuestAgent }) {
   }
 }
 
+export function setActiveConsole ({ vmId, consoleId }) {
+  return {
+    type: SET_ACTIVE_CONSOLE,
+    payload: {
+      vmId,
+      consoleId,
+    },
+  }
+}
+
 export function downloadConsole ({ vmId, consoleId, usbFilter, hasGuestAgent, force }) {
   return {
     type: DOWNLOAD_CONSOLE_VM,
@@ -46,6 +58,17 @@ export function downloadConsole ({ vmId, consoleId, usbFilter, hasGuestAgent, fo
       usbFilter,
       hasGuestAgent,
       force,
+    },
+  }
+}
+
+export function setConsoleTickets ({ vmId, proxyTicket, ticket }) {
+  return {
+    type: SET_CONSOLE_TICKETS,
+    payload: {
+      vmId,
+      proxyTicket,
+      ticket,
     },
   }
 }

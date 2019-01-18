@@ -13,6 +13,7 @@ import {
   setConsoleOptions,
   setVmConsoles,
   vmActionInProgress,
+  setConsoleTickets,
 } from '_/actions'
 
 import { callExternalAction } from '../utils'
@@ -20,6 +21,9 @@ import { fetchVmSessions } from '../../sagas'
 
 import { adjustVVFile } from './vvFileUtils'
 import RDPBuilder from './rdpBuilder'
+
+import { push } from 'connected-react-router'
+import { setActiveConsole } from '../../actions'
 
 // ----- Connection files
 /**
@@ -29,7 +33,8 @@ export function* downloadVmConsole (action) {
   let { vmId, consoleId, usbFilter, hasGuestAgent, force } = action.payload
 
   let isSpice = false
-
+  logger.log(vmId)
+  logger.log(consoleId)
   if (hasGuestAgent && !force) {
     let result = yield callExternalAction('vmLogon', Api.vmLogon, { payload: { vmId } }, true)
     if (!result || result.status !== 'complete') {
@@ -57,19 +62,51 @@ export function* downloadVmConsole (action) {
 
   if (consoleId) {
     let data = yield callExternalAction('console', Api.console, { type: 'INTERNAL_CONSOLE', payload: { vmId, consoleId } })
-
     if (data.error === undefined) {
-      let options = Selectors.getConsoleOptions({ vmId })
-      if (!options) {
-        logger.log('downloadVmConsole() console options not yet present, trying to load from local storage')
-        options = yield getConsoleOptions(getConsoleOptionsAction({ vmId }))
-      }
+      yield put(setActiveConsole({ vmId, consoleId }))
+      if (data.indexOf('type=spice') > -1) {
+        let options = Selectors.getConsoleOptions({ vmId })
+        if (!options) {
+          logger.log('downloadVmConsole() console options not yet present, trying to load from local storage')
+          options = yield getConsoleOptions(getConsoleOptionsAction({ vmId }))
+        }
 
-      data = adjustVVFile({ data, options, usbFilter, isSpice })
-      fileDownload({ data, fileName: `console.vv`, mimeType: 'application/x-virt-viewer' })
+        data = adjustVVFile({ data, options, usbFilter, isSpice })
+        fileDownload({ data, fileName: `console.vv`, mimeType: 'application/x-virt-viewer' })
+      } else {
+        let data = yield callExternalAction('consoleProxyTicket', Api.consoleProxyTicket,
+          { type: 'INTRENAL_CONSOLE', payload: { vmId, consoleId } })
+        let ticket = yield callExternalAction('consoleTicket', Api.consoleTicket,
+          { type: 'INTRENAL_CONSOLE', payload: { vmId, consoleId } })
+        yield put(setConsoleTickets({ vmId, proxyTicket: data.proxy_ticket.value, ticket: ticket.ticket }))
+        logger.log(data)
+      }
     }
   }
   yield put(setConsoleInUse({ vmId, consoleInUse: null }))
+  yield put(push('/vm/' + vmId + '/console/' + consoleId))
+}
+
+export function* openVmConsole (action) {
+  let { vmId, consoleId } = action.payload
+  if (!consoleId) {
+    yield put(vmActionInProgress({ vmId, name: 'getConsole', started: true }))
+    const consolesInternal = yield fetchConsoleVmMeta({ vmId })
+    yield put(setVmConsoles({ vmId, consoles: consolesInternal }))
+    yield put(vmActionInProgress({ vmId, name: 'getConsole', started: false }))
+    // TODO: choose user default over just "SPICE"
+    if (consolesInternal && consolesInternal.length > 0) {
+      let console = consolesInternal.find(c => c.protocol === 'spice') || consolesInternal[0]
+      consoleId = console.id
+    }
+  }
+  let data = yield callExternalAction('consoleProxyTicket', Api.consoleProxyTicket,
+    { type: 'INTRENAL_CONSOLE', payload: { vmId, consoleId } })
+  let ticket = yield callExternalAction('consoleTicket', Api.consoleTicket,
+    { type: 'INTRENAL_CONSOLE', payload: { vmId, consoleId } })
+  yield put(setConsoleTickets({ vmId, proxyTicket: data.proxy_ticket.value, ticket: ticket.ticket }))
+  logger.log(data)
+  yield put(push('/vm/' + vmId + '/console/' + consoleId))
 }
 
 /**
