@@ -52,7 +52,7 @@ StatusTooltip.propTypes = {
   id: PropTypes.string.isRequired,
 }
 
-const SnapshotItem = ({ snapshot, vmId, isEditing, id, onSnapshotDelete }) => {
+const SnapshotItem = ({ snapshot, vmId, isEditing, id, hideActions, onSnapshotDelete }) => {
   let statusIcon = null
   let buttons = []
 
@@ -76,45 +76,47 @@ const SnapshotItem = ({ snapshot, vmId, isEditing, id, onSnapshotDelete }) => {
       </a>
     </OverlayTrigger>)
 
-    // Restore action
-    buttons.push(<RestoreConfirmationModal
-      key='restore'
-      disabled={isActionsDisabled}
-      snapshot={snapshot}
-      vmId={vmId}
-      id={`${id}-restore-modal`}
-      trigger={
-        <SnapshotAction key='restore' id={`${id}-restore`} >
-          <OverlayTrigger placement='left' overlay={<Tooltip id={`${id}-restore-tt`}>{ msg.snapshotRestore() }</Tooltip>}>
-            <Icon type='fa' name='play-circle' />
-          </OverlayTrigger>
-        </SnapshotAction>
-      }
-    />)
+    if (!hideActions) {
+      // Restore action
+      buttons.push(<RestoreConfirmationModal
+        key='restore'
+        disabled={isActionsDisabled}
+        snapshot={snapshot}
+        vmId={vmId}
+        id={`${id}-restore-modal`}
+        trigger={
+          <SnapshotAction key='restore' id={`${id}-restore`} >
+            <OverlayTrigger placement='left' overlay={<Tooltip id={`${id}-restore-tt`}>{ msg.snapshotRestore() }</Tooltip>}>
+              <Icon type='fa' name='play-circle' />
+            </OverlayTrigger>
+          </SnapshotAction>
+        }
+      />)
 
-    // Delete action
-    buttons.push(<DeleteConfirmationModal
-      key='delete'
-      disabled={isActionsDisabled}
-      id={`${id}-delete-modal`}
-      trigger={
-        <SnapshotAction key='delete' id={`${id}-delete`}>
-          <OverlayTrigger placement='left' overlay={<Tooltip id={`${id}-delete-tt`}>{ msg.snapshotDelete() }</Tooltip>}>
-            <Icon type='pf' name='delete' />
-          </OverlayTrigger>
-        </SnapshotAction>
-      }
-      onDelete={onSnapshotDelete}
-    >
-      <div
-        dangerouslySetInnerHTML={{
-          __html: msg.areYouSureYouWantToDeleteSnapshot({
-            snapshotName: `"<strong>${escapeHtml(snapshot.get('description'))}</strong>"`,
-          }),
-        }}
-      />
-      <div>{msg.thisOperationCantBeUndone()}</div>
-    </DeleteConfirmationModal>)
+      // Delete action
+      buttons.push(<DeleteConfirmationModal
+        key='delete'
+        disabled={isActionsDisabled}
+        id={`${id}-delete-modal`}
+        trigger={
+          <SnapshotAction key='delete' id={`${id}-delete`}>
+            <OverlayTrigger placement='left' overlay={<Tooltip id={`${id}-delete-tt`}>{ msg.snapshotDelete() }</Tooltip>}>
+              <Icon type='pf' name='delete' />
+            </OverlayTrigger>
+          </SnapshotAction>
+        }
+        onDelete={onSnapshotDelete}
+      >
+        <div
+          dangerouslySetInnerHTML={{
+            __html: msg.areYouSureYouWantToDeleteSnapshot({
+              snapshotName: `"<strong>${escapeHtml(snapshot.get('description'))}</strong>"`,
+            }),
+          }}
+        />
+        <div>{msg.thisOperationCantBeUndone()}</div>
+      </DeleteConfirmationModal>)
+    }
 
     // Status tooltip
     const tooltipId = `${id}-status-icon-${snapshot.get('status')}`
@@ -147,6 +149,7 @@ SnapshotItem.propTypes = {
   vmId: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
   isEditing: PropTypes.bool,
+  hideActions: PropTypes.bool,
   onSnapshotDelete: PropTypes.func.isRequired,
 }
 
