@@ -12,6 +12,7 @@ import {
   setConsoleLogon,
   setConsoleOptions,
   setVmConsoles,
+  setVmSessions,
   vmActionInProgress,
 } from '_/actions'
 
@@ -103,12 +104,18 @@ export function* getConsoleInUse (action) {
   const consoleUsers = sessionsInternal && sessionsInternal
     .filter(session => session.consoleUser)
     .map(session => session.user)
+  yield put(setVmSessions({ vmId, sessions: sessionsInternal }))
 
   if (consoleUsers.length > 0 && consoleUsers.find(user => user.id === userId) === undefined) {
     yield put(setConsoleInUse({ vmId, consoleInUse: true }))
   } else {
     yield put(setConsoleInUse({ vmId, consoleInUse: false }))
-    yield put(downloadConsole({ vmId, usbFilter, hasGuestAgent }))
+    yield put(downloadConsole({
+      vmId,
+      usbFilter,
+      hasGuestAgent,
+      force: sessionsInternal.find(s => s.user.id === userId) !== undefined,
+    }))
     yield put(setConsoleInUse({ vmId, consoleInUse: null }))
   }
 }
