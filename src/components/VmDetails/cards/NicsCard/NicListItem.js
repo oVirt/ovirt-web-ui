@@ -41,14 +41,14 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEd
       </div>
       <Grid>
         <Row>
-          <Col cols={6} className={style['ip4-container']} id={`${idPrefix}-ipv4`}>
+          <Col cols={4} className={style['ip4-container']} id={`${idPrefix}-ipv4`}>
             { nic.ipv4.length > 0 &&
               <div>
                 {nic.ipv4.map(ip4 => <div key={`${nic.id}-${ip4}`}>{msg.nicIP4()}: {ip4}</div>)}
               </div>
             }
           </Col>
-          <Col cols={6} className={style['ip6-container']} id={`${idPrefix}-ipv6`}>
+          <Col cols={8} className={style['ip6-container']} id={`${idPrefix}-ipv6`}>
             { nic.ipv6.length > 0 &&
               <div>
                 {nic.ipv6.map(ip6 => <div key={`${nic.id}-${ip6}`}>{msg.nicIP6()}: {ip6}</div>)}
