@@ -25,30 +25,34 @@ const UtilizationCard = ({ vm }) => {
   return (
     <BaseCard className={style['utilization-card']} title='Utilization' editable={false} idPrefix={idPrefix}>
       <Grid>
-        <Row>
-          <Col>
-            { stats.cpu
-              ? <CpuCharts cpuStats={stats.cpu} isRunning={isRunning} id={`${idPrefix}-cpu`} />
-              : <NoLiveData message={loadingMessage} id={`${idPrefix}-cpu-no-data`} />
-            }
+        <Row className={style['row-charts-box']}>
+          <Col className={style['row-col-charts-box']}>
+            <Col className={style['col-charts-box']}>
+              { stats.cpu
+                ? <CpuCharts cpuStats={stats.cpu} isRunning={isRunning} id={`${idPrefix}-cpu`} />
+                : <NoLiveData message={loadingMessage} id={`${idPrefix}-cpu-no-data`} />
+              }
+            </Col>
+            <Col className={style['col-charts-box']}>
+              { stats.memory
+                ? <MemoryCharts memoryStats={stats.memory} isRunning={isRunning} id={`${idPrefix}-memory`} />
+                : <NoLiveData message={loadingMessage} id={`${idPrefix}-memory-no-data`} />
+              }
+            </Col>
           </Col>
-          <Col>
-            { stats.memory
-              ? <MemoryCharts memoryStats={stats.memory} isRunning={isRunning} id={`${idPrefix}-memory`} />
-              : <NoLiveData message={loadingMessage} id={`${idPrefix}-memory-no-data`} />
-            }
-          </Col>
-          <Col>
-            { stats.network
-              ? <NetworkingCharts netStats={stats.network} isRunning={isRunning} id={`${idPrefix}-network`} />
-              : <NoLiveData message={loadingMessage} id={`${idPrefix}-network-no-data`} />
-            }
-          </Col>
-          <Col>
-            { vm.has('disks')
-              ? <DiskCharts vm={vm} diskStats={stats.disks} isRunning={isRunning} id={`${idPrefix}-disk`} />
-              : <NoLiveData message={loadingMessage} id={`${idPrefix}-disk-no-data`} />
-            }
+          <Col className={style['row-col-charts-box']}>
+            <Col className={style['col-charts-box']}>
+              { stats.network
+                ? <NetworkingCharts netStats={stats.network} isRunning={isRunning} id={`${idPrefix}-network`} />
+                : <NoLiveData message={loadingMessage} id={`${idPrefix}-network-no-data`} />
+              }
+            </Col>
+            <Col className={style['col-charts-box']}>
+              { vm.has('disks')
+                ? <DiskCharts vm={vm} diskStats={stats.disks} isRunning={isRunning} id={`${idPrefix}-disk`} />
+                : <NoLiveData message={loadingMessage} id={`${idPrefix}-disk-no-data`} />
+              }
+            </Col>
           </Col>
         </Row>
       </Grid>
