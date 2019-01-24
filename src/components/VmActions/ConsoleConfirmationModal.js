@@ -5,6 +5,7 @@ import ConfirmationModal from './ConfirmationModal'
 
 import { downloadConsole, checkConsoleInUse, setConsoleInUse, setConsoleLogon } from '_/actions'
 import { msg } from '_/intl'
+import { doesVmSessionExistForUserId } from '_/utils'
 
 class ConsoleConfirmationModal extends React.Component {
   constructor (props) {
@@ -30,8 +31,8 @@ class ConsoleConfirmationModal extends React.Component {
     this.props.onClose()
   }
 
-  onConsoleDownload (force = false) {
-    this.props.onDownloadConsole({ usbFilter: this.props.config.get('usbFilter'), force, userId: this.props.config.getIn(['user', 'id']) })
+  onConsoleDownload (skipSSO = false) {
+    this.props.onDownloadConsole({ usbFilter: this.props.config.get('usbFilter'), skipSSO, userId: this.props.config.getIn(['user', 'id']) })
   }
 
   render () {
@@ -92,13 +93,13 @@ export default connect(
       dispatch(setConsoleInUse({ vmId: vm.get('id'), consoleInUse: null }))
       dispatch(setConsoleLogon({ vmId: vm.get('id'), isLogon: null }))
     },
-    onDownloadConsole: ({ usbFilter, force, userId }) => dispatch(
+    onDownloadConsole: ({ usbFilter, skipSSO, userId }) => dispatch(
       downloadConsole({
         vmId: vm.get('id'),
         usbFilter,
         consoleId,
         hasGuestAgent: vm.get('ssoGuestAgent'),
-        force: force || vm.get('sessions').find(s => s.getIn(['user', 'id']) === userId) !== undefined,
+        skipSSO: skipSSO || doesVmSessionExistForUserId(vm.get('sessions').toJS(), userId), // Parameter for skiping SSO authorization
       })
     ),
   })

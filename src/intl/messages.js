@@ -65,7 +65,10 @@ export const messages: { [messageId: string]: MessageType } = {
   clusterCanOnlyChangeWhenVmStopped: 'Cluster can only be changed when the VM is stopped.',
   confirmDelete: 'Confirm Delete',
   confirmRestore: 'Confirm Restore',
-  connect: 'Connect',
+  connect: {
+    message: 'Connect',
+    description: 'Connect button for SSO authorization modal dialog.',
+  },
   connectAutomatically: 'Connect automatically',
   console: 'Console',
   consoleInUseContinue: 'Console in use, continue?',

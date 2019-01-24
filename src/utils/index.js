@@ -1,5 +1,6 @@
 // @flow
 import { isNumber } from './unit-conversion'
+import type { VmSessionsType } from '../ovirtapi/types'
 
 export * from './permissions'
 export * from './format'
@@ -18,4 +19,8 @@ export function parseGbToBytes (gbString: string): number | null {
     return gbNumber * (1024 ** 3)
   }
   return null
+}
+
+export function doesVmSessionExistForUserId (sessions: Array<VmSessionsType>, userId: string): boolean {
+  return sessions.find(s => s.user.id === userId) !== undefined
 }
