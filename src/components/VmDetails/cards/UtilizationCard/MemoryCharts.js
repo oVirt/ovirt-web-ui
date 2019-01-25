@@ -13,7 +13,7 @@ import {
   SparklineChart,
 } from 'patternfly-react'
 
-import { round } from '_/utils'
+import { round, floor } from '_/utils'
 import { donutMemoryTooltipContents } from '_/components/utils'
 import { userFormatOfBytes } from '_/helpers'
 
@@ -35,12 +35,16 @@ const MemoryCharts = ({ memoryStats, isRunning, id }) => {
   const available = isRunning ? memoryStats.free.datum : memoryStats.installed.datum
   const used = !isRunning ? 0 : memoryStats.installed.datum - memoryStats.free.datum
 
-  const usedFormated = userFormatOfBytes(used)
-  const availableFormated = userFormatOfBytes(available)
-  const totalFormated = userFormatOfBytes(memoryStats.installed.datum)
+  const usedFormated = userFormatOfBytes(used, null, 1)
+  const availableFormated = userFormatOfBytes(available, null, 1)
+  const totalFormated = userFormatOfBytes(memoryStats.installed.datum, null, 1)
 
   // NOTE: Memory history comes sorted from newest to oldest
   const history = ((memoryStats['usage.history'] && memoryStats['usage.history'].datum) || []).reverse()
+
+  const availableMemoryPercision = availableFormated.number >= 10
+    ? availableFormated.number >= 100 ? 0 : 1
+    : 2
 
   return (
     <UtilizationCard className={style['chart-card']} id={id}>
@@ -51,7 +55,7 @@ const MemoryCharts = ({ memoryStats, isRunning, id }) => {
         <React.Fragment>
           <UtilizationCardDetails>
             <UtilizationCardDetailsCount id={`${id}-available`}>
-              {round(availableFormated.number, 0)}  {availableFormated.suffix !== totalFormated.suffix && availableFormated.suffix}
+              {floor(availableFormated.number, availableMemoryPercision)}  {availableFormated.suffix !== totalFormated.suffix && availableFormated.suffix}
             </UtilizationCardDetailsCount>
             <UtilizationCardDetailsDesc>
               <UtilizationCardDetailsLine1>Available</UtilizationCardDetailsLine1>

@@ -127,7 +127,7 @@ export function getURLQueryParameterByName (name) {
  * @param suffix optional
  * @returns {*}
  */
-export function userFormatOfBytes (number, suffix) {
+export function userFormatOfBytes (number, suffix, precision = 0) {
   const buildRetVal = (number, suffix) => {
     const rounded = number.toFixed(1)
     return {
@@ -139,7 +139,7 @@ export function userFormatOfBytes (number, suffix) {
   }
   number = number || 0
   const factor = 1024
-  const suffixes = [null, 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB']
+  const suffixes = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB']
 
   if (suffix) {
     const i = suffixes.indexOf(suffix)
@@ -154,9 +154,10 @@ export function userFormatOfBytes (number, suffix) {
   // figure it out
   let divisor = 1
   suffix = ''
+  const minValue = 1 - Math.pow(10, -precision) || 1
   for (let i = 0; i < suffixes.length; i++) {
     const quotient = number / divisor
-    if (quotient < factor) {
+    if ((quotient / factor) < minValue) {
       number = quotient
       suffix = suffixes[i]
       break

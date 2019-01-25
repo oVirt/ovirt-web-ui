@@ -13,7 +13,7 @@ import {
   DonutChart,
 } from 'patternfly-react'
 
-import { round, convertValueMap } from '_/utils'
+import { round, floor, convertValueMap } from '_/utils'
 import { donutMemoryTooltipContents } from '_/components/utils'
 import { userFormatOfBytes, isWindows } from '_/helpers'
 
@@ -79,9 +79,13 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
     }
   })
 
-  const usedFormated = userFormatOfBytes(actualSize)
-  const availableFormated = userFormatOfBytes(provisionedSize - actualSize)
-  const totalFormated = userFormatOfBytes(provisionedSize)
+  const usedFormated = userFormatOfBytes(actualSize, null, 1)
+  const availableFormated = userFormatOfBytes(provisionedSize - actualSize, null, 1)
+  const totalFormated = userFormatOfBytes(provisionedSize, null, 1)
+
+  const availableMemoryPercision = availableFormated.number >= 10
+    ? availableFormated.number >= 100 ? 0 : 1
+    : 2
 
   const isVmWindows = isWindows(vm.getIn(['os', 'type']))
 
@@ -96,7 +100,7 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
           <React.Fragment>
             <UtilizationCardDetails>
               <UtilizationCardDetailsCount id={`${id}-available`}>
-                {round(availableFormated.number, 1)} {availableFormated.suffix !== totalFormated.suffix && availableFormated.suffix}
+                {floor(availableFormated.number, availableMemoryPercision)} {availableFormated.suffix !== totalFormated.suffix && availableFormated.suffix}
               </UtilizationCardDetailsCount>
               <UtilizationCardDetailsDesc>
                 <UtilizationCardDetailsLine1>Unallocated</UtilizationCardDetailsLine1>
