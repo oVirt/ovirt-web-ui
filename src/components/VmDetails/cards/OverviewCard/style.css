@@ -47,10 +47,6 @@
   padding-left: 10px;
 }
 
-.vm-checkbox :global(.bootstrap-switch) {
-  margin-right: 10px;
-}
-
 .vm-checkbox :global(.bootstrap-switch-container .bootstrap-switch-label) {
   height: 20px !important;
 }

@@ -10,7 +10,7 @@ import { formatUptimeDuration } from '_/utils'
 import { editVm } from '_/actions'
 
 import { Media } from 'react-bootstrap'
-import { FormControl, FormGroup, HelpBlock, Alert, Switch } from 'patternfly-react'
+import { FormControl, FormGroup, HelpBlock, Alert, Checkbox } from 'patternfly-react'
 
 import BaseCard from '../../BaseCard'
 import VmIcon from '../../../VmIcon'
@@ -245,17 +245,17 @@ class OverviewCard extends React.Component {
                     {
                       showCloudInitCheckbox &&
                       <div className={style['vm-checkbox']}>
-                        <Switch
-                          bsSize='mini'
+                        <Checkbox
                           id={`${idPrefix}-cloud-init`}
-                          value={updateCloudInit}
-                          onChange={(e, state) => this.setState({ updateCloudInit: state })}
+                          checked={updateCloudInit}
+                          onChange={(e) => this.setState({ updateCloudInit: e.target.checked })}
                           disabled={disableHostnameToggle}
-                        />
-                        { !disableHostnameToggle
-                          ? msg.updateCloudInit()
-                          : msg.cannotUpdateCloudInitHostname()
-                        }
+                        >
+                          { !disableHostnameToggle
+                            ? msg.updateCloudInit()
+                            : msg.cannotUpdateCloudInitHostname()
+                          }
+                        </Checkbox>
                       </div>
                     }
                   </div>
