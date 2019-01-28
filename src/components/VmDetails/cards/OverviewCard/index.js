@@ -164,7 +164,7 @@ class OverviewCard extends React.Component {
       <BaseCard
         editMode={isEditing}
         editable={isEditable}
-        editTooltip={`Edit ${vm.get('id')}`}
+        editTooltip={`Edit ${vm.get('name')}`}
         idPrefix={idPrefix}
         onStartEdit={this.handleCardOnStartEdit}
         onCancel={this.handleCardOnCancel}

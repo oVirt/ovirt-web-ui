@@ -681,7 +681,7 @@ class DetailsCard extends React.Component {
         editable={canEditDetails}
         editMode={isEditing}
         idPrefix={idPrefix}
-        editTooltip={msg.cardTooltipEditDetails({ vmId: vm.get('id') })}
+        editTooltip={msg.cardTooltipEditDetails({ vmName: vm.get('name') })}
         onStartEdit={this.handleCardOnStartEdit}
         onCancel={this.handleCardOnCancel}
         onSave={this.handleCardOnSave}
