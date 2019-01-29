@@ -391,6 +391,7 @@ export const messages: { [messageId: string]: MessageType } = {
     message: 'Refresh',
     description: 'Reload data from server',
   },
+  remoteDesktopConnectionSettings: 'Remote Desktop Connection Settings',
   remove: 'Remove',
   removeVm: 'Remove the VM',
   removeVmQustion: 'Remove the VM?',

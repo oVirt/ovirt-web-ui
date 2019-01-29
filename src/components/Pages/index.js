@@ -228,7 +228,7 @@ class VmConsolePage extends React.Component {
         path={proxyTicket}
         host={host} port='6100' onDisconnected={this.onDisconnected} /></div>
     } else {
-      return <div><VmConsoleSelector vmId={this.state.vmId} id='vm-selector' />Downloading vv file</div>
+      return <div>Downloading vv file</div>
     }
   }
 }
