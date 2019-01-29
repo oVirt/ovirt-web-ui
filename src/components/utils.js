@@ -118,10 +118,13 @@ export function isVmNameValid (nameCandidate: string): boolean {
 }
 
 export function isHostNameValid (nameCandidate: string): boolean {
+  if (nameCandidate.length > 64) {
+    return false
+  }
   const asciiLetters = 'a-zA-Z'
   const numbers = '0-9'
   const specialCharacters = '-'
-  const regexpString = '^([' + asciiLetters + numbers + specialCharacters + '])+$'
+  const regexpString = '^[' + asciiLetters + numbers + ']([' + asciiLetters + numbers + specialCharacters + '])+[' + asciiLetters + numbers + ']$'
   const regexp = new RegExp(regexpString)
   return regexp.test(nameCandidate)
 }
