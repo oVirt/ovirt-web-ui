@@ -4,7 +4,7 @@ import {
   SET_CONSOLE_LOGON,
   SET_CONSOLE_TICKETS,
   DOWNLOAD_CONSOLE_VM,
-  SET_ACTIVE_CONSOLE,
+  SET_ACTIVE_CONSOLE, SET_CONSOLE_NVNC,
 } from '../constants'
 
 export function setConsoleInUse ({ vmId, consoleInUse }) {
@@ -45,6 +45,16 @@ export function setActiveConsole ({ vmId, consoleId }) {
     payload: {
       vmId,
       consoleId,
+    },
+  }
+}
+
+export function setConsoleNoVNC ({ vmId, isRunning }) {
+  return {
+    type: SET_CONSOLE_NVNC,
+    payload: {
+      vmId,
+      isRunning,
     },
   }
 }

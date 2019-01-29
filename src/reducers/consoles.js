@@ -1,5 +1,5 @@
 import Immutable from 'immutable'
-import { SET_CONSOLE_IN_USE, SET_CONSOLE_LOGON, SET_CONSOLE_TICKETS } from '_/constants'
+import { SET_CONSOLE_IN_USE, SET_CONSOLE_LOGON, SET_CONSOLE_TICKETS, SET_CONSOLE_NVNC } from '_/constants'
 
 import { actionReducer } from './utils'
 import { SET_ACTIVE_CONSOLE } from '../constants'
@@ -20,6 +20,9 @@ const consoles = actionReducer(initialState, {
   },
   [SET_ACTIVE_CONSOLE] (state, { payload: { vmId, consoleId } }) {
     return state.setIn(['vms', vmId, 'id'], consoleId)
+  },
+  [SET_CONSOLE_NVNC] (state, { payload: { vmId, isRunning } }) {
+    return state.setIn(['vms', vmId, 'nvnc'], isRunning)
   },
 })
 

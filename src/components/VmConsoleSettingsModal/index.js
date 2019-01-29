@@ -46,7 +46,7 @@ class VmConsoleSettingsModal extends React.Component {
           <div>
             <h3>Remote Desctop Viever Connection</h3>
             <div> Here will go messaging and slyling</div>
-            <ActionButtonWraper confirmation={consoleConfirmation} shortTitle={'Download'} />
+            <ActionButtonWraper confirmation={consoleConfirmation} shortTitle={'Download'} id={'vm-console-connection-download-button'} />
           </div>
         </Modal.Body>
       </Modal>

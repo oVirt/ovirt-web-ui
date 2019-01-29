@@ -25,7 +25,7 @@ import { adjustVVFile } from './vvFileUtils'
 import RDPBuilder from './rdpBuilder'
 
 import { push } from 'connected-react-router'
-import { setActiveConsole } from '../../actions'
+import { setActiveConsole, setConsoleNoVNC } from '../../actions'
 
 // ----- Connection files
 /**
@@ -64,7 +64,11 @@ export function* downloadVmConsole (action) {
     let data = yield callExternalAction('console', Api.console, { type: 'INTERNAL_CONSOLE', payload: { vmId, consoleId } })
     if (data.error === undefined) {
       yield put(setActiveConsole({ vmId, consoleId }))
-      if (data.indexOf('type=spice') > -1) {
+      let isRunning = Selectors.isNovncIsRunning({ vmId })
+      /**
+       *Download console if type is spice or novnc is running already
+       */
+      if (data.indexOf('type=spice') > -1 || (data.indexOf('type=spice') === -1 && isRunning)) {
         let options = Selectors.getConsoleOptions({ vmId })
         if (!options) {
           logger.log('downloadVmConsole() console options not yet present, trying to load from local storage')
@@ -79,6 +83,10 @@ export function* downloadVmConsole (action) {
         let ticket = yield callExternalAction('consoleTicket', Api.consoleTicket,
           { type: 'INTRENAL_CONSOLE', payload: { vmId, consoleId } })
         yield put(setConsoleTickets({ vmId, proxyTicket: data.proxy_ticket.value, ticket: ticket.ticket }))
+        /**
+         * Mark nvnc is running
+         */
+        yield put(setConsoleNoVNC(vmId))
         logger.log(data)
       }
     }
