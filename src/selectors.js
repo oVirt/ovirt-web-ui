@@ -71,6 +71,9 @@ Selectors = {
       return poolIds
     }, [])
   },
+  isNovncIsRunning ({ vmId }) {
+    return getState().vms.getIn(['vms', vmId, 'nvnc'])
+  },
 }
 
 function getState () {
