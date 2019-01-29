@@ -191,13 +191,13 @@ const OvirtApi = {
     return httpGet({ url })
   },
 
-  addNewVm ({ vm, transformInput = true }: { vm: VmType | Object, transformInput: boolean }): Promise<Object> {
+  addNewVm ({ vm, transformInput = true, clone = false }: { vm: VmType | Object, transformInput: boolean, clone: boolean }): Promise<Object> {
     assertLogin({ methodName: 'addNewVm' })
     const input = JSON.stringify(transformInput ? OvirtApi.internalVmToOvirt({ vm }) : vm)
     logger.log(`OvirtApi.addNewVm(): ${input}`)
 
     return httpPost({
-      url: `${AppConfiguration.applicationContext}/api/vms`,
+      url: `${AppConfiguration.applicationContext}/api/vms?clone=${clone ? 'true' : 'false'}`,
       input,
     })
   },
