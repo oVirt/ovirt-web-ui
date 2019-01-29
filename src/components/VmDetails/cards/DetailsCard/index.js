@@ -214,6 +214,10 @@ class DetailsCard extends React.Component {
     this.hotPlugNow = true
     this.nextRunUpdates = {}
     this.restartAfterSave = false
+    this.hostOverflow = false
+    this.fqdnOverflow = false
+    this.hostRef = React.createRef()
+    this.fqdnRef = React.createRef()
 
     this.handleCardOnStartEdit = this.handleCardOnStartEdit.bind(this)
     this.handleChange = this.handleChange.bind(this)
@@ -228,6 +232,8 @@ class DetailsCard extends React.Component {
     this.handleHotPlugOnApplyNow = this.handleHotPlugOnApplyNow.bind(this)
 
     this.updateOs = this.updateOs.bind(this)
+    this.updateDimensions = this.updateDimensions.bind(this)
+    this.updateOverflow = this.updateOverflow.bind(this)
   }
 
   static getDerivedStateFromProps (props, state) {
@@ -252,6 +258,36 @@ class DetailsCard extends React.Component {
     }
 
     return null
+  }
+
+  getSnapshotBeforeUpdate () {
+    this.updateOverflow()
+
+    return null
+  }
+
+  updateOverflow () {
+    this.hostOverflow = false
+    this.fqdnOverflow = false
+    if (this.hostRef.current.offsetWidth < this.hostRef.current.scrollWidth) {
+      this.hostOverflow = true
+    }
+    if (this.fqdnRef.current.offsetWidth < this.fqdnRef.current.scrollWidth) {
+      this.fqdnOverflow = true
+    }
+  }
+
+  updateDimensions () {
+    this.updateOverflow()
+    this.forceUpdate()
+  }
+
+  componentDidMount () {
+    window.addEventListener('resize', this.updateDimensions)
+  }
+
+  componentWillUnmount () {
+    window.removeEventListener('resize', this.updateDimensions)
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -694,7 +730,7 @@ class DetailsCard extends React.Component {
                 <Col className={style['fields-column']}>
                   <Grid>
                     <FieldRow label={msg.host()} id={`${idPrefix}-host`}>
-                      { hostName || <NotAvailable tooltip={msg.notAvailableUntilRunning()} id={`${idPrefix}-host-not-available`} /> }
+                      { <span className={style['hostname']} title={this.hostOverflow ? hostName : ''} ref={this.hostRef}>{hostName}</span> || <NotAvailable tooltip={msg.notAvailableUntilRunning()} id={`${idPrefix}-host-not-available`} /> }
                     </FieldRow>
                     <FieldRow label={msg.ipAddress()} id={`${idPrefix}-ip`}>
                       <React.Fragment>
@@ -710,7 +746,7 @@ class DetailsCard extends React.Component {
                       </React.Fragment>
                     </FieldRow>
                     <FieldRow label={msg.fqdn()} id={`${idPrefix}-fqdn`}>
-                      { fqdn || <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id={`${idPrefix}-fqdn-not-available`} /> }
+                      { <span className={style['hostname']} title={this.fqdnOverflow ? fqdn : ''} ref={this.fqdnRef}>{fqdn}</span> || <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id={`${idPrefix}-fqdn-not-available`} /> }
                     </FieldRow>
                     <FieldRow label={msg.cluster()} id={`${idPrefix}-cluster`}>
                       { !isEditing && clusterName }
