@@ -22,6 +22,7 @@ import {
 
   setUserFilterPermission,
   setUserSessionTimeoutInternal,
+  setWebsocket,
   setAdministrator,
   setCpuTopologyOptions,
   getOption,
@@ -84,6 +85,7 @@ export function* login (action) {
   yield fetchPermissionWithoutFilter()
   yield fetchCpuTopologyOptions()
   yield fetchUserSessionTimeoutInterval()
+  yield fetchWebsocketInformation()
   yield put(getUSBFilter())
   yield initialLoad()
   yield autoConnectCheck()
@@ -241,6 +243,15 @@ function* initialLoad () {
 
   // The `Vms` card view component will take care of loading pages of VMs and Pools as needed.
   // Loading VMs and Pools here is not necessary and will cause issues with `Vms`'s loading.
+}
+
+function* fetchWebsocketInformation () {
+  const data = yield callExternalAction('getOption', Api.getOption, getOption('WebSocketProxy', 'general', ''))
+  if (data) {
+    let websocket = data.split(':')
+    websocket = { host: websocket[0], port: websocket[1] }
+    yield put(setWebsocket(websocket))
+  }
 }
 
 function* fetchPermissionWithoutFilter () {

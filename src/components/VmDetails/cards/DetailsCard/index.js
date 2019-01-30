@@ -37,7 +37,6 @@ import { Grid, Row, Col } from '../../GridComponents'
 
 import style from './style.css'
 
-import ConsoleList from './ConsoleList'
 import HotPlugChangeConfirmationModal from './HotPlugConfirmationModal'
 import NextRunChangeConfirmationModal from './NextRunChangeConfirmationModal'
 
@@ -812,7 +811,6 @@ class DetailsCard extends React.Component {
                         {enumMsg('Switch', bootMenuEnabled ? 'on' : 'off')}
                       </div>
                     </FieldRow>
-                    <FieldRow label={msg.console()} id={`${idPrefix}-console`}><ConsoleList idPrefix={`${idPrefix}-console`} vm={vm} /></FieldRow>
 
                     <FieldRow label={msg.optimizedFor()} id={`${idPrefix}-optimized`}>
                       {optimizedFor}

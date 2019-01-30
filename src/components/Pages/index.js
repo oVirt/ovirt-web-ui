@@ -11,14 +11,10 @@ import { canUserUseAnyClusters } from '_/utils'
 import VmDialog from '../VmDialog'
 import VmsList from '../VmsList'
 import VmDetails from '../VmDetails'
+import VmConsole from '../VmConsole'
 import { default as LegacyVmDetails } from '../VmDetail'
-import { SplitButton, MenuItem } from 'patternfly-react'
 
 import { addUserMessage } from '_/actions'
-import { VncConsole } from '@patternfly/react-console'
-import ConsoleConfirmationModal from '../VmActions/ConsoleConfirmationModal'
-import Action from '../VmActions/Action'
-import { fromJS } from 'immutable'
 
 /**
  * Route component (for PageRouter) to view the list of VMs and Pools
@@ -155,93 +151,26 @@ const VmCreatePageConnected = connect(
   })
 )(VmCreatePage)
 
-class VmConsoleSelector extends React.Component {
-  render () {
-    const { vmId, id, vms, consoleId } = this.props
-    let actions = vms.getIn(['vms', vmId, 'consoles'])
-    actions = [...actions]
-    if (actions.length === 0) {
-      return <div />
-    }
-    return <SplitButton title='Spice Console' id={id}>
-      { actions.map(action => {
-        let selected = {}
-        selected['active'] = action.get('id') === consoleId
-        return <Action
-          confirmation={<div><ConsoleConfirmationModal vm={fromJS({ id: vmId })} consoleId={action.get('id')}
-          /></div>}
-        >
-          <MenuItem key={action.id} id={action.id}
-            onClick={action.onClick} {...selected}>{action.get('protocol')}</MenuItem>
-        </Action>
-      }) }
-    </SplitButton>
-  }
-}
-
-VmConsoleSelector.propTypes = {
-  vmId: PropTypes.string.isRequired,
-  id: PropTypes.string.isRequired,
-  vms: PropTypes.object.isRequired,
-  consoleId: PropTypes.string.isRequired,
-}
-
-const VmConsoleSelectorConnected = connect(
-  (state) => ({
-    vms: state.vms,
-    consoles: state.consoles,
-  })
-)(VmConsoleSelector)
-
 class VmConsolePage extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      vmId: undefined,
-      consoleId: undefined,
-      disconnected: false,
-    }
-  }
-
-  static getDerivedStateFromProps (props, state) {
-    if (state.vmId !== props.match.params.id) {
-      const vmId = props.match.params.id
-      return { vmId }
-    }
-  }
-
-  onDisconnected (e) {
-    this.state({ disconnected: true })
-  }
-
   render () {
-    const host = window.location.hostname
-    const confirmation = <ConsoleConfirmationModal vm={fromJS({ vm: this.state.vmId })} consoleId={this.props.match.console_id}
-      onClose={() => {}} />
-    if (this.props.consoles.getIn(['vms', this.state.vmId]) === undefined) {
-      return <div>{confirmation}</div>
+    const { vms, match } = this.props
+    if (match.params.id && vms.getIn(['vms', match.params.id])) {
+      return <VmConsole consoleId={match.params.console_id} vmId={match.params.id} />
     }
-    const proxyTicket = this.props.consoles.getIn(['vms', this.state.vmId, 'proxyTicket'])
-    const ticket = this.props.consoles.getIn(['vms', this.state.vmId, 'ticket'])
-    if (ticket !== undefined) {
-      return <div><VncConsole encrypt credentials={{ password: ticket.value }}
-        path={proxyTicket}
-        host={host} port='6100' onDisconnected={this.onDisconnected} /></div>
-    } else {
-      return <div>Downloading vv file</div>
-    }
+    return null
   }
 }
 
 VmConsolePage.propTypes = {
-  consoles: PropTypes.object.isRequired,
   match: RouterPropTypeShapes.match.isRequired,
+  vms: PropTypes.object.isRequired,
 }
 
 const VmConsolePageConnected = connect(
   (state) => ({
-    consoles: state.consoles,
-  })
+    vms: state.vms,
+  }),
+  (dispatch) => ({})
 )(VmConsolePage)
 
 export {
@@ -249,6 +178,5 @@ export {
   VmDetailsPageConnected as VmDetailsPage,
   VmCreatePageConnected as VmCreatePage,
   VmConsolePageConnected as VmConsolePage,
-  VmConsoleSelectorConnected as VmConsoleSelector,
   VmsPage,
 }

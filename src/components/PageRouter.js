@@ -77,7 +77,7 @@ class PageRouter extends React.Component {
     return (
       <div id='page-router'>
         <Breadcrumb branches={branches} />
-        <Toolbar>
+        <Toolbar isFullWidth={branch.route.isToolbarFullWidth}>
           {tools}
         </Toolbar>
         <div id='page-router-render-component'>

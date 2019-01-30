@@ -5,3 +5,19 @@
 .toolbar {
   width: 100%;
 }
+
+.full-width {
+	width: 100%;
+}
+
+.console-toolbar {
+	height: 30px;
+    display: flex;
+    font-size: 14px;
+    line-height: 1.8;
+    justify-content: space-between;
+}
+
+.console-toolbar-actions {
+	display: flex;
+}

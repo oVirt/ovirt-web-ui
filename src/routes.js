@@ -6,7 +6,7 @@ import { VmDetailToolbar, PoolDetailToolbar, VmConsoleToolbar } from './componen
 import { PoolDetailsPage, VmDetailsPage, VmCreatePage, VmsPage, VmConsolePage } from './components/Pages'
 
 import { msg } from '_/intl'
-import { DETAIL_PAGE_TYPE, DIALOG_PAGE_TYPE, MAIN_PAGE_TYPE, POOL_PAGE_TYPE } from '_/constants'
+import { DETAIL_PAGE_TYPE, DIALOG_PAGE_TYPE, MAIN_PAGE_TYPE, POOL_PAGE_TYPE, CONSOLE_PAGE_TYPE } from '_/constants'
 
 /**
  * Function get vms object, and return routes object
@@ -55,6 +55,8 @@ export default function getRoutes (vms) {
             component: VmConsolePage,
             closeable: true,
             toolbars: [(match) => (<VmConsoleToolbar match={match} />)],
+            isToolbarFullWidth: true,
+            type: CONSOLE_PAGE_TYPE,
           },
         ],
       },

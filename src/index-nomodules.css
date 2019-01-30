@@ -211,3 +211,28 @@ a.disabled {
   display: inline-block;
   text-align: left;
 }
+
+.vnc-console {
+  width: 100%;
+  height: 100%;
+}
+
+.vnc-console > div {
+  height: 100%;
+}
+
+.vnc-console > .toolbar-pf-results {
+  height: 100%;
+}
+
+.vnc-console > .toolbar-pf-results .col-sm-12 {
+  height: 100%;
+}
+
+.vnc-console > .toolbar-pf-results > .col-sm-12 > div {
+  height: 100%;
+}
+/*
+.vnc-console > .toolbar-pf-results > .col-sm-12 > .toolbar-pf-results > .col-sm-12 > div {
+  height: 100%;
+}*/

@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { excludeKeys } from 'patternfly-react'
+import { excludeKeys, DropdownButton, MenuItem } from 'patternfly-react'
 
 import { hrefWithoutHistory } from '_/helpers'
 
@@ -88,11 +88,32 @@ Button.propTypes = {
 }
 
 const ActionButtonWraper = (props) => {
-  const btnProps = excludeKeys(props, [ 'confirmation' ])
-  return <Action confirmation={props.confirmation} key={props.shortTitle}><Button {...btnProps} /></Action>
+  const btnProps = excludeKeys(props, [ 'confirmation', 'items' ])
+  const { items, actionDisabled, confirmation, shortTitle } = props
+  if (items && items.filter(i => i !== null).length > 0) {
+    return <DropdownButton
+      title={shortTitle}
+      bsStyle={props.className}
+      id='console-selector'
+      disabled={actionDisabled}
+    >
+      { items.filter(i => i !== null).map(item => {
+        return <Action
+          key={item.id}
+          confirmation={item.confirmation}
+        >
+          <MenuItem id={item.id} onClick={item.onClick}>
+            {item.shortTitle}
+          </MenuItem>
+        </Action>
+      }) }
+    </DropdownButton>
+  }
+  return <Action confirmation={confirmation} key={shortTitle}><Button {...btnProps} /></Action>
 }
 ActionButtonWraper.propTypes = {
   confirmation: PropTypes.node,
+  items: PropTypes.array,
   ...Button.propTypes,
 }
 

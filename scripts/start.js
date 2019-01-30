@@ -8,6 +8,8 @@ var webpack = require('webpack');
 var WebpackDevServer = require('webpack-dev-server');
 var historyApiFallback = require('connect-history-api-fallback');
 var httpProxyMiddleware = require('http-proxy-middleware');
+var http = require('http');
+var httpProxy = require('http-proxy');
 var execSync = require('child_process').execSync;
 var opn = require('opn');
 var detect = require('detect-port');
@@ -19,6 +21,7 @@ var env = require('../config/env')
 var rimraf = require('rimraf')
 var formatMessage = require('./utils/utils').formatMessage
 var isLikelyASyntaxError = require('./utils/utils').isLikelyASyntaxError
+const url = require('url');
 
 // Tools like Cloud9 rely on this.
 var DEFAULT_PORT = process.env.PORT || 3000;
