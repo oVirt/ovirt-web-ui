@@ -207,7 +207,7 @@ class VmActions extends React.Component {
 
     // Actions for Card
     if (isOnCard) {
-      let filteredActions = actions.filter((action) => !action.actionDisabled).sort((a, b) => a.priority < b.priority ? 1 : 0)
+      let filteredActions = actions.filter((action) => !action.actionDisabled).sort((a, b) => b.priority - a.priority)
       filteredActions = filteredActions.length === 0 ? [ actions[0] ] : filteredActions
 
       return <div className={`actions-line card-pf-items text-center ${style['action-height']}`} id={idPrefix}>
