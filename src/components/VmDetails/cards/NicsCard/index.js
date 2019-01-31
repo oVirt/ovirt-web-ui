@@ -135,7 +135,7 @@ class NicsCard extends React.Component {
       <BaseCard
         icon={{ type: 'pf', name: 'network' }}
         title={msg.nic()}
-        editTooltip={msg.nicCardEditTooltip({ vmId: vm.get('id') })}
+        editTooltip={msg.nicCardEditTooltip({ vmName: vm.get('name') })}
         editable={canEditTheCard}
         idPrefix={idPrefix}
         className={baseStyle['cell-card']}
