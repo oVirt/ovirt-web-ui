@@ -24,7 +24,7 @@
 
 .ip4-container,
 .ip6-container {
-  font-size: 0.7em;
+  font-size: 10px;
   padding: 0 10px;
 }
 .ip6-container {
