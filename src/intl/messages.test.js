@@ -53,21 +53,23 @@ function normalizeMessagesForDiff (messages) {
 describe('verify the content of each locale in translated-messages.json', () => {
   const englishNormalForm = normalizeMessagesForDiff(englishMessages)
 
-  Object.keys(translatedMessages).forEach(locale => {
-    describe(`check ${locale}`, () => {
+  describe.each(Object.keys(translatedMessages))(
+    'check locale [%s]',
+    (locale) => {
       const localeNormalForm = normalizeMessagesForDiff(translatedMessages[locale])
 
-      it('every locale key is a defined English key', () => {
-        Object.keys(localeNormalForm).forEach(name => {
-          expect(englishNormalForm).toHaveProperty(name)
-        })
-      })
+      describe.each(Object.keys(localeNormalForm))(
+        'verify message key [%s]',
+        (key) => {
+          test('localized key is a defined English key', () => {
+            expect(englishNormalForm).toHaveProperty(key)
+          })
 
-      it('messages match ICU arguments', function () {
-        Object.keys(localeNormalForm).forEach(name => {
-          expect(localeNormalForm[name].args).toEqual(englishNormalForm[name].args)
-        })
-      })
-    })
-  })
+          test('messages match ICU arguments', () => {
+            expect(localeNormalForm[key].args).toEqual(englishNormalForm[key].args)
+          })
+        }
+      )
+    }
+  )
 })
