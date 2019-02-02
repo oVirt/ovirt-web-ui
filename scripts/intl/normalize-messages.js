@@ -4,7 +4,7 @@ import fs from 'fs'
 import path from 'path'
 
 import chalk from 'chalk'
-import stableStringify from 'json-stable-stringify'
+import stableStringify from 'json-stable-stringify-without-jsonify'
 
 const SOURCE = path.join('extra', 'from-zanata', 'translated-messages.json')
 const DESTINATION = path.join('src', 'intl', 'translated-messages.json')
