@@ -2,72 +2,121 @@
 
 # VM Portal - Developer information
 
+
 ## Bugs and Enhancements
 Please report bugs and feature requests to the [GitHub issue tracker](https://github.com/oVirt/ovirt-web-ui/issues).
 
+
 ## Users Forum
-Use the [oVirt Users forum / mailing list](https://lists.ovirt.org/archives/list/users@ovirt.org/) for general discussion or help.
-Use the [oVirt Devel forum / mailing list](https://lists.ovirt.org/archives/list/devel@ovirt.org/) development discussion.
+  - Use the [oVirt Users forum / mailing list](https://lists.ovirt.org/archives/list/users@ovirt.org/) for general discussion or help.
+  - Use the [oVirt Devel forum / mailing list](https://lists.ovirt.org/archives/list/devel@ovirt.org/) development discussion.
+
 
 ## Development setup
 
 ### Prerequisites
-
-- Have the **oVirt engine running** at https://[ENGINE_URL]
+  - Have the **oVirt engine running** at https://[ENGINE_URL]
     - example: https://engine.local/ovirt-engine
-- Have `yarn` installed
-    - it's not strictly required but **suggested** to use ovirt-engine-\* JS packages:
-    - from `ovirt/tested` yum repo [http://resources.ovirt.org/repos/ovirt/tested/master/rpm](http://resources.ovirt.org/repos/ovirt/tested/master/rpm) (see [BZ 1427045](https://bugzilla.redhat.com/show_bug.cgi?id=1427045))
-        - `dnf install ovirt-engine-nodejs ovirt-engine-nodejs-modules ovirt-engine-yarn`
-        - use: `export PATH=/usr/share/ovirt-engine-yarn/bin:/usr/share/ovirt-engine-nodejs/bin:$PATH`
+  - Have packages `autoconf`, `automake` and `libtool` installed
+  - Have `yarn` installed
+  - Not strictly required but **suggested**, use the `ovirt-engine-*` packages
+  - `git clone` the repository
 
-**Alternate standalone installation using RPM**
 
-`yum install ovirt-web-ui` installs to `/usr/share/ovirt-web-ui` and a new *ovirt-web-ui.war* is added to the existing ovirt-engine.ear.
+#### ovirt-engine packages
+Install `ovirt-engine-nodejs`, `ovirt-engine-nodejs-modules` and `ovirt-engine-yarn`
+from the `ovirt/tested` yum repo for your platform to use the same packages that will
+be used by CI to build the app.  (See [BZ 1427045](https://bugzilla.redhat.com/show_bug.cgi?id=1427045))
+
+    REPO=fc28 # or the appropriate release and version for you
+    dnf config-manager --add-repo http://resources.ovirt.org/repos/ovirt/tested/master/rpm/$REPO
+    dnf install ovirt-engine-nodejs ovirt-engine-nodejs-modules ovirt-engine-yarn
+
+To set PATH and the project's `node_modules` directory based on yarn offline cache
+and use these packages for development or building use:
+
+    source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh
+
+If you want to stop using `yarn` offline, `yarn` will need to be reconfigured to remove
+the offline mirror added by `setup-env.sh`:
+
+    yarn config delete yarn-offline-mirror
+
+
+**NOTE:** During development it is not necessary to limit your environment to the offline
+yarn repo provided by `ovirt-engine-nodejs-modules`.  However, it is recommended to run a
+full build to verify no dependency errors will be introduced by your change.
+
+
+### Development mode
+A primary goal of VM Portal is a quick development cycle (change-build-deploy-check). The
+project uses [webpack-dev-server](http://webpack.github.io/docs/webpack-dev-server.html)
+to accomplish this. To start the server:
+
+    ENGINE_URL=https://my.ovirt.instance/ovirt-engine/ yarn start
+
+When asked, provide a valid user name (in the form of `user@domain`) and password so
+the application can start in the context of a logged in user.
+
+
+### Build
+You can build the static assets from source by:
+
+    # skip if you don't want to use offline mode
+    source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh
+
+    ./autogen.sh
+    make
+
+
+### Build and install to a local development ovirt-engine
+This allows you to run VM Portal deployed directly in an ovirt-engine development installation.
+
+    # skip if you don't want to use offline mode
+    source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh
+
+    ./autogen.sh --prefix=/usr --datarootdir=/share
+    make all install-data-local DESTDIR=<path_to_engine_development_prefix>
+
+
+### Build RPM
+There are at least 4 ways to build the RPM for the project:
+  1. Manually with `make rpm`
+
+    source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh
+    ./autogen.sh --prefix=/usr --datarootdir=/share
+    make rpm
+
+  2. Use [mock_runner](https://ovirt-infra-docs.readthedocs.io/en/latest/CI/Using_mock_runner/index.html)
+     to run CI build artifacts locally (this method is cleanest since it runs in a chroot)
+
+  3. Each pull request push will automatically have RPMs built (see `automation/build.sh`)
+     by [oVirt infra STDCI](https://ovirt-infra-docs.readthedocs.io/en/latest/CI/Build_and_test_standards/index.html)
+
+  4. Post the comment "`ci please build`" to the GitHub Pull Request for an on-demand
+     CI build artifacts build
+
+
+### RPM Installation
+    yum install ovirt-web-ui
+
+Installs the app to `/usr/share/ovirt-web-ui`. A new **ovirt-web-ui.war** is added to the existing **ovirt-engine.ear**.
 
 You can access the application at: `https://[ENGINE_URL]/ovirt-engine/web-ui`
 
 The latest ovirt-web-ui RPM can be found in the [Copr build system](https://copr.fedorainfracloud.org/coprs/ovirtwebui/ovirt-web-ui/).
 
-### Build
 
-After `git clone` and meeting all **Prerequisities** above, you can build from source by:
+## Browser Developer Tools
+A pair of extensions are recommended to simplify debugging of the application:
+  - [Redux DevTools Extension](http://extension.remotedev.io/)
+  - [React Developer Tools](https://github.com/facebook/react-devtools)
 
-    source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh   # to set PATH and ./node_modules directory based on yarn offline cache
-    ./autogen.sh
-
-    export PATH=/usr/share/ovirt-engine-yarn/bin:/usr/share/ovirt-engine-nodejs/bin:$PATH    # please consider adding to ~/.bashrc
-
-    make    # to create the 'build' directory
-    # or
-    make rpm    # to create (s)rpms under 'tmp.repos'
-
-### Build and install to a local ovirt-engine
-
-This allows you to run VM Portal deployed directly in an ovirt-engine development installation.
-
-    ./autogen.sh --prefix=/usr --datarootdir=/share
-    make all install-data-local DESTDIR=<path_to_engine_development_prefix>
-
-### Development mode
-
-A primary goal of VM Portal is a quick development cycle (change-build-deploy-check). The project uses [webpack-dev-server](http://webpack.github.io/docs/webpack-dev-server.html) to accomplish this. To start the server:
-
-    ENGINE_URL=https://my.ovirt.instance/ovirt-engine/ yarn start
-
-When asked, provide a valid username (in the form of `user@domain`) and password so
-the application can start in the context of a logged in user.
-
-### Redux Dev Tools
-The Redux Dev Tools can significantly simplify debuging of the application.
-
-For Chrome: [https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd)
-
-For Firefox: [https://addons.mozilla.org/en-us/firefox/addon/remotedev/](https://addons.mozilla.org/en-us/firefox/addon/remotedev/)
 
 ## Technical Details
 - based on React, Patternfly, Redux, Redux-Saga
 - based on ejected [create-react-app](https://facebook.github.io/react/blog/2016/07/22/create-apps-with-no-configuration.html)
+
 
 ## Goals
 - fast UI responses and start-up
@@ -79,6 +128,7 @@ For Firefox: [https://addons.mozilla.org/en-us/firefox/addon/remotedev/](https:/
 - simplified maintenance and ongoing development
 
 For more info, see [doc/goals.md](https://github.com/oVirt/ovirt-web-ui/blob/master/doc/goals.md)
+
 
 ## Author(s)
 - Marek Libra (mlibra@redhat.com)
