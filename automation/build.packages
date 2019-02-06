@@ -1,0 +1,5 @@
+make
+autoconf
+automake
+git
+dnf

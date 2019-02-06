@@ -1,0 +1,3 @@
+ovirt-engine-nodejs_master,http://jenkins.ovirt.org/job/ovirt-engine-nodejs_master_build-artifacts-$distro-x86_64/lastSuccessfulBuild/artifact/exported-artifacts/
+ovirt-engine-nodejs-modules_master,http://jenkins.ovirt.org/job/ovirt-engine-nodejs-modules_master_build-artifacts-$distro-x86_64/lastSuccessfulBuild/artifact/exported-artifacts/
+ovirt-engine-yarn_master,http://jenkins.ovirt.org/job/ovirt-engine-yarn_master_build-artifacts-$distro-x86_64/lastSuccessfulBuild/artifact/exported-artifacts/
