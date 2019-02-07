@@ -162,9 +162,11 @@ class VmDialog extends React.Component {
   submitHandler (e) {
     e.preventDefault()
     const correlationId = generateUnique('vm-dialog-')
+    const template = this.getTemplate(this.state.templateId)
+    const clone = !!(template && template.get('type') === 'server')
     this.props.vm
       ? this.props.updateVm(this.composeVm(), correlationId)
-      : this.props.addVm(this.composeVm(), correlationId)
+      : this.props.addVm(this.composeVm(), correlationId, clone)
     this.setState({
       saved: true,
       isChanged: false,
@@ -799,7 +801,7 @@ export default connect(
     storages: state.storageDomains,
   }),
   (dispatch) => ({
-    addVm: (vm, correlationId) => dispatch(createVm({ vm, pushToDetailsOnSuccess: true }, { correlationId })),
+    addVm: (vm, correlationId, clone) => dispatch(createVm({ vm, pushToDetailsOnSuccess: true, clone }, { correlationId })),
     updateVm: (vm, correlationId) => dispatch(editVm({ vm }, { correlationId })),
   })
 )(VmDialog)

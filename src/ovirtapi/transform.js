@@ -334,6 +334,7 @@ const Template = {
       description: template.description,
       clusterId: template.cluster ? template.cluster.id : null,
       memory: template.memory,
+      type: template.type,
 
       cpu: {
         vCPUs: vCpusCount({ cpu: template.cpu }),

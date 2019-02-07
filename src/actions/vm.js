@@ -133,13 +133,14 @@ export function suspendVm ({ vmId }) {
   }
 }
 
-export function createVm ({ vm, transformInput = true, pushToDetailsOnSuccess = false }, { correlationId, ...additionalMeta }) {
+export function createVm ({ vm, transformInput = true, pushToDetailsOnSuccess = false, clone = false }, { correlationId, ...additionalMeta }) {
   return {
     type: CREATE_VM,
     payload: {
       vm,
       transformInput,
       pushToDetailsOnSuccess,
+      clone,
     },
     meta: {
       correlationId,
