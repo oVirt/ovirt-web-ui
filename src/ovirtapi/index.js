@@ -186,8 +186,8 @@ const OvirtApi = {
     return httpGet({ url, custHeaders: { Filter: true } })
   },
   getVmPermissions ({ vmId }: VmIdType): Promise<Object> {
-    assertLogin({ methodName: 'getClusterPermissions' })
-    const url = `${AppConfiguration.applicationContext}/api/vms/${vmId}/permissions?follow=role`
+    assertLogin({ methodName: 'getVmPermissions' })
+    const url = `${AppConfiguration.applicationContext}/api/vms/${vmId}/permissions?follow=role.permits`
     return httpGet({ url, custHeaders: { Filter: true } })
   },
   getAllHosts (): Promise<Object> {
