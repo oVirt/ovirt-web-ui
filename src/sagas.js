@@ -143,12 +143,13 @@ import {
 } from '_/constants'
 
 import {
+  arrayMatch,
+  canUserEditDisk,
   canUserEditVm,
-  getUserPermits,
+  canUserEditVmStorage,
   canUserUseCluster,
   canUserUseVnicProfile,
-  canUserEditVmStorage,
-  canUserEditDisk,
+  getUserPermits,
 } from './utils'
 
 const vmFetchAdditionalList =
@@ -731,17 +732,19 @@ export function* createVm (action) {
  */
 export function* editVm (action) {
   const { payload: { vm } } = action
-  const vmId = action.payload.vm.id
+  const vmId = vm.id
+  const onlyNeedChangeCd = vm && arrayMatch(Object.keys(vm), [ 'id', 'cdrom' ])
 
-  const editVmResult = yield callExternalAction('editVm', Api.editVm, action)
+  const editVmResult = onlyNeedChangeCd
+    ? {}
+    : yield callExternalAction('editVm', Api.editVm, action)
 
   let commitError = editVmResult.error
   if (!commitError && vm.cdrom) {
-    const isUp = editVmResult && editVmResult.status === 'up'
     const changeCdResult = yield changeVmCdRom(actionChangeVmCdRom({
       vmId,
       cdrom: vm.cdrom,
-      current: isUp,
+      current: action.payload.changeCurrentCd,
       updateRedux: false, // the 'actionSelectVmDetail' will fetch the cd-rom update
     }))
 

@@ -7,6 +7,7 @@ export * from './format'
 export * from './round'
 export * from './storage-conversion'
 export { isNumber } from './unit-conversion'
+export * from './array-utils'
 
 export function flatMap<T, U> (array: Array<T>, mapper: (T) => Array<U>): Array<U> {
   return array.map(mapper)

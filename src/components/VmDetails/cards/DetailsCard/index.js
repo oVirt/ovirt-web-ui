@@ -550,7 +550,11 @@ class DetailsCard extends React.Component {
 
     // ---- dispatch the save
     this.setState({ correlationId })
-    this.props.saveChanges(vmUpdates, this.restartAfterSave, !this.hotPlugNow, correlationId)
+    this.props.saveChanges(
+      vmUpdates,
+      this.restartAfterSave,
+      !this.hotPlugNow,
+      correlationId)
 
     return false // control BaseCard's view/edit transition
   }
