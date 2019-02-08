@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { msg } from '_/intl'
 
 import { Grid, Row, Col } from '../../GridComponents'
 import BaseCard from '../../BaseCard'
@@ -20,23 +21,26 @@ const UtilizationCard = ({ vm }) => {
 
   const idPrefix = 'vmdetail-utilization'
 
-  const loadingMessage = 'Loading...'
-
   return (
-    <BaseCard className={style['utilization-card']} title='Utilization' editable={false} idPrefix={idPrefix}>
+    <BaseCard
+      className={style['utilization-card']}
+      title={msg.utilization()}
+      editable={false}
+      idPrefix={idPrefix}
+    >
       <Grid>
         <Row className={style['row-charts-box']}>
           <Col className={style['row-col-charts-box']}>
             <Col className={style['col-charts-box']}>
               { stats.cpu
                 ? <CpuCharts cpuStats={stats.cpu} isRunning={isRunning} id={`${idPrefix}-cpu`} />
-                : <NoLiveData message={loadingMessage} id={`${idPrefix}-cpu-no-data`} />
+                : <NoLiveData message={msg.loadingTripleDot()} id={`${idPrefix}-cpu-no-data`} />
               }
             </Col>
             <Col className={style['col-charts-box']}>
               { stats.memory
                 ? <MemoryCharts memoryStats={stats.memory} isRunning={isRunning} id={`${idPrefix}-memory`} />
-                : <NoLiveData message={loadingMessage} id={`${idPrefix}-memory-no-data`} />
+                : <NoLiveData message={msg.loadingTripleDot()} id={`${idPrefix}-memory-no-data`} />
               }
             </Col>
           </Col>
@@ -44,13 +48,13 @@ const UtilizationCard = ({ vm }) => {
             <Col className={style['col-charts-box']}>
               { stats.network
                 ? <NetworkingCharts netStats={stats.network} isRunning={isRunning} id={`${idPrefix}-network`} />
-                : <NoLiveData message={loadingMessage} id={`${idPrefix}-network-no-data`} />
+                : <NoLiveData message={msg.loadingTripleDot()} id={`${idPrefix}-network-no-data`} />
               }
             </Col>
             <Col className={style['col-charts-box']}>
               { vm.has('disks')
                 ? <DiskCharts vm={vm} diskStats={stats.disks} isRunning={isRunning} id={`${idPrefix}-disk`} />
-                : <NoLiveData message={loadingMessage} id={`${idPrefix}-disk-no-data`} />
+                : <NoLiveData message={msg.loadingTripleDot()} id={`${idPrefix}-disk-no-data`} />
               }
             </Col>
           </Col>

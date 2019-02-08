@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
 import { connect } from 'react-redux'
 
+import { msg } from '_/intl'
 import BaseCard from '../../BaseCard'
 import style from './style.css'
 
@@ -70,7 +70,7 @@ const SnapshotsCard = ({ vm }) => {
   return (
     <BaseCard
       icon={{ type: 'pf', name: 'virtual-machine' }}
-      title='Snapshots'
+      title={msg.snapshot()}
       itemCount={snapshots.size}
       idPrefix={idPrefix}
       editable={false}

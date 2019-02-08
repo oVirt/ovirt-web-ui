@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Alert, Card, CardBody } from 'patternfly-react'
+import { msg } from '_/intl'
 
 import styles from './style.css'
 
@@ -62,7 +63,7 @@ class VmDetailsContainer extends React.Component {
             <Col>
               <Card>
                 <CardBody>
-                  <Alert type='info' style={{ margin: '0' }}>This VM has pending configurations changes that will be applied once the VM is shutdown (or rebooted).</Alert>
+                  <Alert type='info' style={{ margin: '0' }}>{msg.vmHasPendingConfigurationChanges()}</Alert>
                 </CardBody>
               </Card>
             </Col>

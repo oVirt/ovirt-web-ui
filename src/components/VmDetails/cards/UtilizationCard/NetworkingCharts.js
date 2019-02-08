@@ -14,6 +14,8 @@ import {
   SparklineChart,
 } from 'patternfly-react'
 
+import { msg } from '_/intl'
+
 import style from './style.css'
 
 import NoHistoricData from './NoHistoricData'
@@ -38,19 +40,19 @@ const NetworkingCharts = ({ netStats, isRunning, id }) => {
 
   return (
     <UtilizationCard className={style['chart-card']} id={id}>
-      <CardTitle>Networking</CardTitle>
+      <CardTitle>{msg.utilizationCardTitleNetworking()}</CardTitle>
       <CardBody>
         { !isRunning && <NoLiveData id={`${id}-no-live-data`} /> }
         { isRunning && !haveNetworkStats &&
-          <NoLiveData id={`${id}-no-live-data`} message='Network utilization is not currently available for this VM.' />
+          <NoLiveData id={`${id}-no-live-data`} message={msg.utilizationNoNetStats()} />
         }
         { isRunning && haveNetworkStats &&
         <React.Fragment>
           <UtilizationCardDetails>
             <UtilizationCardDetailsCount id={`${id}-available`}>{available}%</UtilizationCardDetailsCount>
             <UtilizationCardDetailsDesc>
-              <UtilizationCardDetailsLine1>Available</UtilizationCardDetailsLine1>
-              <UtilizationCardDetailsLine2>of 100%</UtilizationCardDetailsLine2>
+              <UtilizationCardDetailsLine1>{msg.utilizationCardAvailable()}</UtilizationCardDetailsLine1>
+              <UtilizationCardDetailsLine2>{msg.utilizationCardOf100()}</UtilizationCardDetailsLine2>
             </UtilizationCardDetailsDesc>
           </UtilizationCardDetails>
 
@@ -58,14 +60,14 @@ const NetworkingCharts = ({ netStats, isRunning, id }) => {
             id={`${id}-donut-chart`}
             data={{
               columns: [
-                [`% Used`, used],
-                [`% Available`, available],
+                [msg.utilizationCardLegendUsedP(), used],
+                [msg.utilizationCardLegendAvailableP(), available],
               ],
               order: null,
             }}
             title={{
               primary: `${used}`,
-              secondary: `% Used`,
+              secondary: msg.utilizationCardLegendUsedP(),
             }}
             tooltip={{
               show: true,

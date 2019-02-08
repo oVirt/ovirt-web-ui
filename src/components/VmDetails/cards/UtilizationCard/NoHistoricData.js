@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Icon } from 'patternfly-react'
+import { msg } from '_/intl'
 
 import style from './style.css'
 
@@ -13,7 +14,7 @@ const NoHistoricData = ({ message, id }) => (
       <Icon type='pf' name='info' />
     </div>
     <div className={style['no-history-chart-message']}>
-      { message || 'No historic data available' }
+      { message || msg.utilizationNoHistoricData() }
     </div>
   </div>
 )
