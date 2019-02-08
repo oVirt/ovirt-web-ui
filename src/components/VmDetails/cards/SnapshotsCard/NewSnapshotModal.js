@@ -72,7 +72,7 @@ class NewSnapshotModal extends Component {
               className='close'
               onClick={this.close}
               aria-hidden='true'
-              aria-label='Close'
+              aria-label={msg.close()}
               id={`${modalId}-close`}
             >
               <Icon type='pf' name='close' />

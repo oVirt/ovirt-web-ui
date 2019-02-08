@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Icon } from 'patternfly-react'
+import { msg } from '_/intl'
 
 import style from './style.css'
 
@@ -15,10 +16,10 @@ const NoLiveData = ({ title, message, id }) => (
       <Icon type='fa' name='bar-chart' />
     </div>
     <div className={style['no-data-title']}>
-      { title || 'No Data Available' }
+      { title || msg.utilizationNoDataAvailableTitle() }
     </div>
     <div className={style['no-data-message']}>
-      { message || 'Utilization data is only available when the VM is running.' }
+      { message || msg.utilizationNoDataAvailableMessage() }
     </div>
   </div>
 )

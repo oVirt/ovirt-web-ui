@@ -13,6 +13,7 @@ import {
   SparklineChart,
 } from 'patternfly-react'
 
+import { msg } from '_/intl'
 import { round, floor } from '_/utils'
 import { donutMemoryTooltipContents } from '_/components/utils'
 import { userFormatOfBytes } from '_/helpers'
@@ -48,18 +49,26 @@ const MemoryCharts = ({ memoryStats, isRunning, id }) => {
 
   return (
     <UtilizationCard className={style['chart-card']} id={id}>
-      <CardTitle>Memory</CardTitle>
+      <CardTitle>{msg.utilizationCardTitleMemory()}</CardTitle>
       <CardBody>
         { !isRunning && <NoLiveData id={`${id}-no-live-data`} /> }
         { isRunning &&
         <React.Fragment>
           <UtilizationCardDetails>
             <UtilizationCardDetailsCount id={`${id}-available`}>
-              {floor(availableFormated.number, availableMemoryPercision)}  {availableFormated.suffix !== totalFormated.suffix && availableFormated.suffix}
+              {msg.utilizationCardUnitNumber({
+                number: floor(availableFormated.number, availableMemoryPercision),
+                storageUnits: availableFormated.suffix !== totalFormated.suffix && availableFormated.suffix,
+              })}
             </UtilizationCardDetailsCount>
             <UtilizationCardDetailsDesc>
-              <UtilizationCardDetailsLine1>Available</UtilizationCardDetailsLine1>
-              <UtilizationCardDetailsLine2 id={`${id}-total`}>of {round(totalFormated.number, 0)} {totalFormated.suffix}</UtilizationCardDetailsLine2>
+              <UtilizationCardDetailsLine1>{msg.utilizationCardAvailable()}</UtilizationCardDetailsLine1>
+              <UtilizationCardDetailsLine2 id={`${id}-total`}>
+                {msg.utilizationCardOf({
+                  number: round(totalFormated.number, 0),
+                  storageUnits: totalFormated.suffix,
+                })}
+              </UtilizationCardDetailsLine2>
             </UtilizationCardDetailsDesc>
           </UtilizationCardDetails>
 
@@ -67,14 +76,14 @@ const MemoryCharts = ({ memoryStats, isRunning, id }) => {
             id={`${id}-donut-chart`}
             data={{
               columns: [
-                [`Used`, used],
-                [`Available`, available],
+                [msg.utilizationCardLegendUsed(), used],
+                [msg.utilizationCardLegendAvailable(), available],
               ],
               order: null,
             }}
             title={{
               primary: `${usedFormated.rounded}`,
-              secondary: `${usedFormated.suffix} Used`,
+              secondary: msg.utilizationCardUnitUsed({ storageUnit: usedFormated.suffix }),
             }}
             tooltip={{
               show: true,

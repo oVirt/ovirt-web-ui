@@ -13,6 +13,7 @@ import {
   DonutChart,
   SparklineChart,
 } from 'patternfly-react'
+import { msg } from '_/intl'
 
 import style from './style.css'
 
@@ -33,7 +34,7 @@ const CpuCharts = ({ cpuStats, isRunning, id }) => {
 
   return (
     <UtilizationCard className={style['chart-card']} id={id}>
-      <CardTitle>CPU</CardTitle>
+      <CardTitle>{msg.utilizationCardTitleCpu()}</CardTitle>
       <CardBody>
         { !isRunning && <NoLiveData id={`${id}-no-live-data`} /> }
         { isRunning &&
@@ -41,8 +42,8 @@ const CpuCharts = ({ cpuStats, isRunning, id }) => {
           <UtilizationCardDetails>
             <UtilizationCardDetailsCount id={`${id}-available`}>{cpuAvailable}%</UtilizationCardDetailsCount>
             <UtilizationCardDetailsDesc>
-              <UtilizationCardDetailsLine1>Available</UtilizationCardDetailsLine1>
-              <UtilizationCardDetailsLine2 id={`${id}-total`}>of 100%</UtilizationCardDetailsLine2>
+              <UtilizationCardDetailsLine1>{msg.utilizationCardAvailable()}</UtilizationCardDetailsLine1>
+              <UtilizationCardDetailsLine2 id={`${id}-total`}>{msg.utilizationCardOf100()}</UtilizationCardDetailsLine2>
             </UtilizationCardDetailsDesc>
           </UtilizationCardDetails>
 
@@ -50,14 +51,14 @@ const CpuCharts = ({ cpuStats, isRunning, id }) => {
             id={`${id}-donut-chart`}
             data={{
               columns: [
-                ['% Used', cpuUsed],
-                ['% Available', cpuAvailable],
+                [msg.utilizationCardLegendUsedP(), cpuUsed],
+                [msg.utilizationCardLegendAvailableP(), cpuAvailable],
               ],
               order: null,
             }}
             title={{
               primary: `${cpuUsed}`, // NOTE: String else 0 is truthy false and doesn't render proper
-              secondary: '% Used',
+              secondary: msg.utilizationCardLegendUsedP(),
             }}
             tooltip={{
               show: true,
