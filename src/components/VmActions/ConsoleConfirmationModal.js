@@ -5,6 +5,7 @@ import ConfirmationModal from './ConfirmationModal'
 
 import { downloadConsole, checkConsoleInUse, setConsoleInUse, setConsoleLogon } from '_/actions'
 import { msg } from '_/intl'
+import { doesVmSessionExistForUserId } from '_/utils'
 
 class ConsoleConfirmationModal extends React.Component {
   constructor (props) {
@@ -30,8 +31,8 @@ class ConsoleConfirmationModal extends React.Component {
     this.props.onClose()
   }
 
-  onConsoleDownload (force = false) {
-    this.props.onDownloadConsole({ usbFilter: this.props.config.get('usbFilter'), force })
+  onConsoleDownload (skipSSO = false) {
+    this.props.onDownloadConsole({ usbFilter: this.props.config.get('usbFilter'), skipSSO, userId: this.props.config.getIn(['user', 'id']) })
   }
 
   render () {
@@ -48,7 +49,7 @@ class ConsoleConfirmationModal extends React.Component {
           onClose={this.onConsoleConfirmationClose}
           title={msg.console()}
           body={msg.cantLogonToConsole()}
-          confirm={{ title: msg.yes(), onClick: () => this.onConsoleDownload(true) }}
+          confirm={{ title: msg.connect(), onClick: () => this.onConsoleDownload(true) }}
         />
       )
     }
@@ -92,6 +93,14 @@ export default connect(
       dispatch(setConsoleInUse({ vmId: vm.get('id'), consoleInUse: null }))
       dispatch(setConsoleLogon({ vmId: vm.get('id'), isLogon: null }))
     },
-    onDownloadConsole: ({ usbFilter, force }) => dispatch(downloadConsole({ vmId: vm.get('id'), usbFilter, consoleId, hasGuestAgent: vm.get('ssoGuestAgent'), force })),
+    onDownloadConsole: ({ usbFilter, skipSSO, userId }) => dispatch(
+      downloadConsole({
+        vmId: vm.get('id'),
+        usbFilter,
+        consoleId,
+        hasGuestAgent: vm.get('ssoGuestAgent'),
+        skipSSO: skipSSO || doesVmSessionExistForUserId(vm.get('sessions').toJS(), userId), // Parameter for skiping SSO authorization
+      })
+    ),
   })
 )(ConsoleConfirmationModal)

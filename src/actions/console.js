@@ -37,7 +37,7 @@ export function checkConsoleInUse ({ vmId, usbFilter, userId, hasGuestAgent }) {
   }
 }
 
-export function downloadConsole ({ vmId, consoleId, usbFilter, hasGuestAgent, force }) {
+export function downloadConsole ({ vmId, consoleId, usbFilter, hasGuestAgent, skipSSO }) {
   return {
     type: DOWNLOAD_CONSOLE_VM,
     payload: {
@@ -45,7 +45,7 @@ export function downloadConsole ({ vmId, consoleId, usbFilter, hasGuestAgent, fo
       consoleId,
       usbFilter,
       hasGuestAgent,
-      force,
+      skipSSO,
     },
   }
 }

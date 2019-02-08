@@ -5,6 +5,7 @@ import Selectors from '../../selectors'
 import OptionsManager from '../../optionsManager'
 import logger from '../../logger'
 import { fileDownload } from '_/helpers'
+import { doesVmSessionExistForUserId } from '_/utils'
 import {
   downloadConsole,
   getConsoleOptions as getConsoleOptionsAction,
@@ -12,6 +13,7 @@ import {
   setConsoleLogon,
   setConsoleOptions,
   setVmConsoles,
+  setVmSessions,
   vmActionInProgress,
 } from '_/actions'
 
@@ -26,11 +28,11 @@ import RDPBuilder from './rdpBuilder'
  * Push a virt-viewer connection file (__console.vv__) to connect a user to a VM's console
  */
 export function* downloadVmConsole (action) {
-  let { vmId, consoleId, usbFilter, hasGuestAgent, force } = action.payload
+  let { vmId, consoleId, usbFilter, hasGuestAgent, skipSSO } = action.payload
 
   let isSpice = false
 
-  if (hasGuestAgent && !force) {
+  if (hasGuestAgent && !skipSSO) {
     let result = yield callExternalAction('vmLogon', Api.vmLogon, { payload: { vmId } }, true)
     if (!result || result.status !== 'complete') {
       yield put(setConsoleLogon({ vmId, isLogon: false }))
@@ -103,12 +105,18 @@ export function* getConsoleInUse (action) {
   const consoleUsers = sessionsInternal && sessionsInternal
     .filter(session => session.consoleUser)
     .map(session => session.user)
+  yield put(setVmSessions({ vmId, sessions: sessionsInternal }))
 
   if (consoleUsers.length > 0 && consoleUsers.find(user => user.id === userId) === undefined) {
     yield put(setConsoleInUse({ vmId, consoleInUse: true }))
   } else {
     yield put(setConsoleInUse({ vmId, consoleInUse: false }))
-    yield put(downloadConsole({ vmId, usbFilter, hasGuestAgent }))
+    yield put(downloadConsole({
+      vmId,
+      usbFilter,
+      hasGuestAgent,
+      skipSSO: doesVmSessionExistForUserId(sessionsInternal, userId), // Parameter for skiping SSO authorization
+    }))
     yield put(setConsoleInUse({ vmId, consoleInUse: null }))
   }
 }
