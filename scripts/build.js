@@ -99,7 +99,7 @@ function printFileSizes(stats, previousSizeMap) {
 
 // Create the production build and print the deployment instructions.
 function build(previousSizeMap) {
-  // Delete flow folder, because package flow wan't to do that before start
+  // Delete flow folder, because package flow will not do that before start
   rimrafSync('/tmp/flow');
   console.log('Flow folder deleted');
 

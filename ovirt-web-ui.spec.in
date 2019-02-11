@@ -32,9 +32,11 @@ This package provides the VM Portal for %{product}.
 %setup -q -n"%{source_basename}-%{version}"
 rpm -qa | grep ovirt-engine-nodejs
 
-echo "======== Workaround: 'yarn check' is recently failing on requiring webpack >= v2 . Manually verified that this is ok for recent code base but might be real failure in the future."
-echo "=== Please watch carefuly other potential types of errors"
-source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh || true # workaround: skip the error
+echo "=== Workaround: 'yarn check' is recently failing on requiring webpack >= v2. Manually"
+echo "=== verified that this is ok for recent code base but may be a real failure in the"
+echo "=== future. Please watch carefully for other potential types of errors."
+export IGNORE_YARN_CHECK=1
+source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh
 
 %build
 export PATH="%{_datadir}/ovirt-engine-nodejs/bin:%{_datadir}/ovirt-engine-yarn/bin:${PATH}"
