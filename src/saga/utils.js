@@ -13,6 +13,10 @@ import {
   checkTokenExpired,
 } from '_/actions'
 
+import Api from '_/ovirtapi'
+
+import { getUserPermits } from '_/utils'
+
 export const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 export function* callExternalAction (methodName, method, action, canBeMissing = false) {
@@ -109,4 +113,16 @@ export function* delayInMsSteps (count = 20, msMultiplier = 2000) {
   for (let i = 2; i < (count + 2); i++) {
     yield Math.round(Math.log2(i) * msMultiplier)
   }
+}
+
+export function* fetchPermits ({ entityType, id }) {
+  const permissions = yield callExternalAction(`get${entityType}Permissions`, Api[`get${entityType}Permissions`], { payload: { id } })
+  return getUserPermits(Api.permissionsToInternal({ permissions: permissions.permission }))
+}
+
+export const PermissionsType = {
+  STORAGE_DOMAIN_TYPE: 'StorageDomain',
+  CLUSTER_TYPE: 'Cluster',
+  VNIC_PROFILE_TYPE: 'VnicProfile',
+  DISK_TYPE: 'Disk',
 }

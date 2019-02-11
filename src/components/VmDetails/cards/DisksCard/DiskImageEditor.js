@@ -35,6 +35,7 @@ const DISK_DEFAULTS = {
 
 function storageDomainsToSelectList (storageDomainList) {
   return storageDomainList
+    .filter(storageDomain => storageDomain.get('canUserUseDomain'))
     .map(
       item => ({
         id: item.get('id'),

@@ -28,6 +28,7 @@ import type {
 import {
   canUserUseCluster,
   canUserEditVm,
+  canUserEditVmStorage,
   getUserPermits,
   canUserUseVnicProfile,
   canUserManipulateSnapshots,
@@ -187,6 +188,7 @@ const VM = {
         }))
         parsedVm.canUserEditVm = canUserEditVm(parsedVm.permits)
         parsedVm.canUserManipulateSnapshots = canUserManipulateSnapshots(parsedVm.permits)
+        parsedVm.canUserEditVmStorage = canUserEditVmStorage(parsedVm.permits)
       }
     }
 
@@ -413,6 +415,7 @@ const Snapshot = {
 // VM -> DiskAttachments.DiskAttachment[] -> Disk
 const DiskAttachment = {
   toInternal ({ attachment, disk }: { attachment?: ApiDiskAttachmentType, disk: ApiDiskType }): DiskType {
+    // TODO Add nested permissions support when BZ 1639784 will be done
     return cleanUndefined({
       attachmentId: attachment && attachment['id'],
       active: attachment && convertBool(attachment['active']),
@@ -481,6 +484,7 @@ const DiskAttachment = {
 //
 const DataCenter = {
   toInternal ({ dataCenter }: { dataCenter: ApiDataCenterType }): DataCenterType {
+    // TODO Add nested permissions support when BZ 1639784 will be done
     return {
       id: dataCenter.id,
       name: dataCenter.name,

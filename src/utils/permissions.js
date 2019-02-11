@@ -22,6 +22,18 @@ export function canUserManipulateSnapshots (permits: Set<string>): boolean {
   return checkUserPermit('manipulate_vm_snapshots', permits)
 }
 
+export function canUserUseStorageDomain (permits: Set<string>): boolean {
+  return checkUserPermit('create_disk', permits)
+}
+
+export function canUserEditVmStorage (permits: Set<string>): boolean {
+  return checkUserPermit('configure_vm_storage', permits)
+}
+
+export function canUserEditDisk (permits: Set<string>): boolean {
+  return checkUserPermit('edit_disk_properties', permits)
+}
+
 /*
  * Return if any of the given clusters are available for use by the user (as defined
  * by `canUserUseCluster` above)

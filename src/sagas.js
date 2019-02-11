@@ -74,6 +74,8 @@ import {
   callExternalAction,
   delay,
   foreach,
+  fetchPermits,
+  PermissionsType,
 } from './saga/utils'
 
 import {
@@ -140,7 +142,14 @@ import {
   POOL_PAGE_TYPE,
 } from '_/constants'
 
-import { canUserEditVm, getUserPermits, canUserUseCluster, canUserUseVnicProfile } from './utils'
+import {
+  canUserEditVm,
+  getUserPermits,
+  canUserUseCluster,
+  canUserUseVnicProfile,
+  canUserEditVmStorage,
+  canUserEditDisk,
+} from './utils'
 
 const vmFetchAdditionalList =
   [
@@ -155,9 +164,6 @@ const vmFetchAdditionalList =
   ]
 
 const EVERYONE_GROUP_ID = 'eee00000-0000-0000-0000-123456789eee'
-
-const CLUSTER_TYPE = 'Cluster'
-const VNIC_PROFILE_TYPE = 'VnicProfile'
 
 /**
  * Compare the current oVirt version (held in redux) to the given version.
@@ -431,6 +437,12 @@ function* fetchVmsByCountVLower (action) {
   return fetchedVmIds
 }
 
+export function* putPermissionsInDisk (disk) {
+  disk.permits = yield fetchPermits({ entityType: PermissionsType.DISK_TYPE, id: disk.id })
+  disk.canUserEditDisk = canUserEditDisk(disk.permits)
+  return disk
+}
+
 export function* fetchSingleVm (action) {
   const { vmId, shallowFetch } = action.payload
 
@@ -458,13 +470,18 @@ export function* fetchSingleVm (action) {
     if (!isOvirtGTE42 && !shallowFetch) {
       internalVm.cdrom = yield fetchVmCdRom({ vmId: internalVm.id, current: internalVm.status === 'up' })
       internalVm.consoles = yield fetchConsoleVmMeta({ vmId: internalVm.id })
-      internalVm.disks = yield fetchVmDisks({ vmId: internalVm.id })
       internalVm.nics = yield fetchVmNics({ vmId: internalVm.id })
+      internalVm.disks = yield fetchVmDisks({ vmId: internalVm.id })
       internalVm.sessions = yield fetchVmSessions({ vmId: internalVm.id })
       internalVm.permits = getUserPermits(yield fetchVmPermissions({ vmId: internalVm.id }))
       internalVm.canUserEditVm = canUserEditVm(internalVm.permits)
+      internalVm.canUserEditVmStorage = canUserEditVmStorage(internalVm.permits)
       // TODO: Support <4.2 for snapshots?
       // TODO: Support <4.2 for statistics?
+    }
+
+    if (!shallowFetch) {
+      internalVm.disks = (yield all(internalVm.disks.map(putPermissionsInDisk)))
     }
 
     // NOTE: Snapshot Disks and Nics are not currently (Sept-2018) available via
@@ -596,7 +613,8 @@ function* fetchVmDisks ({ vmId }) {
     yield * foreach(diskattachments['disk_attachment'], function* (attachment) {
       const diskId = attachment.disk.id
       const disk = yield callExternalAction('disk', Api.disk, { type: 'GET_DISK_DETAILS', payload: { diskId } })
-      internalDisks.push(Api.diskToInternal({ disk, attachment }))
+      const internalDisk = yield putPermissionsInDisk(Api.diskToInternal({ disk, attachment }))
+      internalDisks.push(internalDisk)
     })
     return internalDisks
   }
@@ -819,11 +837,6 @@ function* fetchAllTemplates (action) {
   }
 }
 
-function* fetchPermits ({ entityType, id }) {
-  const permissions = yield callExternalAction(`get${entityType}Permissions`, Api[`get${entityType}Permissions`], { payload: { id } })
-  return getUserPermits(Api.permissionsToInternal({ permissions: permissions.permission }))
-}
-
 function* fetchAllClusters (action) {
   const clusters = yield callExternalAction('getAllClusters', Api.getAllClusters, action)
 
@@ -833,7 +846,7 @@ function* fetchAllClusters (action) {
       clusters.cluster
         .map(function* (cluster) {
           const clusterInternal = Api.clusterToInternal({ cluster })
-          clusterInternal.permits = yield fetchPermits({ entityType: CLUSTER_TYPE, id: cluster.id })
+          clusterInternal.permits = yield fetchPermits({ entityType: PermissionsType.CLUSTER_TYPE, id: cluster.id })
           clusterInternal.canUserUseCluster = canUserUseCluster(clusterInternal.permits)
           return clusterInternal
         })
@@ -941,7 +954,7 @@ function* fetchAllVnicProfiles (action) {
       vnicProfiles.vnic_profile
         .map(function* (vnicProfile) {
           const vnicProfileInternal = Api.vnicProfileToInternal({ vnicProfile })
-          vnicProfileInternal.permits = yield fetchPermits({ entityType: VNIC_PROFILE_TYPE, id: vnicProfile.id })
+          vnicProfileInternal.permits = yield fetchPermits({ entityType: PermissionsType.VNIC_PROFILE_TYPE, id: vnicProfile.id })
           vnicProfileInternal.canUserUseProfile = canUserUseVnicProfile(vnicProfileInternal.permits)
           return vnicProfileInternal
         })

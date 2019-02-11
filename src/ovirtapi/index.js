@@ -175,6 +175,16 @@ const OvirtApi = {
     const url = `${AppConfiguration.applicationContext}/api/vnicprofiles/${id}/permissions?follow=role.permits`
     return httpGet({ url, custHeaders: { Filter: true } })
   },
+  getStorageDomainPermissions ({ id }: { id: string }): Promise<Object> {
+    assertLogin({ methodName: 'getStorageDomainPermissions' })
+    const url = `${AppConfiguration.applicationContext}/api/storagedomains/${id}/permissions?follow=role.permits`
+    return httpGet({ url, custHeaders: { Filter: true } })
+  },
+  getDiskPermissions ({ id }: { id: string }): Promise<Object> {
+    assertLogin({ methodName: 'getDiskPermissions' })
+    const url = `${AppConfiguration.applicationContext}/api/disks/${id}/permissions?follow=role.permits`
+    return httpGet({ url, custHeaders: { Filter: true } })
+  },
   getVmPermissions ({ vmId }: VmIdType): Promise<Object> {
     assertLogin({ methodName: 'getClusterPermissions' })
     const url = `${AppConfiguration.applicationContext}/api/vms/${vmId}/permissions?follow=role`
