@@ -3,14 +3,14 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import sharedStyle from '../../../sharedStyle.css'
-import { getOsHumanName, getVmIcon } from '_/components/utils'
-import { enumMsg } from '_/intl'
+import { getOsHumanName, getVmIcon, isVmNameValid, isHostNameValid } from '_/components/utils'
+import { enumMsg, msg } from '_/intl'
 import { generateUnique } from '_/helpers'
 import { formatUptimeDuration } from '_/utils'
 import { editVm } from '_/actions'
 
 import { Media } from 'react-bootstrap'
-import { FormControl, Alert } from 'patternfly-react'
+import { FormControl, FormGroup, HelpBlock, Alert, Checkbox } from 'patternfly-react'
 
 import BaseCard from '../../BaseCard'
 import VmIcon from '../../../VmIcon'
@@ -40,6 +40,10 @@ class OverviewCard extends React.Component {
       isDirty: false,
       correlationId: null,
       correlatedMessages: null,
+
+      nameError: false,
+      updateCloudInit: true,
+      disableHostnameToggle: false,
     }
     this.trackUpdates = {}
 
@@ -47,6 +51,7 @@ class OverviewCard extends React.Component {
     this.handleChange = this.handleChange.bind(this)
     this.handleCardOnCancel = this.handleCardOnCancel.bind(this)
     this.handleCardOnSave = this.handleCardOnSave.bind(this)
+    this.isCloudInitHostnameUpdate = this.isCloudInitHostnameUpdate.bind(this)
   }
 
   static getDerivedStateFromProps (props, state) {
@@ -77,9 +82,28 @@ class OverviewCard extends React.Component {
     }
   }
 
+  isCloudInitHostnameUpdate () {
+    const template = this.props.templates.get(this.props.vm.getIn(['template', 'id']))
+    if (!template) {
+      return false
+    }
+    const templateHostName = template.getIn(['cloudInit', 'hostName'])
+    if (templateHostName) {
+      return false
+    }
+    return true
+  }
+
   handleCardOnStartEdit () {
     this.trackUpdates = {}
-    this.setState({ isEditing: true, isDirty: false, correlationId: null, correlatedMessages: null })
+    this.setState({
+      isEditing: true,
+      isDirty: false,
+      correlationId: null,
+      correlatedMessages: null,
+      nameError: false,
+      updateCloudInit: true,
+    })
     this.props.onEditChange(true)
   }
 
@@ -88,6 +112,7 @@ class OverviewCard extends React.Component {
       this.props.onEditChange(true, true)
     }
 
+    const newState = { isDirty: true }
     let updates = this.state.vm
     // NOTE: The DetailsCard has the possibility of chained updates.  Overview doesn't
     //       have that need, so there is no __changeQueue__ setup here.
@@ -95,9 +120,13 @@ class OverviewCard extends React.Component {
     let fieldUpdated
     switch (fieldName) {
       case 'name':
-        // TODO: add name validation?
         updates = updates.set('name', value)
         fieldUpdated = 'name'
+        newState.nameError = !isVmNameValid(value)
+        newState.disableHostnameToggle = !isHostNameValid(value)
+        if (newState.disableHostnameToggle) {
+          newState.updateCloudInit = false
+        }
         break
 
       case 'description':
@@ -108,12 +137,19 @@ class OverviewCard extends React.Component {
 
     if (updates !== this.state.vm) {
       this.trackUpdates[fieldUpdated] = true
-      this.setState({ vm: updates, isDirty: true })
+      this.setState({ vm: updates, ...newState })
     }
   }
 
   handleCardOnCancel () {
-    this.setState({ isEditing: false, isDirty: false, correlationId: null, correlatedMessages: null })
+    this.setState({
+      isEditing: false,
+      isDirty: false,
+      correlationId: null,
+      correlatedMessages: null,
+      nameError: false,
+      updateCloudInit: true,
+    })
     this.props.onEditChange(false)
   }
 
@@ -123,7 +159,7 @@ class OverviewCard extends React.Component {
       return
     }
 
-    const { vm: stateVm } = this.state
+    const { vm: stateVm, updateCloudInit } = this.state
     const correlationId = generateUnique('OverviewCard-save_')
 
     // --- Create a partial VM (in the internal format expected by editVm() saga),
@@ -138,6 +174,11 @@ class OverviewCard extends React.Component {
       vmUpdates['description'] = stateVm.get('description')
     }
 
+    if (this.trackUpdates['name'] && updateCloudInit && this.isCloudInitHostnameUpdate()) {
+      vmUpdates['cloudInit'] = stateVm.get('cloudInit').toJS()
+      vmUpdates['cloudInit']['hostName'] = stateVm.get('name')
+    }
+
     // --- dispatch the save
     //     saveChanges will add the result of the operation to the vm under the given
     //     correlationId. So, when the vm prop changes, it can be checked and the edit
@@ -150,7 +191,7 @@ class OverviewCard extends React.Component {
 
   render () {
     const { vm, icons, operatingSystems, isEditable } = this.props
-    const { isEditing, correlatedMessages } = this.state
+    const { isEditing, correlatedMessages, nameError, updateCloudInit, disableHostnameToggle } = this.state
 
     const elapsedUptime = vm.getIn(['statistics', 'elapsedUptime', 'datum'], 0)
     const uptime = elapsedUptime <= 0
@@ -160,12 +201,15 @@ class OverviewCard extends React.Component {
     const icon = getVmIcon(icons, operatingSystems, vm)
     const idPrefix = 'vmdetail-overview'
 
+    const showCloudInitCheckbox = isEditing && this.trackUpdates['name'] && !nameError && this.isCloudInitHostnameUpdate()
+
     return (
       <BaseCard
         editMode={isEditing}
         editable={isEditable}
         editTooltip={`Edit ${vm.get('name')}`}
         idPrefix={idPrefix}
+        disableSaveButton={nameError}
         onStartEdit={this.handleCardOnStartEdit}
         onCancel={this.handleCardOnCancel}
         onSave={this.handleCardOnSave}
@@ -185,12 +229,34 @@ class OverviewCard extends React.Component {
                   <div className={style['vm-name']}>
                     { !isEditing && <span id={`${idPrefix}-name`}>{vm.get('name')}</span> }
                     { isEditing &&
-                      <FormControl
-                        id={`${idPrefix}-name-edit`}
-                        type='text'
-                        value={this.state.vm.get('name')}
-                        onChange={e => this.handleChange('name', e.target.value)}
-                      />
+                      <FormGroup controlId={`${idPrefix}-name-edit`} validationState={nameError ? 'error' : null}>
+                        <FormControl
+                          type='text'
+                          value={this.state.vm.get('name')}
+                          onChange={e => this.handleChange('name', e.target.value)}
+                        />
+                        { nameError &&
+                          <HelpBlock>
+                            {msg.pleaseEnterValidVmName()}
+                          </HelpBlock>
+                        }
+                      </FormGroup>
+                    }
+                    {
+                      showCloudInitCheckbox &&
+                      <div className={style['vm-checkbox']}>
+                        <Checkbox
+                          id={`${idPrefix}-cloud-init`}
+                          checked={updateCloudInit}
+                          onChange={(e) => this.setState({ updateCloudInit: e.target.checked })}
+                          disabled={disableHostnameToggle}
+                        >
+                          { !disableHostnameToggle
+                            ? msg.updateCloudInit()
+                            : msg.cannotUpdateCloudInitHostname()
+                          }
+                        </Checkbox>
+                      </div>
                     }
                   </div>
 
@@ -242,6 +308,7 @@ OverviewCard.propTypes = {
   icons: PropTypes.object.isRequired,
   operatingSystems: PropTypes.object.isRequired, // deep immutable, {[id: string]: OperatingSystem}
   userMessages: PropTypes.object.isRequired,
+  templates: PropTypes.object.isRequired,
 
   saveChanges: PropTypes.func.isRequired,
 }
@@ -251,6 +318,7 @@ export default connect(
     icons: state.icons,
     operatingSystems: state.operatingSystems,
     userMessages: state.userMessages,
+    templates: state.templates,
     isEditable: vm.get('canUserEditVm'),
   }),
   (dispatch) => ({

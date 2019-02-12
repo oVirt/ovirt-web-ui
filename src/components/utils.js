@@ -117,6 +117,15 @@ export function isVmNameValid (nameCandidate: string): boolean {
   return regexp.test(nameCandidate)
 }
 
+export function isHostNameValid (nameCandidate: string): boolean {
+  if (nameCandidate.length > 64) {
+    return false
+  }
+  const regexpString = '^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$'
+  const regexp = new RegExp(regexpString)
+  return regexp.test(nameCandidate)
+}
+
 export function getMinimizedString (str: string, maxChar: number): string {
   return str.length > maxChar ? `${str.substring(0, maxChar - 3)}...` : str
 }
