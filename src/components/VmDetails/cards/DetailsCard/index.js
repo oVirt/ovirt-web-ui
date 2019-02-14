@@ -600,11 +600,9 @@ class DetailsCard extends React.Component {
     const { vm, isEditing, correlatedMessages, clusterList, isoList, templateList } = this.state
 
     const idPrefix = 'vmdetail-details'
+
     const isPoolVm = vm.getIn(['pool', 'id']) !== undefined
-
-    const canEditDetails = (vm.get('canUserChangeCd') || vm.get('canUserEditVm')) && !isPoolVm
-    const canOnlyChangeCD = (vm.get('canUserChangeCd') && !vm.get('canUserEditVm')) && !isPoolVm
-
+    const canEditDetails = vm.get('canUserEditVm') && !isPoolVm
     const status = vm.get('status')
 
     // Host Name
@@ -682,7 +680,7 @@ class DetailsCard extends React.Component {
       />
       <BaseCard
         title={msg.cardTitleDetails()}
-        editable={canEditDetails}
+        editable={canEditDetails || canChangeCd}
         editMode={isEditing}
         idPrefix={idPrefix}
         editTooltip={msg.cardTooltipEditDetails({ vmName: vm.get('name') })}
@@ -691,7 +689,7 @@ class DetailsCard extends React.Component {
         onSave={this.handleCardOnSave}
       >
         {({ isEditing }) => {
-          const isFullEdit = isEditing && !canOnlyChangeCD
+          const isFullEdit = isEditing && canEditDetails
           return <React.Fragment>
             {/* Regular options */}
             <Grid className={style['details-container']}>
