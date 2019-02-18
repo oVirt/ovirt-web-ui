@@ -550,7 +550,11 @@ class DetailsCard extends React.Component {
 
     // ---- dispatch the save
     this.setState({ correlationId })
-    this.props.saveChanges(vmUpdates, this.restartAfterSave, !this.hotPlugNow, correlationId)
+    this.props.saveChanges(
+      vmUpdates,
+      this.restartAfterSave,
+      !this.hotPlugNow,
+      correlationId)
 
     return false // control BaseCard's view/edit transition
   }
@@ -597,10 +601,8 @@ class DetailsCard extends React.Component {
 
     const idPrefix = 'vmdetail-details'
 
-    const canEditDetails =
-      vm.get('canUserEditVm') &&
-      vm.getIn(['pool', 'id']) === undefined
-
+    const isPoolVm = vm.getIn(['pool', 'id']) !== undefined
+    const canEditDetails = vm.get('canUserEditVm') && !isPoolVm
     const status = vm.get('status')
 
     // Host Name
@@ -629,7 +631,7 @@ class DetailsCard extends React.Component {
     const templateName = (templates && templates.getIn([templateId, 'name'])) || msg.notAvailable()
 
     // CD
-    const canChangeCd = vmCanChangeCd(status)
+    const canChangeCd = vm.get('canUserChangeCd') && vmCanChangeCd(status)
     const cdImageId = vm.getIn(['cdrom', 'fileId'])
     const cdImage = isoList.find(iso => iso.file.id === cdImageId)
     const cdImageName = (cdImage && cdImage.file.name) || `[${msg.empty()}]`
@@ -678,7 +680,7 @@ class DetailsCard extends React.Component {
       />
       <BaseCard
         title={msg.cardTitleDetails()}
-        editable={canEditDetails}
+        editable={canEditDetails || canChangeCd}
         editMode={isEditing}
         idPrefix={idPrefix}
         editTooltip={msg.cardTooltipEditDetails({ vmName: vm.get('name') })}
@@ -686,8 +688,9 @@ class DetailsCard extends React.Component {
         onCancel={this.handleCardOnCancel}
         onSave={this.handleCardOnSave}
       >
-        {({ isEditing }) =>
-          <React.Fragment>
+        {({ isEditing }) => {
+          const isFullEdit = isEditing && canEditDetails
+          return <React.Fragment>
             {/* Regular options */}
             <Grid className={style['details-container']}>
               <Row>
@@ -713,14 +716,14 @@ class DetailsCard extends React.Component {
                       { fqdn || <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id={`${idPrefix}-fqdn-not-available`} /> }
                     </FieldRow>
                     <FieldRow label={msg.cluster()} id={`${idPrefix}-cluster`}>
-                      { !isEditing && clusterName }
-                      { isEditing && !canChangeCluster &&
+                      { !isFullEdit && clusterName }
+                      { isFullEdit && !canChangeCluster &&
                         <div>
                           {clusterName}
                           <FieldLevelHelp disabled={false} content={msg.clusterCanOnlyChangeWhenVmStopped()} inline />
                         </div>
                       }
-                      { isEditing && canChangeCluster &&
+                      { isFullEdit && canChangeCluster &&
                         <SelectBox
                           id={`${idPrefix}-cluster-edit`}
                           items={clusterList.filter(cluster => cluster.datacenter === dataCenterId)}
@@ -730,8 +733,8 @@ class DetailsCard extends React.Component {
                       }
                     </FieldRow>
                     <FieldRow label={msg.dataCenter()} id={`${idPrefix}-data-center`}>
-                      { !isEditing && dataCenterName }
-                      { isEditing &&
+                      { !isFullEdit && dataCenterName }
+                      { isFullEdit &&
                         <div>
                           {dataCenterName}
                           <FieldLevelHelp disabled={false} content={msg.dataCenterChangesWithCluster()} inline />
@@ -743,8 +746,8 @@ class DetailsCard extends React.Component {
                 <Col className={style['fields-column']}>
                   <Grid>
                     <FieldRow label={msg.template()} id={`${idPrefix}-template`}>
-                      { !isEditing && templateName }
-                      { isEditing &&
+                      { !isFullEdit && templateName }
+                      { isFullEdit &&
                         <SelectBox
                           id={`${idPrefix}-template-edit`}
                           items={templateList}
@@ -795,8 +798,8 @@ class DetailsCard extends React.Component {
                     </FieldRow>
 
                     <FieldRow label={msg.cpus()} id={`${idPrefix}-cpus`}>
-                      { !isEditing && vCpuCount }
-                      { isEditing &&
+                      { !isFullEdit && vCpuCount }
+                      { isFullEdit &&
                         <div>
                           <FormControl
                             id={`${idPrefix}-cpus-edit`}
@@ -809,8 +812,8 @@ class DetailsCard extends React.Component {
                       }
                     </FieldRow>
                     <FieldRow label={msg.memory()} id={`${idPrefix}-memory`}>
-                      { !isEditing && `${round(memorySize)} ${memoryUnit}` }
-                      { isEditing &&
+                      { !isFullEdit && `${round(memorySize)} ${memoryUnit}` }
+                      { isFullEdit &&
                         <div>
                           <FormControl
                             id={`${idPrefix}-memory-edit`}
@@ -828,7 +831,7 @@ class DetailsCard extends React.Component {
               </Row>
             </Grid>
             {/* Advanced options */}
-            { isEditing && <ExpandCollapseSection id={`${idPrefix}-advanced-options`} sectionHeader={msg.advancedOptions()}>
+            { isFullEdit && <ExpandCollapseSection id={`${idPrefix}-advanced-options`} sectionHeader={msg.advancedOptions()}>
               <Grid className={style['details-container']}>
                 <Row>
                   {/* First column */}
@@ -934,7 +937,7 @@ class DetailsCard extends React.Component {
               )
             }
           </React.Fragment>
-        }
+        }}
       </BaseCard>
     </React.Fragment>
   }

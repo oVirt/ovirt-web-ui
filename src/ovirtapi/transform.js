@@ -26,6 +26,7 @@ import type {
 } from './types'
 
 import {
+  canUserChangeCd,
   canUserUseCluster,
   canUserEditVm,
   canUserEditVmStorage,
@@ -136,9 +137,12 @@ const VM = {
       cdrom: {},
       sessions: [],
       nics: [],
+
       permits: new Set(),
+      canUserChangeCd: true,
       canUserEditVm: false,
       canUserManipulateSnapshots: false,
+
       ssoGuestAgent: vm.sso.methods && vm.sso.methods.method && vm.sso.methods.method.length > 0 && vm.sso.methods.method.findIndex(method => method.id === 'guest_agent') > -1,
       display: {
         smartcardEnabled: vm.display && vm.display.smartcard_enabled && convertBool(vm.display.smartcard_enabled),
@@ -186,6 +190,7 @@ const VM = {
         parsedVm.permits = getUserPermits(Permissions.toInternal({
           permissions: vm.permissions.permission,
         }))
+        parsedVm.canUserChangeCd = canUserChangeCd(parsedVm.permits)
         parsedVm.canUserEditVm = canUserEditVm(parsedVm.permits)
         parsedVm.canUserManipulateSnapshots = canUserManipulateSnapshots(parsedVm.permits)
         parsedVm.canUserEditVmStorage = canUserEditVmStorage(parsedVm.permits)

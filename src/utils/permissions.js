@@ -6,6 +6,10 @@ function checkUserPermit (permit: string, permits: Set<string>): boolean {
   return permits.has(permit)
 }
 
+export function canUserChangeCd (permits: Set<string>): boolean {
+  return checkUserPermit('change_vm_cd', permits)
+}
+
 export function canUserUseCluster (permits: Set<string>): boolean {
   return checkUserPermit('create_vm', permits)
 }

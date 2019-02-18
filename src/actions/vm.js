@@ -150,7 +150,7 @@ export function createVm ({ vm, transformInput = true, pushToDetailsOnSuccess = 
 }
 
 export function editVm (
-  { vm, transformInput = true, restartAfterEdit = false, nextRun = false },
+  { vm, transformInput = true, restartAfterEdit = false, nextRun = false, changeCurrentCd = true },
   { correlationId, ...additionalMeta }
 ) {
   return {
@@ -160,6 +160,7 @@ export function editVm (
       transformInput,
       restartAfterEdit,
       nextRun,
+      changeCurrentCd,
     },
     meta: {
       correlationId,
