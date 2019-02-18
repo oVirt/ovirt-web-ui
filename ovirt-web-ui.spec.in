@@ -56,6 +56,10 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Mon Feb 18 2019 Greg Sheremeta <gshereme@redhat.com> - 1.5.1-1
+ - Fixed several issues
+ - updated translations
+
 * Wed Jan 9 2019 Greg Sheremeta <gshereme@redhat.com> - 1.5.0-1
  - Redesign of VM Edit / Dashboard view complete
  - Fixed several issues
