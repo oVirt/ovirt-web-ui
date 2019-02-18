@@ -3,9 +3,9 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 
 import { push } from 'connected-react-router'
-import { DropdownButton, MenuItem } from 'patternfly-react'
+import { DropdownButton, MenuItem, Icon } from 'patternfly-react'
 import ConsoleConfirmationModal from '../VmActions/ConsoleConfirmationModal'
-import Action from '../VmActions/Action'
+import { MenuItemAction } from '../VmActions/Action'
 import { DOWNLOAD_CONSOLE } from '_/constants'
 import { msg } from '_/intl'
 import { getRDP } from '_/actions'
@@ -27,14 +27,12 @@ class VmConsoleSelector extends React.Component {
         : msg.vncConsoleBrowser()
     const vnc = actions.find((a) => a.get('protocol') === 'vnc')
     const consoleItems = actions.map(action =>
-      <Action
-        key={action.get('id')}
+      <MenuItemAction
+        id={action.get('id')}
         confirmation={<ConsoleConfirmationModal isConsolePage={isConsolePage} vm={vms.getIn(['vms', vmId])} consoleId={action.get('id')} onClose={() => {}} />}
-      >
-        <MenuItem>
-          {msg[action.get('protocol') + 'Console']()}
-        </MenuItem>
-      </Action>
+        shortTitle={msg[action.get('protocol') + 'Console']()}
+        icon={<Icon name='external-link' />}
+      />
     ).toJS()
 
     const hasRdp = isWindows(vms.getIn(['vms', vmId, 'os', 'type']))
@@ -46,19 +44,18 @@ class VmConsoleSelector extends React.Component {
         key='rdp'
         onClick={(e) => { e.preventDefault(); onRDP({ domain, username }) }}
       >
-        {msg.rdpConsole()}
+        {msg.rdpConsole()} <Icon name='external-link' />
       </MenuItem>)
     }
 
     if (vnc.size) {
-      consoleItems.push(<Action
-        key={`${vnc.get('id')}_browser`}
-        confirmation={<ConsoleConfirmationModal isConsolePage={isConsolePage} isNoVNC vm={vms.getIn(['vms', vmId])} consoleId={vnc.get('id')} onClose={() => {}} />}
-      >
-        <MenuItem>
-          {msg.vncConsoleBrowser()}
-        </MenuItem>
-      </Action>)
+      consoleItems.push(
+        <MenuItemAction
+          id={`${vnc.get('id')}_browser`}
+          confirmation={<ConsoleConfirmationModal isConsolePage={isConsolePage} isNoVNC vm={vms.getIn(['vms', vmId])} consoleId={vnc.get('id')} onClose={() => {}} />}
+          shortTitle={msg.vncConsoleBrowser()}
+        />
+      )
     }
     return <div className={style['console-dropdown-box']}>
       <span className={style['console-dropdown-label']}>{`${msg.console()}:`}</span>

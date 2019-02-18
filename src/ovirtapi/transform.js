@@ -137,7 +137,7 @@ const VM = {
       cdrom: {},
       sessions: [],
       nics: [],
-
+      statistics: [],
       permits: new Set(),
       canUserChangeCd: true,
       canUserEditVm: false,

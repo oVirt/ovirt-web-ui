@@ -87,6 +87,25 @@ Button.propTypes = {
   id: PropTypes.string.isRequired,
 }
 
+const MenuItemAction = ({ id, confirmation, shortTitle, icon, onClick }) => {
+  return <Action
+    key={id}
+    confirmation={confirmation}
+  >
+    <MenuItem id={id} onClick={onClick}>
+      <span>{shortTitle}</span> { icon }
+    </MenuItem>
+  </Action>
+}
+
+MenuItemAction.propTypes = {
+  id: PropTypes.string.isRequired,
+  confirmation: PropTypes.node,
+  shortTitle: PropTypes.string.isRequired,
+  icon: PropTypes.node,
+  onClick: PropTypes.func,
+}
+
 const ActionButtonWraper = (props) => {
   const btnProps = excludeKeys(props, [ 'confirmation', 'items' ])
   const { items, actionDisabled, confirmation, shortTitle } = props
@@ -98,14 +117,7 @@ const ActionButtonWraper = (props) => {
       disabled={actionDisabled}
     >
       { items.filter(i => i !== null).map(item => {
-        return <Action
-          key={item.id}
-          confirmation={item.confirmation}
-        >
-          <MenuItem id={item.id} onClick={item.onClick}>
-            {item.shortTitle}
-          </MenuItem>
-        </Action>
+        return <MenuItemAction {...item} />
       }) }
     </DropdownButton>
   }
@@ -117,4 +129,4 @@ ActionButtonWraper.propTypes = {
   ...Button.propTypes,
 }
 
-export { ActionButtonWraper }
+export { ActionButtonWraper, MenuItemAction }

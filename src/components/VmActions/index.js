@@ -29,11 +29,11 @@ import {
 
 import { isWindows } from '_/helpers'
 
-import { SplitButton, MenuItem } from 'patternfly-react'
+import { SplitButton, Icon } from 'patternfly-react'
 import Checkbox from '../Checkbox'
 import ConfirmationModal from './ConfirmationModal'
 import ConsoleConfirmationModal from './ConsoleConfirmationModal'
-import Action, { ActionButtonWraper } from './Action'
+import Action, { ActionButtonWraper, MenuItemAction } from './Action'
 
 const EmptyAction = ({ state, isOnCard }) => {
   if (!canConsole(state) && !canShutdown(state) && !canRestart(state) && !canStart(state)) {
@@ -78,16 +78,8 @@ class VmDropdownActions extends React.Component {
         >
           { actionsCopy.slice(1).map(action => {
             return action.items && action.items.length > 0
-              ? action.items.filter(a => a !== null).map(a => <Action key={a.shortTitle} confirmation={a.confirmation}>
-                <MenuItem id={a.id} onClick={a.onClick}>
-                  {a.shortTitle}
-                </MenuItem>
-              </Action>)
-              : <Action key={action.shortTitle} confirmation={action.confirmation}>
-                <MenuItem id={action.id} onClick={action.onClick}>
-                  {action.shortTitle}
-                </MenuItem>
-              </Action>
+              ? action.items.filter(a => a !== null).map(a => <MenuItemAction key={a.shortTitle} {...a} />)
+              : <MenuItemAction key={action.shortTitle} {...action} />
           }).reduce(reshapeArray, [])
           }
         </SplitButton>
@@ -165,6 +157,7 @@ class VmActions extends React.Component {
     const consoles = vm.get('consoles').map((c) => ({
       priority: 0,
       shortTitle: msg[c.get('protocol') + 'Console'](),
+      icon: <Icon name='external-link' />,
       tooltip: msg[c.get('protocol') + 'ConsoleOpen'](),
       id: `${idPrefix}-button-console-${c.get('protocol')}`,
       confirmation: <ConsoleConfirmationModal consoleId={c.get('id')} vm={vm} />,
@@ -176,6 +169,7 @@ class VmActions extends React.Component {
       consoles.push({
         priority: 0,
         shortTitle: msg.rdpConsole(),
+        icon: <Icon name='external-link' />,
         tooltip: msg.rdpConsoleOpen(),
         id: `${idPrefix}-button-console-rdp`,
         onClick: (e) => { e.preventDefault(); onRDP({ domain, username }) },
