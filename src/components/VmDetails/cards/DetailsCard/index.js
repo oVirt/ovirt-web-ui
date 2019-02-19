@@ -12,6 +12,7 @@ import {
   convertValue,
   isNumber,
   round,
+  dividers,
 } from '_/utils'
 import {
   canChangeCluster as vmCanChangeCluster,
@@ -400,13 +401,30 @@ class DetailsCard extends React.Component {
           break
 
         case 'cpu':
-          if (isNumber(value) && value > 0) {
+          if (isNumber(value) && value > 0 && value <= this.props.config.get('maxNumOfVmCpus')) {
+            const maxNumberOfSockets = this.props.config.get('maxNumberOfSockets')
+            let sockets = value
+            let cores = 1
+            let threads = 1
+            if (value > maxNumberOfSockets) {
+              let cpuValue = value
+              let divsOfValue = dividers(cpuValue)
+              divsOfValue = divsOfValue.filter(x => x <= maxNumberOfSockets)
+              sockets = divsOfValue[divsOfValue.length - 1]
+
+              cpuValue /= sockets
+              divsOfValue = dividers(cpuValue)
+              cores = divsOfValue[divsOfValue.length - 1]
+
+              cpuValue /= cores
+              threads = cpuValue
+            }
             updates = updates.mergeDeep({
               'cpu': {
                 'topology': { // NOTE: this may not match VM's template's topology
-                  'sockets': +value,
-                  'cores': 1,
-                  'threads': 1,
+                  sockets,
+                  cores,
+                  threads,
                 },
                 'vCPUs': +value, // === sockets * cores * threads
               },
@@ -926,6 +944,7 @@ DetailsCard.propTypes = {
   storageDomains: PropTypes.object.isRequired,
   userMessages: PropTypes.object.isRequired,
   operatingSystems: PropTypes.object.isRequired,
+  config: PropTypes.object.isRequired,
 
   saveChanges: PropTypes.func.isRequired,
 }
@@ -940,6 +959,7 @@ const DetailsCardConnected = connect(
     storageDomains: state.storageDomains,
     userMessages: state.userMessages,
     operatingSystems: state.operatingSystems,
+    config: state.config,
   }),
   (dispatch) => ({
     saveChanges: (minimalVmChanges, restartAfterEdit, nextRun, correlationId) =>

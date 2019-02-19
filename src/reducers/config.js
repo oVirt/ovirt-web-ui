@@ -7,6 +7,7 @@ import {
   SET_ADMINISTRATOR,
   SET_CURRENT_PAGE,
   SET_DOMAIN,
+  SET_CPU_TOPOLOGY_OPTIONS,
   SET_OVIRT_API_VERSION,
   SET_USB_FILTER,
   SET_USER_FILTER_PERMISSION,
@@ -32,6 +33,8 @@ const initialState = Immutable.fromJS({
   usbFilter: null,
   userGroups: [],
   currentPage: {},
+  maxNumberOfSockets: 16,
+  maxNumOfVmCpus: 1,
   blankTemplateId: '00000000-0000-0000-0000-000000000000', // "engine/api/" -> special_objects.blank_template.id
 })
 
@@ -68,6 +71,9 @@ const config = actionReducer(initialState, {
   },
   [SET_CURRENT_PAGE] (state, { payload }) {
     return state.set('currentPage', Object.assign({}, payload))
+  },
+  [SET_CPU_TOPOLOGY_OPTIONS] (state, { payload: { maxNumberOfSockets, maxNumOfVmCpus } }) {
+    return state.set('maxNumberOfSockets', maxNumberOfSockets).set('maxNumOfVmCpus', maxNumOfVmCpus)
   },
 }, true)
 
