@@ -3,7 +3,7 @@ FROM node:8
 RUN apt-get update -qq && apt-get install -qy libelf1
 
 RUN mkdir -p /web-ui/static
-COPY package.json LICENSE yarn.lock .flowconfig autogen.sh ovirt-web-ui.spec.in configure /web-ui/
+COPY package.json LICENSE yarn.lock .flowconfig autogen.sh ovirt-web-ui.spec.in configure.ac /web-ui/
 COPY static/index.hbs /web-ui/static/
 COPY scripts /web-ui/scripts
 COPY config /web-ui/config
