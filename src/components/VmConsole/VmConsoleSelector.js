@@ -29,6 +29,7 @@ class VmConsoleSelector extends React.Component {
     const consoleItems = actions.map(action =>
       <MenuItemAction
         id={action.get('id')}
+        key={action.get('id')}
         confirmation={<ConsoleConfirmationModal isConsolePage={isConsolePage} vm={vms.getIn(['vms', vmId])} consoleId={action.get('id')} onClose={() => {}} />}
         shortTitle={msg[action.get('protocol') + 'Console']()}
         icon={<Icon name='external-link' />}
@@ -52,6 +53,7 @@ class VmConsoleSelector extends React.Component {
       consoleItems.push(
         <MenuItemAction
           id={`${vnc.get('id')}_browser`}
+          key={`${vnc.get('id')}_browser`}
           confirmation={<ConsoleConfirmationModal isConsolePage={isConsolePage} isNoVNC vm={vms.getIn(['vms', vmId])} consoleId={vnc.get('id')} onClose={() => {}} />}
           shortTitle={msg.vncConsoleBrowser()}
         />

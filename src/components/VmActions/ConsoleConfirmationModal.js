@@ -9,8 +9,8 @@ import { doesVmSessionExistForUserId } from '_/utils'
 import { generateUnique } from '_/helpers'
 
 import {
-  IN_USE,
-  LOGON,
+  CONSOLE_IN_USE,
+  CONSOLE_LOGON,
 } from '_/constants'
 
 class ConsoleConfirmationModal extends React.Component {
@@ -65,7 +65,7 @@ class ConsoleConfirmationModal extends React.Component {
     } = this.props
 
     if (show) {
-      if (consoles.getIn(['modals', this.modalId, 'state']) === LOGON) {
+      if (consoles.getIn(['modals', this.modalId, 'state']) === CONSOLE_LOGON) {
         return (
           <ConfirmationModal
             show
@@ -76,7 +76,7 @@ class ConsoleConfirmationModal extends React.Component {
           />
         )
       }
-      if (consoles.getIn(['modals', this.modalId, 'state']) === IN_USE) {
+      if (consoles.getIn(['modals', this.modalId, 'state']) === CONSOLE_IN_USE) {
         return (
           <ConfirmationModal
             onClose={this.onConsoleConfirmationClose}

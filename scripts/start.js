@@ -21,7 +21,6 @@ var env = require('../config/env')
 var rimraf = require('rimraf')
 var formatMessage = require('./utils/utils').formatMessage
 var isLikelyASyntaxError = require('./utils/utils').isLikelyASyntaxError
-const url = require('url');
 
 // Tools like Cloud9 rely on this.
 var DEFAULT_PORT = process.env.PORT || 3000;

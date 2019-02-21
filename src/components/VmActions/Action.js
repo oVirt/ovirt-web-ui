@@ -88,10 +88,7 @@ Button.propTypes = {
 }
 
 const MenuItemAction = ({ id, confirmation, shortTitle, icon, onClick }) => {
-  return <Action
-    key={id}
-    confirmation={confirmation}
-  >
+  return <Action confirmation={confirmation}>
     <MenuItem id={id} onClick={onClick}>
       <span>{shortTitle}</span> { icon }
     </MenuItem>

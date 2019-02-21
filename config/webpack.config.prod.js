@@ -96,7 +96,7 @@ module.exports = {
       // Process JS with Babel.
       {
         test: /\.(js|jsx)$/,
-        include: [paths.appSrc, paths.novmc],
+        include: [paths.appSrc, paths.novnc],
         loader: 'babel',
         query: require('./babel.prod'),
       },

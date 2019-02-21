@@ -7,9 +7,9 @@ import {
   SET_IN_USE_CONSOLE_MODAL_STATE,
   SET_LOGON_CONSOLE_MODAL_STATE,
 
-  OPENED,
-  IN_USE,
-  LOGON,
+  CONSOLE_OPENED,
+  CONSOLE_IN_USE,
+  CONSOLE_LOGON,
 } from '_/constants'
 
 import { actionReducer } from './utils'
@@ -33,7 +33,7 @@ const consoles = actionReducer(initialState, {
     const modal = {
       vmId,
       consoleId,
-      state: OPENED,
+      state: CONSOLE_OPENED,
     }
     return state.setIn(['modals', modalId], Immutable.fromJS(modal))
   },
@@ -41,10 +41,10 @@ const consoles = actionReducer(initialState, {
     return state.update('modals', modals => modals.delete(modalId))
   },
   [SET_IN_USE_CONSOLE_MODAL_STATE] (state, { payload: { modalId } }) {
-    return state.setIn(['modals', modalId, 'state'], IN_USE)
+    return state.setIn(['modals', modalId, 'state'], CONSOLE_IN_USE)
   },
   [SET_LOGON_CONSOLE_MODAL_STATE] (state, { payload: { modalId } }) {
-    return state.setIn(['modals', modalId, 'state'], LOGON)
+    return state.setIn(['modals', modalId, 'state'], CONSOLE_LOGON)
   },
 })
 

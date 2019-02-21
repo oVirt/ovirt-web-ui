@@ -5,7 +5,7 @@ module.exports = {
   babelrc: false,
   presets: [
     // Latest stable ECMAScript features
-    require.resolve('babel-preset-env'),
+    require.resolve('babel-preset-latest'),
     // JSX, Flow
     require.resolve('babel-preset-react'),
   ],
