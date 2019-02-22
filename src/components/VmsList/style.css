@@ -46,28 +46,6 @@
     color: black;
 }
 
-.loaderBox {
-    width: 100%;
-    text-align: center;
-    align-content: center;
-}
-
-.loader {
-    border: 12px solid #f3f3f3; /* Light grey */
-    border-top: 12px solid #292e34; /* Blue */
-    border-radius: 50%;
-    width: 100px;
-    height: 100px;
-    animation: spin 2s linear infinite;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
 .card-icon {
     text-align: center;
     height: 134px;

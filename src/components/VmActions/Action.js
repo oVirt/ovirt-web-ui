@@ -17,6 +17,7 @@ class Action extends React.Component {
   handleOpen (e) {
     if (e && e.preventDefault) e.preventDefault()
     this.setState({ showModal: true })
+    this.props.children.props.onClick(e)
   }
 
   handleClose () {
@@ -114,7 +115,7 @@ const ActionButtonWraper = (props) => {
       disabled={actionDisabled}
     >
       { items.filter(i => i !== null).map(item => {
-        return <MenuItemAction {...item} />
+        return <MenuItemAction key={item.id} {...item} />
       }) }
     </DropdownButton>
   }

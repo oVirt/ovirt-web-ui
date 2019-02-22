@@ -50,11 +50,11 @@ export default function getRoutes (vms) {
         type: DETAIL_PAGE_TYPE,
         routes: [
           {
-            path: '/vm/:id/console/:console_id',
-            title: (match) => match.params.console_id,
+            path: '/vm/:id/console/:console',
+            title: (match) => msg.console(),
             component: VmConsolePage,
             closeable: true,
-            toolbars: [(match) => (<VmConsoleToolbar match={match} />)],
+            toolbars: [(match) => (<VmConsoleToolbar match={match} key='vmconsole' />)],
             isToolbarFullWidth: true,
             type: CONSOLE_PAGE_TYPE,
           },

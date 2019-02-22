@@ -118,7 +118,8 @@ class VncConsole extends React.Component {
       textConnecting,
       textSendShortcut,
       textCtrlAltDel,
-      portalToolbarTo,
+      textDisconnect,
+      toolbarContainer,
     } = this.props
 
     let status = null
@@ -127,10 +128,11 @@ class VncConsole extends React.Component {
       case CONNECTED:
         rightContent = (
           <VncActions
-            portalToolbarTo={portalToolbarTo}
+            toolbarContainer={toolbarContainer}
             onCtrlAltDel={this.onCtrlAltDel}
             textSendShortcut={textSendShortcut}
             textCtrlAltDel={textCtrlAltDel}
+            textDisconnect={textDisconnect}
             onDisconnect={this.disconnect}
           />
         )
@@ -152,7 +154,7 @@ class VncConsole extends React.Component {
       <div className={classNames('vnc-console', this.props.topClassName)}>
         {this.props.children}
         {
-          !portalToolbarTo &&
+          !toolbarContainer &&
           <React.Fragment>
             <Toolbar.RightContent>{rightContent}</Toolbar.RightContent>
             <Toolbar.Results>
@@ -162,7 +164,7 @@ class VncConsole extends React.Component {
           </React.Fragment>
         }
         {
-          portalToolbarTo &&
+          toolbarContainer &&
           <React.Fragment>
             {rightContent}
             {status}
@@ -190,7 +192,7 @@ VncConsole.propTypes = {
   credentials: PropTypes.object /** { username: '', password: '', target: ''} */,
   repeaterID: PropTypes.string,
   vncLogging: PropTypes.string /** log-level for noVNC */,
-  portalToolbarTo: PropTypes.string,
+  toolbarContainer: PropTypes.string,
 
   topClassName: PropTypes.string /** Enable customization */,
 
@@ -200,6 +202,7 @@ VncConsole.propTypes = {
 
   textConnecting: PropTypes.oneOfType([PropTypes.string, PropTypes.node]) /** For localization */,
   textDisconnected: PropTypes.string,
+  textDisconnect: PropTypes.string,
   textSendShortcut: PropTypes.string,
   textCtrlAltDel: PropTypes.string,
 }
@@ -216,7 +219,7 @@ VncConsole.defaultProps = {
   credentials: undefined,
   repeaterID: '',
   vncLogging: 'warn',
-  portalToolbarTo: '',
+  toolbarContainer: '',
 
   topClassName: '',
 
@@ -226,6 +229,7 @@ VncConsole.defaultProps = {
 
   textConnecting: 'Connecting',
   textDisconnected: 'Disconnected',
+  textDisconnect: 'Disconnect',
   textSendShortcut: undefined /** Default value defined in VncActions */,
   textCtrlAltDel: undefined, /** Default value defined in VncActions */
 }

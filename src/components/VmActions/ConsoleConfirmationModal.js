@@ -37,10 +37,10 @@ class ConsoleConfirmationModal extends React.Component {
         userId: this.props.config.getIn(['user', 'id']),
         modalId: this.modalId,
       })
-    }
-
-    if (this.props.consoles.getIn(['modals', this.modalId, 'state']) === undefined) {
-      this.props.onClose()
+    } else {
+      if (this.props.consoles.getIn(['modals', this.modalId, 'state']) === undefined) {
+        this.props.onClose()
+      }
     }
   }
 

@@ -9,6 +9,7 @@ import Pool from './Pool'
 import ScrollPositionHistory from '../ScrollPositionHistory'
 import { getByPage } from '_/actions'
 import InfiniteScroll from 'react-infinite-scroller'
+import Loader, { SIZES } from '../Loader'
 
 /**
  * Use Patternfly 'Single Select Card View' pattern to show every VM and Pool
@@ -47,7 +48,7 @@ class Vms extends React.Component {
       <InfiniteScroll
         loadMore={this.loadMore}
         hasMore={vms.get('notAllPagesLoaded')}
-        loader={<div key='infinite-scroll-loader' className={style['loaderBox']}><div className={style['loader']} /></div>}
+        loader={<Loader key='infinite-scroll-loader' size={SIZES.LARGE} />}
         useWindow={false}
       >
         <ScrollPositionHistory uniquePrefix='vms-list' scrollContainerSelector='#page-router-render-component'>

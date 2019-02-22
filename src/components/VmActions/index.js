@@ -49,14 +49,6 @@ EmptyAction.propTypes = {
   isOnCard: PropTypes.bool.isRequired,
 }
 
-function reshapeArray (resArray, current) {
-  if (current.constructor === Array) {
-    return resArray.concat(current)
-  }
-  resArray.push(current)
-  return resArray
-}
-
 class VmDropdownActions extends React.Component {
   render () {
     const { actions, id } = this.props
@@ -76,12 +68,11 @@ class VmDropdownActions extends React.Component {
           onClick={actionsCopy[0].onClick}
           id={id}
         >
-          { actionsCopy.slice(1).map(action => {
+          { [].concat(...actionsCopy.slice(1).map(action => {
             return action.items && action.items.length > 0
               ? action.items.filter(a => a !== null).map(a => <MenuItemAction key={a.shortTitle} {...a} />)
               : <MenuItemAction key={action.shortTitle} {...action} />
-          }).reduce(reshapeArray, [])
-          }
+          }))}
         </SplitButton>
       </Action>
     )

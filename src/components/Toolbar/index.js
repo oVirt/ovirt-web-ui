@@ -53,12 +53,12 @@ const VmConsoleToolbar = ({ match, vms, consoles }) => {
       <div className={style['console-toolbar-actions']}>
         <VmConsoleSelector
           vmId={match.params.id}
-          consoleId={match.params.console_id}
+          consoleId={match.params.console}
           isConsolePage
         />
         <VmConsoleSettingsModal
           vm={vms.getIn(['vms', match.params.id])}
-          consoleId={match.params.console_id}
+          consoleId={match.params.console}
           disabled={consoles.getIn(['vms', match.params.id, 'consoleStatus']) !== INIT_CONSOLE} />
       </div>
       <div className={style['console-toolbar-actions']}>

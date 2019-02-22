@@ -220,19 +220,3 @@ a.disabled {
 .vnc-console > div {
   height: 100%;
 }
-
-.vnc-console > .toolbar-pf-results {
-  height: 100%;
-}
-
-.vnc-console > .toolbar-pf-results .col-sm-12 {
-  height: 100%;
-}
-
-.vnc-console > .toolbar-pf-results > .col-sm-12 > div {
-  height: 100%;
-}
-/*
-.vnc-console > .toolbar-pf-results > .col-sm-12 > .toolbar-pf-results > .col-sm-12 > div {
-  height: 100%;
-}*/

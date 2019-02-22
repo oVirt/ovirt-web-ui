@@ -19,9 +19,9 @@ const initialState = Immutable.fromJS({ vms: {}, modals: {} })
 
 const consoles = actionReducer(initialState, {
   [SET_CONSOLE_TICKETS] (state, { payload: { vmId, proxyTicket, ticket } }) {
-    const tmpState = state.setIn(['vms', vmId, 'proxyTicket'], proxyTicket)
-    return tmpState
+    return state
       .setIn(['vms', vmId, 'ticket'], ticket)
+      .setIn(['vms', vmId, 'proxyTicket'], proxyTicket)
   },
   [SET_ACTIVE_CONSOLE] (state, { payload: { vmId, consoleId } }) {
     return state.setIn(['vms', vmId, 'id'], consoleId)

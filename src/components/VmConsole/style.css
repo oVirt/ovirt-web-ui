@@ -72,26 +72,3 @@
     font-size: 15px;
     margin-top: 20px;
 }
-
-.loaderBox {
-    width: 100%;
-    text-align: center;
-    align-content: center;
-    margin-top: 60px;
-}
-
-.loader {
-    border: 6px solid #e3e3e3; /* Light grey */
-    border-top: 6px solid #292e34; /* Blue */
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    animation: spin 2s linear infinite;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}

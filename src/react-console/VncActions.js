@@ -6,7 +6,7 @@ import { MenuItem, Button, DropdownButton, noop } from 'patternfly-react'
 const VncActions = ({
   textSendShortcut,
   textCtrlAltDel,
-  portalToolbarTo,
+  toolbarContainer,
   textDisconnect,
   onCtrlAltDel,
   onDisconnect,
@@ -24,13 +24,13 @@ const VncActions = ({
       {textDisconnect}
     </Button>
   </div>
-  if (!portalToolbarTo) {
+  if (!toolbarContainer) {
     return toolbar
   }
-  return document.getElementById(portalToolbarTo) &&
+  return document.getElementById(toolbarContainer) &&
     ReactDOM.createPortal(
       toolbar,
-      document.getElementById(portalToolbarTo)
+      document.getElementById(toolbarContainer)
     )
 }
 
@@ -41,7 +41,7 @@ VncActions.propTypes = {
   textCtrlAltDel: PropTypes.string,
   textSendShortcut: PropTypes.string,
   textDisconnect: PropTypes.string,
-  portalToolbarTo: PropTypes.string,
+  toolbarContainer: PropTypes.string,
 }
 
 VncActions.defaultProps = {
@@ -51,7 +51,7 @@ VncActions.defaultProps = {
   textCtrlAltDel: 'Ctrl+Alt+Del',
   textSendShortcut: 'Send Key',
   textDisconnect: 'Disconnect',
-  portalToolbarTo: '',
+  toolbarContainer: '',
 }
 
 export default VncActions
