@@ -74,6 +74,14 @@ export const messages: { [messageId: string]: MessageType } = {
   console: 'Console',
   consoleInUseContinue: 'Console in use, continue?',
   containsConfigurationAndDisksWhichWillBeUsedToCreateThisVm: 'Contains the configuration and disks which will be used to create this virtual machine. Please customize as needed.',
+  continueSessionSecondary: {
+    message: 'To continue your session click on the Continue Session button.',
+    description: 'Secondary message in SessionTimeout modal component.',
+  },
+  continueSessionBtn: {
+    message: 'Continue Session',
+    description: 'Button to continue user session in SessionTimeout modal component.',
+  },
   coresPerSockets: 'Cores per Virtual Socket',
   cpus: 'Total Virtual CPUs',
   create: 'Create',
@@ -275,6 +283,7 @@ export const messages: { [messageId: string]: MessageType } = {
   },
   locked: 'Locked',
   logOut: 'Log out',
+  logOutIn30SecondsSecondary: 'You will be logged out in a 30 seconds.',
   lowOVirtVersion: 'SSH keys can not be managed with recent oVirt <strong>{apiVersion}</strong> version. Please upgrade oVirt to <strong>4.2</strong> or higher.',
   mapCtrlAltDelKeyboardShortcutToCtrlAltEnd: 'Map Ctrl + Alt + Del keyboard shortcut to Ctrl + Alt + End',
   memory: 'Memory',
@@ -394,6 +403,10 @@ export const messages: { [messageId: string]: MessageType } = {
   secondDevice: 'Second Device',
   secondDeviceTooltip: 'Second device in order.',
   secondsShort: 's',
+  sessionExpired: {
+    message: 'Your session is about to expire',
+    description: 'Primary message for SessionTimeout modal component',
+  },
   shutdown: 'Shutdown',
   shutdownVm: 'Shutdown the VM',
   shutdownVmQuestion: 'Are you sure you want to Shutdown the VM?',
