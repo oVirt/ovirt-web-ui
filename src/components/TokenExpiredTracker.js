@@ -3,22 +3,22 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { SessionTimeout } from 'patternfly-react'
 
+import AppConfiguration from '_/config'
 import ErrorAlert from './ErrorAlert'
 import { msg } from '_/intl'
 
 import { logout } from '_/actions'
 
-const MAX_INACTIVE_TIME = 60 * 20 // 20 minutes
 const TIME_TO_DISPLAY_MODAL = 30 // 30 seconds
 
 // TODO: allow the user to cancel the automatic reload?
 // If so, change config.isTokenExpired to false and add additional check to doCheckTokenExpired() before actual reload
-class TokenExpired extends React.Component {
+class TokenExpiredTracker extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      expired: false,
-      counter: MAX_INACTIVE_TIME,
+      showTimeoutModal: false,
+      counter: AppConfiguration.maxUserInactiveTimeInSeconds,
     }
 
     this.dropCounter = this.dropCounter.bind(this)
@@ -29,16 +29,16 @@ class TokenExpired extends React.Component {
   }
 
   dropCounter () {
-    if (!this.state.expired) {
-      this.setState({ counter: MAX_INACTIVE_TIME })
+    if (!this.state.showTimeoutModal) {
+      this.setState({ counter: AppConfiguration.maxUserInactiveTimeInSeconds })
     }
   }
   decrementCounter () {
     const state = {
       counter: this.state.counter - 1,
     }
-    if (this.state.counter <= TIME_TO_DISPLAY_MODAL && !this.state.expired) {
-      state.expired = true
+    if (this.state.counter <= TIME_TO_DISPLAY_MODAL && !this.state.showTimeoutModal) {
+      state.showTimeoutModal = true
     }
     if (this.state.counter <= 0) {
       this.props.onLogout()
@@ -52,16 +52,16 @@ class TokenExpired extends React.Component {
 
   render () {
     const { config, onLogout } = this.props
-    if (this.state.expired) {
+    if (this.state.showTimeoutModal) {
       return <SessionTimeout
         timeLeft={this.state.counter}
         displayBefore={TIME_TO_DISPLAY_MODAL}
-        continueFnc={() => this.setState({ expired: false, counter: MAX_INACTIVE_TIME })}
+        continueFnc={() => this.setState({ showTimeoutModal: false, counter: AppConfiguration.maxUserInactiveTimeInSeconds })}
         logoutFnc={onLogout}
         primaryContent={<p className='lead'>{ msg.sessionExpired() }</p>}
         secondaryContent={
           <React.Fragment>
-            <p>{ msg.logOutIn30SecondsSecondary() }</p>
+            <p>{ msg.logOutInSecondsSecondary({ seconds: this.state.counter }) }</p>
             <p>{ msg.continueSessionSecondary() }</p>
           </React.Fragment>
         }
@@ -76,7 +76,7 @@ class TokenExpired extends React.Component {
     return <ErrorAlert message={msg.authorizationExpired()} id='token-expired' />
   }
 }
-TokenExpired.propTypes = {
+TokenExpiredTracker.propTypes = {
   config: PropTypes.object.isRequired,
   onLogout: PropTypes.func.isRequired,
 }
@@ -88,4 +88,4 @@ export default connect(
   (dispatch) => ({
     onLogout: () => dispatch(logout()),
   })
-)(TokenExpired)
+)(TokenExpiredTracker)

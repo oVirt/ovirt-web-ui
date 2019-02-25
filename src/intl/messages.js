@@ -283,7 +283,7 @@ export const messages: { [messageId: string]: MessageType } = {
   },
   locked: 'Locked',
   logOut: 'Log out',
-  logOutIn30SecondsSecondary: 'You will be logged out in a 30 seconds.',
+  logOutInSecondsSecondary: 'You will be logged out in {seconds} seconds.',
   lowOVirtVersion: 'SSH keys can not be managed with recent oVirt <strong>{apiVersion}</strong> version. Please upgrade oVirt to <strong>4.2</strong> or higher.',
   mapCtrlAltDelKeyboardShortcutToCtrlAltEnd: 'Map Ctrl + Alt + Del keyboard shortcut to Ctrl + Alt + End',
   memory: 'Memory',
@@ -404,7 +404,7 @@ export const messages: { [messageId: string]: MessageType } = {
   secondDeviceTooltip: 'Second device in order.',
   secondsShort: 's',
   sessionExpired: {
-    message: 'Your session is about to expire',
+    message: 'Your session is about to timeout due to inactivity.',
     description: 'Primary message for SessionTimeout modal component',
   },
   shutdown: 'Shutdown',

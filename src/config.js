@@ -11,6 +11,7 @@ const AppConfiguration = {
   applicationURL: '/',
   pageLimit: 8,
   schedulerFixedDelayInSeconds: 60,
+  maxUserInactiveTimeInSeconds: 60 * 20, // 20 minutes
 
   consoleClientResourcesURL: 'https://www.ovirt.org/documentation/admin-guide/virt/console-client-resources/',
   cockpitPort: '9090',
