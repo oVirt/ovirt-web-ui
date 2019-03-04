@@ -21,6 +21,7 @@ import {
   setOvirtApiVersion,
 
   setUserFilterPermission,
+  setUserSessionTimeoutInternal,
   setAdministrator,
   setCpuTopologyOptions,
   getOption,
@@ -83,6 +84,7 @@ export function* login (action) {
   // API checks passed.  Load user data and the initial app data
   yield fetchPermissionWithoutFilter()
   yield fetchCpuTopologyOptions()
+  yield fetchUserSessionTimeoutInterval()
   yield put(getUSBFilter())
   yield initialLoad()
   yield autoConnectCheck()
@@ -212,6 +214,14 @@ function* fetchCpuTopologyOptions () {
     maxNumberOfThreads: parseInt(maxNumberOfThreads),
     maxNumOfVmCpus: parseInt(maxNumOfVmCpus),
   }))
+}
+
+function* fetchUserSessionTimeoutInterval () {
+  const userSessionTimeoutInterval = yield callExternalAction(
+    'getOption',
+    Api.getOption,
+    getOption('UserSessionTimeOutInterval', 'general', '30'))
+  yield put(setUserSessionTimeoutInternal(parseInt(userSessionTimeoutInterval)))
 }
 
 function* initialLoad () {

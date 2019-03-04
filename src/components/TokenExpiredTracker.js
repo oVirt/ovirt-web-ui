@@ -1,9 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { SessionTimeout } from 'patternfly-react'
+import { MessageDialog, Icon } from 'patternfly-react'
 
-import AppConfiguration from '_/config'
+import style from './sharedStyle.css'
 import ErrorAlert from './ErrorAlert'
 import { msg } from '_/intl'
 
@@ -18,7 +18,7 @@ class TokenExpiredTracker extends React.Component {
     super(props)
     this.state = {
       showTimeoutModal: false,
-      counter: AppConfiguration.maxUserInactiveTimeInSeconds,
+      counter: props.config.get('userSessionTimeoutInterval'),
     }
 
     this.dropCounter = this.dropCounter.bind(this)
@@ -28,22 +28,33 @@ class TokenExpiredTracker extends React.Component {
     this.timer = setInterval(this.decrementCounter, 1000)
   }
 
+  static getDerivedStateFromProps (props, state) {
+    if (props.config.get('userSessionTimeoutInterval') !== null && state.counter === null) {
+      return {
+        counter: props.config.get('userSessionTimeoutInterval'),
+      }
+    }
+    return null
+  }
+
   dropCounter () {
     if (!this.state.showTimeoutModal) {
-      this.setState({ counter: AppConfiguration.maxUserInactiveTimeInSeconds })
+      this.setState({ counter: this.props.config.get('userSessionTimeoutInterval') })
     }
   }
   decrementCounter () {
-    const state = {
-      counter: this.state.counter - 1,
+    if (this.state.counter !== null) {
+      const state = {
+        counter: this.state.counter - 1,
+      }
+      if (this.state.counter <= TIME_TO_DISPLAY_MODAL && !this.state.showTimeoutModal) {
+        state.showTimeoutModal = true
+      }
+      if (this.state.counter <= 0) {
+        this.props.onLogout()
+      }
+      this.setState(state)
     }
-    if (this.state.counter <= TIME_TO_DISPLAY_MODAL && !this.state.showTimeoutModal) {
-      state.showTimeoutModal = true
-    }
-    if (this.state.counter <= 0) {
-      this.props.onLogout()
-    }
-    this.setState(state)
   }
 
   componentWillUnmount () {
@@ -53,11 +64,11 @@ class TokenExpiredTracker extends React.Component {
   render () {
     const { config, onLogout } = this.props
     if (this.state.showTimeoutModal) {
-      return <SessionTimeout
-        timeLeft={this.state.counter}
-        displayBefore={TIME_TO_DISPLAY_MODAL}
-        continueFnc={() => this.setState({ showTimeoutModal: false, counter: AppConfiguration.maxUserInactiveTimeInSeconds })}
-        logoutFnc={onLogout}
+      return <MessageDialog
+        show={this.state.counter > 0 && this.state.counter <= TIME_TO_DISPLAY_MODAL}
+        primaryAction={() => this.setState({ showTimeoutModal: false, counter: config.get('userSessionTimeoutInterval') })}
+        secondaryAction={onLogout}
+        onHide={onLogout}
         primaryContent={<p className='lead'>{ msg.sessionExpired() }</p>}
         secondaryContent={
           <React.Fragment>
@@ -65,8 +76,10 @@ class TokenExpiredTracker extends React.Component {
             <p>{ msg.continueSessionSecondary() }</p>
           </React.Fragment>
         }
-        continueContent={msg.continueSessionBtn()}
-        logoutContent={msg.logOut()}
+        primaryActionButtonContent={msg.continueSessionBtn()}
+        secondaryActionButtonContent={msg.logOut()}
+        className={style['header-remover']}
+        icon={<Icon type='pf' name='warning-triangle-o' />}
       />
     }
     if (!config.get('isTokenExpired')) {

@@ -14,6 +14,7 @@ import {
   SET_USB_FILTER,
   SET_USER_FILTER_PERMISSION,
   SET_USER_GROUPS,
+  SET_USER_SESSION_TIMEOUT_INTERVAL,
   SHOW_TOKEN_EXPIRED_MSG,
   START_SCHEDULER_FIXED_DELAY,
   STOP_SCHEDULER_FIXED_DELAY,
@@ -76,6 +77,15 @@ export function setUserFilterPermission (filter) {
     type: SET_USER_FILTER_PERMISSION,
     payload: {
       filter,
+    },
+  }
+}
+
+export function setUserSessionTimeoutInternal (userSessionTimeoutInterval) {
+  return {
+    type: SET_USER_SESSION_TIMEOUT_INTERVAL,
+    payload: {
+      userSessionTimeoutInterval,
     },
   }
 }

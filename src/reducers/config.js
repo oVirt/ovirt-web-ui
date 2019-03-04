@@ -12,6 +12,7 @@ import {
   SET_USB_FILTER,
   SET_USER_FILTER_PERMISSION,
   SET_USER_GROUPS,
+  SET_USER_SESSION_TIMEOUT_INTERVAL,
   SHOW_TOKEN_EXPIRED_MSG,
 } from '_/constants'
 
@@ -30,6 +31,7 @@ const initialState = Immutable.fromJS({
   filter: true,
   isFilterChecked: false,
   administrator: false,
+  userSessionTimeoutInterval: null,
   usbFilter: null,
   userGroups: [],
   currentPage: {},
@@ -55,6 +57,9 @@ const config = actionReducer(initialState, {
   },
   [SET_USER_FILTER_PERMISSION] (state, { payload: { filter } }) {
     return state.set('filter', filter).set('isFilterChecked', true)
+  },
+  [SET_USER_SESSION_TIMEOUT_INTERVAL] (state, { payload: { userSessionTimeoutInterval } }) {
+    return state.set('userSessionTimeoutInterval', userSessionTimeoutInterval * 60)
   },
   [SET_ADMINISTRATOR] (state, { payload: { administrator } }) {
     return state.set('administrator', administrator)

@@ -75,11 +75,11 @@ export const messages: { [messageId: string]: MessageType } = {
   consoleInUseContinue: 'Console in use, continue?',
   containsConfigurationAndDisksWhichWillBeUsedToCreateThisVm: 'Contains the configuration and disks which will be used to create this virtual machine. Please customize as needed.',
   continueSessionSecondary: {
-    message: 'To continue your session click on the Continue Session button.',
+    message: 'To continue with your session, click on the \'Continue\' button.',
     description: 'Secondary message in SessionTimeout modal component.',
   },
   continueSessionBtn: {
-    message: 'Continue Session',
+    message: 'Continue',
     description: 'Button to continue user session in SessionTimeout modal component.',
   },
   coresPerSockets: 'Cores per Virtual Socket',
@@ -283,7 +283,7 @@ export const messages: { [messageId: string]: MessageType } = {
   },
   locked: 'Locked',
   logOut: 'Log out',
-  logOutInSecondsSecondary: 'You will be logged out in {seconds} seconds.',
+  logOutInSecondsSecondary: 'You will be logged out in {seconds} seconds if there is no further activity in your session.',
   lowOVirtVersion: 'SSH keys can not be managed with recent oVirt <strong>{apiVersion}</strong> version. Please upgrade oVirt to <strong>4.2</strong> or higher.',
   mapCtrlAltDelKeyboardShortcutToCtrlAltEnd: 'Map Ctrl + Alt + Del keyboard shortcut to Ctrl + Alt + End',
   memory: 'Memory',
