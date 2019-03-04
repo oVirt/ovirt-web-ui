@@ -47,6 +47,9 @@ import {
   setVnicProfiles,
   setVmSnapshots,
 
+  setUserMessages,
+  dismissUserMessage,
+
   getSinglePool,
   removeMissingPools,
   selectPoolDetail as actionSelectPoolDetail,
@@ -95,13 +98,16 @@ import {
   CHANGE_VM_CDROM,
   OPEN_CONSOLE_MODAL,
   CHECK_TOKEN_EXPIRED,
+  CLEAR_USER_MSGS,
   CREATE_VM,
   DELAYED_REMOVE_ACTIVE_REQUEST,
   DELETE_VM_NIC,
+  DISMISS_EVENT,
   DOWNLOAD_CONSOLE_VM,
   EDIT_VM,
   EDIT_VM_NIC,
   GET_ALL_CLUSTERS,
+  GET_ALL_EVENTS,
   GET_ALL_HOSTS,
   GET_ALL_OS,
   GET_ALL_TEMPLATES,
@@ -803,6 +809,60 @@ function* removeVm (action) {
   yield stopProgress({ vmId: action.payload.vmId, name: 'remove', result })
 }
 
+export function* fetchAllEvents (action) {
+  const { userId } = action.payload
+  const events = yield callExternalAction('events', Api.events, { payload: {} })
+
+  if (events.error) {
+    return
+  }
+
+  const internalEvents = events.event
+    ? events.event
+      .filter((event) =>
+        event.severity === 'error' &&
+        event.user &&
+        event.user.id === userId
+      )
+      .map((event) => Api.eventToInternal({ event }))
+    : []
+  yield put(setUserMessages({ messages: internalEvents }))
+}
+
+function* dismissEvent (action) {
+  const { event } = action.payload
+  if (event.get('id')) {
+    const result = yield callExternalAction('dismissEvent', Api.dismissEvent, action)
+
+    if (result.status === 'complete') {
+      yield fetchAllEvents(action)
+    }
+  } else {
+    yield put(dismissUserMessage({ time: event.get('time') }))
+  }
+}
+
+function* clearEvents (action) {
+  const events = yield callExternalAction('events', Api.events, { payload: {} })
+
+  if (events.error) {
+    return
+  }
+
+  const sagaEvents = events.event
+    ? events.event
+      .filter((event) =>
+        event.severity === 'error' &&
+        event.user &&
+        event.user.id === action.payload.userId
+      ).map((event) => callExternalAction('dismissEvent', Api.dismissEvent, { payload: { eventId: event.id } }))
+    : []
+
+  yield all(sagaEvents)
+
+  yield fetchAllEvents(action)
+}
+
 export function* fetchVmSessions ({ vmId }) {
   const sessions = yield callExternalAction('sessions', Api.sessions, { payload: { vmId } })
 
@@ -1074,6 +1134,10 @@ export function* rootSaga () {
     takeLatest(GET_ALL_HOSTS, fetchAllHosts),
     takeLatest(GET_ALL_VNIC_PROFILES, fetchAllVnicProfiles),
     takeLatest(GET_USER_GROUPS, fetchUserGroups),
+
+    takeLatest(GET_ALL_EVENTS, fetchAllEvents),
+    takeEvery(DISMISS_EVENT, dismissEvent),
+    takeEvery(CLEAR_USER_MSGS, clearEvents),
 
     takeEvery(SELECT_VM_DETAIL, selectVmDetail),
     takeEvery(ADD_VM_NIC, addVmNic),

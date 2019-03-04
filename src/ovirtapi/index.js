@@ -82,6 +82,8 @@ const OvirtApi = {
 
   permissionsToInternal: Transforms.Permissions.toInternal,
 
+  eventToInternal: Transforms.Event.toInternal,
+
   //
   //
   // ---- API interaction functions
@@ -353,6 +355,14 @@ const OvirtApi = {
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/logon`,
       input: JSON.stringify({}),
     })
+  },
+  events (): Promise<Object> {
+    assertLogin({ methodName: 'events' })
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/events` })
+  },
+  dismissEvent ({ eventId }: { eventId: string }): Promise<Object> {
+    assertLogin({ methodName: 'dismissEvent' })
+    return httpDelete({ url: `${AppConfiguration.applicationContext}/api/events/${eventId}` })
   },
   checkFilter (): Promise<Object> {
     assertLogin({ methodName: 'checkFilter' })

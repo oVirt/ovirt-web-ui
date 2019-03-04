@@ -1,11 +1,11 @@
 import Immutable from 'immutable'
 import {
   ADD_USER_MESSAGE,
-  CLEAR_USER_MSGS,
   DISMISS_USER_MSG,
   FAILED_EXTERNAL_ACTION,
   LOGIN_FAILED,
   SET_USERMSG_NOTIFIED,
+  SET_USER_MESSAGES,
 } from '_/constants'
 import { actionReducer } from './utils'
 
@@ -17,7 +17,7 @@ function addLogEntry ({ state, message, type = 'ERROR', failedAction }) {
   // TODO: use seq
   return state
     .set('unread', true)
-    .update('records', records => records.push(Immutable.fromJS({
+    .update('records', records => records.unshift(Immutable.fromJS({
       message,
       type,
       failedAction,
@@ -53,12 +53,24 @@ const userMessages = actionReducer(initialState, {
     })
   },
 
-  [CLEAR_USER_MSGS] (state) {
-    return state.set('unread', false).update('records', records => records.clear())
+  [SET_USER_MESSAGES] (state, { payload: { messages } }) {
+    let newState = state.update('records', records => records.clear())
+    for (let message of messages) {
+      newState = newState.update('records', records => records.push(Immutable.fromJS({
+        id: message.id,
+        message: message.description,
+        type: message.severity.toUpperCase(),
+        time: message.time,
+        notified: true,
+      })))
+    }
+    return newState
   },
+
   [SET_USERMSG_NOTIFIED] (state, { payload: { time } }) {
     return state.setIn(['records', state.get('records').findIndex(r => r.get('time') === time), 'notified'], true)
   },
+
   [DISMISS_USER_MSG] (state, { payload: { time } }) {
     return state.update('records', records => records.delete(state.get('records').findIndex(r => r.get('time') === time)))
   },

@@ -7,7 +7,7 @@ import { Notification, NotificationDrawer, MenuItem, Icon, Button } from 'patter
 
 import style from './style.css'
 
-import { clearUserMessages, dismissUserMessage } from '_/actions'
+import { clearUserMessages, dismissEvent } from '_/actions'
 import { hrefWithoutHistory, getFormatedDateTime } from '_/helpers'
 import { msg } from '_/intl'
 
@@ -54,9 +54,10 @@ class VmUserMessages extends React.Component {
   }
 
   render () {
-    const { userMessages, onClearMessages, onDismissMessage } = this.props
+    const { userMessages, config, onClearMessages, onDismissMessage } = this.props
 
     const idPrefix = `usermsgs`
+    const userId = config.getIn(['user', 'id'])
 
     const messagesCount = userMessages.get('records').size
     const messagesList = messagesCount
@@ -65,7 +66,7 @@ class VmUserMessages extends React.Component {
           key={`msg-${r.get('time')}`}
           record={r}
           id={`${idPrefix}-msg-${r.get('time')}-dropdown`}
-          onDismissMessage={() => onDismissMessage(r.get('time'))}
+          onDismissMessage={() => onDismissMessage(r, userId)}
         />
       ))
       : <NotificationDrawer.EmptyState title={msg.noMessages()} />
@@ -87,7 +88,7 @@ class VmUserMessages extends React.Component {
             { messagesCount > 0 &&
               <NotificationDrawer.PanelAction>
                 <NotificationDrawer.PanelActionLink data-toggle='clear-all'>
-                  <Button bsStyle='link' onClick={onClearMessages}>
+                  <Button bsStyle='link' onClick={() => onClearMessages(userId)}>
                     <Icon type='pf' name='close' />
                     { msg.clearAll() }
                   </Button>
@@ -101,6 +102,7 @@ class VmUserMessages extends React.Component {
   }
 }
 VmUserMessages.propTypes = {
+  config: PropTypes.object.isRequired,
   userMessages: PropTypes.object.isRequired,
   onClearMessages: PropTypes.func.isRequired,
   onDismissMessage: PropTypes.func.isRequired,
@@ -108,10 +110,11 @@ VmUserMessages.propTypes = {
 
 export default connect(
   (state) => ({
+    config: state.config,
     userMessages: state.userMessages,
   }),
   (dispatch) => ({
-    onClearMessages: () => dispatch(clearUserMessages()),
-    onDismissMessage: (time) => dispatch(dismissUserMessage({ time })),
+    onClearMessages: (userId) => dispatch(clearUserMessages({ userId })),
+    onDismissMessage: (event, userId) => dispatch(dismissEvent({ event, userId })),
   })
 )(VmUserMessages)

@@ -1,8 +1,11 @@
 import {
   ADD_USER_MESSAGE,
   CLEAR_USER_MSGS,
+  DISMISS_EVENT,
   DISMISS_USER_MSG,
   SET_USERMSG_NOTIFIED,
+  SET_USER_MESSAGES,
+  GET_ALL_EVENTS,
 } from '_/constants'
 
 export function addUserMessage ({ message, shortMessage, type = '' }) {
@@ -16,10 +19,12 @@ export function addUserMessage ({ message, shortMessage, type = '' }) {
   }
 }
 
-export function clearUserMessages () {
+export function clearUserMessages ({ userId }) {
   return {
     type: CLEAR_USER_MSGS,
-    payload: {},
+    payload: {
+      userId,
+    },
   }
 }
 
@@ -37,6 +42,34 @@ export function dismissUserMessage ({ time }) {
     type: DISMISS_USER_MSG,
     payload: {
       time,
+    },
+  }
+}
+
+export function dismissEvent ({ event, userId }) {
+  return {
+    type: DISMISS_EVENT,
+    payload: {
+      event,
+      userId,
+    },
+  }
+}
+
+export function setUserMessages ({ messages }) {
+  return {
+    type: SET_USER_MESSAGES,
+    payload: {
+      messages,
+    },
+  }
+}
+
+export function getAllEvents ({ userId }) {
+  return {
+    type: GET_ALL_EVENTS,
+    payload: {
+      userId,
     },
   }
 }
