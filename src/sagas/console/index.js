@@ -1,9 +1,9 @@
 import { put } from 'redux-saga/effects'
 
 import Api from '_/ovirtapi'
-import Selectors from '../../selectors'
-import OptionsManager from '../../optionsManager'
-import logger from '../../logger'
+import Selectors from '_/selectors'
+import OptionsManager from '_/optionsManager'
+import logger from '_/logger'
 import { fileDownload } from '_/helpers'
 import { doesVmSessionExistForUserId } from '_/utils'
 import {
@@ -18,7 +18,7 @@ import {
 } from '_/actions'
 
 import { callExternalAction } from '../utils'
-import { fetchVmSessions } from '../../sagas'
+import { fetchVmSessions } from '../index'
 
 import { adjustVVFile } from './vvFileUtils'
 import RDPBuilder from './rdpBuilder'

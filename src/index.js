@@ -10,21 +10,21 @@ import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { IntlProvider } from 'react-intl'
 
-import logger from './logger'
+import logger from '_/logger'
 
 // TODO: Look at this WRT patternfly-react CSS!!!!!!!
 import 'patternfly/dist/css/patternfly.css'
 import 'patternfly/dist/css/patternfly-additions.css'
 import './index-nomodules.css'
-import * as branding from './branding'
+import * as branding from '_/branding'
 
 import { getSelectedMessages, locale } from '_/intl'
-import configureStore from './store'
-import Selectors from './selectors'
-import AppConfiguration, { readConfiguration } from './config'
-import { loadStateFromLocalStorage } from './storage'
+import configureStore from '_/store'
+import Selectors from '_/selectors'
+import AppConfiguration, { readConfiguration } from '_/config'
+import { loadStateFromLocalStorage } from '_/storage'
 import { valuesOfObject } from '_/helpers'
-import { rootSaga } from './sagas'
+import { rootSaga } from '_/sagas'
 import {
   login,
   updateIcons,
@@ -32,7 +32,7 @@ import {
   addActiveRequest,
   delayedRemoveActiveRequest,
 } from '_/actions'
-import OvirtApi from './ovirtapi'
+import OvirtApi from '_/ovirtapi'
 
 import App from './App'
 import GlobalErrorBoundary from './GlobalErrorBoundary'

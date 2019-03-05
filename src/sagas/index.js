@@ -1,12 +1,12 @@
 import Api from '_/ovirtapi'
-import { persistStateToLocalStorage } from './storage'
-import Selectors from './selectors'
-import AppConfiguration from './config'
+import { persistStateToLocalStorage } from '_/storage'
+import Selectors from '_/selectors'
+import AppConfiguration from '_/config'
 
-import vmDisksSagas from './saga/disks'
-import storageDomainSagas, { fetchIsoFiles } from './saga/storageDomains'
-import vmSnapshotsSagas from './components/VmDetails/cards/SnapshotsCard/sagas'
-import optionsDialogSagas from './components/OptionsDialog/sagas'
+import vmSnapshotsSagas from '_/components/VmDetails/cards/SnapshotsCard/sagas'
+import optionsDialogSagas from '_/components/OptionsDialog/sagas'
+import vmDisksSagas from './disks'
+import storageDomainSagas, { fetchIsoFiles } from './storageDomains'
 
 import {
   all,
@@ -19,7 +19,7 @@ import {
   throttle,
 } from 'redux-saga/effects'
 
-import logger from './logger'
+import logger from '_/logger'
 
 import { push } from 'connected-react-router'
 import {
@@ -76,14 +76,14 @@ import {
   foreach,
   fetchPermits,
   PermissionsType,
-} from './saga/utils'
+} from './utils'
 
 import {
   doCheckTokenExpired,
   login,
   logout,
   compareVersion,
-} from './saga/login'
+} from './login'
 
 import {
   downloadVmConsole,
@@ -92,7 +92,7 @@ import {
   getRDPVm,
   fetchConsoleVmMeta,
   getConsoleInUse,
-} from './saga/console'
+} from './console'
 
 import {
   ADD_VM_NIC,
@@ -150,7 +150,7 @@ import {
   canUserUseCluster,
   canUserUseVnicProfile,
   getUserPermits,
-} from './utils'
+} from '_/utils'
 
 const vmFetchAdditionalList =
   [
