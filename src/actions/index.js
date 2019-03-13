@@ -181,11 +181,18 @@ export function getUserGroups () {
   }
 }
 
-export function setCpuTopologyOptions ({ maxNumberOfSockets, maxNumOfVmCpus }) {
+export function setCpuTopologyOptions ({
+  maxNumberOfSockets,
+  maxNumberOfCores,
+  maxNumberOfThreads,
+  maxNumOfVmCpus,
+}) {
   return {
     type: SET_CPU_TOPOLOGY_OPTIONS,
     payload: {
       maxNumberOfSockets,
+      maxNumberOfCores,
+      maxNumberOfThreads,
       maxNumOfVmCpus,
     },
   }

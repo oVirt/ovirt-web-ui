@@ -12,14 +12,13 @@ import {
   convertValue,
   isNumber,
   round,
-  dividers,
 } from '_/utils'
 import {
   canChangeCluster as vmCanChangeCluster,
   canChangeCd as vmCanChangeCd,
 } from '_/vm-status'
 
-import { isValidOsIcon } from '../../../utils'
+import { isValidOsIcon, getTopologyPossibleValues, getTopology } from '../../../utils'
 
 import {
   Alert,
@@ -133,15 +132,19 @@ function rephraseVmType (vmType) {
 /*
  * Render a label plus children as a single grid row with 2 columns.
  */
-const FieldRow = ({ label, children, id }) => (
+const FieldRow = ({ label, children, id, tooltip }) => (
   <Row className={style['field-row']}>
-    <Col cols={5} className={style['col-label']}>{label}</Col>
+    <Col cols={5} className={style['col-label']}>
+      <span>{label}</span>
+      {tooltip && <FieldLevelHelp buttonClass={style['field-level-help']} disabled={false} content={tooltip} inline />}
+    </Col>
     <Col cols={7} className={style['col-data']} id={id}>{children}</Col>
   </Row>
 )
 FieldRow.propTypes = {
   id: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
+  tooltip: PropTypes.string,
   children: PropTypes.node.isRequired,
 }
 
@@ -403,35 +406,52 @@ class DetailsCard extends React.Component {
         case 'cpu':
           if (isNumber(value) && value > 0 && value <= this.props.config.get('maxNumOfVmCpus')) {
             const maxNumberOfSockets = this.props.config.get('maxNumberOfSockets')
-            let sockets = value
-            let cores = 1
-            let threads = 1
+            const maxNumberOfCores = this.props.config.get('maxNumberOfCores')
+            const maxNumberOfThreads = this.props.config.get('maxNumberOfThreads')
+            let topology = { sockets: value, cores: 1, threads: 1 }
             if (value > maxNumberOfSockets) {
-              let cpuValue = value
-              let divsOfValue = dividers(cpuValue)
-              divsOfValue = divsOfValue.filter(x => x <= maxNumberOfSockets)
-              sockets = divsOfValue[divsOfValue.length - 1]
-
-              cpuValue /= sockets
-              divsOfValue = dividers(cpuValue)
-              cores = divsOfValue[divsOfValue.length - 1]
-
-              cpuValue /= cores
-              threads = cpuValue
+              topology = getTopology({
+                value,
+                max: {
+                  sockets: maxNumberOfSockets,
+                  cores: maxNumberOfCores,
+                  threads: maxNumberOfThreads,
+                },
+              })
             }
             updates = updates.mergeDeep({
               'cpu': {
-                'topology': { // NOTE: this may not match VM's template's topology
-                  sockets,
-                  cores,
-                  threads,
-                },
+                topology,
                 'vCPUs': +value, // === sockets * cores * threads
               },
             })
             fieldUpdated = 'cpu'
             this.hotPlugUpdates['cpu'] = true
           }
+          break
+
+        case 'topology':
+          const maxNumberOfSockets = this.props.config.get('maxNumberOfSockets')
+          const maxNumberOfCores = this.props.config.get('maxNumberOfCores')
+          const maxNumberOfThreads = this.props.config.get('maxNumberOfThreads')
+          let topology = getTopology({
+            value: this.state.vm.getIn(['cpu', 'vCPUs']),
+            max: {
+              sockets: maxNumberOfSockets,
+              cores: maxNumberOfCores,
+              threads: maxNumberOfThreads,
+            },
+            force: {
+              [additionalArgs.vcpu]: parseInt(value),
+            },
+          })
+          updates = updates.mergeDeep({
+            'cpu': {
+              topology,
+            },
+          })
+          fieldUpdated = 'topology'
+          this.hotPlugUpdates['topology'] = true
           break
 
         case 'memory':
@@ -519,7 +539,7 @@ class DetailsCard extends React.Component {
       }
     }
 
-    if (this.trackUpdates['cpu']) {
+    if (this.trackUpdates['cpu'] || this.trackUpdates['topology']) {
       vmUpdates['cpu'] = {
         topology: stateVm.getIn(['cpu', 'topology']).toJS(),
       }
@@ -593,7 +613,7 @@ class DetailsCard extends React.Component {
   }
 
   render () {
-    const { hosts, clusters, dataCenters, templates, operatingSystems } = this.props
+    const { hosts, clusters, dataCenters, templates, operatingSystems, config } = this.props
     const { vm, isEditing, correlatedMessages, clusterList, isoList } = this.state
 
     const idPrefix = 'vmdetail-details'
@@ -616,6 +636,7 @@ class DetailsCard extends React.Component {
     const canChangeCluster = vmCanChangeCluster(status)
     const clusterId = vm.getIn(['cluster', 'id'])
     const cluster = clusters && clusters.get(clusterId)
+    const isClusterPower8 = cluster && cluster.get('architecture') === 'ppc64'
     const clusterName = (cluster && cluster.get('name')) || msg.notAvailable()
 
     // Data Center
@@ -646,7 +667,17 @@ class DetailsCard extends React.Component {
     const optimizedFor = rephraseVmType(vm.get('type'))
 
     // VCPU
+    const SOCKETS_VCPU = 'sockets'
+    const CORES_VCPU = 'cores'
+    const THREADS_VCPU = 'threads'
     const vCpuCount = vm.getIn(['cpu', 'vCPUs'])
+    const vCpuTopology = vm.getIn(['cpu', 'topology'])
+    const vCpuTopologyDividers = getTopologyPossibleValues({
+      value: vCpuCount,
+      maxNumberOfSockets: config.get('maxNumberOfSockets'),
+      maxNumberOfCores: config.get('maxNumberOfCores'),
+      maxNumberOfThreads: config.get('maxNumberOfThreads'),
+    })
 
     // Boot devices
     const allowedBootDevices = ['hd', 'network', 'cdrom']
@@ -659,7 +690,7 @@ class DetailsCard extends React.Component {
 
     // Operation System
     const osType = vm.getIn(['os', 'type'])
-    const osId = operatingSystems.find(os => os.get('name') === osType).get('id')
+    const osId = operatingSystems && operatingSystems.find(os => os.get('name') === osType).get('id')
 
     const { unit: memoryUnit, value: memorySize } = convertValue('B', vm.getIn(['memory', 'total']))
 
@@ -787,7 +818,16 @@ class DetailsCard extends React.Component {
                       {optimizedFor}
                     </FieldRow>
 
-                    <FieldRow label={msg.cpus()} id={`${idPrefix}-cpus`}>
+                    <FieldRow
+                      label={msg.cpus()}
+                      id={`${idPrefix}-cpus`}
+                      tooltip={
+                        msg.totalCpuTooltip({
+                          sockets: vCpuTopology.get('sockets'),
+                          cores: vCpuTopology.get('cores'),
+                          threads: vCpuTopology.get('threads'),
+                        })
+                      }>
                       { !isFullEdit && vCpuCount }
                       { isFullEdit &&
                         <div>
@@ -836,6 +876,23 @@ class DetailsCard extends React.Component {
                           onChange={(e, state) => { this.handleChange('cloudInitEnabled', state) }}
                         />
                       </FieldRow>
+                      <FieldRow label={msg.operatingSystem()} id={`${idPrefix}-os`}>
+                        <SelectBox
+                          id={`${idPrefix}-os-edit`}
+                          items={this.state.osList}
+                          selected={osId}
+                          onChange={(selectedId) => { this.handleChange('os', selectedId) }}
+                        />
+                      </FieldRow>
+                      <FieldRow label={msg.bootMenu()} id={`${idPrefix}-boot-menu`}>
+                        <Switch
+                          id={`${idPrefix}-boot-menu-edit`}
+                          handleWidth={30}
+                          bsSize='mini'
+                          value={bootMenuEnabled}
+                          onChange={(e, state) => { this.handleChange('bootMenuEnabled', state) }}
+                        />
+                      </FieldRow>
                       { cloudInitEnabled && <div style={{ marginTop: '15px' }}>
                         <FormGroup controlId={`${idPrefix}-cloud-init-hostname`}>
                           <ControlLabel>
@@ -863,23 +920,7 @@ class DetailsCard extends React.Component {
                   {/* Second column */}
                   <Col className={style['fields-column']}>
                     <Grid>
-                      <FieldRow label={msg.operatingSystem()} id={`${idPrefix}-os`}>
-                        <SelectBox
-                          id={`${idPrefix}-os-edit`}
-                          items={this.state.osList}
-                          selected={osId}
-                          onChange={(selectedId) => { this.handleChange('os', selectedId) }}
-                        />
-                      </FieldRow>
-                      <FieldRow label={msg.bootMenu()} id={`${idPrefix}-boot-menu`}>
-                        <Switch
-                          id={`${idPrefix}-boot-menu-edit`}
-                          handleWidth={30}
-                          bsSize='mini'
-                          value={bootMenuEnabled}
-                          onChange={(e, state) => { this.handleChange('bootMenuEnabled', state) }}
-                        />
-                      </FieldRow>
+                      {/* Boot sequence */}
                       <Row className={style['field-row']}>
                         <Col cols={12} className={style['col-label']}>
                           <div>
@@ -913,6 +954,54 @@ class DetailsCard extends React.Component {
                           ]}
                           selected={bootDevices[SECOND_DEVICE]}
                           onChange={(selectedId) => { this.handleChange('bootDevices', selectedId, { device: SECOND_DEVICE }) }}
+                        />
+                      </FieldRow>
+                      {/* VCPU Topology */}
+                      <Row className={style['field-row']}>
+                        <Col cols={12} className={style['col-label']}>
+                          <div>
+                            <span>{msg.vcpuTopology()}</span>
+                          </div>
+                        </Col>
+                      </Row>
+                      <FieldRow label={msg.virtualSockets()} id={`${idPrefix}-vcpu-topology-sockets`}>
+                        <SelectBox
+                          id={`${idPrefix}-vcpu-topology-sockets-edit`}
+                          items={vCpuTopologyDividers.sockets.map(i => ({
+                            id: i.toString(),
+                            value: i.toString(),
+                          }))}
+                          selected={vCpuTopology.get('sockets').toString()}
+                          onChange={(selectedId) => { this.handleChange('topology', selectedId, { vcpu: SOCKETS_VCPU }) }}
+                        />
+                      </FieldRow>
+                      <FieldRow label={msg.coresPerSockets()} id={`${idPrefix}-vcpu-topology-cores`}>
+                        <SelectBox
+                          id={`${idPrefix}-vcpu-topology-cores-edit`}
+                          items={vCpuTopologyDividers.cores.map(i => ({
+                            id: i.toString(),
+                            value: i.toString(),
+                          }))}
+                          selected={vCpuTopology.get('cores').toString()}
+                          onChange={(selectedId) => { this.handleChange('topology', selectedId, { vcpu: CORES_VCPU }) }}
+                        />
+                      </FieldRow>
+                      <FieldRow
+                        label={msg.threadsPerCores()}
+                        id={`${idPrefix}-vcpu-topology-threads`}
+                        tooltip={
+                          isClusterPower8
+                            ? msg.recomendedPower8ValuesForThreads({ threads: config.get('maxNumberOfThreads') })
+                            : msg.recomendedValuesForThreads({ threads: config.get('maxNumberOfThreads') })
+                        }>
+                        <SelectBox
+                          id={`${idPrefix}-vcpu-topology-threads-edit`}
+                          items={vCpuTopologyDividers.threads.map(i => ({
+                            id: i.toString(),
+                            value: i.toString(),
+                          }))}
+                          selected={vCpuTopology.get('threads').toString()}
+                          onChange={(selectedId) => { this.handleChange('topology', selectedId, { vcpu: THREADS_VCPU }) }}
                         />
                       </FieldRow>
                     </Grid>

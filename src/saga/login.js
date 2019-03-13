@@ -194,11 +194,24 @@ function* fetchCpuTopologyOptions () {
     'getOption',
     Api.getOption,
     getOption('MaxNumOfVmSockets', `${version.get('major')}.${version.get('minor')}`, 16))
+  const maxNumberOfCores = yield callExternalAction(
+    'getOption',
+    Api.getOption,
+    getOption('MaxNumOfCpuPerSocket', `${version.get('major')}.${version.get('minor')}`, 16))
+  const maxNumberOfThreads = yield callExternalAction(
+    'getOption',
+    Api.getOption,
+    getOption('MaxNumOfThreadsPerCpu', `${version.get('major')}.${version.get('minor')}`, 16))
   const maxNumOfVmCpus = yield callExternalAction(
     'getOption',
     Api.getOption,
     getOption('MaxNumOfVmCpus', `${version.get('major')}.${version.get('minor')}`, 1))
-  yield put(setCpuTopologyOptions({ maxNumberOfSockets: parseInt(maxNumberOfSockets), maxNumOfVmCpus: parseInt(maxNumOfVmCpus) }))
+  yield put(setCpuTopologyOptions({
+    maxNumberOfSockets: parseInt(maxNumberOfSockets),
+    maxNumberOfCores: parseInt(maxNumberOfCores),
+    maxNumberOfThreads: parseInt(maxNumberOfThreads),
+    maxNumOfVmCpus: parseInt(maxNumOfVmCpus),
+  }))
 }
 
 function* initialLoad () {
