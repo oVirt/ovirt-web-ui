@@ -2,11 +2,9 @@ import React from 'react'
 import { Icon, Modal, Button } from 'patternfly-react'
 import style from './style.css'
 import { msg } from '../../intl'
-import ConsoleConfirmationModal from '../VmActions/ConsoleConfirmationModal'
-import { ActionButtonWraper } from '../VmActions/Action'
 import PropTypes from 'prop-types'
 
-class VmConsoleSettingsModal extends React.Component {
+class VmConsoleInstructionsModal extends React.Component {
   constructor (props) {
     super(props)
     this.state = { showModal: false }
@@ -23,11 +21,10 @@ class VmConsoleSettingsModal extends React.Component {
   }
 
   render () {
-    const { consoleId, vm, disabled } = this.props
-    const consoleConfirmation = <ConsoleConfirmationModal vm={vm} consoleId={consoleId} />
+    const { disabled } = this.props
     return <div className={style['console-modal-box']}>
       <Button bsStyle='link' onClick={this.open} className={style['color-blue']} disabled={disabled}>
-        { msg.remoteDesktopConnectionSettings() }
+        { msg.consoleInstructions() }
       </Button>
 
       <Modal show={this.state.showModal} onHide={this.close} dialogClassName={style['create-snapshot-container']} id={'vm-console-connection-open-modal'}>
@@ -41,13 +38,13 @@ class VmConsoleSettingsModal extends React.Component {
           >
             <Icon type='pf' name='close' />
           </button>
-          <Modal.Title>{ msg.remoteDesktopConnectionSettings() }</Modal.Title>
+          <Modal.Title>{ msg.consoleInstructions() }</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div className={style['modal-container']}>
-            <h3>{ msg.remoteDesktopViewerConnection() }</h3>
+            <h3>{ msg.remoteViewerConnection() }</h3>
             <div>{ msg.usingRemoteViewer() }</div>
-            <div>{ msg.remoteDesktopViewerAvailable() }</div>
+            <div>{ msg.remoteViewerAvailable() }</div>
             <div className={style['console-detail-container']}>
               <dl>
                 <dt>RHEL, CentOS</dt><dd>sudo yum install virt-viewer</dd>
@@ -56,7 +53,6 @@ class VmConsoleSettingsModal extends React.Component {
                 <dt>Windows</dt><dd>{ msg.downloadVirtManagerMSI() }</dd>
               </dl>
             </div>
-            <ActionButtonWraper className='btn btn-default' confirmation={consoleConfirmation} shortTitle={msg.downloadVVFile()} id='vm-console-connection-download-button' />
           </div>
         </Modal.Body>
       </Modal>
@@ -64,10 +60,8 @@ class VmConsoleSettingsModal extends React.Component {
   }
 }
 
-VmConsoleSettingsModal.propTypes = {
-  vm: PropTypes.object.isRequired,
-  consoleId: PropTypes.string.isRequired,
+VmConsoleInstructionsModal.propTypes = {
   disabled: PropTypes.bool,
 }
 
-export default VmConsoleSettingsModal
+export default VmConsoleInstructionsModal

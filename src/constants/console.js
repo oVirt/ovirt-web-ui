@@ -11,3 +11,5 @@ export const SET_NEW_CONSOLE_MODAL = 'SET_NEW_CONSOLE_MODAL'
 export const CONSOLE_OPENED = 'OPENED'
 export const CONSOLE_IN_USE = 'IN_USE'
 export const CONSOLE_LOGON = 'LOGON'
+
+export const RDP_ID = 'rdp'

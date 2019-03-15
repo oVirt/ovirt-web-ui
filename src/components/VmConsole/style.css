@@ -56,9 +56,13 @@
 
 
 .download-page-content {
-	margin-top: auto;
+    margin-top: auto;
     margin-bottom: auto;
     text-align: center;
+}
+
+.download-page-content img {
+    width: 100px;
 }
 
 .download-page-main-text {

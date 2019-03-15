@@ -15,8 +15,8 @@ import Loader, { SIZES } from '../Loader'
 
 import { isRunning } from '../utils'
 
-import downloadIcon from './images/download_icon.svg'
-import disconnectIcon from './images/disconnect_icon.svg'
+import downloadIcon from './images/download_icon.png'
+import disconnectIcon from './images/disconnect_icon.png'
 
 const RDP_ID = 'rdp'
 

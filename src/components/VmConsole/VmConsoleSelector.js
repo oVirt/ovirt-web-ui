@@ -6,14 +6,12 @@ import { push } from 'connected-react-router'
 import { DropdownButton, MenuItem, Icon } from 'patternfly-react'
 import ConsoleConfirmationModal from '../VmActions/ConsoleConfirmationModal'
 import { MenuItemAction } from '../VmActions/Action'
-import { DOWNLOAD_CONSOLE } from '_/constants'
+import { DOWNLOAD_CONSOLE, RDP_ID } from '_/constants'
 import { msg } from '_/intl'
 import { getRDP } from '_/actions'
 
 import { isWindows } from '_/helpers'
 import style from './style.css'
-
-const RDP_ID = 'rdp'
 
 const VmConsoleSelector = ({ vmId, vms, consoles, config, consoleId, isConsolePage, onRDP }) => {
   let actions = vms.getIn(['vms', vmId, 'consoles'])
@@ -41,7 +39,7 @@ const VmConsoleSelector = ({ vmId, vms, consoles, config, consoleId, isConsolePa
     const username = config.getIn([ 'user', 'name' ])
     consoleItems.push(<MenuItem
       key={RDP_ID}
-      onClick={(e) => { e.preventDefault(); onRDP({ domain, username }) }}
+      onClick={(e) => { e.preventDefault(); onRDP({ domain, username, vms }) }}
     >
       {msg.rdpConsole()} <Icon name='external-link' />
     </MenuItem>)
@@ -93,8 +91,8 @@ export default connect(
     consoles: state.consoles,
     config: state.config,
   }),
-  (dispatch, { vms, vmId }) => ({
-    onRDP: ({ domain, username }) => {
+  (dispatch, { vmId }) => ({
+    onRDP: ({ domain, username, vms }) => {
       dispatch(getRDP({ name: vms.getIn(['vms', vmId, 'name']), fqdn: vms.getIn(['vms', vmId, 'fqdn']), domain, username }))
       dispatch(push('/vm/' + vmId + '/console/rdp'))
     },

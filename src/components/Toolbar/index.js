@@ -6,9 +6,9 @@ import style from './style.css'
 import { RouterPropTypeShapes } from '_/propTypeShapes'
 import VmActions from '../VmActions'
 import VmConsoleSelector from '../VmConsole/VmConsoleSelector'
-import VmConsoleSettingsModal from '../VmConsole/VmConsoleSettingsModal'
+import VmConsoleInstructionsModal from '../VmConsole/VmConsoleInstructionsModal'
 
-import { INIT_CONSOLE } from '_/constants'
+import { INIT_CONSOLE, DOWNLOAD_CONSOLE } from '_/constants'
 
 const VmDetailToolbar = ({ match, vms }) => {
   if (vms.getIn(['vms', match.params.id])) {
@@ -49,6 +49,7 @@ const PoolDetailToolbarConnected = connect(
 
 const VmConsoleToolbar = ({ match, vms, consoles }) => {
   if (vms.getIn(['vms', match.params.id])) {
+    const consoleStatus = [INIT_CONSOLE, DOWNLOAD_CONSOLE]
     return <div className={style['console-toolbar']}>
       <div className={style['console-toolbar-actions']}>
         <VmConsoleSelector
@@ -56,10 +57,8 @@ const VmConsoleToolbar = ({ match, vms, consoles }) => {
           consoleId={match.params.console}
           isConsolePage
         />
-        <VmConsoleSettingsModal
-          vm={vms.getIn(['vms', match.params.id])}
-          consoleId={match.params.console}
-          disabled={consoles.getIn(['vms', match.params.id, 'consoleStatus']) !== INIT_CONSOLE} />
+        <VmConsoleInstructionsModal
+          disabled={!consoleStatus.includes(consoles.getIn(['vms', match.params.id, 'consoleStatus']))} />
       </div>
       <div className={style['console-toolbar-actions']}>
         <div id='vm-console-toolbar-sendkeys' />
