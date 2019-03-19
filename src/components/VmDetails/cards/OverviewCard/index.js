@@ -189,7 +189,7 @@ class OverviewCard extends React.Component {
   }
 
   render () {
-    const { vm, icons, operatingSystems, isEditable } = this.props
+    const { vm, icons, vms, operatingSystems, isEditable } = this.props
     const { isEditing, correlatedMessages, nameError, updateCloudInit, disableHostnameToggle } = this.state
 
     const elapsedUptime = vm.getIn(['statistics', 'elapsedUptime', 'datum'], 0)
@@ -201,6 +201,13 @@ class OverviewCard extends React.Component {
     const idPrefix = 'vmdetail-overview'
 
     const showCloudInitCheckbox = isEditing && this.trackUpdates['name'] && !nameError && this.isCloudInitHostnameUpdate()
+
+    const poolId = vm.getIn(['pool', 'id'])
+    const isPoolVm = !!poolId
+    let pool = null
+    if (isPoolVm) {
+      pool = vms.getIn(['pools', poolId])
+    }
 
     return (
       <BaseCard
@@ -220,6 +227,7 @@ class OverviewCard extends React.Component {
                 {getOsHumanName(vm.getIn(['os', 'type']))}
               </div>
 
+              {isPoolVm && pool && <span className={style['pool-vm-label']} style={{ backgroundColor: `rgb(${pool.get('color')})` }}>{ pool.get('name') }</span>}
               <div className={style['container']}>
                 <div className={style['os-icon']}>
                   <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' />
@@ -305,6 +313,7 @@ OverviewCard.propTypes = {
   isEditable: PropTypes.bool,
 
   icons: PropTypes.object.isRequired,
+  vms: PropTypes.object.isRequired,
   operatingSystems: PropTypes.object.isRequired, // deep immutable, {[id: string]: OperatingSystem}
   userMessages: PropTypes.object.isRequired,
   templates: PropTypes.object.isRequired,
@@ -315,6 +324,7 @@ OverviewCard.propTypes = {
 export default connect(
   (state, { vm }) => ({
     icons: state.icons,
+    vms: state.vms,
     operatingSystems: state.operatingSystems,
     userMessages: state.userMessages,
     templates: state.templates,

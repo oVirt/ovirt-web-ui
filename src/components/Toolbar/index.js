@@ -14,10 +14,12 @@ import { INIT_CONSOLE, DOWNLOAD_CONSOLE } from '_/constants'
 
 const VmDetailToolbar = ({ match, vms }) => {
   if (vms.getIn(['vms', match.params.id])) {
+    const poolId = vms.getIn(['vms', match.params.id, 'pool', 'id'])
+    const pool = vms.getIn(['pools', poolId])
     return (
       <Toolbar className={style['full-width']}>
         <Toolbar.RightContent>
-          <VmActions vm={vms.getIn(['vms', match.params.id])} />
+          <VmActions vm={vms.getIn(['vms', match.params.id])} pool={pool} />
         </Toolbar.RightContent>
       </Toolbar>
     )

@@ -4,24 +4,22 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import BaseCard from './BaseCard'
+import { FieldLevelHelp } from 'patternfly-react'
 
 import sharedStyle from '../sharedStyle.css'
 
 import VmActions from '../VmActions'
-import VmStatusIcon from '../VmStatusIcon'
 
 import { startPool } from '_/actions'
-
+import { msg } from '_/intl'
 import { getOsHumanName } from '../utils'
-import { enumMsg } from '_/intl'
 
+import style from './style.css'
 /**
  * Single icon-card in the list for a Pool
  */
 const Pool = ({ pool, icons, onStart }) => {
   const idPrefix = `pool-${pool.get('name')}`
-  const state = pool.get('status')
-  const stateValue = enumMsg('VmStatus', state)
   const osName = getOsHumanName(pool.getIn(['vm', 'os', 'type']))
   const iconId = pool.getIn(['vm', 'icons', 'large', 'id'])
   const icon = icons.get(iconId)
@@ -29,12 +27,16 @@ const Pool = ({ pool, icons, onStart }) => {
   return (
     <BaseCard idPrefix={idPrefix}>
       <BaseCard.Header>
-        <span className={sharedStyle['operating-system-label']}>{ osName }</span>
+        <div className={style['pool-top-line']} style={{ backgroundColor: `rgb(${pool.get('color')})` }} />
+        <span className={`${sharedStyle['operating-system-label']} ${style['pool-os-label']}`}>{ osName }</span>
       </BaseCard.Header>
       <BaseCard.Icon url={`/pool/${pool.get('id')}`} icon={icon} />
-      <BaseCard.Title url={`/pool/${pool.get('id')}`} name={pool.get('name')} />
-      <BaseCard.Status>
-        <VmStatusIcon state={state} />&nbsp;{stateValue}
+      <BaseCard.Title idPrefix={idPrefix} name={pool.get('name')} />
+      <BaseCard.Status idPrefix={idPrefix}>
+        <dl className={style['pool-info']}>
+          <dt>{msg.allocatedVms()} <FieldLevelHelp content={msg.maxNumberOfVms({ numberOfVms: pool.get('maxUserVms') })} inline /></dt><dd>{pool.get('vmsCount')}</dd>
+          <dt>{msg.availableVmsFromPool()}</dt><dd>{pool.get('maxUserVms')}</dd>
+        </dl>
       </BaseCard.Status>
       <VmActions isOnCard vm={pool.get('vm')} onStart={onStart} pool={pool} idPrefix={idPrefix} />
     </BaseCard>

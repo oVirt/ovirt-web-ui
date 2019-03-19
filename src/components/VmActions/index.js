@@ -116,9 +116,9 @@ class VmActions extends React.Component {
       onSuspend,
       onRDP,
     } = this.props
-    const isPool = !!pool
-    const status = vm.get('status')
     const isPoolVm = !!vm.getIn(['pool', 'id'], false)
+    const isPool = !!pool && !isPoolVm
+    const status = vm.get('status')
     const onStart = (isPool ? onStartPool : onStartVm)
 
     // TODO: On the card list page, the VM's consoles would not have been fetched yet,
@@ -138,7 +138,8 @@ class VmActions extends React.Component {
       confirm={{ title: msg.yes(), onClick: () => onSuspend() }} />)
     const shutdownConfirmation = (<ConfirmationModal accessibleDescription='one' title={msg.shutdownVm()} body={msg.shutdownVmQuestion()}
       confirm={{ title: msg.yes(), onClick: () => onShutdown() }}
-      extra={{ title: msg.force(), onClick: () => onForceShutdown() }} />)
+      extra={{ title: msg.force(), onClick: () => onForceShutdown() }}
+      subContent={isPoolVm && pool && vm.get('stateless') && msg.shutdownStatelessPoolVm({ poolName: pool.get('name') })} />)
     const rebootConfirmation = (<ConfirmationModal title={msg.rebootVm()} body={msg.rebootVmQuestion()}
       confirm={{ title: msg.yes(), onClick: () => onRestart() }} />)
 
@@ -180,8 +181,8 @@ class VmActions extends React.Component {
     const actions = [
       {
         priority: 0,
-        actionDisabled: (!isPool && !canStart(status)) || vm.getIn(['actionInProgress', 'start']),
-        shortTitle: msg.run(),
+        actionDisabled: (!isPool && !canStart(status)) || vm.getIn(['actionInProgress', 'start']) || (isPool && pool.get('maxUserVms') <= pool.get('vmsCount')),
+        shortTitle: isPool ? msg.takeVm() : msg.run(),
         tooltip: msg.startVm(),
         className: 'btn btn-success',
         id: `${idPrefix}-button-start`,

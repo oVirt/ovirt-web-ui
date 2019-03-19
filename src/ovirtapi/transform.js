@@ -69,6 +69,20 @@ function cleanUndefined (obj: Object): Object {
   return obj
 }
 
+function getPoolColor (id: string): string {
+  let poolIdLength = Math.floor(id.length / 3)
+  const poolIdArray = id.split('')
+  const poolColor = [ 0, 0, 0 ]
+  if (poolIdLength === 0) {
+    poolColor[0] = id.charCodeAt(0)
+  } else {
+    for (let i = 0; i < poolColor.length; i++) {
+      poolColor[i] = poolIdArray.slice(i * poolIdLength).reduce((a, b) => a + b.charCodeAt(0) > 256 ? a + b.charCodeAt(0) - 256 : a + b.charCodeAt(0), 0)
+    }
+  }
+  return poolColor.join(',')
+}
+
 //
 //
 const VM = {
@@ -88,6 +102,8 @@ const VM = {
       stopTime: convertEpoch(vm['stop_time']),
       creationTime: convertEpoch(vm['creation_time']),
       startPaused: convertBool(vm['start_paused']),
+
+      stateless: vm['stateless'] === 'true',
 
       fqdn: vm['fqdn'],
 
@@ -397,6 +413,7 @@ const Pool = {
 
       vm: VM.toInternal({ vm: pool.vm }),
       vmsCount: 0,
+      color: getPoolColor(pool['id']),
     }
   },
 
