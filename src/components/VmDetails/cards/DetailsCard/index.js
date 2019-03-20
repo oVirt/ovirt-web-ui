@@ -90,26 +90,9 @@ function createClusterList (clusters) {
 }
 
 /*
- * Return a normalized and sorted list of templates ready for use in a __SelectBox__ from
- * the Map of provided templates.
- */
-function createTemplateList (templates) {
-  const templateList =
-    templates
-      .toList()
-      .map(template => ({
-        id: template.get('id'),
-        value: template.get('name'),
-      }))
-      .sort((a, b) => localeCompare(a.value, b.value))
-      .toJS()
-
-  return templateList
-}
-
-/*
  * Return a normalized and sorted list of OS ready for use in a __SelectBox__ from
- * the Map of provided templates.
+ * the Map of provided operating systems cross referenced to the VM's Cluster
+ * architecture.
  */
 function createOsList (vm, clusters, operatingSystems) {
   const clusterId = vm.getIn(['cluster', 'id'])
@@ -206,7 +189,6 @@ class DetailsCard extends React.Component {
 
       isoList: createIsoList(props.storageDomains),
       clusterList: createClusterList(props.clusters),
-      templateList: createTemplateList(props.templates),
       osList: createOsList(props.vm, props.clusters, props.operatingSystems),
     }
     this.trackUpdates = {}
@@ -260,7 +242,7 @@ class DetailsCard extends React.Component {
     }
 
     // NOTE: Doing the following here instead of getDerivedStateFromProps so __clusters__,
-    //       __storageDomains__, and __templates__ don't need to be kept in state for
+    //       __storageDomains__, and __operatingSystems__ don't need to be kept in state for
     //       change comparison
     if (prevProps.clusters !== this.props.clusters) {
       this.setState({ clusterList: createClusterList(this.props.clusters) }) // eslint-disable-line react/no-did-update-set-state
@@ -268,10 +250,6 @@ class DetailsCard extends React.Component {
 
     if (prevProps.storageDomains !== this.props.storageDomains) {
       this.setState({ isoList: createIsoList(this.props.storageDomains) }) // eslint-disable-line react/no-did-update-set-state
-    }
-
-    if (prevProps.templates !== this.props.templates) {
-      this.setState({ templateList: createTemplateList(this.props.templates) }) // eslint-disable-line react/no-did-update-set-state
     }
 
     if (prevProps.operatingSystems !== this.props.operatingSystems ||
@@ -597,7 +575,7 @@ class DetailsCard extends React.Component {
 
   render () {
     const { hosts, clusters, dataCenters, templates, operatingSystems } = this.props
-    const { vm, isEditing, correlatedMessages, clusterList, isoList, templateList } = this.state
+    const { vm, isEditing, correlatedMessages, clusterList, isoList } = this.state
 
     const idPrefix = 'vmdetail-details'
 
@@ -627,6 +605,7 @@ class DetailsCard extends React.Component {
     const dataCenterName = (dataCenter && dataCenter.name) || msg.notAvailable()
 
     // Template
+    // TODO: What about rendering the template's version (base, specific, latest)?
     const templateId = vm.getIn(['template', 'id'])
     const templateName = (templates && templates.getIn([templateId, 'name'])) || msg.notAvailable()
 
@@ -746,15 +725,7 @@ class DetailsCard extends React.Component {
                 <Col className={style['fields-column']}>
                   <Grid>
                     <FieldRow label={msg.template()} id={`${idPrefix}-template`}>
-                      { !isFullEdit && templateName }
-                      { isFullEdit &&
-                        <SelectBox
-                          id={`${idPrefix}-template-edit`}
-                          items={templateList}
-                          selected={templateId}
-                          onChange={(selectedId) => { this.handleChange('template', selectedId) }}
-                        />
-                      }
+                      { templateName }
                     </FieldRow>
                     <FieldRow label={isEditing ? msg.changeCd() : msg.cd()} id={`${idPrefix}-cdrom`}>
                       { !isEditing && cdImageName }
