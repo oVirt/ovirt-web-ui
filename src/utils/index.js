@@ -4,7 +4,7 @@ import type { VmSessionsType } from '../ovirtapi/types'
 
 export * from './permissions'
 export * from './format'
-export * from './round'
+export { floor, round } from './round'
 export * from './storage-conversion'
 export { isNumber } from './unit-conversion'
 export * from './array-utils'

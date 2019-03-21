@@ -1,10 +1,10 @@
 // @flow
-import Selectors from '../selectors'
 import { patternfly } from 'patternfly-react'
 
-import { dividers } from '../utils'
-import { round } from '../utils/round'
-import { userFormatOfBytes } from '../helpers'
+import { userFormatOfBytes } from '_/helpers'
+import Selectors from '_/selectors'
+import { dividers, round } from '_/utils'
+
 /**
  * @param osName guest OS code name, e.g. 'rhel_7x64'
  * @return human friendly guest OS name, e.g. 'Red Hat Enterprise Linux 7.x x64'
