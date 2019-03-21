@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { push } from 'connected-react-router'
+import $ from 'jquery'
 
 import style from './style.css'
 import VncConsole from '_/react-console'
@@ -19,6 +20,7 @@ import downloadIcon from './images/download_icon.png'
 import disconnectIcon from './images/disconnect_icon.png'
 
 const RDP_ID = 'rdp'
+const NOVNC_CONTAINER_ID = 'novnc-console-container'
 
 const InfoPageContainer = ({ mainText, secondaryText, icon, secondaryComponent }) => (
   <div className={style['download-page-container']}>
@@ -110,7 +112,9 @@ class VmConsole extends React.Component {
             host={websocket.get('host')}
             port={websocket.get('port')}
             toolbarContainer='vm-console-toolbar-sendkeys'
+            containerId={NOVNC_CONTAINER_ID}
             onDisconnected={onDisconnected}
+            onConnected={() => $(`#${NOVNC_CONTAINER_ID} canvas`).focus()}
           />
         }
         break

@@ -76,6 +76,7 @@ class VncConsole extends React.Component {
 
   onConnected = () => {
     this.setState({ status: CONNECTED })
+    this.props.onConnected()
   }
 
   onCtrlAltDel = e => {
@@ -120,6 +121,7 @@ class VncConsole extends React.Component {
       textCtrlAltDel,
       textDisconnect,
       toolbarContainer,
+      containerId,
     } = this.props
 
     let status = null
@@ -147,7 +149,7 @@ class VncConsole extends React.Component {
 
     if (!this.novncStaticComponent) {
       // create just once
-      this.novncStaticComponent = <div ref={this.setNovncElem} />
+      this.novncStaticComponent = <div id={containerId} ref={this.setNovncElem} />
     }
 
     return (
@@ -193,9 +195,11 @@ VncConsole.propTypes = {
   repeaterID: PropTypes.string,
   vncLogging: PropTypes.string /** log-level for noVNC */,
   toolbarContainer: PropTypes.string,
+  containerId: PropTypes.string,
 
   topClassName: PropTypes.string /** Enable customization */,
 
+  onConnected: PropTypes.func /** Callback. VNC server connected. */,
   onDisconnected: PropTypes.func /** Callback. VNC server disconnected. */,
   onInitFailed: PropTypes.func /** Initialization of RFB failed */,
   onSecurityFailure: PropTypes.func /** Handshake failed */,

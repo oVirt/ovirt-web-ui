@@ -110,7 +110,7 @@ const ActionButtonWraper = (props) => {
   if (items && items.filter(i => i !== null).length > 0) {
     return <DropdownButton
       title={shortTitle}
-      bsStyle={props.className}
+      bsStyle={props.bsStyle}
       id='console-selector'
       disabled={actionDisabled}
     >
