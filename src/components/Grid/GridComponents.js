@@ -47,7 +47,7 @@ const Col = ({ className = '', cols = -1, style, children, content = 'expand', .
   )
 }
 Col.propTypes = {
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node,
   className: PropTypes.string,
   cols: PropTypes.number,
   style: PropTypes.object,

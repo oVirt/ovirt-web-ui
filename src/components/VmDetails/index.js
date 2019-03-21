@@ -8,7 +8,7 @@ import styles from './style.css'
 import NavigationPrompt from 'react-router-navigation-prompt'
 import NavigationConfirmationModal from '../NavigationConfirmationModal'
 
-import { Grid, Row, Col } from './GridComponents'
+import { Grid, Row, Col } from '_/components/Grid'
 import DetailsCard from './cards/DetailsCard'
 import DisksCard from './cards/DisksCard'
 import NicsCard from './cards/NicsCard'
