@@ -42,6 +42,7 @@ import HotPlugChangeConfirmationModal from './HotPlugConfirmationModal'
 import NextRunChangeConfirmationModal from './NextRunChangeConfirmationModal'
 
 import ExpandCollapseSection from '../../../ExpandCollapseSection'
+import FieldValue from './FieldValue'
 
 /*
  * Return a normalized list of iso files from the set of provided storage domains.
@@ -676,7 +677,7 @@ class DetailsCard extends React.Component {
                 <Col className={style['fields-column']}>
                   <Grid>
                     <FieldRow label={msg.host()} id={`${idPrefix}-host`}>
-                      { hostName || <NotAvailable tooltip={msg.notAvailableUntilRunning()} id={`${idPrefix}-host-not-available`} /> }
+                      { <FieldValue tooltip={hostName}>{hostName}</FieldValue> || <NotAvailable tooltip={msg.notAvailableUntilRunning()} id={`${idPrefix}-host-not-available`} /> }
                     </FieldRow>
                     <FieldRow label={msg.ipAddress()} id={`${idPrefix}-ip`}>
                       <React.Fragment>
@@ -692,7 +693,7 @@ class DetailsCard extends React.Component {
                       </React.Fragment>
                     </FieldRow>
                     <FieldRow label={msg.fqdn()} id={`${idPrefix}-fqdn`}>
-                      { fqdn || <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id={`${idPrefix}-fqdn-not-available`} /> }
+                      { <FieldValue tooltip={fqdn}>{fqdn}</FieldValue> || <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id={`${idPrefix}-fqdn-not-available`} /> }
                     </FieldRow>
                     <FieldRow label={msg.cluster()} id={`${idPrefix}-cluster`}>
                       { !isFullEdit && clusterName }
