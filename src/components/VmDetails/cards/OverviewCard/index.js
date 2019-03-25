@@ -227,7 +227,7 @@ class OverviewCard extends React.Component {
                 {getOsHumanName(vm.getIn(['os', 'type']))}
               </div>
 
-              {isPoolVm && pool && <span className={style['pool-vm-label']} style={{ backgroundColor: `rgb(${pool.get('color')})` }}>{ pool.get('name') }</span>}
+              {isPoolVm && pool && <span className={style['pool-vm-label']} style={{ backgroundColor: pool.get('color') }}>{ pool.get('name') }</span>}
               <div className={style['container']}>
                 <div className={style['os-icon']}>
                   <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' />

@@ -69,18 +69,26 @@ function cleanUndefined (obj: Object): Object {
   return obj
 }
 
+const colors = [
+  '#ec7a08',
+  '#f0ab00',
+  '#92d400',
+  '#3f9c35',
+  '#007a87',
+  '#00b9e4',
+  '#703fec',
+  '#486b00',
+  '#003d44',
+  '#005c73',
+  '#40199a',
+]
+
 function getPoolColor (id: string): string {
-  let poolIdLength = Math.floor(id.length / 3)
-  const poolIdArray = id.split('')
-  const poolColor = [ 0, 0, 0 ]
-  if (poolIdLength === 0) {
-    poolColor[0] = id.charCodeAt(0)
-  } else {
-    for (let i = 0; i < poolColor.length; i++) {
-      poolColor[i] = poolIdArray.slice(i * poolIdLength).reduce((a, b) => a + b.charCodeAt(0) > 256 ? a + b.charCodeAt(0) - 256 : a + b.charCodeAt(0), 0)
-    }
+  let poolColor = 0
+  for (let i = 0; i < id.length; i++) {
+    poolColor += id.charCodeAt(i)
   }
-  return poolColor.join(',')
+  return colors[poolColor % colors.length]
 }
 
 //

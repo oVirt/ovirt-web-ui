@@ -35,11 +35,12 @@ class Vms extends React.Component {
 
     const filters = vms.get('filters').toJS()
 
-    const sortedVms = vms.get('vms').filter(vm => filterVms(vm, filters)).toList().sort(sortFunction(sort))
+    const sortedVms = vms.get('vms').filter(vm => filterVms(vm, filters)).toList().map(vm => vm.set('isVm', true))
     const sortedPools = vms.get('pools')
       .filter(pool => alwaysShowPoolCard || (pool.get('vmsCount') < pool.get('maxUserVms') && pool.get('size') > 0 && filterVms(pool, filters)))
       .toList()
-      .sort(sortFunction(sort)) // TODO: sort vms and pools together!
+
+    const vmsPoolsMerge = [ ...sortedVms, ...sortedPools ].sort(sortFunction(sort))
 
     return (
       <InfiniteScroll
@@ -53,8 +54,11 @@ class Vms extends React.Component {
           <div className={`container-fluid container-cards-pf`}>
             <div className={style['scrollingWrapper']}>
               <div className='row row-cards-pf'>
-                {sortedVms.map(vm => <Vm vm={vm} key={vm.get('id')} />)}
-                {sortedPools.map(pool => <Pool pool={pool} key={pool.get('id')} />)}
+                {vmsPoolsMerge.map(instance =>
+                  instance.get('isVm')
+                    ? <Vm vm={instance} key={instance.get('id')} />
+                    : <Pool pool={instance} key={instance.get('id')} />
+                )}
               </div>
               <div className={style['overlay']} />
             </div>

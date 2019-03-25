@@ -37,7 +37,7 @@ const Vm = ({ vm, icons, os, vms, onStart }) => {
     <BaseCard idPrefix={idPrefix}>
       <BaseCard.Header>
         <span className={sharedStyle['operating-system-label']} id={`${idPrefix}-os`}>{osName}</span>
-        {isPoolVm && pool && <span className={style['pool-vm-label']} style={{ backgroundColor: `rgb(${pool.get('color')})` }}>{ pool.get('name') }</span>}
+        {isPoolVm && pool && <span className={style['pool-vm-label']} style={{ backgroundColor: pool.get('color') }}>{ pool.get('name') }</span>}
       </BaseCard.Header>
       <BaseCard.Icon url={`/vm/${vm.get('id')}`} icon={icon} />
       <BaseCard.Title url={`/vm/${vm.get('id')}`} name={vm.get('name')} />
