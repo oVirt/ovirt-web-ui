@@ -57,7 +57,8 @@ class VmUserMessages extends React.Component {
     const { userMessages, config, onClearMessages, onDismissMessage } = this.props
 
     const idPrefix = `usermsgs`
-    const userId = config.getIn(['user', 'id'])
+    const user = config.get('user').toJS()
+    user.name = `${user.name}@${config.get('domain')}`
 
     const messagesCount = userMessages.get('records').size
     const messagesList = messagesCount
@@ -66,7 +67,7 @@ class VmUserMessages extends React.Component {
           key={`msg-${r.get('time')}`}
           record={r}
           id={`${idPrefix}-msg-${r.get('time')}-dropdown`}
-          onDismissMessage={() => onDismissMessage(r, userId)}
+          onDismissMessage={() => onDismissMessage(r.toJS(), user)}
         />
       ))
       : <NotificationDrawer.EmptyState title={msg.noMessages()} />
@@ -88,7 +89,7 @@ class VmUserMessages extends React.Component {
             { messagesCount > 0 &&
               <NotificationDrawer.PanelAction>
                 <NotificationDrawer.PanelActionLink data-toggle='clear-all'>
-                  <Button bsStyle='link' onClick={() => onClearMessages(userId)}>
+                  <Button bsStyle='link' onClick={() => onClearMessages(user)}>
                     <Icon type='pf' name='close' />
                     { msg.clearAll() }
                   </Button>
@@ -114,7 +115,7 @@ export default connect(
     userMessages: state.userMessages,
   }),
   (dispatch) => ({
-    onClearMessages: (userId) => dispatch(clearUserMessages({ userId })),
-    onDismissMessage: (event, userId) => dispatch(dismissEvent({ event, userId })),
+    onClearMessages: (user) => dispatch(clearUserMessages({ user })),
+    onDismissMessage: (event, user) => dispatch(dismissEvent({ event, user })),
   })
 )(VmUserMessages)

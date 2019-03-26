@@ -97,7 +97,7 @@ function* login (action) {
       [ 'administrator', 'filter', 'domain', 'user', 'userSessionTimeoutInterval', 'websocket', 'cpuTopology' ]))
   )
 
-  yield initialLoad({ userId })
+  yield initialLoad({ user: { id: userId, name: `${username}@${Selectors.getDomain()}` } })
   console.groupEnd('Login Data Fetch')
 
   yield put(appConfigured())
@@ -176,13 +176,13 @@ function* checkUserFilterPermissions () {
   yield put.resolve(setUserFilterPermission(isAlwaysFilterOption))
 }
 
-function* initialLoad ({ userId }) {
+function* initialLoad ({ user }) {
   // no data prerequisites
   yield all([
     call(fetchUserGroups, getUserGroups()),
     call(fetchAllOS, getAllOperatingSystems()),
     call(fetchAllHosts, getAllHosts()),
-    call(fetchAllEvents, getAllEvents({ userId })),
+    call(fetchAllEvents, getAllEvents({ user })),
   ])
   console.log('\u2714 data loads with no pre-reqs are complete')
 

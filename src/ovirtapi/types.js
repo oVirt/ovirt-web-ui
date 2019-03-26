@@ -194,5 +194,6 @@ export type ApiEventType = Object
 export type EventType = {
   id: string,
   time: number,
-  description: string
+  description: string,
+  severity: string
 }

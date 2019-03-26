@@ -19,11 +19,11 @@ export function addUserMessage ({ message, shortMessage, type = '' }) {
   }
 }
 
-export function clearUserMessages ({ userId }) {
+export function clearUserMessages ({ user }) {
   return {
     type: CLEAR_USER_MSGS,
     payload: {
-      userId,
+      user,
     },
   }
 }
@@ -46,12 +46,12 @@ export function dismissUserMessage ({ time }) {
   }
 }
 
-export function dismissEvent ({ event, userId }) {
+export function dismissEvent ({ event, user }) {
   return {
     type: DISMISS_EVENT,
     payload: {
       event,
-      userId,
+      user,
     },
   }
 }
@@ -65,11 +65,11 @@ export function setUserMessages ({ messages }) {
   }
 }
 
-export function getAllEvents ({ userId }) {
+export function getAllEvents ({ user }) {
   return {
     type: GET_ALL_EVENTS,
     payload: {
-      userId,
+      user,
     },
   }
 }

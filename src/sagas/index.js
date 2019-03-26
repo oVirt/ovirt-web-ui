@@ -810,7 +810,7 @@ function* removeVm (action) {
 }
 
 export function* fetchAllEvents (action) {
-  const { userId } = action.payload
+  const { user } = action.payload
   const events = yield callExternalAction('events', Api.events, { payload: {} })
 
   if (events.error) {
@@ -822,7 +822,7 @@ export function* fetchAllEvents (action) {
       .filter((event) =>
         event.severity === 'error' &&
         event.user &&
-        event.user.id === userId
+        (event.user.id === user.id || event.user.name === user.name)
       )
       .map((event) => Api.eventToInternal({ event }))
     : []
@@ -831,8 +831,8 @@ export function* fetchAllEvents (action) {
 
 function* dismissEvent (action) {
   const { event } = action.payload
-  if (event.get('id')) {
-    const result = yield callExternalAction('dismissEvent', Api.dismissEvent, action)
+  if (event.id) {
+    const result = yield callExternalAction('dismissEvent', Api.dismissEvent, { payload: { eventId: event.id } })
 
     if (result.status === 'complete') {
       yield fetchAllEvents(action)
@@ -843,6 +843,7 @@ function* dismissEvent (action) {
 }
 
 function* clearEvents (action) {
+  const { user } = action.payload
   const events = yield callExternalAction('events', Api.events, { payload: {} })
 
   if (events.error) {
@@ -854,7 +855,7 @@ function* clearEvents (action) {
       .filter((event) =>
         event.severity === 'error' &&
         event.user &&
-        event.user.id === action.payload.userId
+        (event.user.id === user.id || event.user.name === user.name)
       ).map((event) => callExternalAction('dismissEvent', Api.dismissEvent, { payload: { eventId: event.id } }))
     : []
 
