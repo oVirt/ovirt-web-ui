@@ -56,6 +56,10 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Wed Mar 27 2019 Greg Sheremeta <gshereme@redhat.com> - 1.5.2-1
+ - Remove edibility of a VM's template
+ - Remove wrap for hostname and FQDN, add ellipsis with tooltip
+
 * Mon Feb 18 2019 Greg Sheremeta <gshereme@redhat.com> - 1.5.1-1
  - Fixed several issues
  - updated translations
