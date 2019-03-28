@@ -8,7 +8,7 @@ import { renderRoutes } from 'react-router-config'
 import { Grid } from 'patternfly-react'
 import LoadingData from './components/LoadingData'
 import OvirtApiCheckFailed from './components/OvirtApiCheckFailed'
-import TokenExpiredTracker from './components/TokenExpiredTracker'
+import SessionActivityTracker from './components/SessionActivityTracker'
 import VmsPageHeader from './components/VmsPageHeader'
 import ToastNotifications from './components/ToastNotifications'
 
@@ -75,7 +75,7 @@ const App = ({ history, config, appReady }) => {
       <div id='app-container'>
         <VmsPageHeader title={fixedStrings.BRAND_NAME + ' ' + msg.vmPortal()} />
         <OvirtApiCheckFailed />
-        <TokenExpiredTracker />
+        <SessionActivityTracker />
         { appReady && renderRoutes(getRoutes()) }
         <LoadingData />
         <ToastNotifications />

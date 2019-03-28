@@ -4,7 +4,6 @@ import { connect } from 'react-redux'
 import { MessageDialog, Icon } from 'patternfly-react'
 
 import style from './sharedStyle.css'
-import ErrorAlert from './ErrorAlert'
 import { msg } from '_/intl'
 
 import { logout } from '_/actions'
@@ -13,7 +12,7 @@ const TIME_TO_DISPLAY_MODAL = 30 // 30 seconds
 
 // TODO: allow the user to cancel the automatic reload?
 // If so, change config.isTokenExpired to false and add additional check to doCheckTokenExpired() before actual reload
-class TokenExpiredTracker extends React.Component {
+class SessionActivityTracker extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -82,14 +81,11 @@ class TokenExpiredTracker extends React.Component {
         icon={<Icon type='pf' name='warning-triangle-o' />}
       />
     }
-    if (!config.get('isTokenExpired')) {
-      return null
-    }
 
-    return <ErrorAlert message={msg.authorizationExpired()} id='token-expired' />
+    return null
   }
 }
-TokenExpiredTracker.propTypes = {
+SessionActivityTracker.propTypes = {
   config: PropTypes.object.isRequired,
   onLogout: PropTypes.func.isRequired,
 }
@@ -101,4 +97,4 @@ export default connect(
   (dispatch) => ({
     onLogout: () => dispatch(logout()),
   })
-)(TokenExpiredTracker)
+)(SessionActivityTracker)
