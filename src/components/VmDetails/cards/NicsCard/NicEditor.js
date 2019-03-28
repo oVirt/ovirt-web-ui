@@ -127,8 +127,8 @@ class NicEditor extends Component {
     return nic
   }
 
-  changeName (event) {
-    this.setState({ name: event.target.value })
+  changeName ({ target: { value } }) {
+    this.setState({ name: value })
   }
 
   changeVnicProfile (value) {
@@ -190,7 +190,11 @@ class NicEditor extends Component {
         </Modal.Header>
         <Modal.Body>
 
-          <Form horizontal>
+          <Form
+            horizontal
+            onSubmit={e => { e.preventDefault() }}
+            id={`${modalId}-form`}
+          >
             <FormGroup controlId={`${modalId}-name`} className='required'>
               <LabelCol sm={3}>
                 { msg.nicEditorNameLabel() }
@@ -246,7 +250,6 @@ class NicEditor extends Component {
                   }
                 </Col>
               </FormGroup>
-
               <FormGroup controlId='nic-link-state-group'>
                 <LabelCol sm={3}>
                   { msg.nicEditorLinkStateLabel() }

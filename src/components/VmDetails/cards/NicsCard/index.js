@@ -161,7 +161,6 @@ class NicsCard extends React.Component {
                           <span className={itemStyle['create-text']} >{msg.nicActionCreateNew()}</span>
                         </a>
                       </div>
-
                     }
                   />
                 </Col>

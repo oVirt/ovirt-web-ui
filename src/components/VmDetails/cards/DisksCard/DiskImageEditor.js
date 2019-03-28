@@ -236,7 +236,11 @@ class DiskImageEditor extends Component {
         </Modal.Header>
         <Modal.Body>
 
-          <Form horizontal>
+          <Form
+            horizontal
+            onSubmit={e => { e.preventDefault() }}
+            id={`${idPrefix}-modal-form`}
+          >
             {/* Alias */}
             <FormGroup controlId={`${idPrefix}-alias`} className={createMode && 'required'}>
               <LabelCol sm={3}>
