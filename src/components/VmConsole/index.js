@@ -39,7 +39,7 @@ const InfoPageContainer = ({ mainText, secondaryText, icon, secondaryComponent }
 
 InfoPageContainer.propTypes = {
   mainText: PropTypes.string.isRequired,
-  secondaryText: PropTypes.string.isRequired,
+  secondaryText: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
   icon: PropTypes.string.isRequired,
   secondaryComponent: PropTypes.node,
 }
@@ -113,7 +113,7 @@ class VmConsole extends React.Component {
             port={websocket.get('port')}
             toolbarContainer='vm-console-toolbar-sendkeys'
             containerId={NOVNC_CONTAINER_ID}
-            onDisconnected={onDisconnected}
+            onDisconnected={(e) => !e.detail.clean && !e.isTrusted ? onDisconnected('SECURITY_FAILURE') : onDisconnected()}
             onConnected={() => $(`#${NOVNC_CONTAINER_ID} canvas`).focus()}
           />
         }
@@ -124,7 +124,7 @@ class VmConsole extends React.Component {
         return <InfoPageContainer
           icon={disconnectIcon}
           mainText={msg.disconectedConsole()}
-          secondaryText={msg.disconectedConsoleInfo()}
+          secondaryText={vmConsole.get('reason') === 'SECURITY_FAILURE' ? <span dangerouslySetInnerHTML={{ __html: msg.unsecuredDisconectedConsoleInfo() }} /> : msg.disconectedConsoleInfo()}
           secondaryComponent={<Button bsStyle='primary' onClick={() => this.setState({ isFirstRun: true })}>{ msg.connect() }</Button>}
         />
     }
@@ -153,7 +153,7 @@ export default connect(
     config: state.config,
   }),
   (dispatch, { vmId }) => ({
-    onDisconnected: () => dispatch(setConsoleStatus({ vmId, status: DISCONNECTED_CONSOLE })),
+    onDisconnected: (reason) => dispatch(setConsoleStatus({ vmId, status: DISCONNECTED_CONSOLE, reason })),
     onShutdown: () => dispatch(push(`/vm/${vmId}`)),
     onRDP: ({ domain, username, vms }) => dispatch(getRDP({ name: vms.getIn(['vms', vmId, 'name']), fqdn: vms.getIn(['vms', vmId, 'fqdn']), domain, username })),
   })

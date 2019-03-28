@@ -26,8 +26,8 @@ const consoles = actionReducer(initialState, {
   [SET_ACTIVE_CONSOLE] (state, { payload: { vmId, consoleId } }) {
     return state.setIn(['vms', vmId, 'id'], consoleId)
   },
-  [SET_CONSOLE_NOVNC_STATUS] (state, { payload: { vmId, status } }) {
-    return state.setIn(['vms', vmId, 'consoleStatus'], status)
+  [SET_CONSOLE_NOVNC_STATUS] (state, { payload: { vmId, status, reason } }) {
+    return state.setIn(['vms', vmId, 'consoleStatus'], status).setIn(['vms', vmId, 'reason'], reason)
   },
   [SET_NEW_CONSOLE_MODAL] (state, { payload: { modalId, vmId, consoleId } }) {
     const modal = {

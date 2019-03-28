@@ -481,6 +481,7 @@ export const messages: { [messageId: string]: MessageType } = {
     message: 'Dialog contains unsaved changes',
     description: 'Title of modal dialog opened when a user tried to navigate off an editor page after changes have been made.',
   },
+  unsecuredDisconectedConsoleInfo: 'The console has been disconnected because of a security error. For more information please refer to the <a href=\'https://www.ovirt.org/documentation/admin-guide/virt/console-client-resources.html\'>console manual</a>.<br/>Press the \'Connect\' button to reconnect the console.',
   updateCloudInit: 'Do you want update Cloud-init hostname on new VM name?',
   updateVm: 'Update VM',
   upload: 'Upload',

@@ -91,8 +91,6 @@ import {
   saveConsoleOptions,
   getRDPVm,
   fetchConsoleVmMeta,
-  getConsoleInUse,
-  openVmConsole,
   openConsoleModal,
 } from './console'
 

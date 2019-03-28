@@ -17,7 +17,7 @@ class Action extends React.Component {
   handleOpen (e) {
     if (e && e.preventDefault) e.preventDefault()
     this.setState({ showModal: true })
-    this.props.children.props.onClick(e)
+    this.props.children.props.onClick && this.props.children.props.onClick(e)
   }
 
   handleClose () {
@@ -90,7 +90,13 @@ Button.propTypes = {
 
 const MenuItemAction = ({ id, confirmation, shortTitle, icon, onClick }) => {
   return <Action confirmation={confirmation}>
-    <MenuItem id={id} onClick={onClick}>
+    <MenuItem
+      id={id}
+      onClick={() => {
+        onClick && onClick()
+        document.dispatchEvent(new MouseEvent('click'))
+      }}
+    >
       <span>{shortTitle}</span> { icon }
     </MenuItem>
   </Action>

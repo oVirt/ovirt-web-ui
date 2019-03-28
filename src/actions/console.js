@@ -63,12 +63,13 @@ export function setConsoleTickets ({ vmId, proxyTicket, ticket }) {
   }
 }
 
-export function setConsoleStatus ({ vmId, status }) {
+export function setConsoleStatus ({ vmId, status, reason }) {
   return {
     type: SET_CONSOLE_NOVNC_STATUS,
     payload: {
       vmId,
       status,
+      reason,
     },
   }
 }

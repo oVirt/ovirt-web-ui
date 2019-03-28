@@ -64,7 +64,7 @@ class ConsoleConfirmationModal extends React.Component {
       show,
     } = this.props
 
-    if (show) {
+    if (consoles.getIn(['modals', this.modalId, 'state'])) {
       if (consoles.getIn(['modals', this.modalId, 'state']) === CONSOLE_LOGON) {
         return (
           <ConfirmationModal

@@ -110,7 +110,7 @@ class VncConsole extends React.Component {
     if (e && e.target && e.target.blur) {
       e.target.blur()
     }
-    this.novncElem && this.novncElem.focus()
+    this.rfb && this.rfb.focus()
   }
 
   render () {
