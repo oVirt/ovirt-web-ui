@@ -36,6 +36,8 @@ import {
   canUserManipulateSnapshots,
 } from '../utils'
 
+import { isWindows } from '_/helpers'
+
 function vCpusCount ({ cpu }: { cpu: Object }): number {
   if (cpu && cpu.topology) {
     const top = cpu.topology
@@ -762,11 +764,13 @@ const OS = {
       id: os.id,
       name: os.name,
       description: os.description,
+      architecture: os.architecture,
       icons: {
         large: {
           id: os['large_icon'] ? os.large_icon['id'] : undefined,
         },
       },
+      isWindows: isWindows(os.description),
     }
   },
 

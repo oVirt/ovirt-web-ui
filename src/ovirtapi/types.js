@@ -187,7 +187,9 @@ export type ApiCloudInitType = Object
 export type CloudInitType = {
   enabled: boolean,
   hostName: string,
-  sshAuthorizedKeys: string
+  sshAuthorizedKeys: string,
+  timezone: string,
+  customScript: string
 }
 
 export type ApiEventType = Object
