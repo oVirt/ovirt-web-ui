@@ -5,7 +5,7 @@ import { List } from 'immutable'
 
 import * as Actions from '_/actions'
 import { MAX_VM_MEMORY_FACTOR } from '_/constants'
-import { generateUnique, isWindows, userFormatOfBytes } from '_/helpers'
+import { generateUnique, isWindows, templateNameRenderer, userFormatOfBytes } from '_/helpers'
 import { msg, enumMsg } from '_/intl'
 
 import {
@@ -585,9 +585,8 @@ class DetailsCard extends React.Component {
     const dataCenterName = (dataCenter && dataCenter.name) || msg.notAvailable()
 
     // Template
-    // TODO: What about rendering the template's version (base, specific, latest)?
     const templateId = vm.getIn(['template', 'id'])
-    const templateName = (templates && templates.getIn([templateId, 'name'])) || msg.notAvailable()
+    const templateName = (templates && templateNameRenderer(templates.get(templateId))) || msg.notAvailable()
 
     // CD
     const canChangeCd = vm.get('canUserChangeCd') && vmCanChangeCd(status)
