@@ -4,9 +4,9 @@ import { connect } from 'react-redux'
 import { matchRoutes } from 'react-router-config'
 import { withRouter } from 'react-router-dom'
 import { push } from 'connected-react-router'
+import { Toolbar } from 'patternfly-react'
 
 import { RouterPropTypeShapes } from '../propTypeShapes'
-import Toolbar from './Toolbar/Toolbar'
 import Breadcrumb from './Breadcrumb'
 import { changePage } from '../actions'
 
@@ -66,20 +66,13 @@ class PageRouter extends React.Component {
     const { location, history } = this.props
     const { previousPath, branches, branch } = this.state
 
-    const tools = []
-    if (branch && branch.route.toolbars) {
-      for (const toolbarBuilder of branch.route.toolbars) {
-        tools.push(toolbarBuilder(branch.match))
-      }
-    }
+    const tools = branch.route.toolbars && branch.route.toolbars(branch.match)
 
     const RenderComponent = branch.route.component
     return (
       <div id='page-router'>
         <Breadcrumb branches={branches} />
-        <Toolbar isFullWidth={branch.route.isToolbarFullWidth}>
-          {tools}
-        </Toolbar>
+        {tools || <Toolbar />}
         <div id='page-router-render-component'>
           <RenderComponent route={branch.route} match={branch.match} location={location} history={history} previousPath={previousPath} />
         </div>

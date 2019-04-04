@@ -8,6 +8,7 @@ import Vm from './Vm'
 import Pool from './Pool'
 import ScrollPositionHistory from '../ScrollPositionHistory'
 import { getByPage } from '_/actions'
+import { filterVms, sortFunction } from '_/utils'
 import InfiniteScroll from 'react-infinite-scroller'
 import Loader, { SIZES } from '../Loader'
 
@@ -30,19 +31,15 @@ class Vms extends React.Component {
   render () {
     const { vms, alwaysShowPoolCard } = this.props
 
-    const sortFunction = (vmA, vmB) => {
-      const vmAName = vmA.get('name')
-      if (!vmAName) {
-        return -1
-      }
-      return vmAName.localeCompare(vmB.get('name'))
-    }
+    const sort = vms.get('sort').toJS()
 
-    const sortedVms = vms.get('vms').toList().sort(sortFunction)
+    const filters = vms.get('filters').toJS()
+
+    const sortedVms = vms.get('vms').filter(vm => filterVms(vm, filters)).toList().sort(sortFunction(sort))
     const sortedPools = vms.get('pools')
-      .filter(pool => alwaysShowPoolCard || (pool.get('vmsCount') < pool.get('maxUserVms') && pool.get('size') > 0))
+      .filter(pool => alwaysShowPoolCard || (pool.get('vmsCount') < pool.get('maxUserVms') && pool.get('size') > 0 && filterVms(pool, filters)))
       .toList()
-      .sort(sortFunction) // TODO: sort vms and pools together!
+      .sort(sortFunction(sort)) // TODO: sort vms and pools together!
 
     return (
       <InfiniteScroll

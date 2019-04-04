@@ -280,7 +280,7 @@ class VmActions extends React.Component {
       />)
 
     return (
-      <div className={`actions-line ${style['left-padding']}`} id={idPrefix}>
+      <div className={`actions-line ${style['actions-toolbar']}`} id={idPrefix}>
         <EmptyAction state={status} isOnCard={isOnCard} />
 
         {actions.map(action => <ActionButtonWraper key={action.id} {...action} />)}

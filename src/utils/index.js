@@ -6,6 +6,8 @@ export * from './permissions'
 export * from './format'
 export { floor, round } from './round'
 export * from './storage-conversion'
+export * from './filters'
+export * from './sort'
 export { isNumber } from './unit-conversion'
 export * from './array-utils'
 

@@ -1,6 +1,7 @@
 import {
   ADD_VM_NIC,
   CHANGE_VM_CDROM,
+  CLEAR_FILTERS,
   CREATE_VM,
   DELETE_VM_NIC,
   EDIT_VM,
@@ -13,11 +14,13 @@ import {
   LOGIN,
   LOGOUT,
   REFRESH_DATA,
+  REMOVE_FILTER,
   REMOVE_MISSING_VMS,
   REMOVE_VM,
   REMOVE_VMS,
   RESTART_VM,
   SET_CHANGED,
+  SET_FILTERS,
   SET_OVIRT_API_VERSION,
   SET_VM_ACTION_RESULT,
   SET_VM_CDROM,
@@ -26,9 +29,11 @@ import {
   SET_VM_NICS,
   SET_VM_SESSIONS,
   SET_VM_SNAPSHOTS,
+  SET_VM_SORT,
   SHUTDOWN_VM,
   START_VM,
   SUSPEND_VM,
+  UPDATE_FILTERS,
   UPDATE_ICONS,
   UPDATE_VM_DISK,
   UPDATE_VMS,
@@ -432,6 +437,49 @@ export function updateVmSnapshot ({ vmId, snapshot }) {
     payload: {
       vmId,
       snapshot,
+    },
+  }
+}
+
+export function updateFilters ({ filters }) {
+  return {
+    type: UPDATE_FILTERS,
+    payload: {
+      filters,
+    },
+  }
+}
+
+export function setVmsFilters ({ filters }) {
+  return {
+    type: SET_FILTERS,
+    payload: {
+      filters,
+    },
+  }
+}
+
+export function removeFilter ({ filter }) {
+  return {
+    type: REMOVE_FILTER,
+    payload: {
+      filter,
+    },
+  }
+}
+
+export function clearFilters () {
+  return {
+    type: CLEAR_FILTERS,
+    payload: {},
+  }
+}
+
+export function setVmSort ({ sort }) {
+  return {
+    type: SET_VM_SORT,
+    payload: {
+      sort,
     },
   }
 }

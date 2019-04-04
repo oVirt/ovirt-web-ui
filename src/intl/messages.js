@@ -19,6 +19,7 @@ export const messages: { [messageId: string]: MessageType } = {
     description: 'About application',
   },
   actionFailed: '{action} failed',
+  activeFilters: 'Active Filters:',
   actualStateVmIsIn: 'The actual state the virtual machine is in.',
   addNewNic: 'Add new NIC',
   addNewSnapshot: 'Add new snapshot',
@@ -54,6 +55,7 @@ export const messages: { [messageId: string]: MessageType } = {
   changeCd: 'Change CD',
   clear: 'Clear',
   clearAll: 'Clear all',
+  clearAllFilters: 'Clear All Filters',
   clearMessages: 'Clear Messages',
   clickForHelp: 'Click for help',
   close: 'Close',
@@ -385,6 +387,7 @@ export const messages: { [messageId: string]: MessageType } = {
   off: 'Off',
   ok: 'OK',
   on: 'On',
+  os: 'Operating System',
   openProtocolConsole: 'Open {protocol} Console',
   operatingSystem: 'Operating System',
   operatingSystemInstalledOnVm: 'Operating system installed on the virtual machine.',
@@ -422,6 +425,14 @@ export const messages: { [messageId: string]: MessageType } = {
   restore: {
     message: 'Restore',
     description: 'Confirmation modal action button label for a Restore operation',
+  },
+  results: {
+    message: '{total} Results',
+    description: 'Number of filtered fetched VMs (including pools)',
+  },
+  resultsOf: {
+    message: '{available} of {total} Results',
+    description: 'Number of all fetched VMs (including pools)',
   },
   run: 'Run',
   save: 'Save',

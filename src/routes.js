@@ -1,8 +1,7 @@
 import React from 'react'
 
-import AddVmButton from './components/VmDialog/AddVmButton'
 import PageRouter from './components/PageRouter'
-import { VmDetailToolbar, PoolDetailToolbar, VmConsoleToolbar } from './components/Toolbar'
+import { VmDetailToolbar, PoolDetailToolbar, VmConsoleToolbar, VmsListToolbar } from './components/Toolbar'
 import { PoolDetailsPage, VmDetailsPage, VmCreatePage, VmsPage, VmConsolePage } from './components/Pages'
 
 import { msg } from '_/intl'
@@ -28,8 +27,9 @@ export default function getRoutes (vms) {
         path: '/',
         exact: true,
         component: VmsPage,
-        toolbars: [() => (<AddVmButton key='addbutton' id={`route-add-vm`} />)],
+        toolbars: (match) => (<VmsListToolbar match={match} vms={vms} key='addbutton' />),
         type: MAIN_PAGE_TYPE,
+        isToolbarFullWidth: true,
       },
 
       {
@@ -37,7 +37,7 @@ export default function getRoutes (vms) {
         exact: true,
         title: () => msg.addNewVm(),
         component: VmCreatePage,
-        toolbars: [], // TODO: When needed, see VmDialog/style.css - .vm-dialog-buttons
+        toolbars: null, // TODO: When needed, see VmDialog/style.css - .vm-dialog-buttons
         closeable: true,
         type: DIALOG_PAGE_TYPE,
       },
@@ -46,7 +46,7 @@ export default function getRoutes (vms) {
         path: '/vm/:id',
         title: (match, vms) => vms.getIn(['vms', match.params.id, 'name']) || match.params.id,
         component: VmDetailsPage,
-        toolbars: [(match) => (<VmDetailToolbar match={match} key='vmaction' />)],
+        toolbars: (match) => (<VmDetailToolbar match={match} key='vmaction' />),
         type: DETAIL_PAGE_TYPE,
         routes: [
           {
@@ -54,7 +54,7 @@ export default function getRoutes (vms) {
             title: (match) => msg.console(),
             component: VmConsolePage,
             closeable: true,
-            toolbars: [(match) => (<VmConsoleToolbar match={match} key='vmconsole' />)],
+            toolbars: (match) => (<VmConsoleToolbar match={match} key='vmconsole' />),
             isToolbarFullWidth: true,
             type: CONSOLE_PAGE_TYPE,
           },
@@ -65,7 +65,7 @@ export default function getRoutes (vms) {
         path: '/pool/:id',
         title: (match, vms) => vms.getIn(['pools', match.params.id, 'name']) || match.params.id,
         component: PoolDetailsPage,
-        toolbars: [(match) => (<PoolDetailToolbar match={match} key='poolaction' />)],
+        toolbars: (match) => (<PoolDetailToolbar match={match} key='poolaction' />),
         type: POOL_PAGE_TYPE,
       },
     ],
