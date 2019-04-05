@@ -10,6 +10,8 @@ import NewSnapshotModal from './NewSnapshotModal'
 import SnapshotItem from './SnapshotItem'
 import { PendingTaskTypes } from '_/reducers/pendingTasks'
 
+const DOWN_STATUS = 'down'
+
 const Snapshots = ({
   snapshots,
   vmId,
@@ -17,6 +19,7 @@ const Snapshots = ({
   beingCreated,
   beingDeleted,
   beingRestored,
+  isVmDown,
   canUserManipulateSnapshot,
 }) => {
   const isVmInPreview = !!snapshots.find(snapshot => snapshot.get('status') === 'in_preview')
@@ -36,6 +39,7 @@ const Snapshots = ({
             vmId={vmId}
             isEditing={!isActionDisabled}
             hideActions={!canUserManipulateSnapshot}
+            isVmDown={isVmDown}
           />
         ))
       }
@@ -49,6 +53,7 @@ Snapshots.propTypes = {
   beingCreated: PropTypes.bool,
   beingRestored: PropTypes.bool,
   beingDeleted: PropTypes.bool,
+  isVmDown: PropTypes.bool,
   canUserManipulateSnapshot: PropTypes.bool,
 }
 
@@ -75,7 +80,13 @@ const SnapshotsCard = ({ vm }) => {
       idPrefix={idPrefix}
       editable={false}
     >
-      <ConnectedSnapshots snapshots={snapshots} vmId={vm.get('id')} canUserManipulateSnapshot={vm.get('canUserManipulateSnapshots')} idPrefix={idPrefix} />
+      <ConnectedSnapshots
+        snapshots={snapshots}
+        vmId={vm.get('id')}
+        canUserManipulateSnapshot={vm.get('canUserManipulateSnapshots')}
+        idPrefix={idPrefix}
+        isVmDown={vm.get('status') === DOWN_STATUS}
+      />
     </BaseCard>
   )
 }
