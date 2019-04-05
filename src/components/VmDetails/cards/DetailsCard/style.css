@@ -17,6 +17,11 @@
   font-weight: bold;
   padding-left: 15px; /* 20px + -15px + this = px from edge */
   padding-right: 5px;
+  flex-direction: row;
+}
+
+.col-label span {
+  vertical-align: top;
 }
 
 .col-data {
@@ -72,4 +77,8 @@
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+}
+
+button.field-level-help:global(.popover-pf-info) {
+  flex-grow: 0;
 }

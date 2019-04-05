@@ -25,3 +25,16 @@ export function parseGbToBytes (gbString: string): number | null {
 export function doesVmSessionExistForUserId (sessions: Array<VmSessionsType>, userId: string): boolean {
   return sessions.find(s => s.user.id === userId) !== undefined
 }
+
+export function dividers (num: number): Array<number> {
+  const divs = [1]
+  for (let i = 2; i < num; i++) {
+    if (num % i === 0) {
+      divs.push(i)
+    }
+  }
+  if (num > 1) {
+    divs.push(num)
+  }
+  return divs
+}
