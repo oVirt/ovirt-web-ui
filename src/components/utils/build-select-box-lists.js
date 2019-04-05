@@ -1,4 +1,9 @@
-import { localeCompare, filterOsByArchitecture } from '_/helpers'
+import {
+  filterOsByArchitecture,
+  localeCompare,
+  templateNameRenderer,
+} from '_/helpers'
+import { enumMsg } from '_/intl'
 
 /**
  * Return a normalized and sorted list of data centers for use in a __SelectBox__ from
@@ -105,9 +110,90 @@ function createOsList (clusterId, clusters, operatingSystems) {
   return osList
 }
 
+/**
+ * Return a normalized and sorted list of Templates ready for use in a __SelectBox__ from
+ * the Map of provided templates cross referenced to the given cluster.
+ */
+function createTemplateList (templates, clusterId = false) {
+  function testCluster (template) {
+    const templateCluster = template.get('clusterId')
+    return templateCluster === null || (clusterId && templateCluster === clusterId)
+  }
+
+  const templateList =
+    templates
+      .toList()
+      .filter(template =>
+        // TODO: template.get('canUserUseTemplate') &&
+        testCluster(template)
+      )
+      .map(template => ({
+        id: template.get('id'),
+        value: templateNameRenderer(template),
+      }))
+      .sort((a, b) => localeCompare(a.value, b.value))
+      .toJS()
+
+  return templateList
+}
+
+/**
+ * Return a list of the interface types available to Nics ready for use in a
+ * __SelectBox__.  This list is static and corresponds to the relevant entries in:
+ *
+ *    http://ovirt.github.io/ovirt-engine-api-model/master/#types/nic_interface
+ */
+function createNicInterfacesList () {
+  return [
+    {
+      id: 'virtio',
+      value: enumMsg('NicInterface', 'virtio'),
+    },
+    {
+      id: 'rtl8139',
+      value: enumMsg('NicInterface', 'rtl8139'),
+    },
+    {
+      id: 'e1000',
+      value: enumMsg('NicInterface', 'e1000'),
+    },
+  ]
+}
+
+/**
+ * Filter the set of vNIC profiles to display to the user such that:
+ *   - each vNIC is in the same data center as the VM
+ *   - each vNIC's network is available on the same cluster as the VM
+ */
+function createVNicProfileList (vnicProfiles, { dataCenterId = false, cluster = false } = {}) {
+  const clusterNetworks = cluster ? cluster.get('networks') : []
+
+  const vnicList =
+    vnicProfiles
+      .toList()
+      .filter(vnic =>
+        (dataCenterId ? vnic.get('dataCenterId') === dataCenterId : true) &&
+        (cluster ? clusterNetworks.contains(vnic.getIn(['network', 'id'])) : true) &&
+        vnic.get('canUserUseProfile')
+      )
+      .map(
+        vnic => ({
+          id: vnic.get('id'),
+          value: `${vnic.getIn(['network', 'name'])}/${vnic.get('name')}`,
+        })
+      )
+      .sort((a, b) => localeCompare(a.value, b.value))
+      .toJS()
+
+  return vnicList
+}
+
 export {
   createClusterList,
   createDataCenterList,
   createIsoList,
+  createNicInterfacesList,
   createOsList,
+  createTemplateList,
+  createVNicProfileList,
 }
