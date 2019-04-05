@@ -29,6 +29,7 @@ const Pool = ({ pool, icons, onStart }) => {
       <BaseCard.Header>
         <div className={style['pool-top-line']} style={{ backgroundColor: pool.get('color') }} />
         <span className={`${sharedStyle['operating-system-label']} ${style['pool-os-label']}`}>{ osName }</span>
+        <span className={style['pool-vm-label']} style={{ backgroundColor: pool.get('color') }}>{ pool.get('name') }</span>
       </BaseCard.Header>
       <BaseCard.Icon url={`/pool/${pool.get('id')}`} icon={icon} />
       <BaseCard.Title idPrefix={idPrefix} name={pool.get('name')} />

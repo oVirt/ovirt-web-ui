@@ -12,10 +12,6 @@
     white-space: nowrap;
 }
 
-.scrollingWrapper {
-    position: relative;
-}
-
 .overlay {
     transition: all 0.6s;
     z-index: 10;
@@ -96,4 +92,13 @@ dl.pool-info dt {
 dl.pool-info dd {
     width: 30%;
     display: inline-block;
+}
+
+.cards-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.card-box :global(.card-pf) {
+    height: calc(100% - 20px);
 }

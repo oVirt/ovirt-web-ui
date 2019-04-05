@@ -51,17 +51,15 @@ class Vms extends React.Component {
         useWindow={false}
       >
         <ScrollPositionHistory uniquePrefix='vms-list' scrollContainerSelector='#page-router-render-component'>
-          <div className={`container-fluid container-cards-pf`}>
-            <div className={style['scrollingWrapper']}>
-              <div className='row row-cards-pf'>
-                {vmsPoolsMerge.map(instance =>
-                  instance.get('isVm')
-                    ? <Vm vm={instance} key={instance.get('id')} />
-                    : <Pool pool={instance} key={instance.get('id')} />
-                )}
-              </div>
-              <div className={style['overlay']} />
+          <div className='container-fluid container-cards-pf'>
+            <div className={`row row-cards-pf ${style['cards-container']}`}>
+              {vmsPoolsMerge.map(instance =>
+                instance.get('isVm')
+                  ? <Vm vm={instance} key={instance.get('id')} />
+                  : <Pool pool={instance} key={instance.get('id')} />
+              )}
             </div>
+            <div className={style['overlay']} />
           </div>
         </ScrollPositionHistory>
       </InfiniteScroll>
