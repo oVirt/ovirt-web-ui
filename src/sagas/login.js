@@ -22,6 +22,7 @@ import {
 
   setUserFilterPermission,
   setAdministrator,
+  setCpuTopologyOptions,
   getOption,
 
   getAllClusters,
@@ -81,6 +82,7 @@ export function* login (action) {
 
   // API checks passed.  Load user data and the initial app data
   yield fetchPermissionWithoutFilter()
+  yield fetchCpuTopologyOptions()
   yield put(getUSBFilter())
   yield initialLoad()
   yield autoConnectCheck()
@@ -184,6 +186,32 @@ function* autoConnectCheck () {
       yield downloadVmConsole(downloadConsole({ vmId, hasGuestAgent: internalVm.ssoGuestAgent }))
     }
   }
+}
+
+function* fetchCpuTopologyOptions () {
+  const version = Selectors.getOvirtVersion()
+  const maxNumberOfSockets = yield callExternalAction(
+    'getOption',
+    Api.getOption,
+    getOption('MaxNumOfVmSockets', `${version.get('major')}.${version.get('minor')}`, 16))
+  const maxNumberOfCores = yield callExternalAction(
+    'getOption',
+    Api.getOption,
+    getOption('MaxNumOfCpuPerSocket', `${version.get('major')}.${version.get('minor')}`, 16))
+  const maxNumberOfThreads = yield callExternalAction(
+    'getOption',
+    Api.getOption,
+    getOption('MaxNumOfThreadsPerCpu', `${version.get('major')}.${version.get('minor')}`, 16))
+  const maxNumOfVmCpus = yield callExternalAction(
+    'getOption',
+    Api.getOption,
+    getOption('MaxNumOfVmCpus', `${version.get('major')}.${version.get('minor')}`, 1))
+  yield put(setCpuTopologyOptions({
+    maxNumberOfSockets: parseInt(maxNumberOfSockets),
+    maxNumberOfCores: parseInt(maxNumberOfCores),
+    maxNumberOfThreads: parseInt(maxNumberOfThreads),
+    maxNumOfVmCpus: parseInt(maxNumOfVmCpus),
+  }))
 }
 
 function* initialLoad () {

@@ -9,6 +9,7 @@ import {
   GET_VM,
   PERSIST_STATE,
   SET_ADMINISTRATOR,
+  SET_CPU_TOPOLOGY_OPTIONS,
   SET_CURRENT_PAGE,
   SET_USB_FILTER,
   SET_USER_FILTER_PERMISSION,
@@ -177,5 +178,22 @@ export function getUserGroups () {
   return {
     type: GET_USER_GROUPS,
     payload: {},
+  }
+}
+
+export function setCpuTopologyOptions ({
+  maxNumberOfSockets,
+  maxNumberOfCores,
+  maxNumberOfThreads,
+  maxNumOfVmCpus,
+}) {
+  return {
+    type: SET_CPU_TOPOLOGY_OPTIONS,
+    payload: {
+      maxNumberOfSockets,
+      maxNumberOfCores,
+      maxNumberOfThreads,
+      maxNumOfVmCpus,
+    },
   }
 }
