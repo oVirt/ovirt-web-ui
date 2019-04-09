@@ -377,7 +377,7 @@ const Template = {
       baseTemplateId: template.version && template.version.base_template ? template.version.base_template.id : undefined,
     }
 
-    return {
+    return cleanUndefined({
       id: template.id,
       name: template.name,
       description: template.description,
@@ -405,7 +405,19 @@ const Template = {
         offset: template.time_zone.utc_offset,
       },
       permits,
-    }
+
+      nics: template.nics && template.nics.nic
+        ? template.nics.nic.map(
+          nic => Nic.toInternal({ nic })
+        )
+        : undefined,
+
+      disks: template.disk_attachments && template.disk_attachments.disk_attachment
+        ? template.disk_attachments.disk_attachment.map(
+          da => DiskAttachment.toInternal({ attachment: da, disk: da.disk })
+        )
+        : undefined,
+    })
   },
 
   toApi: undefined,
@@ -660,7 +672,7 @@ const Nic = {
     return {
       id: nic.id,
       name: nic.name,
-      mac: nic.mac.address,
+      mac: nic.mac && nic.mac.address,
       plugged: convertBool(nic.plugged),
       linked: convertBool(nic.linked),
       interface: nic.interface,

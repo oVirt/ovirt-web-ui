@@ -8,6 +8,7 @@ import vmDisksSagas from './disks'
 import storageDomainSagas, { fetchIsoFiles } from './storageDomains'
 import loginSagas from './login'
 import { fetchUnknownIcons } from './osIcons'
+import templateSagas from './templates'
 
 import {
   all,
@@ -37,7 +38,6 @@ import {
   selectVmDetail as actionSelectVmDetail,
   setClusters,
   setHosts,
-  setTemplates,
   setOperatingSystems,
   setUserGroups,
   addNetworksToVnicProfiles,
@@ -110,7 +110,6 @@ import {
   GET_ALL_EVENTS,
   GET_ALL_HOSTS,
   GET_ALL_OS,
-  GET_ALL_TEMPLATES,
   GET_ALL_VNIC_PROFILES,
   GET_BY_PAGE,
   GET_CONSOLE_OPTIONS,
@@ -149,7 +148,6 @@ import {
   canUserUseCluster,
   canUserUseVnicProfile,
   getUserPermits,
-  canUserUseTemplate,
 } from '_/utils'
 
 const vmFetchAdditionalList =
@@ -889,23 +887,6 @@ function* selectPoolDetail (action) {
   yield fetchSinglePool(getSinglePool({ poolId: action.payload.poolId }))
 }
 
-export function* fetchAllTemplates (action) {
-  const templates = yield callExternalAction('getAllTemplates', Api.getAllTemplates, action)
-
-  if (templates && templates['template']) {
-    const templatesInternal = (yield all(
-      templates.template
-        .map(function* (template) {
-          const templateInternal = Api.templateToInternal({ template })
-          templateInternal.permits = yield fetchPermits({ entityType: PermissionsType.TEMPLATE_TYPE, id: template.id })
-          templateInternal.canUserUseTemplate = canUserUseTemplate(templateInternal.permits)
-          return templateInternal
-        })
-    ))
-    yield put(setTemplates(templatesInternal))
-  }
-}
-
 export function* fetchAllClusters (action) {
   const clusters = yield callExternalAction('getAllClusters', Api.getAllClusters, action)
 
@@ -1139,7 +1120,6 @@ export function* rootSaga () {
     takeEvery(GET_RDP_VM, getRDPVm),
 
     takeLatest(GET_ALL_CLUSTERS, fetchAllClusters),
-    takeLatest(GET_ALL_TEMPLATES, fetchAllTemplates),
     takeLatest(GET_ALL_OS, fetchAllOS),
     takeLatest(GET_ALL_HOSTS, fetchAllHosts),
     takeLatest(GET_ALL_VNIC_PROFILES, fetchAllVnicProfiles),
@@ -1165,5 +1145,6 @@ export function* rootSaga () {
     ...storageDomainSagas,
     ...vmSnapshotsSagas,
     ...optionsDialogSagas,
+    ...templateSagas,
   ])
 }

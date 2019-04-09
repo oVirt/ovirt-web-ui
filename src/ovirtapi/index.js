@@ -141,11 +141,23 @@ const OvirtApi = {
       },
     })
   },
+
   getAllTemplates (): Promise<Object> {
     assertLogin({ methodName: 'getAllTemplates' })
-    const url = `${AppConfiguration.applicationContext}/api/templates`
+    const url = `${AppConfiguration.applicationContext}/api/templates?follow=nics,disk_attachments.disk`
     return httpGet({ url })
   },
+  getTemplateNics ({ templateId }: { templateId: string }): Promise<Object> {
+    assertLogin({ methodName: 'getTemplateNics' })
+    const url = `${AppConfiguration.applicationContext}/api/templates/${templateId}/nics`
+    return httpGet({ url })
+  },
+  getTemplateDiskAttachments ({ templateId }: { templateId: string }): Promise<Object> {
+    assertLogin({ methodName: 'getTemplateDiskAttachments' })
+    const url = `${AppConfiguration.applicationContext}/api/templates/${templateId}/diskattachments?follow=disk`
+    return httpGet({ url })
+  },
+
   getAllDataCenters ({ additional }: { additional: Array<string> }): Promise<Object> {
     assertLogin({ methodName: 'getAllDataCenters' })
     const url = `${AppConfiguration.applicationContext}/api/datacenters` +
