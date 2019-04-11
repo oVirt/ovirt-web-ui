@@ -31,7 +31,6 @@ import {
   getAllStorageDomains,
   getAllTemplates,
   getAllVnicProfiles,
-  getByPage,
   getIsoFiles,
   getUserGroups,
 
@@ -230,8 +229,8 @@ function* initialLoad () {
   // requires storage domains to be in redux store
   yield put(getIsoFiles())
 
-  // --- store is populated with user & system info, now pull VMs and Pools
-  yield put(getByPage({ page: 1 }))
+  // The `Vms` card view component will take care of loading pages of VMs and Pools as needed.
+  // Loading VMs and Pools here is not necessary and will cause issues with `Vms`'s loading.
 }
 
 function* fetchPermissionWithoutFilter () {
