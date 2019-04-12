@@ -208,12 +208,14 @@ class OverviewCard extends React.Component {
     if (isPoolVm) {
       pool = vms.getIn(['pools', poolId])
     }
+    const isPoolAutomatic = pool && pool.get('type') === 'automatic'
 
     return (
       <BaseCard
         editMode={isEditing}
         editable={isEditable}
         editTooltip={`Edit ${vm.get('name')}`}
+        disableTooltip={isPoolVm && isPoolAutomatic ? msg.automaticPoolsNotEditable({ poolName: pool.get('name') }) : undefined}
         idPrefix={idPrefix}
         disableSaveButton={nameError}
         onStartEdit={this.handleCardOnStartEdit}

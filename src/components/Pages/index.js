@@ -14,7 +14,7 @@ import VmDetails from '../VmDetails'
 import VmConsole from '../VmConsole'
 import { default as LegacyVmDetails } from '../VmDetail'
 
-import { addUserMessage } from '_/actions'
+import { addUserMessage, selectPoolDetail } from '_/actions'
 
 /**
  * Route component (for PageRouter) to view the list of VMs and Pools
@@ -43,6 +43,18 @@ class VmDetailsPage extends React.Component {
     return null
   }
 
+  componentDidUpdate () {
+    const { vms, fetchPool } = this.props
+    const { vmId } = this.state
+    if (vmId && vms.getIn(['vms', vmId])) {
+      const poolId = vms.getIn(['vms', vmId]).getIn(['pool', 'id'])
+
+      if (poolId && !vms.getIn(['pools', poolId])) {
+        fetchPool(poolId)
+      }
+    }
+  }
+
   render () {
     const { vms } = this.props
     const { vmId } = this.state
@@ -59,12 +71,15 @@ class VmDetailsPage extends React.Component {
 VmDetailsPage.propTypes = {
   vms: PropTypes.object.isRequired,
   match: RouterPropTypeShapes.match.isRequired,
+  fetchPool: PropTypes.func.isRequired,
 }
 const VmDetailsPageConnected = connect(
   (state) => ({
     vms: state.vms,
   }),
-  (dispatch) => ({})
+  (dispatch) => ({
+    fetchPool: (poolId) => dispatch(selectPoolDetail({ poolId })),
+  })
 )(VmDetailsPage)
 
 /**
