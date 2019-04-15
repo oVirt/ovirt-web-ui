@@ -12,6 +12,8 @@ const ICON_NAME = 'Icon'
 const TITLE_NAME = 'Title'
 const STATUS_NAME = 'Status'
 
+const IdPrefixContext = React.createContext('')
+
 const BaseCardHeader = ({ children }) => (
   <div>
     {children}
@@ -20,6 +22,7 @@ const BaseCardHeader = ({ children }) => (
 
 BaseCardHeader.displayName = HEADER_NAME
 
+BaseCardHeader.contextType = IdPrefixContext
 BaseCardHeader.propTypes = {
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
@@ -44,40 +47,40 @@ BaseCardIcon.propTypes = {
   url: PropTypes.string,
 }
 
-const BaseCardTitle = ({ url, name, idPrefix }) => (
+const BaseCardTitle = ({ url, name }, context) => (
   url
     ? <Link to={url} className={style['vm-detail-link']}>
-      <p className={`${style['vm-name']} ${style['crop']}`} title={name} data-toggle='tooltip' id={`${idPrefix}-name`}>
+      <p className={`${style['vm-name']} ${style['crop']}`} title={name} data-toggle='tooltip' id={`${context}-name`}>
         {name}
       </p>
     </Link>
-    : <p className={`${style['vm-name']} ${style['crop']}`} title={name} data-toggle='tooltip' id={`${idPrefix}-name`}>
+    : <p className={`${style['vm-name']} ${style['crop']}`} title={name} data-toggle='tooltip' id={`${context}-name`}>
       {name}
     </p>
 )
 
 BaseCardTitle.displayName = TITLE_NAME
 
+BaseCardTitle.contextType = IdPrefixContext
 BaseCardTitle.propTypes = {
   name: PropTypes.string.isRequired,
-  idPrefix: PropTypes.string,
   url: PropTypes.string,
 }
 
-const BaseCardStatus = ({ children, idPrefix }) => (
-  <p className={`${style['vm-status']}`} id={`${idPrefix}-status`}>
+const BaseCardStatus = ({ children }, context) => (
+  <p className={`${style['vm-status']}`} id={`${context}-status`}>
     {children}
   </p>
 )
 
 BaseCardStatus.displayName = STATUS_NAME
 
+BaseCardStatus.contextType = IdPrefixContext
 BaseCardStatus.propTypes = {
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
     PropTypes.node,
   ]).isRequired,
-  idPrefix: PropTypes.string,
 }
 
 const names = [ HEADER_NAME, ICON_NAME, TITLE_NAME, STATUS_NAME ]
@@ -95,23 +98,25 @@ const BaseCard = ({ children, idPrefix }) => {
     }
   })
   return (
-    <Col xs={12} sm={6} md={4} lg={3} id={`${idPrefix}-box`}>
-      <Card className='card-pf-view card-pf-view-select card-pf-view-single-select'>
-        {childs[BaseCardHeader.displayName]}
-        <CardBody>
-          <div className={`card-pf-top-element ${style['card-icon']}`}>
-            {childs[BaseCardIcon.displayName]}
-          </div>
+    <IdPrefixContext.Provider value={idPrefix}>
+      <Col xs={12} sm={6} md={4} lg={3} id={`${idPrefix}-box`}>
+        <Card className='card-pf-view card-pf-view-select card-pf-view-single-select'>
+          {childs[BaseCardHeader.displayName]}
+          <CardBody>
+            <div className={`card-pf-top-element ${style['card-icon']}`}>
+              {childs[BaseCardIcon.displayName]}
+            </div>
 
-          <CardTitle className={`text-center ${style['status-height']}`}>
-            {childs[BaseCardTitle.displayName]}
-            {childs[BaseCardStatus.displayName]}
-          </CardTitle>
+            <CardTitle className={`text-center ${style['status-height']}`}>
+              {childs[BaseCardTitle.displayName]}
+              {childs[BaseCardStatus.displayName]}
+            </CardTitle>
 
-          {childs.others}
-        </CardBody>
-      </Card>
-    </Col>
+            {childs.others}
+          </CardBody>
+        </Card>
+      </Col>
+    </IdPrefixContext.Provider>
   )
 }
 BaseCard.propTypes = {
