@@ -70,7 +70,7 @@ class VmDropdownActions extends React.Component {
         >
           { [].concat(...actionsCopy.slice(1).map(action => {
             return action.items && action.items.length > 0
-              ? action.items.filter(a => a !== null).map(a => <MenuItemAction key={a.shortTitle} {...a} />)
+              ? action.items.filter(a => a !== null && !a.actionDisabled).map(a => <MenuItemAction key={a.shortTitle} {...a} />)
               : <MenuItemAction key={action.shortTitle} {...action} />
           }))}
         </SplitButton>
@@ -172,6 +172,7 @@ class VmActions extends React.Component {
         priority: 0,
         shortTitle: msg.vncConsoleBrowser(),
         tooltip: msg.vncConsoleBrowserOpen(),
+        actionDisabled: config.get('websocket') === null,
         id: `${idPrefix}-button-console-browser`,
         confirmation: <ConsoleConfirmationModal isNoVNC consoleId={vncConsole.get('id')} vm={vm} />,
       })

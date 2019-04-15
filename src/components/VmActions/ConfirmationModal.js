@@ -29,8 +29,8 @@ const ConfirmationModal = ({ show, title, confirm, body, onClose, extra, accessi
       </Modal.Body>
       <Modal.Footer>
         { extra && <button className='btn btn-info' onClick={() => { extra.onClick(); onClose() }}>{extra.title}</button> }
-        <button className='btn btn-default' onClick={onClose}>{msg.cancel()}</button>
-        <button className='btn btn-info' onClick={() => { confirm.onClick(); onClose() }}>{confirm.title}</button>
+        <button className={`btn ${confirm ? 'btn-default' : 'btn-info'}`} onClick={onClose}>{msg.cancel()}</button>
+        { confirm && <button className='btn btn-info' onClick={() => { confirm.onClick(); onClose() }}>{confirm.title}</button> }
       </Modal.Footer>
     </Modal>
   )
@@ -41,7 +41,7 @@ ConfirmationModal.propTypes = {
   title: PropsTypes.string.isRequired,
   onClose: PropsTypes.func,
   accessibleDescription: PropsTypes.string,
-  confirm: btnPropType.isRequired,
+  confirm: btnPropType,
   extra: btnPropType,
   body: PropsTypes.oneOfType([PropsTypes.node, PropsTypes.string]).isRequired,
 }

@@ -120,7 +120,7 @@ const ActionButtonWraper = (props) => {
       id='console-selector'
       disabled={actionDisabled}
     >
-      { items.filter(i => i !== null).map(item => {
+      { items.filter(i => i !== null && !i.actionDisabled).map(item => {
         return <MenuItemAction key={item.id} {...item} />
       }) }
     </DropdownButton>
