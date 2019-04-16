@@ -36,7 +36,7 @@ class VmSort extends React.Component {
         <Sort.DirectionSelector
           isAscending={sort.isAsc}
           isNumeric={sort.isNumeric}
-          onClick={() => this.toggleCurrentSortDirection()}
+          onClick={this.toggleCurrentSortDirection}
         />
       </Sort>
     )

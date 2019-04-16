@@ -107,7 +107,7 @@ const OvirtApi = {
     }
     return httpGet({ url })
   },
-  getVmsByCount ({ count, additional, filters }: { count: number, additional: Array<string> }): Promise<Object> {
+  getVmsByCount ({ count, additional }: { count: number, additional: Array<string> }): Promise<Object> {
     assertLogin({ methodName: 'getVmsByCount' })
     let url = `${AppConfiguration.applicationContext}/api/vms/;max=${count}?search=SORTBY NAME ASC`
     if (additional && additional.length > 0) {

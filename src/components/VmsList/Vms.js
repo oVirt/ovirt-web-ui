@@ -44,6 +44,7 @@ class Vms extends React.Component {
     return (
       <InfiniteScroll
         loadMore={this.loadMore}
+        isReverse={!sort.isAsc}
         hasMore={vms.get('notAllPagesLoaded')}
         loader={<Loader key='infinite-scroll-loader' size={SIZES.LARGE} />}
         useWindow={false}

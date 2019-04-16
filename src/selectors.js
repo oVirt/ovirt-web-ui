@@ -59,9 +59,6 @@ Selectors = {
   getCurrentPage () {
     return getState().config.get('currentPage')
   },
-  getVmsFilters () {
-    return getState().vms.get('filters')
-  },
   getVmIds () {
     return getState().vms.get('vms').reduce((vmIds, vm, vmId) => {
       vmIds.push(vmId)

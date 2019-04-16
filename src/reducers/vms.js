@@ -30,6 +30,7 @@ import {
 } from '_/constants'
 import { actionReducer, removeMissingItems } from './utils'
 import { sortFields } from '_/utils'
+import { loadFromLocalStorage } from '_/storage'
 
 const EMPTY_MAP = Immutable.fromJS({})
 const EMPTY_ARRAY = Immutable.fromJS([])
@@ -37,8 +38,8 @@ const EMPTY_ARRAY = Immutable.fromJS([])
 const initialState = Immutable.fromJS({
   vms: {},
   pools: {},
-  filters: EMPTY_MAP,
-  sort: { ...sortFields[0], isAsc: true },
+  filters: Immutable.fromJS(JSON.parse(loadFromLocalStorage('vmFilters')) || {}),
+  sort: Immutable.fromJS({ ...sortFields[0], isAsc: true }),
 
   page: 1,
 

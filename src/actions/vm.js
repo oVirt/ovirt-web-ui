@@ -33,7 +33,6 @@ import {
   SHUTDOWN_VM,
   START_VM,
   SUSPEND_VM,
-  UPDATE_FILTERS,
   UPDATE_ICONS,
   UPDATE_VM_DISK,
   UPDATE_VMS,
@@ -437,15 +436,6 @@ export function updateVmSnapshot ({ vmId, snapshot }) {
     payload: {
       vmId,
       snapshot,
-    },
-  }
-}
-
-export function updateFilters ({ filters }) {
-  return {
-    type: UPDATE_FILTERS,
-    payload: {
-      filters,
     },
   }
 }

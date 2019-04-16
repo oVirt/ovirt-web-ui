@@ -66,7 +66,7 @@ class PageRouter extends React.Component {
     const { location, history } = this.props
     const { previousPath, branches, branch } = this.state
 
-    const tools = branch.route.toolbars && branch.route.toolbars(branch.match)
+    const tools = branch && branch.route.toolbars && branch.route.toolbars(branch.match)
 
     const RenderComponent = branch.route.component
     return (

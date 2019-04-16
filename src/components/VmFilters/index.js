@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { Filter, FormControl } from 'patternfly-react'
 import { enumMsg } from '_/intl'
 import { setVmsFilters } from '_/actions'
+import { saveToLocalStorage } from '_/storage'
 
 class VmFilters extends React.Component {
   constructor (props) {
@@ -165,6 +166,10 @@ class VmFilters extends React.Component {
         onKeyPress={e => this.onValueKeyPress(e)}
       />
     )
+  }
+
+  componentDidUpdate () {
+    saveToLocalStorage('vmFilters', JSON.stringify(this.props.vms.get('filters').toJS()))
   }
 
   render () {
