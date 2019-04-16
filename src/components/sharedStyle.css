@@ -61,3 +61,11 @@
   float: right;
   text-align: center;
 }
+
+.header-remover :global(.modal-header) {
+  display: none;
+}
+
+.header-remover :global(.modal-body) {
+  margin-top: 15px;
+}
