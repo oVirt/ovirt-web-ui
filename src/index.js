@@ -12,9 +12,9 @@ import { IntlProvider } from 'react-intl'
 
 import logger from '_/logger'
 
-// TODO: Look at this WRT patternfly-react CSS!!!!!!!
 import 'patternfly/dist/css/patternfly.css'
 import 'patternfly/dist/css/patternfly-additions.css'
+import 'patternfly-react/dist/css/patternfly-react.css'
 import './index-nomodules.css'
 import * as branding from '_/branding'
 
