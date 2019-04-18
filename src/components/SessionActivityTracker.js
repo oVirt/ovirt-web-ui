@@ -10,8 +10,6 @@ import { logout } from '_/actions'
 
 const TIME_TO_DISPLAY_MODAL = 30 // 30 seconds
 
-// TODO: allow the user to cancel the automatic reload?
-// If so, change config.isTokenExpired to false and add additional check to doCheckTokenExpired() before actual reload
 class SessionActivityTracker extends React.Component {
   constructor (props) {
     super(props)
@@ -22,9 +20,6 @@ class SessionActivityTracker extends React.Component {
 
     this.dropCounter = this.dropCounter.bind(this)
     this.decrementCounter = this.decrementCounter.bind(this)
-
-    document.body.addEventListener('mousemove', this.dropCounter)
-    this.timer = setInterval(this.decrementCounter, 1000)
   }
 
   static getDerivedStateFromProps (props, state) {
@@ -41,23 +36,34 @@ class SessionActivityTracker extends React.Component {
       this.setState({ counter: this.props.config.get('userSessionTimeoutInterval') })
     }
   }
+
   decrementCounter () {
-    if (this.state.counter !== null) {
-      const state = {
-        counter: this.state.counter - 1,
+    this.setState(state => {
+      const { counter } = state
+      if (counter !== null) {
+        return {
+          counter: counter - 1,
+          showTimeoutModal: counter <= TIME_TO_DISPLAY_MODAL,
+        }
       }
-      if (this.state.counter <= TIME_TO_DISPLAY_MODAL && !this.state.showTimeoutModal) {
-        state.showTimeoutModal = true
-      }
+      return null
+    }, () => {
       if (this.state.counter <= 0) {
         this.props.onLogout()
       }
-      this.setState(state)
-    }
+    })
+  }
+
+  componentDidMount () {
+    document.body.addEventListener('mousemove', this.dropCounter)
+    this.timer = setInterval(this.decrementCounter, 1000)
   }
 
   componentWillUnmount () {
-    clearInterval(this.timer)
+    document.body.removeEventListener('mousemove', this.dropCounter)
+    if (this.timer) {
+      clearInterval(this.timer)
+    }
   }
 
   render () {
