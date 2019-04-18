@@ -778,10 +778,10 @@ class DetailsCard extends React.Component {
                       { templateName }
                     </FieldRow>
                     <FieldRow label={isEditing ? msg.changeCd() : msg.cd()} id={`${idPrefix}-cdrom`}>
-                      { !isEditing && cdImageName }
+                      { !isEditing && <FieldValue tooltip={cdImageName}>{cdImageName}</FieldValue> }
                       { isEditing && !canChangeCd &&
                         <div>
-                          {cdImageName}
+                          <FieldValue tooltip={cdImageName}>{cdImageName}</FieldValue>
                           <FieldLevelHelp disabled={false} content={msg.cdCanOnlyChangeWhenVmRunning()} inline />
                         </div>
                       }
