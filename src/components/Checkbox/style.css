@@ -26,12 +26,11 @@
     margin-left: .5em;
 }
 
-.cr-icon {
+:global(.message-dialog-pf) :global(.modal-body) :global(.fa).cr-icon {
     position: absolute;
-    font-size: .8em;
+    font-size: 1.2em;
     line-height: 0;
     top: 50%;
-    left: 20%;
 }
 
 .checkbox label input[type="checkbox"] {
