@@ -17,8 +17,10 @@ class GlobalErrorBoundary extends React.Component {
 
   componentDidCatch (error, info) {
     this.setState({ hasError: true })
-    console.error(error)
-    console.error(info.componentStack)
+    if (!window.DEVELOPMENT) {
+      console.error(error)
+      console.error(info.componentStack)
+    }
   }
 
   render () {

@@ -12,4 +12,5 @@ module.exports = Object
     return env
   }, {
     'process.env.NODE_ENV': NODE_ENV,
+    'window.DEVELOPMENT': JSON.stringify(process.env.NODE_ENV === 'development')
   })
