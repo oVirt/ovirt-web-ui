@@ -7,12 +7,12 @@ import {
 } from 'patternfly-react'
 import { msg } from '_/intl'
 import SelectBox from '../../../../SelectBox'
-import timezones from 'timezones.json'
+import timezones from './timezones.json'
 
 const SysprepForm = ({ idPrefix, vm, onChange }) => {
   const cloudInitHostName = vm.getIn(['cloudInit', 'hostName'])
   const cloudInitPassword = vm.getIn(['cloudInit', 'password'])
-  const cloudInitTimezone = vm.getIn(['cloudInit', 'timezone']) || timezones[0].value
+  const cloudInitTimezone = vm.getIn(['cloudInit', 'timezone']) || timezones[0].id
   const cloudInitCustomScript = vm.getIn(['cloudInit', 'customScript'])
   return (
     <React.Fragment>
@@ -42,12 +42,7 @@ const SysprepForm = ({ idPrefix, vm, onChange }) => {
         </ControlLabel>
         <SelectBox
           id={`${idPrefix}-sysprep-timezone-select`}
-          items={
-            timezones.map(item => ({
-              id: item.value,
-              value: item.text,
-            }))
-          }
+          items={timezones}
           selected={cloudInitTimezone}
           onChange={(selectedId) => onChange('cloudInitTimezone', selectedId)}
         />
