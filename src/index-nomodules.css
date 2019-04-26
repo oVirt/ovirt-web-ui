@@ -222,3 +222,7 @@ a.disabled {
 .vnc-console > div {
   height: calc(100vh - 150px);
 }
+
+textarea {
+  resize: vertical;
+}
