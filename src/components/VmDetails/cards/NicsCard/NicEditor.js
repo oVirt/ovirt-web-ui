@@ -11,6 +11,7 @@ import {
   FormGroup,
   Modal,
   Radio,
+  HelpBlock,
 } from 'patternfly-react'
 import SelectBox from '../../../SelectBox'
 import ExpandCollapseSection from '../../../ExpandCollapseSection'
@@ -70,6 +71,7 @@ class NicEditor extends Component {
       vnicProfileId: EMPTY_ID,
       interface: NIC_INTERFACE_DEFAULT,
       linked: true,
+      errors: {},
     }
 
     this.open = this.open.bind(this)
@@ -95,6 +97,7 @@ class NicEditor extends Component {
         vnicProfileId: nic.vnicProfile.id,
         interface: nic.interface,
         linked: nic.linked,
+        errors: {},
       })
     } else {
       this.setState({
@@ -105,6 +108,7 @@ class NicEditor extends Component {
         vnicProfileId: EMPTY_ID,
         interface: NIC_INTERFACE_DEFAULT,
         linked: true,
+        errors: {},
       })
     }
   }
@@ -132,7 +136,7 @@ class NicEditor extends Component {
   }
 
   changeVnicProfile (value) {
-    this.setState({ vnicProfileId: value })
+    this.setState((state) => ({ vnicProfileId: value, errors: { ...state.errors, vnicProfile: false } }))
   }
 
   changeInterface (value) {
@@ -144,9 +148,13 @@ class NicEditor extends Component {
   }
 
   handleSave () {
-    const newNic = this.composeNic()
-    this.props.onSave(newNic)
-    this.close()
+    if (this.state.vnicProfileId === EMPTY_ID) {
+      this.setState((state) => ({ errors: { ...state.errors, vnicProfile: true } }))
+    } else {
+      const newNic = this.composeNic()
+      this.props.onSave(newNic)
+      this.close()
+    }
   }
 
   render () {
@@ -208,7 +216,7 @@ class NicEditor extends Component {
               </Col>
             </FormGroup>
 
-            <FormGroup controlId={`${modalId}-vnic-profile`} className='required'>
+            <FormGroup controlId={`${modalId}-vnic-profile`} className='required' validationState={this.state.errors['vnicProfile'] && 'error'}>
               <LabelCol sm={3}>
                 { msg.vnicProfile() }
               </LabelCol>
@@ -219,6 +227,7 @@ class NicEditor extends Component {
                   selected={this.state.vnicProfileId}
                   onChange={this.changeVnicProfile}
                 />
+                {this.state.errors['vnicProfile'] && <HelpBlock>{msg.pleaseChooseVnicProfile()}</HelpBlock>}
               </Col>
             </FormGroup>
 

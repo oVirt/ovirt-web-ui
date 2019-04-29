@@ -394,6 +394,7 @@ export const messages: { [messageId: string]: MessageType } = {
   permissionsNoEditVm: 'You do not have the required permissions to edit a VM.',
   permissionsNoEditThisVm: 'You do not have permissions to edit VM {name} / {vmId}',
   pendingChanges: 'Pending Changes',
+  pleaseChooseVnicProfile: 'VNIC profile is required, please select a VNIC profile.',
   pleaseEnterValidVmName: 'Please enter a valid virtual machine name. Only lower-case and upper-case letters, numbers, and \'_\',\'-\',\'.\' are allowed.',
   preserveDisks: 'Preserve disks',
   publicSSHKey: 'Specify public key for access to guest serial console via SSH authentication.',
