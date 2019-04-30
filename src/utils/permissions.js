@@ -14,6 +14,10 @@ export function canUserUseCluster (permits: Set<string>): boolean {
   return checkUserPermit('create_vm', permits)
 }
 
+export function canUserUseTemplate (permits: Set<string>): boolean {
+  return checkUserPermit('create_vm', permits)
+}
+
 export function canUserEditVm (permits: Set<string>): boolean {
   return checkUserPermit('edit_vm_properties', permits)
 }

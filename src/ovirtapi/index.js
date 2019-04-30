@@ -170,6 +170,11 @@ const OvirtApi = {
     const url = `${AppConfiguration.applicationContext}/api/clusters/${id}/permissions?follow=role.permits`
     return httpGet({ url, custHeaders: { Filter: true } })
   },
+  getTemplatePermissions ({ id }: { id: string }): Promise<Object> {
+    assertLogin({ methodName: 'getTemplatePermissions' })
+    const url = `${AppConfiguration.applicationContext}/api/templates/${id}/permissions?follow=role.permits`
+    return httpGet({ url, custHeaders: { Filter: true } })
+  },
   getVnicProfilePermissions ({ id }: { id: string }): Promise<Object> {
     assertLogin({ methodName: 'getVnicProfilePermissions' })
     const url = `${AppConfiguration.applicationContext}/api/vnicprofiles/${id}/permissions?follow=role.permits`

@@ -150,6 +150,7 @@ import {
   canUserUseCluster,
   canUserUseVnicProfile,
   getUserPermits,
+  canUserUseTemplate,
 } from '_/utils'
 
 const vmFetchAdditionalList =
@@ -835,7 +836,15 @@ function* fetchAllTemplates (action) {
   const templates = yield callExternalAction('getAllTemplates', Api.getAllTemplates, action)
 
   if (templates && templates['template']) {
-    const templatesInternal = templates.template.map(template => Api.templateToInternal({ template }))
+    const templatesInternal = (yield all(
+      templates.template
+        .map(function* (template) {
+          const templateInternal = Api.templateToInternal({ template })
+          templateInternal.permits = yield fetchPermits({ entityType: PermissionsType.TEMPLATE_TYPE, id: template.id })
+          templateInternal.canUserUseTemplate = canUserUseTemplate(templateInternal.permits)
+          return templateInternal
+        })
+    ))
     yield put(setTemplates(templatesInternal))
   }
 }
