@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import { msg } from '../../../../intl'
 import { localeCompare } from '../../../../helpers'
 import { isNumber } from '../../../../utils'
+import { isDiskNameValid } from '_/components/utils'
 
 import {
   Button,
@@ -15,6 +16,7 @@ import {
   FormControl,
   FormGroup,
   Modal,
+  HelpBlock,
 } from 'patternfly-react'
 import SelectBox from '../../../SelectBox'
 import style from './style.css'
@@ -94,6 +96,7 @@ class DiskImageEditor extends Component {
       size: DISK_DEFAULTS.provisionedSize / 1024 ** 3,
       storageDomain: props.suggestedStorageDomain || '',
       format: DISK_DEFAULTS.format, // cow vs raw .. Allocation Policy (thin sparse vs preallocated !sparse)?
+      errors: {},
     }
     this.changesMade = false
 
@@ -130,6 +133,7 @@ class DiskImageEditor extends Component {
           (storageDomainSelectList.length > 0 && storageDomainSelectList[0].id) ||
           '',
         format: DISK_DEFAULTS.format,
+        errors: {},
       }
 
     this.setState({
@@ -183,6 +187,14 @@ class DiskImageEditor extends Component {
   }
 
   handleSave () {
+    if (this.state.alias.length === 0) {
+      this.setState((state) => ({ errors: { ...state.errors, 'alias': msg.fieldIsRequired() } }))
+      return
+    }
+    if (!isDiskNameValid(this.state.alias)) {
+      this.setState((state) => ({ errors: { ...state.errors, 'alias': msg.pleaseEnterValidDiskName() } }))
+      return
+    }
     if (!this.props.disk || this.changesMade) {
       const newDisk = this.composeDisk()
       this.props.onSave(this.props.vm.get('id'), newDisk)
@@ -191,7 +203,7 @@ class DiskImageEditor extends Component {
   }
 
   changeAlias ({ target: { value } }) {
-    this.setState({ alias: value })
+    this.setState((state) => ({ alias: value, errors: { ...state.errors, 'alias': '' } }))
     this.changesMade = true
   }
 
@@ -242,7 +254,7 @@ class DiskImageEditor extends Component {
             id={`${idPrefix}-modal-form`}
           >
             {/* Alias */}
-            <FormGroup controlId={`${idPrefix}-alias`} className={createMode && 'required'}>
+            <FormGroup controlId={`${idPrefix}-alias`} className={createMode && 'required'} validationState={this.state.errors['alias'] && 'error'}>
               <LabelCol sm={3}>
                 { msg.diskEditorAliasLabel() }
               </LabelCol>
@@ -252,6 +264,7 @@ class DiskImageEditor extends Component {
                   defaultValue={this.state.alias}
                   onChange={this.changeAlias}
                 />
+                {this.state.errors['alias'] && <HelpBlock>{this.state.errors['alias']}</HelpBlock>}
               </Col>
             </FormGroup>
 

@@ -86,3 +86,7 @@ export function isVmNameValid (nameCandidate: string): boolean {
   }
   return VM_NAME_REGEX.test(nameCandidate)
 }
+
+export function isDiskNameValid (nameCandidate: string): boolean {
+  return isVmNameValid(nameCandidate)
+}
