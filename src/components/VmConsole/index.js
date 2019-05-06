@@ -113,7 +113,9 @@ class VmConsole extends React.Component {
             port={websocket.get('port')}
             toolbarContainer='vm-console-toolbar-sendkeys'
             containerId={NOVNC_CONTAINER_ID}
-            onDisconnected={(e) => !e.detail.clean && !e.isTrusted ? onDisconnected('SECURITY_FAILURE') : onDisconnected()}
+            onDisconnected={
+              (e) => !e.detail.clean ? onDisconnected('CONNECTION_FAILURE') : onDisconnected()
+            }
             onConnected={() => $(`#${NOVNC_CONTAINER_ID} canvas`).focus()}
           />
         }
@@ -124,7 +126,7 @@ class VmConsole extends React.Component {
         return <InfoPageContainer
           icon={disconnectIcon}
           mainText={msg.disconectedConsole()}
-          secondaryText={vmConsole.get('reason') === 'SECURITY_FAILURE' ? <span dangerouslySetInnerHTML={{ __html: msg.unsecuredDisconectedConsoleInfo() }} /> : msg.disconectedConsoleInfo()}
+          secondaryText={vmConsole.get('reason') === 'CONNECTION_FAILURE' ? <span dangerouslySetInnerHTML={{ __html: msg.connectionFailConsoleInfo() }} /> : msg.disconectedConsoleInfo()}
           secondaryComponent={<Button bsStyle='primary' onClick={() => this.setState({ isFirstRun: true })}>{ msg.connect() }</Button>}
         />
     }
