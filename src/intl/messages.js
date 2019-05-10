@@ -177,6 +177,9 @@ export const messages: { [messageId: string]: MessageType } = {
   emptySnapshotDescription: 'Snapshot description is missing.',
   enterVmDescription: 'Enter VM Description (optional)',
   enterVmName: 'Enter VM Name',
+  enum_DiskInterface_ide: { message: 'IDE', description: 'IDE controller VM disk attachment interface' },
+  enum_DiskInterface_virtio: { message: 'VirtIO', description: 'virtio controller VM disk attachment interface' },
+  enum_DiskInterface_virtio_scsi: { message: 'VirtIO-SCSI', description: 'virtio SCSI controller VM disk attachment interface' },
   enum_NicInterface_e1000: {
     message: 'e1000',
     description: 'Display name of a NIC that provides an E1000 based interface to the VM',
@@ -494,6 +497,10 @@ export const messages: { [messageId: string]: MessageType } = {
   storageDomain: {
     message: 'Storage domain',
     description: 'An entity in the system where disks of virtual machines are stored. Abstraction of external file/block storages.',
+  },
+  storageDomainFreeSpace: {
+    message: '({size} {unit} free)',
+    description: 'Show the amount of free space a storage domain has when rendered in a select list of storage domains',
   },
   suspend: 'Suspend',
   suspendVm: 'Suspend the VM',

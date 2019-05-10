@@ -3,7 +3,8 @@ import {
   localeCompare,
   templateNameRenderer,
 } from '_/helpers'
-import { enumMsg } from '_/intl'
+import { enumMsg, msg } from '_/intl'
+import { convertValue } from '_/utils'
 
 /**
  * Return a normalized and sorted list of data centers for use in a __SelectBox__ from
@@ -98,12 +99,10 @@ function createOsList (clusterId, clusters, operatingSystems) {
   const osList =
     filterOsByArchitecture(operatingSystems, architecture)
       .toList()
-      .map(os => (
-        {
-          id: os.get('id'),
-          value: os.get('description'),
-        }
-      ))
+      .map(os => ({
+        id: os.get('id'),
+        value: os.get('description'),
+      }))
       .sort((a, b) => localeCompare(a.value, b.value))
       .toJS()
 
@@ -111,10 +110,41 @@ function createOsList (clusterId, clusters, operatingSystems) {
 }
 
 /**
+ * Return a normalized and sorted list of storage domains for use in a __SelectBox__
+ * from the List of provided storage domains, optionally filtered to be active in the
+ * provided data center.
+ */
+function createStorageDomainList (storageDomains, dataCenterId = null, includeUsage = false) {
+  const storageDomainList =
+    storageDomains
+      .toList()
+      .filter(sd =>
+        sd.get('canUserUseDomain') &&
+        sd.get('type') === 'data' &&
+        (dataCenterId === null
+          ? true
+          : sd.getIn(['statusPerDataCenter', dataCenterId]) === 'active')
+      )
+      .map(sd => {
+        const avail = convertValue('B', sd.get('availableSpace', 0))
+        return {
+          id: sd.get('id'),
+          value:
+            sd.get('name') +
+            (includeUsage ? ' ' + msg.storageDomainFreeSpace({ size: avail.value, unit: avail.unit }) : ''),
+        }
+      })
+      .sort((a, b) => localeCompare(a.value, b.value))
+      .toJS()
+
+  return storageDomainList
+}
+
+/**
  * Return a normalized and sorted list of Templates ready for use in a __SelectBox__ from
  * the Map of provided templates cross referenced to the given cluster.
  */
-function createTemplateList (templates, clusterId = false) {
+function createTemplateList (templates, clusterId = null) {
   function testCluster (template) {
     const templateCluster = template.get('clusterId')
     return templateCluster === null || (clusterId && templateCluster === clusterId)
@@ -135,6 +165,55 @@ function createTemplateList (templates, clusterId = false) {
       .toJS()
 
   return templateList
+}
+
+/**
+ * Filter the set of vNIC profiles to display to the user such that:
+ *   - each vNIC is in the same data center as the VM
+ *   - each vNIC's network is available on the same cluster as the VM
+ */
+function createVNicProfileList (vnicProfiles, { dataCenterId = null, cluster = null } = {}) {
+  const clusterNetworks = cluster === null ? [] : cluster.get('networks')
+
+  const vnicList =
+    vnicProfiles
+      .toList()
+      .filter(vnic =>
+        vnic.get('canUserUseProfile') &&
+        (dataCenterId === null ? true : vnic.get('dataCenterId') === dataCenterId) &&
+        (cluster === null ? true : clusterNetworks.contains(vnic.getIn(['network', 'id'])))
+      )
+      .map(vnic => ({
+        id: vnic.get('id'),
+        value: `${vnic.getIn(['network', 'name'])}/${vnic.get('name')}`,
+      }))
+      .sort((a, b) => localeCompare(a.value, b.value))
+      .toJS()
+
+  return vnicList
+}
+
+/**
+ * Return a list of the interface types available to DiskAttachments ready for use in a
+ * __SelectBox__.  This list is static and corresponds to the relevant entries in:
+ *
+ *    http://ovirt.github.io/ovirt-engine-api-model/master/#types/disk_interface
+ */
+function createDiskInterfacesList () {
+  return [
+    {
+      id: 'ide',
+      value: enumMsg('DiskInterface', 'ide'),
+    },
+    {
+      id: 'virtio_scsi',
+      value: enumMsg('DiskInterface', 'virtio_scsi'),
+    },
+    {
+      id: 'virtio',
+      value: enumMsg('DiskInterface', 'virtio'),
+    },
+  ]
 }
 
 /**
@@ -160,40 +239,15 @@ function createNicInterfacesList () {
   ]
 }
 
-/**
- * Filter the set of vNIC profiles to display to the user such that:
- *   - each vNIC is in the same data center as the VM
- *   - each vNIC's network is available on the same cluster as the VM
- */
-function createVNicProfileList (vnicProfiles, { dataCenterId = false, cluster = false } = {}) {
-  const clusterNetworks = cluster ? cluster.get('networks') : []
-
-  const vnicList =
-    vnicProfiles
-      .toList()
-      .filter(vnic =>
-        (dataCenterId ? vnic.get('dataCenterId') === dataCenterId : true) &&
-        (cluster ? clusterNetworks.contains(vnic.getIn(['network', 'id'])) : true) &&
-        vnic.get('canUserUseProfile')
-      )
-      .map(
-        vnic => ({
-          id: vnic.get('id'),
-          value: `${vnic.getIn(['network', 'name'])}/${vnic.get('name')}`,
-        })
-      )
-      .sort((a, b) => localeCompare(a.value, b.value))
-      .toJS()
-
-  return vnicList
-}
-
 export {
   createClusterList,
   createDataCenterList,
   createIsoList,
-  createNicInterfacesList,
   createOsList,
+  createStorageDomainList,
   createTemplateList,
   createVNicProfileList,
+
+  createDiskInterfacesList,
+  createNicInterfacesList,
 }
