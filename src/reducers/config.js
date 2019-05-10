@@ -18,6 +18,7 @@ import {
 
 const initialState = Immutable.fromJS({
   loginToken: undefined,
+  logoutWasManual: false,
   isTokenExpired: false,
   user: {
     name: undefined,
@@ -49,8 +50,11 @@ const config = actionReducer(initialState, {
   [LOGIN_FAILED] (state) {
     return state.delete('loginToken').deleteIn(['user', 'name'])
   },
-  [LOGOUT] (state) {
-    return state.delete('loginToken').deleteIn(['user', 'name'])
+  [LOGOUT] (state, { payload: { isManual } }) {
+    return state
+      .delete('loginToken')
+      .deleteIn(['user', 'name'])
+      .set('logoutWasManual', isManual)
   },
   [SET_OVIRT_API_VERSION] (state, { payload: { oVirtApiVersion } }) {
     return state.merge({ oVirtApiVersion: oVirtApiVersion })

@@ -172,7 +172,9 @@ function* checkOvirtApiVersion (oVirtMeta) {
 }
 
 export function* logout () {
-  window.location.href = `${AppConfiguration.applicationURL}/sso/logout`
+  if (AppConfiguration.applicationLogoutURL && AppConfiguration.applicationLogoutURL.length > 0) {
+    window.location.href = AppConfiguration.applicationLogoutURL
+  }
 }
 
 function* autoConnectCheck () {

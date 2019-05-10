@@ -7,8 +7,9 @@ const CONFIG_URL = '/ovirt-engine/web-ui/ovirt-web-ui.config'
 
 const AppConfiguration = {
   debug: true,
-  applicationContext: '',
-  applicationURL: '/',
+  applicationContext: '', // url where ovirt is available ('' is web server root)
+  applicationURL: '/', // url where this app is available (dev server path or webapp context root)
+  applicationLogoutURL: '', // url to invalidate the user's SSO token ('' skips SSO token invalidation)
   pageLimit: 8,
   schedulerFixedDelayInSeconds: 60,
 

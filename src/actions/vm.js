@@ -211,10 +211,11 @@ export function setOvirtApiVersion (oVirtApiVersion) {
   }
 }
 
-export function logout () {
+export function logout (isManual = false) {
   return {
     type: LOGOUT,
     payload: {
+      isManual,
     },
   }
 }
