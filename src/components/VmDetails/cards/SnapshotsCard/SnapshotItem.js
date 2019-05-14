@@ -52,17 +52,18 @@ StatusTooltip.propTypes = {
   id: PropTypes.string.isRequired,
 }
 
-const SnapshotItem = ({ snapshot, vmId, isEditing, id, hideActions, onSnapshotDelete }) => {
+const SnapshotItem = ({ snapshot, vmId, isEditing, id, isVmDown, hideActions, onSnapshotDelete }) => {
   let statusIcon = null
   let buttons = []
 
   // Snapshot actions
   const isActionsDisabled = !isEditing || snapshot.get('status') === 'locked'
+  const isRestoreDisabled = isActionsDisabled || !isVmDown
   if (!snapshot.get('isActive')) {
     // Info popover
     buttons.push(<OverlayTrigger
       overlay={
-        <SnapshotDetail key='detail' id={`${id}-info-popover`} snapshot={snapshot} vmId={vmId} restoreDisabled={isActionsDisabled} />
+        <SnapshotDetail key='detail' id={`${id}-info-popover`} snapshot={snapshot} vmId={vmId} restoreDisabled={isRestoreDisabled} />
       }
       placement='left'
       trigger='click'
@@ -80,7 +81,7 @@ const SnapshotItem = ({ snapshot, vmId, isEditing, id, hideActions, onSnapshotDe
       // Restore action
       buttons.push(<RestoreConfirmationModal
         key='restore'
-        disabled={isActionsDisabled}
+        disabled={isRestoreDisabled}
         snapshot={snapshot}
         vmId={vmId}
         id={`${id}-restore-modal`}
@@ -150,6 +151,7 @@ SnapshotItem.propTypes = {
   id: PropTypes.string.isRequired,
   isEditing: PropTypes.bool,
   hideActions: PropTypes.bool,
+  isVmDown: PropTypes.bool,
   onSnapshotDelete: PropTypes.func.isRequired,
 }
 
