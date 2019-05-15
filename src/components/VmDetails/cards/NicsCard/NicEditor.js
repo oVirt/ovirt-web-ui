@@ -11,7 +11,6 @@ import {
   FormGroup,
   Modal,
   Radio,
-  HelpBlock,
 } from 'patternfly-react'
 import SelectBox from '../../../SelectBox'
 import ExpandCollapseSection from '../../../ExpandCollapseSection'
@@ -67,11 +66,12 @@ class NicEditor extends Component {
       showModal: false,
 
       id: undefined,
-      name: props.nextNicName,
-      vnicProfileId: EMPTY_ID,
-      interface: NIC_INTERFACE_DEFAULT,
-      linked: true,
-      errors: {},
+      values: {
+        name: props.nextNicName,
+        vnicProfileId: EMPTY_ID,
+        interface: NIC_INTERFACE_DEFAULT,
+        linked: true,
+      },
     }
 
     this.open = this.open.bind(this)
@@ -93,22 +93,24 @@ class NicEditor extends Component {
         showModal: true,
 
         id: nic.id,
-        name: nic.name,
-        vnicProfileId: nic.vnicProfile.id,
-        interface: nic.interface,
-        linked: nic.linked,
-        errors: {},
+        values: {
+          name: nic.name,
+          vnicProfileId: nic.vnicProfile.id,
+          interface: nic.interface,
+          linked: nic.linked,
+        },
       })
     } else {
       this.setState({
         showModal: true,
 
         id: undefined,
-        name: this.props.nextNicName,
-        vnicProfileId: EMPTY_ID,
-        interface: NIC_INTERFACE_DEFAULT,
-        linked: true,
-        errors: {},
+        values: {
+          name: this.props.nextNicName,
+          vnicProfileId: EMPTY_ID,
+          interface: NIC_INTERFACE_DEFAULT,
+          linked: true,
+        },
       })
     }
   }
@@ -120,41 +122,37 @@ class NicEditor extends Component {
   composeNic () {
     const nic = {
       id: this.state.id,
-      name: this.state.name,
+      name: this.state.values.name,
       vnicProfile: {
-        id: this.state.vnicProfileId,
+        id: this.state.values.vnicProfileId,
       },
-      interface: this.state.interface,
-      linked: this.state.linked,
+      interface: this.state.values.interface,
+      linked: this.state.values.linked,
     }
 
     return nic
   }
 
   changeName ({ target: { value } }) {
-    this.setState({ name: value })
+    this.setState((state) => ({ values: { ...state.values, name: value } }))
   }
 
   changeVnicProfile (value) {
-    this.setState((state) => ({ vnicProfileId: value, errors: { ...state.errors, vnicProfile: false } }))
+    this.setState((state) => ({ values: { ...state.values, vnicProfileId: value } }))
   }
 
   changeInterface (value) {
-    this.setState({ interface: value })
+    this.setState((state) => ({ values: { ...state.values, interface: value } }))
   }
 
   changeLinked (value) {
-    this.setState({ linked: !!value })
+    this.setState((state) => ({ values: { ...state.values, linked: !!value } }))
   }
 
   handleSave () {
-    if (this.state.vnicProfileId === EMPTY_ID) {
-      this.setState((state) => ({ errors: { ...state.errors, vnicProfile: true } }))
-    } else {
-      const newNic = this.composeNic()
-      this.props.onSave(newNic)
-      this.close()
-    }
+    const newNic = this.composeNic()
+    this.props.onSave(newNic)
+    this.close()
   }
 
   render () {
@@ -166,7 +164,7 @@ class NicEditor extends Component {
     const vnicList = [
       {
         id: EMPTY_ID,
-        value: msg.vnicProfileEmpty(),
+        value: msg.selectVnicProfile(),
       },
       ...vnicProfileList.map(
         item => ({
@@ -176,7 +174,7 @@ class NicEditor extends Component {
       ).toJS(),
     ]
 
-    const nicInterface = NIC_INTERFACES.find(ni => ni.id === this.state.interface)
+    const nicInterface = NIC_INTERFACES.find(ni => ni.id === this.state.values.interface)
     const canChangeInterface =
       createMode ||
       (
@@ -203,20 +201,20 @@ class NicEditor extends Component {
             onSubmit={e => { e.preventDefault() }}
             id={`${modalId}-form`}
           >
-            <FormGroup controlId={`${modalId}-name`} className='required'>
+            <FormGroup controlId={`${modalId}-name`}>
               <LabelCol sm={3}>
                 { msg.nicEditorNameLabel() }
               </LabelCol>
               <Col sm={9}>
                 <FormControl
                   type='text'
-                  defaultValue={this.state.name}
+                  defaultValue={this.state.values.name}
                   onChange={this.changeName}
                 />
               </Col>
             </FormGroup>
 
-            <FormGroup controlId={`${modalId}-vnic-profile`} className='required' validationState={this.state.errors['vnicProfile'] && 'error'}>
+            <FormGroup controlId={`${modalId}-vnic-profile`}>
               <LabelCol sm={3}>
                 { msg.vnicProfile() }
               </LabelCol>
@@ -224,10 +222,9 @@ class NicEditor extends Component {
                 <SelectBox
                   id={`${modalId}-vnic-profile`}
                   items={vnicList}
-                  selected={this.state.vnicProfileId}
+                  selected={this.state.values.vnicProfileId}
                   onChange={this.changeVnicProfile}
                 />
-                {this.state.errors['vnicProfile'] && <HelpBlock>{msg.pleaseChooseVnicProfile()}</HelpBlock>}
               </Col>
             </FormGroup>
 
@@ -253,7 +250,7 @@ class NicEditor extends Component {
                     <SelectBox
                       id={`${modalId}-interface`}
                       items={NIC_INTERFACES}
-                      selected={this.state.interface}
+                      selected={this.state.values.interface}
                       onChange={this.changeInterface}
                     />
                   }
@@ -267,7 +264,7 @@ class NicEditor extends Component {
                   <Radio
                     id={`${modalId}-link-state-on`}
                     name='nic-link-state-group'
-                    defaultChecked={this.state.linked}
+                    defaultChecked={this.state.values.linked}
                     onChange={() => { this.changeLinked(true) }}
                   >
                     { msg.nicEditorLinkStateUp() } <NicLinkStateIcon linkState idSuffix='up' showTooltip={false} />
@@ -275,7 +272,7 @@ class NicEditor extends Component {
                   <Radio
                     id={`${modalId}-link-state-off`}
                     name='nic-link-state-group'
-                    defaultChecked={!this.state.linked}
+                    defaultChecked={!this.state.values.linked}
                     onChange={() => { this.changeLinked(false) }}
                   >
                     { msg.nicEditorLinkStateDown() } <NicLinkStateIcon idSuffix='down' showTooltip={false} />
@@ -298,7 +295,8 @@ class NicEditor extends Component {
           <Button
             id={`${modalId}-button-ok`}
             bsStyle='primary'
-            onClick={this.handleSave}>
+            onClick={this.handleSave}
+            disabled={Object.values(this.state.values).reduce((acc, value) => !value && value !== false ? true : acc, false)}>
             { msg.ok() }
           </Button>
         </Modal.Footer>

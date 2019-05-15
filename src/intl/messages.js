@@ -394,7 +394,6 @@ export const messages: { [messageId: string]: MessageType } = {
   permissionsNoEditVm: 'You do not have the required permissions to edit a VM.',
   permissionsNoEditThisVm: 'You do not have permissions to edit VM {name} / {vmId}',
   pendingChanges: 'Pending Changes',
-  pleaseChooseVnicProfile: 'VNIC profile is required, please select a VNIC profile.',
   pleaseEnterValidVmName: 'Please enter a valid virtual machine name. Only lower-case and upper-case letters, numbers, and \'_\',\'-\',\'.\' are allowed.',
   preserveDisks: 'Preserve disks',
   publicSSHKey: 'Specify public key for access to guest serial console via SSH authentication.',
@@ -426,6 +425,7 @@ export const messages: { [messageId: string]: MessageType } = {
   secondDevice: 'Second Device',
   secondDeviceTooltip: 'Second device in order.',
   secondsShort: 's',
+  selectVnicProfile: '<Select a VNIC profile>',
   sendShortcutKey: 'Send Key',
   sendCtrlAltDel: 'Ctrl+Alt+Del',
   sessionExpired: {
@@ -545,7 +545,6 @@ export const messages: { [messageId: string]: MessageType } = {
   vncConsoleBrowser: 'VNC Console (Browser)',
   vncConsoleBrowserOpen: 'Open VNC Console (Browser)',
   vnicProfile: 'VNIC Profile',
-  vnicProfileEmpty: '<Empty>',
   yearsShort: 'y',
   yes: 'Yes',
   youHaveNoAllowedVnicProfiles: 'You cannot create or edit NICs because you do not have permission to use any vNIC Profiles in the VM\'s Data Center.',
