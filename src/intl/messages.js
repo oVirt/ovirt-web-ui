@@ -253,7 +253,6 @@ export const messages: { [messageId: string]: MessageType } = {
   failedToShutdownVm: 'Failed to shutdown the VM',
   failedToStartVm: 'Failed to start the VM',
   failedToSuspendVm: 'Failed to suspend the VM',
-  fieldIsRequired: 'This field is required',
   firstDevice: 'First Device',
   firstDeviceTooltip: 'First device in order.',
   force: 'Force',

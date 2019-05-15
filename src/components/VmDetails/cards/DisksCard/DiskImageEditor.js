@@ -92,17 +92,21 @@ class DiskImageEditor extends Component {
       storageDomainSelectList: storageDomainsToSelectList(props.storageDomainList),
 
       id: undefined,
-      alias: props.suggestedName || '',
-      size: DISK_DEFAULTS.provisionedSize / 1024 ** 3,
-      storageDomain: props.suggestedStorageDomain || '',
-      format: DISK_DEFAULTS.format, // cow vs raw .. Allocation Policy (thin sparse vs preallocated !sparse)?
+      values: {
+        alias: props.suggestedName || '',
+        size: DISK_DEFAULTS.provisionedSize / 1024 ** 3,
+        storageDomain: props.suggestedStorageDomain || '',
+        format: DISK_DEFAULTS.format, // cow vs raw .. Allocation Policy (thin sparse vs preallocated !sparse)?
+      },
       errors: {},
     }
     this.changesMade = false
 
     this.open = this.open.bind(this)
     this.close = this.close.bind(this)
-    this.composeNic = this.composeDisk.bind(this)
+    this.composeDisk = this.composeDisk.bind(this)
+    this.isFormValid = this.isFormValid.bind(this)
+    this.validateField = this.validateField.bind(this)
     this.handleSave = this.handleSave.bind(this)
 
     this.changeAlias = this.changeAlias.bind(this)
@@ -119,20 +123,24 @@ class DiskImageEditor extends Component {
     const diskInfo = disk
       ? { // edit
         id: disk.get('id'),
-        alias: disk.get('name'),
-        size: 0,
-        storageDomain: disk.get('storageDomainId'),
-        format: disk.get('format'),
+        values: {
+          alias: disk.get('name'),
+          size: 0,
+          storageDomain: disk.get('storageDomainId'),
+          format: disk.get('format'),
+        },
       }
       : { // new
         id: undefined,
-        alias: suggestedName,
-        size: DISK_DEFAULTS.provisionedSize / 1024 ** 3,
-        storageDomain:
-          (/\w+/.test(suggestedStorageDomain) && suggestedStorageDomain) ||
-          (storageDomainSelectList.length > 0 && storageDomainSelectList[0].id) ||
-          '',
-        format: DISK_DEFAULTS.format,
+        values: {
+          alias: suggestedName,
+          size: DISK_DEFAULTS.provisionedSize / 1024 ** 3,
+          storageDomain:
+            (/\w+/.test(suggestedStorageDomain) && suggestedStorageDomain) ||
+            (storageDomainSelectList.length > 0 && storageDomainSelectList[0].id) ||
+            '',
+          format: DISK_DEFAULTS.format,
+        },
         errors: {},
       }
 
@@ -153,7 +161,7 @@ class DiskImageEditor extends Component {
 
     const vmDiskInSameStorageDomain =
       vm.get('disks') &&
-      vm.get('disks').find(disk => disk.get('storageDomainId') === this.state.storageDomain)
+      vm.get('disks').find(disk => disk.get('storageDomainId') === this.state.values.storageDomain)
 
     const iface =
       (disk && disk.get('iface')) ||
@@ -161,8 +169,8 @@ class DiskImageEditor extends Component {
       'virtio_scsi'
 
     const provisionedSize = disk
-      ? disk.get('provisionedSize') + this.state.size * 1024 ** 3
-      : this.state.size * 1024 ** 3
+      ? disk.get('provisionedSize') + this.state.values.size * 1024 ** 3
+      : this.state.values.size * 1024 ** 3
 
     const newDisk = {
       ...DISK_DEFAULTS,
@@ -171,11 +179,11 @@ class DiskImageEditor extends Component {
       iface,
 
       id: this.state.id,
-      name: this.state.alias,
+      name: this.state.values.alias,
       provisionedSize,
-      storageDomainId: this.state.storageDomain,
-      format: this.state.format,
-      sparse: this.state.format === 'cow',
+      storageDomainId: this.state.values.storageDomain,
+      format: this.state.values.format,
+      sparse: this.state.values.format === 'cow',
     }
 
     if (disk && disk.get('type') !== 'image') {
@@ -186,13 +194,25 @@ class DiskImageEditor extends Component {
     return newDisk
   }
 
-  handleSave () {
-    if (this.state.alias.length === 0) {
-      this.setState((state) => ({ errors: { ...state.errors, 'alias': msg.fieldIsRequired() } }))
-      return
+  validateField (field = '') {
+    return () => {
+      const errors = {}
+      let isErrors = false
+      switch (field) {
+        case 'alias':
+          if (!isDiskNameValid(this.state.values.alias)) {
+            errors['alias'] = msg.pleaseEnterValidDiskName()
+            isErrors = true
+          }
+          break
+      }
+      this.setState((state) => ({ errors: { ...state.errors, ...errors } }))
+      return isErrors
     }
-    if (!isDiskNameValid(this.state.alias)) {
-      this.setState((state) => ({ errors: { ...state.errors, 'alias': msg.pleaseEnterValidDiskName() } }))
+  }
+
+  handleSave () {
+    if (this.validateField('alias')()) {
       return
     }
     if (!this.props.disk || this.changesMade) {
@@ -203,25 +223,31 @@ class DiskImageEditor extends Component {
   }
 
   changeAlias ({ target: { value } }) {
-    this.setState((state) => ({ alias: value, errors: { ...state.errors, 'alias': '' } }))
+    this.setState((state) => ({ values: { ...state.values, alias: value }, errors: { ...state.errors, 'alias': '' } }))
     this.changesMade = true
   }
 
   changeSize ({ target: { value } }) {
     if (isNumber(value) && value >= 0) {
-      this.setState({ size: value })
+      this.setState((state) => ({ values: { ...state.values, size: value } }))
       this.changesMade = true
     }
   }
 
   changeStorageDomain (value) {
-    this.setState({ storageDomain: value })
+    this.setState((state) => ({ values: { ...state.values, storageDomain: value } }))
     this.changesMade = true
   }
 
   changeFormat (value) {
-    this.setState({ format: value })
+    this.setState((state) => ({ values: { ...state.values, format: value } }))
     this.changesMade = true
+  }
+
+  isFormValid () {
+    const isNotAllFieldFilled = Object.values(this.state.values).reduce((acc, value) => !value ? true : acc, false)
+    const isErrors = Object.values(this.state.errors).reduce((acc, value) => value ? true : acc, false)
+    return isNotAllFieldFilled || isErrors
   }
 
   render () {
@@ -254,15 +280,16 @@ class DiskImageEditor extends Component {
             id={`${idPrefix}-modal-form`}
           >
             {/* Alias */}
-            <FormGroup controlId={`${idPrefix}-alias`} className={createMode && 'required'} validationState={this.state.errors['alias'] && 'error'}>
+            <FormGroup controlId={`${idPrefix}-alias`} validationState={this.state.errors['alias'] && 'error'}>
               <LabelCol sm={3}>
                 { msg.diskEditorAliasLabel() }
               </LabelCol>
               <Col sm={9}>
                 <FormControl
                   type='text'
-                  defaultValue={this.state.alias}
+                  defaultValue={this.state.values.alias}
                   onChange={this.changeAlias}
+                  onBlur={this.validateField('alias')}
                 />
                 {this.state.errors['alias'] && <HelpBlock>{this.state.errors['alias']}</HelpBlock>}
               </Col>
@@ -291,7 +318,7 @@ class DiskImageEditor extends Component {
 
             {/* Size Editor (initial size for create, expand by size for edit) */}
             { (createMode || isImage) &&
-            <FormGroup controlId={`${idPrefix}-size-edit`} className={createMode && 'required'}>
+            <FormGroup controlId={`${idPrefix}-size-edit`}>
               <LabelCol sm={3}>
                 { createMode &&
                   <React.Fragment>
@@ -308,7 +335,7 @@ class DiskImageEditor extends Component {
               <Col sm={9}>
                 <FormControl
                   type='number'
-                  value={this.state.size}
+                  value={this.state.values.size}
                   onChange={this.changeSize}
                 />
               </Col>
@@ -316,7 +343,7 @@ class DiskImageEditor extends Component {
             }
 
             {/* Storage Domain */}
-            <FormGroup controlId={`${idPrefix}-storage-domain`} className={createMode && 'required'}>
+            <FormGroup controlId={`${idPrefix}-storage-domain`}>
               <LabelCol sm={3}>
                 { msg.diskEditorStorageDomainLabel() }
                 <FieldLevelHelp
@@ -334,14 +361,14 @@ class DiskImageEditor extends Component {
                   <SelectBox
                     id={`${idPrefix}-storage-domain`}
                     items={this.state.storageDomainSelectList}
-                    selected={this.state.storageDomain}
+                    selected={this.state.values.storageDomain}
                     onChange={this.changeStorageDomain}
                   />
                 }
                 { !createMode && !isDirectLUN &&
                   <div id={`${idPrefix}-storage-domain`} className={style['editor-field-read-only']}>
                     {
-                      this.props.storageDomains.getIn([this.state.storageDomain, 'name']) ||
+                      this.props.storageDomains.getIn([this.state.values.storageDomain, 'name']) ||
                       msg.diskEditorStorageDomainNotAvailable()
                     }
                   </div>
@@ -355,7 +382,7 @@ class DiskImageEditor extends Component {
             </FormGroup>
 
             {/* Disk Format */}
-            <FormGroup controlId={`${idPrefix}-format`} className={createMode && 'required'}>
+            <FormGroup controlId={`${idPrefix}-format`}>
               <LabelCol sm={3}>
                 { msg.diskEditorFormatLabel() }
                 <FieldLevelHelp
@@ -376,14 +403,14 @@ class DiskImageEditor extends Component {
                       { id: 'raw', value: msg.diskEditorFormatOptionRaw() },
                       { id: 'cow', value: msg.diskEditorFormatOptionCow() },
                     ]}
-                    selected={this.state.format}
+                    selected={this.state.values.format}
                     onChange={this.changeFormat}
                   />
                 }
                 { !createMode && !isDirectLUN &&
                   <div id={`${idPrefix}-format`} className={style['editor-field-read-only']}>
-                    { this.state.format === 'raw' && msg.diskEditorFormatOptionRaw() }
-                    { this.state.format === 'cow' && msg.diskEditorFormatOptionCow() }
+                    { this.state.values.format === 'raw' && msg.diskEditorFormatOptionRaw() }
+                    { this.state.values.format === 'cow' && msg.diskEditorFormatOptionCow() }
                   </div>
                 }
                 { isDirectLUN &&
@@ -409,6 +436,7 @@ class DiskImageEditor extends Component {
             id={`${idPrefix}-modal-ok`}
             bsStyle='primary'
             onClick={this.handleSave}
+            disabled={this.isFormValid()}
           >
             { msg.ok() }
           </Button>
