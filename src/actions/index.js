@@ -39,6 +39,7 @@ export * from './activeRequests'
 export * from './console'
 export * from './userMessages'
 export * from './disks'
+export * from './roles'
 
 export function appConfigured () {
   return { type: APP_CONFIGURED }

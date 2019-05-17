@@ -15,14 +15,14 @@ import Api from '_/ovirtapi'
 import AppConfiguration from '_/config'
 import { saveToLocalStorage } from '_/storage'
 
-import vmSnapshotsSagas from '_/components/VmDetails/cards/SnapshotsCard/sagas'
-import optionsDialogSagas from '_/components/OptionsDialog/sagas'
-import vmDisksSagas from './disks'
-import storageDomainSagas, { fetchIsoFiles } from './storageDomains'
-import loginSagas from './login'
-import { fetchUnknownIcons } from './osIcons'
-import templateSagas from './templates'
-import vmChangeSagas from './vmChanges'
+import sagasDisks from './disks'
+import sagasLogin from './login'
+import sagasOptionsDialog from '_/components/OptionsDialog/sagas'
+import sagasRoles from './roles'
+import sagasStorageDomains, { fetchIsoFiles } from './storageDomains'
+import sagasTemplates from './templates'
+import sagasVmChanges from './vmChanges'
+import sagasVmSnapshots from '_/components/VmDetails/cards/SnapshotsCard/sagas'
 
 import {
   setChanged,
@@ -77,6 +77,8 @@ import {
   fetchPermits,
   PermissionsType,
 } from './utils'
+
+import { fetchUnknownIcons } from './osIcons'
 
 import {
   downloadVmConsole,
@@ -939,7 +941,7 @@ function* navigateToVmDetails ({ payload: { vmId } }) {
 
 export function* rootSaga () {
   yield all([
-    ...loginSagas,
+    ...sagasLogin,
     takeLatest(CHECK_TOKEN_EXPIRED, doCheckTokenExpired),
     takeEvery(DELAYED_REMOVE_ACTIVE_REQUEST, delayedRemoveActiveRequest),
 
@@ -981,11 +983,12 @@ export function* rootSaga () {
     takeEvery(SAVE_FILTERS, saveFilters),
 
     // Sagas from Components
-    ...vmDisksSagas,
-    ...storageDomainSagas,
-    ...vmSnapshotsSagas,
-    ...optionsDialogSagas,
-    ...templateSagas,
-    ...vmChangeSagas,
+    ...sagasDisks,
+    ...sagasOptionsDialog,
+    ...sagasRoles,
+    ...sagasStorageDomains,
+    ...sagasTemplates,
+    ...sagasVmChanges,
+    ...sagasVmSnapshots,
   ])
 }

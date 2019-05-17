@@ -91,6 +91,12 @@ const OvirtApi = {
     const url = `${AppConfiguration.applicationContext}/api/`
     return httpGet({ url })
   },
+  getRoles (): Promise<Object> {
+    assertLogin({ methodName: 'getRoles' })
+    const url = `${AppConfiguration.applicationContext}/api/roles?follow=permits`
+    return httpGet({ url })
+  },
+
   getVm ({ vmId, additional }: { vmId: string, additional: Array<string> }): Promise<Object> {
     assertLogin({ methodName: 'getVm' })
     let url = `${AppConfiguration.applicationContext}/api/vms/${vmId}`
@@ -617,3 +623,6 @@ function getOptionWithoutDefault (optionName: string, version: string): Promise<
 }
 
 export default OvirtApi
+export {
+  Transforms,
+}

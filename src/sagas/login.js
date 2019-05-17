@@ -26,6 +26,7 @@ import {
   getAllTemplates,
   getAllVnicProfiles,
   getIsoFiles,
+  getRoles,
   getUserGroups,
 
   downloadConsole,
@@ -51,6 +52,7 @@ import {
   fetchUserGroups,
 } from './index'
 import { downloadVmConsole } from './console'
+import { fetchRoles } from './roles'
 import { fetchServerConfiguredValues } from './server-configs'
 import { fetchDataCentersAndStorageDomains, fetchIsoFiles } from './storageDomains'
 import { loadIconsFromLocalStorage } from './osIcons'
@@ -189,6 +191,7 @@ function* initialLoad () {
   // no data prerequisites
   yield all([
     call(loadIconsFromLocalStorage),
+    call(fetchRoles, getRoles()),
     call(fetchUserGroups, getUserGroups()),
     call(fetchAllOS, getAllOperatingSystems()),
     call(fetchAllHosts, getAllHosts()),

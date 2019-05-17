@@ -24,6 +24,7 @@ import type {
   ApiVnicProfileType, VnicProfileType,
   ApiPermissionType, PermissionType,
   ApiEventType, EventType,
+  ApiRoleType, RoleType,
 } from './types'
 
 import {
@@ -851,14 +852,40 @@ const VmSessions = {
   toApi: undefined,
 }
 
+//
+//
 const Permissions = {
   toInternal ({ permissions }: { permissions: Array<ApiPermissionType> }): Array<PermissionType> {
     return permissions.map(permission => ({
       name: permission.role.name,
       userId: permission.user && permission.user.id,
       groupId: permission.group && permission.group.id,
+      roleId: permission.role && permission.role.id,
       permits: permission.role.permits ? permission.role.permits.permit.map(permit => ({ name: permit.name })) : [],
     }))
+  },
+
+  toApi: undefined,
+}
+
+//
+//
+const Role = {
+  toInternal ({ role }: { role: ApiRoleType }): RoleType {
+    const permits = role.permits && role.permits.permit && Array.isArray(role.permits.permit)
+      ? role.permits.permit.map(permit => ({
+        id: permit.id,
+        administrative: convertBool(permit.administrative),
+        name: permit.name,
+      }))
+      : []
+
+    return {
+      id: role.id,
+      administrative: convertBool(role.administrative),
+      name: role.name,
+      permits,
+    }
   },
 
   toApi: undefined,
@@ -881,6 +908,8 @@ const CloudInit = {
   toApi: undefined,
 }
 
+//
+//
 const Event = {
   toInternal ({ event }: { event: ApiEventType }): EventType {
     return {
@@ -920,4 +949,5 @@ export {
   CloudInit,
   Permissions,
   Event,
+  Role,
 }

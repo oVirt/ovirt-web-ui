@@ -1,6 +1,7 @@
 import {
   call,
   put,
+  select,
 } from 'redux-saga/effects'
 
 import AppConfiguration from '_/config'
@@ -161,6 +162,39 @@ export function* delayInMsSteps (count = 20, msMultiplier = 2000) {
 export function* fetchPermits ({ entityType, id }) {
   const permissions = yield callExternalAction(`get${entityType}Permissions`, Api[`get${entityType}Permissions`], { payload: { id } })
   return getUserPermits(Api.permissionsToInternal({ permissions: permissions.permission }))
+}
+
+/**
+ * Convert a set of permissions to a set of permits for the app's current user by
+ * mapping the permissions through their assigned roles to the permits.
+ *
+ * NOTE: If the user is an admin user the user's group and id membership must be
+ * explicitly checked.
+ */
+export function* permissionsToUserPermits (permissions) {
+  const userFilter = yield select(state => state.config.get('filter'))
+  const userGroups = yield select(state => state.config.get('userGroups'))
+  const userId = yield select(state => state.config.getIn(['user', 'id']))
+  const roles = yield select(state => state.roles)
+
+  const permitNames = []
+  for (const permission of (Array.isArray(permissions) ? permissions : [permissions])) {
+    if (userFilter ||
+      (
+        (permission.groupId && userGroups.includes(permission.groupId)) ||
+        (permission.userId && permission.userId === userId)
+      )
+    ) {
+      const role = roles.get(permission.roleId)
+      if (!role) {
+        console.info('Could find role in redux state, roleId:', permission.roleId)
+      } else {
+        permitNames.push(...role.get('permitNames', []))
+      }
+    }
+  }
+
+  return new Set(permitNames)
 }
 
 export const PermissionsType = {
