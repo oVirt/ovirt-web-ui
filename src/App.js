@@ -96,10 +96,10 @@ const App = ({ history, config, appReady }) => {
       <div id='app-container'>
         <VmsPageHeader title={fixedStrings.BRAND_NAME + ' ' + msg.vmPortal()} />
         <OvirtApiCheckFailed />
-        <SessionActivityTracker />
-        { appReady && renderRoutes(getRoutes()) }
         <LoadingData />
         <ToastNotifications />
+        { appReady && <SessionActivityTracker /> }
+        { appReady && renderRoutes(getRoutes()) }
       </div>
     </ConnectedRouter>
   )
