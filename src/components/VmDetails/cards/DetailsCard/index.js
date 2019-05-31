@@ -676,10 +676,12 @@ class DetailsCard extends React.Component {
                           <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id={`${idPrefix}-ip-not-available`} />
                         }
                         { ip4Addresses.length > 0 &&
-                          ip4Addresses.map((ip4, index) => <div key={`ip4-${index}`} id={`${idPrefix}-ip-ipv4-${index}`}>{ip4}</div>)
+                          ip4Addresses.map((ip4, index) => <FieldValue tooltip={ip4} key={`ip4-${index}`} id={`${idPrefix}-ip-ipv4-${index}`}>
+                            {ip4}</FieldValue>)
                         }
                         { ip6Addresses.length > 0 &&
-                          ip6Addresses.map((ip4, index) => <div key={`ip4-${index}`} id={`${idPrefix}-ip-ipv6-${index}`}>{ip4}</div>)
+                          ip6Addresses.map((ip4, index) => <FieldValue tooltip={ip4} key={`ip4-${index}`} id={`${idPrefix}-ip-ipv6-${index}`}>
+                            {ip4}</FieldValue>)
                         }
                       </React.Fragment>
                     </FieldRow>
