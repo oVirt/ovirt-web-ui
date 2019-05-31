@@ -18,7 +18,7 @@ class SessionActivityTracker extends React.Component {
       counter: props.config.get('userSessionTimeoutInterval'),
     }
 
-    this.dropCounter = this.dropCounter.bind(this)
+    this.resetTimeoutCounter = this.resetTimeoutCounter.bind(this)
     this.decrementCounter = this.decrementCounter.bind(this)
   }
 
@@ -31,36 +31,37 @@ class SessionActivityTracker extends React.Component {
     return null
   }
 
-  dropCounter () {
+  resetTimeoutCounter () {
     if (!this.state.showTimeoutModal) {
       this.setState({ counter: this.props.config.get('userSessionTimeoutInterval') })
     }
   }
 
   decrementCounter () {
-    this.setState(state => {
-      const { counter } = state
-      if (counter !== null) {
-        return {
-          counter: counter - 1,
-          showTimeoutModal: counter <= TIME_TO_DISPLAY_MODAL,
+    if (this.state.counter === null) { // counter is null if timeout value hasn't been fetched yet
+      return
+    }
+
+    this.setState(
+      state => ({
+        counter: state.counter - 1,
+        showTimeoutModal: state.counter <= TIME_TO_DISPLAY_MODAL,
+      }),
+      () => {
+        if (this.state.counter <= 0) {
+          this.props.onLogout()
         }
       }
-      return null
-    }, () => {
-      if (this.state.counter <= 0) {
-        this.props.onLogout()
-      }
-    })
+    )
   }
 
   componentDidMount () {
-    document.body.addEventListener('mousemove', this.dropCounter)
+    document.body.addEventListener('mousemove', this.resetTimeoutCounter)
     this.timer = setInterval(this.decrementCounter, 1000)
   }
 
   componentWillUnmount () {
-    document.body.removeEventListener('mousemove', this.dropCounter)
+    document.body.removeEventListener('mousemove', this.resetTimeoutCounter)
     if (this.timer) {
       clearInterval(this.timer)
     }
