@@ -97,6 +97,9 @@ const DEFAULT_BOOT_DEVICES = List(['hd', null])
 class DetailsCard extends React.Component {
   constructor (props) {
     super(props)
+    const vmClusterId = props.vm.getIn(['cluster', 'id'])
+    const vmDataCenterId = props.clusters.getIn([vmClusterId, 'dataCenterId'])
+
     this.state = {
       vm: props.vm, // ImmutableJS Map
 
@@ -108,9 +111,9 @@ class DetailsCard extends React.Component {
       promptHotPlugChanges: false,
       promptNextRunChanges: false,
 
-      isoList: createIsoList(props.storageDomains),
+      isoList: createIsoList(props.storageDomains, vmDataCenterId),
       clusterList: createClusterList(props.clusters),
-      osList: createOsList(props.vm.getIn(['cluster', 'id']), props.clusters, props.operatingSystems),
+      osList: createOsList(vmClusterId, props.clusters, props.operatingSystems),
     }
     this.trackUpdates = {}
     this.hotPlugUpdates = {}
@@ -165,19 +168,22 @@ class DetailsCard extends React.Component {
     // NOTE: Doing the following here instead of getDerivedStateFromProps so __clusters__,
     //       __storageDomains__, and __operatingSystems__ don't need to be kept in state for
     //       change comparison
+    const vmClusterId = this.props.vm.getIn(['cluster', 'id'])
+
     if (prevProps.clusters !== this.props.clusters) {
       this.setState({ clusterList: createClusterList(this.props.clusters) }) // eslint-disable-line react/no-did-update-set-state
     }
 
     if (prevProps.storageDomains !== this.props.storageDomains) {
-      this.setState({ isoList: createIsoList(this.props.storageDomains) }) // eslint-disable-line react/no-did-update-set-state
+      const vmDataCenterId = this.props.clusters.getIn([vmClusterId, 'dataCenterId'])
+      this.setState({ isoList: createIsoList(this.props.storageDomains, vmDataCenterId) }) // eslint-disable-line react/no-did-update-set-state
     }
 
     if (prevProps.operatingSystems !== this.props.operatingSystems ||
       prevProps.clusters !== this.props.clusters ||
-      prevProps.vm.getIn(['cluster', 'id']) !== this.props.vm.getIn(['cluster', 'id'])
+      prevProps.vm.getIn(['cluster', 'id']) !== vmClusterId
     ) {
-      this.setState({ osList: createOsList(this.props.vm.getIn(['cluster', 'id']), this.props.clusters, this.props.operatingSystems) }) // eslint-disable-line react/no-did-update-set-state
+      this.setState({ osList: createOsList(vmClusterId, this.props.clusters, this.props.operatingSystems) }) // eslint-disable-line react/no-did-update-set-state
     }
   }
 
