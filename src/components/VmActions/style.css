@@ -52,3 +52,12 @@
 .action-height button {
     height: 27px;
 }
+
+:global(.actions-line .dropdown) {
+    margin-left: 5px;
+}
+
+:global(.actions-line .dropdown) > :global(.btn):first-child {
+    height: 27px;
+}
+

@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { excludeKeys } from 'patternfly-react'
+import { excludeKeys, DropdownButton, MenuItem } from 'patternfly-react'
 
 import { hrefWithoutHistory } from '_/helpers'
 
@@ -17,6 +17,7 @@ class Action extends React.Component {
   handleOpen (e) {
     if (e && e.preventDefault) e.preventDefault()
     this.setState({ showModal: true })
+    this.props.children.props.onClick && this.props.children.props.onClick(e)
   }
 
   handleClose () {
@@ -87,13 +88,49 @@ Button.propTypes = {
   id: PropTypes.string.isRequired,
 }
 
+const MenuItemAction = ({ id, confirmation, shortTitle, icon, onClick }) => {
+  return <Action confirmation={confirmation}>
+    <MenuItem
+      id={id}
+      onClick={() => {
+        onClick && onClick()
+        document.dispatchEvent(new MouseEvent('click'))
+      }}
+    >
+      <span>{shortTitle}</span> { icon }
+    </MenuItem>
+  </Action>
+}
+
+MenuItemAction.propTypes = {
+  id: PropTypes.string.isRequired,
+  confirmation: PropTypes.node,
+  shortTitle: PropTypes.string.isRequired,
+  icon: PropTypes.node,
+  onClick: PropTypes.func,
+}
+
 const ActionButtonWraper = (props) => {
-  const btnProps = excludeKeys(props, [ 'confirmation' ])
-  return <Action confirmation={props.confirmation} key={props.shortTitle}><Button {...btnProps} /></Action>
+  const btnProps = excludeKeys(props, [ 'confirmation', 'items' ])
+  const { items, actionDisabled, confirmation, shortTitle } = props
+  if (items && items.filter(i => i !== null).length > 0) {
+    return <DropdownButton
+      title={shortTitle}
+      bsStyle={props.bsStyle}
+      id='console-selector'
+      disabled={actionDisabled}
+    >
+      { items.filter(i => i !== null && !i.actionDisabled).map(item => {
+        return <MenuItemAction key={item.id} {...item} />
+      }) }
+    </DropdownButton>
+  }
+  return <Action confirmation={confirmation} key={shortTitle}><Button {...btnProps} /></Action>
 }
 ActionButtonWraper.propTypes = {
   confirmation: PropTypes.node,
+  items: PropTypes.array,
   ...Button.propTypes,
 }
 
-export { ActionButtonWraper }
+export { ActionButtonWraper, MenuItemAction }

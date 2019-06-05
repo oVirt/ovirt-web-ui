@@ -13,6 +13,7 @@ import {
   SET_USER_FILTER_PERMISSION,
   SET_USER_GROUPS,
   SET_USER_SESSION_TIMEOUT_INTERVAL,
+  SET_WEBSOCKET,
   SHOW_TOKEN_EXPIRED_MSG,
 } from '_/constants'
 
@@ -40,6 +41,7 @@ const initialState = Immutable.fromJS({
   maxNumberOfCores: 254,
   maxNumberOfThreads: 8,
   maxNumOfVmCpus: 1,
+  websocket: null,
   blankTemplateId: '00000000-0000-0000-0000-000000000000', // "engine/api/" -> special_objects.blank_template.id
 })
 
@@ -76,6 +78,9 @@ const config = actionReducer(initialState, {
   },
   [SET_USB_FILTER] (state, { payload: { usbFilter } }) {
     return state.set('usbFilter', usbFilter)
+  },
+  [SET_WEBSOCKET] (state, { payload: { websocket } }) {
+    return state.set('websocket', Immutable.fromJS(websocket))
   },
   [SET_USER_GROUPS] (state, { payload: { groups } }) {
     return state.set('userGroups', groups)

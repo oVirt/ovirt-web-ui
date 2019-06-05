@@ -9,12 +9,14 @@ import { doesVmSessionExistForUserId } from '_/utils'
 import {
   downloadConsole,
   getConsoleOptions as getConsoleOptionsAction,
-  setConsoleInUse,
-  setConsoleLogon,
   setConsoleOptions,
-  setVmConsoles,
   setVmSessions,
-  vmActionInProgress,
+  setConsoleStatus,
+  setConsoleTickets,
+  setInUseConsoleModalState,
+  setLogonConsoleModalState,
+  closeConsoleModal,
+  setNewConsoleModal,
 } from '_/actions'
 
 import { callExternalAction } from '../utils'
@@ -23,44 +25,35 @@ import { fetchVmSessions } from '../index'
 import { adjustVVFile } from './vvFileUtils'
 import RDPBuilder from './rdpBuilder'
 
+import { push } from 'connected-react-router'
+import { setActiveConsole } from '../../actions'
+import { INIT_CONSOLE, DOWNLOAD_CONSOLE } from '_/constants'
+
 // ----- Connection files
 /**
  * Push a virt-viewer connection file (__console.vv__) to connect a user to a VM's console
  */
 export function* downloadVmConsole (action) {
-  let { vmId, consoleId, usbFilter, hasGuestAgent, skipSSO } = action.payload
+  let { modalId, vmId, consoleId, usbFilter, hasGuestAgent, skipSSO, openInPage, isNoVNC } = action.payload
 
   let isSpice = false
-
   if (hasGuestAgent && !skipSSO) {
     let result = yield callExternalAction('vmLogon', Api.vmLogon, { payload: { vmId } }, true)
     if (!result || result.status !== 'complete') {
-      yield put(setConsoleLogon({ vmId, isLogon: false }))
+      yield put(setLogonConsoleModalState({ modalId }))
       return
     }
   }
 
-  yield put(setConsoleLogon({ vmId, isLogon: true }))
-  if (!consoleId) {
-    yield put(vmActionInProgress({ vmId, name: 'getConsole', started: true }))
-    const consolesInternal = yield fetchConsoleVmMeta({ vmId })
-    yield put(setVmConsoles({ vmId, consoles: consolesInternal }))
-    yield put(vmActionInProgress({ vmId, name: 'getConsole', started: false }))
+  yield put(closeConsoleModal({ modalId }))
 
-    // TODO: choose user default over just "SPICE"
-    if (consolesInternal && consolesInternal.length > 0) {
-      let console = consolesInternal.find(c => c.protocol === 'spice') || consolesInternal[0]
-      consoleId = console.id
-      if (console.protocol === 'spice') {
-        isSpice = true
-      }
-    }
-  }
-
-  if (consoleId) {
-    let data = yield callExternalAction('console', Api.console, { type: 'INTERNAL_CONSOLE', payload: { vmId, consoleId } })
-
-    if (data.error === undefined) {
+  let data = yield callExternalAction('console', Api.console, { type: 'INTERNAL_CONSOLE', payload: { vmId, consoleId } })
+  if (data.error === undefined) {
+    yield put(setActiveConsole({ vmId, consoleId }))
+    /**
+     *Download console if type is spice or novnc is running already
+     */
+    if (data.indexOf('type=spice') > -1 || !isNoVNC) {
       let options = Selectors.getConsoleOptions({ vmId })
       if (!options) {
         logger.log('downloadVmConsole() console options not yet present, trying to load from local storage')
@@ -69,9 +62,19 @@ export function* downloadVmConsole (action) {
 
       data = adjustVVFile({ data, options, usbFilter, isSpice })
       fileDownload({ data, fileName: `console.vv`, mimeType: 'application/x-virt-viewer' })
+      yield put(setConsoleStatus({ vmId, status: DOWNLOAD_CONSOLE }))
+    } else {
+      let dataTicket = yield callExternalAction('consoleProxyTicket', Api.consoleProxyTicket,
+        { type: 'INTRENAL_CONSOLE', payload: { vmId, consoleId } })
+      let ticket = yield callExternalAction('consoleTicket', Api.consoleTicket,
+        { type: 'INTRENAL_CONSOLE', payload: { vmId, consoleId } })
+      yield put(setConsoleTickets({ vmId, proxyTicket: dataTicket.proxy_ticket.value, ticket: ticket.ticket }))
+      yield put(setConsoleStatus({ vmId, status: INIT_CONSOLE }))
+    }
+    if (openInPage || isNoVNC) {
+      yield put(push('/vm/' + vmId + '/console/' + consoleId))
     }
   }
-  yield put(setConsoleInUse({ vmId, consoleInUse: null }))
 }
 
 /**
@@ -99,8 +102,9 @@ export function* fetchConsoleVmMeta ({ vmId }) {
  * console, flag the console as "in use" requiring manual confirmation to open the
  * console (which will disconnect the other user's existing session).
  */
-export function* getConsoleInUse (action) {
-  let { vmId, usbFilter, userId, hasGuestAgent } = action.payload
+export function* openConsoleModal (action) {
+  let { modalId, vmId, usbFilter, userId, hasGuestAgent, consoleId, isNoVNC, openInPage } = action.payload
+  yield put(setNewConsoleModal({ modalId, vmId, consoleId }))
   const sessionsInternal = yield fetchVmSessions({ vmId })
   const consoleUsers = sessionsInternal && sessionsInternal
     .filter(session => session.consoleUser)
@@ -108,16 +112,18 @@ export function* getConsoleInUse (action) {
   yield put(setVmSessions({ vmId, sessions: sessionsInternal }))
 
   if (consoleUsers.length > 0 && consoleUsers.find(user => user.id === userId) === undefined) {
-    yield put(setConsoleInUse({ vmId, consoleInUse: true }))
+    yield put(setInUseConsoleModalState({ modalId }))
   } else {
-    yield put(setConsoleInUse({ vmId, consoleInUse: false }))
     yield put(downloadConsole({
+      modalId,
       vmId,
       usbFilter,
       hasGuestAgent,
-      skipSSO: doesVmSessionExistForUserId(sessionsInternal, userId), // Parameter for skiping SSO authorization
+      consoleId,
+      isNoVNC,
+      openInPage,
+      skipSSO: doesVmSessionExistForUserId(sessionsInternal, userId),
     }))
-    yield put(setConsoleInUse({ vmId, consoleInUse: null }))
   }
 }
 

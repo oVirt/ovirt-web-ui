@@ -24,13 +24,16 @@ import {
   startPool,
   startVm,
   removeVm,
+  getRDP,
 } from '_/actions'
 
-import { SplitButton, MenuItem } from 'patternfly-react'
+import { isWindows } from '_/helpers'
+
+import { SplitButton, Icon } from 'patternfly-react'
 import Checkbox from '../Checkbox'
 import ConfirmationModal from './ConfirmationModal'
 import ConsoleConfirmationModal from './ConsoleConfirmationModal'
-import Action, { ActionButtonWraper } from './Action'
+import Action, { ActionButtonWraper, MenuItemAction } from './Action'
 
 const EmptyAction = ({ state, isOnCard }) => {
   if (!canConsole(state) && !canShutdown(state) && !canRestart(state) && !canStart(state)) {
@@ -65,11 +68,11 @@ class VmDropdownActions extends React.Component {
           onClick={actionsCopy[0].onClick}
           id={id}
         >
-          { actionsCopy.slice(1).map(action => <Action key={action.shortTitle} confirmation={action.confirmation}>
-            <MenuItem id={action.id} onClick={action.onClick}>
-              {action.shortTitle}
-            </MenuItem>
-          </Action>) }
+          { [].concat(...actionsCopy.slice(1).map(action => {
+            return action.items && action.items.length > 0
+              ? action.items.filter(a => a !== null && !a.actionDisabled).map(a => <MenuItemAction key={a.shortTitle} {...a} />)
+              : <MenuItemAction key={action.shortTitle} {...action} />
+          }))}
         </SplitButton>
       </Action>
     )
@@ -105,12 +108,14 @@ class VmActions extends React.Component {
       vm,
       pool,
       idPrefix = `vmaction-${vm.get('name')}`,
+      config,
       onStartVm,
       onStartPool,
       onShutdown,
       onRestart,
       onForceShutdown,
       onSuspend,
+      onRDP,
     } = this.props
     const isPool = !!pool
     const status = vm.get('status')
@@ -137,7 +142,41 @@ class VmActions extends React.Component {
       extra={{ title: msg.force(), onClick: () => onForceShutdown() }} />)
     const rebootConfirmation = (<ConfirmationModal title={msg.rebootVm()} body={msg.rebootVmQuestion()}
       confirm={{ title: msg.yes(), onClick: () => onRestart() }} />)
-    const consoleConfirmation = (<ConsoleConfirmationModal vm={vm} />)
+
+    const vncConsole = vm.get('consoles').find(c => c.get('protocol') === 'vnc')
+    const hasRdp = isWindows(vm.getIn(['os', 'type']))
+    const consoles = vm.get('consoles').map((c) => ({
+      priority: 0,
+      shortTitle: msg[c.get('protocol') + 'Console'](),
+      icon: <Icon name='external-link' />,
+      tooltip: msg[c.get('protocol') + 'ConsoleOpen'](),
+      id: `${idPrefix}-button-console-${c.get('protocol')}`,
+      confirmation: <ConsoleConfirmationModal consoleId={c.get('id')} vm={vm} />,
+    })).toJS()
+
+    if (hasRdp) {
+      const domain = config.get('domain')
+      const username = config.getIn([ 'user', 'name' ])
+      consoles.push({
+        priority: 0,
+        shortTitle: msg.rdpConsole(),
+        icon: <Icon name='external-link' />,
+        tooltip: msg.rdpConsoleOpen(),
+        id: `${idPrefix}-button-console-rdp`,
+        onClick: (e) => { e.preventDefault(); onRDP({ domain, username }) },
+      })
+    }
+
+    if (vncConsole) {
+      consoles.push({
+        priority: 0,
+        shortTitle: msg.vncConsoleBrowser(),
+        tooltip: msg.vncConsoleBrowserOpen(),
+        actionDisabled: config.get('websocket') === null,
+        id: `${idPrefix}-button-console-browser`,
+        confirmation: <ConsoleConfirmationModal isNoVNC consoleId={vncConsole.get('id')} vm={vm} />,
+      })
+    }
 
     const actions = [
       {
@@ -150,7 +189,7 @@ class VmActions extends React.Component {
         onClick: onStart,
       },
       {
-        priority: 0,
+        priority: 1,
         actionDisabled: isPool || isPoolVm || !canSuspend(status) || vm.getIn(['actionInProgress', 'suspend']),
         shortTitle: msg.suspend(),
         tooltip: msg.suspendVm(),
@@ -177,13 +216,14 @@ class VmActions extends React.Component {
         confirmation: rebootConfirmation,
       },
       {
-        priority: 1,
+        priority: 0,
         actionDisabled: isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole']),
         shortTitle: msg.console(),
         tooltip: consoleProtocol,
         className: 'btn btn-default',
+        bsStyle: 'default',
         id: `${idPrefix}-button-console`,
-        confirmation: consoleConfirmation,
+        items: consoles,
       },
     ]
     return actions
@@ -257,6 +297,7 @@ class VmActions extends React.Component {
 VmActions.propTypes = {
   vm: PropTypes.object.isRequired,
   pool: PropTypes.object,
+  config: PropTypes.object.isRequired,
   isOnCard: PropTypes.bool,
   isEditable: PropTypes.bool,
   idPrefix: PropTypes.string,
@@ -270,12 +311,14 @@ VmActions.propTypes = {
   onRemove: PropTypes.func.isRequired,
   onStartPool: PropTypes.func.isRequired,
   onStartVm: PropTypes.func.isRequired,
+  onRDP: PropTypes.func.isRequired,
 }
 
 export default withRouter(
   connect(
     (state, { vm }) => ({
       isEditable: vm.get('canUserEditVm') && state.clusters.find(cluster => cluster.get('canUserUseCluster')) !== undefined,
+      config: state.config,
     }),
     (dispatch, { vm, pool }) => ({
       onShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: false })),
@@ -285,6 +328,7 @@ export default withRouter(
       onRemove: ({ preserveDisks }) => dispatch(removeVm({ vmId: vm.get('id'), preserveDisks })),
       onStartPool: () => dispatch(startPool({ poolId: pool.get('id') })),
       onStartVm: () => dispatch(startVm({ vmId: vm.get('id') })),
+      onRDP: ({ domain, username }) => dispatch(getRDP({ name: vm.get('name'), fqdn: vm.get('fqdn'), domain, username })),
     })
   )(VmActions)
 )

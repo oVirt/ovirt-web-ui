@@ -55,7 +55,9 @@ const vms = actionReducer(initialState, {
 
       if (copySubResources) {
         updates[vm.id].cdrom = state.getIn(['vms', vm.id, 'cdrom'], Immutable.fromJS({ file: { id: '' } })).toJS()
-        updates[vm.id].consoles = state.getIn(['vms', vm.id, 'consoles'], EMPTY_ARRAY).toJS()
+        updates[vm.id].consoles = vm.consoles.length === 0
+          ? state.getIn(['vms', vm.id, 'consoles'], EMPTY_ARRAY).toJS()
+          : vm.consoles
         updates[vm.id].disks = state.getIn(['vms', vm.id, 'disks'], EMPTY_ARRAY).toJS()
         updates[vm.id].nics = state.getIn(['vms', vm.id, 'nics'], EMPTY_ARRAY).toJS()
         updates[vm.id].sessions = state.getIn(['vms', vm.id, 'sessions'], EMPTY_ARRAY).toJS()

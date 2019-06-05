@@ -1,16 +1,50 @@
 import Immutable from 'immutable'
-import { SET_CONSOLE_IN_USE, SET_CONSOLE_LOGON } from '_/constants'
+import {
+  SET_CONSOLE_TICKETS,
+  SET_CONSOLE_NOVNC_STATUS,
+  SET_NEW_CONSOLE_MODAL,
+  CLOSE_CONSOLE_MODAL,
+  SET_IN_USE_CONSOLE_MODAL_STATE,
+  SET_LOGON_CONSOLE_MODAL_STATE,
+
+  CONSOLE_OPENED,
+  CONSOLE_IN_USE,
+  CONSOLE_LOGON,
+} from '_/constants'
 
 import { actionReducer } from './utils'
+import { SET_ACTIVE_CONSOLE } from '../constants'
 
-const initialState = Immutable.fromJS({ vms: {} })
+const initialState = Immutable.fromJS({ vms: {}, modals: {} })
 
 const consoles = actionReducer(initialState, {
-  [SET_CONSOLE_IN_USE] (state, { payload: { vmId, consoleInUse } }) {
-    return state.setIn(['vms', vmId, 'consoleInUse'], consoleInUse)
+  [SET_CONSOLE_TICKETS] (state, { payload: { vmId, proxyTicket, ticket } }) {
+    return state
+      .setIn(['vms', vmId, 'ticket'], ticket)
+      .setIn(['vms', vmId, 'proxyTicket'], proxyTicket)
   },
-  [SET_CONSOLE_LOGON] (state, { payload: { vmId, isLogon } }) {
-    return state.setIn(['vms', vmId, 'isLogon'], isLogon)
+  [SET_ACTIVE_CONSOLE] (state, { payload: { vmId, consoleId } }) {
+    return state.setIn(['vms', vmId, 'id'], consoleId)
+  },
+  [SET_CONSOLE_NOVNC_STATUS] (state, { payload: { vmId, status, reason } }) {
+    return state.setIn(['vms', vmId, 'consoleStatus'], status).setIn(['vms', vmId, 'reason'], reason)
+  },
+  [SET_NEW_CONSOLE_MODAL] (state, { payload: { modalId, vmId, consoleId } }) {
+    const modal = {
+      vmId,
+      consoleId,
+      state: CONSOLE_OPENED,
+    }
+    return state.setIn(['modals', modalId], Immutable.fromJS(modal))
+  },
+  [CLOSE_CONSOLE_MODAL] (state, { payload: { modalId } }) {
+    return state.update('modals', modals => modals.delete(modalId))
+  },
+  [SET_IN_USE_CONSOLE_MODAL_STATE] (state, { payload: { modalId } }) {
+    return state.setIn(['modals', modalId, 'state'], CONSOLE_IN_USE)
+  },
+  [SET_LOGON_CONSOLE_MODAL_STATE] (state, { payload: { modalId } }) {
+    return state.setIn(['modals', modalId, 'state'], CONSOLE_LOGON)
   },
 })
 

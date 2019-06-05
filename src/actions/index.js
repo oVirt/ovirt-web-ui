@@ -15,6 +15,7 @@ import {
   SET_USER_FILTER_PERMISSION,
   SET_USER_GROUPS,
   SET_USER_SESSION_TIMEOUT_INTERVAL,
+  SET_WEBSOCKET,
   SHOW_TOKEN_EXPIRED_MSG,
   START_SCHEDULER_FIXED_DELAY,
   STOP_SCHEDULER_FIXED_DELAY,
@@ -86,6 +87,15 @@ export function setUserSessionTimeoutInternal (userSessionTimeoutInterval) {
     type: SET_USER_SESSION_TIMEOUT_INTERVAL,
     payload: {
       userSessionTimeoutInterval,
+    },
+  }
+}
+
+export function setWebsocket (websocket) {
+  return {
+    type: SET_WEBSOCKET,
+    payload: {
+      websocket,
     },
   }
 }

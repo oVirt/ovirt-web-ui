@@ -91,14 +91,14 @@ import {
   saveConsoleOptions,
   getRDPVm,
   fetchConsoleVmMeta,
-  getConsoleInUse,
+  openConsoleModal,
 } from './console'
 
 import {
   ADD_VM_NIC,
   CHANGE_PAGE,
   CHANGE_VM_CDROM,
-  CHECK_CONSOLE_IN_USE,
+  OPEN_CONSOLE_MODAL,
   CHECK_TOKEN_EXPIRED,
   CREATE_VM,
   DELAYED_REMOVE_ACTIVE_REQUEST,
@@ -136,6 +136,7 @@ import {
   STOP_SCHEDULER_FIXED_DELAY,
   SUSPEND_VM,
 
+  CONSOLE_PAGE_TYPE,
   DETAIL_PAGE_TYPE,
   DIALOG_PAGE_TYPE,
   MAIN_PAGE_TYPE,
@@ -274,6 +275,12 @@ function* refreshDialogPage ({ id, onNavigation, onSchedule }) {
   }
 }
 
+function* refreshConsolePage ({ id }) {
+  if (id) {
+    yield selectVmDetail(actionSelectVmDetail({ vmId: id }))
+  }
+}
+
 function* refreshPoolPage ({ id }) {
   yield selectPoolDetail(actionSelectPoolDetail({ poolId: id }))
 }
@@ -283,6 +290,7 @@ const pagesRefreshers = {
   [DETAIL_PAGE_TYPE]: refreshDetailPage,
   [DIALOG_PAGE_TYPE]: refreshDialogPage,
   [POOL_PAGE_TYPE]: refreshPoolPage,
+  [CONSOLE_PAGE_TYPE]: refreshConsolePage,
 }
 
 function* refreshData (action) {
@@ -325,14 +333,13 @@ function* fetchVmsByPage (action) {
 function* fetchVmsByPageV42 (action) {
   const { shallowFetch, page } = action.payload
 
-  action.payload.additional = shallowFetch ? [] : vmFetchAdditionalList
+  action.payload.additional = shallowFetch ? ['graphics_consoles'] : vmFetchAdditionalList
 
   // TODO: paging: split this call to a loop per up to 25 VMs
   const allVms = yield callExternalAction('getVmsByPage', Api.getVmsByPage, action)
   if (allVms && allVms['vm']) { // array
     const internalVms = allVms.vm.map(vm => Api.vmToInternal({ vm, getSubResources: true }))
-
-    yield put(updateVms({ vms: internalVms, copySubResources: true, page: page }))
+    yield put(updateVms({ vms: internalVms, copySubResources: false, page: page }))
     yield fetchUnknownIconsForVms({ vms: internalVms })
 
     // NOTE: No need to fetch the current=true cdrom info at this point. The cdrom info
@@ -390,7 +397,7 @@ function* fetchVmsByCountV42 (action) {
   const { shallowFetch } = action.payload
   const fetchedVmIds = []
 
-  action.payload.additional = shallowFetch ? [] : vmFetchAdditionalList
+  action.payload.additional = shallowFetch ? [ 'graphics_consoles' ] : vmFetchAdditionalList
 
   const allVms = yield callExternalAction('getVmsByCount', Api.getVmsByCount, action)
   if (allVms && allVms['vm']) { // array
@@ -448,6 +455,7 @@ export function* fetchSingleVm (action) {
   const { vmId, shallowFetch } = action.payload
 
   const isOvirtGTE42 = compareVersionToCurrent({ major: 4, minor: 2 })
+  action.payload.additional = [ 'graphics_consoles' ]
   if (isOvirtGTE42 && !shallowFetch) {
     action.payload.additional = vmFetchAdditionalList
   }
@@ -1064,7 +1072,7 @@ export function* rootSaga () {
 
     takeEvery(START_POOL, startPool),
 
-    takeEvery(CHECK_CONSOLE_IN_USE, getConsoleInUse),
+    takeEvery(OPEN_CONSOLE_MODAL, openConsoleModal),
     takeEvery(DOWNLOAD_CONSOLE_VM, downloadVmConsole),
     takeEvery(GET_RDP_VM, getRDPVm),
 

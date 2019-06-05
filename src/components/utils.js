@@ -37,7 +37,7 @@ export function getVmIconId (operatingSystems: Array<Object>, vm: Object): Objec
 }
 
 export function isRunning (status: string): boolean {
-  return ['wait_for_launch', 'up', 'powering_up', 'powering_down', 'migrating', 'paused'].includes(status)
+  return ['wait_for_launch', 'up', 'powering_up', 'powering_down', 'migrating', 'paused', 'reboot_in_progress'].includes(status)
 }
 
 export function donutMemoryTooltipContents (d: Array<Object>, defaultTitleFormat: Function, defaultValueFormat: Function, color: Function): string {

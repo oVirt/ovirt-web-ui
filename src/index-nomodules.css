@@ -211,3 +211,14 @@ a.disabled {
   display: inline-block;
   text-align: left;
 }
+
+.vnc-console {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.vnc-console > div {
+  height: calc(100vh - 150px);
+}

@@ -206,6 +206,20 @@
     lodash "^4.17.11"
     to-fast-properties "^2.0.0"
 
+"@novnc/novnc@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@novnc/novnc/-/novnc-1.0.0.tgz#76b0e89e6f8738ca8154195baf5b8e6a80bc9105"
+
+"@patternfly/react-console@1.10.22":
+  version "1.10.22"
+  resolved "https://registry.yarnpkg.com/@patternfly/react-console/-/react-console-1.10.22.tgz#c9fc8df8d5f5a1cac19e1fea45af578ae9745aae"
+  dependencies:
+    "@novnc/novnc" "^1.0.0"
+    blob-polyfill "^3.0.20180112"
+    classnames "^2.2.5"
+    file-saver "^1.3.8"
+    xterm "^3.3.0"
+
 "@types/c3@^0.6.0":
   version "0.6.3"
   resolved "https://registry.yarnpkg.com/@types/c3/-/c3-0.6.3.tgz#4b1ab77ec7bbc7abb2125d09b884004ff6d21b5b"
@@ -1461,6 +1475,10 @@ big.js@^5.2.2:
 binary-extensions@^1.0.0:
   version "1.13.0"
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-1.13.0.tgz#9523e001306a32444b907423f1de2164222f6ab1"
+
+blob-polyfill@^3.0.20180112:
+  version "3.0.20180112"
+  resolved "https://registry.yarnpkg.com/blob-polyfill/-/blob-polyfill-3.0.20180112.tgz#7f7c3e235ae298867f8c22b429d33aa9a7cc65b5"
 
 blob-util@1.2.1:
   version "1.2.1"
@@ -3069,6 +3087,10 @@ file-loader@0.9.0:
   dependencies:
     loader-utils "~0.2.5"
 
+file-saver@^1.3.8:
+  version "1.3.8"
+  resolved "https://registry.yarnpkg.com/file-saver/-/file-saver-1.3.8.tgz#e68a30c7cb044e2fb362b428469feb291c2e09d8"
+
 filename-regex@^2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/filename-regex/-/filename-regex-2.0.1.tgz#c1c4b9bee3e09725ddb106b75c1e301fe2f18b26"
@@ -3172,8 +3194,8 @@ flow-babel-webpack-plugin@1.1.1:
     lodash.merge "^4.6.0"
 
 "flow-bin@>=0.44.2 <1":
-  version "0.93.0"
-  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.93.0.tgz#9192a08d88db2a8da0ff55e42420f44539791430"
+  version "0.94.0"
+  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.94.0.tgz#b5d58fe7559705b73a18229f97edfc3ab6ffffcb"
 
 follow-redirects@^1.0.0:
   version "1.7.0"
@@ -6489,8 +6511,8 @@ readable-stream@^2.0.1, readable-stream@^2.0.2, readable-stream@^2.0.6, readable
     util-deprecate "~1.0.1"
 
 readable-stream@^3.1.1:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-3.1.1.tgz#ed6bbc6c5ba58b090039ff18ce670515795aeb06"
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-3.2.0.tgz#de17f229864c120a9f56945756e4f32c4045245d"
   dependencies:
     inherits "^2.0.3"
     string_decoder "^1.1.1"
@@ -7944,6 +7966,10 @@ xml-char-classes@^1.0.0:
 xml-name-validator@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/xml-name-validator/-/xml-name-validator-3.0.0.tgz#6ae73e06de4d8c6e47f9fb181f78d648ad457c6a"
+
+xterm@^3.3.0:
+  version "3.11.0"
+  resolved "https://registry.yarnpkg.com/xterm/-/xterm-3.11.0.tgz#2c10da3e965db9170430aa7b68f8965de3ff004d"
 
 "y18n@^3.2.1 || ^4.0.0":
   version "4.0.0"

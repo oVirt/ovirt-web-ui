@@ -1,3 +1,4 @@
+export const CONSOLE_PAGE_TYPE = 'consolePage'
 export const DETAIL_PAGE_TYPE = 'detailPage'
 export const DIALOG_PAGE_TYPE = 'dialogPage'
 export const MAIN_PAGE_TYPE = 'mainPage'

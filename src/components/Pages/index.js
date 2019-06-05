@@ -11,6 +11,7 @@ import { canUserUseAnyClusters } from '_/utils'
 import VmDialog from '../VmDialog'
 import VmsList from '../VmsList'
 import VmDetails from '../VmDetails'
+import VmConsole from '../VmConsole'
 import { default as LegacyVmDetails } from '../VmDetail'
 
 import { addUserMessage } from '_/actions'
@@ -150,9 +151,32 @@ const VmCreatePageConnected = connect(
   })
 )(VmCreatePage)
 
+class VmConsolePage extends React.Component {
+  render () {
+    const { vms, match } = this.props
+    if (match.params.id && vms.getIn(['vms', match.params.id])) {
+      return <VmConsole consoleId={match.params.console} vmId={match.params.id} />
+    }
+    return null
+  }
+}
+
+VmConsolePage.propTypes = {
+  match: RouterPropTypeShapes.match.isRequired,
+  vms: PropTypes.object.isRequired,
+}
+
+const VmConsolePageConnected = connect(
+  (state) => ({
+    vms: state.vms,
+  }),
+  (dispatch) => ({})
+)(VmConsolePage)
+
 export {
   PoolDetailsPageConnected as PoolDetailsPage,
   VmDetailsPageConnected as VmDetailsPage,
   VmCreatePageConnected as VmCreatePage,
+  VmConsolePageConnected as VmConsolePage,
   VmsPage,
 }
