@@ -35,6 +35,37 @@ div.popover {
   z-index: 20;
 }
 
+@media only screen and (max-width: 600px) {
+  div.popover {
+    width: 90%;
+    margin: 0px 5%;
+  }
+
+  .snapshot-detail-container {
+    display: inline;
+    overflow-wrap: break-word;
+  }
+  
+  .snapshot-detail-container dl {
+    width: 100%;
+    display: flex;
+    flex-flow: row wrap;
+    margin: 0px;
+  }
+
+  .snapshot-detail-container dt {
+    white-space: normal;
+    width: 50%;
+    padding-right: 3px;
+    padding-left: 3px;
+  }
+
+  .snapshot-detail-container dd {
+    width: 50%;
+    float: right;
+  }
+}
+
 .green {
   color: #3B9D2E;
 }

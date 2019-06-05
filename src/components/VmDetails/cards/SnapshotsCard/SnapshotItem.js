@@ -41,8 +41,8 @@ SnapshotAction.propTypes = {
   onClick: PropTypes.func,
 }
 
-const StatusTooltip = ({ icon, text, id }) => {
-  return <OverlayTrigger overlay={<Tooltip id={id}>{text}</Tooltip>} placement='left' trigger={['hover', 'focus']}>
+const StatusTooltip = ({ icon, text, id, placement }) => {
+  return <OverlayTrigger overlay={<Tooltip id={id}>{text}</Tooltip>} placement={placement} trigger={['hover', 'focus']}>
     <a>{icon}</a>
   </OverlayTrigger>
 }
@@ -50,101 +50,146 @@ StatusTooltip.propTypes = {
   icon: PropTypes.node.isRequired,
   text: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
+  placement: PropTypes.string.isRequired,
 }
 
-const SnapshotItem = ({ snapshot, vmId, isEditing, id, isVmDown, hideActions, onSnapshotDelete }) => {
-  let statusIcon = null
-  let buttons = []
-
-  // Snapshot actions
-  const isActionsDisabled = !isEditing || snapshot.get('status') === 'locked'
-  const isRestoreDisabled = isActionsDisabled || !isVmDown
-  if (!snapshot.get('isActive')) {
-    // Info popover
-    buttons.push(<OverlayTrigger
-      overlay={
-        <SnapshotDetail key='detail' id={`${id}-info-popover`} snapshot={snapshot} vmId={vmId} restoreDisabled={isRestoreDisabled} />
-      }
-      placement='left'
-      trigger='click'
-      rootClose
-      key='info'
-    >
-      <a id={`${id}-info`}>
-        <OverlayTooltip id={`${id}-info-tt`} tooltip={msg.details()}>
-          <Icon type='pf' name='info' />
-        </OverlayTooltip>
-      </a>
-    </OverlayTrigger>)
-
-    if (!hideActions) {
-      // Restore action
-      buttons.push(<RestoreConfirmationModal
-        key='restore'
-        disabled={isRestoreDisabled}
-        snapshot={snapshot}
-        vmId={vmId}
-        id={`${id}-restore-modal`}
-        trigger={
-          <SnapshotAction key='restore' id={`${id}-restore`} >
-            <OverlayTooltip id={`${id}-restore-tt`} tooltip={msg.snapshotRestore()}>
-              <Icon type='fa' name='play-circle' />
-            </OverlayTooltip>
-          </SnapshotAction>
-        }
-      />)
-
-      // Delete action
-      buttons.push(<DeleteConfirmationModal
-        key='delete'
-        disabled={isActionsDisabled}
-        id={`${id}-delete-modal`}
-        trigger={
-          <SnapshotAction key='delete' id={`${id}-delete`}>
-            <OverlayTooltip id={`${id}-delete-tt`} tooltip={msg.snapshotDelete()}>
-              <Icon type='pf' name='delete' />
-            </OverlayTooltip>
-          </SnapshotAction>
-        }
-        onDelete={onSnapshotDelete}
-      >
-        <div
-          dangerouslySetInnerHTML={{
-            __html: msg.areYouSureYouWantToDeleteSnapshot({
-              snapshotName: `"<strong>${escapeHtml(snapshot.get('description'))}</strong>"`,
-            }),
-          }}
-        />
-        <div>{msg.thisOperationCantBeUndone()}</div>
-      </DeleteConfirmationModal>)
+class SnapshotItem extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      isMobile: false,
+      isTablet: false,
     }
 
-    // Status tooltip
-    const tooltipId = `${id}-status-icon-${snapshot.get('status')}`
-    switch (snapshot.get('status')) {
-      case 'locked':
-        statusIcon = <StatusTooltip icon={<Icon type='pf' name='locked' />} text={msg.locked()} id={tooltipId} />
-        break
-      case 'in_preview':
-        statusIcon = <StatusTooltip icon={<Icon type='fa' name='eye' />} text={msg.inPreview()} id={tooltipId} />
-        break
-      case 'ok':
-        statusIcon = <StatusTooltip icon={<Icon type='pf' name='ok' />} text={msg.ok()} id={tooltipId} />
-        break
+    this.updateScreenType = this.updateScreenType.bind(this)
+  }
+
+  componentDidUpdate () {
+    this.updateScreenType()
+  }
+
+  updateScreenType () {
+    const state = { isMobile: false, isTablet: false }
+    if (window.innerWidth <= 768 && window.innerWidth > 600) {
+      state.isMobile = false
+      state.isTablet = true
+    } else if (window.innerWidth <= 600) {
+      state.isMobile = true
+      state.isTablet = false
+    } else {
+      state.isMobile = false
+      state.isTablet = false
+    }
+
+    if (this.state.isMobile !== state.isMobile || this.state.isTablet !== state.isTablet) {
+      this.setState(state)
     }
   }
 
-  return (
-    <div className={style['snapshot-item']} id={id}>
-      <span className={style['snapshot-item-status']} id={`${id}-status-icon`}>{statusIcon}</span>
-      <span className={style['snapshot-item-name']} id={`${id}-description`}>
-        {getMinimizedString(snapshot.get('description'), MAX_DESCRIPTION_SIZE)}
-        <span className={style['snapshot-item-time']} id={`${id}-time`}>{`(${formatDateFromNow(snapshot.get('date'))})`}</span>
-      </span>
-      <span className={style['snapshot-item-actions']} id={`${id}-actions`}>{ buttons }</span>
-    </div>
-  )
+  componentDidMount () {
+    window.addEventListener('resize', this.updateScreenType)
+    this.updateScreenType()
+  }
+
+  componentWillUnmount () {
+    window.removeEventListener('resize', this.updateScreenType)
+  }
+
+  render () {
+    let statusIcon = null
+    let buttons = []
+
+    // Snapshot actions
+    const isActionsDisabled = !this.props.isEditing || this.props.snapshot.get('status') === 'locked'
+    const isRestoreDisabled = isActionsDisabled || !this.props.isVmDown
+    if (!this.props.snapshot.get('isActive')) {
+      // Info popover
+      buttons.push(<OverlayTrigger
+        overlay={
+          <SnapshotDetail key='detail' id={`${this.props.id}-info-popover`} snapshot={this.props.snapshot} vmId={this.props.vmId} restoreDisabled={isRestoreDisabled} />
+        }
+        placement={this.state.isMobile || this.state.isTablet ? 'top' : 'left'}
+        trigger='click'
+        rootClose
+        key='info'
+      >
+        <a id={`${this.props.id}-info`}>
+          <OverlayTooltip placement={this.state.isMobile ? 'right' : 'left'} id={`${this.props.id}-info-tt`} tooltip={msg.details()}>
+            <Icon type='pf' name='info' />
+          </OverlayTooltip>
+        </a>
+      </OverlayTrigger>)
+
+      if (!this.props.hideActions) {
+        // Restore action
+        buttons.push(<RestoreConfirmationModal
+          key='restore'
+          disabled={isRestoreDisabled}
+          snapshot={this.props.snapshot}
+          vmId={this.props.vmId}
+          id={`${this.props.id}-restore-modal`}
+          trigger={
+            <SnapshotAction key='restore' id={`${this.props.id}-restore`} >
+              <OverlayTooltip placement={this.state.isMobile ? 'right' : 'left'} id={`${this.props.id}-restore-tt`} tooltip={msg.snapshotRestore()}>
+                <Icon type='fa' name='play-circle' />
+              </OverlayTooltip>
+            </SnapshotAction>
+          }
+        />)
+        // Delete action
+        buttons.push(<DeleteConfirmationModal
+          key='delete'
+          disabled={isActionsDisabled}
+          id={`${this.props.id}-delete-modal`}
+          trigger={
+            <SnapshotAction key='delete' id={`${this.props.id}-delete`}>
+              <OverlayTooltip placement={this.state.isMobile ? 'right' : 'left'} id={`${this.props.id}-delete-tt`} tooltip={msg.snapshotDelete()}>
+                <Icon type='pf' name='delete' />
+              </OverlayTooltip>
+            </SnapshotAction>
+          }
+          onDelete={this.props.onSnapshotDelete}
+        >
+          <div
+            dangerouslySetInnerHTML={{
+              __html: msg.areYouSureYouWantToDeleteSnapshot({
+                snapshotName: `"<strong>${escapeHtml(this.props.snapshot.get('description'))}</strong>"`,
+              }),
+            }}
+          />
+          <div>{msg.thisOperationCantBeUndone()}</div>
+        </DeleteConfirmationModal>)
+      }
+
+      // Status tooltip
+      const tooltipId = `${this.props.id}-status-icon-${this.props.snapshot.get('status')}`
+      var tooltipPlacement = this.state.isMobile ? 'right' : 'left'
+      switch (this.props.snapshot.get('status')) {
+        case 'locked':
+          statusIcon = <StatusTooltip icon={<Icon type='pf' name='locked' />} text={msg.locked()} id={tooltipId} placement={tooltipPlacement} />
+          break
+        case 'in_preview':
+          statusIcon = <StatusTooltip icon={<Icon type='fa' name='eye' />} text={msg.inPreview()} id={tooltipId} placement={tooltipPlacement} />
+          break
+        case 'ok':
+          statusIcon = <StatusTooltip icon={<Icon type='pf' name='ok' />} text={msg.ok()} id={tooltipId} placement={tooltipPlacement} />
+          break
+      }
+    }
+
+    return (
+      <div className={style['snapshot-item']} id={this.props.id}>
+        <span className={style['snapshot-item-status']} id={`${this.props.id}-status-icon`}>{statusIcon}</span>
+        <span className={style['snapshot-item-name']} id={`${this.props.id}-description`}>
+          {getMinimizedString(this.props.snapshot.get('description'), MAX_DESCRIPTION_SIZE)}
+          <span className={style['snapshot-item-time']} id={`${this.props.id}-time`}>{`(${formatDateFromNow(this.props.snapshot.get('date'))})`}</span>
+        </span>
+        <span className={style['snapshot-item-actions']} id={`${this.props.id}-actions`}>{ buttons }</span>
+      </div>
+    )
+  }
 }
+
 SnapshotItem.propTypes = {
   snapshot: PropTypes.object.isRequired,
   vmId: PropTypes.string.isRequired,
