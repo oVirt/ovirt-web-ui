@@ -2,12 +2,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import { createDiskForVm, editDiskOnVm, removeDisk } from '../../../../actions'
+import { createDiskForVm, editDiskOnVm, removeDisk } from '_/actions'
 
 import { msg } from '_/intl'
-import { isNumber } from '_/utils'
-import { sortDisksForDisplay } from '../../../VmDisks/utils'
-import { maskForElementId } from '../../../utils'
+import { maskForElementId, suggestDiskName } from '_/components/utils'
+import { sortDisksForDisplay } from '_/components/VmDisks/utils'
 
 import { Icon } from 'patternfly-react'
 import { Grid, Row, Col } from '_/components/Grid'
@@ -31,18 +30,11 @@ function filterStorageDomains (vm, clusters, storageDomains) {
     ).toList()
 }
 
-function suggestDiskName (vm) {
-  const regex = new RegExp(`${vm.get('name')}_Disk(\\d+)`)
-  let biggestNumber = 0
-
-  vm.get('disks', []).forEach(disk => {
-    const [, number] = regex.exec(disk.get('name')) || []
-    if (isNumber(number)) {
-      biggestNumber = Math.max(biggestNumber, parseInt(number, 0))
-    }
-  })
-
-  return vm.get('name') + '_Disk' + (biggestNumber + 1)
+function suggestDiskName_ (vm) {
+  return suggestDiskName(
+    vm.get('name'),
+    vm.get('disks', []).map(disk => disk.get('name'))
+  )
 }
 
 /*
@@ -80,7 +72,7 @@ class DisksCard extends React.Component {
     super(props)
 
     this.state = {
-      suggestedDiskName: suggestDiskName(props.vm),
+      suggestedDiskName: suggestDiskName_(props.vm),
       suggestedStorageDomain: suggestStorageDomain(props.vm, props.clusters, props.storageDomains),
       filteredStorageDomainList: filterStorageDomains(props.vm, props.clusters, props.storageDomains),
     }
@@ -95,7 +87,7 @@ class DisksCard extends React.Component {
     const changes = {}
 
     if (prevProps.vm !== vm) {
-      changes.suggestedDiskName = suggestDiskName(vm)
+      changes.suggestedDiskName = suggestDiskName_(vm)
       changes.suggestedStorageDomain = suggestStorageDomain(vm, clusters, storageDomains)
     }
 
