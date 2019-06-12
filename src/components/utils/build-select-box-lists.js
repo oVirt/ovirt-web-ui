@@ -194,6 +194,25 @@ function createVNicProfileList (vnicProfiles, { dataCenterId = null, cluster = n
 }
 
 /**
+ * Return a list of the disk format types available to DiskAttachments ready for use in a
+ * __SelectBox__.  This list is static and corresponds to the relevant entries in:
+ *
+ *    http://ovirt.github.io/ovirt-engine-api-model/master/#types/disk_format
+ */
+function createDiskFormatList () {
+  return [
+    {
+      id: 'raw',
+      value: msg.diskEditorFormatOptionRaw(),
+    },
+    {
+      id: 'cow',
+      value: msg.diskEditorFormatOptionCow(),
+    },
+  ]
+}
+
+/**
  * Return a list of the interface types available to DiskAttachments ready for use in a
  * __SelectBox__.  This list is static and corresponds to the relevant entries in:
  *
@@ -248,6 +267,7 @@ export {
   createTemplateList,
   createVNicProfileList,
 
+  createDiskFormatList,
   createDiskInterfacesList,
   createNicInterfacesList,
 }

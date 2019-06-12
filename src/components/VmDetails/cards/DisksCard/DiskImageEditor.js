@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 
 import { msg } from '_/intl'
 import { isNumber } from '_/utils'
-import { createStorageDomainList, isDiskNameValid } from '_/components/utils'
+import { createDiskFormatList, createStorageDomainList, isDiskNameValid } from '_/components/utils'
 
 import {
   Button,
@@ -34,6 +34,8 @@ const DISK_DEFAULTS = {
 
   provisionedSize: 1 * 1024 ** 3,
 }
+
+const DISK_FORMATS = createDiskFormatList()
 
 const LabelCol = ({ children, ...props }) => {
   return <Col componentClass={ControlLabel} {...props}>
@@ -388,11 +390,8 @@ class DiskImageEditor extends Component {
                 { createMode &&
                   <SelectBox
                     id={`${idPrefix}-format`}
-                    items={[
-                      { id: 'raw', value: msg.diskEditorFormatOptionRaw() },
-                      { id: 'cow', value: msg.diskEditorFormatOptionCow() },
-                    ]}
-                    selected={this.state.values.format}
+                    items={DISK_FORMATS}
+                    selected={this.state.format}
                     onChange={this.changeFormat}
                   />
                 }
