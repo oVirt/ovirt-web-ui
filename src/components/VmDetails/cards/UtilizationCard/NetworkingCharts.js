@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {
-  patternfly,
   CardTitle,
   CardBody,
   UtilizationCard,
@@ -10,9 +9,9 @@ import {
   UtilizationCardDetailsDesc,
   UtilizationCardDetailsLine1,
   UtilizationCardDetailsLine2,
-  DonutChart,
-  SparklineChart,
 } from 'patternfly-react'
+import { ChartGroup, ChartArea, ChartTooltip, ChartVoronoiContainer } from '@patternfly/react-charts'
+import DonutChart from './UtilizationCharts/DonutChart'
 
 import { msg } from '_/intl'
 
@@ -55,35 +54,36 @@ const NetworkingCharts = ({ netStats, isRunning, id }) => {
               <UtilizationCardDetailsLine2>{msg.utilizationCardOf100()}</UtilizationCardDetailsLine2>
             </UtilizationCardDetailsDesc>
           </UtilizationCardDetails>
-
           <DonutChart
-            id={`${id}-donut-chart`}
-            data={{
-              columns: [
-                [msg.utilizationCardLegendUsedP(), used],
-                [msg.utilizationCardLegendAvailableP(), available],
-              ],
-              order: null,
-            }}
-            title={{
-              primary: `${used}`,
-              secondary: msg.utilizationCardLegendUsedP(),
-            }}
-            tooltip={{
-              show: true,
-              contents: patternfly.pfDonutTooltipContents,
-            }}
+            data={[
+              {
+                x: msg.utilizationCardLegendUsedP(),
+                y: used,
+                label: `${msg.utilizationCardLegendUsed()} - ${used}%`,
+              },
+              {
+                x: msg.utilizationCardLegendAvailableP(),
+                y: available,
+                label: `${msg.utilizationCardAvailable()} - ${available}%`,
+              },
+            ]}
+            subTitle={msg.utilizationCardLegendUsedP()}
+            title={used}
           />
-
           { history.length === 0 && <NoHistoricData id={`${id}-no-historic-data`} /> }
           { history.length > 0 &&
-            <SparklineChart
-              id={`${id}-line-chart`}
-              data={{
-                columns: [['%', ...history]],
-                type: 'area',
-              }}
-            />
+            <ChartGroup
+              height={150}
+              width={450}
+              containerComponent={
+                <ChartVoronoiContainer
+                  labels={datum => `${datum.y}%`}
+                  labelComponent={<ChartTooltip style={{ fontSize: 16 }} />}
+                />
+              }
+            >
+              <ChartArea style={{ data: { fill: 'rgb(0, 136, 206)' } }} data={history.map((item, i) => ({ x: i, y: item, name: 'cpu' }))} />
+            </ChartGroup>
           }
         </React.Fragment>
         }

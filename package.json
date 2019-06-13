@@ -69,6 +69,8 @@
     "whatwg-fetch": "1.0.0"
   },
   "dependencies": {
+    "@patternfly/react-charts": "4.1.5",
+    "@patternfly/react-tokens": "2.5.5",
     "@patternfly/react-console": "1.10.22",
     "babel-polyfill": "6.26.0",
     "blob-util": "1.2.1",

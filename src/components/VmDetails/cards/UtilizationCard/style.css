@@ -109,6 +109,10 @@
   justify-content: space-around;
 }
 
+.col-charts-box {
+  min-width: 200px;
+}
+
 @media (min-width: 1250px) {
   .row-charts-box {
     flex-wrap: nowrap;

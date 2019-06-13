@@ -3,8 +3,6 @@ import PropTypes from 'prop-types'
 import {
   CardBody,
   CardTitle,
-  DonutChart,
-  SparklineChart,
   UtilizationCard,
   UtilizationCardDetails,
   UtilizationCardDetailsCount,
@@ -12,14 +10,14 @@ import {
   UtilizationCardDetailsLine1,
   UtilizationCardDetailsLine2,
 } from 'patternfly-react'
-
+import { ChartGroup, ChartArea, ChartVoronoiContainer, ChartTooltip } from '@patternfly/react-charts'
+import DonutChart from './UtilizationCharts/DonutChart'
 import { msg } from '_/intl'
 import { round, floor } from '_/utils'
 import { userFormatOfBytes } from '_/helpers'
 
 import style from './style.css'
 
-import { donutMemoryTooltipContents } from './tooltip-helper'
 import NoHistoricData from './NoHistoricData'
 import NoLiveData from './NoLiveData'
 
@@ -71,37 +69,39 @@ const MemoryCharts = ({ memoryStats, isRunning, id }) => {
               </UtilizationCardDetailsLine2>
             </UtilizationCardDetailsDesc>
           </UtilizationCardDetails>
-
           <DonutChart
-            id={`${id}-donut-chart`}
-            data={{
-              columns: [
-                [msg.utilizationCardLegendUsed(), used],
-                [msg.utilizationCardLegendAvailable(), available],
-              ],
-              order: null,
-            }}
-            title={{
-              primary: `${usedFormated.rounded}`,
-              secondary: msg.utilizationCardUnitUsed({ storageUnit: usedFormated.suffix }),
-            }}
-            tooltip={{
-              show: true,
-              contents: donutMemoryTooltipContents,
-            }}
+            data={[
+              {
+                x: msg.utilizationCardLegendUsed(),
+                y: used,
+                label: `${msg.utilizationCardLegendUsed()} - ${usedFormated.rounded} ${usedFormated.suffix}`,
+              },
+              {
+                x: msg.utilizationCardLegendAvailable(),
+                y: available,
+                label: `${msg.utilizationCardLegendAvailable()} - ${availableFormated.rounded} ${availableFormated.suffix}`,
+              },
+            ]}
+            subTitle={msg.utilizationCardUnitUsed({ storageUnit: usedFormated.suffix })}
+            title={usedFormated.rounded}
           />
-
           { history.length === 0 && <NoHistoricData /> }
           { history.length > 0 &&
-            <SparklineChart
-              id={`${id}-line-chart`}
-              data={{
-                columns: [
-                  ['%', ...history],
-                ],
-                type: 'area',
-              }}
-            />
+            <ChartGroup
+              height={150}
+              width={450}
+              containerComponent={
+                <ChartVoronoiContainer
+                  labels={datum => `${datum.y}%`}
+                  labelComponent={<ChartTooltip style={{ fontSize: 16 }} />}
+                />
+              }
+            >
+              <ChartArea
+                style={{ data: { fill: 'rgb(0, 136, 206)' } }}
+                data={history.map((item, i) => ({ x: i, y: item, name: 'cpu' }))}
+              />
+            </ChartGroup>
           }
         </React.Fragment>
         }
