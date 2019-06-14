@@ -1,27 +1,27 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {
-  CardTitle,
   CardBody,
+  CardTitle,
+  DonutChart,
+  UtilizationBar,
   UtilizationCard,
   UtilizationCardDetails,
   UtilizationCardDetailsCount,
   UtilizationCardDetailsDesc,
   UtilizationCardDetailsLine1,
   UtilizationCardDetailsLine2,
-  UtilizationBar,
-  DonutChart,
 } from 'patternfly-react'
 
 import { msg } from '_/intl'
 import { round, floor, convertValueMap } from '_/utils'
-import { donutMemoryTooltipContents } from '_/components/utils'
 import { userFormatOfBytes, isWindows } from '_/helpers'
 
 import style from './style.css'
 
-import NoLiveData from './NoLiveData'
+import { donutMemoryTooltipContents } from './tooltip-helper'
 import NoHistoricData from './NoHistoricData'
+import NoLiveData from './NoLiveData'
 
 const EmptyBlock = () => (
   <div className={style['no-history-chart']} />

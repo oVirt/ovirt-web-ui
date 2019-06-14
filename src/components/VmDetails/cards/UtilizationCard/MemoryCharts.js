@@ -1,25 +1,25 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {
-  CardTitle,
   CardBody,
+  CardTitle,
+  DonutChart,
+  SparklineChart,
   UtilizationCard,
   UtilizationCardDetails,
   UtilizationCardDetailsCount,
   UtilizationCardDetailsDesc,
   UtilizationCardDetailsLine1,
   UtilizationCardDetailsLine2,
-  DonutChart,
-  SparklineChart,
 } from 'patternfly-react'
 
 import { msg } from '_/intl'
 import { round, floor } from '_/utils'
-import { donutMemoryTooltipContents } from '_/components/utils'
 import { userFormatOfBytes } from '_/helpers'
 
 import style from './style.css'
 
+import { donutMemoryTooltipContents } from './tooltip-helper'
 import NoHistoricData from './NoHistoricData'
 import NoLiveData from './NoLiveData'
 
