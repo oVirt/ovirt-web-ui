@@ -12,18 +12,9 @@ class FieldValue extends React.Component {
 
     this.updateOverflow = this.updateOverflow.bind(this)
   }
+
   componentDidUpdate () {
     this.updateOverflow()
-  }
-
-  updateOverflow () {
-    const state = { isOverflow: false }
-    if (this.ref.current.offsetWidth < this.ref.current.scrollWidth) {
-      state.isOverflow = true
-    }
-    if (this.state.isOverflow !== state.isOverflow) {
-      this.setState(state)
-    }
   }
 
   componentDidMount () {
@@ -34,17 +25,51 @@ class FieldValue extends React.Component {
   componentWillUnmount () {
     window.removeEventListener('resize', this.updateOverflow)
   }
+
+  updateOverflow () {
+    if (!this.props.children) {
+      return
+    }
+
+    const state = { isOverflow: false }
+    if (this.ref.current.offsetWidth < this.ref.current.scrollWidth) {
+      state.isOverflow = true
+    }
+    if (this.state.isOverflow !== state.isOverflow) {
+      this.setState(state)
+    }
+  }
+
   render () {
     const { children, tooltip } = this.props
-    return <span className={style['field-value']} title={this.state.isOverflow ? tooltip : ''} ref={this.ref}>
-      {children}
-    </span>
+
+    if (children) {
+      return <span
+        className={style['field-value']}
+        title={this.state.isOverflow ? tooltip : ''}
+        ref={this.ref}
+      >
+        {children}
+      </span>
+    } else {
+      return null
+    }
   }
 }
 
 FieldValue.propTypes = {
-  children: PropTypes.oneOfType([ PropTypes.string, PropTypes.node ]).isRequired,
-  tooltip: PropTypes.string.isRequired,
+  children: function (props, propName, componentName, ...rest) {
+    if ((props.children && !props.tooltip) || (!props.children && props.tooltip)) {
+      return new Error(`Props 'children' and 'tooltip' are both required for component ${componentName}`)
+    }
+    return PropTypes.oneOfType([ PropTypes.string, PropTypes.node ])(props, propName, componentName, ...rest)
+  },
+  tooltip: function (props, propName, componentName, ...rest) {
+    if ((props.children && !props.tooltip) || (!props.children && props.tooltip)) {
+      return new Error(`Props 'children' and 'tooltip' are both required for component ${componentName}`)
+    }
+    return PropTypes.string(props, propName, componentName, ...rest)
+  },
 }
 
 export default FieldValue
