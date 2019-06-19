@@ -10,8 +10,8 @@ import { sortDisksForDisplay } from '../../../VmDisks/utils'
 import { maskForElementId } from '../../../utils'
 
 import { Icon } from 'patternfly-react'
+import { Grid, Row, Col } from '_/components/Grid'
 import BaseCard from '../../BaseCard'
-import { Grid, Row, Col } from '../../GridComponents'
 import DiskImageEditor from './DiskImageEditor'
 import DiskListItem from './DiskListItem'
 

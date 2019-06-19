@@ -3,11 +3,11 @@ import PropTypes from 'prop-types'
 
 import { msg } from '_/intl'
 import { escapeHtml } from '../../../utils'
-import { Grid, Row, Col } from '../../GridComponents'
 import itemStyle from '../../itemListStyle.css'
 import style from './style.css'
 
 import { Icon, OverlayTrigger, Tooltip } from 'patternfly-react'
+import { Grid, Row, Col } from '_/components/Grid'
 import DeleteConfirmationModal from '../../../VmModals/DeleteConfirmationModal'
 import NicEditor from './NicEditor'
 import NicLinkStateIcon from './NicLinkStateIcon'

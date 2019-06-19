@@ -1,0 +1,45 @@
+/* ---> GridComponents styles (Grid, Row, Col) */
+.grid-container { /* bootstrap4 .container-fluid (different padding/margins) */
+  width: 100%;
+  padding-right: 20px;
+  padding-left: 20px;
+  margin: 0 auto;
+}
+
+.grid-row { /* bootstrap4 .row */
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -20px;
+  margin-left: -20px;
+}
+
+.grid-column { /* bootstrap4 .col & .col-md */
+  position: relative;
+  width: 100%;
+  min-height: 1px;
+  padding-right: 20px;
+  padding-left: 20px;
+
+  flex: 1 1 0; /* grow shrink basis */
+  max-width: 100%;
+  /*
+    if the component specifies a column span X, it will override
+    flex and max-width so the col takes X/12 columns
+  */
+
+  display: flex;
+  flex-direction: column;
+}
+
+.grid-column[column-content="expand"] > :global(*) {
+  /* all children takes equal amount of available space */
+  flex: 1 0;
+}
+
+.grid-row:global(.form-group) {
+
+}
+
+.grid-row:global(.form-group) .grid-column:global(.control-label) {
+  display: block;
+}

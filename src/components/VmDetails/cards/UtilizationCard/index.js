@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { msg } from '_/intl'
 
-import { Grid, Row, Col } from '../../GridComponents'
+import { Grid, Row, Col } from '_/components/Grid'
 import BaseCard from '../../BaseCard'
 import style from './style.css'
 

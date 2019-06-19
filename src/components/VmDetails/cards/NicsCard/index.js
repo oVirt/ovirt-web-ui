@@ -7,8 +7,8 @@ import { msg } from '_/intl'
 import { isNumber } from '_/utils'
 import { addVmNic, deleteVmNic, editVmNic } from '_/actions'
 
+import { Grid, Row, Col } from '_/components/Grid'
 import BaseCard from '../../BaseCard'
-import { Grid, Row, Col } from '../../GridComponents'
 
 import itemStyle from '../../itemListStyle.css'
 import style from './style.css'

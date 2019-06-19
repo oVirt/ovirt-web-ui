@@ -33,7 +33,7 @@ import {
 import Switch from '../../../Switch'
 import SelectBox from '../../../SelectBox'
 import BaseCard from '../../BaseCard'
-import { Grid, Row, Col } from '../../GridComponents'
+import { Grid, Row, Col } from '_/components/Grid'
 
 import style from './style.css'
 
