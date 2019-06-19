@@ -164,7 +164,7 @@ class NicEditor extends Component {
     const vnicList = [
       {
         id: EMPTY_ID,
-        value: msg.selectVnicProfile(),
+        value: msg.vnicProfileEmpty(),
       },
       ...vnicProfileList.map(
         item => ({
@@ -296,7 +296,7 @@ class NicEditor extends Component {
             id={`${modalId}-button-ok`}
             bsStyle='primary'
             onClick={this.handleSave}
-            disabled={Object.values(this.state.values).reduce((acc, value) => !value && value !== false ? true : acc, false)}>
+            disabled={this.state.values.name === ''}>
             { msg.ok() }
           </Button>
         </Modal.Footer>

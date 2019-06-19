@@ -425,7 +425,6 @@ export const messages: { [messageId: string]: MessageType } = {
   secondDevice: 'Second Device',
   secondDeviceTooltip: 'Second device in order.',
   secondsShort: 's',
-  selectVnicProfile: '<Select a VNIC profile>',
   sendShortcutKey: 'Send Key',
   sendCtrlAltDel: 'Ctrl+Alt+Del',
   sessionExpired: {
@@ -545,6 +544,7 @@ export const messages: { [messageId: string]: MessageType } = {
   vncConsoleBrowser: 'VNC Console (Browser)',
   vncConsoleBrowserOpen: 'Open VNC Console (Browser)',
   vnicProfile: 'VNIC Profile',
+  vnicProfileEmpty: '<Empty>',
   yearsShort: 'y',
   yes: 'Yes',
   youHaveNoAllowedVnicProfiles: 'You cannot create or edit NICs because you do not have permission to use any vNIC Profiles in the VM\'s Data Center.',

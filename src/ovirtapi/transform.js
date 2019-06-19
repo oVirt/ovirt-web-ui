@@ -632,7 +632,7 @@ const Nic = {
       interface: nic.interface,
       vnic_profile: undefined,
     }
-    if (nic.vnicProfile.id !== undefined) {
+    if (nic.vnicProfile.id) {
       res.vnic_profile = {
         id: nic.vnicProfile.id,
       }
