@@ -6,10 +6,7 @@ import Selectors from '../selectors'
 
 import logger from '../logger'
 
-import {
-  call,
-  put,
-} from 'redux-saga/effects'
+import { put } from 'redux-saga/effects'
 
 import {
   loginSuccessful,
@@ -17,7 +14,6 @@ import {
   startSchedulerFixedDelay,
 
   failedExternalAction,
-  showTokenExpiredMessage,
   setOvirtApiVersion,
 
   setUserFilterPermission,
@@ -90,28 +86,6 @@ export function* login (action) {
   yield initialLoad()
   yield autoConnectCheck()
   yield put(startSchedulerFixedDelay())
-}
-
-export function* doCheckTokenExpired (action) {
-  try {
-    yield call(Api.getOvirtApiMeta, action.payload)
-    logger.info('doCheckTokenExpired(): token is still valid') // info level: to pair former HTTP 401 error message with updated information
-    return
-  } catch (error) {
-    if (error.status === 401) {
-      logger.info('Token expired, going to reload the page')
-      yield put(showTokenExpiredMessage())
-
-      // Reload the page after a delay
-      // No matter saga is canceled for whatever reason, the reload must happen, so here comes the ugly setTimeout()
-      setTimeout(() => {
-        logger.info('======= doCheckTokenExpired() issuing page reload')
-        window.location.href = AppConfiguration.applicationURL
-      }, 5 * 1000)
-      return
-    }
-    logger.error('doCheckTokenExpired(): unexpected oVirt API error: ', error)
-  }
 }
 
 function composeIncompatibleOVirtApiVersionMessage (oVirtMeta) {

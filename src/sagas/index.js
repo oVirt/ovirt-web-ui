@@ -73,13 +73,13 @@ import {
 import {
   callExternalAction,
   delay,
+  doCheckTokenExpired,
   foreach,
   fetchPermits,
   PermissionsType,
 } from './utils'
 
 import {
-  doCheckTokenExpired,
   login,
   logout,
   compareVersion,

@@ -3,19 +3,18 @@ import {
   put,
 } from 'redux-saga/effects'
 
-import logger from '../logger'
+import AppConfiguration from '_/config'
 import { hidePassword } from '_/helpers'
-
 import { msg } from '_/intl'
+import logger from '_/logger'
+import Api from '_/ovirtapi'
+import { getUserPermits } from '_/utils'
 
 import {
-  failedExternalAction,
   checkTokenExpired,
+  failedExternalAction,
+  showTokenExpiredMessage,
 } from '_/actions'
-
-import Api from '_/ovirtapi'
-
-import { getUserPermits } from '_/utils'
 
 export const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -45,6 +44,27 @@ export function* callExternalAction (methodName, method, action, canBeMissing = 
       }))
     }
     return { error: e }
+  }
+}
+export function* doCheckTokenExpired (action) {
+  try {
+    yield call(Api.getOvirtApiMeta, action.payload)
+    logger.info('doCheckTokenExpired(): token is still valid') // info level: to pair former HTTP 401 error message with updated information
+    return
+  } catch (error) {
+    if (error.status === 401) {
+      logger.info('Token expired, going to reload the page')
+      yield put(showTokenExpiredMessage())
+
+      // Reload the page after a delay
+      // No matter saga is canceled for whatever reason, the reload must happen, so here comes the ugly setTimeout()
+      setTimeout(() => {
+        logger.info('======= doCheckTokenExpired() issuing page reload')
+        window.location.href = AppConfiguration.applicationURL
+      }, 5 * 1000)
+      return
+    }
+    logger.error('doCheckTokenExpired(): unexpected oVirt API error: ', error)
   }
 }
 
