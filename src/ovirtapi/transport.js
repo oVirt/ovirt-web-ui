@@ -57,27 +57,32 @@ type GetRequestType = { url: string, custHeaders?: Object}
 type InputRequestType = { url: string, input: string, contentType?: string }
 type DeleteRequestType = { url: string, custHeaders?: Object }
 
+let getCounter = 0
+const logHeaders = (headers) => JSON.stringify({ ...headers, 'Authorization': '*****' })
+
 function httpGet ({ url, custHeaders = {} }: GetRequestType): Promise<Object> {
-  logger.log(`_httpGet start: url="${url}"`)
+  const myCounter = getCounter++
   const requestId = notifyStart('GET', url)
-  const headers = Object.assign({
+  const headers = {
+    'Accept': 'application/json',
     'Authorization': `Bearer ${_getLoginToken()}`,
     'Accept-Language': AppConfiguration.queryParams.locale, // can be: undefined, empty or string
     'Filter': Selectors.getFilter(),
-    'Accept': 'application/json',
-  }, custHeaders)
-  logger.log(`_httpGet: url="${url}", headers="${JSON.stringify(headers)}"`)
+    ...custHeaders,
+  }
 
+  logger.log(`http GET[${myCounter}] -> url: "${url}", headers: ${logHeaders(headers)}`)
   return $.ajax(url, {
     type: 'GET',
     headers,
   })
     .then((data: Object): Object => {
       notifyStop(requestId)
+      logger.log(`http GET[${myCounter}] <- data:`, data)
       return data
     })
     .catch((data: Object): Promise<Object> => {
-      logger.log(`Ajax failed: ${JSON.stringify(data)}`)
+      logger.log(`Ajax GET failed: ${JSON.stringify(data)}`)
       notifyStop(requestId)
       return Promise.reject(data)
     })
@@ -89,10 +94,10 @@ function httpPost ({ url, input, contentType = 'application/json' }: InputReques
     type: 'POST',
     headers: {
       'Accept': 'application/json',
-      'Content-Type': contentType,
       'Authorization': `Bearer ${_getLoginToken()}`,
       'Accept-Language': AppConfiguration.queryParams.locale,
       'Filter': Selectors.getFilter(),
+      'Content-Type': contentType,
     },
     data: input,
   })
@@ -101,7 +106,7 @@ function httpPost ({ url, input, contentType = 'application/json' }: InputReques
       return data
     })
     .catch((data: Object): Promise<Object> => {
-      logger.log(`Ajax failed: ${JSON.stringify(data)}`)
+      logger.log(`Ajax POST failed: ${JSON.stringify(data)}`)
       notifyStop(requestId)
       return Promise.reject(data)
     })
@@ -113,10 +118,10 @@ function httpPut ({ url, input, contentType = 'application/json' }: InputRequest
     type: 'PUT',
     headers: {
       'Accept': 'application/json',
-      'Content-Type': contentType,
       'Authorization': `Bearer ${_getLoginToken()}`,
       'Accept-Language': AppConfiguration.queryParams.locale,
       'Filter': Selectors.getFilter(),
+      'Content-Type': contentType,
     },
     data: input,
   })
@@ -125,30 +130,28 @@ function httpPut ({ url, input, contentType = 'application/json' }: InputRequest
       return data
     })
     .catch((data: Object): Promise<Object> => {
-      logger.log(`Ajax failed: ${JSON.stringify(data)}`)
+      logger.log(`Ajax PUT failed: ${JSON.stringify(data)}`)
       notifyStop(requestId)
       return Promise.reject(data)
     })
 }
 
 function httpDelete ({ url, custHeaders = { 'Accept': 'application/json' } }: DeleteRequestType): Promise<Object> {
-  const headers = Object.assign({
-    'Authorization': `Bearer ${_getLoginToken()}`,
-    'Filter': Selectors.getFilter(),
-  }, custHeaders)
   const requestId = notifyStart('DELETE', url)
-  logger.log(`_httpDelete: url="${url}", headers="${JSON.stringify(headers)}"`)
-
   return $.ajax(url, {
     type: 'DELETE',
-    headers,
+    headers: {
+      'Authorization': `Bearer ${_getLoginToken()}`,
+      'Filter': Selectors.getFilter(),
+      ...custHeaders,
+    },
   })
     .then((data: Object): Object => {
       notifyStop(requestId)
       return data
     })
     .catch((data: Object): Promise<Object> => {
-      logger.log(`Ajax failed: ${JSON.stringify(data)}`)
+      logger.log(`Ajax DELETE failed: ${JSON.stringify(data)}`)
       notifyStop(requestId)
       return Promise.reject(data)
     })

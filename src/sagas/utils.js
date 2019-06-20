@@ -20,7 +20,7 @@ export const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 export function* callExternalAction (methodName, method, action, canBeMissing = false) {
   try {
-    logger.log(`External action ${methodName}() starts on ${JSON.stringify(hidePassword({ action }))}`)
+    logger.log(`External action: ${JSON.stringify(hidePassword({ action }))}, API method: ${methodName}()`)
     const result = yield call(method, action.payload)
     return result
   } catch (e) {
@@ -68,6 +68,7 @@ export function* doCheckTokenExpired (action) {
   }
 }
 
+// TODO: Can't this be replaced by saga's blocking put.resolve()?
 export function* waitTillEqual (leftArg, rightArg, limit) {
   let counter = limit
 
