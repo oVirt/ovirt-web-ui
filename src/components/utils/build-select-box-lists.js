@@ -21,7 +21,7 @@ function createDataCenterList (dataCenters) {
 
 /**
  * Return a normalized and sorted list of clusters ready for use in a __SelectBox__ from
- * the Map of provided clusters.
+ * the Map of provided clusters, optionally limiting to clusters in a given data center.
  */
 function createClusterList (clusters, dataCenterId = null) {
   const clusterList =
@@ -29,7 +29,9 @@ function createClusterList (clusters, dataCenterId = null) {
       .toList()
       .filter(cluster =>
         cluster.get('canUserUseCluster') &&
-        (dataCenterId ? cluster.get('dataCenterId') === dataCenterId : true)
+        (dataCenterId === null
+          ? true
+          : cluster.get('dataCenterId') === dataCenterId)
       )
       .map(cluster => ({
         id: cluster.get('id'),
@@ -44,7 +46,7 @@ function createClusterList (clusters, dataCenterId = null) {
 
 /**
  * Return a normalized list of iso files from the set of provided storage domains,
- * optionally filtering based on the provided data center.
+ * optionally limiting to ISOs available in a given data center.
  */
 function createIsoList (storageDomains, dataCenterId = null) {
   const list = []
@@ -54,7 +56,9 @@ function createIsoList (storageDomains, dataCenterId = null) {
     .filter(storageDomain =>
       storageDomain.has('files') &&
       storageDomain.get('canUserUseDomain') &&
-      (dataCenterId ? storageDomain.getIn([ 'statusPerDataCenter', dataCenterId ]) === 'active' : true)
+      (dataCenterId === null
+        ? true
+        : storageDomain.getIn([ 'statusPerDataCenter', dataCenterId ]) === 'active')
     )
     .forEach(storageDomain => {
       storageDomain.get('files').forEach(file => {
