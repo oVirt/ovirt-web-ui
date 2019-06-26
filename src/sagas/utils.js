@@ -16,7 +16,30 @@ import {
   showTokenExpiredMessage,
 } from '_/actions'
 
+/**
+ * Resolve a promise after the given delay (in milliseconds)
+ */
 export const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+
+/**
+ * Compare the actual { major, minor } version to the required { major, minor } and
+ * return if the **actual** is greater then or equal to **required**.
+ *
+ * Backward compatibility of the API is assumed.
+ */
+export function compareVersion (actual, required) {
+  logger.log(`compareVersion(), actual=${JSON.stringify(actual)}, required=${JSON.stringify(required)}`)
+
+  if (actual.major >= required.major) {
+    if (actual.major === required.major) {
+      if (actual.minor < required.minor) {
+        return false
+      }
+    }
+    return true
+  }
+  return false
+}
 
 export function* callExternalAction (methodName, method, action, canBeMissing = false) {
   try {

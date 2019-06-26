@@ -7,6 +7,7 @@ import vmSnapshotsSagas from '_/components/VmDetails/cards/SnapshotsCard/sagas'
 import optionsDialogSagas from '_/components/OptionsDialog/sagas'
 import vmDisksSagas from './disks'
 import storageDomainSagas, { fetchIsoFiles } from './storageDomains'
+import loginSagas from './login'
 
 import {
   all,
@@ -61,7 +62,6 @@ import {
   getConsoleOptions as actionGetConsoleOptions,
   setVmCdRom,
   setVmNics,
-  setUSBFilter,
   removeActiveRequest,
   stopSchedulerFixedDelay,
   getVmCdRom,
@@ -72,18 +72,13 @@ import {
 
 import {
   callExternalAction,
+  compareVersion,
   delay,
   doCheckTokenExpired,
   foreach,
   fetchPermits,
   PermissionsType,
 } from './utils'
-
-import {
-  login,
-  logout,
-  compareVersion,
-} from './login'
 
 import {
   downloadVmConsole,
@@ -116,12 +111,9 @@ import {
   GET_POOLS_BY_COUNT,
   GET_POOLS_BY_PAGE,
   GET_RDP_VM,
-  GET_USB_FILTER,
   GET_USER_GROUPS,
   GET_VMS_BY_COUNT,
   GET_VMS_BY_PAGE,
-  LOGIN,
-  LOGOUT,
   PERSIST_STATE,
   REFRESH_DATA,
   REMOVE_VM,
@@ -839,7 +831,7 @@ function* selectPoolDetail (action) {
   yield fetchSinglePool(getSinglePool({ poolId: action.payload.poolId }))
 }
 
-function* fetchAllTemplates (action) {
+export function* fetchAllTemplates (action) {
   const templates = yield callExternalAction('getAllTemplates', Api.getAllTemplates, action)
 
   if (templates && templates['template']) {
@@ -848,7 +840,7 @@ function* fetchAllTemplates (action) {
   }
 }
 
-function* fetchAllClusters (action) {
+export function* fetchAllClusters (action) {
   const clusters = yield callExternalAction('getAllClusters', Api.getAllClusters, action)
 
   if (clusters && clusters['cluster']) {
@@ -868,7 +860,7 @@ function* fetchAllClusters (action) {
   // TODO: Api.getAllClusters uses 'follows' so it won't work <4.2, add support if needed
 }
 
-function* fetchAllHosts (action) {
+export function* fetchAllHosts (action) {
   const hosts = yield callExternalAction('getAllHosts', Api.getAllHosts, action)
 
   if (hosts && hosts['host']) {
@@ -877,7 +869,7 @@ function* fetchAllHosts (action) {
   }
 }
 
-function* fetchAllOS (action) {
+export function* fetchAllOS (action) {
   const operatingSystems = yield callExternalAction('getAllOperatingSystems', Api.getAllOperatingSystems, action)
 
   if (operatingSystems && operatingSystems['operating_system']) {
@@ -950,14 +942,7 @@ function* fetchVmSnapshotNics ({ vmId, snapshotId }) {
   return nicsInternal
 }
 
-function* fetchUSBFilter (action) {
-  const usbFilter = yield callExternalAction('getUSBFilter', Api.getUSBFilter, action)
-  if (usbFilter) {
-    yield put(setUSBFilter({ usbFilter }))
-  }
-}
-
-function* fetchAllVnicProfiles (action) {
+export function* fetchAllVnicProfiles (action) {
   const vnicProfiles = yield callExternalAction('getAllVnicProfiles', Api.getAllVnicProfiles, action)
   if (vnicProfiles && vnicProfiles['vnic_profile']) {
     // Temporary solution, till bug will be fixed https://bugzilla.redhat.com/show_bug.cgi?id=1639784
@@ -985,7 +970,7 @@ function* fetchAllNetworks () {
   }
 }
 
-function* fetchUserGroups () {
+export function* fetchUserGroups () {
   const groups = yield callExternalAction('groups', Api.groups, { payload: { userId: Selectors.getUserId() } })
   if (groups && groups['group']) {
     const groupsInternal = groups.group.map(group => group.id)
@@ -1043,10 +1028,8 @@ function* schedulerWithFixedDelay (delayInSeconds = AppConfiguration.schedulerFi
 
 export function* rootSaga () {
   yield all([
-    takeEvery(LOGIN, login),
-    takeEvery(LOGOUT, logout),
+    ...loginSagas,
     takeLatest(CHECK_TOKEN_EXPIRED, doCheckTokenExpired),
-    takeEvery(GET_USB_FILTER, fetchUSBFilter),
     takeEvery(DELAYED_REMOVE_ACTIVE_REQUEST, delayedRemoveActiveRequest),
 
     takeEvery(START_SCHEDULER_FIXED_DELAY, startSchedulerWithFixedDelay),

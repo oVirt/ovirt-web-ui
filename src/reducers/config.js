@@ -1,12 +1,12 @@
 import Immutable from 'immutable'
 import { actionReducer } from './utils'
 import {
+  APP_CONFIGURED,
   LOGIN_FAILED,
   LOGIN_SUCCESSFUL,
   LOGOUT,
   SET_ADMINISTRATOR,
   SET_CURRENT_PAGE,
-  SET_DOMAIN,
   SET_CPU_TOPOLOGY_OPTIONS,
   SET_OVIRT_API_VERSION,
   SET_USB_FILTER,
@@ -18,6 +18,7 @@ import {
 } from '_/constants'
 
 const initialState = Immutable.fromJS({
+  appConfigured: false,
   loginToken: undefined,
   logoutWasManual: false,
   isTokenExpired: false,
@@ -46,8 +47,15 @@ const initialState = Immutable.fromJS({
 })
 
 const config = actionReducer(initialState, {
-  [LOGIN_SUCCESSFUL] (state, { payload: { token, username, userId } }) {
-    return state.merge({ loginToken: token, user: { name: username, id: userId } })
+  [LOGIN_SUCCESSFUL] (state, { payload: { username, domain, token, userId } }) {
+    return state.merge({
+      loginToken: token,
+      user: {
+        name: username,
+        id: userId,
+      },
+      domain,
+    })
   },
   [LOGIN_FAILED] (state) {
     return state.delete('loginToken').deleteIn(['user', 'name'])
@@ -73,9 +81,6 @@ const config = actionReducer(initialState, {
   [SHOW_TOKEN_EXPIRED_MSG] (state) {
     return state.set('isTokenExpired', true)
   },
-  [SET_DOMAIN] (state, { payload: { domain } }) {
-    return state.set('domain', domain)
-  },
   [SET_USB_FILTER] (state, { payload: { usbFilter } }) {
     return state.set('usbFilter', usbFilter)
   },
@@ -90,15 +95,19 @@ const config = actionReducer(initialState, {
   },
   [SET_CPU_TOPOLOGY_OPTIONS] (state, { payload: {
     maxNumberOfSockets,
-    maxNumOfVmCpus,
     maxNumberOfCores,
     maxNumberOfThreads,
+    maxNumOfVmCpus,
   } }) {
-    return state
-      .set('maxNumberOfSockets', maxNumberOfSockets)
-      .set('maxNumberOfCores', maxNumberOfCores)
-      .set('maxNumberOfThreads', maxNumberOfThreads)
-      .set('maxNumOfVmCpus', maxNumOfVmCpus)
+    return state.merge({
+      maxNumberOfSockets,
+      maxNumberOfCores,
+      maxNumberOfThreads,
+      maxNumOfVmCpus,
+    })
+  },
+  [APP_CONFIGURED] (state) {
+    return state.set('appConfigured', true)
   },
 }, true)
 

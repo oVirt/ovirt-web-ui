@@ -1,12 +1,11 @@
-import Product from '../version'
+import { all, call, put, takeEvery, select } from 'redux-saga/effects'
+import pick from 'lodash/pick'
+
+import Product from '_/version'
 import Api from '_/ovirtapi'
-import AppConfiguration from '../config'
-import OptionsManager from '../optionsManager'
-import Selectors from '../selectors'
-
-import logger from '../logger'
-
-import { put } from 'redux-saga/effects'
+import AppConfiguration from '_/config'
+import OptionsManager from '_/optionsManager'
+import logger from '_/logger'
 
 import {
   loginSuccessful,
@@ -17,10 +16,7 @@ import {
   setOvirtApiVersion,
 
   setUserFilterPermission,
-  setUserSessionTimeoutInternal,
-  setWebsocket,
   setAdministrator,
-  setCpuTopologyOptions,
   getOption,
 
   getAllClusters,
@@ -33,26 +29,37 @@ import {
   getUserGroups,
 
   downloadConsole,
-  getUSBFilter,
   getSingleVm,
 
   updateVms,
+  appConfigured,
 } from '_/actions'
+
+import { LOGIN, LOGOUT } from '_/constants'
 
 import {
   callExternalAction,
-  waitTillEqual,
+  compareVersion,
 } from './utils'
 
 import {
-  downloadVmConsole,
-} from './console'
+  fetchAllClusters,
+  fetchAllHosts,
+  fetchAllOS,
+  fetchAllTemplates,
+  fetchAllVnicProfiles,
+  fetchUserGroups,
+} from './index'
+import { downloadVmConsole } from './console'
+import { fetchServerConfiguredValues } from './server-configs'
+import { fetchDataCentersAndStorageDomains, fetchIsoFiles } from './storageDomains'
 
 /**
  * Perform login checks, and if they pass, perform initial data loading
  */
-export function* login (action) {
-  const { payload: { token, userId, credentials: { username } } } = action
+function* login (action) {
+  const { payload: { token, userId, username, domain } } = action
+  console.group('Login Verification')
 
   // Verify a SSO token exists
   if (!token) {
@@ -63,7 +70,7 @@ export function* login (action) {
     return
   }
 
-  yield put(loginSuccessful({ token, username, userId }))
+  yield put(loginSuccessful({ token, userId, username, domain }))
 
   // Verify the API (exists and is the correct version)
   const oVirtMeta = yield callExternalAction('getOvirtApiMeta', Api.getOvirtApiMeta, action)
@@ -76,52 +83,36 @@ export function* login (action) {
     }))
     return
   }
+  console.groupEnd('Login Verification')
 
   // API checks passed.  Load user data and the initial app data
-  yield fetchPermissionWithoutFilter()
-  yield fetchCpuTopologyOptions()
-  yield fetchUserSessionTimeoutInterval()
-  yield fetchWebsocketInformation()
-  yield put(getUSBFilter())
-  yield initialLoad()
-  yield autoConnectCheck()
-  yield put(startSchedulerFixedDelay())
-}
+  console.group('Login Data Fetch')
+  yield checkUserFilterPermissions()
+  yield fetchServerConfiguredValues()
+  console.log('\u2714 login checks and server config fetches are done:',
+    yield select(state => pick(
+      state.config.toJS(),
+      [ 'administrator', 'filter', 'domain', 'user', 'userSessionTimeoutInterval', 'websocket', 'cpuTopology' ]))
+  )
 
-function composeIncompatibleOVirtApiVersionMessage (oVirtMeta) {
-  const requested = `${Product.ovirtApiVersionRequired.major}.${Product.ovirtApiVersionRequired.minor}`
-  let found
-  if (!(oVirtMeta &&
-        oVirtMeta['product_info'] &&
-        oVirtMeta['product_info']['version'] &&
-        oVirtMeta['product_info']['version']['major'] &&
-        oVirtMeta['product_info']['version']['minor'])) {
-    found = JSON.stringify(oVirtMeta)
-  } else {
-    const version = oVirtMeta['product_info']['version']
-    found = `${version.major}.${version.minor}`
-  }
-  return `oVirt API version requested >= ${requested}, but ${found} found` // TODO: Localize
+  yield initialLoad()
+  console.groupEnd('Login Data Fetch')
+
+  yield put(appConfigured())
+  yield put(startSchedulerFixedDelay())
+  yield autoConnectCheck()
 }
 
 /**
- * Compare the actual { major, minor } version to the required { major, minor } and
- * return if the **actual** is greater then or equal to **required**.
+ * Second action on logout: if configured, push the user to a SSO logout URL that
+ * will manually invalidate the SSO token.
  *
- * Backward compatibility of the API is assumed.
+ * NOTE: The __config__ reducer also responds to the logout action
  */
-export function compareVersion (actual, required) {
-  logger.log(`compareVersion(), actual=${JSON.stringify(actual)}, required=${JSON.stringify(required)}`)
-
-  if (actual.major >= required.major) {
-    if (actual.major === required.major) {
-      if (actual.minor < required.minor) {
-        return false
-      }
-    }
-    return true
+function* logout () {
+  if (AppConfiguration.applicationLogoutURL && AppConfiguration.applicationLogoutURL.length > 0) {
+    window.location.href = AppConfiguration.applicationLogoutURL
   }
-  return false
 }
 
 /**
@@ -147,10 +138,66 @@ function* checkOvirtApiVersion (oVirtMeta) {
   return passed
 }
 
-export function* logout () {
-  if (AppConfiguration.applicationLogoutURL && AppConfiguration.applicationLogoutURL.length > 0) {
-    window.location.href = AppConfiguration.applicationLogoutURL
+function composeIncompatibleOVirtApiVersionMessage (oVirtMeta) {
+  const requested = `${Product.ovirtApiVersionRequired.major}.${Product.ovirtApiVersionRequired.minor}`
+  let found
+  if (!(oVirtMeta &&
+        oVirtMeta['product_info'] &&
+        oVirtMeta['product_info']['version'] &&
+        oVirtMeta['product_info']['version']['major'] &&
+        oVirtMeta['product_info']['version']['minor'])) {
+    found = JSON.stringify(oVirtMeta)
+  } else {
+    const version = oVirtMeta['product_info']['version']
+    found = `${version.major}.${version.minor}`
   }
+  return `oVirt API version requested >= ${requested}, but ${found} found` // TODO: Localize
+}
+
+function* checkUserFilterPermissions () {
+  const data = yield callExternalAction('checkFilter', Api.checkFilter, { action: 'CHECK_FILTER' }, true)
+
+  const isAdmin = data.error === undefined // expect an error on `checkFilter` if the user isn't admin
+  yield put(setAdministrator(isAdmin))
+
+  if (!isAdmin) {
+    yield put.resolve(setUserFilterPermission(true))
+    return
+  }
+
+  const alwaysFilterOption = yield callExternalAction(
+    'getOption',
+    Api.getOption,
+    getOption('AlwaysFilterResultsForWebUi', 'general', 'false'))
+
+  const isAlwaysFilterOption = alwaysFilterOption === 'true'
+  yield put.resolve(setUserFilterPermission(isAlwaysFilterOption))
+}
+
+function* initialLoad () {
+  // no data prerequisites
+  yield all([
+    call(fetchUserGroups, getUserGroups()),
+    call(fetchAllOS, getAllOperatingSystems()),
+    call(fetchAllHosts, getAllHosts()),
+  ])
+  console.log('\u2714 data loads with no pre-reqs are complete')
+
+  // requires user groups to be in redux store for authorization checks
+  yield all([
+    call(fetchDataCentersAndStorageDomains, getAllStorageDomains()),
+    call(fetchAllTemplates, getAllTemplates()),
+    call(fetchAllClusters, getAllClusters()),
+    call(fetchAllVnicProfiles, getAllVnicProfiles()),
+  ])
+  console.log('\u2714 data loads that require user groups are complete')
+
+  // requires storage domains to be in redux store
+  yield call(fetchIsoFiles, getIsoFiles())
+  console.log('\u2714 data loads that require storage domains are complete')
+
+  // The `Vms` card view component will take care of loading pages of VMs and Pools as needed.
+  // Loading VMs and Pools here is not necessary and will cause issues with `Vms`'s loading.
 }
 
 function* autoConnectCheck () {
@@ -167,86 +214,7 @@ function* autoConnectCheck () {
   }
 }
 
-function* fetchCpuTopologyOptions () {
-  const version = Selectors.getOvirtVersion()
-  const maxNumberOfSockets = yield callExternalAction(
-    'getOption',
-    Api.getOption,
-    getOption('MaxNumOfVmSockets', `${version.get('major')}.${version.get('minor')}`, 16))
-  const maxNumberOfCores = yield callExternalAction(
-    'getOption',
-    Api.getOption,
-    getOption('MaxNumOfCpuPerSocket', `${version.get('major')}.${version.get('minor')}`, 16))
-  const maxNumberOfThreads = yield callExternalAction(
-    'getOption',
-    Api.getOption,
-    getOption('MaxNumOfThreadsPerCpu', `${version.get('major')}.${version.get('minor')}`, 16))
-  const maxNumOfVmCpus = yield callExternalAction(
-    'getOption',
-    Api.getOption,
-    getOption('MaxNumOfVmCpus', `${version.get('major')}.${version.get('minor')}`, 1))
-  yield put(setCpuTopologyOptions({
-    maxNumberOfSockets: parseInt(maxNumberOfSockets),
-    maxNumberOfCores: parseInt(maxNumberOfCores),
-    maxNumberOfThreads: parseInt(maxNumberOfThreads),
-    maxNumOfVmCpus: parseInt(maxNumOfVmCpus),
-  }))
-}
-
-function* fetchUserSessionTimeoutInterval () {
-  const userSessionTimeoutInterval = yield callExternalAction(
-    'getOption',
-    Api.getOption,
-    getOption('UserSessionTimeOutInterval', 'general', '30'))
-  yield put(setUserSessionTimeoutInternal(parseInt(userSessionTimeoutInterval)))
-}
-
-function* initialLoad () {
-  yield put(getUserGroups())
-
-  // no requirements
-  yield put(getAllOperatingSystems())
-  yield put(getAllTemplates({ shallowFetch: false }))
-  yield put(getAllHosts())
-  yield put(getAllStorageDomains())
-
-  // requires user groups to be in redux store for authorization checks
-  yield put(getAllClusters())
-  yield put(getAllVnicProfiles())
-
-  // requires storage domains to be in redux store
-  yield put(getIsoFiles())
-
-  // The `Vms` card view component will take care of loading pages of VMs and Pools as needed.
-  // Loading VMs and Pools here is not necessary and will cause issues with `Vms`'s loading.
-}
-
-function* fetchWebsocketInformation () {
-  const data = yield callExternalAction('getOption', Api.getOption, getOption('WebSocketProxy', 'general', ''))
-  if (data) {
-    let websocket = data.split(':')
-    websocket = { host: websocket[0], port: websocket[1] }
-    yield put(setWebsocket(websocket))
-  }
-}
-
-function* fetchPermissionWithoutFilter () {
-  const data = yield callExternalAction('checkFilter', Api.checkFilter, { action: 'CHECK_FILTER' }, true)
-
-  const isAdmin = data.error === undefined // expect an error on `checkFilter` if the user isn't admin
-  yield put(setAdministrator(isAdmin))
-
-  if (!isAdmin) {
-    yield put(setUserFilterPermission(true))
-    return
-  }
-
-  const alwaysFilterOption = yield callExternalAction(
-    'getOption',
-    Api.getOption,
-    getOption('AlwaysFilterResultsForWebUi', 'general', 'false'))
-
-  const isAlwaysFilterOption = alwaysFilterOption === 'true'
-  yield put(setUserFilterPermission(isAlwaysFilterOption))
-  yield waitTillEqual(Selectors.getFilter, isAlwaysFilterOption, 50)
-}
+export default [
+  takeEvery(LOGIN, login),
+  takeEvery(LOGOUT, logout),
+]
