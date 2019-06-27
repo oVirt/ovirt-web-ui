@@ -125,4 +125,5 @@ export const PermissionsType = {
   CLUSTER_TYPE: 'Cluster',
   VNIC_PROFILE_TYPE: 'VnicProfile',
   DISK_TYPE: 'Disk',
+  TEMPLATE_TYPE: 'Template',
 }

@@ -329,6 +329,9 @@ const VmStatistics = {
 //
 const Template = {
   toInternal ({ template }: { template: ApiTemplateType}): TemplateType {
+    const permits = template.permissions && template.permissions.permission
+      ? getUserPermits(Permissions.toInternal({ permissions: template.permissions.permission }))
+      : new Set()
     const version = {
       name: template.version ? template.version.version_name : undefined,
       number: template.version ? template.version.version_number : undefined,
@@ -358,6 +361,7 @@ const Template = {
       },
       cloudInit: CloudInit.toInternal({ vm: template }),
       bootMenuEnabled: template.bios && template.bios.boot_menu && convertBool(template.bios.boot_menu.enabled),
+      permits,
     }
   },
 

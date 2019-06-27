@@ -794,7 +794,7 @@ VmDialog.propTypes = {
 export default connect(
   (state) => ({
     clusters: state.clusters.filter(cluster => cluster.get('canUserUseCluster')),
-    templates: state.templates,
+    templates: state.templates.filter(cluster => cluster.get('canUserUseTemplate')),
     operatingSystems: state.operatingSystems,
     userMessages: state.userMessages,
     icons: state.icons,
