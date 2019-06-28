@@ -69,6 +69,7 @@ export function* callExternalAction (methodName, method, action = {}, canBeMissi
     return { error: e }
   }
 }
+
 export function* doCheckTokenExpired (action) {
   try {
     yield call(Api.getOvirtApiMeta, action.payload)
@@ -164,6 +165,10 @@ export function* fetchPermits ({ entityType, id }) {
   return getUserPermits(Api.permissionsToInternal({ permissions: permissions.permission }))
 }
 
+export const PermissionsType = {
+  DISK_TYPE: 'Disk',
+}
+
 /**
  * Convert a set of permissions to a set of permits for the app's current user by
  * mapping the permissions through their assigned roles to the permits.
@@ -172,13 +177,15 @@ export function* fetchPermits ({ entityType, id }) {
  * explicitly checked.
  */
 export function* permissionsToUserPermits (permissions) {
+  permissions = Array.isArray(permissions) ? permissions : [permissions]
+
   const userFilter = yield select(state => state.config.get('filter'))
   const userGroups = yield select(state => state.config.get('userGroups'))
   const userId = yield select(state => state.config.getIn(['user', 'id']))
   const roles = yield select(state => state.roles)
 
   const permitNames = []
-  for (const permission of (Array.isArray(permissions) ? permissions : [permissions])) {
+  for (const permission of permissions) {
     if (userFilter ||
       (
         (permission.groupId && userGroups.includes(permission.groupId)) ||
@@ -195,12 +202,4 @@ export function* permissionsToUserPermits (permissions) {
   }
 
   return new Set(permitNames)
-}
-
-export const PermissionsType = {
-  STORAGE_DOMAIN_TYPE: 'StorageDomain',
-  CLUSTER_TYPE: 'Cluster',
-  VNIC_PROFILE_TYPE: 'VnicProfile',
-  DISK_TYPE: 'Disk',
-  TEMPLATE_TYPE: 'Template',
 }

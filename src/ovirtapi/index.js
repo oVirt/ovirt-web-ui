@@ -42,26 +42,10 @@ const OvirtApi = {
 
   diskToInternal: Transforms.DiskAttachment.toInternal,
 
-  templateToInternal: Transforms.Template.toInternal,
-
-  storageDomainToInternal: Transforms.StorageDomain.toInternal,
-
-  dataCenterToInternal: Transforms.DataCenter.toInternal,
-
-  clusterToInternal: Transforms.Cluster.toInternal,
-
   nicToInternal: Transforms.Nic.toInternal,
   internalNicToOvirt: Transforms.Nic.toApi,
 
-  vnicProfileToInternal: Transforms.VNicProfile.toInternal,
-
   networkToInternal: Transforms.Network.toInternal,
-
-  hostToInternal: Transforms.Host.toInternal,
-
-  OSToInternal: Transforms.OS.toInternal,
-
-  fileToInternal: Transforms.StorageDomainFile.toInternal,
 
   sessionsToInternal: Transforms.VmSessions.toInternal,
 
@@ -162,46 +146,12 @@ const OvirtApi = {
     return httpGet({ url })
   },
 
-  getAllDataCenters ({ additional }: { additional: Array<string> }): Promise<Object> {
-    assertLogin({ methodName: 'getAllDataCenters' })
-    const url = `${AppConfiguration.applicationContext}/api/datacenters` +
-      (additional && additional.length > 0 ? `?follow=${additional.join(',')}` : '')
-    return httpGet({ url })
-  },
-  getAllClusters ({ additional }: { additional: Array<string> }): Promise<Object> {
+  getAllClusters (): Promise<Object> {
     assertLogin({ methodName: 'getAllClusters' })
-
-    let follow = 'networks'
-    if (additional && additional.length > 0) {
-      if (!additional.includes('networks')) {
-        additional.push('networks')
-      }
-      follow = additional.join(',')
-    }
-
-    const url = `${AppConfiguration.applicationContext}/api/clusters?follow=${follow}`
+    const url = `${AppConfiguration.applicationContext}/api/clusters?follow=networks,permissions`
     return httpGet({ url })
   },
-  getClusterPermissions ({ id }: { id: string }): Promise<Object> {
-    assertLogin({ methodName: 'getClusterPermissions' })
-    const url = `${AppConfiguration.applicationContext}/api/clusters/${id}/permissions?follow=role.permits`
-    return httpGet({ url, custHeaders: { Filter: true } })
-  },
-  getTemplatePermissions ({ id }: { id: string }): Promise<Object> {
-    assertLogin({ methodName: 'getTemplatePermissions' })
-    const url = `${AppConfiguration.applicationContext}/api/templates/${id}/permissions?follow=role.permits`
-    return httpGet({ url, custHeaders: { Filter: true } })
-  },
-  getVnicProfilePermissions ({ id }: { id: string }): Promise<Object> {
-    assertLogin({ methodName: 'getVnicProfilePermissions' })
-    const url = `${AppConfiguration.applicationContext}/api/vnicprofiles/${id}/permissions?follow=role.permits`
-    return httpGet({ url, custHeaders: { Filter: true } })
-  },
-  getStorageDomainPermissions ({ id }: { id: string }): Promise<Object> {
-    assertLogin({ methodName: 'getStorageDomainPermissions' })
-    const url = `${AppConfiguration.applicationContext}/api/storagedomains/${id}/permissions?follow=role.permits`
-    return httpGet({ url, custHeaders: { Filter: true } })
-  },
+
   getDiskPermissions ({ id }: { id: string }): Promise<Object> {
     assertLogin({ methodName: 'getDiskPermissions' })
     const url = `${AppConfiguration.applicationContext}/api/disks/${id}/permissions?follow=role.permits`
@@ -211,6 +161,13 @@ const OvirtApi = {
     assertLogin({ methodName: 'getVmPermissions' })
     const url = `${AppConfiguration.applicationContext}/api/vms/${vmId}/permissions?follow=role.permits`
     return httpGet({ url, custHeaders: { Filter: true } })
+  },
+
+  getAllDataCenters ({ additional }: { additional: Array<string> }): Promise<Object> {
+    assertLogin({ methodName: 'getAllDataCenters' })
+    const url = `${AppConfiguration.applicationContext}/api/datacenters` +
+      (additional && additional.length > 0 ? `?follow=${additional.join(',')}` : '')
+    return httpGet({ url })
   },
   getAllHosts (): Promise<Object> {
     assertLogin({ methodName: 'getAllHosts' })
@@ -430,7 +387,7 @@ const OvirtApi = {
 
   getStorages (): Promise<Object> {
     assertLogin({ methodName: 'getStorages' })
-    return httpGet({ url: `${AppConfiguration.applicationContext}/api/storagedomains` })
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/storagedomains?follow=permissions` })
   },
   getStorageFiles ({ storageId }: { storageId: string }): Promise<Object> {
     assertLogin({ methodName: 'getStorageFiles' })
@@ -569,7 +526,7 @@ const OvirtApi = {
 
   getAllVnicProfiles (): Promise<Object> {
     assertLogin({ methodName: 'getVnicProfiles' })
-    return httpGet({ url: `${AppConfiguration.applicationContext}/api/vnicprofiles?follow=network,permissions.role.permits` })
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/vnicprofiles?follow=network,permissions` })
   },
 
   getVmsNic ({ vmId }: { vmId: string }): Promise<Object> {

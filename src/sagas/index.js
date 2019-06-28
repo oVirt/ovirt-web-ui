@@ -36,12 +36,6 @@ import {
 
   getSingleVm,
   selectVmDetail as actionSelectVmDetail,
-  setClusters,
-  setHosts,
-  setOperatingSystems,
-  setUserGroups,
-  addNetworksToVnicProfiles,
-  setVnicProfiles,
   setVmSnapshots,
 
   setUserMessages,
@@ -100,17 +94,12 @@ import {
   DISMISS_EVENT,
   DOWNLOAD_CONSOLE_VM,
   EDIT_VM_NIC,
-  GET_ALL_CLUSTERS,
   GET_ALL_EVENTS,
-  GET_ALL_HOSTS,
-  GET_ALL_OS,
-  GET_ALL_VNIC_PROFILES,
   GET_BY_PAGE,
   GET_CONSOLE_OPTIONS,
   GET_POOLS_BY_COUNT,
   GET_POOLS_BY_PAGE,
   GET_RDP_VM,
-  GET_USER_GROUPS,
   GET_VMS_BY_COUNT,
   GET_VMS_BY_PAGE,
   REFRESH_DATA,
@@ -133,8 +122,6 @@ import {
   canUserEditDisk,
   canUserEditVm,
   canUserEditVmStorage,
-  canUserUseCluster,
-  canUserUseVnicProfile,
   getUserPermits,
   isNumber,
 } from '_/utils'
@@ -151,7 +138,7 @@ const vmFetchAdditionalList =
     'permissions.role.permits',
   ]
 
-const EVERYONE_GROUP_ID = 'eee00000-0000-0000-0000-123456789eee'
+export const EVERYONE_GROUP_ID = 'eee00000-0000-0000-0000-123456789eee'
 
 /**
  * Compare the current oVirt version (held in redux) to the given version.
@@ -731,50 +718,11 @@ function* selectPoolDetail (action) {
   yield fetchSinglePool(getSinglePool({ poolId: action.payload.poolId }))
 }
 
-export function* fetchAllClusters (action) {
-  const clusters = yield callExternalAction('getAllClusters', Api.getAllClusters, action)
-
-  if (clusters && clusters['cluster']) {
-    // Temporary solution, till bug will be fixed https://bugzilla.redhat.com/show_bug.cgi?id=1639784
-    let clustersInternal = (yield all(
-      clusters.cluster
-        .map(function* (cluster) {
-          const clusterInternal = Api.clusterToInternal({ cluster })
-          clusterInternal.permits = yield fetchPermits({ entityType: PermissionsType.CLUSTER_TYPE, id: cluster.id })
-          clusterInternal.canUserUseCluster = canUserUseCluster(clusterInternal.permits)
-          return clusterInternal
-        })
-    ))
-    yield put(setClusters(clustersInternal))
-  }
-
-  // TODO: Api.getAllClusters uses 'follows' so it won't work <4.2, add support if needed
-}
-
 function* saveFilters (actions) {
   const { filters } = actions.payload
   const userId = yield select(state => state.config.getIn(['user', 'id']))
   saveToLocalStorage(`vmFilters-${userId}`, JSON.stringify(filters))
   yield put(setVmsFilters({ filters }))
-}
-
-export function* fetchAllHosts (action) {
-  const hosts = yield callExternalAction('getAllHosts', Api.getAllHosts, action)
-
-  if (hosts && hosts['host']) {
-    const hostsInternal = hosts.host.map(host => Api.hostToInternal({ host }))
-    yield put(setHosts(hostsInternal))
-  }
-}
-
-export function* fetchAllOS (action) {
-  const operatingSystems = yield callExternalAction('getAllOperatingSystems', Api.getAllOperatingSystems, action)
-
-  if (operatingSystems && operatingSystems['operating_system']) {
-    const operatingSystemsInternal = operatingSystems.operating_system.map(os => Api.OSToInternal({ os }))
-    yield put(setOperatingSystems(operatingSystemsInternal))
-    yield fetchUnknownIcons({ os: operatingSystemsInternal })
-  }
 }
 
 function* fetchVmsNics ({ vms }) {
@@ -837,44 +785,6 @@ function* fetchVmSnapshotNics ({ vmId, snapshotId }) {
     nicsInternal = nics.nic.map((nic) => Api.nicToInternal({ nic }))
   }
   return nicsInternal
-}
-
-export function* fetchAllVnicProfiles (action) {
-  const vnicProfiles = yield callExternalAction('getAllVnicProfiles', Api.getAllVnicProfiles, action)
-  if (vnicProfiles && vnicProfiles['vnic_profile']) {
-    // Temporary solution, till bug will be fixed https://bugzilla.redhat.com/show_bug.cgi?id=1639784
-    const vnicProfilesInternal = (yield all(
-      vnicProfiles.vnic_profile
-        .map(function* (vnicProfile) {
-          const vnicProfileInternal = Api.vnicProfileToInternal({ vnicProfile })
-          vnicProfileInternal.permits = yield fetchPermits({ entityType: PermissionsType.VNIC_PROFILE_TYPE, id: vnicProfile.id })
-          vnicProfileInternal.canUserUseProfile = canUserUseVnicProfile(vnicProfileInternal.permits)
-          return vnicProfileInternal
-        })
-    ))
-    yield put(setVnicProfiles({ vnicProfiles: vnicProfilesInternal }))
-    if (!compareVersionToCurrent({ major: 4, minor: 2 })) {
-      yield fetchAllNetworks()
-    }
-  }
-}
-
-function* fetchAllNetworks () {
-  const networks = yield callExternalAction('getAllNetworks', Api.getAllNetworks, { type: 'GET_ALL_NETWORKS' })
-  if (networks && networks['network']) {
-    const networksInternal = networks.network.map(network => Api.networkToInternal({ network }))
-    yield put(addNetworksToVnicProfiles({ networks: networksInternal }))
-  }
-}
-
-export function* fetchUserGroups () {
-  const userId = yield select(state => state.config.getIn(['user', 'id']))
-  const groups = yield callExternalAction('groups', Api.groups, { payload: { userId } })
-  if (groups && groups['group']) {
-    const groupsInternal = groups.group.map(group => group.id)
-    groupsInternal.push(EVERYONE_GROUP_ID)
-    yield put(setUserGroups({ groups: groupsInternal }))
-  }
 }
 
 function* delayedRemoveActiveRequest ({ payload: requestId }) {
@@ -955,12 +865,6 @@ export function* rootSaga () {
     throttle(100, GET_POOLS_BY_COUNT, fetchPoolsByCount),
     throttle(100, GET_POOLS_BY_PAGE, fetchPoolsByPage),
     takeLatest(CHANGE_PAGE, changePage),
-
-    takeLatest(GET_ALL_CLUSTERS, fetchAllClusters),
-    takeLatest(GET_ALL_OS, fetchAllOS),
-    takeLatest(GET_ALL_HOSTS, fetchAllHosts),
-    takeLatest(GET_ALL_VNIC_PROFILES, fetchAllVnicProfiles),
-    takeLatest(GET_USER_GROUPS, fetchUserGroups),
 
     takeLatest(GET_ALL_EVENTS, fetchAllEvents),
     takeEvery(DISMISS_EVENT, dismissEvent),
