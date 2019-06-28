@@ -28,7 +28,6 @@ import { rootSaga } from '_/sagas'
 import {
   login,
   updateIcons,
-  setDomain,
   addActiveRequest,
   delayedRemoveActiveRequest,
 } from '_/actions'
@@ -154,9 +153,8 @@ function onResourcesLoaded () {
   renderApp(store, sagaErrorBridge)
 
   const { token, username, domain, userId }: { token: string, username: string, domain: string, userId: string } = fetchToken()
-  store.dispatch(setDomain({ domain }))
   if (token) {
-    store.dispatch(login({ username, token, userId }))
+    store.dispatch(login({ username, token, userId, domain }))
   } else {
     logger.error('Missing SSO Token!')
   }

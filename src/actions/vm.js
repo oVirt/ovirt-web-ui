@@ -18,7 +18,6 @@ import {
   REMOVE_VMS,
   RESTART_VM,
   SET_CHANGED,
-  SET_DOMAIN,
   SET_OVIRT_API_VERSION,
   SET_VM_ACTION_RESULT,
   SET_VM_CDROM,
@@ -37,25 +36,14 @@ import {
   VM_ACTION_IN_PROGRESS,
 } from '_/constants'
 
-export function login ({ username, password, token, userId }) {
+export function login ({ username, domain, token, userId }) {
   return {
     type: LOGIN,
     payload: {
-      credentials: {
-        username,
-        password,
-      },
+      username,
+      domain,
       token,
       userId,
-    },
-  }
-}
-
-export function setDomain ({ domain }) {
-  return {
-    type: SET_DOMAIN,
-    payload: {
-      domain,
     },
   }
 }
@@ -191,12 +179,13 @@ export function setVmActionResult ({ vmId, correlationId, result }) {
 }
 
 // --- Internal State -------------------------
-export function loginSuccessful ({ token, username, userId }) {
+export function loginSuccessful ({ username, domain, token, userId }) {
   return {
     type: LOGIN_SUCCESSFUL,
     payload: {
-      token,
       username,
+      domain,
+      token,
       userId,
     },
   }

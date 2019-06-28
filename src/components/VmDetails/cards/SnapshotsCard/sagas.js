@@ -1,7 +1,7 @@
 import { takeEvery, put } from 'redux-saga/effects'
 
 import Api from '_/ovirtapi'
-import { callExternalAction, delay } from '_/sagas/utils'
+import { callExternalAction, delay, delayInMsSteps } from '_/sagas/utils'
 import { fetchVmSnapshots, startProgress, stopProgress } from '_/sagas'
 import {
   addSnapshotRemovalPendingTask,
@@ -21,7 +21,7 @@ function* addVmSnapshot (action) {
 
   if (snapshot && snapshot.id) {
     yield fetchVmSnapshots({ vmId: action.payload.vmId })
-    for (let delaySec of [ 4, 4, 4, 30, 30, 60 ]) {
+    for (let delaySec of delayInMsSteps()) {
       const apiSnapshot = yield callExternalAction('snapshot', Api.snapshot, { payload: { snapshotId: snapshot.id, vmId: action.payload.vmId } }, true)
       if (apiSnapshot.snapshot_status !== 'locked') {
         break
@@ -43,7 +43,7 @@ function* deleteVmSnapshot (action) {
   yield put(addSnapshotRemovalPendingTask(snapshotId))
   let snapshotRemoved = false
   yield fetchVmSnapshots({ vmId })
-  for (let delaySec of [ 4, 4, 4, 30, 30, 60 ]) {
+  for (let delaySec of delayInMsSteps()) {
     const snapshot = yield callExternalAction('snapshot', Api.snapshot, { payload: { snapshotId, vmId } }, true)
     if (snapshot.error && snapshot.error.status === 404) {
       snapshotRemoved = true

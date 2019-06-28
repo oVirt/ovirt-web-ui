@@ -1,5 +1,6 @@
 import AppConfiguration from '../config'
 import {
+  APP_CONFIGURED,
   CHANGE_PAGE,
   CHECK_TOKEN_EXPIRED,
   GET_BY_PAGE,
@@ -38,6 +39,13 @@ export * from './activeRequests'
 export * from './console'
 export * from './userMessages'
 export * from './disks'
+
+export function appConfigured () {
+  return {
+    type: APP_CONFIGURED,
+    payload: {},
+  }
+}
 
 export function startSchedulerFixedDelay (delayInSeconds = AppConfiguration.schedulerFixedDelayInSeconds) {
   return {

@@ -13,11 +13,9 @@ export function setTemplates (templates) {
   }
 }
 
-export function getAllTemplates ({ shallowFetch = false }) {
+export function getAllTemplates () {
   return {
     type: GET_ALL_TEMPLATES,
-    payload: {
-      shallowFetch,
-    },
+    payload: {},
   }
 }

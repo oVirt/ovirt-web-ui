@@ -114,6 +114,6 @@ App.propTypes = {
 export default connect(
   (state) => ({
     config: state.config,
-    appReady: !!state.config.get('usbFilter'), // When is the app ready to display data components?
+    appReady: !!state.config.get('appConfigured'), // When is the app ready to display data components?
   })
 )(App)

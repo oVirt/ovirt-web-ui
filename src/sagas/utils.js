@@ -3,25 +3,47 @@ import {
   put,
 } from 'redux-saga/effects'
 
-import logger from '../logger'
+import AppConfiguration from '_/config'
 import { hidePassword } from '_/helpers'
-
 import { msg } from '_/intl'
-
-import {
-  failedExternalAction,
-  checkTokenExpired,
-} from '_/actions'
-
+import logger from '_/logger'
 import Api from '_/ovirtapi'
-
 import { getUserPermits } from '_/utils'
 
+import {
+  checkTokenExpired,
+  failedExternalAction,
+  showTokenExpiredMessage,
+} from '_/actions'
+
+/**
+ * Resolve a promise after the given delay (in milliseconds)
+ */
 export const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+
+/**
+ * Compare the actual { major, minor } version to the required { major, minor } and
+ * return if the **actual** is greater then or equal to **required**.
+ *
+ * Backward compatibility of the API is assumed.
+ */
+export function compareVersion (actual, required) {
+  logger.log(`compareVersion(), actual=${JSON.stringify(actual)}, required=${JSON.stringify(required)}`)
+
+  if (actual.major >= required.major) {
+    if (actual.major === required.major) {
+      if (actual.minor < required.minor) {
+        return false
+      }
+    }
+    return true
+  }
+  return false
+}
 
 export function* callExternalAction (methodName, method, action, canBeMissing = false) {
   try {
-    logger.log(`External action ${methodName}() starts on ${JSON.stringify(hidePassword({ action }))}`)
+    logger.log(`External action: ${JSON.stringify(hidePassword({ action }))}, API method: ${methodName}()`)
     const result = yield call(method, action.payload)
     return result
   } catch (e) {
@@ -47,7 +69,29 @@ export function* callExternalAction (methodName, method, action, canBeMissing = 
     return { error: e }
   }
 }
+export function* doCheckTokenExpired (action) {
+  try {
+    yield call(Api.getOvirtApiMeta, action.payload)
+    logger.info('doCheckTokenExpired(): token is still valid') // info level: to pair former HTTP 401 error message with updated information
+    return
+  } catch (error) {
+    if (error.status === 401) {
+      logger.info('Token expired, going to reload the page')
+      yield put(showTokenExpiredMessage())
 
+      // Reload the page after a delay
+      // No matter saga is canceled for whatever reason, the reload must happen, so here comes the ugly setTimeout()
+      setTimeout(() => {
+        logger.info('======= doCheckTokenExpired() issuing page reload')
+        window.location.href = AppConfiguration.applicationURL
+      }, 5 * 1000)
+      return
+    }
+    logger.error('doCheckTokenExpired(): unexpected oVirt API error: ', error)
+  }
+}
+
+// TODO: Can't this be replaced by saga's blocking put.resolve()?
 export function* waitTillEqual (leftArg, rightArg, limit) {
   let counter = limit
 
