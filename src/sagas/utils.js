@@ -6,7 +6,6 @@ import {
 import AppConfiguration from '_/config'
 import { hidePassword } from '_/helpers'
 import { msg } from '_/intl'
-import logger from '_/logger'
 import Api from '_/ovirtapi'
 import { getUserPermits } from '_/utils'
 
@@ -28,7 +27,7 @@ export const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
  * Backward compatibility of the API is assumed.
  */
 export function compareVersion (actual, required) {
-  logger.log(`compareVersion(), actual=${JSON.stringify(actual)}, required=${JSON.stringify(required)}`)
+  console.log(`compareVersion(), actual=${JSON.stringify(actual)}, required=${JSON.stringify(required)}`)
 
   if (actual.major >= required.major) {
     if (actual.major === required.major) {
@@ -43,12 +42,12 @@ export function compareVersion (actual, required) {
 
 export function* callExternalAction (methodName, method, action, canBeMissing = false) {
   try {
-    logger.log(`External action: ${JSON.stringify(hidePassword({ action }))}, API method: ${methodName}()`)
+    console.log(`External action: ${JSON.stringify(hidePassword({ action }))}, API method: ${methodName}()`)
     const result = yield call(method, action.payload)
     return result
   } catch (e) {
     if (!canBeMissing) {
-      logger.log(`External action exception: ${JSON.stringify(e)}`)
+      console.log(`External action exception: ${JSON.stringify(e)}`)
 
       if (e.status === 401) { // Unauthorized
         yield put(checkTokenExpired())
@@ -72,22 +71,22 @@ export function* callExternalAction (methodName, method, action, canBeMissing = 
 export function* doCheckTokenExpired (action) {
   try {
     yield call(Api.getOvirtApiMeta, action.payload)
-    logger.info('doCheckTokenExpired(): token is still valid') // info level: to pair former HTTP 401 error message with updated information
+    console.info('doCheckTokenExpired(): token is still valid') // info level: to pair former HTTP 401 error message with updated information
     return
   } catch (error) {
     if (error.status === 401) {
-      logger.info('Token expired, going to reload the page')
+      console.info('Token expired, going to reload the page')
       yield put(showTokenExpiredMessage())
 
       // Reload the page after a delay
       // No matter saga is canceled for whatever reason, the reload must happen, so here comes the ugly setTimeout()
       setTimeout(() => {
-        logger.info('======= doCheckTokenExpired() issuing page reload')
+        console.info('======= doCheckTokenExpired() issuing page reload')
         window.location.href = AppConfiguration.applicationURL
       }, 5 * 1000)
       return
     }
-    logger.error('doCheckTokenExpired(): unexpected oVirt API error: ', error)
+    console.error('doCheckTokenExpired(): unexpected oVirt API error: ', error)
   }
 }
 
@@ -105,7 +104,7 @@ export function* waitTillEqual (leftArg, rightArg, limit) {
     yield delay(20) // in ms
     counter--
 
-    logger.log('waitTillEqual() delay ...')
+    console.log('waitTillEqual() delay ...')
   }
 
   return false

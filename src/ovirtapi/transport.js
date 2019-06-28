@@ -3,7 +3,6 @@
 import $ from 'jquery'
 import AppConfiguration from '../config'
 import { Exception } from '../exceptions'
-import logger from '../logger'
 import Selectors from '../selectors'
 
 //
@@ -71,18 +70,18 @@ function httpGet ({ url, custHeaders = {} }: GetRequestType): Promise<Object> {
     ...custHeaders,
   }
 
-  logger.log(`http GET[${myCounter}] -> url: "${url}", headers: ${logHeaders(headers)}`)
+  console.log(`http GET[${myCounter}] -> url: "${url}", headers: ${logHeaders(headers)}`)
   return $.ajax(url, {
     type: 'GET',
     headers,
   })
     .then((data: Object): Object => {
       notifyStop(requestId)
-      logger.log(`http GET[${myCounter}] <- data:`, data)
+      console.log(`http GET[${myCounter}] <- data:`, data)
       return data
     })
     .catch((data: Object): Promise<Object> => {
-      logger.log(`Ajax GET failed: ${JSON.stringify(data)}`)
+      console.log(`Ajax GET failed: ${JSON.stringify(data)}`)
       notifyStop(requestId)
       return Promise.reject(data)
     })
@@ -106,7 +105,7 @@ function httpPost ({ url, input, contentType = 'application/json' }: InputReques
       return data
     })
     .catch((data: Object): Promise<Object> => {
-      logger.log(`Ajax POST failed: ${JSON.stringify(data)}`)
+      console.log(`Ajax POST failed: ${JSON.stringify(data)}`)
       notifyStop(requestId)
       return Promise.reject(data)
     })
@@ -130,7 +129,7 @@ function httpPut ({ url, input, contentType = 'application/json' }: InputRequest
       return data
     })
     .catch((data: Object): Promise<Object> => {
-      logger.log(`Ajax PUT failed: ${JSON.stringify(data)}`)
+      console.log(`Ajax PUT failed: ${JSON.stringify(data)}`)
       notifyStop(requestId)
       return Promise.reject(data)
     })
@@ -151,7 +150,7 @@ function httpDelete ({ url, custHeaders = { 'Accept': 'application/json' } }: De
       return data
     })
     .catch((data: Object): Promise<Object> => {
-      logger.log(`Ajax DELETE failed: ${JSON.stringify(data)}`)
+      console.log(`Ajax DELETE failed: ${JSON.stringify(data)}`)
       notifyStop(requestId)
       return Promise.reject(data)
     })

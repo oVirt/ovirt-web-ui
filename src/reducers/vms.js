@@ -24,7 +24,6 @@ import {
   UPDATE_VMS,
   VM_ACTION_IN_PROGRESS,
 } from '_/constants'
-import logger from '../logger'
 import { actionReducer, removeMissingItems } from './utils'
 
 const initialState = Immutable.fromJS({
@@ -87,7 +86,7 @@ const vms = actionReducer(initialState, {
     if (state.getIn(['vms', vmId])) {
       return state.setIn(['vms', vmId, 'disks'], Immutable.fromJS(disks)) // deep immutable
     } else { // fail, if VM not found
-      logger.error(`vms.setVmDisks() reducer: vmId ${vmId} not found`)
+      console.error(`vms.setVmDisks() reducer: vmId ${vmId} not found`)
     }
     return state
   },
@@ -105,7 +104,7 @@ const vms = actionReducer(initialState, {
     if (state.getIn(['vms', vmId])) {
       return state.setIn(['vms', vmId, 'cdrom'], Immutable.fromJS(cdrom)) // deep immutable
     } else { // fail, if VM not found
-      logger.error(`vms[${SET_VM_CDROM}] reducer: vmId ${vmId} not found`)
+      console.error(`vms[${SET_VM_CDROM}] reducer: vmId ${vmId} not found`)
     }
     return state
   },
@@ -114,7 +113,7 @@ const vms = actionReducer(initialState, {
       return state.setIn(['vms', vmId, 'snapshots'], Immutable.fromJS(snapshots)) // deep immutable
     }
 
-    logger.error(`vms.setVmSnapshots() reducer: vmId ${vmId} not found`)
+    console.error(`vms.setVmSnapshots() reducer: vmId ${vmId} not found`)
     return state
   },
   [UPDATE_VM_SNAPSHOT] (state, { payload: { vmId, snapshot } }) {
@@ -130,14 +129,14 @@ const vms = actionReducer(initialState, {
       return state
     }
 
-    logger.error(`vms.setVmSnapshots() reducer: vmId ${vmId} not found`)
+    console.error(`vms.setVmSnapshots() reducer: vmId ${vmId} not found`)
     return state
   },
   [SET_VM_NICS] (state, { payload: { vmId, nics } }) {
     if (state.getIn(['vms', vmId])) {
       return state.setIn(['vms', vmId, 'nics'], Immutable.fromJS(nics)) // deep immutable
     } else { // fail, if VM not found
-      logger.error(`vms.setVmNics() reducer: vmId ${vmId} not found`)
+      console.error(`vms.setVmNics() reducer: vmId ${vmId} not found`)
     }
     return state
   },
@@ -216,7 +215,7 @@ const vms = actionReducer(initialState, {
       if (state.getIn(['vms', vmId])) {
         return state.setIn(['vms', vmId, 'lastMessage'], shortMessage || message)
       } else {
-        logger.error(`API reports an error associated to nonexistent VM ${vmId}, error`,
+        console.error(`API reports an error associated to nonexistent VM ${vmId}, error`,
           { message, shortMessage, type, failedAction })
       }
     }
