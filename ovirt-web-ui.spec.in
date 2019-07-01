@@ -56,6 +56,15 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Mon Jul 1 2019 Sharon Gratch <sgratch@redhat.com> - 1.5.3-1
+ - Added check for inactivity during session and logout after expiration
+ - Added NoVNC console support
+ - Resolve login data load concurrency issues (allows ISOs to load at login)
+ - updated translations
+ - Added template filtering for VM create dialog
+ - Added validation for Disk name
+ - Allow adding more CPUs than the max sockets count
+
 * Wed Mar 27 2019 Greg Sheremeta <gshereme@redhat.com> - 1.5.2-1
  - Remove edibility of a VM's template
  - Remove wrap for hostname and FQDN, add ellipsis with tooltip
