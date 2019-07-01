@@ -88,6 +88,7 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
             </UtilizationCardDetails>
             { !hasDiskDetails &&
               <DonutChart
+                id={`${id}-donut-chart`}
                 data={[
                   {
                     x: msg.utilizationCardAllocated(),
@@ -101,12 +102,13 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
                   },
                 ]}
                 subTitle={msg.utilizationCardUnitAllocated({ storageUnit: usedFormated.suffix })}
-                title={round(usedFormated.number, 0)}
+                title={`${round(usedFormated.number, 0)}`}
               />
             }
             { isRunning && hasDiskDetails &&
               <div className={style['disk-fs-list']}>
                 <BarChart
+                  id={`${id}-bar-chart`}
                   data={
                     diskDetails.map((disk) => {
                       const usedInPercent = round(disk.used / disk.total * 100, 0)
@@ -134,7 +136,7 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
               </div>
             }
             { isRunning && !hasDiskDetails &&
-              <NoHistoricData message={msg.utilizationCardNoGuestAgent()} />
+              <NoHistoricData id={`${id}-no-historic-data`} message={msg.utilizationCardNoGuestAgent()} />
             }
             {/*
               Disks don't have historic data but stub the space so the card stretches like the others,

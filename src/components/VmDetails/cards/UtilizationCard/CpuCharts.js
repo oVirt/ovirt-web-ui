@@ -10,8 +10,8 @@ import {
   UtilizationCardDetailsLine1,
   UtilizationCardDetailsLine2,
 } from 'patternfly-react'
-import { ChartGroup, ChartArea, ChartTooltip, ChartVoronoiContainer } from '@patternfly/react-charts'
 import DonutChart from './UtilizationCharts/DonutChart'
+import AreaChart from './UtilizationCharts/AreaChart'
 
 import { msg } from '_/intl'
 
@@ -48,6 +48,7 @@ const CpuCharts = ({ cpuStats, isRunning, id }) => {
           </UtilizationCardDetails>
 
           <DonutChart
+            id={`${id}-donut-chart`}
             data={[
               {
                 x: msg.utilizationCardLegendUsedP(),
@@ -66,21 +67,11 @@ const CpuCharts = ({ cpuStats, isRunning, id }) => {
 
           { history.length === 0 && <NoHistoricData id={`${id}-no-historic-data`} /> }
           { history.length > 0 &&
-            <ChartGroup
-              height={150}
-              width={450}
-              containerComponent={
-                <ChartVoronoiContainer
-                  labels={datum => `${datum.y}%`}
-                  labelComponent={<ChartTooltip style={{ fontSize: 16 }} />}
-                />
-              }
-            >
-              <ChartArea
-                style={{ data: { fill: 'rgb(0, 136, 206)' } }}
-                data={history.map((item, i) => ({ x: i, y: item, name: 'cpu' }))}
-              />
-            </ChartGroup>
+            <AreaChart
+              id={`${id}-history-chart`}
+              data={history.map((item, i) => ({ x: i, y: item }))}
+              labels={datum => `${datum.y}%`}
+            />
           }
         </React.Fragment>
         }

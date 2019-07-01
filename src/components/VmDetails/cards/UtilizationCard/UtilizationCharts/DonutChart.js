@@ -2,19 +2,21 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { ChartDonut } from '@patternfly/react-charts'
 
-const DonutChart = ({ data, title, subTitle }) => {
+const DonutChart = ({ data, title, subTitle, id }) => {
   return (
-    <ChartDonut
-      width={400}
-      height={400}
-      radius={100}
-      innerRadius={85}
-      colorScale={['rgb(0, 102, 204)', 'rgb(237, 237, 237)']}
-      data={data}
-      labels={datum => datum.label}
-      subTitle={subTitle}
-      title={title}
-    />
+    <div id={id}>
+      <ChartDonut
+        width={400}
+        height={250}
+        radius={100}
+        innerRadius={85}
+        colorScale={['rgb(0, 136, 206)', 'rgb(209, 209, 209)']}
+        data={data}
+        labels={datum => datum.label}
+        subTitle={subTitle}
+        title={title}
+      />
+    </div>
   )
 }
 
@@ -25,6 +27,7 @@ const datumPropType = PropTypes.shape({
 })
 
 DonutChart.propTypes = {
+  id: PropTypes.string,
   data: PropTypes.arrayOf(datumPropType).isRequired,
   title: PropTypes.string.isRequired,
   subTitle: PropTypes.string.isRequired,
