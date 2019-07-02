@@ -5,7 +5,7 @@ import { List } from 'immutable'
 
 import * as Actions from '_/actions'
 import { MAX_VM_MEMORY_FACTOR } from '_/constants'
-import { generateUnique, localeCompare, filterOsByArchitecture } from '_/helpers'
+import { generateUnique, localeCompare, filterOsByArchitecture, isWindows } from '_/helpers'
 import { msg, enumMsg } from '_/intl'
 
 import {
@@ -27,13 +27,13 @@ import {
   Icon,
   OverlayTrigger,
   Tooltip,
-  ControlLabel,
-  FormGroup,
 } from 'patternfly-react'
 import Switch from '../../../Switch'
 import SelectBox from '../../../SelectBox'
 import BaseCard from '../../BaseCard'
+
 import { Grid, Row, Col } from '_/components/Grid'
+import CloudInit from './CloudInit'
 
 import style from './style.css'
 
@@ -42,6 +42,7 @@ import NextRunChangeConfirmationModal from './NextRunChangeConfirmationModal'
 
 import ExpandCollapseSection from '../../../ExpandCollapseSection'
 import FieldValue from './FieldValue'
+import FieldRow from './FieldRow'
 
 /*
  * Return a normalized list of iso files from the set of provided storage domains.
@@ -126,25 +127,6 @@ function rephraseVmType (vmType) {
   }
 
   return vmType
-}
-
-/*
- * Render a label plus children as a single grid row with 2 columns.
- */
-const FieldRow = ({ label, children, id, tooltip }) => (
-  <Row className={style['field-row']}>
-    <Col cols={5} className={style['col-label']}>
-      <span>{label}</span>
-      {tooltip && <FieldLevelHelp buttonClass={style['field-level-help']} disabled={false} content={tooltip} inline />}
-    </Col>
-    <Col cols={7} className={style['col-data']} id={id}>{children}</Col>
-  </Row>
-)
-FieldRow.propTypes = {
-  id: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  tooltip: PropTypes.string,
-  children: PropTypes.node.isRequired,
 }
 
 /*
@@ -349,6 +331,9 @@ class DetailsCard extends React.Component {
                 { fieldName: 'cloudInitEnabled', value: template.getIn(['cloudInit', 'enabled']) },
                 { fieldName: 'cloudInitHostName', value: template.getIn(['cloudInit', 'hostName']) },
                 { fieldName: 'cloudInitSshAuthorizedKeys', value: template.getIn(['cloudInit', 'sshAuthorizedKeys']) },
+                { fieldName: 'cloudInitTimezone', value: template.getIn(['cloudInit', 'timezone']) },
+                { fieldName: 'cloudInitCustomScript', value: template.getIn(['cloudInit', 'customScript']) },
+                { fieldName: 'cloudInitPassword', value: template.getIn(['cloudInit', 'password']) },
               )
             }
           }
@@ -379,6 +364,21 @@ class DetailsCard extends React.Component {
 
         case 'cloudInitSshAuthorizedKeys':
           updates = updates.setIn(['cloudInit', 'sshAuthorizedKeys'], value)
+          fieldUpdated = 'cloudInit'
+          break
+
+        case 'cloudInitTimezone':
+          updates = updates.setIn(['cloudInit', 'timezone'], value)
+          fieldUpdated = 'cloudInit'
+          break
+
+        case 'cloudInitCustomScript':
+          updates = updates.setIn(['cloudInit', 'customScript'], value)
+          fieldUpdated = 'cloudInit'
+          break
+
+        case 'cloudInitPassword':
+          updates = updates.setIn(['cloudInit', 'password'], value)
           fieldUpdated = 'cloudInit'
           break
 
@@ -656,8 +656,7 @@ class DetailsCard extends React.Component {
 
     // Cloud-Init
     const cloudInitEnabled = vm.getIn(['cloudInit', 'enabled'])
-    const cloudInitHostName = vm.getIn(['cloudInit', 'hostName'])
-    const cloudInitSshAuthorizedKeys = vm.getIn(['cloudInit', 'sshAuthorizedKeys'])
+    const isOsWindows = isWindows(vm.getIn(['os', 'type']))
 
     // Boot Menu
     const bootMenuEnabled = vm.get('bootMenuEnabled')
@@ -799,7 +798,7 @@ class DetailsCard extends React.Component {
                         />
                       }
                     </FieldRow>
-                    <FieldRow label={msg.cloudInit()} id={`${idPrefix}-cloud-init`}>
+                    <FieldRow label={isOsWindows ? msg.sysprep() : msg.cloudInit()} id={`${idPrefix}-cloud-init`}>
                       <div className={style['cloud-init-field']}>
                         {cloudInitEnabled ? <Icon type='pf' name='on' /> : <Icon type='pf' name='off' />}
                         {enumMsg('Switch', cloudInitEnabled ? 'on' : 'off')}
@@ -865,15 +864,6 @@ class DetailsCard extends React.Component {
                   {/* First column */}
                   <Col className={style['fields-column']}>
                     <Grid>
-                      <FieldRow label={msg.cloudInit()} id={`${idPrefix}-cloud-init`}>
-                        <Switch
-                          id={`${idPrefix}-cloud-init-edit`}
-                          bsSize='mini'
-                          handleWidth={30}
-                          value={cloudInitEnabled}
-                          onChange={(e, state) => { this.handleChange('cloudInitEnabled', state) }}
-                        />
-                      </FieldRow>
                       <FieldRow label={msg.operatingSystem()} id={`${idPrefix}-os`}>
                         <SelectBox
                           id={`${idPrefix}-os-edit`}
@@ -891,28 +881,7 @@ class DetailsCard extends React.Component {
                           onChange={(e, state) => { this.handleChange('bootMenuEnabled', state) }}
                         />
                       </FieldRow>
-                      { cloudInitEnabled && <div style={{ marginTop: '15px' }}>
-                        <FormGroup controlId={`${idPrefix}-cloud-init-hostname`}>
-                          <ControlLabel>
-                            {msg.hostName()}
-                          </ControlLabel>
-                          <FormControl
-                            type='text'
-                            value={cloudInitHostName}
-                            onChange={e => this.handleChange('cloudInitHostName', e.target.value)}
-                          />
-                        </FormGroup>
-                        <FormGroup controlId={`${idPrefix}-cloud-init-ssh`}>
-                          <ControlLabel>
-                            {msg.sshAuthorizedKeys()}
-                          </ControlLabel>
-                          <FormControl
-                            componentClass='textarea'
-                            value={cloudInitSshAuthorizedKeys}
-                            onChange={e => this.handleChange('cloudInitSshAuthorizedKeys', e.target.value)}
-                          />
-                        </FormGroup>
-                      </div> }
+                      <CloudInit idPrefix={idPrefix} vm={vm} onChange={this.handleChange} isWindows={isOsWindows} />
                     </Grid>
                   </Col>
                   {/* Second column */}

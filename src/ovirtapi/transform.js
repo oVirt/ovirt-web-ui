@@ -257,6 +257,9 @@ const VM = {
           ? {
             host_name: vm.cloudInit.hostName,
             authorized_ssh_keys: vm.cloudInit.sshAuthorizedKeys,
+            root_password: vm.cloudInit.password,
+            custom_script: vm.cloudInit.customScript,
+            timezone: vm.cloudInit.timezone,
           }
           : {}
       ),
@@ -809,6 +812,9 @@ const CloudInit = {
       enabled: !!vm.initialization,
       hostName: (vm.initialization && vm.initialization.host_name) || '',
       sshAuthorizedKeys: (vm.initialization && vm.initialization.authorized_ssh_keys) || '',
+      timezone: (vm.initialization && vm.initialization.timezone) || '',
+      customScript: (vm.initialization && vm.initialization.custom_script) || '',
+      password: (vm.initialization && vm.initialization.root_password) || '',
     }
   },
 

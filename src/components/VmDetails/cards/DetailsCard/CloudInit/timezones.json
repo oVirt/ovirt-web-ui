@@ -1,0 +1,298 @@
+[
+	{
+		"id": "Dateline Standard Time",
+		"value": "(GMT-12:00) Dateline Standard Time"
+	},
+	{
+		"id": "Samoa Standard Time",
+		"value": "(GMT-11:00) Samoa Standard Time"
+	},
+	{
+		"id": "Hawaiian Standard Time",
+		"value": "(GMT-10:00) Hawaiian Standard Time"
+	},
+	{
+		"id": "Alaskan Standard Time",
+		"value": "(GMT-09:00) Alaskan Standard Time"
+	},
+	{
+		"id": "Pacific Standard Time",
+		"value": "(GMT-08:00) Pacific Standard Time"
+	},
+	{
+		"id": "Mountain Standard Time",
+		"value": "(GMT-07:00) Mountain Standard Time"
+	},
+	{
+		"id": "US Mountain Standard Time",
+		"value": "(GMT-07:00) US Mountain Standard Time"
+	},
+	{
+		"id": "Canada Central Standard Time",
+		"value": "(GMT-06:00) Canada Central Standard Time"
+	},
+	{
+		"id": "Central America Standard Time",
+		"value": "(GMT-06:00) Central America Standard Time"
+	},
+	{
+		"id": "Central Standard Time (Mexico)",
+		"value": "(GMT-06:00) Central Standard Time (Mexico)"
+	},
+	{
+		"id": "Central Standard Time",
+		"value": "(GMT-06:00) Central Standard Time"
+	},
+	{
+		"id": "Eastern Standard Time",
+		"value": "(GMT-05:00) Eastern Standard Time"
+	},
+	{
+		"id": "SA Pacific Standard Time",
+		"value": "(GMT-05:00) SA Pacific Standard Time"
+	},
+	{
+		"id": "US Eastern Standard Time",
+		"value": "(GMT-05:00) US Eastern Standard Time"
+	},
+	{
+		"id": "Venezuela Standard Time",
+		"value": "(GMT-04:30) Venezuela Standard Time"
+	},
+	{
+		"id": "Atlantic Standard Time",
+		"value": "(GMT-04:00) Atlantic Standard Time"
+	},
+	{
+		"id": "SA Western Standard Time",
+		"value": "(GMT-04:00) SA Western Standard Time"
+	},
+	{
+		"id": "Pacific SA Standard Time",
+		"value": "(GMT-04:00) Pacific SA Standard Time"
+	},
+	{
+		"id": "Newfoundland Standard Time",
+		"value": "(GMT-03:30) Newfoundland Standard Time"
+	},
+	{
+		"id": "E. South America Standard Time",
+		"value": "(GMT-03:00) E. South America Standard Time"
+	},
+	{
+		"id": "Greenland Standard Time",
+		"value": "(GMT-03:00) Greenland Standard Time"
+	},
+	{
+		"id": "SA Eastern Standard Time",
+		"value": "(GMT-03:00) SA Eastern Standard Time"
+	},
+	{
+		"id": "Mid-Atlantic Standard Time",
+		"value": "(GMT-02:00) Mid-Atlantic Standard Time"
+	},
+	{
+		"id": "Azores Standard Time",
+		"value": "(GMT-1:00) Azores Standard Time"
+	},
+	{
+		"id": "Cape Verde Standard Time",
+		"value": "(GMT-01:00) Cape Verde Standard Time"
+	},
+	{
+		"id": "GMT Standard Time",
+		"value": "(GMT) GMT Standard Time"
+	},
+	{
+		"id": "Greenwich Standard Time",
+		"value": "(GMT) Greenwich Standard Time"
+	},
+	{
+		"id": "Central Europe Standard Time",
+		"value": "(GMT+01:00) Central Europe Standard Time"
+	},
+	{
+		"id": "Central European Standard Time",
+		"value": "(GMT+01:00) Central European Standard Time"
+	},
+	{
+		"id": "Romance Standard Time",
+		"value": "(GMT+01:00) Romance Standard Time"
+	},
+	{
+		"id": "W. Central Africa Standard Time",
+		"value": "(GMT+01:00) W. Central Africa Standard Time"
+	},
+	{
+		"id": "W. Europe Standard Time",
+		"value": "(GMT+01:00) W. Europe Standard Time"
+	},
+	{
+		"id": "E. Europe Standard Time",
+		"value": "(GMT+02:00) E. Europe Standard Time"
+	},
+	{
+		"id": "Egypt Standard Time",
+		"value": "(GMT+02:00) Egypt Standard Time"
+	},
+	{
+		"id": "FLE Standard Time",
+		"value": "(GMT+02:00) FLE Standard Time"
+	},
+	{
+		"id": "GTB Standard Time",
+		"value": "(GMT+02:00) GTB Standard Time"
+	},
+	{
+		"id": "Israel Standard Time",
+		"value": "(GMT+02:00) Israel Standard Time"
+	},
+	{
+		"id": "South Africa Standard Time",
+		"value": "(GMT+02:00) South Africa Standard Time"
+	},
+	{
+		"id": "Arab Standard Time",
+		"value": "(GMT+03:00) Arab Standard Time"
+	},
+	{
+		"id": "Arabic Standard Time",
+		"value": "(GMT+03:00) Arabic Standard Time"
+	},
+	{
+		"id": "E. Africa Standard Time",
+		"value": "(GMT+03:00) E. Africa Standard Time"
+	},
+	{
+		"id": "Russian Standard Time",
+		"value": "(GMT+03:00) Russian Standard Time"
+	},
+	{
+		"id": "Iran Standard Time",
+		"value": "(GMT+03:30) Iran Standard Time"
+	},
+	{
+		"id": "Arabian Standard Time",
+		"value": "(GMT+04:00) Arabian Standard Time"
+	},
+	{
+		"id": "Caucasus Standard Time",
+		"value": "(GMT+04:00) Caucasus Standard Time"
+	},
+	{
+		"id": "Georgian Standard Time",
+		"value": "(GMT+04:00) Georgian Standard Time"
+	},
+	{
+		"id": "Afghanistan Standard Time",
+		"value": "(GMT+04:30) Afghanistan Standard Time"
+	},
+	{
+		"id": "Ekaterinburg Standard Time",
+		"value": "(GMT+05:00) Ekaterinburg Standard Time"
+	},
+	{
+		"id": "West Asia Standard Time",
+		"value": "(GMT+05:00) West Asia Standard Time"
+	},
+	{
+		"id": "India Standard Time",
+		"value": "(GMT+05:30) India Standard Time"
+	},
+	{
+		"id": "Sri Lanka Standard Time",
+		"value": "(GMT+05:30) Sri Lanka Standard Time"
+	},
+	{
+		"id": "Nepal Standard Time",
+		"value": "(GMT+05:45) Nepal Standard Time"
+	},
+	{
+		"id": "Central Asia Standard Time",
+		"value": "(GMT+06:00) Central Asia Standard Time"
+	},
+	{
+		"id": "N. Central Asia Standard Time",
+		"value": "(GMT+06:00) N. Central Asia Standard Time"
+	},
+	{
+		"id": "Myanmar Standard Time",
+		"value": "(GMT+06:30) Myanmar Standard Time"
+	},
+	{
+		"id": "North Asia Standard Time",
+		"value": "(GMT+07:00) North Asia Standard Time"
+	},
+	{
+		"id": "SE Asia Standard Time",
+		"value": "(GMT+07:00) SE Asia Standard Time"
+	},
+	{
+		"id": "China Standard Time",
+		"value": "(GMT+08:00) China Standard Time"
+	},
+	{
+		"id": "North Asia East Standard Time",
+		"value": "(GMT+08:00) North Asia East Standard Time"
+	},
+	{
+		"id": "Singapore Standard Time",
+		"value": "(GMT+08:00) Singapore Standard Time"
+	},
+	{
+		"id": "Taipei Standard Time",
+		"value": "(GMT+08:00) Taipei Standard Time"
+	},
+	{
+		"id": "W. Australia Standard Time",
+		"value": "(GMT+08:00) W. Australia Standard Time"
+	},
+	{
+		"id": "Korea Standard Time",
+		"value": "(GMT+09:00) Korea Standard Time"
+	},
+	{
+		"id": "Tokyo Standard Time",
+		"value": "(GMT+09:00) Tokyo Standard Time"
+	},
+	{
+		"id": "Yakutsk Standard Time",
+		"value": "(GMT+09:00) Yakutsk Standard Time"
+	},
+	{
+		"id": "Cen. Australia Standard Time",
+		"value": "(GMT+09:30) Cen. Australia Standard Time"
+	},
+	{
+		"id": "E. Australia Standard Time",
+		"value": "(GMT+10:00) E. Australia Standard Time"
+	},
+	{
+		"id": "Tasmania Standard Time",
+		"value": "(GMT+10:00) Tasmania Standard Time"
+	},
+	{
+		"id": "Vladivostok Standard Time",
+		"value": "(GMT+10:00) Vladivostok Standard Time"
+	},
+	{
+		"id": "West Pacific Standard Time",
+		"value": "(GMT+10:00) West Pacific Standard Time"
+	},
+	{
+		"id": "Central Pacific Standard Time",
+		"value": "(GMT+11:00) Central Pacific Standard Time"
+	},
+	{
+		"id": "Fiji Standard Time",
+		"value": "(GMT+12:00) Fiji Standard Time"
+	},
+	{
+		"id": "New Zealand Standard Time",
+		"value": "(GMT+12:00) New Zealand Standard Time"
+	},
+	{
+		"id": "Tonga Standard Time",
+		"value": "(GMT+13:00) Tonga Standard Time"
+	}
+]
