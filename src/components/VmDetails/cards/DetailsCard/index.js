@@ -31,15 +31,14 @@ import SelectBox from '../../../SelectBox'
 import BaseCard from '../../BaseCard'
 
 import { Grid, Row, Col } from '_/components/Grid'
-import CloudInit from './CloudInit'
+import EllipsisValue from '_/components/EllipsisValue'
+import ExpandCollapseSection from '_/components/ExpandCollapseSection'
 
 import style from './style.css'
 
+import CloudInit from './CloudInit'
 import HotPlugChangeConfirmationModal from './HotPlugConfirmationModal'
 import NextRunChangeConfirmationModal from './NextRunChangeConfirmationModal'
-
-import ExpandCollapseSection from '../../../ExpandCollapseSection'
-import FieldValue from './FieldValue'
 import FieldRow from './FieldRow'
 
 /*
@@ -723,7 +722,7 @@ class DetailsCard extends React.Component {
                 <Col className={style['fields-column']}>
                   <Grid>
                     <FieldRow label={msg.host()} id={`${idPrefix}-host`}>
-                      { <FieldValue tooltip={hostName}>{hostName}</FieldValue> || <NotAvailable tooltip={msg.notAvailableUntilRunning()} id={`${idPrefix}-host-not-available`} /> }
+                      { <EllipsisValue tooltip={hostName}>{hostName}</EllipsisValue> || <NotAvailable tooltip={msg.notAvailableUntilRunning()} id={`${idPrefix}-host-not-available`} /> }
                     </FieldRow>
                     <FieldRow label={msg.ipAddress()} id={`${idPrefix}-ip`}>
                       <React.Fragment>
@@ -739,7 +738,7 @@ class DetailsCard extends React.Component {
                       </React.Fragment>
                     </FieldRow>
                     <FieldRow label={msg.fqdn()} id={`${idPrefix}-fqdn`}>
-                      { <FieldValue tooltip={fqdn}>{fqdn}</FieldValue> || <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id={`${idPrefix}-fqdn-not-available`} /> }
+                      { <EllipsisValue tooltip={fqdn}>{fqdn}</EllipsisValue> || <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id={`${idPrefix}-fqdn-not-available`} /> }
                     </FieldRow>
                     <FieldRow label={msg.cluster()} id={`${idPrefix}-cluster`}>
                       { !isFullEdit && clusterName }
@@ -775,10 +774,10 @@ class DetailsCard extends React.Component {
                       { templateName }
                     </FieldRow>
                     <FieldRow label={isEditing ? msg.changeCd() : msg.cd()} id={`${idPrefix}-cdrom`}>
-                      { !isEditing && <FieldValue tooltip={cdImageName}>{cdImageName}</FieldValue> }
+                      { !isEditing && <EllipsisValue tooltip={cdImageName}>{cdImageName}</EllipsisValue> }
                       { isEditing && !canChangeCd &&
                         <div>
-                          <FieldValue tooltip={cdImageName}>{cdImageName}</FieldValue>
+                          <EllipsisValue tooltip={cdImageName}>{cdImageName}</EllipsisValue>
                           <FieldLevelHelp disabled={false} content={msg.cdCanOnlyChangeWhenVmRunning()} inline />
                         </div>
                       }

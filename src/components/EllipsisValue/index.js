@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import style from './style.css'
+import classnames from 'classnames'
 
 class FieldValue extends React.Component {
   constructor (props) {
@@ -41,11 +42,12 @@ class FieldValue extends React.Component {
   }
 
   render () {
-    const { children, tooltip } = this.props
+    const { className, id, children, tooltip } = this.props
 
     if (children) {
       return <span
-        className={style['field-value']}
+        className={classnames(style['field-value'], className)}
+        id={id}
         title={this.state.isOverflow ? tooltip : ''}
         ref={this.ref}
       >
@@ -58,6 +60,8 @@ class FieldValue extends React.Component {
 }
 
 FieldValue.propTypes = {
+  className: PropTypes.string,
+  id: PropTypes.string,
   children: function (props, propName, componentName, ...rest) {
     if ((props.children && !props.tooltip) || (!props.children && props.tooltip)) {
       return new Error(`Props 'children' and 'tooltip' are both required for component ${componentName}`)
