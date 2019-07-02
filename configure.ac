@@ -17,10 +17,10 @@ dnl
 AC_PREREQ(2.60)
 
 define([VERSION_MAJOR], [1])
-define([VERSION_MINOR], [5])
-define([VERSION_FIX], [3])
+define([VERSION_MINOR], [6])
+define([VERSION_FIX], [0])
 define([VERSION_NUMBER], VERSION_MAJOR[.]VERSION_MINOR[.]VERSION_FIX)
-define([VERSION_RELEASE], [1])
+define([VERSION_RELEASE], [0])
 
 AC_INIT([ovirt-web-ui], VERSION_NUMBER, [gshereme@redhat.com])
 PACKAGE_RPM_VERSION="VERSION_NUMBER"
