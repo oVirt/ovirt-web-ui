@@ -53,9 +53,6 @@ Selectors = {
   getUserId () {
     return getState().config.getIn(['user', 'id'])
   },
-  getDomain () {
-    return getState().config.get('domain')
-  },
   getUserGroups () {
     return getState().config.get('userGroups')
   },

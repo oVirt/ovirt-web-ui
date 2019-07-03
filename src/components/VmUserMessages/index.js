@@ -54,11 +54,9 @@ class VmUserMessages extends React.Component {
   }
 
   render () {
-    const { userMessages, config, onClearMessages, onDismissMessage } = this.props
+    const { userMessages, onClearMessages, onDismissMessage } = this.props
 
     const idPrefix = `usermsgs`
-    const user = config.get('user').toJS()
-    user.name = `${user.name}@${config.get('domain')}`
 
     const messagesCount = userMessages.get('records').size
     const messagesList = messagesCount
@@ -67,7 +65,7 @@ class VmUserMessages extends React.Component {
           key={`msg-${r.get('time')}`}
           record={r}
           id={`${idPrefix}-msg-${r.get('time')}-dropdown`}
-          onDismissMessage={() => onDismissMessage(r.toJS(), user)}
+          onDismissMessage={() => onDismissMessage(r.toJS())}
         />
       ))
       : <NotificationDrawer.EmptyState title={msg.noMessages()} />
@@ -89,7 +87,7 @@ class VmUserMessages extends React.Component {
             { messagesCount > 0 &&
               <NotificationDrawer.PanelAction>
                 <NotificationDrawer.PanelActionLink data-toggle='clear-all'>
-                  <Button bsStyle='link' onClick={() => onClearMessages(user)}>
+                  <Button bsStyle='link' onClick={onClearMessages}>
                     <Icon type='pf' name='close' />
                     { msg.clearAll() }
                   </Button>
@@ -103,7 +101,6 @@ class VmUserMessages extends React.Component {
   }
 }
 VmUserMessages.propTypes = {
-  config: PropTypes.object.isRequired,
   userMessages: PropTypes.object.isRequired,
   onClearMessages: PropTypes.func.isRequired,
   onDismissMessage: PropTypes.func.isRequired,
@@ -115,7 +112,7 @@ export default connect(
     userMessages: state.userMessages,
   }),
   (dispatch) => ({
-    onClearMessages: (user) => dispatch(clearUserMessages({ user })),
-    onDismissMessage: (event, user) => dispatch(dismissEvent({ event, user })),
+    onClearMessages: () => dispatch(clearUserMessages()),
+    onDismissMessage: (event) => dispatch(dismissEvent({ event })),
   })
 )(VmUserMessages)

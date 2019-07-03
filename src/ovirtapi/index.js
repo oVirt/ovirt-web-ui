@@ -358,7 +358,7 @@ const OvirtApi = {
   },
   events (): Promise<Object> {
     assertLogin({ methodName: 'events' })
-    return httpGet({ url: `${AppConfiguration.applicationContext}/api/events` })
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/events?search=severity%3Derror` })
   },
   dismissEvent ({ eventId }: { eventId: string }): Promise<Object> {
     assertLogin({ methodName: 'dismissEvent' })

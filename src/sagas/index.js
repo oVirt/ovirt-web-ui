@@ -18,6 +18,7 @@ import {
   takeEvery,
   takeLatest,
   throttle,
+  select,
 } from 'redux-saga/effects'
 
 import logger from '_/logger'
@@ -809,8 +810,12 @@ function* removeVm (action) {
   yield stopProgress({ vmId: action.payload.vmId, name: 'remove', result })
 }
 
-export function* fetchAllEvents (action) {
-  const { user } = action.payload
+function* fetchAllEvents (action) {
+  const user = yield select(state => ({
+    id: state.config.getIn(['user', 'id']),
+    name: `${state.config.getIn(['user', 'name'])}@${state.config.get('domain')}`,
+  }))
+
   const events = yield callExternalAction('events', Api.events, { payload: {} })
 
   if (events.error) {
@@ -843,7 +848,10 @@ function* dismissEvent (action) {
 }
 
 function* clearEvents (action) {
-  const { user } = action.payload
+  const user = yield select(state => ({
+    id: state.config.getIn(['user', 'id']),
+    name: `${state.config.getIn(['user', 'name'])}@${state.config.get('domain')}`,
+  }))
   const events = yield callExternalAction('events', Api.events, { payload: {} })
 
   if (events.error) {

@@ -45,7 +45,6 @@ import {
 
 import {
   fetchAllClusters,
-  fetchAllEvents,
   fetchAllHosts,
   fetchAllOS,
   fetchAllTemplates,
@@ -97,12 +96,13 @@ function* login (action) {
       [ 'administrator', 'filter', 'domain', 'user', 'userSessionTimeoutInterval', 'websocket', 'cpuTopology' ]))
   )
 
-  yield initialLoad({ user: { id: userId, name: `${username}@${Selectors.getDomain()}` } })
+  yield initialLoad()
   console.groupEnd('Login Data Fetch')
 
   yield put(appConfigured())
   yield put(startSchedulerFixedDelay())
   yield autoConnectCheck()
+  yield put(getAllEvents())
 }
 
 /**
@@ -176,13 +176,12 @@ function* checkUserFilterPermissions () {
   yield put.resolve(setUserFilterPermission(isAlwaysFilterOption))
 }
 
-function* initialLoad ({ user }) {
+function* initialLoad () {
   // no data prerequisites
   yield all([
     call(fetchUserGroups, getUserGroups()),
     call(fetchAllOS, getAllOperatingSystems()),
     call(fetchAllHosts, getAllHosts()),
-    call(fetchAllEvents, getAllEvents({ user })),
   ])
   console.log('\u2714 data loads with no pre-reqs are complete')
 
