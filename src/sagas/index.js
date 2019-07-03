@@ -49,7 +49,6 @@ import {
 
   getSinglePool,
   removeMissingPools,
-  selectPoolDetail as actionSelectPoolDetail,
   removePools,
   updatePools,
   updateVmsPoolsCount,
@@ -136,7 +135,6 @@ import {
   DETAIL_PAGE_TYPE,
   DIALOG_PAGE_TYPE,
   MAIN_PAGE_TYPE,
-  POOL_PAGE_TYPE,
 } from '_/constants'
 
 import {
@@ -256,15 +254,10 @@ function* refreshConsolePage ({ id }) {
   }
 }
 
-function* refreshPoolPage ({ id }) {
-  yield selectPoolDetail(actionSelectPoolDetail({ poolId: id }))
-}
-
 const pagesRefreshers = {
   [MAIN_PAGE_TYPE]: refreshMainPage,
   [DETAIL_PAGE_TYPE]: refreshDetailPage,
   [DIALOG_PAGE_TYPE]: refreshDialogPage,
-  [POOL_PAGE_TYPE]: refreshPoolPage,
   [CONSOLE_PAGE_TYPE]: refreshConsolePage,
 }
 

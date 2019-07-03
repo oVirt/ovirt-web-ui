@@ -39,30 +39,6 @@ const VmDetailToolbarConnected = connect(
   })
 )(VmDetailToolbar)
 
-const PoolDetailToolbar = ({ match, vms }) => {
-  if (vms.getIn(['pools', match.params.id])) {
-    return (
-      <Toolbar className={style['full-width']}>
-        <Toolbar.RightContent>
-          <VmActions vm={vms.getIn(['pools', match.params.id, 'vm'])} key='vmaction' pool={vms.getIn(['pools', match.params.id])} />
-        </Toolbar.RightContent>
-      </Toolbar>
-    )
-  }
-  return null
-}
-
-PoolDetailToolbar.propTypes = {
-  vms: PropTypes.object.isRequired,
-  match: RouterPropTypeShapes.match.isRequired,
-}
-
-const PoolDetailToolbarConnected = connect(
-  (state) => ({
-    vms: state.vms,
-  })
-)(PoolDetailToolbar)
-
 const VmConsoleToolbar = ({ match, vms, consoles }) => {
   if (vms.getIn(['vms', match.params.id])) {
     const consoleStatus = [INIT_CONSOLE, DOWNLOAD_CONSOLE]
@@ -99,7 +75,6 @@ const VmConsoleToolbarConnected = connect(
 
 export {
   VmDetailToolbarConnected as VmDetailToolbar,
-  PoolDetailToolbarConnected as PoolDetailToolbar,
   VmConsoleToolbarConnected as VmConsoleToolbar,
   VmsListToolbar,
 }
