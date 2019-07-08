@@ -21,7 +21,7 @@ CustomLabel.propTypes = {
 
 const BarChart = ({ data, additionalLabel, thresholdWarning, thresholdError, id, ...rest }) => {
   const availableInPercent = data.map((datum) => ({ x: datum.x, y: 100 - datum.y }))
-  console.log(availableInPercent)
+
   return <div id={id}>
     <Chart domainPadding={{ x: 20 }}>
       <ChartStack horizontal colorScale={['rgb(0, 102, 204)', 'rgb(237, 237, 237)']}>
