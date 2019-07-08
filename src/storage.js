@@ -1,8 +1,6 @@
-/**
+/*
  Local/Session Storage manipulation
  */
-
-import logger from './logger'
 
 export function saveToLocalStorage (key, value) {
   window.localStorage.setItem(key, value)
@@ -17,12 +15,12 @@ export function removeFromLocalStorage (key) {
 }
 
 export function persistStateToLocalStorage ({ icons }) {
-  logger.log(`persistStateToLocalStorage() called`)
+  console.log(`persistStateToLocalStorage() called`)
   saveToLocalStorage('icons', JSON.stringify(icons))
 }
 
 export function loadStateFromLocalStorage () {
-  logger.log(`loadStateFromLocalStorage() called`)
+  console.log(`loadStateFromLocalStorage() called`)
   return {
     icons: JSON.parse(loadFromLocalStorage('icons')),
   }

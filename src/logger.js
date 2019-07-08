@@ -1,5 +1,8 @@
 let isDebugEnabled = true
 
+/**
+ * Control output of console logging.
+ */
 export function setLogDebug (enabled) {
   isDebugEnabled = enabled
 }
@@ -49,6 +52,8 @@ function attachLoggers (object) {
   })
 }
 
+/**
+ * Enhance the standard browser console logging functions.  Output will be colored
+ * and will log based on the `setLogDebug` value.
+ */
 attachLoggers(window.console)
-
-export default attachLoggers({})

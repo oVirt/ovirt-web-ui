@@ -8,7 +8,6 @@ import { Link } from 'react-router-dom'
 import NavigationPrompt from 'react-router-navigation-prompt'
 import Switch from 'react-bootstrap-switch'
 
-import logger from '_/logger'
 import { generateUnique, templateNameRenderer } from '_/helpers'
 import { isRunning, getVmIconId, isValidOsIcon, isVmNameValid } from '../utils'
 
@@ -193,7 +192,7 @@ class VmDialog extends React.Component {
       'max': this.state.memory * MAX_VM_MEMORY_FACTOR,
       'guaranteed': Math.round(guaranteed),
     }
-    logger.log('getMemoryPolicy() resulting memory_policy: ', memoryPolicy)
+    console.log('getMemoryPolicy() resulting memory_policy: ', memoryPolicy)
 
     return memoryPolicy
   }
@@ -462,13 +461,13 @@ class VmDialog extends React.Component {
       const clustersList = clusters.toList()
       const def = (clustersList.filter(item => item.get('name') === defaultClusterName).first()) || clustersList.first()
       stateChange.clusterId = def ? def.get('id') : undefined
-      logger.log(`VmDialog initDefaults(): Setting initial value for clusterId = ${this.state.clusterId} to ${stateChange.clusterId}`)
+      console.log(`VmDialog initDefaults(): Setting initial value for clusterId = ${this.state.clusterId} to ${stateChange.clusterId}`)
     }
 
     if (!this.getTemplate()) {
       const def = templates.get(zeroUID) || this.props.templates.toList().first()
       stateChange.templateId = def ? def.get('id') : undefined
-      logger.log(`VmDialog initDefaults(): Setting initial value for templateId = ${this.state.templateId} to ${stateChange.templateId}`)
+      console.log(`VmDialog initDefaults(): Setting initial value for templateId = ${this.state.templateId} to ${stateChange.templateId}`)
     }
 
     if (!this.getOS()) {
@@ -480,7 +479,7 @@ class VmDialog extends React.Component {
           id: os.getIn(['icons', 'large', 'id']),
         }
       }
-      logger.log(`VmDialog initDefaults(): Setting initial value for osId = ${this.state.osId} to ${stateChange.osId}`)
+      console.log(`VmDialog initDefaults(): Setting initial value for osId = ${this.state.osId} to ${stateChange.osId}`)
     }
 
     this.setState(stateChange)

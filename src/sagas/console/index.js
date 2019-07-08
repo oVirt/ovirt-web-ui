@@ -3,7 +3,6 @@ import { put } from 'redux-saga/effects'
 import Api from '_/ovirtapi'
 import Selectors from '_/selectors'
 import OptionsManager from '_/optionsManager'
-import logger from '_/logger'
 import { fileDownload } from '_/helpers'
 import { doesVmSessionExistForUserId } from '_/utils'
 import {
@@ -56,7 +55,7 @@ export function* downloadVmConsole (action) {
     if (data.indexOf('type=spice') > -1 || !isNoVNC) {
       let options = Selectors.getConsoleOptions({ vmId })
       if (!options) {
-        logger.log('downloadVmConsole() console options not yet present, trying to load from local storage')
+        console.log('downloadVmConsole() console options not yet present, trying to load from local storage')
         options = yield getConsoleOptions(getConsoleOptionsAction({ vmId }))
       }
 
