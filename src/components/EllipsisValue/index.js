@@ -1,9 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { xor } from '_/propTypeExtras'
 import style from './style.css'
 import classnames from 'classnames'
 
-class FieldValue extends React.Component {
+class EllipsisValue extends React.Component {
   constructor (props) {
     super(props)
     this.ref = React.createRef()
@@ -53,27 +54,16 @@ class FieldValue extends React.Component {
       >
         {children}
       </span>
-    } else {
-      return null
     }
+    return null
   }
 }
 
-FieldValue.propTypes = {
+EllipsisValue.propTypes = {
   className: PropTypes.string,
   id: PropTypes.string,
-  children: function (props, propName, componentName, ...rest) {
-    if ((props.children && !props.tooltip) || (!props.children && props.tooltip)) {
-      return new Error(`Props 'children' and 'tooltip' are both required for component ${componentName}`)
-    }
-    return PropTypes.oneOfType([ PropTypes.string, PropTypes.node ])(props, propName, componentName, ...rest)
-  },
-  tooltip: function (props, propName, componentName, ...rest) {
-    if ((props.children && !props.tooltip) || (!props.children && props.tooltip)) {
-      return new Error(`Props 'children' and 'tooltip' are both required for component ${componentName}`)
-    }
-    return PropTypes.string(props, propName, componentName, ...rest)
-  },
+  children: xor(PropTypes.oneOfType([ PropTypes.string, PropTypes.node ]), 'tooltip'),
+  tooltip: xor(PropTypes.string, 'children'),
 }
 
-export default FieldValue
+export default EllipsisValue
