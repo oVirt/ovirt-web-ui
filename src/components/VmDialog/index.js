@@ -8,7 +8,13 @@ import { Link } from 'react-router-dom'
 import NavigationPrompt from 'react-router-navigation-prompt'
 import Switch from 'react-bootstrap-switch'
 
-import { generateUnique, templateNameRenderer } from '_/helpers'
+import {
+  generateUnique,
+  templateNameRenderer,
+  filterOsByArchitecture,
+  findOsByName,
+} from '_/helpers'
+
 import { isRunning, getVmIconId, isValidOsIcon, isVmNameValid } from '../utils'
 
 import style from './style.css'
@@ -25,7 +31,6 @@ import VmIcon from '../VmIcon'
 
 import { createVm, editVm } from '_/actions'
 
-import Selectors from '_/selectors'
 import { MAX_VM_MEMORY_FACTOR } from '_/constants'
 import { msg } from '_/intl'
 
@@ -338,8 +343,7 @@ class VmDialog extends React.Component {
   }
 
   getOsIdFromType (type) {
-    // hack: this.props.operatingSystems shall be used instead, but this is harmless reuse of code
-    const os = Selectors.getOperatingSystemByName(type)
+    const os = findOsByName(this.props.operatingSystems, type)
     return os ? os.get('id') : undefined
   }
 
@@ -507,7 +511,14 @@ class VmDialog extends React.Component {
   }
 
   render () {
-    const { icons, templates, clusters, storages, previousPath } = this.props
+    const {
+      icons,
+      templates,
+      clusters,
+      storages,
+      previousPath,
+      operatingSystems,
+    } = this.props
     const { bootDevices } = this.state
     const vm = this.props.vm
     const idPrefix = `vmdialog-${vm ? vm.get('name') : '_new'}`
@@ -531,7 +542,7 @@ class VmDialog extends React.Component {
     const cluster = this.getCluster()
     const architecture = cluster && cluster.get('architecture')
 
-    const osMap = Selectors.getOperatingSystemsByArchitecture(architecture)
+    const osMap = filterOsByArchitecture(operatingSystems, architecture)
     const os = this.getOS()
 
     const template = this.getTemplate()
