@@ -257,7 +257,7 @@ class VmActions extends React.Component {
     // Actions for the Toolbar
     const removeConfirmation = (
       <ConfirmationModal
-        title={msg.remove()}
+        title={msg.removeVm()}
         body={
           <div>
             <div id={`${idPrefix}-question`}>{msg.removeVmQustion()}</div>
