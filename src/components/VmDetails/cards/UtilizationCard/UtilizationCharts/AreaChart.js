@@ -11,8 +11,9 @@ const AreaChart = ({ data, labels, id }) => {
   return (
     <div id={id}>
       <ChartGroup
-        height={150}
+        height={120}
         width={450}
+        padding={{ top: 60 }}
         containerComponent={
           <ChartVoronoiContainer
             labels={labels}
