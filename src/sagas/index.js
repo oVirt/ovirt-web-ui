@@ -1,5 +1,5 @@
 import Api from '_/ovirtapi'
-import { persistStateToLocalStorage } from '_/storage'
+import { persistStateToLocalStorage, saveToLocalStorage } from '_/storage'
 import Selectors from '_/selectors'
 import AppConfiguration from '_/config'
 
@@ -18,6 +18,7 @@ import {
   takeEvery,
   takeLatest,
   throttle,
+  select,
 } from 'redux-saga/effects'
 
 import { push } from 'connected-react-router'
@@ -66,6 +67,7 @@ import {
   changeVmCdRom as actionChangeVmCdRom,
   restartVm as actionRestartVm,
   setCurrentPage,
+  setVmsFilters,
 } from '_/actions'
 
 import {
@@ -117,6 +119,7 @@ import {
   REMOVE_VM,
   RESTART_VM,
   SAVE_CONSOLE_OPTIONS,
+  SAVE_FILTERS,
   SELECT_POOL_DETAIL,
   SELECT_VM_DETAIL,
   SHUTDOWN_VM,
@@ -868,6 +871,13 @@ export function* fetchAllClusters (action) {
   // TODO: Api.getAllClusters uses 'follows' so it won't work <4.2, add support if needed
 }
 
+function* saveFilters (actions) {
+  const { filters } = actions.payload
+  const userId = yield select(state => state.config.getIn(['user', 'id']))
+  saveToLocalStorage(`vmFilters-${userId}`, JSON.stringify(filters))
+  yield put(setVmsFilters({ filters }))
+}
+
 export function* fetchAllHosts (action) {
   const hosts = yield callExternalAction('getAllHosts', Api.getAllHosts, action)
 
@@ -1080,6 +1090,8 @@ export function* rootSaga () {
     takeEvery(EDIT_VM_NIC, editVmNic),
     takeEvery(GET_CONSOLE_OPTIONS, getConsoleOptions),
     takeEvery(SAVE_CONSOLE_OPTIONS, saveConsoleOptions),
+
+    takeEvery(SAVE_FILTERS, saveFilters),
 
     takeEvery(SELECT_POOL_DETAIL, selectPoolDetail),
 

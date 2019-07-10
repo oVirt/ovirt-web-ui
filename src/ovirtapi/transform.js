@@ -385,7 +385,7 @@ const Pool = {
       description: pool['description'],
       status: 'down',
       os: {
-        type: pool.vm && pool.vm['os'] ? pool.vm.os['type'] : undefined,
+        type: pool.vm && pool.vm.os ? pool.vm.os.type : undefined,
       },
       type: pool['type'],
       lastMessage: '',

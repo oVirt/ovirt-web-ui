@@ -3,17 +3,33 @@ import PropTypes from 'prop-types'
 import { List } from 'immutable'
 import { connect } from 'react-redux'
 import AddVmButton from '../VmDialog/AddVmButton'
-import VmFilter from '../VmFilters'
-import VmSort from '../VmSort'
+import VmFilter from './VmFilters'
+import VmSort from './VmSort'
 import { Toolbar, Filter } from 'patternfly-react'
 import { filterVms, mapFilterValues } from '_/utils'
 import { RouterPropTypeShapes } from '_/propTypeShapes'
-import { removeFilter, clearFilters } from '_/actions'
+import { saveVmsFilters } from '_/actions'
 import { msg } from '_/intl'
 import style from './style.css'
 
 const VmsListToolbar = ({ match, vms, onRemoveFilter, onClearFilters }) => {
   const filters = vms.get('filters').toJS()
+
+  const removeFilter = (filter) => {
+    let filters = vms.get('filters')
+    const filterValue = filters.get(filter.id)
+    if (filterValue) {
+      if (List.isList(filterValue)) {
+        filters = filters.update(filter.id, (v) => v.delete(v.findIndex(v2 => filter.value === v2)))
+        if (filters.get(filter.id).size === 0) {
+          filters = filters.delete(filter.id)
+        }
+      } else {
+        filters = filters.delete(filter.id)
+      }
+      onRemoveFilter(filters.toJS())
+    }
+  }
 
   const mapLabels = (item, index) => {
     const labels = []
@@ -21,7 +37,7 @@ const VmsListToolbar = ({ match, vms, onRemoveFilter, onClearFilters }) => {
       item.forEach((t, i) => {
         labels.push(<Filter.Item
           key={i}
-          onRemove={onRemoveFilter}
+          onRemove={removeFilter}
           filterData={{ value: t, id: index }}
         >
           {msg[index]()}: {mapFilterValues[index](t)}
@@ -30,7 +46,7 @@ const VmsListToolbar = ({ match, vms, onRemoveFilter, onClearFilters }) => {
     } else {
       labels.push(<Filter.Item
         key={index}
-        onRemove={onRemoveFilter}
+        onRemove={removeFilter}
         filterData={{ value: item, id: index }}
       >
         {msg[index]()}: {mapFilterValues[index](item)}
@@ -91,7 +107,7 @@ export default connect(
     vms: state.vms,
   }),
   (dispatch) => ({
-    onRemoveFilter: (filter) => dispatch(removeFilter({ filter })),
-    onClearFilters: () => dispatch(clearFilters()),
+    onRemoveFilter: (filters) => dispatch(saveVmsFilters({ filters })),
+    onClearFilters: () => dispatch(saveVmsFilters({ filters: {} })),
   })
 )(VmsListToolbar)

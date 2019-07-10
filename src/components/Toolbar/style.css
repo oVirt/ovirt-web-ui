@@ -24,3 +24,8 @@
 .console-toolbar-actions :global(.btn.btn-default) {
   margin-right: 10px;
 }
+
+.selector-overflow :global(.dropdown-menu) {
+  overflow: auto;
+  max-height: 600px;
+}

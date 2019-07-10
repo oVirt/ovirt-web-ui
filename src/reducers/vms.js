@@ -1,11 +1,9 @@
-import Immutable, { Map, List } from 'immutable'
+import Immutable, { Map } from 'immutable'
 
 import {
-  CLEAR_FILTERS,
   FAILED_EXTERNAL_ACTION,
   LOGOUT,
   POOL_ACTION_IN_PROGRESS,
-  REMOVE_FILTER,
   REMOVE_MISSING_POOLS,
   REMOVE_MISSING_VMS,
   REMOVE_POOLS,
@@ -30,7 +28,6 @@ import {
 } from '_/constants'
 import { actionReducer, removeMissingItems } from './utils'
 import { sortFields } from '_/utils'
-import { loadFromLocalStorage } from '_/storage'
 
 const EMPTY_MAP = Immutable.fromJS({})
 const EMPTY_ARRAY = Immutable.fromJS([])
@@ -38,8 +35,8 @@ const EMPTY_ARRAY = Immutable.fromJS([])
 const initialState = Immutable.fromJS({
   vms: {},
   pools: {},
-  filters: Immutable.fromJS(JSON.parse(loadFromLocalStorage('vmFilters')) || {}),
-  sort: Immutable.fromJS({ ...sortFields[0], isAsc: true }),
+  filters: EMPTY_MAP,
+  sort: { ...sortFields[0], isAsc: true },
 
   page: 1,
 
@@ -255,23 +252,6 @@ const vms = actionReducer(initialState, {
   },
   [SET_FILTERS] (state, { payload: { filters } }) { // see the config() reducer
     return state.set('filters', Immutable.fromJS(filters))
-  },
-  [REMOVE_FILTER] (state, { payload: { filter } }) { // see the config() reducer
-    const filterValue = state.getIn(['filters', filter.id])
-    if (filterValue) {
-      if (List.isList(filterValue)) {
-        const newState = state.updateIn(['filters', filter.id], (v) => v.delete(v.findIndex(v2 => filter.value === v2)))
-        if (newState.getIn(['filters', filter.id]).size === 0) {
-          return newState.deleteIn(['filters', filter.id])
-        }
-        return newState
-      }
-      return state.deleteIn(['filters', filter.id])
-    }
-    return state
-  },
-  [CLEAR_FILTERS] (state) { // see the config() reducer
-    return state.update('filters', (v) => v.clear())
   },
   [SET_VM_SORT] (state, { payload: { sort } }) { // see the config() reducer
     return state.set('sort', Immutable.fromJS(sort))

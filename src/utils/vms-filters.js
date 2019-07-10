@@ -1,15 +1,16 @@
+import { getOsHumanName } from '../components/utils'
 import { enumMsg } from '_/intl'
 
 const compareMap = {
   name: (item, filter) => !!filter.find(n => item.get('name').startsWith(n)),
-  os: (item, filter) => item.getIn(['os', 'type']) === filter,
-  status: (item, filter) => item.get('status') === filter,
+  os: (item, filter) => getOsHumanName(item.getIn(['os', 'type'])) === filter,
+  status: (item, filter) => enumMsg('VmStatus', item.get('status')) === filter,
 }
 
 export const mapFilterValues = {
   name: (value) => value,
   os: (value) => value,
-  status: (value) => enumMsg('VmStatus', value),
+  status: (value) => value,
 }
 
 export function filterVms (item, filters) {

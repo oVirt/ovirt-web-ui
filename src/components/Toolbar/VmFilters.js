@@ -3,8 +3,10 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Filter, FormControl } from 'patternfly-react'
 import { enumMsg } from '_/intl'
-import { setVmsFilters } from '_/actions'
-import { saveToLocalStorage } from '_/storage'
+import { saveVmsFilters } from '_/actions'
+import { localeCompare } from '_/helpers'
+
+import style from './style.css'
 
 class VmFilters extends React.Component {
   constructor (props) {
@@ -58,14 +60,22 @@ class VmFilters extends React.Component {
         title: 'Status',
         placeholder: 'Filter by Status',
         filterType: 'select',
-        filterValues: statuses.map((status) => ({ title: enumMsg('VmStatus', status), id: status })),
+        filterValues: statuses
+          .map((status) => ({ title: enumMsg('VmStatus', status), id: status }))
+          .sort((a, b) => localeCompare(a.title, b.title)),
       },
       {
         id: 'os',
         title: 'Operating System',
         placeholder: 'Filter by Operating System',
         filterType: 'select',
-        filterValues: this.props.operatingSystems.toList().map((os) => ({ title: os.get('name'), id: os.get('name') })),
+        filterValues: Array.from(this.props.operatingSystems
+          .toList()
+          .reduce((acc, item) => (
+            acc.add(item.get('description'))
+          ), new Set()))
+          .map(item => ({ title: item, id: item }))
+          .sort((a, b) => localeCompare(a.title, b.title)),
       },
     ]
     return filterTypes
@@ -74,7 +84,7 @@ class VmFilters extends React.Component {
   filterAdded (field, value) {
     let activeFilters = Object.assign({}, this.props.vms.get('filters').toJS())
     if ((field.filterType === 'select')) {
-      activeFilters[field.id] = value.id
+      activeFilters[field.id] = value.title
     } else {
       if (!activeFilters[field.id]) {
         activeFilters[field.id] = []
@@ -154,6 +164,7 @@ class VmFilters extends React.Component {
           placeholder={currentFilterType.placeholder}
           currentValue={currentValue}
           onFilterValueSelected={this.filterValueSelected}
+          className={style['selector-overflow']}
         />
       )
     }
@@ -166,10 +177,6 @@ class VmFilters extends React.Component {
         onKeyPress={e => this.onValueKeyPress(e)}
       />
     )
-  }
-
-  componentDidUpdate () {
-    saveToLocalStorage('vmFilters', JSON.stringify(this.props.vms.get('filters').toJS()))
   }
 
   render () {
@@ -202,6 +209,6 @@ export default connect(
     vms: state.vms,
   }),
   (dispatch) => ({
-    onFilterUpdate: (filters) => dispatch(setVmsFilters({ filters })),
+    onFilterUpdate: (filters) => dispatch(saveVmsFilters({ filters })),
   })
 )(VmFilters)

@@ -240,6 +240,10 @@ export const messages: { [messageId: string]: MessageType } = {
     message: 'Waiting for launch',
     description: 'VM is down but planned to started. be One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
   },
+  enum_VmStatus_not_responding: {
+    message: 'Not responding',
+    description: 'VM is not responding. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
+  },
   errorWhileCreatingNewDisk: 'Error while creating new disk:',
   failedToChangeVmIcon: 'Failed to change VM icon',
   failedToChangeVmIconToDefault: 'Failed to change VM icon to default',

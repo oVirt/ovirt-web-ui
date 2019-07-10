@@ -14,17 +14,16 @@ class VmSort extends React.Component {
   }
 
   updateCurrentSortType (sortType) {
-    this.props.onSortChange({ ...sortType, isAsc: this.props.sort.get('isAsc') })
+    this.props.onSortChange({ ...sortType, isAsc: this.props.sort.isAsc })
   }
 
   toggleCurrentSortDirection () {
-    const sort = this.props.sort.toJS()
-    this.props.onSortChange({ ...sort, isAsc: !this.props.sort.get('isAsc') })
+    const sort = this.props.sort
+    this.props.onSortChange({ ...sort, isAsc: !sort.isAsc })
   }
 
   render () {
-    let { sort } = this.props
-    sort = sort.toJS()
+    const { sort } = this.props
 
     return (
       <Sort>
@@ -44,13 +43,18 @@ class VmSort extends React.Component {
 }
 
 VmSort.propTypes = {
-  sort: PropTypes.object.isRequired,
+  sort: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    isNumeric: PropTypes.bool,
+    isAsc: PropTypes.bool,
+  }).isRequired,
   onSortChange: PropTypes.func.isRequired,
 }
 
 export default connect(
   (state) => ({
-    sort: state.vms.get('sort'),
+    sort: state.vms.get('sort').toJS(),
   }),
   (dispatch) => ({
     onSortChange: (sort) => dispatch(setVmSort({ sort })),

@@ -1,7 +1,6 @@
 import {
   ADD_VM_NIC,
   CHANGE_VM_CDROM,
-  CLEAR_FILTERS,
   CREATE_VM,
   DELETE_VM_NIC,
   EDIT_VM,
@@ -14,11 +13,11 @@ import {
   LOGIN,
   LOGOUT,
   REFRESH_DATA,
-  REMOVE_FILTER,
   REMOVE_MISSING_VMS,
   REMOVE_VM,
   REMOVE_VMS,
   RESTART_VM,
+  SAVE_FILTERS,
   SET_CHANGED,
   SET_FILTERS,
   SET_OVIRT_API_VERSION,
@@ -449,19 +448,12 @@ export function setVmsFilters ({ filters }) {
   }
 }
 
-export function removeFilter ({ filter }) {
+export function saveVmsFilters ({ filters }) {
   return {
-    type: REMOVE_FILTER,
+    type: SAVE_FILTERS,
     payload: {
-      filter,
+      filters,
     },
-  }
-}
-
-export function clearFilters () {
-  return {
-    type: CLEAR_FILTERS,
-    payload: {},
   }
 }
 
