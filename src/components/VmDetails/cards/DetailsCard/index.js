@@ -5,13 +5,11 @@ import { List } from 'immutable'
 
 import * as Actions from '_/actions'
 import { MAX_VM_MEMORY_FACTOR } from '_/constants'
-import { generateUnique, localeCompare, filterOsByArchitecture, isWindows } from '_/helpers'
+import { generateUnique, localeCompare, filterOsByArchitecture, isWindows, userFormatOfBytes } from '_/helpers'
 import { msg, enumMsg } from '_/intl'
 
 import {
-  convertValue,
   isNumber,
-  round,
 } from '_/utils'
 import {
   canChangeCluster as vmCanChangeCluster,
@@ -324,7 +322,7 @@ class DetailsCard extends React.Component {
 
               // fields that are editable on the card
               changeQueue.push(
-                { fieldName: 'memory', value: template.get('memory') / (1024 ** 3) }, // input assumed to be GiB
+                { fieldName: 'memory', value: template.get('memory') / (1024 ** 2) }, // input assumed to be MiB
                 { fieldName: 'cpu', value: template.getIn(['cpu', 'vCPUs']) },
                 { fieldName: 'bootMenuEnabled', value: template.get('bootMenuEnabled') },
                 { fieldName: 'os', value: templateOs && templateOs.get('id') },
@@ -455,7 +453,7 @@ class DetailsCard extends React.Component {
 
         case 'memory':
           if (isNumber(value) && value > 0) {
-            const asBytes = value * (1024 ** 3) // input assumed to be GiB
+            const asBytes = value * (1024 ** 2) // input assumed to be MiB
             updates = updates.setIn(['memory', 'total'], asBytes)
             fieldUpdated = 'memory'
             this.hotPlugUpdates['memory'] = true
@@ -690,7 +688,8 @@ class DetailsCard extends React.Component {
     const osType = vm.getIn(['os', 'type'])
     const osId = operatingSystems && operatingSystems.find(os => os.get('name') === osType).get('id')
 
-    const { unit: memoryUnit, value: memorySize } = convertValue('B', vm.getIn(['memory', 'total']))
+    // Memory
+    const memorySize = vm.getIn(['memory', 'total'])
 
     return <React.Fragment>
       <NextRunChangeConfirmationModal
@@ -839,17 +838,17 @@ class DetailsCard extends React.Component {
                       }
                     </FieldRow>
                     <FieldRow label={msg.memory()} id={`${idPrefix}-memory`}>
-                      { !isFullEdit && `${round(memorySize)} ${memoryUnit}` }
+                      { !isFullEdit && `${userFormatOfBytes(memorySize).str}` }
                       { isFullEdit &&
                         <div>
                           <FormControl
                             id={`${idPrefix}-memory-edit`}
                             className={style['memory-input']}
                             type='number'
-                            value={round(memorySize)}
+                            value={(memorySize / (1024 ** 2))}
                             onChange={e => this.handleChange('memory', e.target.value)}
                           />
-                          {memoryUnit}
+                          MiB
                         </div>
                       }
                     </FieldRow>
