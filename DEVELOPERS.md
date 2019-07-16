@@ -58,6 +58,15 @@ to accomplish this. To start the server:
 When asked, provide a valid user name (in the form of `user@domain`) and password so
 the application can start in the context of a logged in user.
 
+When the dev server is started, it will attempt to open a new browser window/tab on
+your system default browser to the app's running URL.  This behavior can be modified
+by specifying the `BROWSER` environment variable.  Possible values are:
+    BROWSER=none               # disable the feature
+    BROWSER=google-chrome      # open a new tab in chrome on Linux
+    BROWSER='google chrome'    # open a new tab in chrome on MacOS
+    BROWSER=chrome             # open a new tab in chrome on Windows
+    BROWSER=firefox            # open a new tab in firefox on Linux
+
 
 ### Build
 You can build the static assets from source by:
