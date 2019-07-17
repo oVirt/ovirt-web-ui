@@ -7,7 +7,7 @@ const CustomLabel = ({ label, offsetX, text, ...rest }) => {
   const t = label ? typeof label === 'function' ? label(rest.datum) : label : ''
   return (
     <g>
-      <ChartLabel {...rest} x={offsetX} dy={40} style={{ fontSize: 16 }} text={t} />
+      <ChartLabel {...rest} x={offsetX} dy={40} style={{ fontSize: 20 }} text={t} />
       <ChartTooltip {...rest} text={text} style={{ fontSize: 18 }} />
     </g>
   )
@@ -23,7 +23,7 @@ CustomLabel.propTypes = {
 const BarChart = ({ data, additionalLabel, thresholdWarning, thresholdError, id, ...rest }) => {
   const availableInPercent = data.map((datum) => ({ x: datum.x, y: 100 - datum.y }))
   const maxLength = Math.max(...data.map((datum) => datum.x.length))
-  const offsetX = maxLength * 10
+  const offsetX = maxLength * 14
 
   return <div id={id}>
     <Chart domainPadding={{ x: 20 }} padding={{ left: offsetX, bottom: 40 }} height={100 * data.length}>
@@ -50,7 +50,7 @@ const BarChart = ({ data, additionalLabel, thresholdWarning, thresholdError, id,
       <ChartAxis
         style={{
           axis: { strokeWidth: 0 },
-          tickLabels: { fontSize: 18 },
+          tickLabels: { fontSize: 22 },
         }}
         offsetX={offsetX}
       />

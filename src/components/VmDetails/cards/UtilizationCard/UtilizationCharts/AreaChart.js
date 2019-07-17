@@ -7,9 +7,11 @@ import {
   ChartArea,
 } from '@patternfly/react-charts'
 
+import style from '../style.css'
+
 const AreaChart = ({ data, labels, id }) => {
   return (
-    <div id={id}>
+    <div id={id} className={style['area-box']}>
       <ChartGroup
         height={120}
         width={450}

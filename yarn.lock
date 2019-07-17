@@ -446,12 +446,12 @@
   resolved "https://registry.yarnpkg.com/@novnc/novnc/-/novnc-1.1.0.tgz#3827b623e9e201ee1e1c8a61d107c51cbfaeb871"
   integrity sha512-W90Q79EuCYT++39aT/VKGyk7hUt2gPN3rN+ifPUvY4rdjgZlfwdCg9q7yzj04hke/zgdHsbXFfyFijBvrRuU5A==
 
-"@patternfly/react-charts@4.1.5":
-  version "4.1.5"
-  resolved "https://registry.yarnpkg.com/@patternfly/react-charts/-/react-charts-4.1.5.tgz#6a2e72aa97d91d57d9eab522c495c2123ce4a479"
-  integrity sha512-wXK8+RXVoC4fT1Eo+diWMgtz+aNid9doEoQG7+/9OI/64X7Qju/JGJ0Wl+kTy0kjQd0bQW61/sTLJ+bS0KOukw==
+"@patternfly/react-charts@4.4.17":
+  version "4.4.17"
+  resolved "https://registry.yarnpkg.com/@patternfly/react-charts/-/react-charts-4.4.17.tgz#af4104bd4f58ef189e44a8cb36b09bceca336677"
+  integrity sha512-OKgguAmk8axwyFES14hPmgb16425cpZ/Prxs5wTzdgu60/NGwsGeYevskhT7vbW3LPMcethyQuaocMPmXCz3cg==
   dependencies:
-    "@patternfly/react-styles" "^3.3.3"
+    "@patternfly/react-styles" "^3.5.2"
   optionalDependencies:
     "@types/lodash" "^4.14.132"
     "@types/victory" "^31.0.18"
@@ -472,7 +472,7 @@
     file-saver "^1.3.8"
     xterm "^3.3.0"
 
-"@patternfly/react-styles@^3.3.3":
+"@patternfly/react-styles@^3.5.2":
   version "3.5.13"
   resolved "https://registry.yarnpkg.com/@patternfly/react-styles/-/react-styles-3.5.13.tgz#b6d4454eaf8ce2041f6e410aa85eef0e53892b24"
   integrity sha512-aiyOp/n4cMxWhNmokG9EAFt06YmWDi3EdGfa5gyjYRwABGLUhyHo2r7kBqT3xxw0bLcOYDTPU94SaH63uAaRag==
@@ -491,10 +491,10 @@
     resolve-from "^4.0.0"
     typescript "3.4.5"
 
-"@patternfly/react-tokens@2.5.5":
-  version "2.5.5"
-  resolved "https://registry.yarnpkg.com/@patternfly/react-tokens/-/react-tokens-2.5.5.tgz#4d1ff0c2f6091be5c0031a70079e0b745c5d57f0"
-  integrity sha512-5ztqkgBjSNcBnCqJFltG2OaP1bUgk+s5+Fp4kTDpVZLu3LNI46O/gPTRwObYXkbCna0r/hv2k3JVGER53G9fEA==
+"@patternfly/react-tokens@2.6.9":
+  version "2.6.9"
+  resolved "https://registry.yarnpkg.com/@patternfly/react-tokens/-/react-tokens-2.6.9.tgz#e1cb0d77f6737d9669ba41bcaf0610ef1148176b"
+  integrity sha512-hpJEtupHgrm0V7Lyywq2R+UkcQAxNWjcZDLUx2rOe1haCZEdzRk3kf2CuPsqf0Jai9Wuu7J6K8jXXu5ZGUFWZA==
 
 "@types/babel__core@^7.1.0":
   version "7.1.2"
@@ -769,9 +769,9 @@
     "@types/istanbul-lib-report" "*"
 
 "@types/lodash@^4.14.132":
-  version "4.14.137"
-  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.137.tgz#8a4804937dc6462274ffcc088df8f14fc1b368e2"
-  integrity sha512-g4rNK5SRKloO+sUGbuO7aPtwbwzMgjK+bm9BBhLD7jGUiGR7zhwYEhSln/ihgYQBeIJ5j7xjyaYzrWTcu3UotQ==
+  version "4.14.138"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.138.tgz#34f52640d7358230308344e579c15b378d91989e"
+  integrity sha512-A4uJgHz4hakwNBdHNPdxOTkYmXNgmUAKLbXZ7PKGslgeV0Mb8P3BlbYfPovExek1qnod4pDfRbxuzcVs3dlFLg==
 
 "@types/prop-types@*":
   version "15.7.1"
@@ -3306,7 +3306,7 @@ debug@2.6.9, debug@^2.2.0, debug@^2.3.3, debug@^2.6.0, debug@^2.6.8, debug@^2.6.
   dependencies:
     ms "2.0.0"
 
-debug@^3.1.0, debug@^3.2.5, debug@^3.2.6:
+debug@^3.0.0, debug@^3.1.0, debug@^3.2.5, debug@^3.2.6:
   version "3.2.6"
   resolved "https://registry.yarnpkg.com/debug/-/debug-3.2.6.tgz#e83d17de16d8a7efb7717edbe5fb10135eee629b"
   integrity sha512-mel+jf7nrtEl5Pn1Qx46zARXKDpBbvzezse7p7LqINmdoIk8PYP5SySaxEmYv6TZ0JyEKA1hsCId6DIhgITtWQ==
@@ -3558,9 +3558,9 @@ ee-first@1.1.1:
   integrity sha1-WQxhFWsK4vTwJVcyoViyZrxWsh0=
 
 electron-to-chromium@^1.2.7, electron-to-chromium@^1.3.47:
-  version "1.3.241"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.241.tgz#859dc49ab7f90773ed698767372d384190f60cb1"
-  integrity sha512-Gb9E6nWZlbgjDDNe5cAvMJixtn79krNJ70EDpq/M10lkGo7PGtBUe7Y0CYVHsBScRwi6ybCS+YetXAN9ysAHDg==
+  version "1.3.243"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.243.tgz#32f64f00fa121532d1d49f5c0a15fd77f52ae889"
+  integrity sha512-+edFdHGxLSmAKftXa5xZIg19rHkkJLiW+tRu0VMVG3RKztyeKX7d3pXf707lS6+BxB9uBun3RShbxCI1PtBAgQ==
 
 emoji-regex@^7.0.1:
   version "7.0.3"
@@ -4323,11 +4323,11 @@ flow-babel-webpack-plugin@1.1.1:
   integrity sha512-pALWFKf+AQiX4VfSEdxruj2bSMigsrAcg8djV6Hue2y3FJyiA/Z42UkEv6zEvSIpDj1EL+cRBvJNUx6L2+gdTQ==
 
 follow-redirects@^1.0.0:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.8.0.tgz#dcf34930bcfdb6c1eb22b8eb7c457ec95a3dcf40"
-  integrity sha512-eYyazyi+vwXZ6LfSQicvqFwaNEF5xTvnB/rpzRLuqwK45u7WbBEnQ/dDic66KD/A8IzTXFlj2ROAcaP0f2v4lg==
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.8.1.tgz#24804f9eaab67160b0e840c085885d606371a35b"
+  integrity sha512-micCIbldHioIegeKs41DoH0KS3AXfFzgS30qVkM6z/XOE/GJgvmsoc839NUqa1B9udYe9dQxgv7KFwng6+p/dw==
   dependencies:
-    debug "^4.1.1"
+    debug "^3.0.0"
 
 font-awesome-sass@^4.7.0:
   version "4.7.0"

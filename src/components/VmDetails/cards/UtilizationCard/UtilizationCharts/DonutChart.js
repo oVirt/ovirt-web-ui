@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { ChartDonut } from '@patternfly/react-charts'
+import { ChartDonut, ChartLabel } from '@patternfly/react-charts'
 
 import style from '../style.css'
 
@@ -19,6 +19,7 @@ const DonutChart = ({ data, title, subTitle, id }) => {
         subTitle={subTitle}
         title={title}
         style={{ labels: { fontSize: 12 } }}
+        titleComponent={<ChartLabel style={[{ fontSize: 30 }, { fontSize: 20, fill: '#bbb' }]} />}
       />
     </div>
   )

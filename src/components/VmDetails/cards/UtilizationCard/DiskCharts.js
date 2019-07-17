@@ -116,13 +116,7 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
                     })
                   }
                   additionalLabel={({ total, used }) => {
-                    const { unit, value } =
-                      convertValueMap(
-                        'B',
-                        {
-                          total: total,
-                          used: used,
-                        })
+                    const { unit, value } = convertValueMap('B', { total, used })
                     return msg.utilizationCardDiskUsed({
                       used: round(value.used, 0),
                       total: round(value.total, 0),
