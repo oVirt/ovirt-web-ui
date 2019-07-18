@@ -26,7 +26,6 @@ import {
   getAllStorageDomains,
   getAllTemplates,
   getAllVnicProfiles,
-  getIsoFiles,
   getRoles,
   getUserGroups,
 
@@ -216,7 +215,7 @@ function* initialLoad () {
 
   // requires storage domains to be in redux store
   console.group('needs storage domains')
-  yield call(fetchIsoFiles, getIsoFiles())
+  yield call(fetchIsoFiles)
   console.log('\u2714 data loads that require storage domains are complete')
   console.groupEnd('needs storage domains')
 

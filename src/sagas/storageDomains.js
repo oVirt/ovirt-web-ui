@@ -86,48 +86,58 @@ function* fetchDataAndIsoStorageDomains () {
  * Fetch all of the ISO images from both 'iso' type storage domains and 'iso' types
  * images from other types of storage domains.
  */
-export function* fetchIsoFiles (action) {
+export function* fetchIsoFiles () {
   yield all([
-    call(function* () {
-      // fetch ISO disk images and distribute them to their storage domains as files
-      const images = yield callExternalAction('getIsoImages', Api.getIsoImages, { payload: {} })
-      if (images && images.disk) {
-        const storageDomainToDisks = images.disk.reduce(
-          (acc, disk) => {
-            disk.storage_domains.storage_domain.forEach(({ id }) => {
-              const files = acc[id] = acc[id] || []
-              files.push(Transforms.StorageDomainFile.toInternal({ file: disk }))
-            })
-            return acc
-          },
-          {}
-        )
-
-        const updates = Object.entries(storageDomainToDisks).map(
-          function* ([sd, files]) {
-            yield put(setStorageDomainsFiles(sd, files))
-          }
-        )
-        yield all(updates)
-      }
-    }),
-
-    call(function* () {
-      // fetch 'files' from ISO storage domains
-      const storageDomains = yield select((state) => state.storageDomains)
-
-      const isoStorageDomains = storageDomains
-        .filter(storageDomain => storageDomain.get('type') === 'iso')
-        .keySeq()
-        .toArray()
-
-      const isoFilesFetches = isoStorageDomains.map(fetchAllFilesForISO)
-      yield all(isoFilesFetches)
-    }),
+    call(fetchIsoDiskImages),
+    call(fetchIsoFilesFromIsoStorageDomains),
   ])
 }
 
-function* fetchAllFilesForISO (storageDomainId) {
+/**
+ * Fetch ISO disk images and distribute them to their storage domains as files
+ */
+function* fetchIsoDiskImages () {
+  const images = yield callExternalAction('getIsoImages', Api.getIsoImages, { payload: {} })
+  if (images && images.disk) {
+    const storageDomainToDisks = images.disk.reduce(
+      (acc, disk) => {
+        disk.storage_domains.storage_domain.forEach(({ id }) => {
+          const files = acc[id] = acc[id] || []
+          files.push(Transforms.StorageDomainFile.toInternal({ file: disk }))
+        })
+        return acc
+      },
+      {}
+    )
+
+    const updates = Object.entries(storageDomainToDisks).map(
+      function* ([sd, files]) {
+        yield put(setStorageDomainsFiles(sd, files))
+      }
+    )
+    yield all(updates)
+  }
+}
+
+/**
+ * Fetch 'files' from all ISO storage domains
+ */
+function* fetchIsoFilesFromIsoStorageDomains () {
+  const storageDomains = yield select((state) => state.storageDomains)
+
+  const isoStorageDomains = storageDomains
+    .filter(storageDomain => storageDomain.get('type') === 'iso')
+    .keySeq()
+    .toArray()
+
+  const isoFilesFetches = isoStorageDomains.map(fetchIsoFilesFromIsoStorageDomain)
+  yield all(isoFilesFetches)
+}
+
+/**
+ * Fetch 'files' from the single given ISO storage domain
+ */
+function* fetchIsoFilesFromIsoStorageDomain (storageDomainId) {
   const files = yield callExternalAction('getStorageFiles', Api.getStorageFiles, { payload: { storageId: storageDomainId } })
   if (files && files.file) {
     const filesInternal = files.file.map(
