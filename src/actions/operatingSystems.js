@@ -14,8 +14,5 @@ export function setOperatingSystems (operatingSystems) {
 }
 
 export function getAllOperatingSystems () {
-  return {
-    type: GET_ALL_OS,
-    payload: {},
-  }
+  return { type: GET_ALL_OS }
 }

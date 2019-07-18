@@ -40,10 +40,10 @@ export function compareVersion (actual, required) {
   return false
 }
 
-export function* callExternalAction (methodName, method, action, canBeMissing = false) {
+export function* callExternalAction (methodName, method, action = {}, canBeMissing = false) {
   try {
     console.log(`External action: ${JSON.stringify(hidePassword({ action }))}, API method: ${methodName}()`)
-    const result = yield call(method, action.payload)
+    const result = yield call(method, action.payload || {})
     return result
   } catch (e) {
     if (!canBeMissing) {

@@ -88,7 +88,7 @@ function mergeStorageDomains (storageDomainsInternal) {
  */
 export function* fetchIsoFiles (action) {
   // fetch ISO disk images and distribute them to their storage domains as files
-  const images = yield callExternalAction('getIsoImages', Api.getIsoImages, { payload: {} })
+  const images = yield callExternalAction('getIsoImages', Api.getIsoImages)
   if (images && images.disk) {
     const storageDomainToDisks = images.disk.reduce(
       (acc, disk) => {

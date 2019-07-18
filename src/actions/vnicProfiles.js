@@ -14,10 +14,7 @@ export function setVnicProfiles ({ vnicProfiles }) {
 }
 
 export function getAllVnicProfiles () {
-  return {
-    type: GET_ALL_VNIC_PROFILES,
-    payload: {},
-  }
+  return { type: GET_ALL_VNIC_PROFILES }
 }
 
 export function addNetworksToVnicProfiles ({ networks }) {

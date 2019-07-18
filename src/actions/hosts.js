@@ -11,8 +11,5 @@ export function setHosts (hosts) {
 }
 
 export function getAllHosts () {
-  return {
-    type: GET_ALL_HOSTS,
-    payload: {},
-  }
+  return { type: GET_ALL_HOSTS }
 }
