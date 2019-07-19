@@ -54,6 +54,7 @@ import {
 import { downloadVmConsole } from './console'
 import { fetchServerConfiguredValues } from './server-configs'
 import { fetchDataCentersAndStorageDomains, fetchIsoFiles } from './storageDomains'
+import { loadIconsFromLocalStorage } from './osIcons'
 
 import { loadFromLocalStorage } from '_/storage'
 
@@ -187,6 +188,7 @@ function* loadFilters () {
 function* initialLoad () {
   // no data prerequisites
   yield all([
+    call(loadIconsFromLocalStorage),
     call(fetchUserGroups, getUserGroups()),
     call(fetchAllOS, getAllOperatingSystems()),
     call(fetchAllHosts, getAllHosts()),

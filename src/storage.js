@@ -14,18 +14,6 @@ export function removeFromLocalStorage (key) {
   return window.localStorage.removeItem(key)
 }
 
-export function persistStateToLocalStorage ({ icons }) {
-  console.log(`persistStateToLocalStorage() called`)
-  saveToLocalStorage('icons', JSON.stringify(icons))
-}
-
-export function loadStateFromLocalStorage () {
-  console.log(`loadStateFromLocalStorage() called`)
-  return {
-    icons: JSON.parse(loadFromLocalStorage('icons')),
-  }
-}
-
 // --------------------
 export function saveToSessionStorage (key, value) {
   window.sessionStorage.setItem(key, value)

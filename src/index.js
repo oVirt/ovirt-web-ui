@@ -22,12 +22,9 @@ import { getSelectedMessages, locale } from '_/intl'
 import configureStore from '_/store'
 import Selectors from '_/selectors'
 import AppConfiguration, { readConfiguration } from '_/config'
-import { loadStateFromLocalStorage } from '_/storage'
-import { valuesOfObject } from '_/helpers'
 import { rootSaga } from '_/sagas'
 import {
   login,
-  updateIcons,
   addActiveRequest,
   delayedRemoveActiveRequest,
 } from '_/actions'
@@ -87,17 +84,6 @@ function fetchToken (): { token: string, username: string, domain: string, userI
   }
 }
 
-function loadPersistedState (store: Object) {
-  // load persisted icons, etc ...
-  const { icons } = loadStateFromLocalStorage()
-
-  if (icons) {
-    const iconsArray = valuesOfObject(icons)
-    console.log(`loadPersistedState: ${iconsArray.length} icons loaded`)
-    store.dispatch(updateIcons({ icons: iconsArray }))
-  }
-}
-
 function addBrandedResources () {
   addLinkElement('shortcut icon', branding.resourcesUrls.favicon)
   addLinkElement('stylesheet', branding.resourcesUrls.brandStylesheet)
@@ -147,11 +133,11 @@ function onResourcesLoaded () {
   rootTask.done.catch(err => sagaErrorBridge.throw(err))
   Selectors.init({ store })
   initializeApiListener(store)
-  loadPersistedState(store)
 
   // do initial render
   renderApp(store, sagaErrorBridge)
 
+  // and start the login/init-data-load action
   const { token, username, domain, userId }: { token: string, username: string, domain: string, userId: string } = fetchToken()
   if (token) {
     store.dispatch(login({ username, token, userId, domain }))
