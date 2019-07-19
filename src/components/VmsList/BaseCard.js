@@ -34,20 +34,21 @@ BaseCardHeader.propTypes = {
   ]).isRequired,
 }
 
-const BaseCardIcon = ({ url, icon }) => (
-  url
-    ? <Link to={url}>
-      <VmIcon icon={icon} className={style['card-pf-icon']}
-        missingIconClassName='fa fa-birthday-cake card-pf-icon-circle' />
-    </Link>
-    : <VmIcon icon={icon} className={style['card-pf-icon']}
-      missingIconClassName='fa fa-birthday-cake card-pf-icon-circle' />
-)
+const BaseCardIcon = ({ url, icon }) => {
+  const i =
+    <VmIcon
+      icon={icon}
+      className={style['card-pf-icon']}
+      missingIconClassName='fa fa-birthday-cake card-pf-icon-circle'
+    />
+
+  return (url ? <Link to={url}>{i}</Link> : i)
+}
 
 BaseCardIcon.displayName = ICON_NAME
 
 BaseCardIcon.propTypes = {
-  icon: PropTypes.object.isRequired,
+  icon: PropTypes.object,
   url: PropTypes.string,
 }
 
