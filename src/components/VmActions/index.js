@@ -29,10 +29,10 @@ import {
 
 import { isWindows } from '_/helpers'
 
-import { SplitButton, Icon, Checkbox } from 'patternfly-react'
+import { SplitButton, Icon, Checkbox, DropdownKebab } from 'patternfly-react'
 import ConfirmationModal from './ConfirmationModal'
 import ConsoleConfirmationModal from './ConsoleConfirmationModal'
-import Action, { ActionButtonWraper, MenuItemAction } from './Action'
+import Action, { ActionButtonWraper, MenuItemAction, ActionMenuItemWrapper } from './Action'
 
 const EmptyAction = ({ state, isOnCard }) => {
   if (!canConsole(state) && !canShutdown(state) && !canRestart(state) && !canStart(state)) {
@@ -201,7 +201,7 @@ class VmActions extends React.Component {
         actionDisabled: isPool || !canShutdown(status) || vm.getIn(['actionInProgress', 'shutdown']),
         shortTitle: msg.shutdown(),
         tooltip: msg.shutdownVm(),
-        className: 'btn btn-danger',
+        className: 'btn btn-default',
         id: `${idPrefix}-button-shutdown`,
         confirmation: shutdownConfirmation,
       },
@@ -279,8 +279,18 @@ class VmActions extends React.Component {
         confirm={{ title: msg.remove(), type: 'danger', onClick: () => onRemove({ preserveDisks: this.state.removePreserveDisks }) }}
       />)
 
-    return (
-      <div className={`actions-line ${style['actions-toolbar']}`} id={idPrefix}>
+    return (<React.Fragment>
+      <DropdownKebab id='kebab' pullRight className='visible-xs'>
+        { actions.map(action => <ActionMenuItemWrapper key={action.id} {...action} />) }
+        <ActionMenuItemWrapper
+          confirmation={removeConfirmation}
+          actionDisabled={isPool || !canRemove(status) || vm.getIn(['actionInProgress', 'remove'])}
+          shortTitle={msg.remove()}
+          className='btn btn-danger'
+          id={`${idPrefix}-button-remove`}
+        />
+      </DropdownKebab>
+      <div className={`actions-line ${style['actions-toolbar']} hidden-xs`} id={idPrefix}>
         <EmptyAction state={status} isOnCard={isOnCard} />
 
         {actions.map(action => <ActionButtonWraper key={action.id} {...action} />)}
@@ -294,9 +304,11 @@ class VmActions extends React.Component {
           id={`${idPrefix}-button-remove`}
         />
       </div>
+    </React.Fragment>
     )
   }
 }
+
 VmActions.propTypes = {
   vm: PropTypes.object.isRequired,
   pool: PropTypes.object,

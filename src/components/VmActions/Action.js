@@ -88,16 +88,16 @@ Button.propTypes = {
   id: PropTypes.string.isRequired,
 }
 
-const MenuItemAction = ({ id, confirmation, shortTitle, icon, onClick }) => {
+const MenuItemAction = ({ confirmation, shortTitle, icon, onClick, ...rest }) => {
   return <Action confirmation={confirmation}>
     <MenuItem
-      id={id}
       onClick={() => {
         onClick && onClick()
         document.dispatchEvent(new MouseEvent('click'))
       }}
+      {...rest}
     >
-      <span>{shortTitle}</span> { icon }
+      <span>{shortTitle}</span> {icon}
     </MenuItem>
   </Action>
 }
@@ -108,6 +108,8 @@ MenuItemAction.propTypes = {
   shortTitle: PropTypes.string.isRequired,
   icon: PropTypes.node,
   onClick: PropTypes.func,
+  className: PropTypes.string,
+  disabled: PropTypes.bool,
 }
 
 const ActionButtonWraper = (props) => {
@@ -133,4 +135,46 @@ ActionButtonWraper.propTypes = {
   ...Button.propTypes,
 }
 
-export { ActionButtonWraper, MenuItemAction }
+const ActionMenuItemWrapper = (props) => {
+  const { items, actionDisabled, confirmation, shortTitle } = props
+
+  const dangerText = (!actionDisabled && props.className === 'btn btn-danger') ? style['menu-item-danger'] : ''
+
+  // For console button
+  if (items && items.filter(i => i !== null).length > 0) {
+    if (actionDisabled) {
+      return <MenuItemAction
+        shortTitle={shortTitle}
+        id='console-selector'
+        disabled={actionDisabled}
+      />
+    } else {
+      return (<React.Fragment>
+        <MenuItem divider />
+        {items.filter(i => i !== null && !i.actionDisabled).map(item => {
+          return <MenuItemAction key={item.id} {...item} />
+        })
+        }
+        <MenuItem divider />
+      </React.Fragment>)
+    }
+  }
+
+  return (
+    <MenuItemAction
+      id={shortTitle}
+      key={shortTitle}
+      confirmation={!actionDisabled && confirmation}
+      disabled={actionDisabled}
+      className={dangerText}
+      shortTitle={shortTitle}
+    />)
+}
+
+ActionMenuItemWrapper.propTypes = {
+  confirmation: PropTypes.node,
+  items: PropTypes.array,
+  ...Button.propTypes,
+}
+
+export { ActionButtonWraper, MenuItemAction, ActionMenuItemWrapper }
