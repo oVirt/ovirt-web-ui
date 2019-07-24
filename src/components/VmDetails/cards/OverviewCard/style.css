@@ -9,6 +9,10 @@
   margin: auto;
 }
 
+.vm-info {
+  padding: 15px;
+}
+
 .vm-name {
   font-size: 150%;
   margin-bottom: 5px;
@@ -45,4 +49,14 @@
   font-size: 10px;
   line-height: 20px;
   padding-left: 10px;
+}
+
+.os-icon {
+  padding: 15px;
+}
+
+.container {
+  display: flex;
+  overflow: visible;
+  flex-flow: row wrap;
 }
