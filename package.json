@@ -68,12 +68,13 @@
     "whatwg-fetch": "1.0.0"
   },
   "dependencies": {
-    "babel-polyfill": "6.26.0",
     "@patternfly/react-console": "1.10.22",
+    "babel-polyfill": "6.26.0",
     "blob-util": "1.2.1",
     "bootstrap": "3.4.1",
     "bootstrap-select": "1.13.1",
     "bootstrap-switch": "3.3.4",
+    "classnames": "2.2.6",
     "connected-react-router": "4.3.0",
     "history": "4.7.2",
     "immutable": "3.8.2",

@@ -53,12 +53,6 @@
   display: inline-block;
 }
 
-.field-value {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
 button.field-level-help:global(.popover-pf-info) {
   flex-grow: 0;
 }
