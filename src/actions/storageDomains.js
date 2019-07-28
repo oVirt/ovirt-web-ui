@@ -8,15 +8,11 @@ import {
 } from '_/constants'
 
 export function getAllStorageDomains (): Object {
-  return {
-    type: GET_ALL_STORAGE_DOMAINS,
-  }
+  return { type: GET_ALL_STORAGE_DOMAINS }
 }
 
 export function getIsoFiles (): Object {
-  return {
-    type: GET_ISO_FILES,
-  }
+  return { type: GET_ISO_FILES }
 }
 
 export function setStorageDomains (storageDomains: Array<Object>): Object {

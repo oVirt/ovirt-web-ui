@@ -61,10 +61,7 @@ export function addSnapshotRestorePendingTask () {
 }
 
 export function removeSnapshotRestorePendingTask () {
-  return {
-    type: REMOVE_SNAPSHOT_RESTORE_PENDING_TASK,
-    payload: {},
-  }
+  return { type: REMOVE_SNAPSHOT_RESTORE_PENDING_TASK }
 }
 
 export function addSnapshotAddPendingTask () {
@@ -78,8 +75,5 @@ export function addSnapshotAddPendingTask () {
 }
 
 export function removeSnapshotAddPendingTask () {
-  return {
-    type: REMOVE_SNAPSHOT_ADD_PENDING_TASK,
-    payload: {},
-  }
+  return { type: REMOVE_SNAPSHOT_ADD_PENDING_TASK }
 }

@@ -20,9 +20,7 @@ export function addUserMessage ({ message, shortMessage, type = '' }) {
 }
 
 export function clearUserMessages () {
-  return {
-    type: CLEAR_USER_MSGS,
-  }
+  return { type: CLEAR_USER_MSGS }
 }
 
 export function setNotificationNotified ({ time }) {
@@ -62,7 +60,5 @@ export function setUserMessages ({ messages }) {
 }
 
 export function getAllEvents () {
-  return {
-    type: GET_ALL_EVENTS,
-  }
+  return { type: GET_ALL_EVENTS }
 }

@@ -29,8 +29,7 @@ import {
 
 import { isWindows } from '_/helpers'
 
-import { SplitButton, Icon } from 'patternfly-react'
-import Checkbox from '../Checkbox'
+import { SplitButton, Icon, Checkbox } from 'patternfly-react'
 import ConfirmationModal from './ConfirmationModal'
 import ConsoleConfirmationModal from './ConsoleConfirmationModal'
 import Action, { ActionButtonWraper, MenuItemAction } from './Action'
@@ -266,9 +265,13 @@ class VmActions extends React.Component {
               <div style={{ marginTop: '8px' }} id={`${idPrefix}-preservedisks`}>
                 <Checkbox
                   checked={this.state.removePreserveDisks}
-                  onClick={() => this.setState((s) => { return { removePreserveDisks: !s.removePreserveDisks } })}
-                  label={msg.preserveDisks()}
-                />
+                  onChange={
+                    () =>
+                      this.setState((s) => { return { removePreserveDisks: !s.removePreserveDisks } })
+                  }
+                >
+                  {msg.preserveDisks()}
+                </Checkbox>
               </div>
             )}
           </div>

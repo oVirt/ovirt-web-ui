@@ -7,7 +7,6 @@ import type {
   VmType, ApiVmType,
 } from './types'
 
-import logger from '../logger'
 import Selectors from '../selectors'
 import AppConfiguration from '../config'
 
@@ -211,7 +210,7 @@ const OvirtApi = {
   addNewVm ({ vm, transformInput = true, clone = false }: { vm: VmType | Object, transformInput: boolean, clone: boolean }): Promise<Object> {
     assertLogin({ methodName: 'addNewVm' })
     const input = JSON.stringify(transformInput ? OvirtApi.internalVmToOvirt({ vm }) : vm)
-    logger.log(`OvirtApi.addNewVm(): ${input}`)
+    console.log(`OvirtApi.addNewVm(): ${input}`)
 
     return httpPost({
       url: `${AppConfiguration.applicationContext}/api/vms?clone=${clone ? 'true' : 'false'}`,
@@ -221,7 +220,7 @@ const OvirtApi = {
   editVm ({ vm, nextRun = false, transformInput = true }: { vm: VmType | Object, nextRun: boolean, transformInput: boolean}): Promise<Object> {
     assertLogin({ methodName: 'editVm' })
     const input = JSON.stringify(transformInput ? OvirtApi.internalVmToOvirt({ vm }) : vm)
-    logger.log(`OvirtApi.editVm(): ${input}`, 'nextRun?', nextRun)
+    console.log(`OvirtApi.editVm(): ${input}`, 'nextRun?', nextRun)
 
     const suffix = nextRun ? '?next_run=true' : ''
 
@@ -262,7 +261,7 @@ const OvirtApi = {
   addNewSnapshot ({ vmId, snapshot }: { vmId: string, snapshot: SnapshotType }): Promise<Object> {
     assertLogin({ methodName: 'addNewSnapshot' })
     const input = JSON.stringify(OvirtApi.internalSnapshotToOvirt({ snapshot }))
-    logger.log(`OvirtApi.addNewSnapshot(): ${input}`)
+    console.log(`OvirtApi.addNewSnapshot(): ${input}`)
     return httpPost({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots`,
       input,
@@ -419,7 +418,7 @@ const OvirtApi = {
   changeCdRom ({ cdrom, vmId, current = true }: { cdrom: CdRomType, vmId: string, current?: boolean }): Promise<Object> {
     assertLogin({ methodName: 'changeCdRom' })
     const input = JSON.stringify(OvirtApi.internalCdRomToOvirt({ cdrom }))
-    logger.log(`OvirtApi.changeCdRom(): ${input}`)
+    console.log(`OvirtApi.changeCdRom(): ${input}`)
     return httpPut({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/cdroms/${zeroUUID}?current=${current ? 'true' : 'false'}`,
       input,
@@ -572,18 +571,18 @@ function getOptionWithoutDefault (optionName: string, version: string): Promise<
           .map(valueAndVersion => valueAndVersion.value)[0]
       } catch (error) {
         if (error instanceof TypeError) {
-          logger.log(`Response to getting option '${optionName}' has unexpected format:`, response)
+          console.log(`Response to getting option '${optionName}' has unexpected format:`, response)
         }
         throw error
       }
       if (result === undefined) {
-        logger.log(`Config option '${optionName}' was not found for version '${version}'.`)
+        console.log(`Config option '${optionName}' was not found for version '${version}'.`)
         return null
       }
       return result
     }, error => {
       if (error.status === 404) {
-        logger.log(`Config option '${optionName}' doesn't exist in any version.`)
+        console.log(`Config option '${optionName}' doesn't exist in any version.`)
         return null
       }
       throw error

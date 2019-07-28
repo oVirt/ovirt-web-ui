@@ -11,8 +11,5 @@ export function setClusters (clusters) {
 }
 
 export function getAllClusters () {
-  return {
-    type: GET_ALL_CLUSTERS,
-    payload: {},
-  }
+  return { type: GET_ALL_CLUSTERS }
 }

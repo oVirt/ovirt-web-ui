@@ -74,7 +74,8 @@ DiskBar.propTypes = {
  *       via REST. Storage allocation is being used instead.
  */
 const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
-  const diskDetails = diskStats && diskStats['usage'] && diskStats['usage'].datum
+  const diskDetails = diskStats && diskStats.usage && diskStats.usage.datum
+  const hasDiskDetails = diskDetails && diskDetails.length > 0
 
   let actualSize = 0
   let provisionedSize = 0
@@ -125,7 +126,7 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
                 </UtilizationCardDetailsLine2>
               </UtilizationCardDetailsDesc>
             </UtilizationCardDetails>
-            { !diskDetails &&
+            { !hasDiskDetails &&
               <DonutChart
                 id={`${id}-donut-chart`}
                 data={{
@@ -145,7 +146,7 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
                 }}
               />
             }
-            { isRunning && diskDetails &&
+            { isRunning && hasDiskDetails &&
               <div className={style['disk-fs-list']}>
                 {
                   diskDetails.map((disk) =>
@@ -154,14 +155,14 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
                 }
               </div>
             }
-            { isRunning && !diskDetails &&
+            { isRunning && !hasDiskDetails &&
               <NoHistoricData message={msg.utilizationCardNoGuestAgent()} />
             }
             {/*
               Disks don't have historic data but stub the space so the card stretches like the others,
               thus if message above doesn't show, need to insert EmptyBlock
             */}
-            { !(isRunning && !diskDetails) &&
+            { !(isRunning && !hasDiskDetails) &&
               <EmptyBlock />
             }
           </React.Fragment>

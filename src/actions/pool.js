@@ -90,11 +90,7 @@ export function getSinglePool ({ poolId }) {
 }
 
 export function updateVmsPoolsCount () {
-  return {
-    type: UPDATE_VMPOOLS_COUNT,
-    payload: {
-    },
-  }
+  return { type: UPDATE_VMPOOLS_COUNT }
 }
 
 export function poolActionInProgress ({ poolId, name, started }) {

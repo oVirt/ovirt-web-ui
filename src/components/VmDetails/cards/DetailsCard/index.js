@@ -5,13 +5,11 @@ import { List } from 'immutable'
 
 import * as Actions from '_/actions'
 import { MAX_VM_MEMORY_FACTOR } from '_/constants'
-import { generateUnique, localeCompare, filterOsByArchitecture, isWindows } from '_/helpers'
+import { generateUnique, localeCompare, filterOsByArchitecture, isWindows, userFormatOfBytes } from '_/helpers'
 import { msg, enumMsg } from '_/intl'
 
 import {
-  convertValue,
   isNumber,
-  round,
 } from '_/utils'
 import {
   canChangeCluster as vmCanChangeCluster,
@@ -33,15 +31,14 @@ import SelectBox from '../../../SelectBox'
 import BaseCard from '../../BaseCard'
 
 import { Grid, Row, Col } from '_/components/Grid'
-import CloudInit from './CloudInit'
+import EllipsisValue from '_/components/EllipsisValue'
+import ExpandCollapseSection from '_/components/ExpandCollapseSection'
 
 import style from './style.css'
 
+import CloudInit from './CloudInit'
 import HotPlugChangeConfirmationModal from './HotPlugConfirmationModal'
 import NextRunChangeConfirmationModal from './NextRunChangeConfirmationModal'
-
-import ExpandCollapseSection from '../../../ExpandCollapseSection'
-import FieldValue from './FieldValue'
 import FieldRow from './FieldRow'
 
 /*
@@ -324,7 +321,7 @@ class DetailsCard extends React.Component {
 
               // fields that are editable on the card
               changeQueue.push(
-                { fieldName: 'memory', value: template.get('memory') / (1024 ** 3) }, // input assumed to be GiB
+                { fieldName: 'memory', value: template.get('memory') / (1024 ** 2) }, // input assumed to be MiB
                 { fieldName: 'cpu', value: template.getIn(['cpu', 'vCPUs']) },
                 { fieldName: 'bootMenuEnabled', value: template.get('bootMenuEnabled') },
                 { fieldName: 'os', value: templateOs && templateOs.get('id') },
@@ -455,7 +452,7 @@ class DetailsCard extends React.Component {
 
         case 'memory':
           if (isNumber(value) && value > 0) {
-            const asBytes = value * (1024 ** 3) // input assumed to be GiB
+            const asBytes = value * (1024 ** 2) // input assumed to be MiB
             updates = updates.setIn(['memory', 'total'], asBytes)
             fieldUpdated = 'memory'
             this.hotPlugUpdates['memory'] = true
@@ -690,7 +687,8 @@ class DetailsCard extends React.Component {
     const osType = vm.getIn(['os', 'type'])
     const osId = operatingSystems && operatingSystems.find(os => os.get('name') === osType).get('id')
 
-    const { unit: memoryUnit, value: memorySize } = convertValue('B', vm.getIn(['memory', 'total']))
+    // Memory
+    const memorySize = vm.getIn(['memory', 'total'])
 
     return <React.Fragment>
       <NextRunChangeConfirmationModal
@@ -724,7 +722,7 @@ class DetailsCard extends React.Component {
                 <Col className={style['fields-column']}>
                   <Grid>
                     <FieldRow label={msg.host()} id={`${idPrefix}-host`}>
-                      { <FieldValue tooltip={hostName}>{hostName}</FieldValue> || <NotAvailable tooltip={msg.notAvailableUntilRunning()} id={`${idPrefix}-host-not-available`} /> }
+                      { <EllipsisValue tooltip={hostName}>{hostName}</EllipsisValue> || <NotAvailable tooltip={msg.notAvailableUntilRunning()} id={`${idPrefix}-host-not-available`} /> }
                     </FieldRow>
                     <FieldRow label={msg.ipAddress()} id={`${idPrefix}-ip`}>
                       <React.Fragment>
@@ -740,7 +738,7 @@ class DetailsCard extends React.Component {
                       </React.Fragment>
                     </FieldRow>
                     <FieldRow label={msg.fqdn()} id={`${idPrefix}-fqdn`}>
-                      { <FieldValue tooltip={fqdn}>{fqdn}</FieldValue> || <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id={`${idPrefix}-fqdn-not-available`} /> }
+                      { <EllipsisValue tooltip={fqdn}>{fqdn}</EllipsisValue> || <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id={`${idPrefix}-fqdn-not-available`} /> }
                     </FieldRow>
                     <FieldRow label={msg.cluster()} id={`${idPrefix}-cluster`}>
                       { !isFullEdit && clusterName }
@@ -776,10 +774,10 @@ class DetailsCard extends React.Component {
                       { templateName }
                     </FieldRow>
                     <FieldRow label={isEditing ? msg.changeCd() : msg.cd()} id={`${idPrefix}-cdrom`}>
-                      { !isEditing && <FieldValue tooltip={cdImageName}>{cdImageName}</FieldValue> }
+                      { !isEditing && <EllipsisValue tooltip={cdImageName}>{cdImageName}</EllipsisValue> }
                       { isEditing && !canChangeCd &&
                         <div>
-                          <FieldValue tooltip={cdImageName}>{cdImageName}</FieldValue>
+                          <EllipsisValue tooltip={cdImageName}>{cdImageName}</EllipsisValue>
                           <FieldLevelHelp disabled={false} content={msg.cdCanOnlyChangeWhenVmRunning()} inline />
                         </div>
                       }
@@ -839,17 +837,17 @@ class DetailsCard extends React.Component {
                       }
                     </FieldRow>
                     <FieldRow label={msg.memory()} id={`${idPrefix}-memory`}>
-                      { !isFullEdit && `${round(memorySize)} ${memoryUnit}` }
+                      { !isFullEdit && `${userFormatOfBytes(memorySize).str}` }
                       { isFullEdit &&
                         <div>
                           <FormControl
                             id={`${idPrefix}-memory-edit`}
                             className={style['memory-input']}
                             type='number'
-                            value={round(memorySize)}
+                            value={(memorySize / (1024 ** 2))}
                             onChange={e => this.handleChange('memory', e.target.value)}
                           />
-                          {memoryUnit}
+                          MiB
                         </div>
                       }
                     </FieldRow>

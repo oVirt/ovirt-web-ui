@@ -5,7 +5,6 @@ import Product from '_/version'
 import Api from '_/ovirtapi'
 import AppConfiguration from '_/config'
 import OptionsManager from '_/optionsManager'
-import logger from '_/logger'
 
 import {
   loginSuccessful,
@@ -77,7 +76,7 @@ function* login (action) {
   const oVirtMeta = yield callExternalAction('getOvirtApiMeta', Api.getOvirtApiMeta, action)
   const versionOk = yield checkOvirtApiVersion(oVirtMeta)
   if (!versionOk) {
-    logger.error('oVirt API version check failed')
+    console.error('oVirt API version check failed')
     yield put(failedExternalAction({
       message: composeIncompatibleOVirtApiVersionMessage(oVirtMeta),
       shortMessage: 'oVirt API version check failed', // TODO: Localize
@@ -127,7 +126,7 @@ function* checkOvirtApiVersion (oVirtMeta) {
         oVirtMeta['product_info']['version'] &&
         oVirtMeta['product_info']['version']['major'] &&
         oVirtMeta['product_info']['version']['minor'])) {
-    logger.error('Incompatible oVirt API version: ', oVirtMeta)
+    console.error('Incompatible oVirt API version: ', oVirtMeta)
     yield put(setOvirtApiVersion({ passed: false, ...oVirtMeta }))
     return false
   }

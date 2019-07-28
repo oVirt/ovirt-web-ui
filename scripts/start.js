@@ -134,9 +134,11 @@ function openBrowser(port, protocol) {
   if (process.env.BROWSER) {
     options.app = process.env.BROWSER
   }
-  opn(protocol + '://localhost:' + port + '/', options).catch(err => {
-    // ignore errors - can happen when starting the server in docker container
-  })
+  if (options.app !== 'none') {
+    opn(protocol + '://localhost:' + port + '/', options).catch(err => {
+      // ignore errors - can happen when starting the server in docker container
+    })
+  }
 }
 
 // We need to provide a custom onError function for httpProxyMiddleware.

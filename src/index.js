@@ -10,7 +10,7 @@ import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { IntlProvider } from 'react-intl'
 
-import logger from '_/logger'
+import '_/logger' // initialize our console logging overlay
 
 import 'patternfly/dist/css/patternfly.css'
 import 'patternfly/dist/css/patternfly-additions.css'
@@ -69,7 +69,7 @@ function renderApp (store: Object, errorBridge: Object) {
  */
 function fetchToken (): { token: string, username: string, domain: string, userId: string } {
   const userInfo = window.userInfo
-  logger.log(`SSO userInfo: ${JSON.stringify(userInfo)}`)
+  console.log(`SSO userInfo: ${JSON.stringify(userInfo)}`)
 
   if (userInfo) {
     return {
@@ -93,7 +93,7 @@ function loadPersistedState (store: Object) {
 
   if (icons) {
     const iconsArray = valuesOfObject(icons)
-    logger.log(`loadPersistedState: ${iconsArray.length} icons loaded`)
+    console.log(`loadPersistedState: ${iconsArray.length} icons loaded`)
     store.dispatch(updateIcons({ icons: iconsArray }))
   }
 }
@@ -137,7 +137,7 @@ function SagaErrorBridge () {
 }
 
 function onResourcesLoaded () {
-  logger.log(`Current configuration: ${JSON.stringify(AppConfiguration)}`)
+  console.log(`Current configuration: ${JSON.stringify(AppConfiguration)}`)
 
   addBrandedResources()
 
@@ -156,7 +156,7 @@ function onResourcesLoaded () {
   if (token) {
     store.dispatch(login({ username, token, userId, domain }))
   } else {
-    logger.error('Missing SSO Token!')
+    console.error('Missing SSO Token!')
   }
 }
 

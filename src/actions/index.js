@@ -41,10 +41,7 @@ export * from './userMessages'
 export * from './disks'
 
 export function appConfigured () {
-  return {
-    type: APP_CONFIGURED,
-    payload: {},
-  }
+  return { type: APP_CONFIGURED }
 }
 
 export function startSchedulerFixedDelay (delayInSeconds = AppConfiguration.schedulerFixedDelayInSeconds) {
@@ -55,17 +52,11 @@ export function startSchedulerFixedDelay (delayInSeconds = AppConfiguration.sche
 }
 
 export function stopSchedulerFixedDelay () {
-  return {
-    type: STOP_SCHEDULER_FIXED_DELAY,
-    payload: {},
-  }
+  return { type: STOP_SCHEDULER_FIXED_DELAY }
 }
 
 export function persistState () {
-  return {
-    type: PERSIST_STATE,
-    payload: {},
-  }
+  return { type: PERSIST_STATE }
 }
 
 /**
@@ -138,17 +129,11 @@ export function changePage ({ type, id }) {
 }
 
 export function checkTokenExpired () {
-  return {
-    type: CHECK_TOKEN_EXPIRED,
-    payload: {},
-  }
+  return { type: CHECK_TOKEN_EXPIRED }
 }
 
 export function showTokenExpiredMessage () {
-  return {
-    type: SHOW_TOKEN_EXPIRED_MSG,
-    payload: {},
-  }
+  return { type: SHOW_TOKEN_EXPIRED_MSG }
 }
 
 export function getByPage ({ page, shallowFetch = true }) {
@@ -171,10 +156,7 @@ export function setUSBFilter ({ usbFilter }) {
 }
 
 export function getUSBFilter () {
-  return {
-    type: GET_USB_FILTER,
-    payload: {},
-  }
+  return { type: GET_USB_FILTER }
 }
 
 /**
@@ -203,10 +185,7 @@ export function setUserGroups ({ groups }) {
 }
 
 export function getUserGroups () {
-  return {
-    type: GET_USER_GROUPS,
-    payload: {},
-  }
+  return { type: GET_USER_GROUPS }
 }
 
 export function setCpuTopologyOptions ({
