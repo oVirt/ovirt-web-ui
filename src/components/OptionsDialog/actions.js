@@ -31,8 +31,5 @@ export function getSSHKey ({ userId }) {
 }
 
 export function setUnloaded () {
-  return {
-    type: SET_UNLOADED,
-    payload: {},
-  }
+  return { type: SET_UNLOADED }
 }

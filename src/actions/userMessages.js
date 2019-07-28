@@ -17,10 +17,7 @@ export function addUserMessage ({ message, shortMessage, type = '' }) {
 }
 
 export function clearUserMessages () {
-  return {
-    type: CLEAR_USER_MSGS,
-    payload: {},
-  }
+  return { type: CLEAR_USER_MSGS }
 }
 
 export function setNotificationNotified ({ time }) {

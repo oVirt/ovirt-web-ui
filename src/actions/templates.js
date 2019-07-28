@@ -14,8 +14,5 @@ export function setTemplates (templates) {
 }
 
 export function getAllTemplates () {
-  return {
-    type: GET_ALL_TEMPLATES,
-    payload: {},
-  }
+  return { type: GET_ALL_TEMPLATES }
 }
