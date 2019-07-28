@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import { xor } from '_/propTypeExtras'
 
 describe('xor PropType cross property validation', () => {
-  const propTypesRest = [ 'prop', null, "SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED" ]
+  const propTypesRest = [ 'prop', null, 'SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED' ]
 
   it('both exist, and self-verify', () => {
     const p1 = xor(PropTypes.string, 'p2')
