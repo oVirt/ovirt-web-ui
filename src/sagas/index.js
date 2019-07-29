@@ -316,6 +316,7 @@ function* fetchVmsByPage (action) {
   } else {
     yield fetchVmsByPageVLower(action)
   }
+  yield put(updateVmsPoolsCount())
 }
 
 /**

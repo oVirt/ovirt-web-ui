@@ -28,7 +28,7 @@ class Vms extends React.Component {
   }
 
   render () {
-    const { vms } = this.props
+    const { vms, alwaysShowPoolCard } = this.props
 
     const sortFunction = (vmA, vmB) => {
       const vmAName = vmA.get('name')
@@ -40,7 +40,7 @@ class Vms extends React.Component {
 
     const sortedVms = vms.get('vms').toList().sort(sortFunction)
     const sortedPools = vms.get('pools')
-      .filter(pool => (pool.get('vmsCount') < pool.get('maxUserVms') && pool.get('size') > 0))
+      .filter(pool => alwaysShowPoolCard || (pool.get('vmsCount') < pool.get('maxUserVms') && pool.get('size') > 0))
       .toList()
       .sort(sortFunction) // TODO: sort vms and pools together!
 
@@ -68,12 +68,14 @@ class Vms extends React.Component {
 }
 Vms.propTypes = {
   vms: PropTypes.object.isRequired,
+  alwaysShowPoolCard: PropTypes.bool,
   onUpdate: PropTypes.func.isRequired,
 }
 
 export default connect(
   (state) => ({
     vms: state.vms,
+    alwaysShowPoolCard: !state.config.get('filter'),
   }),
   (dispatch) => ({
     onUpdate: (page) => dispatch(getByPage({ page })),
