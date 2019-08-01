@@ -14,15 +14,21 @@ const STATUS_NAME = 'Status'
 
 const IdPrefixContext = React.createContext('')
 
-const BaseCardHeader = ({ children }) => (
-  <div>
-    {children}
-  </div>
-)
+class BaseCardHeader extends React.Component {
+  static contextType = IdPrefixContext;
+
+  render () {
+    const { children } = this.props
+    return (
+      <div>
+        {children}
+      </div>
+    )
+  }
+}
 
 BaseCardHeader.displayName = HEADER_NAME
 
-BaseCardHeader.contextType = IdPrefixContext
 BaseCardHeader.propTypes = {
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
@@ -47,35 +53,47 @@ BaseCardIcon.propTypes = {
   url: PropTypes.string,
 }
 
-const BaseCardTitle = ({ url, name }, context) => (
-  url
-    ? <Link to={url} className={style['vm-detail-link']}>
-      <p className={`${style['vm-name']} ${style['crop']}`} title={name} data-toggle='tooltip' id={`${context}-name`}>
-        {name}
-      </p>
-    </Link>
-    : <p className={`${style['vm-name']} ${style['crop']}`} title={name} data-toggle='tooltip' id={`${context}-name`}>
+class BaseCardTitle extends React.Component {
+  static contextType = IdPrefixContext;
+
+  render () {
+    const { url, name } = this.props
+    if (url) {
+      return (<Link to={url} className={style['vm-detail-link']}>
+        <p className={`${style['vm-name']} ${style['crop']}`} title={name} data-toggle='tooltip' id={`${this.context}-name`}>
+          {name}
+        </p>
+      </Link>)
+    }
+    return (<p className={`${style['vm-name']} ${style['crop']}`} title={name} data-toggle='tooltip' id={`${this.context}-name`}>
       {name}
-    </p>
-)
+    </p>)
+  }
+}
 
 BaseCardTitle.displayName = TITLE_NAME
 
-BaseCardTitle.contextType = IdPrefixContext
 BaseCardTitle.propTypes = {
   name: PropTypes.string.isRequired,
   url: PropTypes.string,
 }
 
-const BaseCardStatus = ({ children }, context) => (
-  <p className={`${style['vm-status']}`} id={`${context}-status`}>
-    {children}
-  </p>
-)
+class BaseCardStatus extends React.Component {
+  static contextType = IdPrefixContext
+
+  render () {
+    const { children } = this.props
+
+    return (
+      <p className={`${style['vm-status']}`} id={`${this.context}-status`}>
+        {children}
+      </p>
+    )
+  }
+}
 
 BaseCardStatus.displayName = STATUS_NAME
 
-BaseCardStatus.contextType = IdPrefixContext
 BaseCardStatus.propTypes = {
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
@@ -83,7 +101,7 @@ BaseCardStatus.propTypes = {
   ]).isRequired,
 }
 
-const names = [ HEADER_NAME, ICON_NAME, TITLE_NAME, STATUS_NAME ]
+const names = [HEADER_NAME, ICON_NAME, TITLE_NAME, STATUS_NAME]
 
 /**
  * Single icon-card in the list for a VM
