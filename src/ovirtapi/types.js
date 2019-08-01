@@ -189,3 +189,11 @@ export type CloudInitType = {
   hostName: string,
   sshAuthorizedKeys: string
 }
+
+export type ApiEventType = Object
+export type EventType = {
+  id: string,
+  time: number,
+  description: string,
+  severity: string
+}

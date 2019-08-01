@@ -7,7 +7,7 @@ import { Notification, NotificationDrawer, MenuItem, Icon, Button } from 'patter
 
 import style from './style.css'
 
-import { clearUserMessages, dismissUserMessage } from '_/actions'
+import { clearUserMessages, dismissEvent } from '_/actions'
 import { hrefWithoutHistory, getFormatedDateTime } from '_/helpers'
 import { msg } from '_/intl'
 
@@ -65,7 +65,7 @@ class VmUserMessages extends React.Component {
           key={`msg-${r.get('time')}`}
           record={r}
           id={`${idPrefix}-msg-${r.get('time')}-dropdown`}
-          onDismissMessage={() => onDismissMessage(r.get('time'))}
+          onDismissMessage={() => onDismissMessage(r.toJS())}
         />
       ))
       : <NotificationDrawer.EmptyState title={msg.noMessages()} />
@@ -108,10 +108,11 @@ VmUserMessages.propTypes = {
 
 export default connect(
   (state) => ({
+    config: state.config,
     userMessages: state.userMessages,
   }),
   (dispatch) => ({
     onClearMessages: () => dispatch(clearUserMessages()),
-    onDismissMessage: (time) => dispatch(dismissUserMessage({ time })),
+    onDismissMessage: (event) => dispatch(dismissEvent({ event })),
   })
 )(VmUserMessages)

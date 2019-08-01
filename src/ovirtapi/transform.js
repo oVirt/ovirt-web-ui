@@ -23,6 +23,7 @@ import type {
   ApiVmType, VmType,
   ApiVnicProfileType, VnicProfileType,
   ApiPermissionType, PermissionType,
+  ApiEventType, EventType,
 } from './types'
 
 import {
@@ -821,6 +822,19 @@ const CloudInit = {
   toApi: undefined,
 }
 
+const Event = {
+  toInternal ({ event }: { event: ApiEventType }): EventType {
+    return {
+      id: event.id,
+      time: event.time,
+      description: event.description,
+      severity: event.severity,
+    }
+  },
+
+  toApi: undefined,
+}
+
 //
 // Export each transforms individually so they can be consumed individually
 //
@@ -846,4 +860,5 @@ export {
   VmSessions,
   CloudInit,
   Permissions,
+  Event,
 }

@@ -16,6 +16,7 @@ import {
 
   setUserFilterPermission,
   setAdministrator,
+  getAllEvents,
   getOption,
 
   getAllClusters,
@@ -100,6 +101,7 @@ function* login (action) {
   yield put(appConfigured())
   yield put(startSchedulerFixedDelay())
   yield autoConnectCheck()
+  yield put(getAllEvents())
 }
 
 /**
