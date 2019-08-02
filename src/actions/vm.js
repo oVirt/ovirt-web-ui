@@ -1,10 +1,11 @@
 import {
   ADD_VM_NIC,
   CHANGE_VM_CDROM,
+  COMPOSE_CREATE_VM,
   CREATE_VM,
   DELETE_VM_NIC,
-  EDIT_VM,
   EDIT_VM_NIC,
+  EDIT_VM,
   GET_RDP_VM,
   GET_VM_CDROM,
   GET_VMS_BY_COUNT,
@@ -12,6 +13,7 @@ import {
   LOGIN_SUCCESSFUL,
   LOGIN,
   LOGOUT,
+  NAVIGATE_TO_VM_DETAILS,
   REFRESH_DATA,
   REMOVE_MISSING_VMS,
   REMOVE_VM,
@@ -34,8 +36,8 @@ import {
   SUSPEND_VM,
   UPDATE_ICONS,
   UPDATE_VM_DISK,
-  UPDATE_VMS,
   UPDATE_VM_SNAPSHOT,
+  UPDATE_VMS,
   VM_ACTION_IN_PROGRESS,
 } from '_/constants'
 
@@ -62,6 +64,15 @@ export function refresh ({ page, shallowFetch = false, onNavigation = false, onS
       shallowFetch,
       onNavigation,
       onSchedule,
+    },
+  }
+}
+
+export function navigateToVmDetails (vmId) {
+  return {
+    type: NAVIGATE_TO_VM_DETAILS,
+    payload: {
+      vmId,
     },
   }
 }
@@ -124,14 +135,34 @@ export function suspendVm ({ vmId }) {
   }
 }
 
-export function createVm ({ vm, transformInput = true, pushToDetailsOnSuccess = false, clone = false }, { correlationId, ...additionalMeta }) {
+export function composeAndCreateVm ({ basic, nics, disks }, { correlationId, ...additionalMeta }) {
+  return {
+    type: COMPOSE_CREATE_VM,
+    payload: {
+      basic,
+      nics,
+      disks,
+    },
+    meta: {
+      correlationId,
+      ...additionalMeta,
+    },
+  }
+}
+
+export function createVm (
+  { vm, cdrom, transformInput = true, pushToDetailsOnSuccess = false, clone = false, clonePermissions },
+  { correlationId, ...additionalMeta }
+) {
   return {
     type: CREATE_VM,
     payload: {
       vm,
+      cdrom,
       transformInput,
       pushToDetailsOnSuccess,
       clone,
+      clonePermissions,
     },
     meta: {
       correlationId,
@@ -368,13 +399,13 @@ export function getVmCdRom ({ vmId, current = true }) {
   }
 }
 
-export function changeVmCdRom ({ cdrom, vmId, updateRedux = true, current = true }, { correlationId, ...additionalMeta } = {}) {
+export function changeVmCdRom ({ cdrom, vmId, updateVm = true, current = true }, { correlationId, ...additionalMeta } = {}) {
   const action = {
     type: CHANGE_VM_CDROM,
     payload: {
       cdrom,
       vmId,
-      updateRedux,
+      updateVm,
       current,
     },
   }

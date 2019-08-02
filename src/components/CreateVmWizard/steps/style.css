@@ -1,0 +1,198 @@
+/*** Borrowed from VmDetails/cards/DetailsCard ***/
+
+.settings-container {
+  width: auto;
+  margin-left: -15px; /* max is -20px to edge of the containing card */
+  margin-right: -15px;
+}
+
+/*
+ * Basic Settings - for field layout
+ */
+.fields-column {
+  padding: 0;
+  min-width: 250px;
+}
+
+.field-row + .field-row {
+  margin-top: 10px;
+}
+
+.col-label {
+  font-weight: bold;
+  padding-left: 15px; /* 20px + -15px + this = px from edge */
+  padding-right: 5px;
+}
+
+.col-label-vertical {
+  font-weight: bold;
+  padding-left: 0;
+}
+
+.col-data {
+  padding-left: 5px;
+  padding-right: 15px;
+}
+
+/*
+ * Basic Settings - for CPU and Memory input fields
+ */
+.cpus-input {
+  margin-bottom: 3px;
+  margin-right: 5px;
+  width: 40%;
+}
+
+.memory-input {
+  margin-bottom: 3px;
+  margin-right: 5px;
+  width: 40%;
+  display: inline-block;
+}
+
+.field-row.cloud-init {
+  margin-top: -15px;
+}
+
+.sub-heading {
+  text-transform: uppercase;
+  margin-left: -15px;
+}
+
+/*
+ * Networking
+ */
+.action-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.nic-table {
+  width: 100%;
+  margin-top: 5px;
+}
+
+.action-kebab:global(.btn-group) {
+  margin-right: 10px;
+}
+
+.nic-table :global(.inline-edit-buttons) {
+  z-index: 900;
+}
+
+/* .nic-from-template {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+} */
+
+.nic-from-template :global(.popover-pf-info):last-child {
+  margin-right: 3px;
+}
+
+/*
+ * Storage
+ */
+.disk-table {
+  width: 100%;
+  margin-top: 5px;
+}
+
+.disk-table :global(.inline-edit-buttons) {
+  z-index: 900;
+}
+
+.disk-from-template :global(.popover-pf-info):last-child {
+  margin-right: 3px;
+}
+
+.disk-size-edit {
+  display: flex;
+  align-items: center;
+}
+
+.disk-size-edit .disk-size-edit-label {
+  margin: 0 3px;
+}
+
+/*
+ * Shared
+ */
+.nic-label, .disk-label {
+  margin-left: 5px;
+  font-size: 75%;
+}
+
+/*
+ * Summary Review
+ */
+.review-content {
+  margin: 0 auto;
+  width: 80%;
+}
+
+.review-progress {
+   margin: 10px 0;
+
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   align-items: center;
+ }
+
+.review-progress .review-icon-container {
+  height: 60px;
+  width: 60px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.review-progress .review-icon-container .review-icon {
+  font-size: 36pt;
+}
+
+.review-progress .review-icon-container .review-spinner {
+  width: 100%;
+  height: 100%
+}
+
+.review-progress .review-text {
+  margin-top: 10px;
+  font-size: 140%
+}
+
+.review-item .review-item-label {
+  text-transform: uppercase;
+  color: #888;
+}
+
+.review-item + .review-item {
+  margin-top: 5px;
+}
+
+.review-item .review-item-content {
+  margin-top: 0;
+}
+
+.review-entity-info {
+  display: inline-block;
+}
+
+.review-entity-info + .review-entity-info::before {
+  content: "-";
+  margin: auto 4px;
+}
+
+.review-init-expand .review-item {
+  margin-left: 10px;
+}
+
+.review-subsection {
+  margin-left: 10px;
+  border-left: 1px solid #eee;
+  padding-left: 10px;
+}

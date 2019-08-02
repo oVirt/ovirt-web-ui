@@ -47,6 +47,8 @@ const initialState = Immutable.fromJS({
    * false ~ all visible entities already fetched
    */
   notAllPagesLoaded: true,
+
+  correlationResult: {},
 })
 
 const vms = actionReducer(initialState, {
@@ -238,10 +240,14 @@ const vms = actionReducer(initialState, {
           { message, shortMessage, type, failedAction })
       }
     }
+
     return state
   },
 
   [SET_VM_ACTION_RESULT] (state, { payload: { vmId, correlationId, result } }) {
+    if (!vmId) {
+      return state.update('correlationResult', results => results.set(correlationId, result))
+    }
     if (state.getIn(['vms', vmId])) {
       return state.setIn(['vms', vmId, 'actionResults', correlationId], result)
     }

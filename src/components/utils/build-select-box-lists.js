@@ -7,25 +7,6 @@ import { enumMsg, msg } from '_/intl'
 import { convertValue } from '_/utils'
 
 /**
- * Return a normalized and sorted list of data centers for use in a __SelectBox__ from
- * the list of provided data centers.
- */
-function createDataCenterList (dataCenters) {
-  const dataCenterList =
-    dataCenters
-      .toList()
-      .filter(datacenter => true) // TODO: canUserUseDataCenter permission check?
-      .map(dataCenter => ({
-        id: dataCenter.id,
-        value: dataCenter.name,
-      }))
-      .sort((a, b) => localeCompare(a.value, b.value))
-      .toJS()
-
-  return dataCenterList
-}
-
-/**
  * Return a normalized and sorted list of clusters ready for use in a __SelectBox__ from
  * the Map of provided clusters, optionally limiting to clusters in a given data center.
  */
@@ -260,7 +241,6 @@ function createNicInterfacesList () {
 
 export {
   createClusterList,
-  createDataCenterList,
   createIsoList,
   createOsList,
   createStorageDomainList,

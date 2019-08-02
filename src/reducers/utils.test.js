@@ -28,7 +28,7 @@ describe('actionReducer', () => {
     expect(counter(4, { type: 'DECREMENT' })).toEqual(3)
   })
 
-  it('preserves state on uknown actions', () => {
+  it('preserves state on unknown actions', () => {
     expect(counter(42, { type: 'UNKNOWN' })).toEqual(42)
   })
 

@@ -1,15 +1,3 @@
-import Api from '_/ovirtapi'
-import AppConfiguration from '_/config'
-import { saveToLocalStorage } from '_/storage'
-
-import vmSnapshotsSagas from '_/components/VmDetails/cards/SnapshotsCard/sagas'
-import optionsDialogSagas from '_/components/OptionsDialog/sagas'
-import vmDisksSagas from './disks'
-import storageDomainSagas, { fetchIsoFiles } from './storageDomains'
-import loginSagas from './login'
-import { fetchUnknownIcons } from './osIcons'
-import templateSagas from './templates'
-
 import {
   all,
   call,
@@ -21,8 +9,21 @@ import {
   throttle,
   select,
 } from 'redux-saga/effects'
-
 import { push } from 'connected-react-router'
+
+import Api from '_/ovirtapi'
+import AppConfiguration from '_/config'
+import { saveToLocalStorage } from '_/storage'
+
+import vmSnapshotsSagas from '_/components/VmDetails/cards/SnapshotsCard/sagas'
+import optionsDialogSagas from '_/components/OptionsDialog/sagas'
+import vmDisksSagas from './disks'
+import storageDomainSagas, { fetchIsoFiles } from './storageDomains'
+import loginSagas from './login'
+import { fetchUnknownIcons } from './osIcons'
+import templateSagas from './templates'
+import vmChangeSagas from './vmChanges'
+
 import {
   setChanged,
   setVmDisks,
@@ -32,7 +33,6 @@ import {
   setVmConsoles,
   removeMissingVms,
   setVmSessions,
-  setVmActionResult,
 
   getSingleVm,
   selectVmDetail as actionSelectVmDetail,
@@ -46,7 +46,6 @@ import {
 
   setUserMessages,
   dismissUserMessage,
-  addUserMessage,
 
   getSinglePool,
   removeMissingPools,
@@ -65,8 +64,6 @@ import {
   removeActiveRequest,
   stopSchedulerFixedDelay,
   getVmCdRom,
-  changeVmCdRom as actionChangeVmCdRom,
-  restartVm as actionRestartVm,
   setCurrentPage,
   setVmsFilters,
 } from '_/actions'
@@ -90,21 +87,16 @@ import {
   openConsoleModal,
 } from './console'
 
-import { msg } from '_/intl'
-
 import {
   ADD_VM_NIC,
   CHANGE_PAGE,
-  CHANGE_VM_CDROM,
   OPEN_CONSOLE_MODAL,
   CHECK_TOKEN_EXPIRED,
   CLEAR_USER_MSGS,
-  CREATE_VM,
   DELAYED_REMOVE_ACTIVE_REQUEST,
   DELETE_VM_NIC,
   DISMISS_EVENT,
   DOWNLOAD_CONSOLE_VM,
-  EDIT_VM,
   EDIT_VM_NIC,
   GET_ALL_CLUSTERS,
   GET_ALL_EVENTS,
@@ -120,18 +112,13 @@ import {
   GET_VMS_BY_COUNT,
   GET_VMS_BY_PAGE,
   REFRESH_DATA,
-  REMOVE_VM,
-  RESTART_VM,
   SAVE_CONSOLE_OPTIONS,
   SAVE_FILTERS,
   SELECT_POOL_DETAIL,
   SELECT_VM_DETAIL,
-  SHUTDOWN_VM,
-  START_POOL,
+  NAVIGATE_TO_VM_DETAILS,
   START_SCHEDULER_FIXED_DELAY,
-  START_VM,
   STOP_SCHEDULER_FIXED_DELAY,
-  SUSPEND_VM,
 
   CONSOLE_PAGE_TYPE,
   DETAIL_PAGE_TYPE,
@@ -141,7 +128,6 @@ import {
 } from '_/constants'
 
 import {
-  arrayMatch,
   canUserEditDisk,
   canUserEditVm,
   canUserEditVmStorage,
@@ -413,7 +399,7 @@ function* fetchVmsByCountVLower (action) {
   return fetchedVmIds
 }
 
-export function* putPermissionsInDisk (disk) {
+function* putPermissionsInDisk (disk) {
   disk.permits = yield fetchPermits({ entityType: PermissionsType.DISK_TYPE, id: disk.id })
   disk.canUserEditDisk = canUserEditDisk(disk.permits)
   return disk
@@ -619,20 +605,20 @@ function* editVmNic (action) {
   yield put(setVmNics({ vmId: action.payload.vmId, nics: nicsInternal }))
 }
 
-export function* startProgress ({ vmId, poolId, name }) {
-  if (vmId) {
-    yield put(vmActionInProgress({ vmId, name, started: true }))
-  } else {
-    yield put(poolActionInProgress({ poolId, name, started: true }))
-  }
-}
-
 function* getSingleInstance ({ vmId, poolId }) {
   const fetches = [ fetchSingleVm(getSingleVm({ vmId })) ]
   if (poolId) {
     fetches.push(fetchSinglePool(getSinglePool({ poolId })))
   }
   yield all(fetches)
+}
+
+export function* startProgress ({ vmId, poolId, name }) {
+  if (vmId) {
+    yield put(vmActionInProgress({ vmId, name, started: true }))
+  } else {
+    yield put(poolActionInProgress({ poolId, name, started: true }))
+  }
 }
 
 export function* stopProgress ({ vmId, poolId, name, result }) {
@@ -649,151 +635,6 @@ export function* stopProgress ({ vmId, poolId, name, result }) {
   }
 
   yield put(actionInProgress(Object.assign(vmId ? { vmId } : { poolId }, { name, started: false })))
-}
-
-function* shutdownVm (action) {
-  yield startProgress({ vmId: action.payload.vmId, name: 'shutdown' })
-  const result = yield callExternalAction('shutdown', Api.shutdown, action)
-  const vmName = yield select(state => state.vms.getIn([ 'vms', action.payload.vmId, 'name' ]))
-  if (result.status === 'complete') {
-    yield put(addUserMessage({ message: msg.actionFeedbackShutdownVm({ VmName: vmName }), type: 'success' }))
-  }
-  yield stopProgress({ vmId: action.payload.vmId, name: 'shutdown', result })
-}
-
-function* restartVm (action) {
-  yield startProgress({ vmId: action.payload.vmId, name: 'restart' })
-  const result = yield callExternalAction('restart', Api.restart, action)
-  const vmName = yield select(state => state.vms.getIn([ 'vms', action.payload.vmId, 'name' ]))
-  if (result.status === 'complete') {
-    yield put(addUserMessage({ message: msg.actionFeedbackRestartVm({ VmName: vmName }), type: 'success' }))
-  }
-  yield stopProgress({ vmId: action.payload.vmId, name: 'restart', result })
-}
-
-function* suspendVm (action) {
-  yield startProgress({ vmId: action.payload.vmId, name: 'suspend' })
-  const result = yield callExternalAction('suspend', Api.suspend, action)
-  const vmName = yield select(state => state.vms.getIn([ 'vms', action.payload.vmId, 'name' ]))
-  if (result.status === 'pending') {
-    yield put(addUserMessage({ message: msg.actionFeedbackSuspendVm({ VmName: vmName }), type: 'success' }))
-  }
-  yield stopProgress({ vmId: action.payload.vmId, name: 'suspend', result })
-}
-
-function* startVm (action) {
-  yield startProgress({ vmId: action.payload.vmId, name: 'start' })
-  const result = yield callExternalAction('start', Api.start, action)
-  const vmName = yield select(state => state.vms.getIn([ 'vms', action.payload.vmId, 'name' ]))
-  // TODO: check status at refresh --> conditional refresh wait_for_launch
-  if (result.status === 'complete') {
-    yield put(addUserMessage({ message: msg.actionFeedbackStartVm({ VmName: vmName }), type: 'success' }))
-  }
-  yield stopProgress({ vmId: action.payload.vmId, name: 'start', result })
-}
-
-function* startPool (action) {
-  yield startProgress({ poolId: action.payload.poolId, name: 'start' })
-  const result = yield callExternalAction('startPool', Api.startPool, action)
-  const poolName = yield select(state => state.vms.getIn([ 'pools', action.payload.poolId, 'name' ]))
-  if (result.status === 'complete') {
-    yield put(addUserMessage({ message: msg.actionFeedbackAllocateVm({ poolname: poolName }), type: 'success' }))
-  }
-  yield stopProgress({ poolId: action.payload.poolId, name: 'start', result })
-}
-
-export function* createVm (action) {
-  const result = yield callExternalAction('addNewVm', Api.addNewVm, action)
-
-  if (!result.error) {
-    const vmId = result.id
-    yield put(actionSelectVmDetail({ vmId }))
-
-    if (action.payload.pushToDetailsOnSuccess) {
-      yield put(push(`/vm/${vmId}`))
-    }
-  }
-
-  return result
-}
-
-/*
- * Edit a VM by pushing (with a full or partial VM definition) VM updates, and if
- * new cdrom info is provided, change the cdrom as appropriate for the VM's status. A
- * running VM will have its current=true cdrom updated (to make the change immediate).
- * A non-running VM will have its current=false cdrom updated (to make the change apply
- * at next_run).
- */
-export function* editVm (action) {
-  const { payload: { vm } } = action
-  const vmId = vm.id
-  const onlyNeedChangeCd = vm && arrayMatch(Object.keys(vm), [ 'id', 'cdrom' ])
-
-  const editVmResult = onlyNeedChangeCd
-    ? {}
-    : yield callExternalAction('editVm', Api.editVm, action)
-
-  let commitError = editVmResult.error
-  if (!commitError && vm.cdrom) {
-    const changeCdResult = yield changeVmCdRom(actionChangeVmCdRom({
-      vmId,
-      cdrom: vm.cdrom,
-      current: action.payload.changeCurrentCd,
-      updateRedux: false, // the 'actionSelectVmDetail' will fetch the cd-rom update
-    }))
-
-    commitError = changeCdResult.error
-  }
-
-  if (!commitError) {
-    // deep fetch refresh the VM with any/all updates applied
-    yield put(actionSelectVmDetail({ vmId }))
-  }
-
-  if (action.meta && action.meta.correlationId) {
-    yield put(setVmActionResult({
-      vmId,
-      correlationId: action.meta.correlationId,
-      result: !commitError,
-    }))
-  }
-
-  if (!commitError && action.payload.restartAfterEdit) {
-    yield put(actionRestartVm({ vmId })) // non-blocking restart
-  }
-}
-
-export function* changeVmCdRom (action) {
-  const result = yield callExternalAction('changeCdRom', Api.changeCdRom, action)
-
-  if (!result.error && action.payload.updateRedux) {
-    yield put(setVmCdRom({
-      vmId: action.payload.vm.id,
-      cdrom: Api.cdRomToInternal(result),
-    }))
-  }
-
-  if (action.meta && action.meta.correlationId) {
-    yield put(setVmActionResult({
-      vmId: action.payload.vm.id,
-      correlationId: action.meta.correlationId,
-      result: !result.error,
-    }))
-  }
-
-  return result
-}
-
-function* removeVm (action) {
-  yield startProgress({ vmId: action.payload.vmId, name: 'remove' })
-  const result = yield callExternalAction('remove', Api.remove, action)
-
-  if (result.status === 'complete') {
-    // TODO: Remove the VM from the store so we don't see it on the list page!
-    yield put(push('/'))
-  }
-
-  yield stopProgress({ vmId: action.payload.vmId, name: 'remove', result })
 }
 
 function* fetchAllEvents (action) {
@@ -1087,6 +928,10 @@ function* schedulerWithFixedDelay (delayInSeconds = AppConfiguration.schedulerFi
   }
 }
 
+function* navigateToVmDetails ({ payload: { vmId } }) {
+  yield put(push(`/vm/${vmId}`))
+}
+
 export function* rootSaga () {
   yield all([
     ...loginSagas,
@@ -1104,21 +949,6 @@ export function* rootSaga () {
     throttle(100, GET_POOLS_BY_PAGE, fetchPoolsByPage),
     takeLatest(CHANGE_PAGE, changePage),
 
-    takeEvery(SHUTDOWN_VM, shutdownVm),
-    takeEvery(RESTART_VM, restartVm),
-    takeEvery(START_VM, startVm),
-    takeEvery(SUSPEND_VM, suspendVm),
-    takeEvery(CREATE_VM, createVm),
-    takeEvery(EDIT_VM, editVm),
-    takeEvery(REMOVE_VM, removeVm),
-    takeEvery(CHANGE_VM_CDROM, changeVmCdRom),
-
-    takeEvery(START_POOL, startPool),
-
-    takeEvery(OPEN_CONSOLE_MODAL, openConsoleModal),
-    takeEvery(DOWNLOAD_CONSOLE_VM, downloadVmConsole),
-    takeEvery(GET_RDP_VM, getRDPVm),
-
     takeLatest(GET_ALL_CLUSTERS, fetchAllClusters),
     takeLatest(GET_ALL_OS, fetchAllOS),
     takeLatest(GET_ALL_HOSTS, fetchAllHosts),
@@ -1129,16 +959,21 @@ export function* rootSaga () {
     takeEvery(DISMISS_EVENT, dismissEvent),
     takeEvery(CLEAR_USER_MSGS, clearEvents),
 
+    takeLatest(NAVIGATE_TO_VM_DETAILS, navigateToVmDetails),
     takeEvery(SELECT_VM_DETAIL, selectVmDetail),
+    takeEvery(SELECT_POOL_DETAIL, selectPoolDetail),
+
     takeEvery(ADD_VM_NIC, addVmNic),
     takeEvery(DELETE_VM_NIC, deleteVmNic),
     takeEvery(EDIT_VM_NIC, editVmNic),
+
     takeEvery(GET_CONSOLE_OPTIONS, getConsoleOptions),
     takeEvery(SAVE_CONSOLE_OPTIONS, saveConsoleOptions),
+    takeEvery(OPEN_CONSOLE_MODAL, openConsoleModal),
+    takeEvery(DOWNLOAD_CONSOLE_VM, downloadVmConsole),
+    takeEvery(GET_RDP_VM, getRDPVm),
 
     takeEvery(SAVE_FILTERS, saveFilters),
-
-    takeEvery(SELECT_POOL_DETAIL, selectPoolDetail),
 
     // Sagas from Components
     ...vmDisksSagas,
@@ -1146,5 +981,6 @@ export function* rootSaga () {
     ...vmSnapshotsSagas,
     ...optionsDialogSagas,
     ...templateSagas,
+    ...vmChangeSagas,
   ])
 }

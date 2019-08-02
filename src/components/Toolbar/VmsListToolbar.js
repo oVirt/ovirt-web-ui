@@ -2,14 +2,16 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { List } from 'immutable'
 import { connect } from 'react-redux'
-import AddVmButton from '../VmDialog/AddVmButton'
-import VmFilter from './VmFilters'
-import VmSort from './VmSort'
-import { Toolbar, Filter } from 'patternfly-react'
-import { filterVms, mapFilterValues } from '_/utils'
-import { RouterPropTypeShapes } from '_/propTypeShapes'
+
 import { saveVmsFilters } from '_/actions'
 import { msg } from '_/intl'
+import { RouterPropTypeShapes } from '_/propTypeShapes'
+import { filterVms, mapFilterValues } from '_/utils'
+
+import { Toolbar, Filter } from 'patternfly-react'
+import { AddVmButton } from '_/components/CreateVmWizard'
+import VmFilter from './VmFilters'
+import VmSort from './VmSort'
 import style from './style.css'
 
 const VmsListToolbar = ({ match, vms, onRemoveFilter, onClearFilters }) => {
@@ -54,10 +56,12 @@ const VmsListToolbar = ({ match, vms, onRemoveFilter, onClearFilters }) => {
     }
     return labels
   }
+
   const total = vms.get('vms').size + vms.get('pools').size
   const available = vms.get('filters').size &&
     vms.get('vms').filter(vm => filterVms(vm, filters)).size +
     vms.get('pools').filter(vm => filterVms(vm, filters)).size
+
   return (
     <Toolbar className={style['full-width']}>
       <VmFilter />

@@ -42,7 +42,7 @@ class PageRouter extends React.Component {
     document.removeEventListener('keyup', this.handleKeyUp)
   }
 
-  static getDerivedStateFromProps ({ location, route, currentPage, onChangePage }, { currentPath, previousPath }) {
+  static getDerivedStateFromProps ({ location, route, onChangePage }, { currentPath, previousPath }) {
     const newPath = location.pathname
     const updates = {}
 
@@ -86,7 +86,6 @@ PageRouter.propTypes = {
   location: RouterPropTypeShapes.location.isRequired,
   history: RouterPropTypeShapes.history.isRequired,
   route: PropTypes.object.isRequired,
-  currentPage: PropTypes.object.isRequired,
 
   navigationHandler: PropTypes.func.isRequired,
   onChangePage: PropTypes.func.isRequired,
@@ -98,7 +97,6 @@ PageRouter.propTypes = {
 export default withRouter(
   connect(
     state => ({
-      currentPage: state.config.get('currentPage'),
     }),
     dispatch => ({
       navigationHandler: (newPath) => dispatch(push(newPath)),

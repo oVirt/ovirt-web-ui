@@ -1,20 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+
+import { selectPoolDetail } from '_/actions'
 import { RouterPropTypeShapes } from '_/propTypeShapes'
 
-import { push } from 'connected-react-router'
-
-import { msg } from '_/intl'
-import { canUserUseAnyClusters } from '_/utils'
-
-import VmDialog from '../VmDialog'
 import VmsList from '../VmsList'
 import VmDetails from '../VmDetails'
 import VmConsole from '../VmConsole'
 import Handler404 from '_/Handler404'
-
-import { addUserMessage, selectPoolDetail } from '_/actions'
 
 /**
  * Route component (for PageRouter) to view the list of VMs and Pools
@@ -85,43 +79,8 @@ const VmDetailsPageConnected = connect(
 )(VmDetailsPage)
 
 /**
- * Route component (for PageRouter) to create a new VM
+ * Route component (for PageRouter) to view a VM's console (with webVNC)
  */
-class VmCreatePage extends React.Component {
-  componentDidUpdate () {
-    // If the user cannot create any VMs (not just the one requested), bump them out
-    if (!this.props.canUserCreateVMs) {
-      this.props.redirectToMainPage()
-      this.props.addUserMessage(msg.permissionsNoCreateVm())
-    }
-  }
-
-  render () {
-    if (!this.props.canUserCreateVMs) {
-      return null
-    }
-
-    const { previousPath } = this.props
-    return <VmDialog previousPath={previousPath} />
-  }
-}
-VmCreatePage.propTypes = {
-  canUserCreateVMs: PropTypes.bool.isRequired,
-  previousPath: PropTypes.string.isRequired,
-
-  redirectToMainPage: PropTypes.func.isRequired,
-  addUserMessage: PropTypes.func.isRequired,
-}
-const VmCreatePageConnected = connect(
-  (state) => ({
-    canUserCreateVMs: canUserUseAnyClusters(state.clusters) && state.clusters.size > 0,
-  }),
-  (dispatch) => ({
-    redirectToMainPage: () => dispatch(push('/')),
-    addUserMessage: (message) => dispatch(addUserMessage({ message })),
-  })
-)(VmCreatePage)
-
 class VmConsolePage extends React.Component {
   render () {
     const { vms, match } = this.props
@@ -131,12 +90,10 @@ class VmConsolePage extends React.Component {
     return null
   }
 }
-
 VmConsolePage.propTypes = {
   match: RouterPropTypeShapes.match.isRequired,
   vms: PropTypes.object.isRequired,
 }
-
 const VmConsolePageConnected = connect(
   (state) => ({
     vms: state.vms,
@@ -145,8 +102,7 @@ const VmConsolePageConnected = connect(
 )(VmConsolePage)
 
 export {
-  VmDetailsPageConnected as VmDetailsPage,
-  VmCreatePageConnected as VmCreatePage,
   VmConsolePageConnected as VmConsolePage,
+  VmDetailsPageConnected as VmDetailsPage,
   VmsPage,
 }
