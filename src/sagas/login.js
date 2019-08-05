@@ -33,6 +33,7 @@ import {
 
   updateVms,
   appConfigured,
+  saveVmsFilters,
 } from '_/actions'
 
 import { LOGIN, LOGOUT } from '_/constants'
@@ -53,6 +54,8 @@ import {
 import { downloadVmConsole } from './console'
 import { fetchServerConfiguredValues } from './server-configs'
 import { fetchDataCentersAndStorageDomains, fetchIsoFiles } from './storageDomains'
+
+import { loadFromLocalStorage } from '_/storage'
 
 /**
  * Perform login checks, and if they pass, perform initial data loading
@@ -175,12 +178,19 @@ function* checkUserFilterPermissions () {
   yield put.resolve(setUserFilterPermission(isAlwaysFilterOption))
 }
 
+function* loadFilters () {
+  const userId = yield select(state => state.config.getIn(['user', 'id']))
+  const filters = JSON.parse(loadFromLocalStorage(`vmFilters-${userId}`)) || {}
+  yield put(saveVmsFilters({ filters }))
+}
+
 function* initialLoad () {
   // no data prerequisites
   yield all([
     call(fetchUserGroups, getUserGroups()),
     call(fetchAllOS, getAllOperatingSystems()),
     call(fetchAllHosts, getAllHosts()),
+    call(loadFilters),
   ])
   console.log('\u2714 data loads with no pre-reqs are complete')
 

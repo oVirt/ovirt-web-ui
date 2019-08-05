@@ -12,8 +12,9 @@
     border-left: 1px solid #d1d1d1;
 }
 
-.left-padding {
+.actions-toolbar {
     text-align: left;
+    margin-bottom: 10px;
 }
 
 .action-link {

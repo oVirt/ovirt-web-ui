@@ -9,7 +9,9 @@ import {
   REMOVE_POOLS,
   REMOVE_VMS,
   SET_CHANGED,
+  SET_FILTERS,
   SET_PAGE,
+  SET_VM_SORT,
   SET_VM_ACTION_RESULT,
   SET_VM_CDROM,
   SET_VM_CONSOLES,
@@ -25,21 +27,25 @@ import {
   VM_ACTION_IN_PROGRESS,
 } from '_/constants'
 import { actionReducer, removeMissingItems } from './utils'
+import { sortFields } from '_/utils'
+
+const EMPTY_MAP = Immutable.fromJS({})
+const EMPTY_ARRAY = Immutable.fromJS([])
 
 const initialState = Immutable.fromJS({
   vms: {},
   pools: {},
+  filters: EMPTY_MAP,
+  sort: { ...sortFields[0], isAsc: true },
 
   page: 1,
+
   /**
    * true ~ we need to fetch further vms and pools
    * false ~ all visible entities already fetched
    */
   notAllPagesLoaded: true,
 })
-
-const EMPTY_MAP = Immutable.fromJS({})
-const EMPTY_ARRAY = Immutable.fromJS([])
 
 const vms = actionReducer(initialState, {
   [UPDATE_VMS] (state, { payload: { vms, copySubResources, page } }) {
@@ -243,6 +249,12 @@ const vms = actionReducer(initialState, {
   },
   [LOGOUT] (state) { // see the config() reducer
     return state.set('vms', EMPTY_MAP)
+  },
+  [SET_FILTERS] (state, { payload: { filters } }) { // see the config() reducer
+    return state.set('filters', Immutable.fromJS(filters))
+  },
+  [SET_VM_SORT] (state, { payload: { sort } }) { // see the config() reducer
+    return state.set('sort', Immutable.fromJS(sort))
   },
 })
 

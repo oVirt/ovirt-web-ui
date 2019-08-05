@@ -2,17 +2,25 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
+import { Toolbar } from 'patternfly-react'
 import style from './style.css'
 import { RouterPropTypeShapes } from '_/propTypeShapes'
 import VmActions from '../VmActions'
 import VmConsoleSelector from '../VmConsole/VmConsoleSelector'
 import VmConsoleInstructionsModal from '../VmConsole/VmConsoleInstructionsModal'
+import VmsListToolbar from './VmsListToolbar'
 
 import { INIT_CONSOLE, DOWNLOAD_CONSOLE } from '_/constants'
 
 const VmDetailToolbar = ({ match, vms }) => {
   if (vms.getIn(['vms', match.params.id])) {
-    return (<VmActions vm={vms.getIn(['vms', match.params.id])} />)
+    return (
+      <Toolbar className={style['full-width']}>
+        <Toolbar.RightContent>
+          <VmActions vm={vms.getIn(['vms', match.params.id])} />
+        </Toolbar.RightContent>
+      </Toolbar>
+    )
   }
   return null
 }
@@ -31,7 +39,13 @@ const VmDetailToolbarConnected = connect(
 
 const PoolDetailToolbar = ({ match, vms }) => {
   if (vms.getIn(['pools', match.params.id])) {
-    return (<VmActions vm={vms.getIn(['pools', match.params.id, 'vm'])} key='vmaction' pool={vms.getIn(['pools', match.params.id])} />)
+    return (
+      <Toolbar className={style['full-width']}>
+        <Toolbar.RightContent>
+          <VmActions vm={vms.getIn(['pools', match.params.id, 'vm'])} key='vmaction' pool={vms.getIn(['pools', match.params.id])} />
+        </Toolbar.RightContent>
+      </Toolbar>
+    )
   }
   return null
 }
@@ -50,8 +64,8 @@ const PoolDetailToolbarConnected = connect(
 const VmConsoleToolbar = ({ match, vms, consoles }) => {
   if (vms.getIn(['vms', match.params.id])) {
     const consoleStatus = [INIT_CONSOLE, DOWNLOAD_CONSOLE]
-    return <div className={style['console-toolbar']}>
-      <div className={style['console-toolbar-actions']}>
+    return <div className={`${style['console-toolbar']} container-fluid`}>
+      <div className={style['console-toolbar-actions']} style={{ marginRight: 'auto' }}>
         <VmConsoleSelector
           vmId={match.params.id}
           consoleId={match.params.console}
@@ -85,4 +99,5 @@ export {
   VmDetailToolbarConnected as VmDetailToolbar,
   PoolDetailToolbarConnected as PoolDetailToolbar,
   VmConsoleToolbarConnected as VmConsoleToolbar,
+  VmsListToolbar,
 }
