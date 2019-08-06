@@ -221,7 +221,7 @@ export const messages: { [messageId: string]: MessageType } = {
     description: 'Being hibernated. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
   },
   enum_VmStatus_suspended: {
-    message: 'Asleep',
+    message: 'Suspended',
     description: 'Hibernated. One of states of a virtual machine. Other are e.g. Up, Down, Powering-Up',
   },
   enum_VmStatus_unassigned: {
