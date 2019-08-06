@@ -32,11 +32,11 @@ const Pool = ({ pool, icons, onStart }) => {
         <span className={sharedStyle['operating-system-label']}>{ osName }</span>
       </BaseCard.Header>
       <BaseCard.Icon url={`/pool/${pool.get('id')}`} icon={icon} />
-      <BaseCard.Title idPrefix={idPrefix} url={`/pool/${pool.get('id')}`} name={pool.get('name')} />
-      <BaseCard.Status idPrefix={idPrefix}>
+      <BaseCard.Title url={`/pool/${pool.get('id')}`} name={pool.get('name')} />
+      <BaseCard.Status>
         <VmStatusIcon state={state} />&nbsp;{stateValue}
       </BaseCard.Status>
-      <VmActions isOnCard vm={pool.get('vm')} onStart={onStart} pool={pool} />
+      <VmActions isOnCard vm={pool.get('vm')} onStart={onStart} pool={pool} idPrefix={idPrefix} />
     </BaseCard>
   )
 }

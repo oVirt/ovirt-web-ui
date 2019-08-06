@@ -15,8 +15,6 @@ const STATUS_NAME = 'Status'
 const IdPrefixContext = React.createContext('')
 
 class BaseCardHeader extends React.Component {
-  static contextType = IdPrefixContext;
-
   render () {
     const { children } = this.props
     return (
@@ -54,8 +52,6 @@ BaseCardIcon.propTypes = {
 }
 
 class BaseCardTitle extends React.Component {
-  static contextType = IdPrefixContext;
-
   render () {
     const { url, name } = this.props
     if (url) {
@@ -72,6 +68,7 @@ class BaseCardTitle extends React.Component {
 }
 
 BaseCardTitle.displayName = TITLE_NAME
+BaseCardTitle.contextType = IdPrefixContext
 
 BaseCardTitle.propTypes = {
   name: PropTypes.string.isRequired,
@@ -79,8 +76,6 @@ BaseCardTitle.propTypes = {
 }
 
 class BaseCardStatus extends React.Component {
-  static contextType = IdPrefixContext
-
   render () {
     const { children } = this.props
 
@@ -93,6 +88,7 @@ class BaseCardStatus extends React.Component {
 }
 
 BaseCardStatus.displayName = STATUS_NAME
+BaseCardStatus.contextType = IdPrefixContext
 
 BaseCardStatus.propTypes = {
   children: PropTypes.oneOfType([
