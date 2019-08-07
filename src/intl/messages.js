@@ -563,6 +563,7 @@ export const messages: { [messageId: string]: MessageType } = {
   vmHasPendingConfigurationChanges: 'This VM has pending configurations changes that will be applied once the VM is shutdown (or rebooted).',
   vmMemory: 'VM Memory',
   vmPortal: 'VM Portal',
+  vmPoolSnapshotRestoreUnavailable: 'This VM is from a pool, so this action is unavailable.',
   vmType_desktop: 'Desktop',
   vmType_highPerformance: 'High Performance',
   vmType_server: 'Server',
