@@ -7,6 +7,7 @@ import {
 
 import style from './style.css'
 
+import OverlayTooltip from '../OverlayTooltip'
 /**
  * Render the edit icon/button to enable the editing of the content of a card.
  *
@@ -44,9 +45,11 @@ class CardEditButton extends React.Component {
     const myClick = editEnabled ? noop : this.enableEditHandler
 
     return (
-      <a title={tooltip} onClick={(e) => { e.preventDefault(); myClick() }} className={classes} id={id}>
-        <Icon type='pf' name='edit' />
-      </a>
+      <OverlayTooltip id={`${id}-tooltip`} tooltip={tooltip} placement='bottom'>
+        <a id={id} className={classes} onClick={(e) => { e.preventDefault(); myClick() }}>
+          <Icon type='pf' name='edit' />
+        </a>
+      </OverlayTooltip>
     )
   }
 }
