@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
 import { connect } from 'react-redux'
 
 import { logout } from '_/actions'
@@ -8,14 +7,17 @@ import { logout } from '_/actions'
 import { msg } from '_/intl'
 import AboutDialog from '../About'
 import OptionsDialog from '../OptionsDialog'
+import OverlayTooltip from '_/components/OverlayTooltip'
 
 const UserMenu = ({ config, onLogout }) => {
   const idPrefix = 'usermenu'
   return (
     <li className='dropdown'>
-      <a className='dropdown-toggle nav-item-iconic' href='#' data-toggle='dropdown' title={config.getIn(['user', 'name'])} id={`${idPrefix}-user`}>
-        <i className='pficon pficon-user' /><span className='caret' />
-      </a>
+      <OverlayTooltip id={`${idPrefix}-tooltip`} tooltip={config.getIn(['user', 'name'])} placement='bottom'>
+        <a className='dropdown-toggle nav-item-iconic' href='#' data-toggle='dropdown' id={`${idPrefix}-user`}>
+          <i className='pficon pficon-user' /><span className='caret' />
+        </a>
+      </OverlayTooltip>
       <ul className='dropdown-menu'>
         <li>
           <OptionsDialog userId={config.getIn(['user', 'id'])} />

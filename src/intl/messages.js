@@ -385,6 +385,7 @@ export const messages: { [messageId: string]: MessageType } = {
     message: 'This field is only available when the VM is running and the guest agent is installed and running.',
     description: 'Tooltip displayed next to \'notAvailable\' for fields that require the VM to be up and a running guest agent',
   },
+  notifications: 'Notifications',
   notEditableForPoolsOrPoolVms: 'Not editable for Pools or pool VMs.',
   noVmAvailable: 'No VM available.',
   noVmAvailableForLoggedUser: 'No VM is available for the logged user.',
