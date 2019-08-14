@@ -5,11 +5,11 @@ import { push } from 'connected-react-router'
 import $ from 'jquery'
 
 import style from './style.css'
-import VncConsole from '_/react-console'
 import { setConsoleStatus, getRDP } from '_/actions'
 import ConsoleConfirmationModal from '../VmActions/ConsoleConfirmationModal'
 import { INIT_CONSOLE, DOWNLOAD_CONSOLE, DISCONNECTED_CONSOLE } from '_/constants'
 import { Button } from 'patternfly-react'
+import { VncConsole } from '@patternfly/react-console'
 import { msg } from '_/intl'
 import CounterAlert from '_/components/CounterAlert'
 
@@ -149,13 +149,12 @@ class VmConsole extends React.Component {
               path={proxyTicket}
               host={websocket.get('host')}
               port={websocket.get('port')}
-              toolbarContainer='vm-console-toolbar-sendkeys'
-              containerId={NOVNC_CONTAINER_ID}
+              portalToolbarTo='vm-console-toolbar-sendkeys'
+              consoleContainerId={NOVNC_CONTAINER_ID}
               onDisconnected={
                 (e) => !e.detail.clean ? onDisconnected('CONNECTION_FAILURE') : onDisconnected()
               }
               onConnected={() => $(`#${NOVNC_CONTAINER_ID} canvas`).focus()}
-              onFullScreen={() => this.setState({ isFullScreen: true })}
               additionalButtons={[
                 <Button
                   key='full-screen'
@@ -168,10 +167,11 @@ class VmConsole extends React.Component {
             />
           </div>
         }
-
         break
+
       case DOWNLOAD_CONSOLE:
         return <InfoPageContainer icon={downloadIcon} mainText={msg.downloadedVVFile()} secondaryText={msg[`downloaded${currentConsole.get('protocol').toUpperCase()}`]()} />
+
       case DISCONNECTED_CONSOLE:
         return <InfoPageContainer
           icon={disconnectIcon}
