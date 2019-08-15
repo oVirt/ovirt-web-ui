@@ -12,10 +12,12 @@ import constants from './constants'
 
 const { CONNECTED, CONNECTING, DISCONNECTED } = constants
 
-/* eslint no-console: ["warn", { allow: ["error"] }] */
+/* eslint no-console: ['warn', { allow: ['error'] }] */
 
 class VncConsole extends React.Component {
-  state = { status: CONNECTING }
+  state = {
+    status: CONNECTING,
+  }
 
   addEventListeners () {
     this.rfb.addEventListener('connect', this.onConnected)
@@ -91,6 +93,10 @@ class VncConsole extends React.Component {
     this.props.onDisconnected(e)
   }
 
+  onFullScreen = () => {
+    this.props.onFullScreen()
+  }
+
   onSecurityFailure = e => {
     this.setState({ status: DISCONNECTED })
     this.props.onSecurityFailure(e)
@@ -120,6 +126,7 @@ class VncConsole extends React.Component {
       textSendShortcut,
       textCtrlAltDel,
       textDisconnect,
+      textFullScreen,
       toolbarContainer,
       containerId,
     } = this.props
@@ -135,7 +142,9 @@ class VncConsole extends React.Component {
             textSendShortcut={textSendShortcut}
             textCtrlAltDel={textCtrlAltDel}
             textDisconnect={textDisconnect}
+            textFullScreen={textFullScreen}
             onDisconnect={this.disconnect}
+            onFullScreen={this.onFullScreen}
           />
         )
         break
@@ -149,9 +158,9 @@ class VncConsole extends React.Component {
 
     if (!this.novncStaticComponent) {
       // create just once
-      this.novncStaticComponent = <div id={containerId} ref={this.setNovncElem} />
+      this.novncStaticComponent =
+        <div id={containerId} ref={this.setNovncElem} />
     }
-
     return (
       <div className={classNames('vnc-console', this.props.topClassName)}>
         {this.props.children}
@@ -203,12 +212,14 @@ VncConsole.propTypes = {
   onDisconnected: PropTypes.func /** Callback. VNC server disconnected. */,
   onInitFailed: PropTypes.func /** Initialization of RFB failed */,
   onSecurityFailure: PropTypes.func /** Handshake failed */,
+  onFullScreen: PropTypes.func,
 
   textConnecting: PropTypes.oneOfType([PropTypes.string, PropTypes.node]) /** For localization */,
   textDisconnected: PropTypes.string,
   textDisconnect: PropTypes.string,
   textSendShortcut: PropTypes.string,
   textCtrlAltDel: PropTypes.string,
+  textFullScreen: PropTypes.string,
 }
 
 VncConsole.defaultProps = {
@@ -230,12 +241,14 @@ VncConsole.defaultProps = {
   onDisconnected: noop,
   onInitFailed: noop,
   onSecurityFailure: noop,
+  onFullScreen: noop,
 
   textConnecting: 'Connecting',
   textDisconnected: 'Disconnected',
   textDisconnect: 'Disconnect',
   textSendShortcut: undefined /** Default value defined in VncActions */,
   textCtrlAltDel: undefined, /** Default value defined in VncActions */
+  textFullScreen: undefined, /** Default value defined in VncActions */
 }
 
 export default VncConsole

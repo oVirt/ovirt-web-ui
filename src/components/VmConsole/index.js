@@ -11,6 +11,7 @@ import ConsoleConfirmationModal from '../VmActions/ConsoleConfirmationModal'
 import { INIT_CONSOLE, DOWNLOAD_CONSOLE, DISCONNECTED_CONSOLE } from '_/constants'
 import { Button } from 'patternfly-react'
 import { msg } from '_/intl'
+import InfoAlert from '_/components/InfoAlert'
 
 import Loader, { SIZES } from '../Loader'
 
@@ -51,6 +52,7 @@ class VmConsole extends React.Component {
       vmId: props.vmId,
       consoleId: props.consoleId,
       isFirstRun: props.consoles.getIn(['vms', props.vmId]) === undefined,
+      isFullScreen: false,
     }
   }
 
@@ -94,31 +96,53 @@ class VmConsole extends React.Component {
         />
       </div>
     }
+
+    function onFullScreen () {
+      var elem = document.getElementById('console-component')
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen()
+      } else if (elem.mozRequestFullScreen) { /* Firefox */
+        elem.mozRequestFullScreen()
+      } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+        elem.webkitRequestFullscreen()
+      } else if (elem.msRequestFullscreen) { /* IE/Edge */
+        elem.msRequestFullscreen()
+      }
+    }
+
     const proxyTicket = vmConsole && vmConsole.get('proxyTicket')
     const ticket = vmConsole && vmConsole.get('ticket')
     switch (vmConsole && vmConsole.get('consoleStatus')) {
       case INIT_CONSOLE:
         if (ticket !== undefined && websocket !== null) {
-          return <VncConsole
-            encrypt
-            resizeSession
-            scaleViewport
-            textConnecting={<Loader loaderText={msg.connecting()} size={SIZES.SMALL} />}
-            textDisconnect={msg.disconnect()}
-            textSendShortcut={msg.sendShortcutKey()}
-            textCtrlAltDel={msg.sendCtrlAltDel()}
-            credentials={{ password: ticket.value }}
-            path={proxyTicket}
-            host={websocket.get('host')}
-            port={websocket.get('port')}
-            toolbarContainer='vm-console-toolbar-sendkeys'
-            containerId={NOVNC_CONTAINER_ID}
-            onDisconnected={
-              (e) => !e.detail.clean ? onDisconnected('CONNECTION_FAILURE') : onDisconnected()
+          return <div id='console-component'>
+            {this.state.isFullScreen &&
+              <InfoAlert />
             }
-            onConnected={() => $(`#${NOVNC_CONTAINER_ID} canvas`).focus()}
-          />
+            <VncConsole
+              encrypt
+              resizeSession
+              scaleViewport
+              textConnecting={<Loader loaderText={msg.connecting()} size={SIZES.SMALL} />}
+              textDisconnect={msg.disconnect()}
+              textSendShortcut={msg.sendShortcutKey()}
+              textCtrlAltDel={msg.sendCtrlAltDel()}
+              credentials={{ password: ticket.value }}
+              path={proxyTicket}
+              host={websocket.get('host')}
+              port={websocket.get('port')}
+              toolbarContainer='vm-console-toolbar-sendkeys'
+              containerId={NOVNC_CONTAINER_ID}
+              onDisconnected={
+                (e) => !e.detail.clean ? onDisconnected('CONNECTION_FAILURE') : onDisconnected()
+              }
+              onConnected={() => $(`#${NOVNC_CONTAINER_ID} canvas`).focus()}
+              onFullScreen={() => this.setState({ isFullScreen: true })}
+            />
+            {this.state.isFullScreen && onFullScreen()}
+          </div>
         }
+
         break
       case DOWNLOAD_CONSOLE:
         return <InfoPageContainer icon={downloadIcon} mainText={msg.downloadedVVFile()} secondaryText={msg[`downloaded${currentConsole.get('protocol').toUpperCase()}`]()} />

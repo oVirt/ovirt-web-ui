@@ -331,7 +331,7 @@ export const messages: { [messageId: string]: MessageType } = {
   force: 'Force',
   fqdn: { message: 'FQDN', description: 'Label for the VM guest agent reported full qualified domain name' },
   freeBrowsers: 'Free browsers:',
-  fullScreen: 'Fullscreen',
+  fullScreen: 'Full Screen',
   fullyQualifiedDomainName: 'Fully Qualified Domain Name (FQDN) of the virtual machine. Please note, guest agent must be installed within the virtual machine to retrieve this value.',
   gitHub: 'GitHub',
   globalErrorBoundaryTitle: 'Sorry, VM Portal is currently having some issues.',

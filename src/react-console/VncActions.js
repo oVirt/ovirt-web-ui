@@ -8,8 +8,10 @@ const VncActions = ({
   textCtrlAltDel,
   toolbarContainer,
   textDisconnect,
+  textFullScreen,
   onCtrlAltDel,
   onDisconnect,
+  onFullScreen,
 }) => {
   const toolbar = <div>
     <DropdownButton bsStyle='default' title={textSendShortcut} id='console-send-shortcut' onClick={noop}>
@@ -19,10 +21,17 @@ const VncActions = ({
     </DropdownButton>
     <Button
       bsStyle='default'
+      onClick={onFullScreen}
+    >
+      {textFullScreen}
+    </Button>
+    <Button
+      bsStyle='default'
       onClick={onDisconnect}
     >
       {textDisconnect}
     </Button>
+
   </div>
   if (!toolbarContainer) {
     return toolbar
@@ -37,20 +46,24 @@ const VncActions = ({
 VncActions.propTypes = {
   onCtrlAltDel: PropTypes.func,
   onDisconnect: PropTypes.func,
+  onFullScreen: PropTypes.func,
 
   textCtrlAltDel: PropTypes.string,
   textSendShortcut: PropTypes.string,
   textDisconnect: PropTypes.string,
   toolbarContainer: PropTypes.string,
+  textFullScreen: PropTypes.string,
 }
 
 VncActions.defaultProps = {
   onCtrlAltDel: noop,
   onDisconnect: noop,
+  onFullScreen: noop,
 
   textCtrlAltDel: 'Ctrl+Alt+Del',
   textSendShortcut: 'Send Key',
   textDisconnect: 'Disconnect',
+  textFullScreen: 'Full Screen',
   toolbarContainer: '',
 }
 
