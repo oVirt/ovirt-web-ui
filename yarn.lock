@@ -5702,21 +5702,21 @@ patternfly-react@2.36.2:
     sortabular "^1.5.1"
     table-resolver "^3.2.0"
 
-patternfly@^3.58.0:
-  version "3.59.1"
-  resolved "https://registry.yarnpkg.com/patternfly/-/patternfly-3.59.1.tgz#4adea89223e7386551bc9560ad5bed99e37df904"
-  integrity sha512-0Q/P58yaxcQXwnXo/OssiXaZmuX0g9QvWdpsYHyml4ihqnN2lL/yGdadFarA6UAQb//15XtNjKHZocoJXCkWYg==
+patternfly@3.59.3:
+  version "3.59.3"
+  resolved "https://registry.yarnpkg.com/patternfly/-/patternfly-3.59.3.tgz#e76a95fcdeb22763c1d7cd5836cb043ec7c5a782"
+  integrity sha512-gStdjLCS9k6NmI2xCXa1IBK0s8p5l5dqMEh/zLEUwA+qdV6z6qwSxHe8QT3AjLyEy27qMSzmtUXxvkO1c8jENw==
   dependencies:
-    bootstrap "~3.4.0"
+    bootstrap "~3.4.1"
     font-awesome "^4.7.0"
-    jquery "~3.2.1"
+    jquery "~3.4.1"
   optionalDependencies:
     "@types/c3" "^0.6.0"
     bootstrap-datepicker "^1.7.1"
     bootstrap-sass "^3.4.0"
     bootstrap-select "1.12.2"
     bootstrap-slider "^9.9.0"
-    bootstrap-switch "~3.3.4"
+    bootstrap-switch "3.3.4"
     bootstrap-touchspin "~3.1.1"
     c3 "~0.4.11"
     d3 "~3.5.17"
@@ -5734,21 +5734,21 @@ patternfly@^3.58.0:
     patternfly-bootstrap-combobox "~1.1.7"
     patternfly-bootstrap-treeview "~2.1.0"
 
-patternfly@^3.59.3:
-  version "3.59.3"
-  resolved "https://registry.yarnpkg.com/patternfly/-/patternfly-3.59.3.tgz#e76a95fcdeb22763c1d7cd5836cb043ec7c5a782"
-  integrity sha512-gStdjLCS9k6NmI2xCXa1IBK0s8p5l5dqMEh/zLEUwA+qdV6z6qwSxHe8QT3AjLyEy27qMSzmtUXxvkO1c8jENw==
+patternfly@^3.58.0:
+  version "3.59.1"
+  resolved "https://registry.yarnpkg.com/patternfly/-/patternfly-3.59.1.tgz#4adea89223e7386551bc9560ad5bed99e37df904"
+  integrity sha512-0Q/P58yaxcQXwnXo/OssiXaZmuX0g9QvWdpsYHyml4ihqnN2lL/yGdadFarA6UAQb//15XtNjKHZocoJXCkWYg==
   dependencies:
-    bootstrap "~3.4.1"
+    bootstrap "~3.4.0"
     font-awesome "^4.7.0"
-    jquery "~3.4.1"
+    jquery "~3.2.1"
   optionalDependencies:
     "@types/c3" "^0.6.0"
     bootstrap-datepicker "^1.7.1"
     bootstrap-sass "^3.4.0"
     bootstrap-select "1.12.2"
     bootstrap-slider "^9.9.0"
-    bootstrap-switch "3.3.4"
+    bootstrap-switch "~3.3.4"
     bootstrap-touchspin "~3.1.1"
     c3 "~0.4.11"
     d3 "~3.5.17"
