@@ -1,7 +1,7 @@
 .no-items {
   font-style: italic;
   text-align: center;
-  color: rgba(0, 0, 0, 0.65);
+  color: #8B8D8F;
 }
 
 /* create action */
@@ -63,5 +63,5 @@
 }
 
 .item-row .item-row-actions .item-action-disabled {
-  color: rgba(0, 0, 0, 0.65);
+  color: #8B8D8F;
 }
