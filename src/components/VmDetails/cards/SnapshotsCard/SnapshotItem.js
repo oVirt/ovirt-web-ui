@@ -19,7 +19,7 @@ import SnapshotDetail from './SnapshotDetail'
 import { deleteVmSnapshot } from './actions'
 import { formatDateFromNow } from '_/helpers'
 import { getMinimizedString, escapeHtml } from '../../../utils'
-
+import OverlayTooltip from '_/components/OverlayTooltip'
 const MAX_DESCRIPTION_SIZE = 50
 
 const SnapshotAction = ({ children, className, disabled, id, onClick }) => {
@@ -71,9 +71,9 @@ const SnapshotItem = ({ snapshot, vmId, isEditing, id, isVmDown, hideActions, on
       key='info'
     >
       <a id={`${id}-info`}>
-        <OverlayTrigger placement='left' overlay={<Tooltip id={`${id}-info-tt`}>{ msg.details() }</Tooltip>}>
+        <OverlayTooltip id={`${id}-info-tt`} tooltip={msg.details()}>
           <Icon type='pf' name='info' />
-        </OverlayTrigger>
+        </OverlayTooltip>
       </a>
     </OverlayTrigger>)
 
@@ -87,9 +87,9 @@ const SnapshotItem = ({ snapshot, vmId, isEditing, id, isVmDown, hideActions, on
         id={`${id}-restore-modal`}
         trigger={
           <SnapshotAction key='restore' id={`${id}-restore`} >
-            <OverlayTrigger placement='left' overlay={<Tooltip id={`${id}-restore-tt`}>{ msg.snapshotRestore() }</Tooltip>}>
+            <OverlayTooltip id={`${id}-restore-tt`} tooltip={msg.snapshotRestore()}>
               <Icon type='fa' name='play-circle' />
-            </OverlayTrigger>
+            </OverlayTooltip>
           </SnapshotAction>
         }
       />)
@@ -101,9 +101,9 @@ const SnapshotItem = ({ snapshot, vmId, isEditing, id, isVmDown, hideActions, on
         id={`${id}-delete-modal`}
         trigger={
           <SnapshotAction key='delete' id={`${id}-delete`}>
-            <OverlayTrigger placement='left' overlay={<Tooltip id={`${id}-delete-tt`}>{ msg.snapshotDelete() }</Tooltip>}>
+            <OverlayTooltip id={`${id}-delete-tt`} tooltip={msg.snapshotDelete()}>
               <Icon type='pf' name='delete' />
-            </OverlayTrigger>
+            </OverlayTooltip>
           </SnapshotAction>
         }
         onDelete={onSnapshotDelete}

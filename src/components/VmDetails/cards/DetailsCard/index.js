@@ -23,8 +23,6 @@ import {
   FieldLevelHelp,
   FormControl,
   Icon,
-  OverlayTrigger,
-  Tooltip,
 } from 'patternfly-react'
 import Switch from '../../../Switch'
 import SelectBox from '../../../SelectBox'
@@ -40,6 +38,7 @@ import CloudInit from './CloudInit'
 import HotPlugChangeConfirmationModal from './HotPlugConfirmationModal'
 import NextRunChangeConfirmationModal from './NextRunChangeConfirmationModal'
 import FieldRow from './FieldRow'
+import OverlayTooltip from '_/components/OverlayTooltip'
 
 /*
  * Return a normalized list of iso files from the set of provided storage domains.
@@ -134,9 +133,9 @@ const NotAvailable = ({ tooltip, id }) => (
   <div>
     { tooltip
       ? (
-        <OverlayTrigger overlay={<Tooltip id={id}>{tooltip}</Tooltip>}>
+        <OverlayTooltip id={id} tooltip={tooltip} placement='top'>
           <span>{msg.notAvailable()}</span>
-        </OverlayTrigger>
+        </OverlayTooltip>
       )
       : (
         <span id={id}>{msg.notAvailable()}</span>

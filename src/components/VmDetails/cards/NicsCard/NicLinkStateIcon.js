@@ -1,10 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { Icon, OverlayTrigger, Tooltip } from 'patternfly-react'
+import { Icon } from 'patternfly-react'
 
 import { msg } from '_/intl'
 import style from './style.css'
+import OverlayTooltip from '_/components/OverlayTooltip'
 
 const nicLinkInfoSettings = {
   true: {
@@ -32,16 +33,9 @@ const NicLinkStateIcon = ({ linkState = false, showTooltip = true, idSuffix }) =
     />
 
   if (showTooltip) {
-    return <OverlayTrigger
-      placement='left'
-      overlay={
-        <Tooltip id={`nic-link-icon-tooltip-${idSuffix || linkState}`}>
-          {linkInfo.tooltip}
-        </Tooltip>
-      }
-    >
+    return <OverlayTooltip id={`nic-link-icon-tooltip-${idSuffix || linkState}`} tooltip={linkInfo.tooltip}>
       {theIcon}
-    </OverlayTrigger>
+    </OverlayTooltip>
   }
 
   return theIcon
