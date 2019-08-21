@@ -276,7 +276,7 @@ class VmActions extends React.Component {
             )}
           </div>
         }
-        confirm={{ title: msg.yes(), onClick: () => onRemove({ preserveDisks: this.state.removePreserveDisks }) }}
+        confirm={{ title: msg.remove(), type: 'danger', onClick: () => onRemove({ preserveDisks: this.state.removePreserveDisks }) }}
       />)
 
     return (
