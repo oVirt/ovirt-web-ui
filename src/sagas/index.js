@@ -46,6 +46,7 @@ import {
 
   setUserMessages,
   dismissUserMessage,
+  addUserMessage,
 
   getSinglePool,
   removeMissingPools,
@@ -89,6 +90,8 @@ import {
   fetchConsoleVmMeta,
   openConsoleModal,
 } from './console'
+
+import { msg } from '_/intl'
 
 import {
   ADD_VM_NIC,
@@ -657,31 +660,51 @@ export function* stopProgress ({ vmId, poolId, name, result }) {
 function* shutdownVm (action) {
   yield startProgress({ vmId: action.payload.vmId, name: 'shutdown' })
   const result = yield callExternalAction('shutdown', Api.shutdown, action)
+  const vmName = yield select(state => state.vms.getIn([ 'vms', action.payload.vmId, 'name' ]))
+  if (result.status === 'complete') {
+    yield put(addUserMessage({ message: msg.actionFeedbackShutdownVm({ VmName: vmName }), type: 'success' }))
+  }
   yield stopProgress({ vmId: action.payload.vmId, name: 'shutdown', result })
 }
 
 function* restartVm (action) {
   yield startProgress({ vmId: action.payload.vmId, name: 'restart' })
   const result = yield callExternalAction('restart', Api.restart, action)
+  const vmName = yield select(state => state.vms.getIn([ 'vms', action.payload.vmId, 'name' ]))
+  if (result.status === 'complete') {
+    yield put(addUserMessage({ message: msg.actionFeedbackRestartVm({ VmName: vmName }), type: 'success' }))
+  }
   yield stopProgress({ vmId: action.payload.vmId, name: 'restart', result })
 }
 
 function* suspendVm (action) {
   yield startProgress({ vmId: action.payload.vmId, name: 'suspend' })
   const result = yield callExternalAction('suspend', Api.suspend, action)
+  const vmName = yield select(state => state.vms.getIn([ 'vms', action.payload.vmId, 'name' ]))
+  if (result.status === 'pending') {
+    yield put(addUserMessage({ message: msg.actionFeedbackSuspendVm({ VmName: vmName }), type: 'success' }))
+  }
   yield stopProgress({ vmId: action.payload.vmId, name: 'suspend', result })
 }
 
 function* startVm (action) {
   yield startProgress({ vmId: action.payload.vmId, name: 'start' })
   const result = yield callExternalAction('start', Api.start, action)
+  const vmName = yield select(state => state.vms.getIn([ 'vms', action.payload.vmId, 'name' ]))
   // TODO: check status at refresh --> conditional refresh wait_for_launch
+  if (result.status === 'complete') {
+    yield put(addUserMessage({ message: msg.actionFeedbackStartVm({ VmName: vmName }), type: 'success' }))
+  }
   yield stopProgress({ vmId: action.payload.vmId, name: 'start', result })
 }
 
 function* startPool (action) {
   yield startProgress({ poolId: action.payload.poolId, name: 'start' })
   const result = yield callExternalAction('startPool', Api.startPool, action)
+  const poolName = yield select(state => state.vms.getIn([ 'pools', action.payload.poolId, 'name' ]))
+  if (result.status === 'complete') {
+    yield put(addUserMessage({ message: msg.actionFeedbackAllocateVm({ poolname: poolName }), type: 'success' }))
+  }
   yield stopProgress({ poolId: action.payload.poolId, name: 'start', result })
 }
 

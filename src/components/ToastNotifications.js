@@ -7,10 +7,16 @@ import { setNotificationNotified } from '_/actions'
 
 import style from './sharedStyle.css'
 
+function normalizeType (theType) {
+  const isExpected = ['error', 'warning', 'success', 'info', 'danger'].includes(String(theType).toLowerCase())
+  return isExpected ? theType : 'warning'
+}
+
 const ToastNotifications = ({ userMessages, onDismissNotification }) => {
   return <ToastNotificationList>
+
     { userMessages.get('records').filter(r => !r.get('notified')).map(r =>
-      <TimedToastNotification className={style['toast-margin-top']} type='warning' onDismiss={() => onDismissNotification(r.get('time'))} key={r.get('time')}>
+      <TimedToastNotification className={style['toast-margin-top']} type={normalizeType(r.get('type'))} onDismiss={() => onDismissNotification(r.get('time'))} key={r.get('time')}>
         <span>
           {r.get('message')}
         </span>
