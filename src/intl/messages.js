@@ -18,6 +18,8 @@ export const messages: { [messageId: string]: MessageType } = {
     message: 'About',
     description: 'About application',
   },
+  aboutDialogDocumentationLink: 'For further information see {link}',
+  aboutDialogDocumentationText: 'Documentation',
   actionFailed: '{action} failed',
   activeFilters: 'Active Filters:',
   actualStateVmIsIn: 'The actual state the virtual machine is in.',

@@ -43,6 +43,10 @@ class AboutDialog extends React.Component {
       apiVersion = `${oVirtApiVersion.get('major')}.${oVirtApiVersion.get('minor')}`
     }
 
+    const docLink = msg.aboutDialogDocumentationLink({
+      link: `<strong><a href='${fixedStrings.DOCUMENTATION_LINK}' target='_blank' id='${idPrefix}-documentation-link'>${msg.aboutDialogDocumentationText()}</a></strong>`,
+    })
+
     return (
       <React.Fragment>
         <a href='#' id='about-modal' onClick={() => this.setState({ openModal: true })}>{msg.about()}</a>
@@ -58,6 +62,11 @@ class AboutDialog extends React.Component {
                   <li id={`${idPrefix}-version`}>Version <strong id={`${idPrefix}-version-value`}>{Product.version}-{Product.release}</strong></li>
                   <li id={`${idPrefix}-apiversion`}>{fixedStrings.BRAND_NAME} API Version <strong id={`${idPrefix}-apiversion-value`}>{apiVersion}</strong></li>
                   <li id={`${idPrefix}-issues`}>Please report issues on <strong><a href='https://github.com/oVirt/ovirt-web-ui/issues' target='_blank' id={`${idPrefix}-issues-link`}>GitHub Issue Tracker</a></strong></li>
+                  {fixedStrings.DOCUMENTATION_LINK &&
+                    <li id={`${idPrefix}-documentation`}>
+                      <span dangerouslySetInnerHTML={{ __html: docLink }} />
+                    </li>
+                  }
                 </ul>
               </div>
 
