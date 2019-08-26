@@ -5,6 +5,9 @@ import path from 'path'
 
 import chalk from 'chalk'
 import stableStringify from 'json-stable-stringify-without-jsonify'
+import { table } from 'table'
+
+import { messages as englishMessages } from '../../src/intl/messages'
 
 const SOURCE = path.join('extra', 'from-zanata', 'translated-messages.json')
 const DESTINATION = path.join('src', 'intl', 'translated-messages.json')
@@ -19,8 +22,8 @@ function main() {
 }
 
 /**
- * Sometimes Zanata returns empty string. These are removed for the app to be able to rendered the message in default
- * language (English).
+ * Sometimes Zanata returns empty string. These are removed for the app to be able to
+ * rendered the message in default language (English).
  *
  * @param translations object from zanata
  */

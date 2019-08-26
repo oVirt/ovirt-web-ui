@@ -62,6 +62,7 @@
     "string-natural-compare": "2.0.2",
     "strip-ansi": "3.0.1",
     "style-loader": "0.13.1",
+    "table": "^5.4.6",
     "url-loader": "0.5.7",
     "webpack": "1.13.2",
     "webpack-dev-server": "1.16.1",
@@ -124,7 +125,8 @@
     "intl:extract": "babel-node scripts/intl/extract-messages.js --presets env,flow && rip json2pot -o extra/to-zanata/messages.pot extra/to-zanata/messages.json",
     "intl:push": "zanata-cli push",
     "intl:pull": "zanata-cli pull -e",
-    "intl:apply": "rip po2json -o extra/from-zanata/translated-messages.json -m extra/to-zanata/messages.json 'extra/from-zanata/*.po' && babel-node scripts/intl/normalize-messages.js --presets env,flow"
+    "intl:apply": "rip po2json -o extra/from-zanata/translated-messages.json -m extra/to-zanata/messages.json 'extra/from-zanata/*.po' && babel-node scripts/intl/normalize-messages.js --presets env,flow",
+    "intl:report": "babel-node scripts/intl/report.js --presets env,flow"
   },
   "jest": {
     "moduleFileExtensions": [
