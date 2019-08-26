@@ -5,18 +5,26 @@ import { List } from 'immutable'
 
 import * as Actions from '_/actions'
 import { MAX_VM_MEMORY_FACTOR } from '_/constants'
-import { generateUnique, localeCompare, filterOsByArchitecture, isWindows, userFormatOfBytes } from '_/helpers'
+import { generateUnique, isWindows, templateNameRenderer, userFormatOfBytes } from '_/helpers'
 import { msg, enumMsg } from '_/intl'
 
 import {
   isNumber,
 } from '_/utils'
+
 import {
   canChangeCluster as vmCanChangeCluster,
   canChangeCd as vmCanChangeCd,
 } from '_/vm-status'
 
-import { isValidOsIcon, getTopologyPossibleValues, getTopology } from '../../../utils'
+import {
+  createClusterList,
+  createIsoList,
+  createOsList,
+  getTopology,
+  getTopologyPossibleValues,
+  isValidOsIcon,
+} from '_/components/utils'
 
 import {
   Alert,
@@ -40,76 +48,6 @@ import CloudInit from './CloudInit'
 import HotPlugChangeConfirmationModal from './HotPlugConfirmationModal'
 import NextRunChangeConfirmationModal from './NextRunChangeConfirmationModal'
 import FieldRow from './FieldRow'
-
-/*
- * Return a normalized list of iso files from the set of provided storage domains.
- */
-function createIsoList (storageDomains) {
-  const list = []
-
-  storageDomains.forEach(storageDomain => {
-    if (storageDomain.has('files')) {
-      storageDomain.get('files').forEach(file => {
-        list.push({
-          sd: {
-            id: storageDomain.get('id'),
-            name: storageDomain.get('name'),
-          },
-          file: {
-            id: file.id,
-            name: file.name,
-          },
-        })
-      })
-    }
-  })
-
-  return list
-}
-
-/*
- * Return a normalized and sorted list of clusters ready for use in a __SelectBox__ from
- * the Map of provided clusters.
- */
-function createClusterList (clusters) {
-  const clusterList =
-    clusters
-      .toList()
-      .filter(cluster => cluster.get('canUserUseCluster'))
-      .map(cluster => ({
-        id: cluster.get('id'),
-        value: cluster.get('name'),
-        datacenter: cluster.get('dataCenterId'),
-      }))
-      .sort((a, b) => localeCompare(a.value, b.value))
-      .toJS()
-
-  return clusterList
-}
-
-/*
- * Return a normalized and sorted list of OS ready for use in a __SelectBox__ from
- * the Map of provided operating systems cross referenced to the VM's Cluster
- * architecture.
- */
-function createOsList (vm, clusters, operatingSystems) {
-  const clusterId = vm.getIn(['cluster', 'id'])
-  const cluster = clusters && clusters.get(clusterId)
-  const architecture = cluster && cluster.get('architecture')
-  const osList =
-    filterOsByArchitecture(operatingSystems, architecture)
-      .toList()
-      .map(os => (
-        {
-          id: os.get('id'),
-          value: os.get('description'),
-        }
-      ))
-      .sort((a, b) => localeCompare(a.value, b.value))
-      .toJS()
-
-  return osList
-}
 
 function rephraseVmType (vmType) {
   const types = {
@@ -159,6 +97,9 @@ const DEFAULT_BOOT_DEVICES = List(['hd', null])
 class DetailsCard extends React.Component {
   constructor (props) {
     super(props)
+    const vmClusterId = props.vm.getIn(['cluster', 'id'])
+    const vmDataCenterId = props.clusters.getIn([vmClusterId, 'dataCenterId'])
+
     this.state = {
       vm: props.vm, // ImmutableJS Map
 
@@ -170,9 +111,9 @@ class DetailsCard extends React.Component {
       promptHotPlugChanges: false,
       promptNextRunChanges: false,
 
-      isoList: createIsoList(props.storageDomains),
+      isoList: createIsoList(props.storageDomains, vmDataCenterId),
       clusterList: createClusterList(props.clusters),
-      osList: createOsList(props.vm, props.clusters, props.operatingSystems),
+      osList: createOsList(vmClusterId, props.clusters, props.operatingSystems),
     }
     this.trackUpdates = {}
     this.hotPlugUpdates = {}
@@ -227,19 +168,22 @@ class DetailsCard extends React.Component {
     // NOTE: Doing the following here instead of getDerivedStateFromProps so __clusters__,
     //       __storageDomains__, and __operatingSystems__ don't need to be kept in state for
     //       change comparison
+    const vmClusterId = this.props.vm.getIn(['cluster', 'id'])
+
     if (prevProps.clusters !== this.props.clusters) {
       this.setState({ clusterList: createClusterList(this.props.clusters) }) // eslint-disable-line react/no-did-update-set-state
     }
 
     if (prevProps.storageDomains !== this.props.storageDomains) {
-      this.setState({ isoList: createIsoList(this.props.storageDomains) }) // eslint-disable-line react/no-did-update-set-state
+      const vmDataCenterId = this.props.clusters.getIn([vmClusterId, 'dataCenterId'])
+      this.setState({ isoList: createIsoList(this.props.storageDomains, vmDataCenterId) }) // eslint-disable-line react/no-did-update-set-state
     }
 
     if (prevProps.operatingSystems !== this.props.operatingSystems ||
       prevProps.clusters !== this.props.clusters ||
-      prevProps.vm.getIn(['cluster', 'id']) !== this.props.vm.getIn(['cluster', 'id'])
+      prevProps.vm.getIn(['cluster', 'id']) !== vmClusterId
     ) {
-      this.setState({ osList: createOsList(this.props.vm, this.props.clusters, this.props.operatingSystems) }) // eslint-disable-line react/no-did-update-set-state
+      this.setState({ osList: createOsList(vmClusterId, this.props.clusters, this.props.operatingSystems) }) // eslint-disable-line react/no-did-update-set-state
     }
   }
 
@@ -641,9 +585,8 @@ class DetailsCard extends React.Component {
     const dataCenterName = (dataCenter && dataCenter.name) || msg.notAvailable()
 
     // Template
-    // TODO: What about rendering the template's version (base, specific, latest)?
     const templateId = vm.getIn(['template', 'id'])
-    const templateName = (templates && templates.getIn([templateId, 'name'])) || msg.notAvailable()
+    const templateName = (templates && templateNameRenderer(templates.get(templateId))) || msg.notAvailable()
 
     // CD
     const canChangeCd = vm.get('canUserChangeCd') && vmCanChangeCd(status)
