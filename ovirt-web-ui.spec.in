@@ -56,6 +56,13 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Tue Aug 27 2019 Michal Skrivanek <michal.skrivanek@redhat.com> - 1.6.0-1
+ - updated translations
+ - limit CD/ISO list by data center
+ - improve responsiveness on small screens (mobile)
+ - updated patternfly3 and js dependencies
+ - added Sysprep to Details card for Windows VM
+
 * Mon Jul 1 2019 Sharon Gratch <sgratch@redhat.com> - 1.5.3-1
  - Added check for inactivity during session and logout after expiration
  - Added NoVNC console support
