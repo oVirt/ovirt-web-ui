@@ -12,6 +12,7 @@ import VmDialog from '../VmDialog'
 import VmsList from '../VmsList'
 import VmDetails from '../VmDetails'
 import VmConsole from '../VmConsole'
+import Handler404 from '_/Handler404'
 
 import { addUserMessage, selectPoolDetail } from '_/actions'
 
@@ -61,9 +62,11 @@ class VmDetailsPage extends React.Component {
     if (vmId && vms.getIn(['vms', vmId])) {
       return (<VmDetails vm={vms.getIn(['vms', vmId])} />)
     }
+    if (vms.get('missedVms').has(vmId)) {
+      console.info(`VmDetailsPage: VM id cannot be found: ${vmId}`)
+      return <Handler404 />
+    }
 
-    // TODO: Add handling for if the fetch runs but fails (FETCH-FAIL), see issue #631
-    console.info(`VmDetailsPage: VM id cannot be found: ${vmId}`)
     return null
   }
 }

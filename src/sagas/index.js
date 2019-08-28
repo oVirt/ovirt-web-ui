@@ -135,6 +135,7 @@ import {
   DETAIL_PAGE_TYPE,
   DIALOG_PAGE_TYPE,
   MAIN_PAGE_TYPE,
+  NO_REFRESH_TYPE,
 } from '_/constants'
 
 import {
@@ -266,10 +267,12 @@ function* refreshData (action) {
 
   const currentPage = yield select(state => state.config.get('currentPage'))
 
-  if (currentPage.type === undefined) {
-    yield pagesRefreshers[MAIN_PAGE_TYPE](action.payload)
-  } else {
-    yield pagesRefreshers[currentPage.type](Object.assign({ id: currentPage.id }, action.payload))
+  if (currentPage.type !== NO_REFRESH_TYPE) {
+    if (currentPage.type === undefined) {
+      yield pagesRefreshers[MAIN_PAGE_TYPE](action.payload)
+    } else {
+      yield pagesRefreshers[currentPage.type](Object.assign({ id: currentPage.id }, action.payload))
+    }
   }
 
   console.log('refreshData(): finished')
