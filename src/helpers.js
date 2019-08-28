@@ -228,3 +228,8 @@ export function filterOsByArchitecture (operatingSystems, architecture) {
     }
   })
 }
+
+export function findOsByName (operatingSystems, name) {
+  return operatingSystems.toList().find(os =>
+    os.get('name') === name)
+}

@@ -1,7 +1,6 @@
-import { put } from 'redux-saga/effects'
+import { put, select } from 'redux-saga/effects'
 
 import Api from '_/ovirtapi'
-import Selectors from '_/selectors'
 import OptionsManager from '_/optionsManager'
 import { fileDownload } from '_/helpers'
 import { doesVmSessionExistForUserId } from '_/utils'
@@ -53,7 +52,7 @@ export function* downloadVmConsole (action) {
      *Download console if type is spice or novnc is running already
      */
     if (data.indexOf('type=spice') > -1 || !isNoVNC) {
-      let options = Selectors.getConsoleOptions({ vmId })
+      let options = yield select(state => state.options.getIn(['options', 'consoleOptions', vmId]))
       if (!options) {
         console.log('downloadVmConsole() console options not yet present, trying to load from local storage')
         options = yield getConsoleOptions(getConsoleOptionsAction({ vmId }))

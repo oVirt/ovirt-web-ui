@@ -1,6 +1,5 @@
 import Api from '_/ovirtapi'
 import { persistStateToLocalStorage, saveToLocalStorage } from '_/storage'
-import Selectors from '_/selectors'
 import AppConfiguration from '_/config'
 
 import vmSnapshotsSagas from '_/components/VmDetails/cards/SnapshotsCard/sagas'
@@ -170,8 +169,8 @@ const EVERYONE_GROUP_ID = 'eee00000-0000-0000-0000-123456789eee'
 /**
  * Compare the current oVirt version (held in redux) to the given version.
  */
-function compareVersionToCurrent ({ major, minor }) {
-  const current = Selectors.getOvirtVersion().toJS()
+function* compareVersionToCurrent ({ major, minor }) {
+  const current = yield select(state => state.config.get('oVirtApiVersion').toJS())
   return compareVersion(current, { major, minor })
 }
 
@@ -182,7 +181,9 @@ function* fetchByPage (action) {
 }
 
 function* persistStateSaga () {
-  yield persistStateToLocalStorage({ icons: Selectors.getAllIcons().toJS() })
+  yield persistStateToLocalStorage({
+    icons: yield select(state => state.icons.toJS()),
+  })
 }
 
 function* fetchUnknownIconsForVms ({ vms, os }) {
@@ -197,7 +198,7 @@ function* fetchUnknownIconsForVms ({ vms, os }) {
   }
 
   // reduce to just unknown
-  const allKnownIcons = Selectors.getAllIcons()
+  const allKnownIcons = yield select(state => state.icons)
   const notLoadedIconIds = [...iconsIds].filter(id => !allKnownIcons.get(id))
 
   yield * foreach(notLoadedIconIds, function* (iconId) {
@@ -214,6 +215,18 @@ function* fetchIcon ({ iconId }) {
   }
 }
 
+function* getIdsByType (type) {
+  const ids = yield select(state =>
+    state.vms
+      .get(type)
+      .reduce((entityIds, entity, entityId) => {
+        entityIds.push(entityId)
+        return entityIds
+      }, [])
+  )
+  return ids
+}
+
 export function* refreshMainPage ({ shallowFetch, page }) {
   shallowFetch = !!shallowFetch
 
@@ -223,10 +236,10 @@ export function* refreshMainPage ({ shallowFetch, page }) {
     shallowFetch,
   }))
 
+  const vmsIds = yield getIdsByType('vms')
   const fetchedDirectlyVmIds =
     (yield all(
-      Selectors
-        .getVmIds()
+      vmsIds
         .filter(vmId => !fetchedVmIds.includes(vmId))
         .map(vmId => call(fetchSingleVm, getSingleVm({ vmId, shallowFetch })))
     ))
@@ -238,11 +251,10 @@ export function* refreshMainPage ({ shallowFetch, page }) {
   const fetchedPoolIds = yield fetchPoolsByCount(getPoolsByCount({
     count: page * AppConfiguration.pageLimit,
   }))
-
+  const filteredPoolIds = yield getIdsByType('pools')
   const fetchedDirectlyPoolIds =
     (yield all(
-      Selectors
-        .getPoolIds()
+      filteredPoolIds
         .filter(poolId => !fetchedPoolIds.includes(poolId))
         .map(poolId => call(fetchSinglePool, getSinglePool({ poolId })))
     ))
@@ -296,7 +308,7 @@ const pagesRefreshers = {
 function* refreshData (action) {
   console.log('refreshData(): ', action.payload)
 
-  const currentPage = Selectors.getCurrentPage()
+  const currentPage = yield select(state => state.config.get('currentPage'))
 
   if (currentPage.type === undefined) {
     yield pagesRefreshers[MAIN_PAGE_TYPE](action.payload)
@@ -315,12 +327,13 @@ function* changePage (action) {
   yield refreshData(refresh({
     onNavigation: true,
     shallowFetch: true,
-    page: Selectors.getCurrentFetchPage(),
+    page: yield select(state => state.vms.get('page')),
   }))
 }
 
 function* fetchVmsByPage (action) {
-  if (compareVersionToCurrent({ major: 4, minor: 2 })) {
+  const isOvirtGTE42 = yield compareVersionToCurrent({ major: 4, minor: 2 })
+  if (isOvirtGTE42) {
     yield fetchVmsByPageV42(action)
   } else {
     yield fetchVmsByPageVLower(action)
@@ -387,7 +400,8 @@ function* fetchVmsByPageVLower (action) {
  * Fetch a given number of VMs (**action.payload.count**).
  */
 function* fetchVmsByCount (action) {
-  if (compareVersionToCurrent({ major: 4, minor: 2 })) {
+  const isOvirtGTE42 = yield compareVersionToCurrent({ major: 4, minor: 2 })
+  if (isOvirtGTE42) {
     return yield fetchVmsByCountV42(action)
   } else {
     return yield fetchVmsByCountVLower(action)
@@ -464,6 +478,7 @@ export function* fetchSingleVm (action) {
   const vm = yield callExternalAction('getVm', Api.getVm, action, true)
   let internalVm = null
   if (vm && vm.id) {
+    const isFilter = yield select(state => state.config.get('filter'))
     internalVm = Api.vmToInternal({ vm, getSubResources: isOvirtGTE42 })
 
     // If the VM is running, we want to display the current=true cdrom info. Due
@@ -473,7 +488,7 @@ export function* fetchSingleVm (action) {
       internalVm.cdrom = yield fetchVmCdRom({ vmId: internalVm.id, current: true })
     }
 
-    if (isOvirtGTE42 && !shallowFetch && !Selectors.getFilter()) {
+    if (isOvirtGTE42 && !shallowFetch && !isFilter) {
       internalVm.permits = getUserPermits(yield fetchVmPermissions({ vmId: internalVm.id }))
     }
 
@@ -1057,7 +1072,8 @@ function* fetchAllNetworks () {
 }
 
 export function* fetchUserGroups () {
-  const groups = yield callExternalAction('groups', Api.groups, { payload: { userId: Selectors.getUserId() } })
+  const userId = yield select(state => state.config.getIn(['user', 'id']))
+  const groups = yield callExternalAction('groups', Api.groups, { payload: { userId } })
   if (groups && groups['group']) {
     const groupsInternal = groups.group.map(group => group.id)
     groupsInternal.push(EVERYONE_GROUP_ID)
@@ -1098,12 +1114,12 @@ function* schedulerWithFixedDelay (delayInSeconds = AppConfiguration.schedulerFi
     } else {
       console.log(`⏰ schedulerWithFixedDelay[${myId}] running after delay of: ${delayInSeconds}`)
 
-      const oVirtVersion = Selectors.getOvirtVersion()
+      const oVirtVersion = yield select(state => state.config.get('oVirtApiVersion'))
       if (oVirtVersion.get('passed')) {
         yield refreshData(refresh({
           onSchedule: true,
           shallowFetch: true,
-          page: Selectors.getCurrentFetchPage(),
+          page: yield select(state => state.vms.get('page')),
         }))
       } else {
         console.log(`⏰ schedulerWithFixedDelay[${myId}] event skipped since oVirt API version does not match`)
