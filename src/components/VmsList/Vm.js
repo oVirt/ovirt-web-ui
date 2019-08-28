@@ -31,8 +31,8 @@ const Vm = ({ vm, icons, os, onStart }) => {
         <span className={sharedStyle['operating-system-label']} id={`${idPrefix}-os`}>{osName}</span>
       </BaseCard.Header>
       <BaseCard.Icon url={`/vm/${vm.get('id')}`} icon={icon} />
-      <BaseCard.Title idPrefix={idPrefix} url={`/vm/${vm.get('id')}`} name={vm.get('name')} />
-      <BaseCard.Status idPrefix={idPrefix}>
+      <BaseCard.Title url={`/vm/${vm.get('id')}`} name={vm.get('name')} />
+      <BaseCard.Status>
         <VmStatusIcon state={state} />&nbsp;{stateValue}
       </BaseCard.Status>
       <VmActions isOnCard vm={vm} onStart={onStart} idPrefix={idPrefix} />
