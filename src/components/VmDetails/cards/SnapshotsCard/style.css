@@ -72,11 +72,13 @@ div.popover {
 .snapshot-item-name {
   display: table-cell;
   padding-left: 5px;
+  padding-right: 5px;
 }
 
 .snapshot-item-time {
   color: #808080;
-  padding-left: 5px;
+  display: inline-block;
+  overflow-wrap: break-word;
 }
 
 .snapshot-item-actions {

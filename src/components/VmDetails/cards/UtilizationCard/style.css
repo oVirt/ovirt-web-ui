@@ -145,5 +145,6 @@
   }
   .col-charts-box {
       max-width: 100%;
+      min-height: 50%;
   }
 }
