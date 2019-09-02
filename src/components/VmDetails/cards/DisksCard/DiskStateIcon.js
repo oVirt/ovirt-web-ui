@@ -1,10 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { Icon, OverlayTrigger, Tooltip } from 'patternfly-react'
+import { Icon } from 'patternfly-react'
 
 import { msg } from '../../../../intl'
 import style from './style.css'
+import OverlayTooltip from '_/components/OverlayTooltip'
 
 const diskStateSettings = {
   'active': {
@@ -39,18 +40,10 @@ const DiskStateIcon = ({ idPrefix, diskState, showTooltip = true }) => {
     />
 
   if (showTooltip) {
-    return <OverlayTrigger
-      placement='left'
-      overlay={
-        <Tooltip id={`${idPrefix}-state-icon-tooltip`}>
-          {diskInfo.tooltip}
-        </Tooltip>
-      }
-    >
+    return <OverlayTooltip id={`${idPrefix}-state-icon-tooltip`} tooltip={diskInfo.tooltip}>
       {theIcon}
-    </OverlayTrigger>
+    </OverlayTooltip>
   }
-
   return theIcon
 }
 DiskStateIcon.propTypes = {

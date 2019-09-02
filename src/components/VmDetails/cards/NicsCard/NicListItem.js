@@ -6,11 +6,12 @@ import { escapeHtml } from '../../../utils'
 import itemStyle from '../../itemListStyle.css'
 import style from './style.css'
 
-import { Icon, OverlayTrigger, Tooltip } from 'patternfly-react'
+import { Icon } from 'patternfly-react'
 import { Grid, Row, Col } from '_/components/Grid'
 import DeleteConfirmationModal from '../../../VmModals/DeleteConfirmationModal'
 import NicEditor from './NicEditor'
 import NicLinkStateIcon from './NicLinkStateIcon'
+import OverlayTooltip from '_/components/OverlayTooltip'
 
 /**
  * Render a single NIC in the list of Nics on the Nics Card.
@@ -70,29 +71,23 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEd
           vnicProfileList={vnicProfileList}
           onSave={onEdit}
           trigger={
-            <OverlayTrigger
-              overlay={<Tooltip id={`${idPrefix}-edit-tooltip`}>{msg.nicEditTooltip()}</Tooltip>}
-              placement='left'
-            >
+            <OverlayTooltip id={`${idPrefix}-edit-tooltip`} tooltip={msg.nicEditTooltip()}>
               <a id={`${idPrefix}-edit-action`} className={itemStyle['item-action']}>
                 <Icon type='pf' name='edit' />
               </a>
-            </OverlayTrigger>
+            </OverlayTooltip>
           }
         />
       }
       { !canEdit &&
-        <OverlayTrigger
-          overlay={<Tooltip id={`${idPrefix}-edit-tooltip-disabled`}>{msg.nicEditDisabledTooltip()}</Tooltip>}
-          placement='left'
-        >
+        <OverlayTooltip id={`${idPrefix}-edit-tooltip-disabled`} tooltip={msg.nicEditDisabledTooltip()}>
           <Icon
             type='pf'
             name='edit'
             id={`${idPrefix}-edit-action-disabled`}
             className={`${itemStyle['item-action']} ${itemStyle['item-action-disabled']}`}
           />
-        </OverlayTrigger>
+        </OverlayTooltip>
       }
 
       { canDelete &&
@@ -100,14 +95,11 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEd
           id={`${idPrefix}-delete-modal`}
           onDelete={() => { onDelete(nic.id) }}
           trigger={
-            <OverlayTrigger
-              overlay={<Tooltip id={`${idPrefix}-delete-tooltip`}>{msg.nicDeleteTooltip()}</Tooltip>}
-              placement='left'
-            >
+            <OverlayTooltip id={`${idPrefix}-delete-tooltip`} tooltip={msg.nicDeleteTooltip()}>
               <a id={`${idPrefix}-delete-action`} className={itemStyle['item-action']}>
                 <Icon type='pf' name='delete' />
               </a>
-            </OverlayTrigger>
+            </OverlayTooltip>
           }
         >
           <span
@@ -120,17 +112,14 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEd
         </DeleteConfirmationModal>
       }
       { !canDelete &&
-        <OverlayTrigger
-          overlay={<Tooltip id={`${idPrefix}-delete-tooltip-disabled`}>{msg.nicDeleteDisabledTooltip()}</Tooltip>}
-          placement='left'
-        >
+        <OverlayTooltip id={`${idPrefix}-delete-tooltip-disabled`} tooltip={msg.nicDeleteDisabledTooltip()}>
           <Icon
             type='pf'
             name='delete'
             id={`${idPrefix}-delete-action-disabled`}
             className={`${itemStyle['item-action']} ${itemStyle['item-action-disabled']}`}
           />
-        </OverlayTrigger>
+        </OverlayTooltip>
       }
     </span>
     }

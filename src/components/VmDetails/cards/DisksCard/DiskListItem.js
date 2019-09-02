@@ -10,10 +10,11 @@ import { escapeHtml } from '../../../utils'
 import itemStyle from '../../itemListStyle.css'
 import style from './style.css'
 
-import { Icon, OverlayTrigger, Tooltip, Label } from 'patternfly-react'
+import { Icon, Label } from 'patternfly-react'
 import DeleteConfirmationModal from '../../../VmModals/DeleteConfirmationModal'
 import DiskStateIcon from './DiskStateIcon'
 import DiskImageEditor from './DiskImageEditor'
+import OverlayTooltip from '_/components/OverlayTooltip'
 
 function isDiskBeingDeleted (diskId, pendingTasks) {
   return !!pendingTasks.find(
@@ -60,14 +61,11 @@ const DiskListItem = ({
     {/* Details Column - take the rest of the space */}
     <div className={itemStyle['item-row-info']}>
       { isDiskBeingDeleted &&
-        <OverlayTrigger
-          overlay={<Tooltip id={`${idPrefix}-name-info-deleting-tooltip`}>{msg.diskEditorDiskDeletingTooltip()}</Tooltip>}
-          placement='top'
-        >
+        <OverlayTooltip id={`${idPrefix}-name-info-deleting-tooltip`} tooltip={msg.diskEditorDiskDeletingTooltip()} placement='top'>
           <span id={`${idPrefix}-name`} className={`${style['name-info']} ${style['name-info-deleting']}`}>
             {view.name}
           </span>
-        </OverlayTrigger>
+        </OverlayTooltip>
       }
       { !isDiskBeingDeleted &&
         <span id={`${idPrefix}-name`} className={style['name-info']}>
@@ -95,29 +93,23 @@ const DiskListItem = ({
           storageDomainList={storageDomainList}
           onSave={onEdit}
           trigger={
-            <OverlayTrigger
-              overlay={<Tooltip id={`${idPrefix}-action-edit-tooltip`}>{msg.diskEditTooltip()}</Tooltip>}
-              placement='left'
-            >
+            <OverlayTooltip id={`${idPrefix}-action-edit-tooltip`} tooltip={msg.diskEditTooltip()}>
               <a id={`${idPrefix}-action-edit`} className={itemStyle['item-action']}>
                 <Icon type='pf' name='edit' />
               </a>
-            </OverlayTrigger>
+            </OverlayTooltip>
           }
         />
       }
       { !canEdit &&
-        <OverlayTrigger
-          overlay={<Tooltip id={`${idPrefix}-action-edit-tooltip-disabled`}>{msg.diskEditDisabledTooltip()}</Tooltip>}
-          placement='left'
-        >
+        <OverlayTooltip id={`${idPrefix}-action-edit-tooltip-disabled`} tooltip={msg.diskEditDisabledTooltip()}>
           <Icon
             type='pf'
             name='edit'
             id={`${idPrefix}-action-edit-disabled`}
             className={`${itemStyle['item-action']} ${itemStyle['item-action-disabled']}`}
           />
-        </OverlayTrigger>
+        </OverlayTooltip>
       }
 
       { canDelete &&
@@ -126,14 +118,11 @@ const DiskListItem = ({
           severity='danger'
           onDelete={() => { onDelete(vm.get('id'), view.id) }}
           trigger={
-            <OverlayTrigger
-              overlay={<Tooltip id={`${idPrefix}-action-delete-tooltip`}>{msg.diskDeleteTooltip()}</Tooltip>}
-              placement='left'
-            >
+            <OverlayTooltip id={`${idPrefix}-action-delete-tooltip`} tooltip={msg.diskDeleteTooltip()}>
               <a id={`${idPrefix}-action-delete`} className={itemStyle['item-action']}>
                 <Icon type='pf' name='delete' />
               </a>
-            </OverlayTrigger>
+            </OverlayTooltip>
           }
         >
           <span
@@ -147,17 +136,14 @@ const DiskListItem = ({
         </DeleteConfirmationModal>
       }
       { !canDelete &&
-        <OverlayTrigger
-          overlay={<Tooltip id={`${idPrefix}-action-delete-tooltip-disabled`}>{msg.diskDeleteDisabledTooltip()}</Tooltip>}
-          placement='left'
-        >
+        <OverlayTooltip id={`${idPrefix}-action-delete-tooltip-disabled`} tooltip={msg.diskDeleteDisabledTooltip()}>
           <Icon
             type='pf'
             name='delete'
             id={`${idPrefix}-action-delete-disabled`}
             className={`${itemStyle['item-action']} ${itemStyle['item-action-disabled']}`}
           />
-        </OverlayTrigger>
+        </OverlayTooltip>
       }
     </div>
     }
