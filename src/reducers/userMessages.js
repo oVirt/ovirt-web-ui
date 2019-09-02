@@ -28,8 +28,6 @@ function addLogEntry ({ state, message, type = 'ERROR', failedAction }) {
 
 const initialState = Immutable.fromJS({
   records: [],
-  unread: false,
-  show: false,
 })
 
 const userMessages = actionReducer(initialState, {
