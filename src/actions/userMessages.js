@@ -23,20 +23,20 @@ export function clearUserMessages () {
   return { type: CLEAR_USER_MSGS }
 }
 
-export function setNotificationNotified ({ time }) {
+export function setNotificationNotified ({ eventId }) {
   return {
     type: SET_USERMSG_NOTIFIED,
     payload: {
-      time,
+      eventId,
     },
   }
 }
 
-export function dismissUserMessage ({ time }) {
+export function dismissUserMessage ({ eventId }) {
   return {
     type: DISMISS_USER_MSG,
     payload: {
-      time,
+      eventId,
     },
   }
 }

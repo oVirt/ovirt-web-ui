@@ -852,14 +852,14 @@ function* fetchAllEvents (action) {
 
 function* dismissEvent (action) {
   const { event } = action.payload
-  if (event.id) {
+  if (event.source === 'server') {
     const result = yield callExternalAction('dismissEvent', Api.dismissEvent, { payload: { eventId: event.id } })
 
     if (result.status === 'complete') {
       yield fetchAllEvents(action)
     }
   } else {
-    yield put(dismissUserMessage({ time: event.get('time') }))
+    yield put(dismissUserMessage({ eventId: event.id }))
   }
 }
 

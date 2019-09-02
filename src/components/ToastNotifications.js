@@ -10,7 +10,7 @@ import style from './sharedStyle.css'
 const ToastNotifications = ({ userMessages, onDismissNotification }) => {
   return <ToastNotificationList>
     { userMessages.get('records').filter(r => !r.get('notified')).map(r =>
-      <TimedToastNotification className={style['toast-margin-top']} type='warning' onDismiss={() => onDismissNotification(r.get('time'))} key={r.get('time')}>
+      <TimedToastNotification className={style['toast-margin-top']} type='warning' onDismiss={() => onDismissNotification(r.get('id'))} key={r.get('id')}>
         <span>
           {r.get('message')}
         </span>
@@ -29,6 +29,6 @@ export default connect(
     userMessages: state.userMessages,
   }),
   (dispatch) => ({
-    onDismissNotification: (time) => dispatch(setNotificationNotified({ time })),
+    onDismissNotification: (eventId) => dispatch(setNotificationNotified({ eventId })),
   })
 )(ToastNotifications)
