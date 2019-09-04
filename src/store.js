@@ -1,12 +1,17 @@
-import { createStore, applyMiddleware, compose } from 'redux'
-import createSagaMiddleware from 'redux-saga'
+// @flow
+import { createStore, applyMiddleware, compose, type History, type StoreCreator } from 'redux'
+import createSagaMiddleware, { type SagaMiddleware, type Task } from 'redux-saga'
 import { connectRouter, routerMiddleware } from 'connected-react-router'
 import { createBrowserHistory } from 'history'
 
-import AppConfiguration from './config'
-import reducers from './reducers'
+import AppConfiguration from '_/config'
+import OvirtApi from '_/ovirtapi'
+import reducers from '_/reducers'
+import { rootSaga } from '_/sagas'
 
-const composeEnhancers =
+import { addActiveRequest, delayedRemoveActiveRequest } from '_/actions'
+
+const composeEnhancers: any =
   (process.env.NODE_ENV !== 'production' &&
    window &&
    typeof window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ === 'function' &&
@@ -16,29 +21,50 @@ const composeEnhancers =
    })) ||
   compose
 
-export default function configureStore () {
-  const sagaMiddleware = createSagaMiddleware({
-    onError (...args) {
-      console.error('Uncaught saga error (store.js): ', ...args)
+function initializeApiListener (store: StoreCreator) {
+  OvirtApi.addHttpListener((requestId, eventType) => {
+    if (eventType === 'START') {
+      store.dispatch(addActiveRequest(requestId))
+      return
+    }
+    if (eventType === 'STOP') {
+      store.dispatch(delayedRemoveActiveRequest(requestId))
+    }
+  })
+}
+
+/**
+ * Configure the app's redux store with saga middleware, connected react-router,
+ * and connected to the OvirtApi listeners.
+ */
+export default function configureStore (): StoreCreator & { rootTask: Task, history: History } {
+  const sagaMiddleware: SagaMiddleware = createSagaMiddleware({
+    onError (error: Error) {
+      console.error('Uncaught saga error (store.js): ', error)
     },
   })
 
   // history to use for the connected react-router
-  const history = createBrowserHistory({
+  const history: History = createBrowserHistory({
     basename: AppConfiguration.applicationURL,
   })
 
-  return {
-    ...createStore(
-      connectRouter(history)(reducers),
-      composeEnhancers(
-        applyMiddleware(
-          routerMiddleware(history),
-          sagaMiddleware
-        )
+  const store: StoreCreator = createStore(
+    connectRouter(history)(reducers),
+    composeEnhancers(
+      applyMiddleware(
+        routerMiddleware(history),
+        sagaMiddleware
       )
-    ),
-    runSaga: sagaMiddleware.run,
-    history: history,
+    )
+  )
+
+  initializeApiListener(store)
+  const rootTask: Task = sagaMiddleware.run(rootSaga)
+
+  return {
+    ...store,
+    rootTask,
+    history,
   }
 }

@@ -1,12 +1,13 @@
 import Api from '_/ovirtapi'
-import { persistStateToLocalStorage, saveToLocalStorage } from '_/storage'
 import AppConfiguration from '_/config'
+import { saveToLocalStorage } from '_/storage'
 
 import vmSnapshotsSagas from '_/components/VmDetails/cards/SnapshotsCard/sagas'
 import optionsDialogSagas from '_/components/OptionsDialog/sagas'
 import vmDisksSagas from './disks'
 import storageDomainSagas, { fetchIsoFiles } from './storageDomains'
 import loginSagas from './login'
+import { fetchUnknownIcons } from './osIcons'
 
 import {
   all,
@@ -23,7 +24,6 @@ import {
 import { push } from 'connected-react-router'
 import {
   setChanged,
-  updateIcons,
   setVmDisks,
   updateVms,
   removeVms,
@@ -31,7 +31,6 @@ import {
   setVmConsoles,
   removeMissingVms,
   setVmSessions,
-  persistState,
   setVmActionResult,
 
   getSingleVm,
@@ -119,7 +118,6 @@ import {
   GET_USER_GROUPS,
   GET_VMS_BY_COUNT,
   GET_VMS_BY_PAGE,
-  PERSIST_STATE,
   REFRESH_DATA,
   REMOVE_VM,
   RESTART_VM,
@@ -178,41 +176,6 @@ function* fetchByPage (action) {
   yield put(setChanged({ value: false }))
   yield fetchVmsByPage(action)
   yield fetchPoolsByPage(action)
-}
-
-function* persistStateSaga () {
-  yield persistStateToLocalStorage({
-    icons: yield select(state => state.icons.toJS()),
-  })
-}
-
-function* fetchUnknownIconsForVms ({ vms, os }) {
-  // unique iconIds from all VMs or OS (if available)
-  const iconsIds = new Set()
-  if (vms) {
-    vms.map(vm => vm.icons.large.id).forEach(id => iconsIds.add(id))
-  }
-
-  if (os) {
-    os.map(os => os.icons.large.id).forEach(id => iconsIds.add(id))
-  }
-
-  // reduce to just unknown
-  const allKnownIcons = yield select(state => state.icons)
-  const notLoadedIconIds = [...iconsIds].filter(id => !allKnownIcons.get(id))
-
-  yield * foreach(notLoadedIconIds, function* (iconId) {
-    yield fetchIcon({ iconId })
-  })
-}
-
-function* fetchIcon ({ iconId }) {
-  if (iconId) {
-    const icon = yield callExternalAction('icon', Api.icon, { type: 'GET_ICON', payload: { id: iconId } })
-    if (icon['media_type'] && icon['data']) {
-      yield put(updateIcons({ icons: [Api.iconToInternal({ icon })] }))
-    }
-  }
 }
 
 function* getIdsByType (type) {
@@ -354,7 +317,7 @@ function* fetchVmsByPageV42 (action) {
   if (allVms && allVms['vm']) { // array
     const internalVms = allVms.vm.map(vm => Api.vmToInternal({ vm, getSubResources: true }))
     yield put(updateVms({ vms: internalVms, copySubResources: false, page: page }))
-    yield fetchUnknownIconsForVms({ vms: internalVms })
+    yield fetchUnknownIcons({ vms: internalVms })
 
     // NOTE: No need to fetch the current=true cdrom info at this point. The cdrom info
     //       is needed on the VM details page and `fetchSingleVm` is called upon entry
@@ -362,8 +325,6 @@ function* fetchVmsByPageV42 (action) {
     //       appropriate cdrom info based on the VM's state. See `fetchSingleVm` for more
     //       details.
   }
-
-  yield put(persistState())
 }
 
 /**
@@ -378,7 +339,7 @@ function* fetchVmsByPageVLower (action) {
     const internalVms = allVms.vm.map(vm => Api.vmToInternal({ vm }))
 
     yield put(updateVms({ vms: internalVms, copySubResources: true, page: page }))
-    yield fetchUnknownIconsForVms({ vms: internalVms })
+    yield fetchUnknownIcons({ vms: internalVms })
 
     if (!shallowFetch) {
       yield fetchConsoleMetadatas({ vms: internalVms })
@@ -392,8 +353,6 @@ function* fetchVmsByPageVLower (action) {
       console.log('getVmsByPage() shallow fetch requested - skipping other resources')
     }
   }
-
-  yield put(persistState())
 }
 
 /**
@@ -420,13 +379,11 @@ function* fetchVmsByCountV42 (action) {
     internalVms.forEach(vm => fetchedVmIds.push(vm.id))
 
     yield put(updateVms({ vms: internalVms, copySubResources: true }))
-    yield fetchUnknownIconsForVms({ vms: internalVms })
+    yield fetchUnknownIcons({ vms: internalVms })
 
     // NOTE: No need to fetch the current=true cdrom info at this point. See `fetchVmsByPageV42`
     //       or `fetchSingleVm` for more details.
   }
-
-  yield put(persistState())
   return fetchedVmIds
 }
 
@@ -441,7 +398,7 @@ function* fetchVmsByCountVLower (action) {
     internalVms.forEach(vm => fetchedVmIds.push(vm.id))
 
     yield put(updateVms({ vms: internalVms, copySubResources: true }))
-    yield fetchUnknownIconsForVms({ vms: internalVms })
+    yield fetchUnknownIcons({ vms: internalVms })
 
     if (!shallowFetch) {
       yield fetchConsoleMetadatas({ vms: internalVms })
@@ -456,7 +413,6 @@ function* fetchVmsByCountVLower (action) {
     }
   }
 
-  yield put(persistState())
   return fetchedVmIds
 }
 
@@ -522,7 +478,7 @@ export function* fetchSingleVm (action) {
     }
 
     yield put(updateVms({ vms: [internalVm], copySubResources: shallowFetch }))
-    yield fetchUnknownIconsForVms({ vms: [internalVm] })
+    yield fetchUnknownIcons({ vms: [internalVm] })
   } else {
     if (vm && vm.error && vm.error.status === 404) {
       yield put(removeVms({ vmIds: [vmId] }))
@@ -545,7 +501,6 @@ function* fetchPoolsByCount (action) {
     yield put(updateVmsPoolsCount())
   }
 
-  yield put(persistState())
   return fetchedPoolIds
 }
 
@@ -558,8 +513,6 @@ function* fetchPoolsByPage (action) {
     yield put(updatePools({ pools: internalPools }))
     yield put(updateVmsPoolsCount())
   }
-
-  yield put(persistState())
 }
 
 function* fetchSinglePool (action) {
@@ -976,8 +929,7 @@ export function* fetchAllOS (action) {
   if (operatingSystems && operatingSystems['operating_system']) {
     const operatingSystemsInternal = operatingSystems.operating_system.map(os => Api.OSToInternal({ os }))
     yield put(setOperatingSystems(operatingSystemsInternal))
-    // load icons for OS
-    yield fetchUnknownIconsForVms({ os: operatingSystemsInternal })
+    yield fetchUnknownIcons({ os: operatingSystemsInternal })
   }
 }
 
@@ -1144,7 +1096,6 @@ export function* rootSaga () {
     throttle(100, GET_POOLS_BY_COUNT, fetchPoolsByCount),
     throttle(100, GET_POOLS_BY_PAGE, fetchPoolsByPage),
     takeLatest(CHANGE_PAGE, changePage),
-    takeLatest(PERSIST_STATE, persistStateSaga),
 
     takeEvery(SHUTDOWN_VM, shutdownVm),
     takeEvery(RESTART_VM, restartVm),

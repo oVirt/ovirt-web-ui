@@ -8,7 +8,6 @@ import {
   GET_USB_FILTER,
   GET_USER_GROUPS,
   GET_VM,
-  PERSIST_STATE,
   SET_ADMINISTRATOR,
   SET_CPU_TOPOLOGY_OPTIONS,
   SET_CURRENT_PAGE,
@@ -53,10 +52,6 @@ export function startSchedulerFixedDelay (delayInSeconds = AppConfiguration.sche
 
 export function stopSchedulerFixedDelay () {
   return { type: STOP_SCHEDULER_FIXED_DELAY }
-}
-
-export function persistState () {
-  return { type: PERSIST_STATE }
 }
 
 /**

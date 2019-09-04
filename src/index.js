@@ -9,6 +9,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { IntlProvider } from 'react-intl'
+import { type Task } from 'redux-saga'
 
 import '_/logger' // initialize our console logging overlay
 
@@ -22,16 +23,7 @@ import { getSelectedMessages, locale } from '_/intl'
 import configureStore from '_/store'
 import Selectors from '_/selectors'
 import AppConfiguration, { readConfiguration } from '_/config'
-import { loadStateFromLocalStorage } from '_/storage'
-import { valuesOfObject } from '_/helpers'
-import { rootSaga } from '_/sagas'
-import {
-  login,
-  updateIcons,
-  addActiveRequest,
-  delayedRemoveActiveRequest,
-} from '_/actions'
-import OvirtApi from '_/ovirtapi'
+import { login } from '_/actions'
 
 import App from './App'
 import GlobalErrorBoundary from './GlobalErrorBoundary'
@@ -87,17 +79,6 @@ function fetchToken (): { token: string, username: string, domain: string, userI
   }
 }
 
-function loadPersistedState (store: Object) {
-  // load persisted icons, etc ...
-  const { icons } = loadStateFromLocalStorage()
-
-  if (icons) {
-    const iconsArray = valuesOfObject(icons)
-    console.log(`loadPersistedState: ${iconsArray.length} icons loaded`)
-    store.dispatch(updateIcons({ icons: iconsArray }))
-  }
-}
-
 function addBrandedResources () {
   addLinkElement('shortcut icon', branding.resourcesUrls.favicon)
   addLinkElement('stylesheet', branding.resourcesUrls.brandStylesheet)
@@ -111,20 +92,9 @@ function addLinkElement (rel: string, href: string) {
   window.document.head.appendChild(linkElement)
 }
 
-function initializeApiListener (store: Object) {
-  OvirtApi.addHttpListener((requestId, eventType) => {
-    if (eventType === 'START') {
-      store.dispatch(addActiveRequest(requestId))
-      return
-    }
-    if (eventType === 'STOP') {
-      store.dispatch(delayedRemoveActiveRequest(requestId))
-    }
-  })
-}
-
-function SagaErrorBridge () {
+function SagaErrorBridge (storeRootTask: Task) {
   let handler = null
+
   this.setErrorHandler = (errorHandler) => {
     handler = errorHandler
   }
@@ -134,6 +104,8 @@ function SagaErrorBridge () {
       handler(err)
     }
   }
+
+  storeRootTask.done.catch(err => this.throw(err))
 }
 
 function onResourcesLoaded () {
@@ -142,16 +114,12 @@ function onResourcesLoaded () {
   addBrandedResources()
 
   const store = configureStore()
-  const rootTask = store.runSaga(rootSaga)
-  const sagaErrorBridge = new SagaErrorBridge()
-  rootTask.done.catch(err => sagaErrorBridge.throw(err))
   Selectors.init({ store })
-  initializeApiListener(store)
-  loadPersistedState(store)
 
   // do initial render
-  renderApp(store, sagaErrorBridge)
+  renderApp(store, new SagaErrorBridge(store.rootTask))
 
+  // and start the login/init-data-load action
   const { token, username, domain, userId }: { token: string, username: string, domain: string, userId: string } = fetchToken()
   if (token) {
     store.dispatch(login({ username, token, userId, domain }))
