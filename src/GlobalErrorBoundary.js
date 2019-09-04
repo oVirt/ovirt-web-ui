@@ -1,9 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import * as branding from './branding'
 import { msg } from '_/intl'
 import AppConfiguration from './config'
 import ErrorContent from '_/components/ErrorContent'
+import { resourcesUrls } from '_/branding'
 
 class GlobalErrorBoundary extends React.Component {
   constructor (props) {
@@ -30,7 +30,7 @@ class GlobalErrorBoundary extends React.Component {
           <nav className='navbar obrand_mastheadBackground obrand_topBorder navbar-pf-vertical'>
             <div className='navbar-header'>
               <a href='/' className='navbar-brand obrand_headerLogoLink' id='pageheader-logo'>
-                <img className='obrand_mastheadLogo' src={branding.resourcesUrls.clearGif} />
+                <img className='obrand_mastheadLogo' src={resourcesUrls.clearGif} />
               </a>
             </div>
           </nav>

@@ -18,7 +18,7 @@ BuildArch: noarch
 
 # Keep ovirt-engine-{nodejs|nodejs-modules} at particular version unless tested on higher
 BuildRequires: ovirt-engine-nodejs = 8.11.4
-BuildRequires: ovirt-engine-nodejs-modules >= 2.0.2
+BuildRequires: ovirt-engine-nodejs-modules >= 2.0.8
 
 %description
 This package provides the VM Portal for %{product}.

@@ -102,7 +102,7 @@ function setupCompiler(port, protocol) {
       return;
     }
     if (hasWarnings) {
-      console.log(chalk`{yellow Compiled with warnings.`);
+      console.log(chalk`{yellow Compiled with warnings.}`);  // Got error because of missed brace
       console.log();
       formattedWarnings.forEach(message => {
         console.log(message);
