@@ -43,7 +43,7 @@ class NewNicModal extends Component {
   render () {
     let { vnicProfiles } = this.props
 
-    let preparedVnicProfiles = [ { id: EMPTY_ID, value: msg.vnicProfileEmpty() }, ...vnicProfiles.toList().map(item => (
+    let preparedVnicProfiles = [ { id: EMPTY_ID, value: msg.selectVnicProfile() }, ...vnicProfiles.toList().map(item => (
       {
         id: item.get('id'),
         value: `${item.getIn(['network', 'name'])}/${item.get('name')}`,
