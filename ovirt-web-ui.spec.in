@@ -16,32 +16,25 @@ Source0:        https://github.com/oVirt/ovirt-web-ui/archive/%{source_basename}
 
 BuildArch: noarch
 
-# Keep ovirt-engine-{nodejs|nodejs-modules|yarn} at particular version unless tested on higher
+# Keep ovirt-engine-{nodejs|nodejs-modules} at particular version unless tested on higher
 BuildRequires: ovirt-engine-nodejs = 8.11.4
-BuildRequires: ovirt-engine-yarn = 1.7.0
-
-BuildRequires: ovirt-engine-nodejs-modules >= 2.0.1
+BuildRequires: ovirt-engine-nodejs-modules >= 2.0.2
 
 %description
 This package provides the VM Portal for %{product}.
 
 %prep
-# Use the ovirt-engine nodejs installation
-# export PATH="%{_datadir}/ovirt-engine-nodejs/bin:${PATH}"
-
 %setup -q -n"%{source_basename}-%{version}"
 rpm -qa | grep ovirt-engine-nodejs
 
 echo "=== Workaround: 'yarn check' is recently failing on requiring webpack >= v2. Manually"
 echo "=== verified that this is ok for recent code base but may be a real failure in the"
 echo "=== future. Please watch carefully for other potential types of errors."
-export IGNORE_YARN_CHECK=1
-source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh
+IGNORE_YARN_CHECK=1 source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh
 
 %build
-export PATH="%{_datadir}/ovirt-engine-nodejs/bin:%{_datadir}/ovirt-engine-yarn/bin:${PATH}"
+export PATH="%{_datadir}/ovirt-engine-nodejs/bin:%{_datadir}/ovirt-engine-nodejs-modules/bin:${PATH}"
 %configure
-export PATH="./node_modules/.bin:${PATH}"
 make
 
 %install

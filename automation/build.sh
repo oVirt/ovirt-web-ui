@@ -16,31 +16,26 @@ rm -f ./*tar.gz
 
 # Resolve the release version (is this a snapshot build?)
 version_release="$(grep -m1 VERSION_RELEASE configure.ac | cut -d ' ' -f2 | sed 's/[][)]//g')"
-if [[ "${version_release}" == "0" ]]; then
-    date="$(date --utc +%Y%m%d)"
-    commit="$(git log --no-merges -1 --pretty=format:%h)"
-    version_release="0.${date}git${commit}"
-    # update configure.ac with this
-    sed -i -r "s/define\(\[VERSION_RELEASE\], \[0\]\)/define([VERSION_RELEASE], [${version_release}])/" configure.ac
-fi
-
-# The "build.packages.force" file contains BuildRequires packages
-# to be installed using their latest version.
-# When reading the file, make sure to remove blank lines as well
-# as lines starting with the "#" character:
-build_requires="$(sed -e '/^[ \t]*$/d' -e '/^#/d' -e 's/^/BuildRequires: /' < \
-    automation/build.packages.force | \
-    sed ':a;N;$!ba;s/\n/\\n/g')"
 
 # Force CI to get the latest version of these packages:
 dependencies="$(sed -e '/^[ \t]*$/d' -e '/^#/d' automation/build.packages.force)"
 ${PACKAGER} clean metadata
 ${PACKAGER} -y install ${dependencies}
 
-export PATH="/usr/share/ovirt-engine-nodejs/bin:/usr/share/ovirt-engine-yarn/bin:${PATH}"
+export PATH="/usr/share/ovirt-engine-nodejs/bin:/usr/share/ovirt-engine-nodejs-modules/bin:${PATH}"
+
+# if yarn is not available, patch in the yarn-*.js from nodejs-modules
+# (really only necessary until nodejs-modules makes a yarn executable available)
+if [[ "$(type -t yarn)" == "" ]]; then
+  export YARN="node $(find /usr/share/ovirt-engine-nodejs-modules -maxdepth 1 -name 'yarn-*.js')"
+fi
 
 ./autogen.sh --prefix=/usr --datarootdir=/share
-make rpm
+if [[ "${version_release}" == "0" ]]; then
+  make snapshot-rpm
+else
+  make rpm
+fi
 
 # Store any relevant artifacts in exported-artifacts for the ci system to
 # archive

@@ -33,11 +33,9 @@ AM_INIT_AUTOMAKE([-Wall -Werror foreign -Wno-portability tar-pax])
 AC_ARG_VAR([RPMBUILD], [path to rpmbuild utility])
 AC_CHECK_PROGS([RPMBUILD], [rpmbuild])
 
-echo ${PATH}
 AC_ARG_VAR([YARN], [path to yarn utility])
 AC_CHECK_PROGS([YARN], [yarn])
-
-test -z "${YARN}" && AC_MSG_ERROR([YARN program not found (install ovirt-engine-yarn, ovirt-engine-nodejs-modules, ovirt-engine-nodejs])
+test -z "${YARN}" && AC_MSG_ERROR([YARN program not found (install ovirt-engine-nodejs, ovirt-engine-nodejs-modules])
 
 AC_CONFIG_FILES([
 	Makefile

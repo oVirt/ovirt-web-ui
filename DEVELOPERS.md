@@ -24,13 +24,13 @@ Please report bugs and feature requests to the [GitHub issue tracker](https://gi
 
 
 #### ovirt-engine packages
-Install `ovirt-engine-nodejs`, `ovirt-engine-nodejs-modules` and `ovirt-engine-yarn`
-from the `ovirt/tested` yum repo for your platform to use the same packages that will
-be used by CI to build the app.  (See [BZ 1427045](https://bugzilla.redhat.com/show_bug.cgi?id=1427045))
+Install `ovirt-engine-nodejs`, `ovirt-engine-nodejs-modules` from the `ovirt/tested`
+yum repo for your platform to use the same packages that will be used by CI to build
+the app.  (See [BZ 1427045](https://bugzilla.redhat.com/show_bug.cgi?id=1427045))
 
     REPO=fc28 # or the appropriate release and version for you
     dnf config-manager --add-repo http://resources.ovirt.org/repos/ovirt/tested/master/rpm/$REPO
-    dnf install ovirt-engine-nodejs ovirt-engine-nodejs-modules ovirt-engine-yarn
+    dnf install ovirt-engine-nodejs ovirt-engine-nodejs-modules
 
 To set PATH and the project's `node_modules` directory based on yarn offline cache
 and use these packages for development or building use:
