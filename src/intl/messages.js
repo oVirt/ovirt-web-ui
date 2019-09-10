@@ -514,7 +514,7 @@ export const messages: { [messageId: string]: MessageType } = {
   utilizationCardAllocated: 'Allocated',
   utilizationCardAvailable: 'Available',
   utilizationCardDiskUsed: {
-    message: '<strong>{used} of {total} {storageUnits}</strong> Used',
+    message: '{used} of {total} {storageUnits} Used',
     description: 'Used amount of a single file system on a VM (HTML may be embedded to emphasize the amounts',
   },
   utilizationCardOf: {

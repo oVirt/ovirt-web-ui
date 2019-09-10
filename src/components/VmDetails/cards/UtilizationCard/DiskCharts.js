@@ -3,8 +3,6 @@ import PropTypes from 'prop-types'
 import {
   CardBody,
   CardTitle,
-  DonutChart,
-  UtilizationBar,
   UtilizationCard,
   UtilizationCardDetails,
   UtilizationCardDetailsCount,
@@ -12,6 +10,8 @@ import {
   UtilizationCardDetailsLine1,
   UtilizationCardDetailsLine2,
 } from 'patternfly-react'
+import BarChart from './UtilizationCharts/BarChart'
+import DonutChart from './UtilizationCharts/DonutChart'
 
 import { msg } from '_/intl'
 import { round, floor, convertValueMap } from '_/utils'
@@ -19,52 +19,12 @@ import { userFormatOfBytes, isWindows } from '_/helpers'
 
 import style from './style.css'
 
-import { donutMemoryTooltipContents } from './tooltip-helper'
 import NoHistoricData from './NoHistoricData'
 import NoLiveData from './NoLiveData'
 
 const EmptyBlock = () => (
   <div className={style['no-history-chart']} />
 )
-
-const DiskBar = ({ path, total, used, isVmWindows }) => {
-  const { unit, value } =
-    convertValueMap(
-      'B',
-      {
-        total: total,
-        used: used,
-      })
-  const thresholdError = 90
-  const thresholdWarning = 70
-  const usedInPercent = round(used / total * 100, 0)
-  return <div className={style['disk-fs-box']}>
-    <div className={style['disk-fs-name']}>{ isVmWindows ? path.toUpperCase() : path }</div>
-    <div className={style['disk-fs-bar']}>
-      <UtilizationBar
-        now={usedInPercent}
-        thresholdWarning={thresholdWarning}
-        thresholdError={thresholdError}
-      />
-      <div
-        className={style['disk-fs-used']}
-        dangerouslySetInnerHTML={{
-          __html: msg.utilizationCardDiskUsed({
-            used: round(value.used, 0),
-            total: round(value.total, 0),
-            storageUnits: unit,
-          }),
-        }}
-      />
-    </div>
-  </div>
-}
-DiskBar.propTypes = {
-  path: PropTypes.string.isRequired,
-  total: PropTypes.number.isRequired,
-  used: PropTypes.number.isRequired,
-  isVmWindows: PropTypes.bool,
-}
 
 /*
  * Disks, but intended to be in terms of guest agent reported data (file system viewpoint),
@@ -129,34 +89,48 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
             { !hasDiskDetails &&
               <DonutChart
                 id={`${id}-donut-chart`}
-                data={{
-                  columns: [
-                    [msg.utilizationCardAllocated(), actualSize],
-                    [msg.utilizationCardUnallocated(), provisionedSize - actualSize],
-                  ],
-                  order: null,
-                }}
-                title={{
-                  primary: `${round(usedFormated.number, 0)}`,
-                  secondary: msg.utilizationCardUnitAllocated({ storageUnit: usedFormated.suffix }),
-                }}
-                tooltip={{
-                  show: true,
-                  contents: donutMemoryTooltipContents,
-                }}
+                data={[
+                  {
+                    x: msg.utilizationCardAllocated(),
+                    y: actualSize,
+                    label: `${msg.utilizationCardLegendUsed()} - ${usedFormated.rounded} ${usedFormated.suffix}`,
+                  },
+                  {
+                    x: msg.utilizationCardUnallocated(),
+                    y: provisionedSize - actualSize,
+                    label: `${msg.utilizationCardLegendAvailable()} - ${availableFormated.rounded} ${availableFormated.suffix}`,
+                  },
+                ]}
+                subTitle={msg.utilizationCardUnitAllocated({ storageUnit: usedFormated.suffix })}
+                title={`${round(usedFormated.number, 0)}`}
               />
             }
             { isRunning && hasDiskDetails &&
               <div className={style['disk-fs-list']}>
-                {
-                  diskDetails.map((disk) =>
-                    <DiskBar key={disk.path} path={disk.path} total={disk.total} used={disk.used} isVmWindows={isVmWindows} />
-                  )
-                }
+                <BarChart
+                  id={`${id}-bar-chart`}
+                  data={
+                    diskDetails.map((disk) => {
+                      const usedInPercent = round(disk.used / disk.total * 100, 0)
+                      return { x: isVmWindows ? disk.path.toUpperCase() : disk.path, y: usedInPercent, total: disk.total, used: disk.used }
+                    })
+                  }
+                  additionalLabel={({ total, used }) => {
+                    const { unit, value } = convertValueMap('B', { total, used })
+                    return msg.utilizationCardDiskUsed({
+                      used: round(value.used, 0),
+                      total: round(value.total, 0),
+                      storageUnits: unit,
+                    })
+                  }}
+                  labels={datum => datum ? `${msg.utilizationCardLegendUsed()} ${datum.y}%` : null}
+                  thresholdWarning={70}
+                  thresholdError={90}
+                />
               </div>
             }
             { isRunning && !hasDiskDetails &&
-              <NoHistoricData message={msg.utilizationCardNoGuestAgent()} />
+              <NoHistoricData id={`${id}-no-historic-data`} message={msg.utilizationCardNoGuestAgent()} />
             }
             {/*
               Disks don't have historic data but stub the space so the card stretches like the others,

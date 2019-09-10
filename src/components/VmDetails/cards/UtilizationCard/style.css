@@ -109,6 +109,17 @@
   justify-content: space-around;
 }
 
+.col-charts-box {
+  min-width: 200px;
+}
+
+.donut-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 @media (min-width: 1250px) {
   .row-charts-box {
     flex-wrap: nowrap;
@@ -147,4 +158,8 @@
       max-width: 100%;
       min-height: 50%;
   }
+}
+
+.area-box :global(svg:not(:root)) {
+  overflow: visible;
 }
