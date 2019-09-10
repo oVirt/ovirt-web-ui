@@ -69,7 +69,7 @@ rpm:	srpm
 	@echo
 
 snapshot-rpm:
-	make rpm RELEASE_SUFFIX=".$$(date --utc +%Y%m%d).git$$(git rev-parse --short HEAD)"
+	make rpm RELEASE_SUFFIX=".$$(date --utc +%Y%m%d).git$$(git log --no-merges -1 --pretty=format:%h)"
 
 publish:
 	mkdir -p $(OVIRT_CACHE_DIR)
@@ -84,6 +84,8 @@ distclean-local:
 all: ovirt-web-ui
 
 ovirt-web-ui:
+	node --version
+	$(YARN) --version
 	$(YARN) run build
 	cp -rpv packaging/* build/
 	mv build/static build/index.jsp build/ovirt-web-ui.config build/ovirt-web-ui.war/
