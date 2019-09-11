@@ -93,10 +93,6 @@ class VncConsole extends React.Component {
     this.props.onDisconnected(e)
   }
 
-  onFullScreen = () => {
-    this.props.onFullScreen()
-  }
-
   onSecurityFailure = e => {
     this.setState({ status: DISCONNECTED })
     this.props.onSecurityFailure(e)
@@ -126,9 +122,9 @@ class VncConsole extends React.Component {
       textSendShortcut,
       textCtrlAltDel,
       textDisconnect,
-      textFullScreen,
       toolbarContainer,
       containerId,
+      additionalButtons,
     } = this.props
 
     let status = null
@@ -142,9 +138,8 @@ class VncConsole extends React.Component {
             textSendShortcut={textSendShortcut}
             textCtrlAltDel={textCtrlAltDel}
             textDisconnect={textDisconnect}
-            textFullScreen={textFullScreen}
             onDisconnect={this.disconnect}
-            onFullScreen={this.onFullScreen}
+            additionalButtons={additionalButtons}
           />
         )
         break
@@ -205,6 +200,7 @@ VncConsole.propTypes = {
   vncLogging: PropTypes.string /** log-level for noVNC */,
   toolbarContainer: PropTypes.string,
   containerId: PropTypes.string,
+  additionalButtons: PropTypes.arrayOf(PropTypes.node),
 
   topClassName: PropTypes.string /** Enable customization */,
 
@@ -212,14 +208,12 @@ VncConsole.propTypes = {
   onDisconnected: PropTypes.func /** Callback. VNC server disconnected. */,
   onInitFailed: PropTypes.func /** Initialization of RFB failed */,
   onSecurityFailure: PropTypes.func /** Handshake failed */,
-  onFullScreen: PropTypes.func,
 
   textConnecting: PropTypes.oneOfType([PropTypes.string, PropTypes.node]) /** For localization */,
   textDisconnected: PropTypes.string,
   textDisconnect: PropTypes.string,
   textSendShortcut: PropTypes.string,
   textCtrlAltDel: PropTypes.string,
-  textFullScreen: PropTypes.string,
 }
 
 VncConsole.defaultProps = {
@@ -235,20 +229,19 @@ VncConsole.defaultProps = {
   repeaterID: '',
   vncLogging: 'warn',
   toolbarContainer: '',
+  additionalButtons: [],
 
   topClassName: '',
 
   onDisconnected: noop,
   onInitFailed: noop,
   onSecurityFailure: noop,
-  onFullScreen: noop,
 
   textConnecting: 'Connecting',
   textDisconnected: 'Disconnected',
   textDisconnect: 'Disconnect',
   textSendShortcut: undefined /** Default value defined in VncActions */,
   textCtrlAltDel: undefined, /** Default value defined in VncActions */
-  textFullScreen: undefined, /** Default value defined in VncActions */
 }
 
 export default VncConsole

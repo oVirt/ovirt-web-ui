@@ -8,23 +8,17 @@ const VncActions = ({
   textCtrlAltDel,
   toolbarContainer,
   textDisconnect,
-  textFullScreen,
+  additionalButtons,
   onCtrlAltDel,
   onDisconnect,
-  onFullScreen,
 }) => {
   const toolbar = <div>
+    {additionalButtons}
     <DropdownButton bsStyle='default' title={textSendShortcut} id='console-send-shortcut' onClick={noop}>
       <MenuItem eventKey='1' onClick={onCtrlAltDel}>
         {textCtrlAltDel}
       </MenuItem>
     </DropdownButton>
-    <Button
-      bsStyle='default'
-      onClick={onFullScreen}
-    >
-      {textFullScreen}
-    </Button>
     <Button
       bsStyle='default'
       onClick={onDisconnect}
@@ -53,6 +47,8 @@ VncActions.propTypes = {
   textDisconnect: PropTypes.string,
   toolbarContainer: PropTypes.string,
   textFullScreen: PropTypes.string,
+
+  additionalButtons: PropTypes.arrayOf(PropTypes.node),
 }
 
 VncActions.defaultProps = {
@@ -65,6 +61,8 @@ VncActions.defaultProps = {
   textDisconnect: 'Disconnect',
   textFullScreen: 'Full Screen',
   toolbarContainer: '',
+
+  additionalButtons: [],
 }
 
 export default VncActions

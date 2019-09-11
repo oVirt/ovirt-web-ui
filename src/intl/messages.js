@@ -478,6 +478,7 @@ export const messages: { [messageId: string]: MessageType } = {
   pleaseEnterValidDiskName: 'Please enter a valid disk name. Only lower-case and upper-case letters, numbers, and \'_\',\'-\',\'.\' are allowed.',
   pleaseEnterValidVmName: 'Please enter a valid virtual machine name. Only lower-case and upper-case letters, numbers, and \'_\',\'-\',\'.\' are allowed.',
   preserveDisks: 'Preserve disks',
+  pressF11ExitFullScreen: 'Press F11 to exit full screen mode',
   provisionSource: {
     message: 'Provision Source',
     description: 'label on Create New VM',

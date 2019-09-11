@@ -47,13 +47,6 @@
     margin-top: 0;
 }
 
-.toast-console-message {
-  text-align: center;
-  align-content: center;
-  margin-top: 60px;
-  margin-left: 43%;
-  position: absolute;
-}
 /* For VM Card List and VM Details Overview Card */
 .operating-system-label {
   font-size: 10px;
@@ -98,4 +91,8 @@
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+.text-align-left {
+  text-align: left;
 }

@@ -11,7 +11,7 @@ import ConsoleConfirmationModal from '../VmActions/ConsoleConfirmationModal'
 import { INIT_CONSOLE, DOWNLOAD_CONSOLE, DISCONNECTED_CONSOLE } from '_/constants'
 import { Button } from 'patternfly-react'
 import { msg } from '_/intl'
-import InfoAlert from '_/components/InfoAlert'
+import CounterAlert from '_/components/CounterAlert'
 
 import Loader, { SIZES } from '../Loader'
 
@@ -54,6 +54,8 @@ class VmConsole extends React.Component {
       isFirstRun: props.consoles.getIn(['vms', props.vmId]) === undefined,
       isFullScreen: false,
     }
+    this.handleFullscreenChange = this.handleFullscreenChange.bind(this)
+    this.onFullScreen = this.onFullScreen.bind(this)
   }
 
   componentDidMount () {
@@ -69,10 +71,37 @@ class VmConsole extends React.Component {
     if (!isRunning(this.props.vms.getIn(['vms', this.props.vmId, 'status']))) {
       this.props.onShutdown()
     }
+    if (this.state.isFullScreen) {
+      this.onFullScreen()
+    }
+  }
+
+  onFullScreen () {
+    var elem = document.getElementById('console-component')
+    elem.onfullscreenchange = this.handleFullscreenChange
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen()
+    } else if (elem.mozRequestFullScreen) { /* Firefox */
+      elem.mozRequestFullScreen()
+    } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+      elem.webkitRequestFullscreen()
+    } else if (elem.msRequestFullscreen) { /* IE/Edge */
+      elem.msRequestFullscreen()
+    }
+  }
+
+  handleFullscreenChange (event) {
+    let elem = event.target
+    let isFullscreen = document.fullscreenElement === elem
+
+    if (!isFullscreen) {
+      this.setState({ isFullScreen: false })
+    }
   }
 
   render () {
     const { vmId, config, consoleId, vms, onDisconnected } = this.props
+    const { isFullScreen } = this.state
     const websocket = config.get('websocket')
     const vmConsole = this.props.consoles.getIn(['vms', vmId])
     if (consoleId === RDP_ID) {
@@ -97,27 +126,16 @@ class VmConsole extends React.Component {
       </div>
     }
 
-    function onFullScreen () {
-      var elem = document.getElementById('console-component')
-      if (elem.requestFullscreen) {
-        elem.requestFullscreen()
-      } else if (elem.mozRequestFullScreen) { /* Firefox */
-        elem.mozRequestFullScreen()
-      } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
-        elem.webkitRequestFullscreen()
-      } else if (elem.msRequestFullscreen) { /* IE/Edge */
-        elem.msRequestFullscreen()
-      }
-    }
-
     const proxyTicket = vmConsole && vmConsole.get('proxyTicket')
     const ticket = vmConsole && vmConsole.get('ticket')
     switch (vmConsole && vmConsole.get('consoleStatus')) {
       case INIT_CONSOLE:
         if (ticket !== undefined && websocket !== null) {
-          return <div id='console-component'>
-            {this.state.isFullScreen &&
-              <InfoAlert />
+          return <div id='console-component' className={isFullScreen ? style['full-screen'] : null}>
+            {isFullScreen &&
+              <div className={style['toast-message']}>
+                <CounterAlert timeout={5} type='info' title={msg.pressF11ExitFullScreen()} />
+              </div>
             }
             <VncConsole
               encrypt
@@ -138,8 +156,16 @@ class VmConsole extends React.Component {
               }
               onConnected={() => $(`#${NOVNC_CONTAINER_ID} canvas`).focus()}
               onFullScreen={() => this.setState({ isFullScreen: true })}
+              additionalButtons={[
+                <Button
+                  key='full-screen'
+                  bsStyle='default'
+                  onClick={() => this.setState({ isFullScreen: true })}
+                >
+                  {msg.fullScreen()}
+                </Button>,
+              ]}
             />
-            {this.state.isFullScreen && onFullScreen()}
           </div>
         }
 
