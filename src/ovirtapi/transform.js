@@ -150,6 +150,10 @@ const VM = {
       },
       bootMenuEnabled: vm.bios && vm.bios.boot_menu && convertBool(vm.bios.boot_menu.enabled),
       cloudInit: CloudInit.toInternal({ vm }),
+      timeZone: vm.time_zone && {
+        name: vm.time_zone.name,
+        offset: vm.time_zone.utc_offset,
+      },
     }
 
     if (includeSubResources) {
@@ -242,6 +246,11 @@ const VM = {
             device: vm.os.bootDevices.filter((item) => item !== null),
           },
         },
+      },
+
+      time_zone: vm.timeZone && {
+        name: vm.timeZone.name,
+        utc_offset: vm.timeZone.offset,
       },
 
       bios: vm.hasOwnProperty('bootMenuEnabled')
@@ -365,6 +374,10 @@ const Template = {
       },
       cloudInit: CloudInit.toInternal({ vm: template }),
       bootMenuEnabled: template.bios && template.bios.boot_menu && convertBool(template.bios.boot_menu.enabled),
+      timeZone: template.time_zone && {
+        name: template.time_zone.name,
+        offset: template.time_zone.utc_offset,
+      },
       permits,
     }
   },

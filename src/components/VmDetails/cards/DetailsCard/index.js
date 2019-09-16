@@ -48,6 +48,8 @@ import NextRunChangeConfirmationModal from './NextRunChangeConfirmationModal'
 import FieldRow from './FieldRow'
 import OverlayTooltip from '_/components/OverlayTooltip'
 
+import timezones from '_/components/utils/timezones.json'
+
 function rephraseVmType (vmType) {
   const types = {
     'desktop': msg.vmType_desktop(),
@@ -327,6 +329,17 @@ class DetailsCard extends React.Component {
           const operatingSystems = this.props.operatingSystems
           const os = operatingSystems.find(os => os.get('id') === value)
           updates = this.updateOs(updates, os)
+
+          const timeZoneName = updates.getIn(['timeZone', 'name'])
+          const isWindowsTimeZone = timezones.find(timezone => timezone.id === timeZoneName)
+          const isWindowsVm = isWindows(os.get('name'))
+
+          if (isWindowsVm && !isWindowsTimeZone) {
+            changeQueue.push({ fieldName: 'timeZone', value: 'GMT Standard Time' })
+          }
+          if (!isWindowsVm && isWindowsTimeZone) {
+            changeQueue.push({ fieldName: 'timeZone', value: 'Etc/GMT' })
+          }
           break
 
         case 'bootDevices':
@@ -401,6 +414,14 @@ class DetailsCard extends React.Component {
             this.hotPlugUpdates['memory'] = true
           }
           break
+        case 'timeZone':
+          updates = updates.mergeDeep({
+            timeZone: {
+              name: value,
+            },
+          })
+          fieldUpdated = 'timeZone'
+          break
       }
 
       if (updates !== this.state.vm) {
@@ -470,6 +491,10 @@ class DetailsCard extends React.Component {
 
     if (this.trackUpdates['cloudInit']) {
       vmUpdates['cloudInit'] = stateVm.get('cloudInit').toJS()
+    }
+
+    if (this.trackUpdates['timeZone']) {
+      vmUpdates['timeZone'] = stateVm.get('timeZone').toJS()
     }
 
     if (this.trackUpdates['bootDevices']) {
