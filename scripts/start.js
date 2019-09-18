@@ -63,6 +63,9 @@ function setupCompiler(port, protocol) {
       console.log(chalk`oVirt user: {yellow ${userInfo.userName}}, oVirt userId: {yellow ${userInfo.userId}}`);
       console.log(chalk`oVirt SSO token: {yellow ${userInfo.ssoToken}}`)
       console.log();
+      if (process.env.BRANDING) {
+        console.log(chalk`Branding from: {yellow ${paths.appBranding}}`)
+      }
       console.log('The app is running at:');
       console.log();
       console.log(chalk`  {cyan ${protocol}://localhost:${port}/}`);

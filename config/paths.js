@@ -24,8 +24,15 @@ var nodePaths = (process.env.NODE_PATH || '')
   .filter(Boolean)
   .map(resolveApp)
 
+// Allow setting the branding to use by `BRANDING` var
+var brandingPath = undefined
+if (process.env.BRANDING && fs.existsSync(process.env.BRANDING)) {
+  brandingPath = process.env.BRANDING
+}
+
 // config after eject: we're in ./config/
 module.exports = {
+  appBranding: brandingPath || resolveApp('branding'),
   appBuild: resolveApp('build'),
   appHtml: resolveApp('static/index.hbs'),
   appIndexJs: resolveApp('src/index.js'),

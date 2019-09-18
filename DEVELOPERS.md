@@ -58,17 +58,30 @@ to accomplish this. To start the server:
 When asked, provide a valid user name (in the form of `user@domain`) and password so
 the application can start in the context of a logged in user.
 
+#### Auto-Open browser
 When the dev server is started, it will attempt to open a new browser window/tab on
 your system default browser to the app's running URL.  This behavior can be modified
 by specifying the `BROWSER` environment variable.  Possible values are:
+
     BROWSER=none               # disable the feature
     BROWSER=google-chrome      # open a new tab in chrome on Linux
     BROWSER='google chrome'    # open a new tab in chrome on MacOS
     BROWSER=chrome             # open a new tab in chrome on Windows
     BROWSER=firefox            # open a new tab in firefox on Linux
 
+#### Alternative Branding
+To test an alternative branding, the dev server may be started with the `BRANDING`
+environment variable.  This variable allows specifying a location where alternative
+branding file are located.  For example, if there is an alternative branding located
+at `$HOME/new-branding`, start the dev server like this:
 
-### Build
+    ENGINE_URL=https://my.ovirt.instance/ovirt-engine \
+    BRANDING=$HOME/new-branding \
+    yarn start
+
+## Production Builds
+
+### Build static assets
 You can build the static assets from source by:
 
     # skip if you don't want to use offline mode
@@ -99,11 +112,13 @@ There are at least 4 ways to build the RPM for the project:
   2. Use [mock_runner](https://ovirt-infra-docs.readthedocs.io/en/latest/CI/Using_mock_runner/index.html)
      to run CI build artifacts locally (this method is cleanest since it runs in a chroot)
 
-  3. Each pull request push will automatically have RPMs built (see `automation/build.sh`)
+  3. Each pull request push will automatically have RPMs built (the check-patch,
+     check-merged, and build-artifact stages all use the same script: `automation/build.sh`)
      by [oVirt infra STDCI](https://ovirt-infra-docs.readthedocs.io/en/latest/CI/Build_and_test_standards/index.html)
 
-  4. Post the comment "`ci please build`" to the GitHub Pull Request for an on-demand
-     CI build artifacts build
+  4. Post the comment "`ci build please`" to the GitHub Pull Request for an on-demand
+     CI build artifacts build. Reference
+     [manual functionality of the oVirt CI system](https://ovirt-infra-docs.readthedocs.io/en/latest/CI/Using_STDCI_with_GitHub/index.html#manual-functionality-of-the-ovirt-ci-system)
 
 
 ### RPM Installation

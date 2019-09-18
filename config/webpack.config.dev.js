@@ -204,7 +204,7 @@ module.exports = {
         from: 'src/ovirt-web-ui.config',
       },
       {
-        from: 'branding',
+        from: paths.appBranding,
         to: 'branding',
         toType: 'dir'
       }
