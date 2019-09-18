@@ -113,13 +113,13 @@
     "lodash": "4.17.14",
     "js-yaml": "3.13.1"
   },
-  "autogenTest": "Makefile",
-  "autogenCmd": "./autogen.sh --prefix=/usr --datarootdir=/share",
   "scripts": {
-    "start": "(test -e $npm_package_autogenTest || $npm_package_autogenCmd) && node scripts/start.js",
+    "preinstall": "./autogen.sh --prefix=/usr --datarootdir=/share",
+    "clean": "make distclean",
+    "start": "node scripts/start.js",
     "prebuild": "yarn run test",
     "build": "node scripts/build.js",
-    "pretest": "(test -e $npm_package_autogenTest || $npm_package_autogenCmd) && node scripts/pretest.js",
+    "pretest": "node scripts/pretest.js",
     "test": "jest --no-watchman",
     "test:watch": "yarn run pretest && jest --watch --no-watchman",
     "eslint": "eslint -c config/eslint.js src",

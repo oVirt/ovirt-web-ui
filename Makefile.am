@@ -41,13 +41,21 @@ DISTCLEANFILES = $(PACKAGE)-$(VERSION).tar.gz \
 	configure \
 	install-sh \
 	missing \
-	Makefile.in
+	Makefile.in \
+	.bash_history \
+	mocker-*.cfg
 
 DISTCLEANDIRS = autom4te.cache \
 	engine-plugin \
 	tmp.repos \
 	build \
-	dockerbuild
+	extra \
+	.zanata-cache \
+	dockerbuild \
+	.node-gyp \
+	exported-artifacts \
+	rpmbuild \
+	node_modules
 
 TMPREPOS = tmp.repos
 RPMBUILD_ARGS :=
