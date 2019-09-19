@@ -110,11 +110,11 @@
   },
   "resolutions": {
     "redux": "4.0.0",
-    "lodash": "4.17.14",
+    "lodash": "^4.17.14",
     "js-yaml": "3.13.1"
   },
   "scripts": {
-    "preinstall": "test -e ./autogen.sh && ./autogen.sh --prefix=/usr --datarootdir=/share",
+    "preinstall": "test -e ./autogen.sh && ./autogen.sh --prefix=/usr --datarootdir=/share || :",
     "clean": "make distclean",
     "start": "node scripts/start.js",
     "prebuild": "yarn run test",
