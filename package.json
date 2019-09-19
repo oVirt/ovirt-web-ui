@@ -114,7 +114,7 @@
     "js-yaml": "3.13.1"
   },
   "scripts": {
-    "preinstall": "./autogen.sh --prefix=/usr --datarootdir=/share",
+    "preinstall": "test -e ./autogen.sh && ./autogen.sh --prefix=/usr --datarootdir=/share",
     "clean": "make distclean",
     "start": "node scripts/start.js",
     "prebuild": "yarn run test",
