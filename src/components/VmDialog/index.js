@@ -325,24 +325,23 @@ class VmDialog extends React.Component {
   }
 
   checkTimeZone ({ osType }) {
-    let timeZone = null
+    const { config } = this.props
+    let timeZone = this.state.timeZone
     const template = this.getTemplate()
-    if (template) {
-      if (template.getIn(['timeZone', 'name'])) {
-        timeZone = timeZone || template.get('timeZone').toJS()
-        const isWindowsTimeZone = timezones.find(timezone => timezone.id === timeZone.name)
-        const isWindowsVm = isWindows(osType)
+    if (template && template.getIn(['timeZone', 'name'])) {
+      timeZone = timeZone || template.get('timeZone').toJS()
+    }
+    const isWindowsTimeZone = timeZone && timezones.find(timezone => timezone.id === timeZone.name)
+    const isWindowsVm = isWindows(osType)
 
-        if (isWindowsVm && !isWindowsTimeZone) {
-          timeZone = {
-            name: 'GMT Standard Time',
-          }
-        }
-        if (!isWindowsVm && isWindowsTimeZone) {
-          timeZone = {
-            name: 'Etc/GMT',
-          }
-        }
+    if (isWindowsVm && !isWindowsTimeZone) {
+      timeZone = {
+        name: config.get('defaultWindowsTimezone'),
+      }
+    }
+    if (!isWindowsVm && isWindowsTimeZone) {
+      timeZone = {
+        name: config.get('defaultGeneralTimezone'),
       }
     }
     if (timeZone) {
@@ -524,9 +523,9 @@ class VmDialog extends React.Component {
       }
       console.log(`VmDialog initDefaults(): Setting initial value for osId = ${this.state.osId} to ${stateChange.osId}`)
     }
-
     if (this.getTemplate(stateChange.templateId).get('timeZone')) {
       stateChange.timeZone = this.getTemplate(stateChange.templateId).get('timeZone').toJS()
+      console.log(`VmDialog initDefaults(): Setting initial value for timeZone = ${JSON.stringify(this.state.timeZone)} to ${JSON.stringify(stateChange.timeZone)}`)
     }
 
     this.setState(stateChange)
@@ -837,6 +836,7 @@ VmDialog.propTypes = {
   operatingSystems: PropTypes.object.isRequired, // deep immutable, {[id: string]: OperatingSystem}
   userMessages: PropTypes.object.isRequired,
   icons: PropTypes.object.isRequired,
+  config: PropTypes.object.isRequired,
   storages: PropTypes.object.isRequired, // deep immutable, {[id: string]: StorageDomain}
   previousPath: PropTypes.string.isRequired,
 
@@ -852,6 +852,7 @@ export default connect(
     userMessages: state.userMessages,
     icons: state.icons,
     storages: state.storageDomains,
+    config: state.config,
   }),
   (dispatch) => ({
     addVm: (vm, correlationId, clone) => dispatch(createVm({ vm, pushToDetailsOnSuccess: true, clone }, { correlationId })),

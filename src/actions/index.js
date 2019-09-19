@@ -11,6 +11,7 @@ import {
   SET_ADMINISTRATOR,
   SET_CPU_TOPOLOGY_OPTIONS,
   SET_CURRENT_PAGE,
+  SET_DEFAULT_TIMEZONE,
   SET_USB_FILTER,
   SET_USER_FILTER_PERMISSION,
   SET_USER_GROUPS,
@@ -196,6 +197,19 @@ export function setCpuTopologyOptions ({
       maxNumberOfCores,
       maxNumberOfThreads,
       maxNumOfVmCpus,
+    },
+  }
+}
+
+export function setDefaultTimezone ({
+  defaultGeneralTimezone,
+  defaultWindowsTimezone,
+}) {
+  return {
+    type: SET_DEFAULT_TIMEZONE,
+    payload: {
+      defaultGeneralTimezone,
+      defaultWindowsTimezone,
     },
   }
 }

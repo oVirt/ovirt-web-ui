@@ -333,12 +333,14 @@ class DetailsCard extends React.Component {
           const timeZoneName = updates.getIn(['timeZone', 'name'])
           const isWindowsTimeZone = timezones.find(timezone => timezone.id === timeZoneName)
           const isWindowsVm = isWindows(os.get('name'))
+          const defaultWindowsTimezone = this.props.config.get('defaultWindowsTimezone')
+          const defaultGeneralTimezone = this.props.config.get('defaultGeneralTimezone')
 
           if (isWindowsVm && !isWindowsTimeZone) {
-            changeQueue.push({ fieldName: 'timeZone', value: 'GMT Standard Time' })
+            changeQueue.push({ fieldName: 'timeZone', value: defaultWindowsTimezone })
           }
           if (!isWindowsVm && isWindowsTimeZone) {
-            changeQueue.push({ fieldName: 'timeZone', value: 'Etc/GMT' })
+            changeQueue.push({ fieldName: 'timeZone', value: defaultGeneralTimezone })
           }
           break
 
