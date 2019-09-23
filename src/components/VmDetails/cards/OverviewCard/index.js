@@ -9,7 +9,6 @@ import { generateUnique } from '_/helpers'
 import { formatUptimeDuration } from '_/utils'
 import { editVm } from '_/actions'
 
-import { Media } from 'react-bootstrap'
 import { FormControl, FormGroup, HelpBlock, Alert, Checkbox } from 'patternfly-react'
 
 import BaseCard from '../../BaseCard'
@@ -221,11 +220,11 @@ class OverviewCard extends React.Component {
                 {getOsHumanName(vm.getIn(['os', 'type']))}
               </div>
 
-              <Media>
-                <Media.Left>
+              <div className={style['container']}>
+                <div className={style['os-icon']}>
                   <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' />
-                </Media.Left>
-                <Media.Body>
+                </div>
+                <div className={style['vm-info']}>
                   <div className={style['vm-name']}>
                     { !isEditing && <span id={`${idPrefix}-name`}>{vm.get('name')}</span> }
                     { isEditing &&
@@ -283,8 +282,8 @@ class OverviewCard extends React.Component {
                       />
                     }
                   </div>
-                </Media.Body>
-              </Media>
+                </div>
+              </div>
 
               { correlatedMessages && correlatedMessages.size > 0 &&
                 correlatedMessages.map((message, key) =>
