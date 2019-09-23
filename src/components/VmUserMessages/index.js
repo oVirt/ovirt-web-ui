@@ -1,9 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
 import { connect } from 'react-redux'
 
 import { Notification, NotificationDrawer, MenuItem, Icon, Button } from 'patternfly-react'
+import OverlayTooltip from '../OverlayTooltip'
 
 import style from './style.css'
 
@@ -75,11 +75,13 @@ class VmUserMessages extends React.Component {
       : <span className='badge' id={`${idPrefix}-size`}>{messagesCount}</span>
     return (
       <li className='dropdown'>
-        <a className='dropdown-toggle nav-item-iconic' href='#' title={msg.messages()} onClick={hrefWithoutHistory(this.handleToggle)} id={`${idPrefix}-toggle`}>
-          <i className={`fa fa-bell ${style['usermessages-icon']}`} />
-          {badgeElement}
-          <span className='caret' id={`${idPrefix}-caret`} />
-        </a>
+        <OverlayTooltip id={`${idPrefix}-tooltip`} tooltip={msg.notifications()} placement='bottom'>
+          <a className='dropdown-toggle nav-item-iconic' href='#' onClick={hrefWithoutHistory(this.handleToggle)} id={`${idPrefix}-toggle`}>
+            <i className={`fa fa-bell ${style['usermessages-icon']}`} />
+            {badgeElement}
+            <span className='caret' id={`${idPrefix}-caret`} />
+          </a>
+        </OverlayTooltip>
         <NotificationDrawer hide={!this.state.show} expanded={this.state.expanded}>
           <NotificationDrawer.Title onCloseClick={this.handleToggle} onExpandClick={this.handleExpand} />
           <NotificationDrawer.PanelBody className={style['panel-body']}>
@@ -97,6 +99,7 @@ class VmUserMessages extends React.Component {
           </NotificationDrawer.PanelBody>
         </NotificationDrawer>
       </li>
+
     )
   }
 }

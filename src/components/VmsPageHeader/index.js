@@ -9,6 +9,8 @@ import { hrefWithoutHistory } from '_/helpers'
 
 import { refresh } from '_/actions'
 import * as branding from '_/branding'
+import { msg } from '_/intl'
+import OverlayTooltip from '../OverlayTooltip'
 
 /**
  * Main application header on top of the page
@@ -22,20 +24,19 @@ const VmsPageHeader = ({ page, onRefresh }) => {
           <img className='obrand_mastheadLogo' src={branding.resourcesUrls.clearGif} />
         </a>
       </div>
-
       <div className='collapse navbar-collapse'>
         <ul className='nav navbar-nav navbar-right navbar-iconic'>
           <li>
-            <a href='#' className='nav-item-iconic' onClick={hrefWithoutHistory(() => onRefresh(page))} id={`${idPrefix}-refresh`}>
-              <i className='fa fa-refresh' />
-            </a>
+            <OverlayTooltip id={`${idPrefix}-tooltip`} tooltip={msg.refresh()} placement='bottom'>
+              <a href='#' className='nav-item-iconic' onClick={hrefWithoutHistory(() => onRefresh(page))} id={`${idPrefix}-refresh`}>
+                <i className='fa fa-refresh' />
+              </a>
+            </OverlayTooltip>
           </li>
-
           <UserMenu />
           <VmUserMessages />
         </ul>
       </div>
-
     </nav>
   )
 }
