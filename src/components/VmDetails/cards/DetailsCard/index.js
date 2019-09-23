@@ -555,6 +555,7 @@ class DetailsCard extends React.Component {
     const { hosts, clusters, dataCenters, templates, operatingSystems, config } = this.props
     const { vm, isEditing, correlatedMessages, clusterList, isoList } = this.state
 
+    const isAdmin = config.get('administrator')
     const idPrefix = 'vmdetail-details'
 
     const isPoolVm = vm.getIn(['pool', 'id']) !== undefined
@@ -663,9 +664,12 @@ class DetailsCard extends React.Component {
               <Row>
                 <Col className={style['fields-column']}>
                   <Grid>
-                    <FieldRow label={msg.host()} id={`${idPrefix}-host`}>
-                      { <EllipsisValue tooltip={hostName}>{hostName}</EllipsisValue> || <NotAvailable tooltip={msg.notAvailableUntilRunning()} id={`${idPrefix}-host-not-available`} /> }
-                    </FieldRow>
+                    {
+                      isAdmin &&
+                      <FieldRow label={msg.host()} id={`${idPrefix}-host`}>
+                        {<EllipsisValue tooltip={hostName}>{hostName}</EllipsisValue> || <NotAvailable tooltip={msg.notAvailableUntilRunning()} id={`${idPrefix}-host-not-available`} />}
+                      </FieldRow>
+                    }
                     <FieldRow label={msg.ipAddress()} id={`${idPrefix}-ip`}>
                       <React.Fragment>
                         { ip4Addresses.length === 0 && ip6Addresses.length === 0 &&
