@@ -81,13 +81,13 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEd
           vmStatus={vmStatus}
           vnicProfileList={vnicProfileList}
           onSave={onEdit}
-          trigger={
+          trigger={({ onClick }) => (
             <OverlayTooltip id={`${idPrefix}-edit-tooltip`} tooltip={msg.nicEditTooltip()}>
-              <a id={`${idPrefix}-edit-action`} className={itemStyle['item-action']}>
+              <a id={`${idPrefix}-edit-action`} className={itemStyle['item-action']} onClick={onClick}>
                 <Icon type='pf' name='edit' />
               </a>
             </OverlayTooltip>
-          }
+          )}
         />
       }
       { !canEdit &&

@@ -151,14 +151,14 @@ class DisksCard extends React.Component {
                     suggestedStorageDomain={suggestedStorageDomain}
                     storageDomainList={filteredStorageDomainList}
                     onSave={this.onCreateConfirm}
-                    trigger={
+                    trigger={({ onClick }) => (
                       <div className={itemStyle['create-block']}>
-                        <a href='#' id={`${idPrefix}-new-disk-action`}>
+                        <a href='#' id={`${idPrefix}-new-disk-action`} onClick={onClick}>
                           <Icon className={itemStyle['create-icon']} type='fa' name='plus' />
                           <span className={itemStyle['create-text']} >{msg.diskActionCreateNew()}</span>
                         </a>
                       </div>
-                    }
+                    )}
                   />
                 </Col>
               </Row>

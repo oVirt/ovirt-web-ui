@@ -92,13 +92,13 @@ const DiskListItem = ({
           disk={disk}
           storageDomainList={storageDomainList}
           onSave={onEdit}
-          trigger={
+          trigger={({ onClick }) => (
             <OverlayTooltip id={`${idPrefix}-action-edit-tooltip`} tooltip={msg.diskEditTooltip()}>
-              <a id={`${idPrefix}-action-edit`} className={itemStyle['item-action']}>
+              <a id={`${idPrefix}-action-edit`} className={itemStyle['item-action']} onClick={onClick} >
                 <Icon type='pf' name='edit' />
               </a>
             </OverlayTooltip>
-          }
+          )}
         />
       }
       { !canEdit &&

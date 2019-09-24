@@ -142,14 +142,14 @@ class NicsCard extends React.Component {
                     nextNicName={this.state.nextNicName}
                     vnicProfileList={this.state.filteredVnicList}
                     onSave={this.onCreateConfirm}
-                    trigger={
+                    trigger={({ onClick }) => (
                       <div className={itemStyle['create-block']}>
-                        <a href='#' id={`${idPrefix}-new-button`}>
+                        <a href='#' id={`${idPrefix}-new-button`} onClick={onClick}>
                           <Icon className={itemStyle['create-icon']} type='fa' name='plus' />
                           <span className={itemStyle['create-text']} >{msg.nicActionCreateNew()}</span>
                         </a>
                       </div>
-                    }
+                    )}
                   />
                 </Col>
               </Row>

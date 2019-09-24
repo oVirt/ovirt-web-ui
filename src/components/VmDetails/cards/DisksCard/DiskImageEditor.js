@@ -249,7 +249,7 @@ class DiskImageEditor extends Component {
     const diskSize = disk && (disk.get('lunSize') ? disk.get('lunSize') : disk.get('provisionedSize'))
 
     return <React.Fragment>
-      {React.cloneElement(trigger, { onClick: this.open })}
+      { trigger({ onClick: this.open }) }
 
       <Modal
         dialogClassName={style['editor-modal']}
@@ -442,7 +442,7 @@ DiskImageEditor.propTypes = {
   suggestedStorageDomain: PropTypes.string,
 
   storageDomainList: PropTypes.object.isRequired,
-  trigger: PropTypes.element.isRequired,
+  trigger: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
 
   storageDomains: PropTypes.object.isRequired,
