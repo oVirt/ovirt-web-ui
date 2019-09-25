@@ -134,16 +134,15 @@ class SnapshotItem extends React.Component {
           <RestoreConfirmationModal
             key='restore'
             id={`${this.props.id}-restore-modal`}
-            disabled={isRestoreDisabled}
             snapshot={this.props.snapshot}
             vmId={this.props.vmId}
-            trigger={
-              <SnapshotAction key='restore' id={`${this.props.id}-restore`} >
+            trigger={({ onClick }) => (
+              <SnapshotAction key='restore' id={`${this.props.id}-restore`} onClick={onClick} disabled={isRestoreDisabled}>
                 <OverlayTooltip placement={this.state.isMobile ? 'right' : 'left'} id={`${this.props.id}-restore-tt`} tooltip={msg.snapshotRestore()}>
                   <Icon type='fa' name='play-circle' />
                 </OverlayTooltip>
               </SnapshotAction>
-            }
+            )}
           />
         )
 
