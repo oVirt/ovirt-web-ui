@@ -280,16 +280,19 @@ class VmActions extends React.Component {
       />)
 
     return (<React.Fragment>
-      <DropdownKebab id='kebab' pullRight className='visible-xs'>
-        { actions.map(action => <ActionMenuItemWrapper key={action.id} {...action} />) }
-        <ActionMenuItemWrapper
-          confirmation={removeConfirmation}
-          actionDisabled={isPool || !canRemove(status) || vm.getIn(['actionInProgress', 'remove'])}
-          shortTitle={msg.remove()}
-          className='btn btn-danger'
-          id={`${idPrefix}-button-remove`}
-        />
-      </DropdownKebab>
+      <div className={`actions-line ${style['actions-toolbar']} visible-xs`} id={`${idPrefix}Kebab`}>
+        <DropdownKebab id={`${idPrefix}Kebab-kebab`} pullRight>
+          { actions.map(action => <ActionMenuItemWrapper key={action.id} {...action} />) }
+          <ActionMenuItemWrapper
+            confirmation={removeConfirmation}
+            actionDisabled={isPool || !canRemove(status) || vm.getIn(['actionInProgress', 'remove'])}
+            shortTitle={msg.remove()}
+            className='btn btn-danger'
+            id={`${idPrefix}Kebab-button-remove`}
+          />
+        </DropdownKebab>
+      </div>
+
       <div className={`actions-line ${style['actions-toolbar']} hidden-xs`} id={idPrefix}>
         <EmptyAction state={status} isOnCard={isOnCard} />
 
