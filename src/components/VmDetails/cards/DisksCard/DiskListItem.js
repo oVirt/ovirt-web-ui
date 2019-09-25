@@ -117,13 +117,13 @@ const DiskListItem = ({
           id={`${idPrefix}-delete-modal`}
           severity='danger'
           onDelete={() => { onDelete(vm.get('id'), view.id) }}
-          trigger={
+          trigger={({ onClick }) => (
             <OverlayTooltip id={`${idPrefix}-action-delete-tooltip`} tooltip={msg.diskDeleteTooltip()}>
-              <a id={`${idPrefix}-action-delete`} className={itemStyle['item-action']}>
+              <a id={`${idPrefix}-action-delete`} className={itemStyle['item-action']} onClick={onClick}>
                 <Icon type='pf' name='delete' />
               </a>
             </OverlayTooltip>
-          }
+          )}
         >
           <span
             dangerouslySetInnerHTML={{
