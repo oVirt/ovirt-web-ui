@@ -63,3 +63,11 @@
 div.base-card.cell-card {
   flex-basis: auto;
 }
+
+@media only screen and (max-width: 600px) {
+  .col-overview, .col-details, .col-snapshots, 
+  .col-utilization, .col-nics-disks
+  {
+    min-width: 100%;
+  }
+}
