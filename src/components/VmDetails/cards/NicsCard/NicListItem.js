@@ -13,6 +13,7 @@ import NicEditor from './NicEditor'
 import NicLinkStateIcon from './NicLinkStateIcon'
 import OverlayTooltip from '_/components/OverlayTooltip'
 import EllipsisValue from '_/components/EllipsisValue'
+
 /**
  * Render a single NIC in the list of Nics on the Nics Card.
  *
@@ -50,7 +51,7 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEd
                   key={`${nic.id}-${ip4}-${index}`}
                   id={`${idPrefix}-ipv4-${index}`}
                 >
-                  <div>{msg.nicIP4()}: {ip4}</div>
+                  {msg.nicIP4()}: {ip4}
                 </EllipsisValue>)
             }
           </Col>
@@ -62,7 +63,7 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEd
                   key={`${nic.id}-${ip6}-${index}`}
                   id={`${idPrefix}-ipv6-${index}`}
                 >
-                  <div>{msg.nicIP6()}: {ip6}</div>
+                  {msg.nicIP6()}: {ip6}
                 </EllipsisValue>)
             }
           </Col>
