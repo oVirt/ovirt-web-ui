@@ -129,7 +129,8 @@
     "intl:push": "zanata-cli push",
     "intl:pull": "zanata-cli pull -e",
     "intl:apply": "rip po2json -o extra/from-zanata/translated-messages.json -m extra/to-zanata/messages.json 'extra/from-zanata/*.po' && babel-node scripts/intl/normalize-messages.js --presets env,flow",
-    "intl:report": "babel-node scripts/intl/report.js --presets env,flow"
+    "intl:report": "babel-node scripts/intl/report.js --presets env,flow",
+    "intl:sync": "babel-node scripts/intl/sync-messages.js --presets env,flow"
   },
   "jest": {
     "moduleFileExtensions": [
