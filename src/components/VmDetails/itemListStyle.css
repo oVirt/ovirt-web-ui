@@ -39,6 +39,8 @@
   flex-direction: row;
   flex-wrap: wrap;
   align-items: baseline;
+
+  max-width: 100%;
 }
 
 .item-row .item-row-info.no-status {

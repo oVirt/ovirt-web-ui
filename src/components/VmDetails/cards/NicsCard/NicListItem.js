@@ -12,6 +12,7 @@ import DeleteConfirmationModal from '../../../VmModals/DeleteConfirmationModal'
 import NicEditor from './NicEditor'
 import NicLinkStateIcon from './NicLinkStateIcon'
 import OverlayTooltip from '_/components/OverlayTooltip'
+import EllipsisValue from '_/components/EllipsisValue'
 
 /**
  * Render a single NIC in the list of Nics on the Nics Card.
@@ -31,7 +32,7 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEd
 
     {/* Details Column - take the rest of the space */}
     <span className={itemStyle['item-row-info']}>
-      <div>
+      <div className={style['nics-title']}>
         <span id={`${idPrefix}-name`}>{nic.name}</span>
         <span className={style['vnic-info']} id={`${idPrefix}-vnic-info`}>
           { nic.vnicProfile.id
@@ -42,18 +43,28 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEd
       </div>
       <Grid>
         <Row>
-          <Col cols={4} className={style['ip4-container']} id={`${idPrefix}-ipv4`}>
+          <Col cols={4} wrapExpand className={style['ip4-container']} id={`${idPrefix}-ipv4`}>
             { nic.ipv4.length > 0 &&
-              <div>
-                {nic.ipv4.map(ip4 => <div key={`${nic.id}-${ip4}`}>{msg.nicIP4()}: {ip4}</div>)}
-              </div>
+              nic.ipv4.map((ip4, index) =>
+                <EllipsisValue
+                  tooltip={ip4}
+                  key={`${nic.id}-${ip4}-${index}`}
+                  id={`${idPrefix}-ipv4-${index}`}
+                >
+                  {msg.nicIP4()}: {ip4}
+                </EllipsisValue>)
             }
           </Col>
-          <Col cols={8} className={style['ip6-container']} id={`${idPrefix}-ipv6`}>
+          <Col cols={8} wrapExpand className={style['ip6-container']} id={`${idPrefix}-ipv6`}>
             { nic.ipv6.length > 0 &&
-              <div>
-                {nic.ipv6.map(ip6 => <div key={`${nic.id}-${ip6}`}>{msg.nicIP6()}: {ip6}</div>)}
-              </div>
+              nic.ipv6.map((ip6, index) =>
+                <EllipsisValue
+                  tooltip={ip6}
+                  key={`${nic.id}-${ip6}-${index}`}
+                  id={`${idPrefix}-ipv6-${index}`}
+                >
+                  {msg.nicIP6()}: {ip6}
+                </EllipsisValue>)
             }
           </Col>
         </Row>
