@@ -62,3 +62,10 @@
     height: 27px;
 }
 
+:global(.dropdown-menu) > .menu-item-danger > a {
+    color: #cc0000;
+}
+
+:global(a#console-selector)  {
+    box-shadow: none;
+}
