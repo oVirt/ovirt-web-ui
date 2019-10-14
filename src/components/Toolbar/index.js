@@ -14,10 +14,12 @@ import { INIT_CONSOLE, DOWNLOAD_CONSOLE } from '_/constants'
 
 const VmDetailToolbar = ({ match, vms }) => {
   if (vms.getIn(['vms', match.params.id])) {
+    const poolId = vms.getIn(['vms', match.params.id, 'pool', 'id'])
+    const pool = vms.getIn(['pools', poolId])
     return (
       <Toolbar className={style['full-width']}>
         <Toolbar.RightContent>
-          <VmActions vm={vms.getIn(['vms', match.params.id])} />
+          <VmActions vm={vms.getIn(['vms', match.params.id])} pool={pool} />
         </Toolbar.RightContent>
       </Toolbar>
     )
@@ -36,30 +38,6 @@ const VmDetailToolbarConnected = connect(
     vms: state.vms,
   })
 )(VmDetailToolbar)
-
-const PoolDetailToolbar = ({ match, vms }) => {
-  if (vms.getIn(['pools', match.params.id])) {
-    return (
-      <Toolbar className={style['full-width']}>
-        <Toolbar.RightContent>
-          <VmActions vm={vms.getIn(['pools', match.params.id, 'vm'])} key='vmaction' pool={vms.getIn(['pools', match.params.id])} />
-        </Toolbar.RightContent>
-      </Toolbar>
-    )
-  }
-  return null
-}
-
-PoolDetailToolbar.propTypes = {
-  vms: PropTypes.object.isRequired,
-  match: RouterPropTypeShapes.match.isRequired,
-}
-
-const PoolDetailToolbarConnected = connect(
-  (state) => ({
-    vms: state.vms,
-  })
-)(PoolDetailToolbar)
 
 const VmConsoleToolbar = ({ match, vms, consoles }) => {
   if (vms.getIn(['vms', match.params.id])) {
@@ -97,7 +75,6 @@ const VmConsoleToolbarConnected = connect(
 
 export {
   VmDetailToolbarConnected as VmDetailToolbar,
-  PoolDetailToolbarConnected as PoolDetailToolbar,
   VmConsoleToolbarConnected as VmConsoleToolbar,
   VmsListToolbar,
 }

@@ -189,7 +189,7 @@ class OverviewCard extends React.Component {
   }
 
   render () {
-    const { vm, icons, operatingSystems, isEditable } = this.props
+    const { vm, icons, vms, operatingSystems, isEditable } = this.props
     const { isEditing, correlatedMessages, nameError, updateCloudInit, disableHostnameToggle } = this.state
 
     const elapsedUptime = vm.getIn(['statistics', 'elapsedUptime', 'datum'], 0)
@@ -202,11 +202,20 @@ class OverviewCard extends React.Component {
 
     const showCloudInitCheckbox = isEditing && this.trackUpdates['name'] && !nameError && this.isCloudInitHostnameUpdate()
 
+    const poolId = vm.getIn(['pool', 'id'])
+    const isPoolVm = !!poolId
+    let pool = null
+    if (isPoolVm) {
+      pool = vms.getIn(['pools', poolId])
+    }
+    const isPoolAutomatic = pool && pool.get('type') === 'automatic'
+
     return (
       <BaseCard
         editMode={isEditing}
         editable={isEditable}
         editTooltip={`Edit ${vm.get('name')}`}
+        disableTooltip={isPoolVm && isPoolAutomatic ? msg.automaticPoolsNotEditable({ poolName: pool.get('name') }) : undefined}
         idPrefix={idPrefix}
         disableSaveButton={nameError}
         onStartEdit={this.handleCardOnStartEdit}
@@ -220,6 +229,7 @@ class OverviewCard extends React.Component {
                 {getOsHumanName(vm.getIn(['os', 'type']))}
               </div>
 
+              {isPoolVm && pool && <span className={style['pool-vm-label']} style={{ backgroundColor: pool.get('color') }}>{ pool.get('name') }</span>}
               <div className={style['container']}>
                 <div className={style['os-icon']}>
                   <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' />
@@ -305,6 +315,7 @@ OverviewCard.propTypes = {
   isEditable: PropTypes.bool,
 
   icons: PropTypes.object.isRequired,
+  vms: PropTypes.object.isRequired,
   operatingSystems: PropTypes.object.isRequired, // deep immutable, {[id: string]: OperatingSystem}
   userMessages: PropTypes.object.isRequired,
   templates: PropTypes.object.isRequired,
@@ -315,6 +326,7 @@ OverviewCard.propTypes = {
 export default connect(
   (state, { vm }) => ({
     icons: state.icons,
+    vms: state.vms,
     operatingSystems: state.operatingSystems,
     userMessages: state.userMessages,
     templates: state.templates,

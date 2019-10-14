@@ -92,6 +92,7 @@ class BaseCard extends React.Component {
       idPrefix = '',
       className = '',
       disableSaveButton = false,
+      disableTooltip = undefined,
     } = this.props
     const editing = editMode === undefined ? this.state.edit : editMode
     const hasHeading = !!title
@@ -103,7 +104,14 @@ class BaseCard extends React.Component {
       <Card className={`${style['base-card']} ${className}`} id={`${idPrefix}-card`} {...excludeKeys(this.props, this.propTypeKeys)}>
         {hasHeading && (
           <CardHeading className={style['base-card-heading']}>
-            {editable && <CardEditButton tooltip={editTooltip} editEnabled={editing} onClick={this.clickEdit} id={`${idPrefix}-button-edit`} />}
+            <CardEditButton
+              tooltip={editTooltip}
+              editable={editable}
+              disableTooltip={disableTooltip}
+              editEnabled={editing}
+              onClick={this.clickEdit}
+              id={`${idPrefix}-button-edit`}
+            />
             <CardTitle>
               {hasIcon && <Icon type={icon.type} name={icon.name} className={style['base-card-title-icon']} />}
               {title}
@@ -113,8 +121,15 @@ class BaseCard extends React.Component {
         )}
 
         <CardBody className={style['base-card-body']}>
-          {(!hasHeading && editable) && (
-            <CardEditButton tooltip={editTooltip} editEnabled={editing} onClick={this.clickEdit} id={`${idPrefix}-button-edit`} />
+          {!hasHeading && (
+            <CardEditButton
+              tooltip={editTooltip}
+              editable={editable}
+              disableTooltip={disableTooltip}
+              editEnabled={editing}
+              onClick={this.clickEdit}
+              id={`${idPrefix}-button-edit`}
+            />
           )}
 
           <RenderChildren isEditing={editing} />
@@ -146,6 +161,7 @@ BaseCard.propTypes = {
   editable: PropTypes.bool,
   disableSaveButton: PropTypes.bool,
   editTooltip: PropTypes.string,
+  disableTooltip: PropTypes.string,
 
   onStartEdit: PropTypes.func,
   onCancel: PropTypes.func,

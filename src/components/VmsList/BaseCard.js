@@ -114,7 +114,7 @@ const BaseCard = ({ children, idPrefix }) => {
   })
   return (
     <IdPrefixContext.Provider value={idPrefix}>
-      <Col xs={12} sm={6} md={4} lg={3} id={`${idPrefix}-box`}>
+      <Col xs={12} sm={6} md={4} lg={3} id={`${idPrefix}-box`} className={style['card-box']}>
         <Card className='card-pf-view card-pf-view-select card-pf-view-single-select'>
           {childs[BaseCardHeader.displayName]}
           <CardBody>

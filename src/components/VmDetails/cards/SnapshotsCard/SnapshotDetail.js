@@ -47,7 +47,7 @@ const statusMap = {
   'ok': msg.ok(),
 }
 
-const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, id, ...otherProps }) => {
+const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, id, isPoolVm, ...otherProps }) => {
   const template = Selectors.getTemplateById(snapshot.getIn(['vm', 'template', 'id']))
   const time = getFormatedDateTime(snapshot.get('date'))
 
@@ -62,6 +62,14 @@ const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, id, ...otherProps }) 
   const showMoreNics = nicsToRender.size > 2
   const nicsToShow = nicsToRender.slice(0, 2)
   const additionalNics = nicsToRender.slice(2)
+
+  const restoreButton = isPoolVm
+    ? <OverlayTrigger placement='top' overlay={<Tooltip id={`${id}-restore-tt`}>{ msg.vmPoolSnapshotRestoreUnavailable() }</Tooltip>}>
+      <span>
+        <Button bsStyle='default' id={`${id}-restore`} disabled style={{ pointerEvents: 'none' }}>{ msg.snapshotRestore() }</Button>
+      </span>
+    </OverlayTrigger>
+    : <Button bsStyle='default' id={`${id}-restore`}>{ msg.snapshotRestore() }</Button>
 
   return <Popover
     id={id}
@@ -200,9 +208,7 @@ const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, id, ...otherProps }) 
         id={`${id}-restore-modal`}
         vmId={vmId}
         disabled={restoreDisabled}
-        trigger={
-          <Button bsStyle='default' id={`${id}-restore`}>{ msg.snapshotRestore() }</Button>
-        }
+        trigger={restoreButton}
       />
     </div>
   </Popover>
@@ -213,6 +219,7 @@ SnapshotDetail.propTypes = {
   snapshot: PropTypes.object.isRequired,
   vmId: PropTypes.string.isRequired,
   restoreDisabled: PropTypes.bool,
+  isPoolVm: PropTypes.bool,
 }
 
 export default SnapshotDetail

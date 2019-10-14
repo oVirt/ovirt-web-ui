@@ -69,6 +69,28 @@ function cleanUndefined (obj: Object): Object {
   return obj
 }
 
+const colors = [
+  '#ec7a08',
+  '#f0ab00',
+  '#92d400',
+  '#3f9c35',
+  '#007a87',
+  '#00b9e4',
+  '#703fec',
+  '#486b00',
+  '#003d44',
+  '#005c73',
+  '#40199a',
+]
+
+function getPoolColor (id: string): string {
+  let poolColor = 0
+  for (let i = 0; i < id.length; i++) {
+    poolColor += id.charCodeAt(i)
+  }
+  return colors[poolColor % colors.length]
+}
+
 //
 //
 const VM = {
@@ -88,6 +110,8 @@ const VM = {
       stopTime: convertEpoch(vm['stop_time']),
       creationTime: convertEpoch(vm['creation_time']),
       startPaused: convertBool(vm['start_paused']),
+
+      stateless: vm['stateless'] === 'true',
 
       fqdn: vm['fqdn'],
 
@@ -397,6 +421,7 @@ const Pool = {
 
       vm: VM.toInternal({ vm: pool.vm }),
       vmsCount: 0,
+      color: getPoolColor(pool['id']),
     }
   },
 

@@ -552,7 +552,7 @@ class DetailsCard extends React.Component {
   }
 
   render () {
-    const { hosts, clusters, dataCenters, templates, operatingSystems, config } = this.props
+    const { hosts, clusters, dataCenters, templates, operatingSystems, config, vms } = this.props
     const { vm, isEditing, correlatedMessages, clusterList, isoList } = this.state
 
     const isAdmin = config.get('administrator')
@@ -560,6 +560,11 @@ class DetailsCard extends React.Component {
 
     const isPoolVm = vm.getIn(['pool', 'id']) !== undefined
     const canEditDetails = vm.get('canUserEditVm') && !isPoolVm
+    let pool = null
+    if (isPoolVm) {
+      pool = vms.getIn(['pools', vm.getIn(['pool', 'id'])])
+    }
+    const isPoolAutomatic = pool && pool.get('type') === 'automatic'
     const status = vm.get('status')
 
     // Host Name
@@ -628,7 +633,9 @@ class DetailsCard extends React.Component {
 
     // Operation System
     const osType = vm.getIn(['os', 'type'])
-    const osId = operatingSystems && operatingSystems.find(os => os.get('name') === osType).get('id')
+    const osId = operatingSystems &&
+      operatingSystems.find(os => os.get('name') === osType) &&
+      operatingSystems.find(os => os.get('name') === osType).get('id')
 
     // Memory
     const memorySize = vm.getIn(['memory', 'total'])
@@ -649,6 +656,7 @@ class DetailsCard extends React.Component {
       <BaseCard
         title={msg.cardTitleDetails()}
         editable={canEditDetails || canChangeCd}
+        disableTooltip={isPoolVm && isPoolAutomatic ? msg.automaticPoolsNotEditable({ poolName: pool.get('name') }) : undefined}
         editMode={isEditing}
         idPrefix={idPrefix}
         editTooltip={msg.cardTooltipEditDetails({ vmName: vm.get('name') })}
@@ -942,6 +950,7 @@ class DetailsCard extends React.Component {
 }
 DetailsCard.propTypes = {
   vm: PropTypes.object.isRequired,
+  vms: PropTypes.object.isRequired,
   onEditChange: PropTypes.func,
 
   blankTemplateId: PropTypes.string.isRequired,
@@ -960,6 +969,7 @@ DetailsCard.propTypes = {
 const DetailsCardConnected = connect(
   (state) => ({
     blankTemplateId: state.config.get('blankTemplateId'),
+    vms: state.vms,
     hosts: state.hosts,
     clusters: state.clusters,
     dataCenters: state.dataCenters,

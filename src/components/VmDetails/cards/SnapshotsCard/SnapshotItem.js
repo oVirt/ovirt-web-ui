@@ -101,12 +101,12 @@ class SnapshotItem extends React.Component {
 
     // Snapshot actions
     const isActionsDisabled = !this.props.isEditing || this.props.snapshot.get('status') === 'locked'
-    const isRestoreDisabled = isActionsDisabled || !this.props.isVmDown
+    const isRestoreDisabled = isActionsDisabled || !this.props.isVmDown || this.props.isPoolVm
     if (!this.props.snapshot.get('isActive')) {
       // Info popover
       buttons.push(<OverlayTrigger
         overlay={
-          <SnapshotDetail key='detail' id={`${this.props.id}-info-popover`} snapshot={this.props.snapshot} vmId={this.props.vmId} restoreDisabled={isRestoreDisabled} />
+          <SnapshotDetail key='detail' id={`${this.props.id}-info-popover`} snapshot={this.props.snapshot} vmId={this.props.vmId} restoreDisabled={isRestoreDisabled} isPoolVm={this.props.isPoolVm} />
         }
         placement={this.state.isMobile || this.state.isTablet ? 'top' : 'left'}
         trigger='click'
@@ -197,11 +197,14 @@ SnapshotItem.propTypes = {
   isEditing: PropTypes.bool,
   hideActions: PropTypes.bool,
   isVmDown: PropTypes.bool,
+  isPoolVm: PropTypes.bool,
   onSnapshotDelete: PropTypes.func.isRequired,
 }
 
 export default connect(
-  (state) => ({ }),
+  (state, { vmId }) => ({
+    isPoolVm: !!state.vms.getIn(['vms', vmId, 'pool', 'id'], false),
+  }),
   (dispatch, { vmId, snapshot }) => ({
     onSnapshotDelete: () => dispatch(deleteVmSnapshot({ vmId, snapshotId: snapshot.get('id') })),
   })

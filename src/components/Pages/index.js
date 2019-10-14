@@ -12,9 +12,8 @@ import VmDialog from '../VmDialog'
 import VmsList from '../VmsList'
 import VmDetails from '../VmDetails'
 import VmConsole from '../VmConsole'
-import { default as LegacyVmDetails } from '../VmDetail'
 
-import { addUserMessage } from '_/actions'
+import { addUserMessage, selectPoolDetail } from '_/actions'
 
 /**
  * Route component (for PageRouter) to view the list of VMs and Pools
@@ -43,6 +42,18 @@ class VmDetailsPage extends React.Component {
     return null
   }
 
+  componentDidUpdate () {
+    const { vms, fetchPool } = this.props
+    const { vmId } = this.state
+    if (vmId && vms.getIn(['vms', vmId])) {
+      const poolId = vms.getIn(['vms', vmId]).getIn(['pool', 'id'])
+
+      if (poolId && !vms.getIn(['pools', poolId])) {
+        fetchPool(poolId)
+      }
+    }
+  }
+
   render () {
     const { vms } = this.props
     const { vmId } = this.state
@@ -59,59 +70,16 @@ class VmDetailsPage extends React.Component {
 VmDetailsPage.propTypes = {
   vms: PropTypes.object.isRequired,
   match: RouterPropTypeShapes.match.isRequired,
+  fetchPool: PropTypes.func.isRequired,
 }
 const VmDetailsPageConnected = connect(
   (state) => ({
     vms: state.vms,
   }),
-  (dispatch) => ({})
+  (dispatch) => ({
+    fetchPool: (poolId) => dispatch(selectPoolDetail({ poolId })),
+  })
 )(VmDetailsPage)
-
-/**
- * Route component (for PageRouter) to view a Pool's details
- */
-class PoolDetailsPage extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      poolId: undefined,
-    }
-  }
-
-  static getDerivedStateFromProps (props, state) {
-    if (state.poolId !== props.match.params.id) {
-      const poolId = props.match.params.id
-
-      return { poolId }
-    }
-
-    return null
-  }
-
-  render () {
-    const { vms } = this.props
-    const { poolId } = this.state
-
-    if (poolId && vms.getIn(['pools', poolId, 'vm'])) {
-      // TODO: ux-redesign VmDetails will need to also handle viewing a Pool / Pool (template)? VM
-      return (<LegacyVmDetails vm={vms.getIn(['pools', poolId, 'vm'])} pool={vms.getIn(['pools', poolId])} />)
-    }
-
-    // TODO: Add handling for if the fetch runs but fails (FETCH-FAIL), see issue #631
-    console.info(`PoolDetailsPage: Pool id cannot be found: ${poolId}`)
-    return null
-  }
-}
-PoolDetailsPage.propTypes = {
-  vms: PropTypes.object.isRequired,
-  match: RouterPropTypeShapes.match.isRequired,
-}
-const PoolDetailsPageConnected = connect(
-  (state) => ({
-    vms: state.vms,
-  }),
-  (dispatch) => ({})
-)(PoolDetailsPage)
 
 /**
  * Route component (for PageRouter) to create a new VM
@@ -174,7 +142,6 @@ const VmConsolePageConnected = connect(
 )(VmConsolePage)
 
 export {
-  PoolDetailsPageConnected as PoolDetailsPage,
   VmDetailsPageConnected as VmDetailsPage,
   VmCreatePageConnected as VmCreatePage,
   VmConsolePageConnected as VmConsolePage,
