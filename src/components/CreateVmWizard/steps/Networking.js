@@ -3,12 +3,12 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { msg, enumMsg } from '_/intl'
 import { localeCompare, generateUnique } from '_/helpers'
-import { isNumber } from '_/utils'
 import { NIC_SHAPE } from '../dataPropTypes'
 
 import {
   createNicInterfacesList,
   createVNicProfileList,
+  suggestNicName,
 } from '_/components/utils'
 
 import {
@@ -33,7 +33,7 @@ export const NicNameWithLabels = ({ id, nic }) => {
   return <React.Fragment>
     <span id={`${idPrefix}-name`}>{ nic.name }</span>
     { nic.isFromTemplate &&
-      <Label id={`${idPrefix}-from-template`} className={`${style['nic-label']}`}>
+      <Label id={`${idPrefix}-from-template`} className={style['nic-label']}>
         T
       </Label>
     }
@@ -74,9 +74,7 @@ class Networking extends React.Component {
       creating: false,
     }
 
-    const {
-      id: idPrefix = 'create-vm-wizard-nics',
-    } = this.props
+    const idPrefix = this.props.id || 'create-vm-wizard-nics'
 
     // ---- Table Row Editing Controller
     this.inlineEditController = {
@@ -95,7 +93,7 @@ class Networking extends React.Component {
       renderValue: (value, additionalData) => {
         const { column } = additionalData
         return (
-          <Table.Cell className=''>
+          <Table.Cell>
             { column.valueView ? column.valueView(value, additionalData) : value }
           </Table.Cell>
         )
@@ -277,16 +275,7 @@ class Networking extends React.Component {
 
   onCreateNic () {
     const newId = generateUnique('NEW_')
-
-    // Search the current NIC names and return the next unused numbered NIC name.
-    let biggestNumber = 0
-    for (const nic of this.props.nics) {
-      const [, number] = /nic(\d+)/.exec(nic.name) || []
-      if (isNumber(number)) {
-        biggestNumber = Math.max(biggestNumber, parseInt(number, 10))
-      }
-    }
-    const nextNicName = `nic${biggestNumber + 1}`
+    const nextNicName = suggestNicName(this.props.nics)
 
     // If only 1 vnic profile is available, select it automatically
     const {

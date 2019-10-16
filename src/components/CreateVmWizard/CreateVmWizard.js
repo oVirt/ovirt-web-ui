@@ -397,8 +397,10 @@ class CreateVmWizard extends React.Component {
     // make sure we can leave the current step and enter the new step
     if (activeStep.preventExit || newStep.preventEnter) return
 
-    // run and verify the current step's `onExit()`
-    if ((activeStep.onExit && activeStep.onExit()) === false) return
+    // run and the current step's `onExit()`
+    if (activeStep.onExit) {
+      activeStep.onExit()
+    }
 
     this.setState({ activeStepIndex: newStepIndex })
   }

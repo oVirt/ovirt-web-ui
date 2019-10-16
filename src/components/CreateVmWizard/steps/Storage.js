@@ -8,7 +8,6 @@ import { BASIC_DATA_SHAPE, STORAGE_SHAPE } from '../dataPropTypes'
 
 import {
   createDiskFormatList,
-  // createDiskInterfacesList,
   createStorageDomainList,
   suggestDiskName,
 } from '_/components/utils'
@@ -26,9 +25,6 @@ import {
 import SelectBox from '_/components/SelectBox'
 
 import style from './style.css'
-
-// const DISK_INTERFACES = createDiskInterfacesList()
-// const DISK_INTERFACE_DEFAULT = 'virtio_scsi'
 
 function getDefaultFormatType (vmOptimizedFor) {
   const format =
@@ -125,7 +121,7 @@ class Storage extends React.Component {
       renderValue: (value, additionalData) => {
         const { column } = additionalData
         return (
-          <Table.Cell className=''>
+          <Table.Cell>
             { column.valueView ? column.valueView(value, additionalData) : value }
           </Table.Cell>
         )
@@ -405,8 +401,6 @@ class Storage extends React.Component {
   }
 
   handleCellChange (rowData, field, value) {
-    console.log('disk.id:', rowData.id, 'field:', field, 'value:', value)
-
     if (field === 'size') {
       if (isNumber(value) && value > 0 && value <= this.props.maxDiskSizeInGiB) {
         value = +value * (1024 ** 3) // GiB to B

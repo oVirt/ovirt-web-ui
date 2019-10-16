@@ -177,7 +177,7 @@ const ReviewAdvanced = ({ id, operatingSystems, basic }) => {
           }
           { basic.initAdminPassword &&
             <Item id={`${id}-sysprep-admin-pwd`} label={msg.sysPrepAdministratorPassword()}>
-              { '*'.repeat(basic.initAdminPassword.length) }
+              ******
             </Item>
           }
           { basic.initCustomScript &&

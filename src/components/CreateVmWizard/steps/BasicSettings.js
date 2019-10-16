@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { localeCompare } from '_/helpers'
 import { msg } from '_/intl'
-import { isNumber } from '_/utils'
+import { isNumberInRange } from '_/utils'
 import { BASIC_DATA_SHAPE } from '../dataPropTypes'
 
 import {
@@ -44,7 +44,7 @@ const FieldRow = ({
     { vertical &&
       <React.Fragment>
         <Col offset={3} cols={7} className={style['col-data']} id={id}>
-          <div className={`${style['col-label-vertical']}`}>
+          <div className={style['col-label-vertical']}>
             {label}
           </div>
           <div>{children}</div>
@@ -103,7 +103,7 @@ function isOsWindows (operatingSystemId, operatingSystems) {
 export const optimizedForMap = {
   'desktop': { id: 'desktop', value: msg.vmType_desktop() },
   'server': { id: 'server', value: msg.vmType_server() },
-  'high_performance': { id: 'high_performance', value: msg.vmType_highPerformance() },
+  // 'high_performance': { id: 'high_performance', value: msg.vmType_highPerformance() },
 }
 
 /**
@@ -140,7 +140,7 @@ class BasicSettings extends React.Component {
       clusters.get(dataSet.clusterId) !== undefined &&
       clusters.getIn([ dataSet.clusterId, 'dataCenterId' ]) === dataSet.dataCenterId
 
-    const okProvision = [ 'iso', 'template' ].includes(dataSet.provisionSource)
+    const okProvision = isValidSource(dataSet.provisionSource)
     const okProvisionIso = dataSet.provisionSource === 'iso' &&
       storageDomains.find(sd =>
         sd.getIn([ 'statusPerDataCenter', dataSet.dataCenterId ]) === 'active' &&
@@ -151,8 +151,8 @@ class BasicSettings extends React.Component {
         [ null, dataSet.clusterId ].includes(templates.getIn([ dataSet.templateId, 'clusterId' ]))
 
     const okOperatingSystem = dataSet.operatingSystemId && operatingSystems.find(os => os.get('id') === dataSet.operatingSystemId) !== undefined
-    const okMemory = isNumber(dataSet.memory) && dataSet.memory > 0 && dataSet.memory <= maxMemorySizeInMiB
-    const okCpu = isNumber(dataSet.cpus) && dataSet.cpus > 0 && dataSet.cpus <= maxNumOfVmCpus
+    const okMemory = isNumberInRange(dataSet.memory, 0, maxMemorySizeInMiB)
+    const okCpu = isNumberInRange(dataSet.cpus, 0, maxNumOfVmCpus)
     const okOptimizedFor = dataSet.optimizedFor && optimizedForMap[dataSet.optimizedFor] !== undefined
 
     const checkInit = dataSet.cloudInitEnabled
@@ -229,13 +229,13 @@ class BasicSettings extends React.Component {
         break
 
       case 'memory':
-        if (isNumber(value) && value > 0 && value <= this.props.maxMemorySizeInMiB) {
+        if (isNumberInRange(value, 0, this.props.maxMemorySizeInMiB)) {
           changes.memory = +value
         }
         break
 
       case 'cpus':
-        if (isNumber(value) && value > 0 && value <= this.props.maxNumOfVmCpus) {
+        if (isNumberInRange(value, 0, this.props.maxNumOfVmCpus)) {
           changes.cpus = +value
         }
         break
@@ -247,8 +247,6 @@ class BasicSettings extends React.Component {
     if (Object.keys(changes).length > 0) {
       const isFormValid = this.validateForm({ ...this.props.data, ...changes })
       this.props.onUpdate({ valid: isFormValid, partialUpdate: changes })
-    } else {
-
     }
   }
 
