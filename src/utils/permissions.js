@@ -1,6 +1,6 @@
 // @flow
-import Selectors from '../selectors'
-import type { ClusterType, PermissionType, VnicProfileType } from '../ovirtapi/types'
+import Selectors from '_/selectors'
+import type { ClusterType, PermissionType, VnicProfileType } from '_/ovirtapi/types'
 
 function checkUserPermit (permit: string, permits: Set<string>): boolean {
   return permits.has(permit)
