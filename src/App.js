@@ -82,7 +82,7 @@ function isBrowserUnsupported () {
  * Main App component. Wrap the main react-router components together with
  * the various dialogs and error messages that may be needed.
  */
-const App = ({ history, config, appReady }) => {
+const App = ({ history, config, appReady, activateSessionTracker }) => {
   if (isBrowserUnsupported()) {
     return <UnsupportedBrowser />
   }
@@ -98,7 +98,7 @@ const App = ({ history, config, appReady }) => {
         <OvirtApiCheckFailed />
         <LoadingData />
         <ToastNotifications />
-        { appReady && <SessionActivityTracker /> }
+        { appReady && activateSessionTracker && <SessionActivityTracker /> }
         { appReady && renderRoutes(getRoutes()) }
       </div>
     </ConnectedRouter>
@@ -109,11 +109,13 @@ App.propTypes = {
 
   config: PropTypes.object.isRequired,
   appReady: PropTypes.bool.isRequired,
+  activateSessionTracker: PropTypes.bool.isRequired,
 }
 
 export default connect(
   (state) => ({
     config: state.config,
     appReady: !!state.config.get('appConfigured'), // When is the app ready to display data components?
+    activateSessionTracker: (state.config.get('userSessionTimeoutInterval') > 0),
   })
 )(App)
