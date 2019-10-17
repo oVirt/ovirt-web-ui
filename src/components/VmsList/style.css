@@ -27,11 +27,13 @@
 .vm-name {
     font-size: 0.8em;
     min-height: 0.8em;
+    margin-bottom: 10px;
 }
 
 .vm-status {
     font-size: 0.8em;
     min-height: 46px;
+    margin-bottom: 10px;
 }
 
 .selectedVm {

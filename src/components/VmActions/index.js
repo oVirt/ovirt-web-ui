@@ -48,36 +48,46 @@ EmptyAction.propTypes = {
   isOnCard: PropTypes.bool.isRequired,
 }
 
-class VmDropdownActions extends React.Component {
-  render () {
-    const { actions, id } = this.props
-    let actionsCopy = [...actions]
-    if (actionsCopy.length === 0) {
-      return null
-    }
-    if (actionsCopy.length === 1) {
-      actionsCopy[0].className = 'btn btn-default'
-      return <ActionButtonWraper {...actionsCopy[0]} />
-    }
-    return (
-      <Action confirmation={actionsCopy[0].confirmation}>
-        <SplitButton
-          bsStyle='default'
-          title={actionsCopy[0].shortTitle}
-          onClick={actionsCopy[0].onClick}
-          id={id}
-        >
-          { [].concat(...actionsCopy.slice(1).map(action => {
-            return action.items && action.items.length > 0
-              ? action.items.filter(a => a !== null && !a.actionDisabled).map(a => <MenuItemAction key={a.shortTitle} {...a} />)
-              : <MenuItemAction key={action.shortTitle} {...action} />
-          }))}
-        </SplitButton>
-      </Action>
-    )
+const VmDropdownActions = ({ actions, id }) => {
+  if (actions.length === 0) {
+    return null
   }
-}
 
+  if (actions.length === 1) {
+    return <ActionButtonWraper {...actions[0]} className='btn btn-default' />
+  }
+
+  const primaryAction = actions[0]
+  const secondaryActions = []
+  for (const action of actions.slice(1)) {
+    if (action.items) {
+      secondaryActions.push(...action.items.filter(item => item && !item.actionDisabled))
+    } else {
+      secondaryActions.push(action)
+    }
+  }
+
+  return (
+    <Action confirmation={primaryAction.confirmation}>
+      <SplitButton
+        bsStyle='default'
+        title={primaryAction.shortTitle}
+        onClick={primaryAction.onClick}
+        id={id}
+      >
+        {secondaryActions.map(action =>
+          <MenuItemAction key={action.shortTitle}
+            id={action.id}
+            confirmation={action.confirmation}
+            shortTitle={action.shortTitle}
+            icon={action.icon}
+            className=''
+          />
+        )}
+      </SplitButton>
+    </Action>
+  )
+}
 VmDropdownActions.propTypes = {
   actions: PropTypes.array.isRequired,
   id: PropTypes.string.isRequired,
@@ -103,7 +113,7 @@ class VmActions extends React.Component {
    * Compose main actions that appear in Card and Toolbar
    */
   getDefaultActions () {
-    let {
+    const {
       vm,
       pool,
       idPrefix = `vmaction-${vm.get('name')}`,
@@ -134,15 +144,6 @@ class VmActions extends React.Component {
       consoleProtocol = 'Console in use'
     }
 
-    const suspendConfirmation = (<ConfirmationModal title={msg.suspendVm()} body={msg.suspendVmQuestion()}
-      confirm={{ title: msg.yes(), onClick: () => onSuspend() }} />)
-    const shutdownConfirmation = (<ConfirmationModal accessibleDescription='one' title={msg.shutdownVm()} body={msg.shutdownVmQuestion()}
-      confirm={{ title: msg.yes(), onClick: () => onShutdown() }}
-      extra={{ title: msg.force(), onClick: () => onForceShutdown() }}
-      subContent={isPoolVm && pool && vm.get('stateless') && msg.shutdownStatelessPoolVm({ poolName: pool.get('name') })} />)
-    const rebootConfirmation = (<ConfirmationModal title={msg.rebootVm()} body={msg.rebootVmQuestion()}
-      confirm={{ title: msg.yes(), onClick: () => onRestart() }} />)
-
     const vncConsole = vm.get('consoles').find(c => c.get('protocol') === 'vnc')
     const hasRdp = isWindows(vm.getIn(['os', 'type']))
     const consoles = vm.get('consoles').map((c) => ({
@@ -151,7 +152,9 @@ class VmActions extends React.Component {
       icon: <Icon name='external-link' />,
       tooltip: msg[c.get('protocol') + 'ConsoleOpen'](),
       id: `${idPrefix}-button-console-${c.get('protocol')}`,
-      confirmation: <ConsoleConfirmationModal consoleId={c.get('id')} vm={vm} />,
+      confirmation: (
+        <ConsoleConfirmationModal consoleId={c.get('id')} vm={vm} />
+      ),
     })).toJS()
 
     if (hasRdp) {
@@ -174,7 +177,9 @@ class VmActions extends React.Component {
         tooltip: msg.vncConsoleBrowserOpen(),
         actionDisabled: config.get('websocket') === null,
         id: `${idPrefix}-button-console-browser`,
-        confirmation: <ConsoleConfirmationModal isNoVNC consoleId={vncConsole.get('id')} vm={vm} />,
+        confirmation: (
+          <ConsoleConfirmationModal isNoVNC consoleId={vncConsole.get('id')} vm={vm} />
+        ),
       })
     }
 
@@ -195,7 +200,13 @@ class VmActions extends React.Component {
         tooltip: msg.suspendVm(),
         className: 'btn btn-default',
         id: `${idPrefix}-button-suspend`,
-        confirmation: suspendConfirmation,
+        confirmation: (
+          <ConfirmationModal
+            title={msg.suspendVm()}
+            body={msg.suspendVmQuestion()}
+            confirm={{ title: msg.yes(), onClick: () => onSuspend() }}
+          />
+        ),
       },
       {
         priority: 0,
@@ -204,7 +215,15 @@ class VmActions extends React.Component {
         tooltip: msg.shutdownVm(),
         className: 'btn btn-default',
         id: `${idPrefix}-button-shutdown`,
-        confirmation: shutdownConfirmation,
+        confirmation: (
+          <ConfirmationModal accessibleDescription='one'
+            title={msg.shutdownVm()}
+            body={msg.shutdownVmQuestion()}
+            confirm={{ title: msg.yes(), onClick: () => onShutdown() }}
+            extra={{ title: msg.force(), onClick: () => onForceShutdown() }}
+            subContent={isPoolVm && pool && vm.get('stateless') ? msg.shutdownStatelessPoolVm({ poolName: pool.get('name') }) : null}
+          />
+        ),
       },
       {
         priority: 0,
@@ -213,7 +232,13 @@ class VmActions extends React.Component {
         tooltip: msg.rebootVm(),
         className: 'btn btn-default',
         id: `${idPrefix}-button-reboot`,
-        confirmation: rebootConfirmation,
+        confirmation: (
+          <ConfirmationModal
+            title={msg.rebootVm()}
+            body={msg.rebootVmQuestion()}
+            confirm={{ title: msg.yes(), onClick: () => onRestart() }}
+          />
+        ),
       },
       {
         priority: 0,
