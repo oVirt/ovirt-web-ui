@@ -431,8 +431,8 @@ export const messages: { [messageId: string]: MessageType } = {
   remoteViewerConnection: 'Remote Viewer Connection',
   remoteViewerAvailable: 'Remote Viewer is available for most operating systems. To install it, search for it in GNOME Software or run the following:',
   remove: 'Remove',
-  removeVm: 'Remove the VM',
-  removeVmQustion: 'Remove the VM?',
+  removeVm: 'Remove VM',
+  removeVmQustion: 'Are you sure you want to remove the VM? All of the data attached to the VM will be removed as well.',
   restore: {
     message: 'Restore',
     description: 'Confirmation modal action button label for a Restore operation',
