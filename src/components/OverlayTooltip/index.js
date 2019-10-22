@@ -17,7 +17,7 @@ const OverlayTooltip = ({ id, tooltip, placement = 'left', children }) => {
 OverlayTooltip.propTypes = {
   id: PropTypes.string.isRequired,
   tooltip: PropTypes.string.isRequired,
-  placement: PropTypes.string.isRequired,
+  placement: PropTypes.string,
   children: PropTypes.node.isRequired,
 }
 
