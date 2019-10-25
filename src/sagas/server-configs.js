@@ -4,6 +4,7 @@ import Api from '_/ovirtapi'
 import {
   getOption,
   setCpuTopologyOptions,
+  setDefaultTimezone,
   setUSBFilter,
   setUserSessionTimeoutInternal,
   setWebsocket,
@@ -17,6 +18,7 @@ export function* fetchServerConfiguredValues () {
     call(fetchUSBFilter),
     call(fetchUserSessionTimeoutInterval),
     call(fetchWebsocketProxy),
+    call(fetchDefaultTimeZoneConfig),
   ])
 }
 
@@ -61,6 +63,18 @@ function* fetchUSBFilter () {
 function* fetchUserSessionTimeoutInterval () {
   const userSessionTimeout = yield callGetOption('UserSessionTimeOutInterval', 'general', 30)
   yield put(setUserSessionTimeoutInternal(parseInt(userSessionTimeout, 10)))
+}
+
+function* fetchDefaultTimeZoneConfig () {
+  const [ defaultGeneralTimezone, defaultWindowsTimezone ] =
+  yield all([
+    yield callGetOption('DefaultGeneralTimeZone', 'general', 'Etc/GMT'),
+    yield callGetOption('DefaultWindowsTimeZone', 'general', 'GMT Standard Time'),
+  ])
+  yield put(setDefaultTimezone({
+    defaultGeneralTimezone,
+    defaultWindowsTimezone,
+  }))
 }
 
 function* fetchWebsocketProxy () {

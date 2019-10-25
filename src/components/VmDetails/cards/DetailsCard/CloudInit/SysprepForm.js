@@ -7,7 +7,7 @@ import {
 } from 'patternfly-react'
 import { msg } from '_/intl'
 import SelectBox from '../../../../SelectBox'
-import timezones from './timezones.json'
+import timezones from '_/components/utils/timezones.json'
 
 const SysprepForm = ({ idPrefix, vm, onChange }) => {
   const cloudInitHostName = vm.getIn(['cloudInit', 'hostName'])

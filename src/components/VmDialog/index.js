@@ -13,6 +13,7 @@ import {
   templateNameRenderer,
   filterOsByArchitecture,
   findOsByName,
+  isWindows,
 } from '_/helpers'
 
 import { isRunning, getVmIconId, isValidOsIcon, isVmNameValid } from '../utils'
@@ -28,6 +29,8 @@ import FieldHelp from '../FieldHelp'
 import NavigationConfirmationModal from '../NavigationConfirmationModal'
 import SelectBox from '../SelectBox'
 import VmIcon from '../VmIcon'
+
+import timezones from '_/components/utils/timezones.json'
 
 import { createVm, editVm } from '_/actions'
 
@@ -78,6 +81,7 @@ class VmDialog extends React.Component {
       uiErrors: {
         icon: undefined,
       },
+      timeZone: null,
     }
 
     this.submitHandler = this.submitHandler.bind(this)
@@ -89,6 +93,7 @@ class VmDialog extends React.Component {
     this.getTemplate = this.getTemplate.bind(this)
     this.getOS = this.getOS.bind(this)
     this.getOsIdFromType = this.getOsIdFromType.bind(this)
+    this.checkTimeZone = this.checkTimeZone.bind(this)
 
     this.onChangeCluster = this.onChangeCluster.bind(this)
     this.onChangeTemplate = this.onChangeTemplate.bind(this)
@@ -140,6 +145,7 @@ class VmDialog extends React.Component {
           mediaType: undefined,
           data: undefined,
         },
+        timeZone: null,
       })
     }
     setTimeout(() => this.initDefaults(), 0)
@@ -242,6 +248,7 @@ class VmDialog extends React.Component {
           data: this.state.icon.id ? undefined : this.state.icon.data,
         },
       },
+      timeZone: this.state.timeZone,
     }
   }
 
@@ -303,6 +310,7 @@ class VmDialog extends React.Component {
     const os = this.props.operatingSystems.get(osId)
     if (os) {
       this.onChangeOsIconId(os.getIn(['icons', 'large', 'id']))
+      this.checkTimeZone({ osType: os.get('name') })
     }
     this.setState({
       osId,
@@ -313,6 +321,33 @@ class VmDialog extends React.Component {
   onChangeOsIconId (iconId) {
     if (this.state.icon.id && isValidOsIcon(this.props.operatingSystems, this.state.icon.id)) { // change unless custom icon is selected
       this.doChangeIconId(iconId)
+    }
+  }
+
+  checkTimeZone ({ osType }) {
+    const { config } = this.props
+    let timeZone = this.state.timeZone
+    const template = this.getTemplate()
+    if (template && template.getIn(['timeZone', 'name'])) {
+      timeZone = timeZone || template.get('timeZone').toJS()
+    }
+    const isWindowsTimeZone = timeZone && timezones.find(timezone => timezone.id === timeZone.name)
+    const isWindowsVm = isWindows(osType)
+
+    if (isWindowsVm && !isWindowsTimeZone) {
+      timeZone = {
+        name: config.get('defaultWindowsTimezone'),
+      }
+    }
+    if (!isWindowsVm && isWindowsTimeZone) {
+      timeZone = {
+        name: config.get('defaultGeneralTimezone'),
+      }
+    }
+    if (timeZone) {
+      this.setState({
+        timeZone,
+      })
     }
   }
 
@@ -390,6 +425,9 @@ class VmDialog extends React.Component {
       cloudInit,
       bootMenuEnabled,
     })
+
+    const osType = this.props.operatingSystems.getIn([ osId, 'name' ])
+    this.checkTimeZone({ osType })
 
     if (this.state.osId !== osId) {
       this.doChangeOsIdTo(osId)
@@ -484,6 +522,10 @@ class VmDialog extends React.Component {
         }
       }
       console.log(`VmDialog initDefaults(): Setting initial value for osId = ${this.state.osId} to ${stateChange.osId}`)
+    }
+    if (this.getTemplate(stateChange.templateId).get('timeZone')) {
+      stateChange.timeZone = this.getTemplate(stateChange.templateId).get('timeZone').toJS()
+      console.log(`VmDialog initDefaults(): Setting initial value for timeZone = ${JSON.stringify(this.state.timeZone)} to ${JSON.stringify(stateChange.timeZone)}`)
     }
 
     this.setState(stateChange)
@@ -794,6 +836,7 @@ VmDialog.propTypes = {
   operatingSystems: PropTypes.object.isRequired, // deep immutable, {[id: string]: OperatingSystem}
   userMessages: PropTypes.object.isRequired,
   icons: PropTypes.object.isRequired,
+  config: PropTypes.object.isRequired,
   storages: PropTypes.object.isRequired, // deep immutable, {[id: string]: StorageDomain}
   previousPath: PropTypes.string.isRequired,
 
@@ -809,6 +852,7 @@ export default connect(
     userMessages: state.userMessages,
     icons: state.icons,
     storages: state.storageDomains,
+    config: state.config,
   }),
   (dispatch) => ({
     addVm: (vm, correlationId, clone) => dispatch(createVm({ vm, pushToDetailsOnSuccess: true, clone }, { correlationId })),
