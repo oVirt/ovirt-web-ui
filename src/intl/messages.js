@@ -275,6 +275,7 @@ export const messages: { [messageId: string]: MessageType } = {
   gitHub: 'GitHub',
   globalErrorBoundaryTitle: 'Sorry, VM Portal is currently having some issues.',
   globalErrorBoundaryDescription: 'Please refresh the page or log out and log back in. If the issue persists, please report a bug on {bugUrl}',
+  goBack: 'Go Back',
   groupOfHostsVmCanBeRunningOn: 'Group of hosts the virtual machine can be running on.',
   hdBoot: 'Hard Disk',
   host: { message: 'Host', description: 'Label for host where the VM is running' },
@@ -300,6 +301,7 @@ export const messages: { [messageId: string]: MessageType } = {
   ieNotSupported: 'Internet Explorer is not a supported browser.',
   ipAddress: { message: 'IP Address', description: 'Label for IP addresses reported by VM guest agent' },
   isPersistMemorySnapshot: 'Content of the memory of the virtual machine is included in the snapshot.',
+  itemDoesntExistOrDontHavePermissions: 'The item doesn\'t exist or you do not have the permissions to view it.',
   less: {
     message: 'less',
     description: 'more/less pair used to control collapsible long listing',
@@ -496,6 +498,7 @@ export const messages: { [messageId: string]: MessageType } = {
   totalCountOfVirtualProcessorsVmWillBeEquippedWith: 'Total count of virtual processors the virtual machine will be equipped with.',
   totalCpuTooltip: 'Total virtual CPUs include {sockets} virtual sockets, {cores} cores per socket, and {threads} thread per core.',
   totalMemoryVmWillBeEquippedWith: 'Total memory the virtual machine will be equipped with.',
+  troubleWithFindingPage: 'We\'re having trouble finding that page.',
   typeOfWorkloadVmConfigurationIsOptimizedFor: 'Type of workload the virtual machine configuration is optimized for.',
   uniqueNameOfTheVirtualMachine: 'Unique name of the virtual machine.',
   unknown: {
@@ -560,6 +563,7 @@ export const messages: { [messageId: string]: MessageType } = {
   useCtrlAltEnd: 'Use Ctrl+Alt+End',
   usingRemoteViewer: 'Using a remote viewer relies on a downloaded .vv file.',
   vcpuTopology: 'VCPU Topology',
+  viewAllVirtualMachines: 'View All Virtual Machines',
   virtualMachines: 'Virtual Machines',
   virtualSockets: 'Virtual Sockets',
   vmHasPendingConfigurationChanges: 'This VM has pending configurations changes that will be applied once the VM is shutdown (or rebooted).',

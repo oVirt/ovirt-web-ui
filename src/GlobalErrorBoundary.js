@@ -2,8 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import * as branding from './branding'
 import { msg } from '_/intl'
-import styles from './error.css'
 import AppConfiguration from './config'
+import ErrorContent from '_/components/ErrorContent'
 
 class GlobalErrorBoundary extends React.Component {
   constructor (props) {
@@ -24,14 +24,6 @@ class GlobalErrorBoundary extends React.Component {
   }
 
   render () {
-    const title = msg.globalErrorBoundaryTitle()
-    const descr = msg.globalErrorBoundaryDescription({
-      bugUrl: `<a href='https://github.com/oVirt/ovirt-web-ui/issues'>${msg.gitHub()}</a>`,
-    })
-    const logOut = msg.logOut()
-    const refresh = msg.refresh()
-    const refreshUrl = AppConfiguration.applicationURL
-    const logoutUrl = AppConfiguration.applicationURL + '/sso/logout'
     if (this.state.hasError) {
       return (
         <div>
@@ -42,15 +34,20 @@ class GlobalErrorBoundary extends React.Component {
               </a>
             </div>
           </nav>
-          <div className={`container text-center ${styles['globalErrorContainer']}`}>
-            <img src={branding.resourcesUrls.errorImg} />
-            <h1 className='bolder'>{title}</h1>
-            <p className='h4' dangerouslySetInnerHTML={{ __html: descr }} />
-            <div>
-              <a href={refreshUrl} className='btn'>{refresh}</a>
-              <a href={logoutUrl} className='btn-primary btn'>{logOut}</a>
-            </div>
-          </div>
+          <ErrorContent
+            title={msg.globalErrorBoundaryTitle()}
+            description={msg.globalErrorBoundaryDescription({
+              bugUrl: `<a href='https://github.com/oVirt/ovirt-web-ui/issues'>${msg.gitHub()}</a>`,
+            })}
+            leftButton={{
+              href: AppConfiguration.applicationURL,
+              title: msg.refresh(),
+            }}
+            rightButton={{
+              href: AppConfiguration.applicationURL + '/sso/logout',
+              title: msg.logOut(),
+            }}
+          />
         </div>
       )
     }
