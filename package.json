@@ -72,6 +72,7 @@
     "@patternfly/react-charts": "4.4.17",
     "@patternfly/react-console": "1.10.22",
     "@patternfly/react-tokens": "2.6.9",
+    "@patternfly/react-core": "3.87.3",
     "babel-polyfill": "6.26.0",
     "blob-util": "1.2.1",
     "bootstrap": "3.4.1",

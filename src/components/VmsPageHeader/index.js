@@ -5,10 +5,10 @@ import { connect } from 'react-redux'
 
 import VmUserMessages from '../VmUserMessages'
 import UserMenu from './UserMenu'
+import Header from '../Header'
 import { hrefWithoutHistory } from '_/helpers'
 
 import { refresh } from '_/actions'
-import * as branding from '_/branding'
 import { msg } from '_/intl'
 import OverlayTooltip from '../OverlayTooltip'
 
@@ -18,12 +18,7 @@ import OverlayTooltip from '../OverlayTooltip'
 const VmsPageHeader = ({ page, onRefresh }) => {
   const idPrefix = `pageheader`
   return (
-    <nav className='navbar obrand_mastheadBackground obrand_topBorder navbar-pf-vertical'>
-      <div className='navbar-header'>
-        <a href='/' className='navbar-brand obrand_headerLogoLink' id={`${idPrefix}-logo`}>
-          <img className='obrand_mastheadLogo' src={branding.resourcesUrls.clearGif} />
-        </a>
-      </div>
+    <Header>
       <div className='collapse navbar-collapse'>
         <ul className='nav navbar-nav navbar-right navbar-iconic'>
           <li>
@@ -37,7 +32,7 @@ const VmsPageHeader = ({ page, onRefresh }) => {
           <VmUserMessages />
         </ul>
       </div>
-    </nav>
+    </Header>
   )
 }
 VmsPageHeader.propTypes = {

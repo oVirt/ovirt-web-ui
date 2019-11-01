@@ -13,6 +13,7 @@ import { type Task } from 'redux-saga'
 
 import '_/logger' // initialize our console logging overlay
 
+import '@patternfly/react-core/dist/styles/base.css'
 import 'patternfly/dist/css/patternfly.css'
 import 'patternfly/dist/css/patternfly-additions.css'
 import 'patternfly-react/dist/css/patternfly-react.css'

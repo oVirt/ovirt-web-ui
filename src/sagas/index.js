@@ -1056,6 +1056,13 @@ function* schedulerWithFixedDelay (delayInSeconds = AppConfiguration.schedulerFi
       fixedDelay: call(delay, (delayInSeconds * 1000)),
     })
 
+    const isTokenExpired = yield select(state => state.config.get('isTokenExpired'))
+    if (isTokenExpired) {
+      enabled = false
+      console.log(`⏰ schedulerWithFixedDelay[${myId}] scheduler has been stopped due token expiration`)
+      continue
+    }
+
     if (stopped) {
       enabled = false
       console.log(`⏰ schedulerWithFixedDelay[${myId}] scheduler has been stopped`)
