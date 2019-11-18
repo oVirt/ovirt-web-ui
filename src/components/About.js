@@ -37,6 +37,11 @@ class AboutDialog extends React.Component {
 
     const { oVirtApiVersion } = this.props
     const idPrefix = `about`
+    const trackText = fixedStrings.ISSUES_TRACKER_TEXT || 'Github Issue Tracker'
+    const trackUrl = fixedStrings.ISSUES_TRACKER_URL || 'https://github.com/oVirt/ovirt-web-ui/issues'
+    const reportLink = msg.aboutDialogReportIssuesLink({
+      link: `<strong><a href='${trackUrl}' target='_blank' id='${idPrefix}-issues-link'>${trackText}</a></strong>`,
+    })
 
     let apiVersion = 'unknown'
     if (oVirtApiVersion && oVirtApiVersion.get('major')) {
@@ -67,6 +72,9 @@ class AboutDialog extends React.Component {
                       <span dangerouslySetInnerHTML={{ __html: docLink }} />
                     </li>
                   }
+                  <li id={`${idPrefix}-issues`}>
+                    <div dangerouslySetInnerHTML={{ __html: reportLink }} />
+                  </li>
                 </ul>
               </div>
 
