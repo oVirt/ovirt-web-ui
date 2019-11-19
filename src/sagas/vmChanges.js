@@ -1,4 +1,4 @@
-import { put, select, takeEvery, takeLatest } from 'redux-saga/effects'
+import { put, select, takeEvery, takeLatest, all, call } from 'redux-saga/effects'
 import { push } from 'connected-react-router'
 import merge from 'lodash/merge'
 
@@ -10,8 +10,9 @@ import { msg } from '_/intl'
 
 import { getTopology } from '_/components/utils'
 
-import { callExternalAction, delay } from './utils'
-import { startProgress, stopProgress } from './index'
+import { callExternalAction, delay, delayInMsSteps } from './utils'
+import { startProgress, stopProgress, addVmNic, fetchSingleVm } from './index'
+import { createDiskForVm } from './disks'
 
 function* createMemoryPolicyFromCluster (clusterId, memorySize) {
   const cluster = yield select(state => state.clusters.get(clusterId))
@@ -48,7 +49,7 @@ function* createCpuTopology (vcpu) {
  * @see http://ovirt.github.io/ovirt-engine-api-model/master/#types/vm
  */
 function* composeAndCreateVm ({ payload: { basic, nics, disks }, meta: { correlationId } }) {
-  yield delay(3000) // TODO: *** remove after testing ***
+  yield delay(2000) // TODO: *** remove after testing ***
 
   const osType = yield select(state => state.operatingSystems.getIn([ basic.operatingSystemId, 'name' ]))
   const memory = basic.memory * (1024 ** 2) // input in MiB, stored in bytes
@@ -99,13 +100,13 @@ function* composeAndCreateVm ({ payload: { basic, nics, disks }, meta: { correla
 
   // Provision = TEMPLATE
   if (basic.provisionSource === 'template') {
-    const template = yield select(state => state.teplates.get(basic.templateId))
+    const template = yield select(state => state.templates.get(basic.templateId))
     merge(vm, {
       template: { id: template.get('id') },
 
       cpu: {
-        topology: (basic.cpus === template.cpu.vCPUs)
-          ? template.cpu.topology
+        topology: (basic.cpus === template.getIn(['cpu', 'vCPUs']))
+          ? template.getIn(['cpu', 'topology']).toJS()
           : vm.cpu.topology,
       },
     })
@@ -113,30 +114,63 @@ function* composeAndCreateVm ({ payload: { basic, nics, disks }, meta: { correla
     // TODO: TimeZone handling (https://github.com/oVirt/ovirt-web-ui/pull/1118)
   }
 
-  // TODO: ++ non-template defined NICS
-  const vmNics = nics
-    .filter(nic => !nic.isFromTemplate)
-    .map(nic => ({
-      name: nic.name,
-      interface: nic.deviceType,
-      vnic_profile: { id: nic.vnicProfileId },
-    }))
-
-  vm.nics = { nic: vmNics } // TODO: Can NICs be created and added with the VM create?
-
-  // TODO: ++ non-template defined DISKS
+  /*
+   * NOTE: The VM create REST service does not handle adding NICs or Disks. Until
+   *       the create service supports this, we will add Nics and Disks individually
+   *       after the VM has been created and is no longer image locked.
+   */
 
   const clone = false // TODO: Clone from template based on criteria
   const clonePermissions = basic.provisionSource === 'template'
 
-  const result = yield createVm(
+  const newVmId = yield createVm(
     A.createVm({ vm, cdrom, clone, clonePermissions, transformInput: false }, { correlationId })
   )
-  console.log('Create result:', result)
+
+  if (newVmId === -1) {
+    return
+  }
+
+  // Wait for the VM image to be unlocked before adding NICs and Disks
+  yield waitForVmToBeUnlocked(newVmId)
+
+  // Assuming NICs cannot be added along with the VM create request, add them now
+  yield all(nics.filter(nic => !nic.isFromTemplate).map(nic =>
+    call(addVmNic, A.addVmNic({
+      vmId: newVmId,
+      nic: {
+        name: nic.name,
+        plugged: true,
+        linked: true,
+        vnicProfile: { id: nic.vnicProfileId },
+        interface: nic.deviceType,
+      },
+    }))
+  ))
+
+  // Assuming Disks cannot be added along with the VM create request, add them now
+  yield all(disks.filter(disk => !disk.isFromTemplate).map(disk =>
+    call(createDiskForVm, A.createDiskForVm({
+      vmId: newVmId,
+      disk: {
+        active: true,
+        bootable: disk.bootable,
+        iface: disk.iface,
+
+        name: disk.name,
+        type: 'image',
+        format: disk.format,
+        sparse: disk.format === 'cow',
+        provisionedSize: disk.size,
+
+        storageDomainId: disk.storageDomainId,
+      },
+    }))
+  ))
 
   // start on create, but after everything else is done...
-  if (result !== -1 && basic.startOnCreation) {
-    yield put(A.startVm({ vmId: result }))
+  if (newVmId !== -1 && basic.startOnCreation) {
+    yield put(A.startVm({ vmId: newVmId }))
   }
 }
 
@@ -179,12 +213,31 @@ function* createVm (action) {
     if (action.payload.pushToDetailsOnSuccess) {
       yield put(A.navigateToVmDetails(`/vm/${vmId}`))
     } else {
-      yield put(A.selectVmDetail({ vmId }))
+      yield fetchSingleVm(A.getSingleVm({ vmId }))
     }
     return vmId
   }
 
   return -1
+}
+
+function* waitForVmToBeUnlocked (vmId) {
+  const vm = yield select(state => state.vms.getIn(['vms', vmId]))
+  if (vm.get('status') === 'image_locked') {
+    for (let delayMs of delayInMsSteps()) {
+      console.log(`VM ${vmId} is IMAGE_LOCKED, you may NOT pass.`)
+      yield delay(delayMs)
+
+      const check = yield callExternalAction('getVm', Api.getVm, { payload: { vmId } }, true)
+      if (check && check.id === vmId && check.status !== 'image_locked') {
+        break
+      }
+    }
+
+    yield fetchSingleVm(A.getSingleVm({ vmId }))
+  }
+
+  console.log(`VM ${vmId} is NOT locked, you MAY pass.`)
 }
 
 /*

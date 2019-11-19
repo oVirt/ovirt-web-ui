@@ -309,6 +309,7 @@ class BasicSettings extends React.Component {
         <FieldRow label={msg.name()} id={`${idPrefix}-name`} required validationState={this.validateVmName()}>
           <FormControl
             id={`${idPrefix}-name-edit`}
+            autoComplete='off'
             type='text'
             defaultValue={data.name}
             onChange={e => this.handleChange('name', e.target.value)}

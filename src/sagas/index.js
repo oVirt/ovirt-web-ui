@@ -582,7 +582,7 @@ function* fetchVmDisks ({ vmId }) {
   return []
 }
 
-function* addVmNic (action) {
+export function* addVmNic (action) {
   const nic = yield callExternalAction('addNicToVm', Api.addNicToVm, action)
 
   if (nic && nic.id) {
