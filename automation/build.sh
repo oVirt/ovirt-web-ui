@@ -1,12 +1,11 @@
 #!/bin/bash -xe
 
-DISTVER="$(rpm --eval "%dist"|cut -c2-3)"
-PACKAGER=""
-if [[ "${DISTVER}" == "el" ]]; then
-    PACKAGER=yum
-else
-    PACKAGER=dnf
-fi
+# Force updating nodejs-modules so any pre-seed update to rpm wait is minimized
+PACKAGER=$(command -v dnf >/dev/null 2>&1 && echo 'dnf' || echo 'yum')
+REPOS=$(sed -e '/^#/d' -e '/^[ \t]*$/d' automation/build.repos | cut -f 1 -d ',' | paste -s -d,)
+
+${PACKAGER} --disablerepo='*' --enablerepo="${REPOS}" clean metadata
+${PACKAGER} -y install ovirt-engine-nodejs-modules
 
 # Clean and then create the artifacts directory:
 rm -rf exported-artifacts
@@ -17,18 +16,8 @@ rm -f ./*tar.gz
 # Resolve the release version (is this a snapshot build?)
 version_release="$(grep -m1 VERSION_RELEASE configure.ac | cut -d ' ' -f2 | sed 's/[][)]//g')"
 
-# Force CI to get the latest version of these packages:
-dependencies="$(sed -e '/^[ \t]*$/d' -e '/^#/d' automation/build.packages.force)"
-${PACKAGER} clean metadata
-${PACKAGER} -y install ${dependencies}
-
+# Run the build
 export PATH="/usr/share/ovirt-engine-nodejs/bin:/usr/share/ovirt-engine-nodejs-modules/bin:${PATH}"
-
-# if yarn is not available, patch in the yarn-*.js from nodejs-modules
-# (really only necessary until nodejs-modules makes a yarn executable available)
-if [[ "$(type -t yarn)" == "" ]]; then
-  export YARN="node $(find /usr/share/ovirt-engine-nodejs-modules -maxdepth 1 -name 'yarn-*.js')"
-fi
 
 ./autogen.sh --prefix=/usr --datarootdir=/share
 if [[ "${version_release}" == "0" ]]; then
