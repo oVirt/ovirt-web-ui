@@ -16,6 +16,7 @@ import {
   FormGroup,
   Modal,
   HelpBlock,
+  Checkbox,
 } from 'patternfly-react'
 import SelectBox from '_/components/SelectBox'
 import style from './style.css'
@@ -23,13 +24,13 @@ import OverlayTooltip from '_/components/OverlayTooltip'
 
 const DISK_DEFAULTS = {
   active: true,
-  bootable: false,
   iface: 'virtio_scsi', // virtio | virtio_scsi
 
   id: undefined,
   name: '',
   type: 'image',
   format: 'cow', // cow | raw
+  bootable: false,
   sparse: true,
 
   provisionedSize: 1 * 1024 ** 3,
@@ -85,6 +86,7 @@ class DiskImageEditor extends Component {
         alias: props.suggestedName || '',
         size: DISK_DEFAULTS.provisionedSize / 1024 ** 3,
         storageDomain: props.suggestedStorageDomain || '',
+        bootable: DISK_DEFAULTS.bootable,
         format: DISK_DEFAULTS.format, // cow vs raw .. Allocation Policy (thin sparse vs preallocated !sparse)?
       },
       errors: {},
@@ -102,18 +104,19 @@ class DiskImageEditor extends Component {
     this.changeSize = this.changeSize.bind(this)
     this.changeStorageDomain = this.changeStorageDomain.bind(this)
     this.changeFormat = this.changeFormat.bind(this)
+    this.changeBootable = this.changeBootable.bind(this)
   }
 
   open (e) {
     e.preventDefault()
     const { disk, suggestedName, suggestedStorageDomain } = this.props
     const { storageDomainSelectList } = this.state
-
     const diskInfo = disk
       ? { // edit
         id: disk.get('id'),
         values: {
           alias: disk.get('name'),
+          bootable: disk.get('bootable'),
           size: 0,
           storageDomain: disk.get('storageDomainId'),
           format: disk.get('format'),
@@ -123,6 +126,7 @@ class DiskImageEditor extends Component {
         id: undefined,
         values: {
           alias: suggestedName,
+          bootable: this.props.vm.get('disks').size > 0 ? DISK_DEFAULTS.bootable : true,
           size: DISK_DEFAULTS.provisionedSize / 1024 ** 3,
           storageDomain:
             (/\w+/.test(suggestedStorageDomain) && suggestedStorageDomain) ||
@@ -147,7 +151,6 @@ class DiskImageEditor extends Component {
 
   composeDisk () {
     const { vm, disk } = this.props
-
     const vmDiskInSameStorageDomain =
       vm.get('disks') &&
       vm.get('disks').find(disk => disk.get('storageDomainId') === this.state.values.storageDomain)
@@ -160,18 +163,18 @@ class DiskImageEditor extends Component {
     const provisionedSize = disk
       ? disk.get('provisionedSize') + this.state.values.size * 1024 ** 3
       : this.state.values.size * 1024 ** 3
-
+    const bootable = this.state.values.bootable
     const newDisk = {
       ...DISK_DEFAULTS,
       attachmentId: disk && disk.get('attachmentId'),
 
       iface,
-
       id: this.state.id,
       name: this.state.values.alias,
       provisionedSize,
       storageDomainId: this.state.values.storageDomain,
       format: this.state.values.format,
+      bootable,
       sparse: this.state.values.format === 'cow',
     }
 
@@ -179,7 +182,6 @@ class DiskImageEditor extends Component {
       newDisk.type = disk.get('type')
       newDisk.provisionedSize = undefined
     }
-
     return newDisk
   }
 
@@ -223,6 +225,13 @@ class DiskImageEditor extends Component {
     }
   }
 
+  changeBootable (event) {
+    const target = event.target
+    const bootable = target.type === 'checkbox' ? target.checked : target.value
+    this.setState((state) => ({ values: { ...state.values, bootable } }))
+    this.changesMade = true
+  }
+
   changeStorageDomain (value) {
     this.setState((state) => ({ values: { ...state.values, storageDomain: value } }))
     this.changesMade = true
@@ -234,9 +243,18 @@ class DiskImageEditor extends Component {
   }
 
   isFormValid () {
-    const isNotAllFieldFilled = Object.values(this.state.values).reduce((acc, value) => !value ? true : acc, false)
-    const isErrors = Object.values(this.state.errors).reduce((acc, value) => value ? true : acc, false)
-    return isNotAllFieldFilled || isErrors
+    const isErrors = Object.values(this.state.errors).reduce((acc, value) => (value !== undefined) ? true : acc, false)
+    if (isErrors) {
+      return false
+    }
+
+    // make sure that required fields have data
+    const { values } = this.state
+    return this.props.disk
+      // edit mode needs: a change, an alias and a disk size
+      ? this.changesMade && !!values.alias // add size + bootable or leave like that
+      // create mode needs: name, size, storage domain, disk type
+      : values.alias && values.size > 0 && values.storageDomain && values.format
   }
 
   render () {
@@ -247,6 +265,7 @@ class DiskImageEditor extends Component {
     const isDirectLUN = disk && disk.get('type') === 'lun'
 
     const diskSize = disk && (disk.get('lunSize') ? disk.get('lunSize') : disk.get('provisionedSize'))
+    const vmIsDown = this.props.vm.get('status') === 'down'
 
     return <React.Fragment>
       { trigger({ onClick: this.open }) }
@@ -408,8 +427,28 @@ class DiskImageEditor extends Component {
                 }
               </Col>
             </FormGroup>
+            {/* Disk Bootable */}
+            <FormGroup controlId={`${idPrefix}-bootable`}>
+              <LabelCol sm={3}>
+                { msg.diskEditorBootableLabel() }
+                {!vmIsDown &&
+                  <FieldLevelHelp
+                    inline
+                    content={msg.bootableEditTooltip()}
+                    buttonClass={style['editor-field-help']}
+                  />
+                }
+              </LabelCol>
+              <Col sm={9}>
+                <Checkbox
+                  checked={this.state.values.bootable}
+                  onChange={this.changeBootable}
+                  id={`${idPrefix}-bootable`}
+                  disabled={!vmIsDown}
+                />
+              </Col>
+            </FormGroup>
           </Form>
-
         </Modal.Body>
         <Modal.Footer>
           <Button
@@ -424,7 +463,7 @@ class DiskImageEditor extends Component {
             id={`${idPrefix}-modal-ok`}
             bsStyle='primary'
             onClick={this.handleSave}
-            disabled={this.isFormValid()}
+            disabled={!this.isFormValid()}
           >
             { msg.ok() }
           </Button>

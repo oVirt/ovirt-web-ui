@@ -1,4 +1,4 @@
-import { takeEvery, put } from 'redux-saga/effects'
+import { takeEvery, put, select } from 'redux-saga/effects'
 
 import { CREATE_DISK_FOR_VM, REMOVE_DISK, EDIT_VM_DISK } from '../constants'
 import Api from '../ovirtapi'
@@ -31,6 +31,8 @@ export function* createDiskForVm (action) {
     yield put(setNewDiskDialogDone())
   }
   yield put(setNewDiskDialogProgressIndicator(false))
+
+  yield clearBootableFlagOnVm(vmId, result)
 }
 
 function* removeDisk (action) {
@@ -58,14 +60,16 @@ function* removeDisk (action) {
 
 function* editDiskOnVm (action) {
   const { disk, vmId } = action.payload
-
-  // only allow editing name and provisionedSize
+  // only allow editing name, provisionedSize and bootable
   const editableFieldsDisk = {
     attachmentId: disk.attachmentId,
     id: disk.id,
     name: disk.name,
     provisionedSize: disk.provisionedSize, // only for type === 'image'
+    bootable: disk.bootable,
   }
+
+  yield clearBootableFlagOnVm(vmId, disk)
 
   action.payload.disk = editableFieldsDisk
   const result = yield callExternalAction('updateDiskAttachment', Api.updateDiskAttachment, action)
@@ -77,6 +81,28 @@ function* editDiskOnVm (action) {
   yield fetchDisks({ vms: [ { id: vmId } ] })
 }
 
+function* clearBootableFlagOnVm (vmId, currentDisk) {
+  const vmDisks = yield select(state => state.vms.getIn([ 'vms', vmId, 'disks' ]))
+  const bootableDisk = vmDisks.find(disk => disk.get('bootable'))
+
+  if (bootableDisk && bootableDisk.get('id') !== currentDisk.id) {
+    const removeBootable = bootableDisk.toJS()
+    removeBootable.bootable = false
+
+    // NOTE: Only the attachment needs to be adjusted, but since we put the attachment
+    //       and the disk information together, we'd need to update the Api call to get
+    //       a clean attachment only update.  However, it shouldn't cause any problem
+    //       to just send the whole disk back without changes.
+    const result = yield callExternalAction(
+      'updateDiskAttachment',
+      Api.updateDiskAttachment,
+      { payload: { disk: removeBootable, vmId } }
+    )
+    if (result.error) {
+      console.error('Problem removing the bootable flag :shrug:', result.error)
+    }
+  }
+}
 function* waitForDiskToBeUnlocked (vmId, attachmentId) {
   return yield waitForDiskAttachment(
     vmId,
