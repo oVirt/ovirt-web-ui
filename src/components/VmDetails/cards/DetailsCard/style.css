@@ -9,6 +9,10 @@
   min-width: 250px;
 }
 
+.field-row {
+  max-width: 100%;
+}
+
 .field-row + .field-row {
   margin-top: 5px;
 }

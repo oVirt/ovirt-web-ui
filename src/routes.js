@@ -1,11 +1,18 @@
 import React from 'react'
 
 import PageRouter from './components/PageRouter'
-import { VmDetailToolbar, PoolDetailToolbar, VmConsoleToolbar, VmsListToolbar } from './components/Toolbar'
-import { PoolDetailsPage, VmDetailsPage, VmCreatePage, VmsPage, VmConsolePage } from './components/Pages'
+import Handler404 from './Handler404'
+import { VmDetailToolbar, VmConsoleToolbar, VmsListToolbar } from './components/Toolbar'
+import { VmDetailsPage, VmCreatePage, VmsPage, VmConsolePage } from './components/Pages'
 
 import { msg } from '_/intl'
-import { DETAIL_PAGE_TYPE, DIALOG_PAGE_TYPE, MAIN_PAGE_TYPE, POOL_PAGE_TYPE, CONSOLE_PAGE_TYPE } from '_/constants'
+import {
+  DETAIL_PAGE_TYPE,
+  DIALOG_PAGE_TYPE,
+  MAIN_PAGE_TYPE,
+  CONSOLE_PAGE_TYPE,
+  NO_REFRESH_TYPE,
+} from '_/constants'
 
 /**
  * Function get vms object, and return routes object
@@ -60,13 +67,12 @@ export default function getRoutes (vms) {
           },
         ],
       },
-
       {
-        path: '/pool/:id',
-        title: (match, vms) => vms.getIn(['pools', match.params.id, 'name']) || match.params.id,
-        component: PoolDetailsPage,
-        toolbars: (match) => (<PoolDetailToolbar match={match} key='poolaction' />),
-        type: POOL_PAGE_TYPE,
+        title: '404',
+        component: Handler404,
+        toolbars: null,
+        type: NO_REFRESH_TYPE,
+        breadcrumb: false,
       },
     ],
   }]

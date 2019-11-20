@@ -50,7 +50,6 @@ import {
 
   getSinglePool,
   removeMissingPools,
-  selectPoolDetail as actionSelectPoolDetail,
   removePools,
   updatePools,
   updateVmsPoolsCount,
@@ -139,7 +138,7 @@ import {
   DETAIL_PAGE_TYPE,
   DIALOG_PAGE_TYPE,
   MAIN_PAGE_TYPE,
-  POOL_PAGE_TYPE,
+  NO_REFRESH_TYPE,
 } from '_/constants'
 
 import {
@@ -259,15 +258,10 @@ function* refreshConsolePage ({ id }) {
   }
 }
 
-function* refreshPoolPage ({ id }) {
-  yield selectPoolDetail(actionSelectPoolDetail({ poolId: id }))
-}
-
 const pagesRefreshers = {
   [MAIN_PAGE_TYPE]: refreshMainPage,
   [DETAIL_PAGE_TYPE]: refreshDetailPage,
   [DIALOG_PAGE_TYPE]: refreshDialogPage,
-  [POOL_PAGE_TYPE]: refreshPoolPage,
   [CONSOLE_PAGE_TYPE]: refreshConsolePage,
 }
 
@@ -276,10 +270,12 @@ function* refreshData (action) {
 
   const currentPage = yield select(state => state.config.get('currentPage'))
 
-  if (currentPage.type === undefined) {
-    yield pagesRefreshers[MAIN_PAGE_TYPE](action.payload)
-  } else {
-    yield pagesRefreshers[currentPage.type](Object.assign({ id: currentPage.id }, action.payload))
+  if (currentPage.type !== NO_REFRESH_TYPE) {
+    if (currentPage.type === undefined) {
+      yield pagesRefreshers[MAIN_PAGE_TYPE](action.payload)
+    } else {
+      yield pagesRefreshers[currentPage.type](Object.assign({ id: currentPage.id }, action.payload))
+    }
   }
 
   console.log('refreshData(): finished')
@@ -828,14 +824,14 @@ function* fetchAllEvents (action) {
 
 function* dismissEvent (action) {
   const { event } = action.payload
-  if (event.id) {
+  if (event.source === 'server') {
     const result = yield callExternalAction('dismissEvent', Api.dismissEvent, { payload: { eventId: event.id } })
 
     if (result.status === 'complete') {
       yield fetchAllEvents(action)
     }
   } else {
-    yield put(dismissUserMessage({ time: event.get('time') }))
+    yield put(dismissUserMessage({ eventId: event.id }))
   }
 }
 
@@ -1082,6 +1078,13 @@ function* schedulerWithFixedDelay (delayInSeconds = AppConfiguration.schedulerFi
       stopped: take(STOP_SCHEDULER_FIXED_DELAY),
       fixedDelay: call(delay, (delayInSeconds * 1000)),
     })
+
+    const isTokenExpired = yield select(state => state.config.get('isTokenExpired'))
+    if (isTokenExpired) {
+      enabled = false
+      console.log(`⏰ schedulerWithFixedDelay[${myId}] scheduler has been stopped due token expiration`)
+      continue
+    }
 
     if (stopped) {
       enabled = false

@@ -24,11 +24,15 @@
 
 .ip4-container,
 .ip6-container {
+  padding: 0 5px 3px 5px;
   font-size: 10px;
-  padding: 0 10px;
+  max-width: 100%;
+  min-width: 90px;
 }
-.ip6-container {
-  padding-left: 0;
+
+.nics-title {
+  max-width: 100%;
+  overflow-wrap: break-word;
 }
 
 /* for NicEditor */

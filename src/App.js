@@ -12,45 +12,12 @@ import VmsPageHeader from './components/VmsPageHeader'
 import ToastNotifications from './components/ToastNotifications'
 
 import getRoutes from './routes'
-import AppConfiguration from './config'
-import { fixedStrings, resourcesUrls } from './branding'
+import { fixedStrings } from './branding'
 import { msg } from '_/intl'
-
-/**
- * Login (token) to Engine is missing.
- */
-const NoLogin = ({ logoutWasManual = false }) => {
-  return (
-    <div>
-      <nav className='navbar obrand_mastheadBackground obrand_topBorder navbar-pf-vertical'>
-        <div className='navbar-header'>
-          <a href='/' className='navbar-brand obrand_headerLogoLink' id='pageheader-logo'>
-            <img className='obrand_mastheadLogo' src={resourcesUrls.clearGif} />
-          </a>
-        </div>
-      </nav>
-      <div className='container text-center'>
-        <h1 className='bolder'>
-          { logoutWasManual ? msg.logoutMessageManual() : msg.logoutMessageAutomatic() }
-        </h1>
-
-        <div style={{ margin: '25px 0' }}>
-          { window.DEVELOPMENT ? msg.logoutDeveloperMessage() : msg.logoutRedirected() }
-        </div>
-
-        <div>
-          <a href={AppConfiguration.applicationURL}>{msg.login()}</a>
-        </div>
-      </div>
-    </div>
-  )
-}
-NoLogin.propTypes = {
-  logoutWasManual: PropTypes.bool.isRequired,
-}
+import NoLogin from '_/components/NoLogin'
 
 function isLoginMissing (config) {
-  return !config.get('loginToken')
+  return !config.get('loginToken') || config.get('isTokenExpired')
 }
 
 const UnsupportedBrowser = () => (
@@ -82,13 +49,13 @@ function isBrowserUnsupported () {
  * Main App component. Wrap the main react-router components together with
  * the various dialogs and error messages that may be needed.
  */
-const App = ({ history, config, appReady }) => {
+const App = ({ history, config, appReady, activateSessionTracker }) => {
   if (isBrowserUnsupported()) {
     return <UnsupportedBrowser />
   }
 
   if (isLoginMissing(config)) {
-    return <NoLogin logoutWasManual={config.get('logoutWasManual')} />
+    return <NoLogin logoutWasManual={config.get('logoutWasManual')} isTokenExpired={config.get('isTokenExpired')} />
   }
 
   return (
@@ -98,7 +65,7 @@ const App = ({ history, config, appReady }) => {
         <OvirtApiCheckFailed />
         <LoadingData />
         <ToastNotifications />
-        { appReady && <SessionActivityTracker /> }
+        { appReady && activateSessionTracker && <SessionActivityTracker /> }
         { appReady && renderRoutes(getRoutes()) }
       </div>
     </ConnectedRouter>
@@ -109,11 +76,13 @@ App.propTypes = {
 
   config: PropTypes.object.isRequired,
   appReady: PropTypes.bool.isRequired,
+  activateSessionTracker: PropTypes.bool.isRequired,
 }
 
 export default connect(
   (state) => ({
     config: state.config,
     appReady: !!state.config.get('appConfigured'), // When is the app ready to display data components?
+    activateSessionTracker: (state.config.get('userSessionTimeoutInterval') > 0),
   })
 )(App)

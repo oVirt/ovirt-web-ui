@@ -29,17 +29,31 @@ Row.propTypes = {
   style: PropTypes.object,
 }
 
-const Col = ({ children, id, className = '', style, cols = -1, offset = -1, content = 'expand', ...props }) => {
+const Col = ({
+  children,
+  id,
+  className = '',
+  style,
+  cols = -1,
+  offset = -1,
+  content = 'expand',
+  wrapExpand = false,
+  ...props
+}) => {
   const cn = `${styles['grid-column']} ${className}`
 
   if (cols === -1 && offset > 0) {
     cols = 12 - offset
   }
   const widthPercent = cols * 100 / 12
-  const colStyle = cols <= 0 ? {} : {
-    flex: `0 0 ${widthPercent}%`,
-    maxWidth: `${widthPercent}%`,
-  }
+  const colStyle = cols <= 0
+    ? {}
+    : wrapExpand
+      ? { flex: `1 0 ${widthPercent}%` }
+      : {
+        flex: `0 0 ${widthPercent}%`,
+        maxWidth: `${widthPercent}%`,
+      }
   const offsetStyle = offset < 1 ? {} : {
     marginLeft: `${offset * 100 / 12}%`,
   }
@@ -75,6 +89,7 @@ Col.propTypes = {
     }
   },
   content: PropTypes.oneOf(['expand', 'auto']),
+  wrapExpand: PropTypes.bool,
 }
 
 export {

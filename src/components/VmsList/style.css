@@ -12,10 +12,6 @@
     white-space: nowrap;
 }
 
-.scrollingWrapper {
-    position: relative;
-}
-
 .overlay {
     transition: all 0.6s;
     z-index: 10;
@@ -31,11 +27,13 @@
 .vm-name {
     font-size: 0.8em;
     min-height: 0.8em;
+    margin-bottom: 10px;
 }
 
 .vm-status {
     font-size: 0.8em;
-    min-height: 2.5em;
+    min-height: 46px;
+    margin-bottom: 10px;
 }
 
 .selectedVm {
@@ -55,5 +53,54 @@
 }
 
 .status-height {
-    margin-top: 5px !important;
+    margin-bottom: 30px !important;
+}
+
+.pool-top-line {
+    width: 100%;
+    background: blue;
+    height: 5px;
+    margin-top: -2px;
+    margin-left: -2px;
+    float: left;
+}
+
+.pool-vm-label {
+    padding: 5px 10px;
+    color: white;
+    position: absolute;
+    top: 15px;
+    left: 20px;
+}
+
+.pool-os-label {
+    margin-top: -5px;
+}
+
+dl.pool-info {
+    width: 65%;
+    margin-right: auto;
+    margin-left: auto;
+    font-size: 14px;
+}
+
+dl.pool-info dt {
+    width: 70%;
+    display: inline-block;
+    text-align: left;
+    font-weight: lighter;
+}
+
+dl.pool-info dd {
+    width: 30%;
+    display: inline-block;
+}
+
+.cards-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.card-box :global(.card-pf) {
+    height: calc(100% - 20px);
 }

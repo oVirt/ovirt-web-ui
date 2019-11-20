@@ -35,6 +35,6 @@ export default connect(
     userMessages: state.userMessages,
   }),
   (dispatch) => ({
-    onDismissNotification: (time) => dispatch(setNotificationNotified({ time })),
+    onDismissNotification: (eventId) => dispatch(setNotificationNotified({ eventId })),
   })
 )(ToastNotifications)

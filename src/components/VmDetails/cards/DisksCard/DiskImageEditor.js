@@ -20,6 +20,7 @@ import {
 } from 'patternfly-react'
 import SelectBox from '../../../SelectBox'
 import style from './style.css'
+import OverlayTooltip from '_/components/OverlayTooltip'
 
 const DISK_DEFAULTS = {
   active: true,
@@ -299,7 +300,7 @@ class DiskImageEditor extends Component {
             { !createMode &&
             <FormGroup controlId={`${idPrefix}-size`}>
               <LabelCol sm={3}>
-                { msg.diskEditorSizeLabel() }
+                { msg.diskEditorSizeEditLabel() }
                 { !isImage &&
                   <FieldLevelHelp
                     inline
@@ -332,12 +333,14 @@ class DiskImageEditor extends Component {
                 }
                 { !createMode && msg.diskEditorResizeLabel() }
               </LabelCol>
-              <Col sm={9}>
-                <FormControl
-                  type='number'
-                  value={this.state.values.size}
-                  onChange={this.changeSize}
-                />
+              <Col sm={2}>
+                <OverlayTooltip id={`${idPrefix}-form-tooltip`} tooltip={msg.diskEditorResizeNote()} placement='right'>
+                  <FormControl
+                    type='number'
+                    value={this.state.values.size}
+                    onChange={this.changeSize}
+                  />
+                </OverlayTooltip>
               </Col>
             </FormGroup>
             }

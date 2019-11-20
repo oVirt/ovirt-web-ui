@@ -56,15 +56,19 @@ class BaseCardTitle extends React.Component {
   render () {
     const { url, name } = this.props
     if (url) {
-      return (<Link to={url} className={style['vm-detail-link']}>
-        <p className={`${style['vm-name']} ${style['crop']}`} title={name} data-toggle='tooltip' id={`${this.context}-name`}>
-          {name}
-        </p>
-      </Link>)
+      return (
+        <Link to={url} className={style['vm-detail-link']}>
+          <div className={`${style['vm-name']} ${style['crop']}`} title={name} data-toggle='tooltip' id={`${this.context}-name`}>
+            {name}
+          </div>
+        </Link>
+      )
     }
-    return (<p className={`${style['vm-name']} ${style['crop']}`} title={name} data-toggle='tooltip' id={`${this.context}-name`}>
-      {name}
-    </p>)
+    return (
+      <div className={`${style['vm-name']} ${style['crop']}`} title={name} data-toggle='tooltip' id={`${this.context}-name`}>
+        {name}
+      </div>
+    )
   }
 }
 
@@ -81,9 +85,9 @@ class BaseCardStatus extends React.Component {
     const { children } = this.props
 
     return (
-      <p className={`${style['vm-status']}`} id={`${this.context}-status`}>
+      <div className={`${style['vm-status']}`} id={`${this.context}-status`}>
         {children}
-      </p>
+      </div>
     )
   }
 }
@@ -114,7 +118,7 @@ const BaseCard = ({ children, idPrefix }) => {
   })
   return (
     <IdPrefixContext.Provider value={idPrefix}>
-      <Col xs={12} sm={6} md={4} lg={3} id={`${idPrefix}-box`}>
+      <Col xs={12} sm={6} md={4} lg={3} id={`${idPrefix}-box`} className={style['card-box']}>
         <Card className='card-pf-view card-pf-view-select card-pf-view-single-select'>
           {childs[BaseCardHeader.displayName]}
           <CardBody>

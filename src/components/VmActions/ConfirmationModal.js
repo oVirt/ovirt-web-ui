@@ -8,7 +8,7 @@ const btnPropType = PropsTypes.shape({
   onClick: PropsTypes.func,
 })
 
-const ConfirmationModal = ({ show, title, confirm, body, onClose, extra, accessibleDescription }) => {
+const ConfirmationModal = ({ show, title, confirm, body, subContent, onClose, extra, accessibleDescription }) => {
   return (
     <Modal onHide={onClose} show={show} className='message-dialog-pf' aria-describedby={accessibleDescription}>
       <Modal.Header>
@@ -23,7 +23,17 @@ const ConfirmationModal = ({ show, title, confirm, body, onClose, extra, accessi
       <Modal.Body>
         {
           typeof body === 'string'
-            ? <React.Fragment><Icon type='pf' name='warning-triangle-o' /><div id={accessibleDescription}><p className='lead'>{ body }</p></div></React.Fragment>
+            ? <React.Fragment>
+              <Icon type='pf' name='warning-triangle-o' />
+              <div id={accessibleDescription}>
+                <p className='lead'>
+                  { body }
+                </p>
+                {
+                  subContent && <p>{ subContent }</p>
+                }
+              </div>
+            </React.Fragment>
             : body
         }
       </Modal.Body>
@@ -49,6 +59,7 @@ ConfirmationModal.propTypes = {
   }),
   extra: btnPropType,
   body: PropsTypes.oneOfType([PropsTypes.node, PropsTypes.string]).isRequired,
+  subContent: PropsTypes.string,
 }
 
 export default ConfirmationModal

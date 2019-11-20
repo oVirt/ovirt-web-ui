@@ -40,6 +40,8 @@ const initialState = Immutable.fromJS({
 
   page: 1,
 
+  missedVms: Immutable.Set(),
+
   /**
    * true ~ we need to fetch further vms and pools
    * false ~ all visible entities already fetched
@@ -77,11 +79,16 @@ const vms = actionReducer(initialState, {
     if (page) {
       st = st.set('page', page)
     }
+
+    const vmsIds = Object.keys(updates)
+    st = st.set('missedVms', st.get('missedVms').subtract(vmsIds))
+
     return st
   },
   [REMOVE_VMS] (state, { payload: { vmIds } }) {
     const mutable = state.asMutable()
     vmIds.forEach(vmId => mutable.deleteIn([ 'vms', vmId ]))
+    mutable.update('missedVms', missedVms => missedVms.union(vmIds))
     return mutable.asImmutable()
   },
   [REMOVE_MISSING_VMS] (state, { payload: { vmIdsToPreserve } }) {

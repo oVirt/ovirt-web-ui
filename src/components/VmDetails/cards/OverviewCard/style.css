@@ -41,6 +41,10 @@
   padding-left: 15px;
 }
 
+.vm-margin-top25 {
+  margin-top: 25px;
+}
+
 .vm-description {
   white-space: pre-wrap;
 }
@@ -59,4 +63,12 @@
   display: flex;
   overflow: visible;
   flex-flow: row wrap;
+}
+
+.pool-vm-label {
+    padding: 5px 10px;
+    color: white;
+    position: absolute;
+    top: 15px;
+    left: 30px;
 }

@@ -86,6 +86,12 @@ body {
   height: 28px;
 }
 
+@media (max-width: 768px) {
+  .toolbar-pf-action-right {
+    float: right;
+  }
+}
+
 .card-pf .card-pf-footer {
   background-color: inherit;
   padding-top: 10px;

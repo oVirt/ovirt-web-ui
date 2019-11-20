@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { excludeKeys, DropdownButton, MenuItem } from 'patternfly-react'
+import { excludeKeys, DropdownButton, MenuItem, noop } from 'patternfly-react'
 
 import { hrefWithoutHistory } from '_/helpers'
 
@@ -26,12 +26,15 @@ class Action extends React.Component {
 
   render () {
     const { children, confirmation } = this.props
-    let trigger = children
-    let confirmationDialog = confirmation || null
-    if (confirmation) {
-      trigger = React.cloneElement(trigger, { onClick: this.handleOpen })
-      confirmationDialog = React.cloneElement(confirmationDialog, { show: this.state.showModal, onClose: this.handleClose })
-    }
+
+    const trigger = confirmation
+      ? React.cloneElement(children, { onClick: this.handleOpen })
+      : children
+
+    const confirmationDialog = confirmation
+      ? React.cloneElement(confirmation, { show: this.state.showModal, onClose: this.handleClose })
+      : null
+
     return <React.Fragment>
       {trigger}
       {confirmationDialog}
@@ -43,41 +46,35 @@ Action.propTypes = {
   confirmation: PropTypes.node,
 }
 
-export default Action
+const Button = ({
+  className,
+  tooltip = '',
+  shortTitle,
+  onClick = noop,
+  actionDisabled = false,
+  id,
+}) => {
+  const handleClick = hrefWithoutHistory(onClick)
 
-class Button extends React.Component {
-  render () {
-    let {
-      className,
-      tooltip = '',
-      actionDisabled = false,
-      onClick,
-      shortTitle,
-      id,
-    } = this.props
-
-    let handleClick = hrefWithoutHistory(onClick)
-
-    if (actionDisabled) {
-      return (
-        <button className={`${className} ${style['disabled-button']}`} disabled='disabled' id={id}>
-          <span data-toggle='tooltip' data-placement='left' title={tooltip}>
-            {shortTitle}
-          </span>
-        </button>
-      )
-    }
-
+  if (actionDisabled) {
     return (
-      <span className={style['full-button']}>
-        <a href='#' onClick={handleClick} className={`${className} ${style['link']}`} id={id}>
-          <span data-toggle='tooltip' data-placement='left' title={tooltip} id={`${id}-title`}>
-            {shortTitle}
-          </span>
-        </a>
-      </span>
+      <button className={`${className} ${style['disabled-button']}`} disabled='disabled' id={id}>
+        <span data-toggle='tooltip' data-placement='left' title={tooltip}>
+          {shortTitle}
+        </span>
+      </button>
     )
   }
+
+  return (
+    <span className={style['full-button']}>
+      <a href='#' onClick={handleClick} className={`${className} ${style['link']}`} id={id}>
+        <span data-toggle='tooltip' data-placement='left' title={tooltip} id={`${id}-title`}>
+          {shortTitle}
+        </span>
+      </a>
+    </span>
+  )
 }
 Button.propTypes = {
   className: PropTypes.string.isRequired,
@@ -88,31 +85,33 @@ Button.propTypes = {
   id: PropTypes.string.isRequired,
 }
 
-const MenuItemAction = ({ id, confirmation, shortTitle, icon, onClick }) => {
+const MenuItemAction = ({ confirmation, onClick, shortTitle, icon, ...rest }) => {
   return <Action confirmation={confirmation}>
     <MenuItem
-      id={id}
       onClick={() => {
         onClick && onClick()
         document.dispatchEvent(new MouseEvent('click'))
       }}
+      {...rest}
     >
-      <span>{shortTitle}</span> { icon }
+      <span>{shortTitle}</span> {icon}
     </MenuItem>
   </Action>
 }
-
 MenuItemAction.propTypes = {
   id: PropTypes.string.isRequired,
   confirmation: PropTypes.node,
+  onClick: PropTypes.func,
   shortTitle: PropTypes.string.isRequired,
   icon: PropTypes.node,
-  onClick: PropTypes.func,
+  className: PropTypes.string,
+  disabled: PropTypes.bool,
 }
 
 const ActionButtonWraper = (props) => {
-  const btnProps = excludeKeys(props, [ 'confirmation', 'items' ])
   const { items, actionDisabled, confirmation, shortTitle } = props
+  const btnProps = excludeKeys(props, [ 'confirmation', 'items' ])
+
   if (items && items.filter(i => i !== null).length > 0) {
     return <DropdownButton
       title={shortTitle}
@@ -120,12 +119,17 @@ const ActionButtonWraper = (props) => {
       id='console-selector'
       disabled={actionDisabled}
     >
-      { items.filter(i => i !== null && !i.actionDisabled).map(item => {
-        return <MenuItemAction key={item.id} {...item} />
-      }) }
+      {
+        items.filter(i => i !== null && !i.actionDisabled).map(
+          item => <MenuItemAction key={item.id} {...item} />
+        )
+      }
     </DropdownButton>
   }
-  return <Action confirmation={confirmation} key={shortTitle}><Button {...btnProps} /></Action>
+
+  return <Action confirmation={confirmation} key={shortTitle}>
+    <Button {...btnProps} />
+  </Action>
 }
 ActionButtonWraper.propTypes = {
   confirmation: PropTypes.node,
@@ -133,4 +137,55 @@ ActionButtonWraper.propTypes = {
   ...Button.propTypes,
 }
 
-export { ActionButtonWraper, MenuItemAction }
+const ActionMenuItemWrapper = (props) => {
+  const { items, actionDisabled, shortTitle } = props
+
+  // For console button
+  if (items && items.filter(i => i !== null).length > 0) {
+    if (actionDisabled) {
+      return <MenuItemAction
+        shortTitle={shortTitle}
+        id='console-selector'
+        disabled
+      />
+    } else {
+      return <React.Fragment>
+        <MenuItem divider />
+        {
+          items.filter(i => i !== null && !i.actionDisabled).map(
+            item => <MenuItemAction key={item.id} {...item} />
+          )
+        }
+        <MenuItem divider />
+      </React.Fragment>
+    }
+  }
+
+  const menuProps = excludeKeys(props, [ 'confirmation', 'items' ])
+  const menuClassName = (!actionDisabled && /btn-danger/.test(props.className)) ? style['menu-item-danger'] : ''
+  return (
+    <MenuItemAction
+      {...menuProps}
+      id={`${props.id}-kebab`}
+      key={props.id}
+      confirmation={!actionDisabled && props.confirmation}
+      disabled={actionDisabled}
+      className={menuClassName}
+    />
+  )
+}
+ActionMenuItemWrapper.propTypes = {
+  items: PropTypes.array,
+  confirmation: PropTypes.node,
+  actionDisabled: PropTypes.bool,
+
+  // modified from MenuItemAction.propTypes
+  id: PropTypes.string.isRequired,
+  onClick: PropTypes.func,
+  shortTitle: PropTypes.string.isRequired,
+  icon: PropTypes.node,
+  className: PropTypes.string,
+}
+
+export default Action
+export { ActionButtonWraper, MenuItemAction, ActionMenuItemWrapper }

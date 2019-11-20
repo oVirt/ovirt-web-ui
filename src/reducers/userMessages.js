@@ -8,6 +8,7 @@ import {
   SET_USER_MESSAGES,
 } from '_/constants'
 import { actionReducer } from './utils'
+import uniqueId from 'lodash/uniqueId'
 
 /*flow-include
 import type { FailedExternalAction } from '../actions/error'
@@ -16,20 +17,19 @@ import type { FailedExternalAction } from '../actions/error'
 function addLogEntry ({ state, message, type = 'ERROR', failedAction }) {
   // TODO: use seq
   return state
-    .set('unread', true)
     .update('records', records => records.unshift(Immutable.fromJS({
+      id: uniqueId(),
       message,
       type,
       failedAction,
       time: Date.now(),
       notified: false,
+      source: 'local',
     })))
 }
 
 const initialState = Immutable.fromJS({
   records: [],
-  unread: false,
-  show: false,
 })
 
 const userMessages = actionReducer(initialState, {
@@ -62,17 +62,18 @@ const userMessages = actionReducer(initialState, {
         type: message.severity.toUpperCase(),
         time: message.time,
         notified: true,
+        source: 'server',
       })))
     }
     return newState
   },
 
-  [SET_USERMSG_NOTIFIED] (state, { payload: { time } }) {
-    return state.setIn(['records', state.get('records').findIndex(r => r.get('time') === time), 'notified'], true)
+  [SET_USERMSG_NOTIFIED] (state, { payload: { eventId } }) {
+    return state.setIn(['records', state.get('records').findIndex(r => r.get('id') === eventId), 'notified'], true)
   },
 
-  [DISMISS_USER_MSG] (state, { payload: { time } }) {
-    return state.update('records', records => records.delete(state.get('records').findIndex(r => r.get('time') === time)))
+  [DISMISS_USER_MSG] (state, { payload: { eventId } }) {
+    return state.update('records', records => records.delete(state.get('records').findIndex(r => r.get('id') === eventId)))
   },
 })
 

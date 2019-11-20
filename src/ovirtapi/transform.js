@@ -69,6 +69,28 @@ function cleanUndefined (obj: Object): Object {
   return obj
 }
 
+const colors = [
+  '#ec7a08',
+  '#f0ab00',
+  '#92d400',
+  '#3f9c35',
+  '#007a87',
+  '#00b9e4',
+  '#703fec',
+  '#486b00',
+  '#003d44',
+  '#005c73',
+  '#40199a',
+]
+
+function getPoolColor (id: string): string {
+  let poolColor = 0
+  for (let i = 0; i < id.length; i++) {
+    poolColor += id.charCodeAt(i)
+  }
+  return colors[poolColor % colors.length]
+}
+
 //
 //
 const VM = {
@@ -88,6 +110,8 @@ const VM = {
       stopTime: convertEpoch(vm['stop_time']),
       creationTime: convertEpoch(vm['creation_time']),
       startPaused: convertBool(vm['start_paused']),
+
+      stateless: vm['stateless'] === 'true',
 
       fqdn: vm['fqdn'],
 
@@ -150,6 +174,10 @@ const VM = {
       },
       bootMenuEnabled: vm.bios && vm.bios.boot_menu && convertBool(vm.bios.boot_menu.enabled),
       cloudInit: CloudInit.toInternal({ vm }),
+      timeZone: vm.time_zone && {
+        name: vm.time_zone.name,
+        offset: vm.time_zone.utc_offset,
+      },
     }
 
     if (includeSubResources) {
@@ -242,6 +270,11 @@ const VM = {
             device: vm.os.bootDevices.filter((item) => item !== null),
           },
         },
+      },
+
+      time_zone: vm.timeZone && {
+        name: vm.timeZone.name,
+        utc_offset: vm.timeZone.offset,
       },
 
       bios: vm.hasOwnProperty('bootMenuEnabled')
@@ -365,6 +398,10 @@ const Template = {
       },
       cloudInit: CloudInit.toInternal({ vm: template }),
       bootMenuEnabled: template.bios && template.bios.boot_menu && convertBool(template.bios.boot_menu.enabled),
+      timeZone: template.time_zone && {
+        name: template.time_zone.name,
+        offset: template.time_zone.utc_offset,
+      },
       permits,
     }
   },
@@ -397,6 +434,7 @@ const Pool = {
 
       vm: VM.toInternal({ vm: pool.vm }),
       vmsCount: 0,
+      color: getPoolColor(pool['id']),
     }
   },
 

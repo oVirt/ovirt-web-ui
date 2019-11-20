@@ -8,6 +8,7 @@ import {
   SET_ADMINISTRATOR,
   SET_CURRENT_PAGE,
   SET_CPU_TOPOLOGY_OPTIONS,
+  SET_DEFAULT_TIMEZONE,
   SET_OVIRT_API_VERSION,
   SET_USB_FILTER,
   SET_USER_FILTER_PERMISSION,
@@ -42,6 +43,8 @@ const initialState = Immutable.fromJS({
   maxNumberOfCores: 254,
   maxNumberOfThreads: 8,
   maxNumOfVmCpus: 1,
+  defaultGeneralTimezone: 'Etc/GMT',
+  defaultWindowsTimezone: 'GMT Standard Time',
   websocket: null,
   blankTemplateId: '00000000-0000-0000-0000-000000000000', // "engine/api/" -> special_objects.blank_template.id
 })
@@ -104,6 +107,15 @@ const config = actionReducer(initialState, {
       maxNumberOfCores,
       maxNumberOfThreads,
       maxNumOfVmCpus,
+    })
+  },
+  [SET_DEFAULT_TIMEZONE] (state, { payload: {
+    defaultGeneralTimezone,
+    defaultWindowsTimezone,
+  } }) {
+    return state.merge({
+      defaultGeneralTimezone,
+      defaultWindowsTimezone,
     })
   },
   [APP_CONFIGURED] (state) {
