@@ -13,7 +13,7 @@ const UserMenu = ({ config, onLogout }) => {
   const idPrefix = 'usermenu'
   return (
     <li className='dropdown'>
-      <OverlayTooltip id={`${idPrefix}-tooltip`} tooltip={config.getIn(['user', 'name'])} placement='bottom'>
+      <OverlayTooltip id={`${idPrefix}-tooltip`} tooltip={msg.accountTooltip()} placement='bottom'>
         <a className='dropdown-toggle nav-item-iconic' href='#' data-toggle='dropdown' id={`${idPrefix}-user`}>
           <i className='pficon pficon-user' /><span className='caret' />
         </a>

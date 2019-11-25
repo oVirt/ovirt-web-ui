@@ -114,7 +114,7 @@ class SnapshotItem extends React.Component {
         key='info'
       >
         <a id={`${this.props.id}-info`}>
-          <OverlayTooltip placement={this.state.isMobile ? 'right' : 'left'} id={`${this.props.id}-info-tt`} tooltip={msg.details()}>
+          <OverlayTooltip placement={'top'} id={`${this.props.id}-info-tt`} tooltip={msg.details()}>
             <Icon type='pf' name='info' />
           </OverlayTooltip>
         </a>
@@ -130,7 +130,7 @@ class SnapshotItem extends React.Component {
           id={`${this.props.id}-restore-modal`}
           trigger={
             <SnapshotAction key='restore' id={`${this.props.id}-restore`} >
-              <OverlayTooltip placement={this.state.isMobile ? 'right' : 'left'} id={`${this.props.id}-restore-tt`} tooltip={msg.snapshotRestore()}>
+              <OverlayTooltip placement={'top'} id={`${this.props.id}-restore-tt`} tooltip={msg.snapshotRestore()}>
                 <Icon type='fa' name='play-circle' />
               </OverlayTooltip>
             </SnapshotAction>
@@ -143,7 +143,7 @@ class SnapshotItem extends React.Component {
           id={`${this.props.id}-delete-modal`}
           trigger={
             <SnapshotAction key='delete' id={`${this.props.id}-delete`}>
-              <OverlayTooltip placement={this.state.isMobile ? 'right' : 'left'} id={`${this.props.id}-delete-tt`} tooltip={msg.snapshotDelete()}>
+              <OverlayTooltip placement={'top'} id={`${this.props.id}-delete-tt`} tooltip={msg.snapshotDelete()}>
                 <Icon type='pf' name='delete' />
               </OverlayTooltip>
             </SnapshotAction>
@@ -163,7 +163,7 @@ class SnapshotItem extends React.Component {
 
       // Status tooltip
       const tooltipId = `${this.props.id}-status-icon-${this.props.snapshot.get('status')}`
-      var tooltipPlacement = this.state.isMobile ? 'right' : 'left'
+      var tooltipPlacement = 'top'
       switch (this.props.snapshot.get('status')) {
         case 'locked':
           statusIcon = <StatusTooltip icon={<Icon type='pf' name='locked' />} text={msg.locked()} id={tooltipId} placement={tooltipPlacement} />

@@ -37,7 +37,7 @@ const VmStatusIcon = ({ state, className = undefined }) => {
         : !iconData.className && className ? `${className}`
           : undefined
 
-  return <Icon type={iconData.type} name={iconData.name} className={classNames} title={iconData.tooltip} />
+  return <Icon type={iconData.type} name={iconData.name} className={classNames} />
 }
 VmStatusIcon.propTypes = {
   state: PropTypes.string.isRequired,

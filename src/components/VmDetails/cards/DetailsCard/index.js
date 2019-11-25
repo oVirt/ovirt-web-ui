@@ -686,7 +686,7 @@ class DetailsCard extends React.Component {
         disableTooltip={isPoolVm && isPoolAutomatic ? msg.automaticPoolsNotEditable({ poolName: pool.get('name') }) : undefined}
         editMode={isEditing}
         idPrefix={idPrefix}
-        editTooltip={msg.cardTooltipEditDetails({ vmName: vm.get('name') })}
+        editTooltip={msg.edit()}
         onStartEdit={this.handleCardOnStartEdit}
         onCancel={this.handleCardOnCancel}
         onSave={this.handleCardOnSave}

@@ -58,14 +58,14 @@ class BaseCardTitle extends React.Component {
     if (url) {
       return (
         <Link to={url} className={style['vm-detail-link']}>
-          <div className={`${style['vm-name']} ${style['crop']}`} title={name} data-toggle='tooltip' id={`${this.context}-name`}>
+          <div className={`${style['vm-name']} ${style['crop']}`} id={`${this.context}-name`}>
             {name}
           </div>
         </Link>
       )
     }
     return (
-      <div className={`${style['vm-name']} ${style['crop']}`} title={name} data-toggle='tooltip' id={`${this.context}-name`}>
+      <div className={`${style['vm-name']} ${style['crop']}`} id={`${this.context}-name`}>
         {name}
       </div>
     )

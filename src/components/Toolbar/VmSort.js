@@ -2,6 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Sort } from 'patternfly-react'
+import OverlayTooltip from '../OverlayTooltip'
+import { msg } from '_/intl'
 
 import { setVmSort } from '_/actions'
 import { sortFields } from '_/utils'
@@ -32,11 +34,13 @@ class VmSort extends React.Component {
           currentSortType={sort}
           onSortTypeSelected={this.updateCurrentSortType}
         />
-        <Sort.DirectionSelector
-          isAscending={sort.isAsc}
-          isNumeric={sort.isNumeric}
-          onClick={this.toggleCurrentSortDirection}
-        />
+        <OverlayTooltip id={'sort-tooltip'} tooltip={sort.isAsc ? msg.sortAToZ() : msg.sortZToA()} placement='bottom'>
+          <Sort.DirectionSelector
+            isAscending={sort.isAsc}
+            isNumeric={sort.isNumeric}
+            onClick={this.toggleCurrentSortDirection}
+          />
+        </OverlayTooltip>
       </Sort>
     )
   }

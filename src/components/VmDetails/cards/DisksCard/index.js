@@ -139,7 +139,7 @@ class DisksCard extends React.Component {
         idPrefix={idPrefix}
         icon={{ type: 'pf', name: 'storage-domain' }}
         title={msg.disks()}
-        editTooltip={msg.disksCardEditTooltip({ vmName: vm.get('name') })}
+        editTooltip={msg.edit()}
         itemCount={diskList.size}
         className={baseStyle['cell-card']}
         editable={canEditTheCard}
