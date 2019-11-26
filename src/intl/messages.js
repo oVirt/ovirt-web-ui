@@ -43,6 +43,7 @@ export const messages: { [messageId: string]: MessageType } = {
   authorizationExpired: 'Authorization expired. The page is going to be reloaded to re-login.',
   automaticPoolsNotEditable: 'The pool type of {poolName} is automatic so the details of this virtual machine are not editable.',
   availableVmsFromPool: 'Available VMs from this Pool',
+  aboutDialogReportIssuesLink: 'Please report issues on {link}',
   bootMenu: 'Boot Menu',
   bootMenuTooltip: 'Boot menu allows to select bootable device. It is accessible from a console.',
   bootMenuWarning: 'All changes will take effect after reboot only.',

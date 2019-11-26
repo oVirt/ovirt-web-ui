@@ -3,5 +3,7 @@
   "LEGAL_INFO": "Released under",
   "LEGAL_INFO_LINK_TEXT": "Apache License 2.0",
   "LEGAL_INFO_LINK_URL": "https://github.com/oVirt/ovirt-web-ui/blob/master/LICENSE",
-  "DOCUMENTATION_LINK": "https://ovirt.org/documentation"
+  "DOCUMENTATION_LINK": "https://ovirt.org/documentation",
+  "ISSUES_TRACKER_URL": "https://github.com/oVirt/ovirt-web-ui/issues",
+  "ISSUES_TRACKER_TEXT": "Github Issue Tracker"
 }
