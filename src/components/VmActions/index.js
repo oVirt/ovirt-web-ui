@@ -56,16 +56,15 @@ const VmDropdownActions = ({ actions, id }) => {
   if (actions.length === 1) {
     return <ActionButtonWraper {...actions[0]} className='btn btn-default' />
   }
-
-  const primaryAction = actions[0]
   const secondaryActions = []
-  for (const action of actions.slice(1)) {
+  for (const action of actions) {
     if (action.items) {
       secondaryActions.push(...action.items.filter(item => item && !item.actionDisabled))
     } else {
       secondaryActions.push(action)
     }
   }
+  const primaryAction = secondaryActions.shift()
 
   return (
     <Action confirmation={primaryAction.confirmation}>
@@ -194,7 +193,7 @@ class VmActions extends React.Component {
         onClick: onStart,
       },
       {
-        priority: 1,
+        priority: 0,
         actionDisabled: isPool || isPoolVm || !canSuspend(status) || vm.getIn(['actionInProgress', 'suspend']),
         shortTitle: msg.suspend(),
         tooltip: msg.suspendVm(),
@@ -241,7 +240,7 @@ class VmActions extends React.Component {
         ),
       },
       {
-        priority: 0,
+        priority: 1,
         actionDisabled: isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole']),
         shortTitle: msg.console(),
         tooltip: consoleProtocol,
@@ -274,7 +273,6 @@ class VmActions extends React.Component {
     if (isOnCard) {
       let filteredActions = actions.filter((action) => !action.actionDisabled).sort((a, b) => b.priority - a.priority)
       filteredActions = filteredActions.length === 0 ? [ actions[0] ] : filteredActions
-
       return <div className={`actions-line card-pf-items text-center ${style['action-height']}`} id={idPrefix}>
         <VmDropdownActions id={`${idPrefix}-dropdown`} actions={filteredActions} />
       </div>
