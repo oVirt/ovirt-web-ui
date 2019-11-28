@@ -186,24 +186,26 @@ class DiskImageEditor extends Component {
   }
 
   validateField (field = '') {
-    return () => {
-      const errors = {}
-      let isErrors = false
-      switch (field) {
-        case 'alias':
-          if (!isDiskNameValid(this.state.values.alias)) {
-            errors['alias'] = msg.pleaseEnterValidDiskName()
-            isErrors = true
-          }
-          break
-      }
-      this.setState((state) => ({ errors: { ...state.errors, ...errors } }))
-      return isErrors
+    const errors = this.state.errors
+    let isErrorOnField = false
+
+    switch (field) {
+      case 'alias':
+        if (!isDiskNameValid(this.state.values.alias)) {
+          errors['alias'] = msg.pleaseEnterValidDiskName()
+          isErrorOnField = true
+        } else {
+          delete errors['alias']
+        }
+        break
     }
+
+    this.setState((state) => ({ errors }))
+    return isErrorOnField
   }
 
   handleSave () {
-    if (this.validateField('alias')()) {
+    if (!this.isFormValid()) {
       return
     }
     if (!this.props.disk || this.changesMade) {
@@ -214,7 +216,11 @@ class DiskImageEditor extends Component {
   }
 
   changeAlias ({ target: { value } }) {
-    this.setState((state) => ({ values: { ...state.values, alias: value }, errors: { ...state.errors, 'alias': '' } }))
+    this.setState(
+      (state) => ({ values: { ...state.values, alias: value }, errors: { ...state.errors, 'alias': '' } }),
+      () => {
+        this.validateField('alias')
+      })
     this.changesMade = true
   }
 
@@ -250,11 +256,12 @@ class DiskImageEditor extends Component {
 
     // make sure that required fields have data
     const { values } = this.state
-    return this.props.disk
+    return !!(this.props.disk
       // edit mode needs: a change, an alias and a disk size
       ? this.changesMade && !!values.alias // add size + bootable or leave like that
       // create mode needs: name, size, storage domain, disk type
       : values.alias && values.size > 0 && values.storageDomain && values.format
+    )
   }
 
   render () {
@@ -288,7 +295,7 @@ class DiskImageEditor extends Component {
             id={`${idPrefix}-modal-form`}
           >
             {/* Alias */}
-            <FormGroup controlId={`${idPrefix}-alias`} validationState={this.state.errors['alias'] && 'error'}>
+            <FormGroup controlId={`${idPrefix}-alias`} validationState={this.state.errors['alias'] ? 'error' : null}>
               <LabelCol sm={3}>
                 { msg.diskEditorAliasLabel() }
               </LabelCol>
@@ -297,7 +304,6 @@ class DiskImageEditor extends Component {
                   type='text'
                   defaultValue={this.state.values.alias}
                   onChange={this.changeAlias}
-                  onBlur={this.validateField('alias')}
                 />
                 {this.state.errors['alias'] && <HelpBlock>{this.state.errors['alias']}</HelpBlock>}
               </Col>
