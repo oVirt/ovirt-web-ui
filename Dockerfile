@@ -1,4 +1,4 @@
-FROM node:8
+FROM node:10
 
 RUN apt-get update -qq && apt-get install -qy libelf1
 
