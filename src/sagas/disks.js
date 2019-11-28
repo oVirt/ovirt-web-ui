@@ -21,6 +21,10 @@ export function* createDiskForVm (action) {
   yield put(setNewDiskDialogProgressIndicator(true))
   const vmId = action.payload.vmId
 
+  if (action.payload.disk.bootable) {
+    yield clearBootableFlagOnVm(vmId)
+  }
+
   const result = yield callExternalAction('addDiskAttachment', Api.addDiskAttachment, action)
   if (result.error) {
     const errorText = extractErrorText(result.error)
@@ -31,8 +35,6 @@ export function* createDiskForVm (action) {
     yield put(setNewDiskDialogDone())
   }
   yield put(setNewDiskDialogProgressIndicator(false))
-
-  yield clearBootableFlagOnVm(vmId, result)
 }
 
 function* removeDisk (action) {
@@ -85,7 +87,7 @@ function* clearBootableFlagOnVm (vmId, currentDisk) {
   const vmDisks = yield select(state => state.vms.getIn([ 'vms', vmId, 'disks' ]))
   const bootableDisk = vmDisks.find(disk => disk.get('bootable'))
 
-  if (bootableDisk && bootableDisk.get('id') !== currentDisk.id) {
+  if (bootableDisk && (!currentDisk || bootableDisk.get('id') !== currentDisk.id)) {
     const removeBootable = bootableDisk.toJS()
     removeBootable.bootable = false
 
