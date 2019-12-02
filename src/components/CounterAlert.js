@@ -15,19 +15,18 @@ class CounterAlert extends React.Component {
 
     this.decrementCounter = this.decrementCounter.bind(this)
     this.handleDismiss = this.handleDismiss.bind(this)
-    this.timer = props.timeout ? setInterval(this.decrementCounter, 1000) : null
+    this.timer = props.timeout > 0 ? setInterval(this.decrementCounter, 1000) : null
   }
 
   decrementCounter () {
-    const state = {
-      counter: this.state.counter - 1,
-    }
-    if (this.state.counter <= 0) {
-      clearInterval(this.timer)
-      this.timer = null
-      this.handleDismiss()
-    }
-    this.setState(state)
+    this.setState(
+      state => ({ counter: state.counter - 1 }),
+      () => {
+        if (this.state.counter <= 0) {
+          this.handleDismiss()
+        }
+      }
+    )
   }
 
   componentWillUnmount () {
@@ -35,6 +34,10 @@ class CounterAlert extends React.Component {
   }
 
   handleDismiss () {
+    if (this.timer) {
+      clearInterval(this.timer)
+      this.timer = null
+    }
     this.setState({ showAlert: false })
   }
 
@@ -46,9 +49,15 @@ class CounterAlert extends React.Component {
       </Alert>
   }
 }
+
 CounterAlert.propTypes = {
   title: PropTypes.string.isRequired,
+
+  /**
+   * A timeout of <= 0 will force a manual dismiss of the alert.
+   */
   timeout: PropTypes.number,
+
   type: PropTypes.string,
 }
 
