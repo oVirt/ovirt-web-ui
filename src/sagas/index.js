@@ -134,6 +134,7 @@ import {
   canUserUseCluster,
   canUserUseVnicProfile,
   getUserPermits,
+  isNumber,
 } from '_/utils'
 
 const vmFetchAdditionalList =
@@ -890,6 +891,10 @@ function* startSchedulerWithFixedDelay (action) {
 let _SchedulerCount = 0
 
 function* schedulerWithFixedDelay (delayInSeconds = AppConfiguration.schedulerFixedDelayInSeconds) {
+  if (!isNumber(delayInSeconds) || delayInSeconds <= 0) {
+    return
+  }
+
   const myId = _SchedulerCount++
   console.log(`⏰ schedulerWithFixedDelay[${myId}] starting fixed delay scheduler`)
 
