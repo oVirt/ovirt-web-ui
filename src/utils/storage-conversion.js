@@ -1,5 +1,5 @@
 // @flow
-import { convertValue as convertUnits } from './unit-conversion'
+import { convertUnits } from './unit-conversion'
 
 export const storageUnitTable = [
   { unit: 'TiB' },

@@ -214,6 +214,7 @@ class VmDialog extends React.Component {
    * Structure conforms vmToInternal()
    */
   composeVm () {
+    // TODO: Here is the old compose!!
     const os = this.props.operatingSystems.get(this.state.osId)
 
     return {

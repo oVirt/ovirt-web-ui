@@ -1,8 +1,5 @@
 import { locale as appLocale, msg } from '_/intl'
 
-const PPC_64 = 'ppc64'
-const S390X = 's390x'
-
 // "payload":{"message":"Not Found","shortMessage":"LOGIN failed","type":404,"action":{"type":"LOGIN","payload":{"credentials":{"username":"admin@internal","password":"admi"}}}}}
 export function hidePassword ({ action, param }) {
   if (action) {
@@ -123,7 +120,7 @@ export function getURLQueryParameterByName (name) {
  * @param suffix optional
  * @returns {*}
  */
-export function userFormatOfBytes (number, suffix, precision = 0) {
+export function userFormatOfBytes (number, suffix = 'B', precision = 0) {
   const buildRetVal = (number, suffix) => {
     const rounded = number.toFixed(1)
     return {
@@ -136,22 +133,13 @@ export function userFormatOfBytes (number, suffix, precision = 0) {
   number = number || 0
   const factor = 1024
   const suffixes = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB']
-
-  if (suffix) {
-    const i = suffixes.indexOf(suffix)
-    if (i > 0) {
-      const divisor = Math.pow(factor, i)
-      number = number / divisor
-
-      return buildRetVal(number, suffix)
-    }
-  }
+  const suffixStart = suffix && suffixes.indexOf(suffix) > -1 ? suffixes.indexOf(suffix) : 0
 
   // figure it out
   let divisor = 1
   suffix = ''
   const minValue = 1 - Math.pow(10, -precision) || 1
-  for (let i = 0; i < suffixes.length; i++) {
+  for (let i = suffixStart; i < suffixes.length; i++) {
     const quotient = number / divisor
     if ((quotient / factor) < minValue) {
       number = quotient
@@ -214,15 +202,7 @@ export function formatDateFromNow (d) {
 }
 
 export function filterOsByArchitecture (operatingSystems, architecture) {
-  return operatingSystems.filter(os => {
-    const osName = os.get('name')
-    if (architecture === PPC_64 || architecture === S390X) {
-      return osName.includes(architecture)
-    } else {
-      // default to x64_86 for others (x64_86, undefined - all architectures)
-      return !osName.includes(PPC_64) && !osName.includes(S390X)
-    }
-  })
+  return operatingSystems.filter(os => os.get('architecture') === architecture)
 }
 
 export function findOsByName (operatingSystems, name) {

@@ -17,7 +17,7 @@ import {
   setNewDiskDialogDone,
 } from '../components/NewDiskDialog/actions'
 
-function* createDiskForVm (action) {
+export function* createDiskForVm (action) {
   yield put(setNewDiskDialogProgressIndicator(true))
   const vmId = action.payload.vmId
 

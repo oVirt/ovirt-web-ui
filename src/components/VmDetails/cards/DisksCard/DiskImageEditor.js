@@ -2,10 +2,9 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import { msg } from '../../../../intl'
-import { localeCompare } from '../../../../helpers'
-import { isNumber } from '../../../../utils'
-import { isDiskNameValid } from '_/components/utils'
+import { msg } from '_/intl'
+import { isNumber } from '_/utils'
+import { createDiskFormatList, createStorageDomainList, isDiskNameValid } from '_/components/utils'
 
 import {
   Button,
@@ -18,7 +17,7 @@ import {
   Modal,
   HelpBlock,
 } from 'patternfly-react'
-import SelectBox from '../../../SelectBox'
+import SelectBox from '_/components/SelectBox'
 import style from './style.css'
 import OverlayTooltip from '_/components/OverlayTooltip'
 
@@ -36,18 +35,7 @@ const DISK_DEFAULTS = {
   provisionedSize: 1 * 1024 ** 3,
 }
 
-function storageDomainsToSelectList (storageDomainList) {
-  return storageDomainList
-    .filter(storageDomain => storageDomain.get('canUserUseDomain'))
-    .map(
-      item => ({
-        id: item.get('id'),
-        value: item.get('name'),
-      })
-    )
-    .sort((a, b) => localeCompare(a.value, b.value))
-    .toJS()
-}
+const DISK_FORMATS = createDiskFormatList()
 
 const LabelCol = ({ children, ...props }) => {
   return <Col componentClass={ControlLabel} {...props}>
@@ -90,7 +78,7 @@ class DiskImageEditor extends Component {
     super(props)
     this.state = {
       showModal: false,
-      storageDomainSelectList: storageDomainsToSelectList(props.storageDomainList),
+      storageDomainSelectList: createStorageDomainList(props.storageDomainList, undefined, true),
 
       id: undefined,
       values: {
@@ -147,7 +135,7 @@ class DiskImageEditor extends Component {
 
     this.setState({
       showModal: true,
-      storageDomainSelectList: storageDomainsToSelectList(this.props.storageDomainList),
+      storageDomainSelectList: createStorageDomainList(this.props.storageDomainList, true),
       ...diskInfo,
     })
     this.changesMade = false
@@ -402,11 +390,8 @@ class DiskImageEditor extends Component {
                 { createMode &&
                   <SelectBox
                     id={`${idPrefix}-format`}
-                    items={[
-                      { id: 'raw', value: msg.diskEditorFormatOptionRaw() },
-                      { id: 'cow', value: msg.diskEditorFormatOptionCow() },
-                    ]}
-                    selected={this.state.values.format}
+                    items={DISK_FORMATS}
+                    selected={this.state.format}
                     onChange={this.changeFormat}
                   />
                 }

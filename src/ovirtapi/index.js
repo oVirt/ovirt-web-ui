@@ -38,8 +38,6 @@ const OvirtApi = {
     return Transforms.VM.toInternal({ vm, includeSubResources: getSubResources })
   },
 
-  internalVmToOvirt: Transforms.VM.toApi,
-
   poolToInternal: Transforms.Pool.toInternal,
 
   diskToInternal: Transforms.DiskAttachment.toInternal,
@@ -141,11 +139,23 @@ const OvirtApi = {
       },
     })
   },
+
   getAllTemplates (): Promise<Object> {
     assertLogin({ methodName: 'getAllTemplates' })
-    const url = `${AppConfiguration.applicationContext}/api/templates`
+    const url = `${AppConfiguration.applicationContext}/api/templates?follow=nics,disk_attachments.disk`
     return httpGet({ url })
   },
+  getTemplateNics ({ templateId }: { templateId: string }): Promise<Object> {
+    assertLogin({ methodName: 'getTemplateNics' })
+    const url = `${AppConfiguration.applicationContext}/api/templates/${templateId}/nics`
+    return httpGet({ url })
+  },
+  getTemplateDiskAttachments ({ templateId }: { templateId: string }): Promise<Object> {
+    assertLogin({ methodName: 'getTemplateDiskAttachments' })
+    const url = `${AppConfiguration.applicationContext}/api/templates/${templateId}/diskattachments?follow=disk`
+    return httpGet({ url })
+  },
+
   getAllDataCenters ({ additional }: { additional: Array<string> }): Promise<Object> {
     assertLogin({ methodName: 'getAllDataCenters' })
     const url = `${AppConfiguration.applicationContext}/api/datacenters` +
@@ -207,19 +217,36 @@ const OvirtApi = {
     return httpGet({ url })
   },
 
-  addNewVm ({ vm, transformInput = true, clone = false }: { vm: VmType | Object, transformInput: boolean, clone: boolean }): Promise<Object> {
+  addNewVm ({
+    vm,
+    transformInput = true,
+    clone = false,
+    clonePermissions,
+  }: {
+    vm: VmType | Object,
+    transformInput: boolean,
+    clone: boolean,
+    clonePermissions?: boolean
+  }): Promise<Object> {
     assertLogin({ methodName: 'addNewVm' })
-    const input = JSON.stringify(transformInput ? OvirtApi.internalVmToOvirt({ vm }) : vm)
+    const input = JSON.stringify(transformInput ? Transforms.VM.toApi({ vm }) : vm)
     console.log(`OvirtApi.addNewVm(): ${input}`)
 
     return httpPost({
-      url: `${AppConfiguration.applicationContext}/api/vms?clone=${clone ? 'true' : 'false'}`,
+      url:
+        `${AppConfiguration.applicationContext}/api/vms` +
+        `?clone=${clone ? 'true' : 'false'}` +
+        (clonePermissions === undefined ? '' : `&clone_permissions=${clonePermissions ? 'true' : 'false'}`),
       input,
     })
   },
-  editVm ({ vm, nextRun = false, transformInput = true }: { vm: VmType | Object, nextRun: boolean, transformInput: boolean}): Promise<Object> {
+  editVm ({
+    vm, nextRun = false, transformInput = true,
+  }: {
+    vm: VmType | Object, nextRun: boolean, transformInput: boolean
+  }): Promise<Object> {
     assertLogin({ methodName: 'editVm' })
-    const input = JSON.stringify(transformInput ? OvirtApi.internalVmToOvirt({ vm }) : vm)
+    const input = JSON.stringify(transformInput ? Transforms.VM.toApi({ vm }) : vm)
     console.log(`OvirtApi.editVm(): ${input}`, 'nextRun?', nextRun)
 
     const suffix = nextRun ? '?next_run=true' : ''

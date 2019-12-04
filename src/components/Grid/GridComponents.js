@@ -54,21 +54,26 @@ const Col = ({
         flex: `0 0 ${widthPercent}%`,
         maxWidth: `${widthPercent}%`,
       }
-  const offsetStyle = offset < 1 ? {} : {
-    marginLeft: `${offset * 100 / 12}%`,
-  }
 
-  return (
+  return <React.Fragment>
+    { offset > 0 &&
+      <div
+        style={{
+          flex: `0 0 ${offset * 100 / 12}%`,
+          maxWidth: `${offset * 100 / 12}%`,
+        }}
+      />
+    }
     <div
       column-content={content}
       className={cn}
-      style={{ ...colStyle, ...offsetStyle, ...style }}
+      style={{ ...colStyle, ...style }}
       id={id}
       {...props}
     >
       {children}
     </div>
-  )
+  </React.Fragment>
 }
 Col.propTypes = {
   children: PropTypes.node.isRequired,

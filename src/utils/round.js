@@ -1,4 +1,4 @@
-import { isNumber } from './unit-conversion'
+import { isNumber } from './type-validation'
 
 /*
  * Round a number, an array of numbers, or an Object map of numbers to the specified

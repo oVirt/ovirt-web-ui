@@ -34,9 +34,9 @@ function clearConsole() {
 }
 
 function setupCompiler(port, protocol) {
-
-  // Delete flow folder, because package flow wan't to do that before start
+  // Delete flow folder, because package flow won't to do that before start
   rimraf('/tmp/flow', function () { console.log('Flow folder deleted'); });
+
   // "Compiler" is a low-level interface to Webpack.
   // It lets us listen to some events and provide our own custom messages.
   compiler = webpack(config, handleCompile);
@@ -62,10 +62,13 @@ function setupCompiler(port, protocol) {
       console.log();
       console.log(chalk`oVirt user: {yellow ${userInfo.userName}}, oVirt userId: {yellow ${userInfo.userId}}`);
       console.log(chalk`oVirt SSO token: {yellow ${userInfo.ssoToken}}`)
-      console.log();
       if (process.env.BRANDING) {
         console.log(chalk`Branding from: {yellow ${paths.appBranding}}`)
       }
+      if (process.env.KEEP_ALIVE) {
+        console.log(chalk`Keep SSO token alive interval (minutes): {yellow ${parseInt(process.env.KEEP_ALIVE, 10) || 10}}`)
+      }
+      console.log();
       console.log('The app is running at:');
       console.log();
       console.log(chalk`  {cyan ${protocol}://localhost:${port}/}`);
@@ -277,6 +280,7 @@ function run(port) {
     injectUserInfo(userInfo);
     setupCompiler(port, protocol);
     runDevServer(port, protocol);
+    keepSsoTokenAlive(userInfo.ssoToken)
   }).catch(err => {
     console.error(`Failed obtaining oVirt auth token: ${err}`)
   })
@@ -376,6 +380,28 @@ function getUserInfo (protocol, port) {
       }
     })
   });
+}
+
+function keepSsoTokenAlive (ssoToken) {
+  if (process.env.KEEP_ALIVE) {
+    const engineUrl = process.env.ENGINE_URL.replace(/\/$/, '') + '/api'
+    const minuteInterval = parseInt(process.env.KEEP_ALIVE, 10) || 10
+
+    setInterval(function () {
+      console.log(chalk`keep SSO token alive url {cyan ${engineUrl}}...`)
+      request(
+        engineUrl,
+        { json: true, strictSSL: false, headers: { Authorization: `Bearer ${ssoToken}` }},
+        (error, response, body) => {
+          if (error) {
+            console.log(chalk`...pinged rest api {red ERROR}:`, error)
+          } else {
+            console.log(chalk`...pinged rest api {green OK}`)
+          }
+        }
+      )
+    }, minuteInterval * 60 * 1000)
+  }
 }
 
 /*

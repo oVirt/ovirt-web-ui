@@ -1,15 +1,15 @@
 // @flow
-import { isNumber } from './unit-conversion'
-import type { VmSessionsType } from '../ovirtapi/types'
+import type { VmSessionsType } from '_/ovirtapi/types'
+import { isNumber } from './type-validation'
 
-export * from './permissions'
+export * from './array-utils'
 export * from './format'
-export { floor, round } from './round'
+export * from './permissions'
+export * from './round'
 export * from './storage-conversion'
+export * from './type-validation'
 export * from './vms-filters'
 export * from './vms-sort'
-export { isNumber } from './unit-conversion'
-export * from './array-utils'
 
 export function flatMap<T, U> (array: Array<T>, mapper: (T) => Array<U>): Array<U> {
   return array.map(mapper)

@@ -16,25 +16,13 @@ import SelectBox from '../../../SelectBox'
 import ExpandCollapseSection from '../../../ExpandCollapseSection'
 import NicLinkStateIcon from './NicLinkStateIcon'
 
-import { msg, enumMsg } from '_/intl'
+import { msg } from '_/intl'
 import style from './style.css'
+import { createNicInterfacesList, createVNicProfileList } from '_/components/utils'
 
 const EMPTY_ID = ''
 
-const NIC_INTERFACES = [
-  {
-    id: 'rtl8139',
-    value: enumMsg('NicInterface', 'rtl8139'),
-  },
-  {
-    id: 'e1000',
-    value: enumMsg('NicInterface', 'e1000'),
-  },
-  {
-    id: 'virtio',
-    value: enumMsg('NicInterface', 'virtio'),
-  },
-]
+const NIC_INTERFACES = createNicInterfacesList()
 const NIC_INTERFACE_DEFAULT = 'virtio'
 const NIC_INTERFACE_CANT_CHANGE = [ 'pci_passthrough' ]
 
@@ -166,12 +154,7 @@ class NicEditor extends Component {
         id: EMPTY_ID,
         value: msg.vnicProfileEmpty(),
       },
-      ...vnicProfileList.map(
-        item => ({
-          id: item.get('id'),
-          value: `${item.getIn(['network', 'name'])}/${item.get('name')}`,
-        })
-      ).toJS(),
+      ...createVNicProfileList(vnicProfileList),
     ]
 
     const nicInterface = NIC_INTERFACES.find(ni => ni.id === this.state.values.interface)

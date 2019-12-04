@@ -4,15 +4,15 @@ import { connect } from 'react-redux'
 import { Icon } from 'patternfly-react'
 
 import { msg } from '_/intl'
-import { isNumber } from '_/utils'
 import { addVmNic, deleteVmNic, editVmNic } from '_/actions'
 
 import { Grid, Row, Col } from '_/components/Grid'
+import { suggestNicName } from '_/components/utils'
 import BaseCard from '../../BaseCard'
 
 import itemStyle from '../../itemListStyle.css'
-import style from './style.css'
 import baseStyle from '../../style.css'
+import style from './style.css'
 import NicEditor from './NicEditor'
 import NicListItem from './NicListItem'
 
@@ -35,20 +35,8 @@ function filterVnicProfiles (vm, clusters, vnicProfiles) {
     .toList()
 }
 
-/*
- * Search the VM's current NIC names and return the next unused numbered NIC name.
- */
-function findNextNicName (vm) {
-  let biggestNumber = 0
-
-  vm.get('nics').forEach(nic => {
-    const [, number] = /nic(\d+)/.exec(nic.get('name')) || []
-    if (isNumber(number)) {
-      biggestNumber = Math.max(biggestNumber, parseInt(number, 10))
-    }
-  })
-
-  return `nic${biggestNumber + 1}`
+function suggestNicName_ (vm) {
+  return suggestNicName(vm.get('nics', []).map(nic => nic.get('name')))
 }
 
 /**
@@ -60,7 +48,7 @@ class NicsCard extends React.Component {
     super(props)
 
     this.state = {
-      nextNicName: findNextNicName(props.vm),
+      nextNicName: suggestNicName_(props.vm),
       filteredVnicList: filterVnicProfiles(props.vm, props.clusters, props.vnicProfiles),
     }
 
@@ -75,7 +63,7 @@ class NicsCard extends React.Component {
     const changes = {}
 
     if (prevProps.vm !== vm) {
-      changes.nextNicName = findNextNicName(vm)
+      changes.nextNicName = suggestNicName_(vm)
     }
 
     if (prevProps.vm !== vm || prevProps.clusters !== clusters || prevProps.vnicProfiles !== vnicProfiles) {

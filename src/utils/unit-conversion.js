@@ -1,10 +1,7 @@
 // adapted from: https://github.com/oVirt/ovirt-engine-dashboard/blob/master/src/utils/unit-conversion.js
+import { isNumber } from './type-validation'
 
-export function isNumber (n) {
-  return !isNaN(parseFloat(n)) && isFinite(n)
-}
-
-export function convertValue (unitTable = [], unit, value, minThreshold = 0.1, maxThreshold = 1024) {
+export function convertUnits (unitTable = [], unit, value, minThreshold = 0.1, maxThreshold = 1024) {
   let newUnit = unit
   let newValue
   if (Array.isArray(value)) {
