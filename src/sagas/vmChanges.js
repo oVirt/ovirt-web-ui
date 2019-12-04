@@ -49,8 +49,6 @@ function* createCpuTopology (vcpu) {
  * @see http://ovirt.github.io/ovirt-engine-api-model/master/#types/vm
  */
 function* composeAndCreateVm ({ payload: { basic, nics, disks }, meta: { correlationId } }) {
-  yield delay(2000) // TODO: *** remove after testing ***
-
   const osType = yield select(state => state.operatingSystems.getIn([ basic.operatingSystemId, 'name' ]))
   const memory = basic.memory * (1024 ** 2) // input in MiB, stored in bytes
   const memoryPolicy = yield createMemoryPolicyFromCluster(basic.clusterId, memory)
@@ -225,7 +223,6 @@ function* waitForVmToBeUnlocked (vmId) {
   const vm = yield select(state => state.vms.getIn(['vms', vmId]))
   if (vm.get('status') === 'image_locked') {
     for (let delayMs of delayInMsSteps()) {
-      console.log(`VM ${vmId} is IMAGE_LOCKED, you may NOT pass.`)
       yield delay(delayMs)
 
       const check = yield callExternalAction('getVm', Api.getVm, { payload: { vmId } }, true)
@@ -236,8 +233,6 @@ function* waitForVmToBeUnlocked (vmId) {
 
     yield fetchSingleVm(A.getSingleVm({ vmId }))
   }
-
-  console.log(`VM ${vmId} is NOT locked, you MAY pass.`)
 }
 
 /*

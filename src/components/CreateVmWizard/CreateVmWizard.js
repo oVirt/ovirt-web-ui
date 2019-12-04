@@ -382,9 +382,6 @@ class CreateVmWizard extends React.Component {
     const correlationId = generateUnique('CreateVmWizard_')
     const { basic, network: { nics }, storage: { disks } } = this.state.steps
 
-    console.info('Confirmed the review screen, start the creation with correlationId:', correlationId)
-    console.info('Basic:', basic, 'NICs:', nics, 'Disks:', disks)
-
     this.setState({ correlationId })
     this.props.onCreate(basic, nics, disks, correlationId)
   }
