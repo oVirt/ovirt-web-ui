@@ -40,7 +40,7 @@ window.combobox = require('patternfly-bootstrap-combobox/js/bootstrap-combobox.j
 
 function renderApp (store: Object, errorBridge: Object) {
   ReactDOM.render(
-    <GlobalErrorBoundary errorBridge={errorBridge}>
+    <GlobalErrorBoundary errorBridge={errorBridge} store={store}>
       <Provider store={store}>
         <IntlProvider locale={locale} messages={getSelectedMessages()}>
           <App history={store.history} />

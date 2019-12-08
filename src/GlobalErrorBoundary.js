@@ -1,7 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { msg } from '_/intl'
-import AppConfiguration from './config'
+import { logout } from '_/actions'
+import AppConfiguration from '_/config'
 import ErrorContent from '_/components/ErrorContent'
 import * as branding from '_/branding'
 
@@ -9,10 +10,13 @@ class GlobalErrorBoundary extends React.Component {
   constructor (props) {
     super(props)
     this.state = { hasError: false }
+
     this.props.errorBridge.setErrorHandler((error) => {
       this.setState({ hasError: true })
       console.error(error)
     })
+
+    this.doLogout = this.doLogout.bind(this)
   }
 
   componentDidCatch (error, info) {
@@ -23,17 +27,24 @@ class GlobalErrorBoundary extends React.Component {
     }
   }
 
+  doLogout () {
+    if (this.props.store) {
+      this.props.store.dispatch(logout())
+      this.setState({ hasError: false })
+    } else {
+      if (AppConfiguration.applicationLogoutURL && AppConfiguration.applicationLogoutURL.length > 0) {
+        window.location.href = AppConfiguration.applicationLogoutURL
+      }
+    }
+  }
+
   render () {
     const trackText = branding.fixedStrings.ISSUES_TRACKER_TEXT || 'Github Issue Tracker'
     const trackUrl = branding.fixedStrings.ISSUES_TRACKER_URL || 'https://github.com/oVirt/ovirt-web-ui/issues'
-    // const title = msg.globalErrorBoundaryTitle()
     const descr = msg.globalErrorBoundaryDescription({
       bugUrl: `<a href='${trackUrl}'>${trackText}</a>`,
     })
-    const logOut = msg.logOut()
-    const refresh = msg.refresh()
-    const refreshUrl = AppConfiguration.applicationURL
-    const logoutUrl = AppConfiguration.applicationURL + '/sso/logout'
+
     if (this.state.hasError) {
       return (
         <div>
@@ -46,14 +57,15 @@ class GlobalErrorBoundary extends React.Component {
           </nav>
           <ErrorContent
             title={msg.globalErrorBoundaryTitle()}
-            description={msg.globalErrorBoundaryDescription(descr)}
+            description={descr}
             leftButton={{
-              href: logoutUrl,
-              title: logOut,
+              href: '#',
+              onClick: this.doLogout,
+              title: msg.logOut(),
             }}
             rightButton={{
-              href: refreshUrl + '/sso/logout',
-              title: refresh,
+              href: AppConfiguration.applicationURL,
+              title: msg.refresh(),
             }}
           />
         </div>
@@ -66,6 +78,7 @@ class GlobalErrorBoundary extends React.Component {
 GlobalErrorBoundary.propTypes = {
   children: PropTypes.object.isRequired,
   errorBridge: PropTypes.object.isRequired,
+  store: PropTypes.object,
 }
 
 export default GlobalErrorBoundary
