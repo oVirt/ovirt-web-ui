@@ -331,7 +331,7 @@ export const messages: { [messageId: string]: MessageType } = {
   force: 'Force',
   fqdn: { message: 'FQDN', description: 'Label for the VM guest agent reported full qualified domain name' },
   freeBrowsers: 'Free browsers:',
-  fullScreen: 'Fullscreen',
+  fullScreen: 'Full Screen',
   fullyQualifiedDomainName: 'Fully Qualified Domain Name (FQDN) of the virtual machine. Please note, guest agent must be installed within the virtual machine to retrieve this value.',
   gitHub: 'GitHub',
   globalErrorBoundaryTitle: 'Sorry, VM Portal is currently having some issues.',
@@ -478,6 +478,7 @@ export const messages: { [messageId: string]: MessageType } = {
   pleaseEnterValidDiskName: 'Please enter a valid disk name. Only lower-case and upper-case letters, numbers, and \'_\',\'-\',\'.\' are allowed.',
   pleaseEnterValidVmName: 'Please enter a valid virtual machine name. Only lower-case and upper-case letters, numbers, and \'_\',\'-\',\'.\' are allowed.',
   preserveDisks: 'Preserve disks',
+  pressF11ExitFullScreen: 'Press F11 to exit full screen mode',
   provisionSource: {
     message: 'Provision Source',
     description: 'label on Create New VM',

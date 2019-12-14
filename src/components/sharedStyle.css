@@ -70,7 +70,6 @@
   margin-top: 15px;
 }
 
-
 .loaderBox {
     width: 100%;
     text-align: center;
@@ -92,4 +91,8 @@
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+.text-align-left {
+  text-align: left;
 }

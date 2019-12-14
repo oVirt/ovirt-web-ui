@@ -12,10 +12,12 @@ import constants from './constants'
 
 const { CONNECTED, CONNECTING, DISCONNECTED } = constants
 
-/* eslint no-console: ["warn", { allow: ["error"] }] */
+/* eslint no-console: ['warn', { allow: ['error'] }] */
 
 class VncConsole extends React.Component {
-  state = { status: CONNECTING }
+  state = {
+    status: CONNECTING,
+  }
 
   addEventListeners () {
     this.rfb.addEventListener('connect', this.onConnected)
@@ -122,6 +124,7 @@ class VncConsole extends React.Component {
       textDisconnect,
       toolbarContainer,
       containerId,
+      additionalButtons,
     } = this.props
 
     let status = null
@@ -136,6 +139,7 @@ class VncConsole extends React.Component {
             textCtrlAltDel={textCtrlAltDel}
             textDisconnect={textDisconnect}
             onDisconnect={this.disconnect}
+            additionalButtons={additionalButtons}
           />
         )
         break
@@ -149,9 +153,9 @@ class VncConsole extends React.Component {
 
     if (!this.novncStaticComponent) {
       // create just once
-      this.novncStaticComponent = <div id={containerId} ref={this.setNovncElem} />
+      this.novncStaticComponent =
+        <div id={containerId} ref={this.setNovncElem} />
     }
-
     return (
       <div className={classNames('vnc-console', this.props.topClassName)}>
         {this.props.children}
@@ -196,6 +200,7 @@ VncConsole.propTypes = {
   vncLogging: PropTypes.string /** log-level for noVNC */,
   toolbarContainer: PropTypes.string,
   containerId: PropTypes.string,
+  additionalButtons: PropTypes.arrayOf(PropTypes.node),
 
   topClassName: PropTypes.string /** Enable customization */,
 
@@ -224,6 +229,7 @@ VncConsole.defaultProps = {
   repeaterID: '',
   vncLogging: 'warn',
   toolbarContainer: '',
+  additionalButtons: [],
 
   topClassName: '',
 
