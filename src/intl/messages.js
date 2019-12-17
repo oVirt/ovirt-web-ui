@@ -184,6 +184,7 @@ export const messages: { [messageId: string]: MessageType } = {
   diskEditTooltip: 'Edit',
   diskEditorAliasLabel: 'Name',
   diskEditorBootableLabel: 'Bootable',
+  diskEditorBootableChangeMessage: 'Only one disk can be bootable at a time. The bootable flag will be removed from "{diskName}" and placed on this disk.',
   diskEditorDiskDeletingTooltip: 'The disk is being deleted.',
   diskEditorFormatCantChangeHelp: 'Disk type cannot be changed after it has been created.',
   diskEditorFormatCreateHelp: 'Once you have selected a disk type, you will not be able to change it.',

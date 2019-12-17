@@ -8,16 +8,17 @@ import { createDiskFormatList, createStorageDomainList, isDiskNameValid } from '
 
 import {
   Button,
+  Checkbox,
   Col,
   ControlLabel,
   FieldLevelHelp,
   Form,
   FormControl,
   FormGroup,
-  Modal,
   HelpBlock,
-  Checkbox,
+  Modal,
 } from 'patternfly-react'
+import { Alert } from '@patternfly/react-core'
 import SelectBox from '_/components/SelectBox'
 import style from './style.css'
 import OverlayTooltip from '_/components/OverlayTooltip'
@@ -265,14 +266,18 @@ class DiskImageEditor extends Component {
   }
 
   render () {
-    const { idPrefix, disk, trigger } = this.props
+    const { idPrefix, disk, trigger, vm } = this.props
 
     const createMode = !disk
     const isImage = disk && disk.get('type') === 'image'
     const isDirectLUN = disk && disk.get('type') === 'lun'
 
     const diskSize = disk && (disk.get('lunSize') ? disk.get('lunSize') : disk.get('provisionedSize'))
-    const vmIsDown = this.props.vm.get('status') === 'down'
+    const vmIsDown = vm.get('status') === 'down'
+
+    const isThisDiskCurrentBootable = disk && disk.get('bootable')
+    const currentBootableDisk = vm.get('disks').find(disk => disk.get('bootable'))
+    const showBootableChangeAlert = currentBootableDisk && !isThisDiskCurrentBootable && this.state.values.bootable
 
     return <React.Fragment>
       { trigger({ onClick: this.open }) }
@@ -433,6 +438,7 @@ class DiskImageEditor extends Component {
                 }
               </Col>
             </FormGroup>
+
             {/* Disk Bootable */}
             <FormGroup controlId={`${idPrefix}-bootable`}>
               <LabelCol sm={3}>
@@ -454,6 +460,19 @@ class DiskImageEditor extends Component {
                 />
               </Col>
             </FormGroup>
+            { showBootableChangeAlert &&
+              <FormGroup controlId={`${idPrefix}-bootable`} className={style['editor-bootable-alert-container']}>
+                <Col sm={3} />
+                <Col sm={9}>
+                  <Alert
+                    className={style['editor-bootable-alert']}
+                    isInline
+                    variant='warning'
+                    title={msg.diskEditorBootableChangeMessage({ diskName: currentBootableDisk.get('name') })}
+                  />
+                </Col>
+              </FormGroup>
+            }
           </Form>
         </Modal.Body>
         <Modal.Footer>

@@ -56,6 +56,14 @@
   padding-top: 5px;
 }
 
+.editor-bootable-alert-container {
+  margin-top: -10px;
+}
+
+.editor-bootable-alert {
+  --pf-c-alert__title--FontSize: 15px;
+}
+
 @media only screen and (max-width: 600px) {
   .editor-modal {
     width: 95%;
