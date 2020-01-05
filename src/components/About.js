@@ -66,7 +66,6 @@ class AboutDialog extends React.Component {
                 <ul className='list-unstyled'>
                   <li id={`${idPrefix}-version`}>Version <strong id={`${idPrefix}-version-value`}>{Product.version}-{Product.release}</strong></li>
                   <li id={`${idPrefix}-apiversion`}>{fixedStrings.BRAND_NAME} API Version <strong id={`${idPrefix}-apiversion-value`}>{apiVersion}</strong></li>
-                  <li id={`${idPrefix}-issues`}>Please report issues on <strong><a href='https://github.com/oVirt/ovirt-web-ui/issues' target='_blank' id={`${idPrefix}-issues-link`}>GitHub Issue Tracker</a></strong></li>
                   {fixedStrings.DOCUMENTATION_LINK &&
                     <li id={`${idPrefix}-documentation`}>
                       <span dangerouslySetInnerHTML={{ __html: docLink }} />
