@@ -78,7 +78,7 @@ class DiskImageEditor extends Component {
     super(props)
     this.state = {
       showModal: false,
-      storageDomainSelectList: createStorageDomainList(props.storageDomainList, undefined, true),
+      storageDomainSelectList: createStorageDomainList(props.storageDomainList, props.dataCenterId, true),
 
       id: undefined,
       values: {
@@ -135,7 +135,7 @@ class DiskImageEditor extends Component {
 
     this.setState({
       showModal: true,
-      storageDomainSelectList: createStorageDomainList(this.props.storageDomainList, true),
+      storageDomainSelectList: createStorageDomainList(this.props.storageDomainList, this.props.dataCenterId, true),
       ...diskInfo,
     })
     this.changesMade = false
@@ -446,10 +446,12 @@ DiskImageEditor.propTypes = {
   onSave: PropTypes.func.isRequired,
 
   storageDomains: PropTypes.object.isRequired,
+  dataCenterId: PropTypes.string.isRequired,
 }
 
 export default connect(
-  (state) => ({
+  (state, { vm }) => ({
     storageDomains: state.storageDomains,
+    dataCenterId: state.clusters.getIn([ vm.getIn([ 'cluster', 'id' ]), 'dataCenterId' ]),
   })
 )(DiskImageEditor)
