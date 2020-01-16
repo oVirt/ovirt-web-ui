@@ -81,13 +81,13 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEd
           vmStatus={vmStatus}
           vnicProfileList={vnicProfileList}
           onSave={onEdit}
-          trigger={
+          trigger={({ onClick }) => (
             <OverlayTooltip id={`${idPrefix}-edit-tooltip`} tooltip={msg.nicEditTooltip()}>
-              <a id={`${idPrefix}-edit-action`} className={itemStyle['item-action']}>
+              <a id={`${idPrefix}-edit-action`} className={itemStyle['item-action']} onClick={onClick}>
                 <Icon type='pf' name='edit' />
               </a>
             </OverlayTooltip>
-          }
+          )}
         />
       }
       { !canEdit &&
@@ -105,13 +105,13 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEd
         <DeleteConfirmationModal
           id={`${idPrefix}-delete-modal`}
           onDelete={() => { onDelete(nic.id) }}
-          trigger={
+          trigger={({ onClick }) => (
             <OverlayTooltip id={`${idPrefix}-delete-tooltip`} tooltip={msg.nicDeleteTooltip()}>
-              <a id={`${idPrefix}-delete-action`} className={itemStyle['item-action']}>
+              <a id={`${idPrefix}-delete-action`} className={itemStyle['item-action']} onClick={onClick}>
                 <Icon type='pf' name='delete' />
               </a>
             </OverlayTooltip>
-          }
+          )}
         >
           <span
             dangerouslySetInnerHTML={{

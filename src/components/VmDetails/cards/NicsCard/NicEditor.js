@@ -166,7 +166,7 @@ class NicEditor extends Component {
       )
 
     return <React.Fragment>
-      {React.cloneElement(trigger, { onClick: this.open })}
+      { trigger({ onClick: this.open }) }
 
       <Modal
         id={modalId}
@@ -294,7 +294,7 @@ NicEditor.propTypes = {
   nextNicName: PropTypes.string,
 
   vnicProfileList: PropTypes.object.isRequired,
-  trigger: PropTypes.element.isRequired,
+  trigger: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
 }
 

@@ -41,6 +41,9 @@ class VmNic extends React.Component {
         ({vnicProfile ? `${vnicProfile.getIn(['network', 'name'])}/${vnicProfile.get('name')}` : `${msg.noNetwork()}`})
       </span>
     )
+    const areYouSure = msg.areYouSureYouWantToDeleteNic({
+      nicName: `"<strong>${this.props.nic.get('name')}</strong>"`,
+    })
 
     return (
       <li>
@@ -55,14 +58,14 @@ class VmNic extends React.Component {
           </span>
           { showSettings &&
             <DeleteConfirmationModal
-              trigger={
-                <Button bsStyle='default' bsSize='small' disabled={isUp}>
+              trigger={({ onClick }) => (
+                <Button bsStyle='default' bsSize='small' disabled={isUp} onClick={onClick}>
                   {msg.delete()}
                 </Button>
-              }
+              )}
               onDelete={this.handleDelete}
             >
-              <p dangerouslySetInnerHTML={{ __html: msg.areYouSureYouWantToDeleteNic({ nicName: `"<strong>${this.props.nic.get('name')}</strong>"` }) }} />
+              <p dangerouslySetInnerHTML={{ __html: areYouSure }} />
               <p>{msg.thisOperationCantBeUndone()}</p>
             </DeleteConfirmationModal>
           }

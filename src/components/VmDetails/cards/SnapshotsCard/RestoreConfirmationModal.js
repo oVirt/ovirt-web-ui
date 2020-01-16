@@ -5,8 +5,8 @@ import Immutable from 'immutable'
 
 import { Icon, MessageDialog } from 'patternfly-react'
 import { msg } from '_/intl'
+import { getMinimizedString, escapeHtml } from '_/components/utils'
 import { restoreVmSnapshot } from './actions'
-import { getMinimizedString, escapeHtml } from '../../../utils'
 
 const MAX_DESCRIPTION_SIZE = 150
 
@@ -33,16 +33,15 @@ class RestoreConfirmationModal extends React.Component {
   }
 
   render () {
-    const { snapshot, trigger, snapshots, disabled, id } = this.props
+    const { snapshot, trigger, snapshots, id } = this.props
 
     const icon = <Icon type='pf' name='warning-triangle-o' />
-    const clonedTrigger = React.cloneElement(trigger, { onClick: this.open, disabled })
     const snapshotsThatWillBeDeleted = snapshots.filter((s) => s.get('date') > snapshot.get('date'))
     const minDescription = escapeHtml(getMinimizedString(snapshot.get('description'), MAX_DESCRIPTION_SIZE))
 
     return (
       <React.Fragment>
-        {clonedTrigger}
+        { trigger({ onClick: this.open })}
         <MessageDialog
           id={id}
           show={this.state.showModal}
@@ -75,12 +74,12 @@ class RestoreConfirmationModal extends React.Component {
 }
 
 RestoreConfirmationModal.propTypes = {
+  id: PropsTypes.string.isRequired,
   snapshot: PropsTypes.object.isRequired,
   vmId: PropsTypes.string.isRequired, // eslint-disable-line react/no-unused-prop-types
-  id: PropsTypes.string.isRequired,
+  trigger: PropsTypes.func.isRequired,
+
   snapshots: PropsTypes.object.isRequired,
-  trigger: PropsTypes.node.isRequired,
-  disabled: PropsTypes.bool,
   onRestore: PropsTypes.func.isRequired,
 }
 

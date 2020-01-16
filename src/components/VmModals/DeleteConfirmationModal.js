@@ -28,7 +28,7 @@ class DeleteConfirmationModal extends React.Component {
   }
 
   render () {
-    const { children, trigger, disabled, id, severity = 'normal' } = this.props
+    const { children, trigger, id, severity = 'normal' } = this.props
 
     const primary = Array.isArray(children) ? children[0] : children
     const secondary = Array.isArray(children) ? children.slice(1) : undefined
@@ -40,7 +40,7 @@ class DeleteConfirmationModal extends React.Component {
 
     return (
       <React.Fragment>
-        {React.cloneElement(trigger, { onClick: this.handleTriggerClick, disabled })}
+        { trigger({ onClick: this.handleTriggerClick }) }
         <MessageDialog
           id={id}
           show={this.state.show}
@@ -61,8 +61,7 @@ class DeleteConfirmationModal extends React.Component {
 }
 DeleteConfirmationModal.propTypes = {
   id: PropTypes.string.isRequired,
-  trigger: PropTypes.node.isRequired,
-  disabled: PropTypes.bool,
+  trigger: PropTypes.func.isRequired,
   children: PropTypes.node.isRequired,
   onDelete: PropTypes.func.isRequired,
   onClose: PropTypes.func,

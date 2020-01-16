@@ -63,14 +63,6 @@ const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, id, isPoolVm, ...othe
   const nicsToShow = nicsToRender.slice(0, 2)
   const additionalNics = nicsToRender.slice(2)
 
-  const restoreButton = isPoolVm
-    ? <OverlayTrigger placement='top' overlay={<Tooltip id={`${id}-restore-tt`}>{ msg.vmPoolSnapshotRestoreUnavailable() }</Tooltip>}>
-      <span>
-        <Button bsStyle='default' id={`${id}-restore`} disabled style={{ pointerEvents: 'none' }}>{ msg.snapshotRestore() }</Button>
-      </span>
-    </OverlayTrigger>
-    : <Button bsStyle='default' id={`${id}-restore`}>{ msg.snapshotRestore() }</Button>
-
   return <Popover
     id={id}
     title={
@@ -204,11 +196,22 @@ const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, id, isPoolVm, ...othe
     </div>
     <div style={{ textAlign: 'left' }}>
       <RestoreConfirmationModal
-        snapshot={snapshot}
         id={`${id}-restore-modal`}
+        snapshot={snapshot}
         vmId={vmId}
-        disabled={restoreDisabled}
-        trigger={restoreButton}
+        trigger={({ onClick }) =>
+          isPoolVm ? (
+            <OverlayTrigger placement='top' overlay={<Tooltip id={`${id}-restore-tt`}>{ msg.vmPoolSnapshotRestoreUnavailable() }</Tooltip>}>
+              <span>
+                <Button bsStyle='default' id={`${id}-restore`} disabled style={{ pointerEvents: 'none' }}>{ msg.snapshotRestore() }</Button>
+              </span>
+            </OverlayTrigger>
+          ) : (
+            <Button bsStyle='default' id={`${id}-restore`} onClick={onClick} disabled={restoreDisabled}>
+              { msg.snapshotRestore() }
+            </Button>
+          )
+        }
       />
     </div>
   </Popover>
