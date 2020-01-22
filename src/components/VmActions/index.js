@@ -15,6 +15,7 @@ import {
   canConsole,
   canSuspend,
   canRemove,
+  canExternalService,
 } from '../../vm-status'
 
 import {
@@ -80,6 +81,7 @@ const VmDropdownActions = ({ actions, id }) => {
             confirmation={action.confirmation}
             shortTitle={action.shortTitle}
             icon={action.icon}
+            onClick={action.onClick}
             className=''
           />
         )}
@@ -250,6 +252,30 @@ class VmActions extends React.Component {
         items: consoles,
       },
     ]
+
+    // add custom service buttons based on value of the
+    // external_service custom VM param.
+    const fqdn = vm.get('fqdn')
+    const servicesRaw = vm.get('customProperties').find(prop => prop.get('name') === 'external_service')
+    if (servicesRaw && servicesRaw.get('value')) {
+      // external_service is a bar deliniated list of NAME/PROTOCOL/PORT
+      // multiple services can be defined by chaining them with a comma
+      const services = servicesRaw.get('value').split(',').map(svc => svc.split('/')).filter(svc => svc.length === 3)
+
+      let idx = 0
+      for (const [serviceName, protocol, port] of services) {
+        actions.push({
+          priority: 0,
+          actionDisabled: isPool || !canExternalService(status, fqdn),
+          shortTitle: serviceName,
+          tooltip: msg.serviceTip({ serviceName }),
+          className: 'btn btn-default',
+          id: `${idPrefix}-button-svc-${idx++}`,
+          onClick: () => window.open(`${protocol}://${fqdn}:${port}`),
+        })
+      }
+    }
+
     return actions
   }
 

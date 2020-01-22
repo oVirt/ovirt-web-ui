@@ -522,6 +522,7 @@ export const messages: { [messageId: string]: MessageType } = {
   secondsShort: 's',
   sendShortcutKey: 'Send Key',
   sendCtrlAltDel: 'Ctrl+Alt+Del',
+  serviceTip: 'Launch VM service - {serviceName}',
   sessionExpired: {
     message: 'Your session is about to timeout due to inactivity.',
     description: 'Primary message for SessionTimeout modal component',

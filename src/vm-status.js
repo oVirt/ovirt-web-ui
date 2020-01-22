@@ -33,3 +33,7 @@ export function canChangeCd (state) {
 export function canDeleteDisk (state) {
   return ['down'].includes(state)
 }
+
+export function canExternalService (state, fqdn) {
+  return fqdn ? canRestart(state) : false
+}
