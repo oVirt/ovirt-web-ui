@@ -117,6 +117,8 @@ const VM = {
 
       fqdn: vm['fqdn'],
 
+      customProperties: vm['custom_properties'] ? vm['custom_properties']['custom_property'] : [],
+
       template: {
         id: vm['template'] ? vm.template['id'] : undefined,
       },
