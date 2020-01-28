@@ -21,6 +21,7 @@ import {
   MenuItem,
   Table,
 } from 'patternfly-react'
+import _TableInlineEditRow from './_TableInlineEditRow'
 import SelectBox from '_/components/SelectBox'
 
 import style from './style.css'
@@ -424,7 +425,7 @@ class Networking extends React.Component {
             columns={this.columns}
             components={{
               body: {
-                row: Table.InlineEditRow,
+                row: _TableInlineEditRow,
               },
             }}
           >
