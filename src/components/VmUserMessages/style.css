@@ -2,6 +2,7 @@
     border-bottom: 1px solid #d1d1d1;
     padding: 0;
     background-color: #fff;
+    overflow-y: auto;
 }
 
 .usermessages-icon {
