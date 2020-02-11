@@ -85,10 +85,12 @@ class VmUserMessages extends React.Component {
         <NotificationDrawer hide={!this.state.show} expanded={this.state.expanded}>
           <NotificationDrawer.Title onCloseClick={this.handleToggle} onExpandClick={this.handleExpand} />
           <NotificationDrawer.PanelBody className={style['panel-body']}>
-            {messagesList}
+            <div className={style['drawer-pf-notifications-list']}>
+              {messagesList}
+            </div>
             { messagesCount > 0 &&
               <NotificationDrawer.PanelAction>
-                <NotificationDrawer.PanelActionLink data-toggle='clear-all'>
+                <NotificationDrawer.PanelActionLink data-toggle='clear-all' className={style['drawer-pf-action-clear-notification-list']}>
                   <Button bsStyle='link' onClick={onClearMessages}>
                     <Icon type='pf' name='close' />
                     { msg.clearAll() }

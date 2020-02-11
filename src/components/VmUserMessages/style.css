@@ -1,7 +1,19 @@
 .panel-body {
-    border-bottom: 1px solid #d1d1d1;
     padding: 0;
     background-color: #fff;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.drawer-pf-action-clear-messages {
+    border: solid 1px #d1d1d1 !important;
+    padding: 10px 0 !important;
+    margin: 0;
+}
+
+.drawer-pf-action-clear-notification-list {
+    flex: auto;
     overflow-y: auto;
 }
 
