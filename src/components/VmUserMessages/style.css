@@ -6,10 +6,11 @@
     flex-direction: column;
 }
 
-.drawer-pf-action-clear-messages {
+.drawer-pf-notifications-list {
     border: solid 1px #d1d1d1 !important;
     padding: 10px 0 !important;
     margin: 0;
+    overflow-y: auto;
 }
 
 .drawer-pf-action-clear-notification-list {
