@@ -22,6 +22,7 @@ import {
   Table,
   Label,
 } from 'patternfly-react'
+import _TableInlineEditRow from './_TableInlineEditRow'
 import SelectBox from '_/components/SelectBox'
 
 import style from './style.css'
@@ -529,7 +530,7 @@ class Storage extends React.Component {
             columns={this.columns}
             components={{
               body: {
-                row: Table.InlineEditRow,
+                row: _TableInlineEditRow, // Table.InlineEditRow,
               },
             }}
           >
