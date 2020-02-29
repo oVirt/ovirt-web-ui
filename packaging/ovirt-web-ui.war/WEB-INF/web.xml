@@ -3,6 +3,7 @@
          version="3.0">
 
     <display-name>oVirt Web UI</display-name>
+
     <!-- Application with context parameters -->
     <context-param>
         <param-name>applicationName</param-name>
@@ -81,19 +82,7 @@
     <servlet>
         <servlet-name>logout</servlet-name>
         <servlet-class>org.ovirt.engine.core.aaa.servlet.SsoLogoutServlet</servlet-class>
-
     </servlet>
-
-    <servlet>
-        <servlet-name>index</servlet-name>
-        <jsp-file>/index.jsp</jsp-file>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>index</servlet-name>
-        <url-pattern>/vm/*</url-pattern>
-        <url-pattern>/pool/*</url-pattern>
-    </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>logout</servlet-name>
         <url-pattern>/sso/logout</url-pattern>
@@ -111,19 +100,6 @@
         <servlet-name>SsoPostLoginServlet</servlet-name>
         <url-pattern>/sso/oauth2-callback</url-pattern>
     </servlet-mapping>
-   <servlet-mapping>
-        <servlet-name>remoteLogging</servlet-name>
-        <url-pattern>/remote_logging</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>PageNotFoundForwardServlet</servlet-name>
-        <url-pattern>/404.html</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>MethodNotAllowedForwardServlet</servlet-name>
-        <url-pattern>/405.html</url-pattern>
-    </servlet-mapping>
 
     <servlet>
         <servlet-name>BrandingJsp</servlet-name>
@@ -132,6 +108,22 @@
     <servlet-mapping>
         <servlet-name>BrandingJsp</servlet-name>
         <url-pattern>/branding/*</url-pattern>
+    </servlet-mapping>
+
+    <!--
+      The main page for ovirt-web-ui's React app.
+
+      Note: All URL patterns used by the page router must be mapped here or
+            they will not work when deployed to ovirt-engine.
+    -->
+    <servlet>
+        <servlet-name>index</servlet-name>
+        <jsp-file>/index.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>index</servlet-name>
+        <url-pattern>/vm/*</url-pattern>
+        <url-pattern>/pool/*</url-pattern>
     </servlet-mapping>
 
     <!-- Default page to serve -->
@@ -144,7 +136,6 @@
         <error-code>404</error-code>
         <location>/index.jsp</location>
     </error-page>
-
     <error-page>
         <error-code>405</error-code>
         <location>/405.html</location>
