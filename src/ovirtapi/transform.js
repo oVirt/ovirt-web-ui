@@ -374,6 +374,7 @@ const Template = {
       number: template.version ? template.version.version_number : undefined,
       baseTemplateId: template.version && template.version.base_template ? template.version.base_template.id : undefined,
     }
+
     const permissions = template.permissions && template.permissions.permission
       ? Permissions.toInternal({ permissions: template.permissions.permission })
       : []

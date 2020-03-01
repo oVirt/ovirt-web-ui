@@ -1,6 +1,6 @@
 import Api, { Transforms } from '_/ovirtapi'
 import { all, call, put, select, takeLatest, throttle } from 'redux-saga/effects'
-import { callExternalAction, permissionsToUserPermits } from './utils'
+import { callExternalAction, entityPermissionsToUserPermits } from './utils'
 
 import { canUserUseStorageDomain } from '_/utils'
 
@@ -53,7 +53,7 @@ function* fetchDataCenters () {
 
     // Calculate permits and 'canUser*'
     for (const dataCenter of dataCentersInternal) {
-      dataCenter.userPermits = yield permissionsToUserPermits(dataCenter.permissions)
+      dataCenter.userPermits = yield entityPermissionsToUserPermits(dataCenter)
     }
 
     return dataCentersInternal
@@ -72,7 +72,7 @@ function* fetchDataAndIsoStorageDomains () {
 
     // Calculate permits and 'canUser*'
     for (const storageDomain of storageDomainsInternal) {
-      storageDomain.userPermits = yield permissionsToUserPermits(storageDomain.permissions)
+      storageDomain.userPermits = yield entityPermissionsToUserPermits(storageDomain)
       storageDomain.canUserUseDomain = canUserUseStorageDomain(storageDomain.userPermits)
     }
 

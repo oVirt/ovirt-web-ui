@@ -20,7 +20,6 @@ import sagasLogin from './login'
 import sagasOptionsDialog from '_/components/OptionsDialog/sagas'
 import sagasRoles from './roles'
 import sagasStorageDomains, { fetchIsoFiles } from './storageDomains'
-import sagasTemplates from './templates'
 import sagasVmChanges from './vmChanges'
 import sagasVmSnapshots from '_/components/VmDetails/cards/SnapshotsCard/sagas'
 
@@ -891,7 +890,6 @@ export function* rootSaga () {
     ...sagasOptionsDialog,
     ...sagasRoles,
     ...sagasStorageDomains,
-    ...sagasTemplates,
     ...sagasVmChanges,
     ...sagasVmSnapshots,
   ])

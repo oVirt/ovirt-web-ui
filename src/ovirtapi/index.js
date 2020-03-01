@@ -43,23 +43,18 @@ const OvirtApi = {
   diskToInternal: Transforms.DiskAttachment.toInternal,
 
   nicToInternal: Transforms.Nic.toInternal,
-  internalNicToOvirt: Transforms.Nic.toApi,
-
-  networkToInternal: Transforms.Network.toInternal,
 
   sessionsToInternal: Transforms.VmSessions.toInternal,
 
   iconToInternal: Transforms.Icon.toInternal,
 
   cdRomToInternal: Transforms.CdRom.toInternal,
-  internalCdRomToOvirt: Transforms.CdRom.toApi,
 
   SSHKeyToInternal: Transforms.SSHKey.toInternal,
 
   consolesToInternal: Transforms.VmConsoles.toInternal,
 
   snapshotToInternal: Transforms.Snapshot.toInternal,
-  internalSnapshotToOvirt: Transforms.Snapshot.toApi,
 
   permissionsToInternal: Transforms.Permissions.toInternal,
 
@@ -75,12 +70,63 @@ const OvirtApi = {
     const url = `${AppConfiguration.applicationContext}/api/`
     return httpGet({ url })
   },
+
+  icon ({ id }: { id: string }): Promise<Object> {
+    assertLogin({ methodName: 'icon' })
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/icons/${id}` })
+  },
+
+  groups ({ userId }: { userId: string }): Promise<Object> {
+    assertLogin({ methodName: 'groups' })
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/users/${userId}/groups` })
+  },
   getRoles (): Promise<Object> {
     assertLogin({ methodName: 'getRoles' })
     const url = `${AppConfiguration.applicationContext}/api/roles?follow=permits`
     return httpGet({ url })
   },
 
+  getAllClusters (): Promise<Object> {
+    assertLogin({ methodName: 'getAllClusters' })
+    const url = `${AppConfiguration.applicationContext}/api/clusters?follow=networks,permissions`
+    return httpGet({ url })
+  },
+  getAllDataCenters ({ additional }: { additional: Array<string> }): Promise<Object> {
+    assertLogin({ methodName: 'getAllDataCenters' })
+    const url = `${AppConfiguration.applicationContext}/api/datacenters` +
+      (additional && additional.length > 0 ? `?follow=${additional.join(',')}` : '')
+    return httpGet({ url })
+  },
+  getAllHosts (): Promise<Object> {
+    assertLogin({ methodName: 'getAllHosts' })
+    const url = `${AppConfiguration.applicationContext}/api/hosts`
+    return httpGet({ url })
+  },
+  getAllOperatingSystems (): Promise<Object> {
+    assertLogin({ methodName: 'getAllOperatingSystems' })
+    const url = `${AppConfiguration.applicationContext}/api/operatingsystems`
+    return httpGet({ url })
+  },
+  getAllTemplates (): Promise<Object> {
+    assertLogin({ methodName: 'getAllTemplates' })
+    const url = `${AppConfiguration.applicationContext}/api/templates?follow=nics,disk_attachments.disk,permissions`
+    return httpGet({ url })
+  },
+
+  // TODO: Convert to use frontend based role to permission mapping
+  getDiskPermissions ({ id }: { id: string }): Promise<Object> {
+    assertLogin({ methodName: 'getDiskPermissions' })
+    const url = `${AppConfiguration.applicationContext}/api/disks/${id}/permissions?follow=role.permits`
+    return httpGet({ url, custHeaders: { Filter: true } })
+  },
+  // TODO: Convert to use frontend based role to permission mapping
+  getVmPermissions ({ vmId }: VmIdType): Promise<Object> {
+    assertLogin({ methodName: 'getVmPermissions' })
+    const url = `${AppConfiguration.applicationContext}/api/vms/${vmId}/permissions?follow=role.permits`
+    return httpGet({ url, custHeaders: { Filter: true } })
+  },
+
+  // ---- VM fetching
   getVm ({ vmId, additional }: { vmId: string, additional: Array<string> }): Promise<Object> {
     assertLogin({ methodName: 'getVm' })
     let url = `${AppConfiguration.applicationContext}/api/vms/${vmId}`
@@ -105,81 +151,8 @@ const OvirtApi = {
     }
     return httpGet({ url })
   },
-  shutdown ({ vmId, force }: { vmId: string, force: boolean }): Promise<Object> {
-    assertLogin({ methodName: 'shutdown' })
-    let restMethod = 'shutdown'
-    if (force) {
-      restMethod = 'stop'
-    }
-    return httpPost({
-      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/${restMethod}`,
-      input: '{}',
-    })
-  },
-  remove ({ vmId, preserveDisks }: { vmId: string, preserveDisks: boolean }): Promise<Object> {
-    assertLogin({ methodName: 'remove' })
-    let url = `${AppConfiguration.applicationContext}/api/vms/${vmId}`
-    if (preserveDisks) {
-      url = url + ';detach_only=true'
-    }
-    return httpDelete({
-      url,
-      custHeaders: {
-        'Accept': 'application/json',
-      },
-    })
-  },
 
-  getAllTemplates (): Promise<Object> {
-    assertLogin({ methodName: 'getAllTemplates' })
-    const url = `${AppConfiguration.applicationContext}/api/templates?follow=nics,disk_attachments.disk`
-    return httpGet({ url })
-  },
-  getTemplateNics ({ templateId }: { templateId: string }): Promise<Object> {
-    assertLogin({ methodName: 'getTemplateNics' })
-    const url = `${AppConfiguration.applicationContext}/api/templates/${templateId}/nics`
-    return httpGet({ url })
-  },
-  getTemplateDiskAttachments ({ templateId }: { templateId: string }): Promise<Object> {
-    assertLogin({ methodName: 'getTemplateDiskAttachments' })
-    const url = `${AppConfiguration.applicationContext}/api/templates/${templateId}/diskattachments?follow=disk`
-    return httpGet({ url })
-  },
-
-  getAllClusters (): Promise<Object> {
-    assertLogin({ methodName: 'getAllClusters' })
-    const url = `${AppConfiguration.applicationContext}/api/clusters?follow=networks,permissions`
-    return httpGet({ url })
-  },
-
-  getDiskPermissions ({ id }: { id: string }): Promise<Object> {
-    assertLogin({ methodName: 'getDiskPermissions' })
-    const url = `${AppConfiguration.applicationContext}/api/disks/${id}/permissions?follow=role.permits`
-    return httpGet({ url, custHeaders: { Filter: true } })
-  },
-  getVmPermissions ({ vmId }: VmIdType): Promise<Object> {
-    assertLogin({ methodName: 'getVmPermissions' })
-    const url = `${AppConfiguration.applicationContext}/api/vms/${vmId}/permissions?follow=role.permits`
-    return httpGet({ url, custHeaders: { Filter: true } })
-  },
-
-  getAllDataCenters ({ additional }: { additional: Array<string> }): Promise<Object> {
-    assertLogin({ methodName: 'getAllDataCenters' })
-    const url = `${AppConfiguration.applicationContext}/api/datacenters` +
-      (additional && additional.length > 0 ? `?follow=${additional.join(',')}` : '')
-    return httpGet({ url })
-  },
-  getAllHosts (): Promise<Object> {
-    assertLogin({ methodName: 'getAllHosts' })
-    const url = `${AppConfiguration.applicationContext}/api/hosts`
-    return httpGet({ url })
-  },
-  getAllOperatingSystems (): Promise<Object> {
-    assertLogin({ methodName: 'getAllOperatingSystems' })
-    const url = `${AppConfiguration.applicationContext}/api/operatingsystems`
-    return httpGet({ url })
-  },
-
+  // --- VM actions
   addNewVm ({
     vm,
     transformInput = true,
@@ -219,7 +192,30 @@ const OvirtApi = {
       input,
     })
   },
-
+  remove ({ vmId, preserveDisks }: { vmId: string, preserveDisks: boolean }): Promise<Object> {
+    assertLogin({ methodName: 'remove' })
+    let url = `${AppConfiguration.applicationContext}/api/vms/${vmId}`
+    if (preserveDisks) {
+      url = url + ';detach_only=true'
+    }
+    return httpDelete({
+      url,
+      custHeaders: {
+        'Accept': 'application/json',
+      },
+    })
+  },
+  shutdown ({ vmId, force }: { vmId: string, force: boolean }): Promise<Object> {
+    assertLogin({ methodName: 'shutdown' })
+    let restMethod = 'shutdown'
+    if (force) {
+      restMethod = 'stop'
+    }
+    return httpPost({
+      url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/${restMethod}`,
+      input: '{}',
+    })
+  },
   start ({ vmId }: VmIdType): Promise<Object> {
     assertLogin({ methodName: 'start' })
     return httpPost({
@@ -240,17 +236,11 @@ const OvirtApi = {
       input: '{}',
     })
   },
-  startPool ({ poolId }: PoolIdType): Promise<Object> {
-    assertLogin({ methodName: 'startPool' })
-    return httpPost({
-      url: `${AppConfiguration.applicationContext}/api/vmpools/${poolId}/allocatevm`,
-      input: '<action />',
-      contentType: 'application/xml',
-    })
-  },
+
+  // ---- Snapshots
   addNewSnapshot ({ vmId, snapshot }: { vmId: string, snapshot: SnapshotType }): Promise<Object> {
     assertLogin({ methodName: 'addNewSnapshot' })
-    const input = JSON.stringify(OvirtApi.internalSnapshotToOvirt({ snapshot }))
+    const input = JSON.stringify(Transforms.Snapshot.toApi({ snapshot }))
     console.log(`OvirtApi.addNewSnapshot(): ${input}`)
     return httpPost({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots`,
@@ -286,14 +276,6 @@ const OvirtApi = {
   snapshots ({ vmId }: { vmId: string }): Promise<Object> {
     assertLogin({ methodName: 'snapshots' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots` })
-  },
-  groups ({ userId }: { userId: string }): Promise<Object> {
-    assertLogin({ methodName: 'groups' })
-    return httpGet({ url: `${AppConfiguration.applicationContext}/api/users/${userId}/groups` })
-  },
-  icon ({ id }: { id: string }): Promise<Object> {
-    assertLogin({ methodName: 'icon' })
-    return httpGet({ url: `${AppConfiguration.applicationContext}/api/icons/${id}` })
   },
 
   diskattachment ({ vmId, attachmentId }: { vmId: string, attachmentId: string}): Promise<Object> {
@@ -345,6 +327,7 @@ const OvirtApi = {
       input: JSON.stringify({}),
     })
   },
+
   events (): Promise<Object> {
     assertLogin({ methodName: 'events' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/events?search=severity%3Derror` })
@@ -379,6 +362,14 @@ const OvirtApi = {
     const url = `${AppConfiguration.applicationContext}/api/vmpools/${poolId}`
     return httpGet({ url })
   },
+  startPool ({ poolId }: PoolIdType): Promise<Object> {
+    assertLogin({ methodName: 'startPool' })
+    return httpPost({
+      url: `${AppConfiguration.applicationContext}/api/vmpools/${poolId}/allocatevm`,
+      input: '<action />',
+      contentType: 'application/xml',
+    })
+  },
 
   sessions ({ vmId }: VmIdType): Promise<Object> {
     assertLogin({ methodName: 'sessions' })
@@ -407,7 +398,7 @@ const OvirtApi = {
   },
   changeCdRom ({ cdrom, vmId, current = true }: { cdrom: CdRomType, vmId: string, current?: boolean }): Promise<Object> {
     assertLogin({ methodName: 'changeCdRom' })
-    const input = JSON.stringify(OvirtApi.internalCdRomToOvirt({ cdrom }))
+    const input = JSON.stringify(Transforms.CdRom.toApi({ cdrom }))
     console.log(`OvirtApi.changeCdRom(): ${input}`)
     return httpPut({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/cdroms/${zeroUUID}?current=${current ? 'true' : 'false'}`,
@@ -417,7 +408,7 @@ const OvirtApi = {
 
   addNicToVm ({ nic, vmId }: { nic: NicType, vmId: string }): Promise<Object> {
     assertLogin({ methodName: 'addNicToVm' })
-    const input = JSON.stringify(OvirtApi.internalNicToOvirt({ nic }))
+    const input = JSON.stringify(Transforms.Nic.toApi({ nic }))
     return httpPost({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/nics`,
       input,
@@ -431,7 +422,7 @@ const OvirtApi = {
   },
   editNicInVm ({ nic, vmId }: { nic: NicType, vmId: string }): Promise<Object> {
     assertLogin({ methodName: 'editNicInVm' })
-    const input = JSON.stringify(OvirtApi.internalNicToOvirt({ nic }))
+    const input = JSON.stringify(Transforms.Nic.toApi({ nic }))
     return httpPut({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/nics/${nic.id}`,
       input,

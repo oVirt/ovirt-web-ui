@@ -48,6 +48,7 @@ import {
   fetchAllHosts,
   fetchAllOS,
   fetchAllVnicProfiles,
+  fetchAllTemplates,
   fetchUserGroups,
 } from './base-data'
 import { downloadVmConsole } from './console'
@@ -55,7 +56,6 @@ import { fetchRoles } from './roles'
 import { fetchServerConfiguredValues } from './server-configs'
 import { fetchDataCentersAndStorageDomains, fetchIsoFiles } from './storageDomains'
 import { loadIconsFromLocalStorage } from './osIcons'
-import { fetchAllTemplates } from './templates'
 
 import { loadFromLocalStorage } from '_/storage'
 

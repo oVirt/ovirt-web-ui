@@ -170,14 +170,16 @@ export const PermissionsType = {
 }
 
 /**
- * Convert a set of permissions to a set of permits for the app's current user by
- * mapping the permissions through their assigned roles to the permits.
+ * Convert an entity's set of permissions to a set of permits for the app's current
+ * user by mapping the permissions through their assigned roles to the permits.
  *
  * NOTE: If the user is an admin user the user's group and id membership must be
  * explicitly checked.
  */
-export function* permissionsToUserPermits (permissions) {
-  permissions = Array.isArray(permissions) ? permissions : [permissions]
+export function* entityPermissionsToUserPermits (entity) {
+  const permissions = entity.permissions
+    ? Array.isArray(entity.permissions) ? entity.permissions : [entity.permissions]
+    : []
 
   const userFilter = yield select(state => state.config.get('filter'))
   const userGroups = yield select(state => state.config.get('userGroups'))
@@ -194,7 +196,7 @@ export function* permissionsToUserPermits (permissions) {
     ) {
       const role = roles.get(permission.roleId)
       if (!role) {
-        console.info('Could find role in redux state, roleId:', permission.roleId)
+        console.info('Could not find role in redux state, roleId:', permission.roleId)
       } else {
         permitNames.push(...role.get('permitNames', []))
       }
