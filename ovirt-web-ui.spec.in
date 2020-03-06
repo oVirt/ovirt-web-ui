@@ -16,7 +16,7 @@ Source0:        https://github.com/oVirt/ovirt-web-ui/archive/%{source_basename}
 
 BuildArch: noarch
 
-# nodejs-modules embeds yarn and ovirt-engine-nodejs (or nodejs on fc30+,el8)
+# nodejs-modules embeds yarn and requires nodejs
 BuildRequires: ovirt-engine-nodejs-modules >= 2.0.17-1
 
 %description
