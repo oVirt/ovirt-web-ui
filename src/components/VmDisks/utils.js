@@ -7,5 +7,5 @@ import { localeCompare } from '_/helpers'
  * Bootable drives sort first, then sorted number aware alphabetically.
  */
 export function sortDisksForDisplay (disks, locale = appLocale) {
-  return disks.sort((a, b) => { return  localeCompare(a.get('name'), b.get('name'), locale)})
+  return disks.sort((a, b) => { return localeCompare(a.get('name'), b.get('name'), locale) })
 }
