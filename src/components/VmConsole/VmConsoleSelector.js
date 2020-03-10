@@ -84,6 +84,7 @@ VmConsoleSelector.propTypes = {
   consoles: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
   onRDP: PropTypes.func.isRequired,
+  disabled: PropTypes.bool.isRequired,
 }
 
 export default connect(
