@@ -42,15 +42,17 @@ const VmDetailToolbarConnected = connect(
 const VmConsoleToolbar = ({ match, vms, consoles }) => {
   if (vms.getIn(['vms', match.params.id])) {
     const consoleStatus = [INIT_CONSOLE, DOWNLOAD_CONSOLE]
+    const isConsoleDisabled = !consoleStatus.includes(consoles.getIn(['vms', match.params.id, 'consoleStatus']))
     return <div className={`${style['console-toolbar']} container-fluid`}>
       <div className={style['console-toolbar-actions']} style={{ marginRight: 'auto' }}>
         <VmConsoleSelector
           vmId={match.params.id}
           consoleId={match.params.console}
+          disabled={isConsoleDisabled}
           isConsolePage
         />
         <VmConsoleInstructionsModal
-          disabled={!consoleStatus.includes(consoles.getIn(['vms', match.params.id, 'consoleStatus']))} />
+          disabled={isConsoleDisabled} />
       </div>
       <div className={style['console-toolbar-actions']}>
         <div id='vm-console-toolbar-sendkeys' />

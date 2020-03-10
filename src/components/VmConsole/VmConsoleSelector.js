@@ -13,7 +13,7 @@ import { getRDP } from '_/actions'
 import { isWindows } from '_/helpers'
 import style from './style.css'
 
-const VmConsoleSelector = ({ vmId, vms, consoles, config, consoleId, isConsolePage, onRDP }) => {
+const VmConsoleSelector = ({ vmId, vms, consoles, config, consoleId, disabled, isConsolePage, onRDP }) => {
   let actions = vms.getIn(['vms', vmId, 'consoles'])
   if (actions.size === 0) {
     return <div />
@@ -69,6 +69,7 @@ const VmConsoleSelector = ({ vmId, vms, consoles, config, consoleId, isConsolePa
       title={activeConsole}
       bsStyle='default'
       id='console-selector'
+      disabled={disabled}
     >
       { consoleItems }
     </DropdownButton>
