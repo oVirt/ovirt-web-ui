@@ -1,134 +1,53 @@
 /********************************************
-ovirt brand
 
-manually copied from ovirt build with:
+  ovirt-engine frontend brand
 
-  cp ./frontend/brands/ovirt-brand/src/main/sass/_branding.scss ../ovirt-web-ui/branding/ovirt-brand.css
-  cp ./frontend/webadmin/modules/webadmin/target/webadmin-4.2.0-SNAPSHOT/clear.cache.gif ../ovirt-web-ui/branding/images
-  cp -r ./frontend/brands/ovirt-brand/target/ovirt.brand/images ../ovirt-web-ui/branding/
+  based on the Application branding sections from:
+    ovirt-engine/frontend/brands/ovirt-brand/src/main/sass/_branding.scss
 
 *********************************************/
 
-/*******************************************************
-classes used to brand (logos, colors, etc) everything --
-welcome app, sso, webadmin, etc. Please make sure
-everything in here uses the "obrand_" prefix. These
-classes are designed to be drop-in replaced (cascaded
-over) by other installed brands.
-*/
-
-.obrand_topBorder {
-    border-top: 4px solid #00659c !important;
+:root {
+  --ovirt-masthead-height: 60px;
+  --ovirt-masthead-topborder-size: 4px;
 }
 
-.obrand_loginPageLogo {
-    background-image: url(images/ovirt_logo.png);
-    width: 80px;
-    height: 30px;
-    border: 0px;
-    display: block;
-}
+/* --- Application: masthead --- */
+.obrand_masthead {
+  border-top: var(--ovirt-masthead-topborder-size) solid #00659c;
+  height: var(--ovirt-masthead-height);
 
-.obrand_loginPageLogoLink {
-    display: block;
-    float: right;
-    margin-right: 64px;
-    margin-top: 75px;
-    margin-bottom: 70px;
-    position: relative;
-    text-align: center;
-}
-
-@media (max-width: 768px) {
-    .obrand_loginPageLogo {
-        display: none;
-    }
-    .obrand_loginPageLogoLink {
-        display: none;
-    }
-}
-
-.obrand_middleLogoName {
-    background-image: url(images/ovirt_middle_logo.png);
-    width: 440px;
-    height: 35px;
-    border: 0px;
-    display: block;
-    background-size: contain;
-    background-repeat: no-repeat;
-    float: left;
-    clear: left;
-}
-
-.obrand_ssoHeader {
-    height: 41px;
-    position: relative;
-    top: 4px;
-    background-color: #121212;
-}
-
-.obrand_main_tab {
-    height: calc(100vh - 66px);
-    min-height: calc(100vh - 66px);
-}
-
-.obrand_detail_tab {
-    min-height: 265px;
-}
-
-.obrand_landingBgTop {
-    position: absolute;
-    top: 0;
-    right: 0;
-    background-image: url(images/ovirt_landing_bg_top_right.png);
-    width: 561px;
-    height: 413px;
-    background-repeat: no-repeat;
-}
-
-.obrand_landingBgBottom {
-    background-image: url(images/ovirt_landing_bg_bottom_left.png);
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-top: 4px solid #00659c;
-    background-repeat: no-repeat;
+  background-image: url(images/ovirt_masthead_bg.png);
+  background-size: cover;
 }
 
 .obrand_mastheadLogo {
-    background-image: url(images/ovirt_masthead_logo.png);
-    width: 272px;
-    height: 16px;
-    position: relative;
-    top: 6px;
-    border: 0px;
-    display: inline !important;
-    background-size: contain;
-    background-repeat: no-repeat;
+  width: 272px;
+  height: 16px;
+  position: relative;
+  top: 9px;
+  border: 0px;
+  background-image: url(images/ovirt_masthead_logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 
-.obrand_mastheadBackground {
-    background-image: url(images/ovirt_masthead_bg.png);
-    background-size: cover;
-}
-
+/* --- Application: About Dialog --- */
 .obrand_aboutBackground {
-    width: 565px;
-    height: 355px;
-    background-image: url(images/ovirt_about_bg.png);
+  width: 565px;
+  height: 355px;
+  background-image: url(images/ovirt_about_bg.png);
 }
 
 .obrand_aboutApplicationLogo {
-    background-image: url(images/ovirt_logo.png);
-    width: 80px;
-    height: 30px;
-    border: 0px;
-    display: block;
-    background-size: contain;
-    background-repeat: no-repeat;
-    position: absolute;
-    bottom: 25px;
-    right: 25px;
+  display: block;
+  width: 80px;
+  height: 30px;
+  border: 0px;
+  position: absolute;
+  bottom: 25px;
+  right: 25px;
+  background-image: url(images/ovirt_logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
 }
