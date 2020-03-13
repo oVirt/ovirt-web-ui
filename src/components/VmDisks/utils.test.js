@@ -16,8 +16,8 @@ const samples = [
     ]),
     expect: fromJS([
       { bootable: true, name: 'Alpha' },
-      { bootable: true, name: 'Xray' },
       { bootable: false, name: 'Beta' },
+      { bootable: true, name: 'Xray' },
       { bootable: false, name: 'Yankee' },
       { bootable: false, name: 'Zulu' },
     ]),
