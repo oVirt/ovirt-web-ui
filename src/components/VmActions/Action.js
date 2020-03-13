@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { excludeKeys, DropdownButton, MenuItem, noop } from 'patternfly-react'
+import { DropdownButton, MenuItem } from 'patternfly-react'
 
 import { hrefWithoutHistory } from '_/helpers'
 
@@ -50,7 +50,7 @@ const Button = ({
   className,
   tooltip = '',
   shortTitle,
-  onClick = noop,
+  onClick = () => {},
   actionDisabled = false,
   id,
 }) => {
@@ -85,9 +85,10 @@ Button.propTypes = {
   id: PropTypes.string.isRequired,
 }
 
-const MenuItemAction = ({ confirmation, onClick, shortTitle, icon, ...rest }) => {
+const MenuItemAction = ({ confirmation, onClick, shortTitle, icon, actionDisabled = false, ...rest }) => {
   return <Action confirmation={confirmation}>
     <MenuItem
+      disabled={actionDisabled}
       onClick={(...args) => {
         onClick && onClick(...args)
         document.dispatchEvent(new MouseEvent('click'))
@@ -105,17 +106,14 @@ MenuItemAction.propTypes = {
   shortTitle: PropTypes.string.isRequired,
   icon: PropTypes.node,
   className: PropTypes.string,
-  disabled: PropTypes.bool,
+  actionDisabled: PropTypes.bool,
 }
 
-const ActionButtonWraper = (props) => {
-  const { items, actionDisabled, confirmation, shortTitle } = props
-  const btnProps = excludeKeys(props, [ 'confirmation', 'items' ])
-
+const ActionButtonWraper = ({ items, confirmation, actionDisabled, shortTitle, bsStyle, ...rest }) => {
   if (items && items.filter(i => i !== null).length > 0) {
     return <DropdownButton
       title={shortTitle}
-      bsStyle={props.bsStyle}
+      bsStyle={bsStyle}
       id='console-selector'
       disabled={actionDisabled}
     >
@@ -128,7 +126,7 @@ const ActionButtonWraper = (props) => {
   }
 
   return <Action confirmation={confirmation} key={shortTitle}>
-    <Button {...btnProps} />
+    <Button actionDisabled={actionDisabled} shortTitle={shortTitle} {...rest} />
   </Action>
 }
 ActionButtonWraper.propTypes = {
@@ -137,16 +135,14 @@ ActionButtonWraper.propTypes = {
   ...Button.propTypes,
 }
 
-const ActionMenuItemWrapper = (props) => {
-  const { items, actionDisabled, shortTitle } = props
-
+const ActionMenuItemWrapper = ({ id, className, items, confirmation, actionDisabled, shortTitle, ...rest }) => {
   // For console button
   if (items && items.filter(i => i !== null).length > 0) {
     if (actionDisabled) {
       return <MenuItemAction
         shortTitle={shortTitle}
         id='console-selector'
-        disabled
+        actionDisabled
       />
     } else {
       return <React.Fragment>
@@ -161,15 +157,14 @@ const ActionMenuItemWrapper = (props) => {
     }
   }
 
-  const menuProps = excludeKeys(props, [ 'confirmation', 'items' ])
-  const menuClassName = (!actionDisabled && /btn-danger/.test(props.className)) ? style['menu-item-danger'] : ''
+  const menuClassName = (!actionDisabled && /btn-danger/.test(className)) ? style['menu-item-danger'] : ''
   return (
     <MenuItemAction
-      {...menuProps}
-      id={`${props.id}-kebab`}
-      key={props.id}
-      confirmation={!actionDisabled && props.confirmation}
-      disabled={actionDisabled}
+      {...rest}
+      shortTitle={shortTitle}
+      id={`${id}-kebab`}
+      key={id}
+      confirmation={!actionDisabled && confirmation}
       className={menuClassName}
     />
   )
