@@ -77,7 +77,7 @@ class VmUserMessages extends React.Component {
       <li className='dropdown'>
         <OverlayTooltip id={`${idPrefix}-tooltip`} tooltip={msg.notifications()} placement='bottom'>
           <a className='dropdown-toggle nav-item-iconic' href='#' onClick={hrefWithoutHistory(this.handleToggle)} id={`${idPrefix}-toggle`}>
-            <i className={`fa fa-bell ${style['usermessages-icon']}`} />
+            <i className='fa fa-bell' />
             {badgeElement}
             <span className='caret' id={`${idPrefix}-caret`} />
           </a>

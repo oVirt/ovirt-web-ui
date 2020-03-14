@@ -15,7 +15,7 @@ const UserMenu = ({ config, onLogout }) => {
     <li className='dropdown'>
       <OverlayTooltip id={`${idPrefix}-tooltip`} tooltip={config.getIn(['user', 'name'])} placement='bottom'>
         <a className='dropdown-toggle nav-item-iconic' href='#' data-toggle='dropdown' id={`${idPrefix}-user`}>
-          <i className='pficon pficon-user' /><span className='caret' />
+          <i className='fa fa-user' /><span className='caret' />
         </a>
       </OverlayTooltip>
       <ul className='dropdown-menu'>
