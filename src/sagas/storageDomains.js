@@ -1,6 +1,6 @@
-import Api from '_/ovirtapi'
-import { all, put, select, takeLatest, throttle } from 'redux-saga/effects'
-import { callExternalAction, fetchPermits, PermissionsType } from './utils'
+import Api, { Transforms } from '_/ovirtapi'
+import { all, call, put, select, takeLatest, throttle } from 'redux-saga/effects'
+import { callExternalAction, entityPermissionsToUserPermits } from './utils'
 
 import { canUserUseStorageDomain } from '_/utils'
 
@@ -20,81 +20,90 @@ import {
  * center.
  */
 export function* fetchDataCentersAndStorageDomains (action) {
-  Object.assign(action, { payload: { additional: [ 'storage_domains' ] } })
-  const dataCentersApi = yield callExternalAction('getAllDataCenters', Api.getAllDataCenters, action)
-  if (!dataCentersApi || !dataCentersApi.data_center) {
-    return
-  }
+  const [ dataCenters, storageDomains ] =
+    yield all([
+      call(fetchDataCenters),
+      call(fetchDataAndIsoStorageDomains),
+    ])
 
-  // getting data centers is necessary to get storage domains with statuses
-  // so why not to store them when we have them fresh
-  const dataCentersInternal = dataCentersApi.data_center.map(dataCenter => Api.dataCenterToInternal({ dataCenter }))
-  yield put(setDataCenters(dataCentersInternal))
-
-  // transform all storage domains from dataCentersApi.data_center[*].storage_domains.storage_domain[*]
-  const storageDomainsInternal = []
-  for (const dataCenter of dataCentersApi.data_center) {
-    const storageDomains = dataCenter.storage_domains && dataCenter.storage_domains.storage_domain
-    if (storageDomains) {
-      storageDomainsInternal.push(
-        ...(
-          yield all(
-            storageDomains.map(
-              function* (storageDomain) {
-                let storageDomainInternal = Api.storageDomainToInternal({ storageDomain })
-                storageDomainInternal.permits = yield fetchPermits({ entityType: PermissionsType.STORAGE_DOMAIN_TYPE, id: storageDomain.id })
-                storageDomainInternal.canUserUseDomain = canUserUseStorageDomain(storageDomainInternal.permits)
-                return storageDomainInternal
-              }
-            )
-          )
-        )
-      )
+  // figure out the domain's status per data center
+  const sdById = storageDomains.reduce((acc, sd) => ({ ...acc, [sd.id]: sd }), {})
+  for (const dataCenter of dataCenters) {
+    for (const storageDomainId of Object.keys(dataCenter.storageDomains)) {
+      const sd = sdById[ storageDomainId ]
+      sd.statusPerDataCenter = {
+        ...sd.statusPerDataCenter,
+        [dataCenter.id]: dataCenter.storageDomains[storageDomainId].status,
+      }
     }
   }
 
-  // since storage domains can be attached to >1 data center, collate the copies
-  // and track the domain's status per data center
-  const storageDomainsMerged = mergeStorageDomains(storageDomainsInternal)
-  yield put(setStorageDomains(storageDomainsMerged))
+  yield put(setDataCenters(dataCenters))
+  yield put(setStorageDomains(storageDomains))
 }
 
-/**
- * From a list of storage domains, where a storage domain may occur multiple times
- * with a different data center, build a unique list of storage domains.  Each storage
- * domain returned will contain a data center to SD status map.
- */
-function mergeStorageDomains (storageDomainsInternal) {
-  const idToStorageDomain = storageDomainsInternal.reduce(
-    (accum, storageDomain) => {
-      const merged = accum[storageDomain.id]
-      if (merged) {
-        Object.assign(merged.statusPerDataCenter, storageDomain.statusPerDataCenter)
-      } else {
-        accum[storageDomain.id] = storageDomain
-      }
-      return accum
-    },
-    {}
-  )
+function* fetchDataCenters () {
+  const payload = { additional: [ 'permissions', 'storage_domains' ] }
+  const dataCentersApi = yield callExternalAction('getAllDataCenters', Api.getAllDataCenters, { payload })
 
-  const mergedStorageDomains = Object.values(idToStorageDomain)
-  return mergedStorageDomains
+  if (dataCentersApi && dataCentersApi.data_center) {
+    const dataCentersInternal = dataCentersApi.data_center.map(
+      dataCenter => Transforms.DataCenter.toInternal({ dataCenter })
+    )
+
+    // Calculate permits and 'canUser*'
+    for (const dataCenter of dataCentersInternal) {
+      dataCenter.userPermits = yield entityPermissionsToUserPermits(dataCenter)
+    }
+
+    return dataCentersInternal
+  }
+
+  return []
+}
+
+function* fetchDataAndIsoStorageDomains () {
+  const storageDomainsApi = yield callExternalAction('getStorages', Api.getStorages, { payload: {} })
+
+  if (storageDomainsApi && storageDomainsApi.storage_domain) {
+    const storageDomainsInternal = storageDomainsApi.storage_domain
+      .map(storageDomain => Transforms.StorageDomain.toInternal({ storageDomain }))
+      .filter(storageDomain => storageDomain.type === 'data' || storageDomain.type === 'iso')
+
+    // Calculate permits and 'canUser*'
+    for (const storageDomain of storageDomainsInternal) {
+      storageDomain.userPermits = yield entityPermissionsToUserPermits(storageDomain)
+      storageDomain.canUserUseDomain = canUserUseStorageDomain(storageDomain.userPermits)
+    }
+
+    return storageDomainsInternal
+  }
+
+  return []
 }
 
 /**
  * Fetch all of the ISO images from both 'iso' type storage domains and 'iso' types
  * images from other types of storage domains.
  */
-export function* fetchIsoFiles (action) {
-  // fetch ISO disk images and distribute them to their storage domains as files
-  const images = yield callExternalAction('getIsoImages', Api.getIsoImages)
+export function* fetchIsoFiles () {
+  yield all([
+    call(fetchIsoDiskImages),
+    call(fetchIsoFilesFromIsoStorageDomains),
+  ])
+}
+
+/**
+ * Fetch ISO disk images and distribute them to their storage domains as files
+ */
+function* fetchIsoDiskImages () {
+  const images = yield callExternalAction('getIsoImages', Api.getIsoImages, { payload: {} })
   if (images && images.disk) {
     const storageDomainToDisks = images.disk.reduce(
       (acc, disk) => {
         disk.storage_domains.storage_domain.forEach(({ id }) => {
           const files = acc[id] = acc[id] || []
-          files.push(Api.fileToInternal({ file: disk }))
+          files.push(Transforms.StorageDomainFile.toInternal({ file: disk }))
         })
         return acc
       },
@@ -108,8 +117,12 @@ export function* fetchIsoFiles (action) {
     )
     yield all(updates)
   }
+}
 
-  // fetch 'files' from ISO storage domains
+/**
+ * Fetch 'files' from all ISO storage domains
+ */
+function* fetchIsoFilesFromIsoStorageDomains () {
   const storageDomains = yield select((state) => state.storageDomains)
 
   const isoStorageDomains = storageDomains
@@ -117,14 +130,19 @@ export function* fetchIsoFiles (action) {
     .keySeq()
     .toArray()
 
-  const isoFilesFetches = isoStorageDomains.map(isoStorageDomain => fetchAllFilesForISO(isoStorageDomain))
+  const isoFilesFetches = isoStorageDomains.map(fetchIsoFilesFromIsoStorageDomain)
   yield all(isoFilesFetches)
 }
 
-function* fetchAllFilesForISO (storageDomainId) {
+/**
+ * Fetch 'files' from the single given ISO storage domain
+ */
+function* fetchIsoFilesFromIsoStorageDomain (storageDomainId) {
   const files = yield callExternalAction('getStorageFiles', Api.getStorageFiles, { payload: { storageId: storageDomainId } })
   if (files && files.file) {
-    const filesInternal = files.file.map(file => Api.fileToInternal({ file }))
+    const filesInternal = files.file.map(
+      file => Transforms.StorageDomainFile.toInternal({ file })
+    )
     yield put(setStorageDomainsFiles(storageDomainId, filesInternal))
   }
 }

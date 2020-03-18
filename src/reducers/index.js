@@ -15,6 +15,7 @@ import vnicProfiles from './vnicProfiles'
 import activeRequests from './activeRequests'
 import consoles from './consoles'
 import pendingTasks from './pendingTasks'
+import roles from './roles'
 
 import { reducer as OptionsDialog } from '../components/OptionsDialog/reducer'
 import NewDiskDialog from '../components/NewDiskDialog/reducers'
@@ -35,6 +36,7 @@ export default combineReducers({
   activeRequests,
   consoles,
   pendingTasks,
+  roles,
 
   OptionsDialog,
   NewDiskDialog,

@@ -9,6 +9,7 @@ import OptionsManager from '_/optionsManager'
 import {
   loginSuccessful,
   loginFailed,
+  appConfigured,
   startSchedulerFixedDelay,
 
   failedExternalAction,
@@ -25,14 +26,13 @@ import {
   getAllStorageDomains,
   getAllTemplates,
   getAllVnicProfiles,
-  getIsoFiles,
+  getRoles,
   getUserGroups,
 
   downloadConsole,
   getSingleVm,
 
   updateVms,
-  appConfigured,
   saveVmsFilters,
 } from '_/actions'
 
@@ -48,13 +48,14 @@ import {
   fetchAllHosts,
   fetchAllOS,
   fetchAllVnicProfiles,
+  fetchAllTemplates,
   fetchUserGroups,
-} from './index'
+} from './base-data'
 import { downloadVmConsole } from './console'
+import { fetchRoles } from './roles'
 import { fetchServerConfiguredValues } from './server-configs'
 import { fetchDataCentersAndStorageDomains, fetchIsoFiles } from './storageDomains'
 import { loadIconsFromLocalStorage } from './osIcons'
-import { fetchAllTemplates } from './templates'
 
 import { loadFromLocalStorage } from '_/storage'
 
@@ -91,6 +92,7 @@ function* login (action) {
 
   // API checks passed.  Load user data and the initial app data
   console.group('Login Data Fetch')
+  console.group('user checks and server config')
   yield checkUserFilterPermissions()
   yield fetchServerConfiguredValues()
   console.log('\u2714 login checks and server config fetches are done:',
@@ -98,6 +100,7 @@ function* login (action) {
       state.config.toJS(),
       [ 'administrator', 'filter', 'domain', 'user', 'userSessionTimeoutInterval', 'websocket', 'cpuTopology' ]))
   )
+  console.groupEnd('user checks and server config')
 
   yield initialLoad()
   console.groupEnd('Login Data Fetch')
@@ -187,27 +190,34 @@ function* loadFilters () {
 
 function* initialLoad () {
   // no data prerequisites
+  console.group('no data prerequisites')
   yield all([
     call(loadIconsFromLocalStorage),
+    call(fetchRoles, getRoles()),
     call(fetchUserGroups, getUserGroups()),
     call(fetchAllOS, getAllOperatingSystems()),
     call(fetchAllHosts, getAllHosts()),
     call(loadFilters),
   ])
-  console.log('\u2714 data loads with no pre-reqs are complete')
+  console.log('\u2714 data loads with no prerequisites are complete')
+  console.groupEnd('no data prerequisites')
 
-  // requires user groups to be in redux store for authorization checks
+  // requires user groups and roles to be in redux store for authorization checks
+  console.group('needs user groups and roles')
   yield all([
     call(fetchDataCentersAndStorageDomains, getAllStorageDomains()),
     call(fetchAllTemplates, getAllTemplates()),
     call(fetchAllClusters, getAllClusters()),
     call(fetchAllVnicProfiles, getAllVnicProfiles()),
   ])
-  console.log('\u2714 data loads that require user groups are complete')
+  console.log('\u2714 data loads that require user groups and roles are complete')
+  console.groupEnd('needs user groups and roles')
 
   // requires storage domains to be in redux store
-  yield call(fetchIsoFiles, getIsoFiles())
+  console.group('needs storage domains')
+  yield call(fetchIsoFiles)
   console.log('\u2714 data loads that require storage domains are complete')
+  console.groupEnd('needs storage domains')
 
   // The `Vms` card view component will take care of loading pages of VMs and Pools as needed.
   // Loading VMs and Pools here is not necessary and will cause issues with `Vms`'s loading.

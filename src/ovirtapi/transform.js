@@ -24,15 +24,14 @@ import type {
   ApiVnicProfileType, VnicProfileType,
   ApiPermissionType, PermissionType,
   ApiEventType, EventType,
+  ApiRoleType, RoleType,
 } from './types'
 
 import {
   canUserChangeCd,
-  canUserUseCluster,
   canUserEditVm,
   canUserEditVmStorage,
   getUserPermits,
-  canUserUseVnicProfile,
   canUserManipulateSnapshots,
 } from '../utils'
 
@@ -370,14 +369,15 @@ const VmStatistics = {
 //
 const Template = {
   toInternal ({ template }: { template: ApiTemplateType}): TemplateType {
-    const permits = template.permissions && template.permissions.permission
-      ? getUserPermits(Permissions.toInternal({ permissions: template.permissions.permission }))
-      : new Set()
     const version = {
       name: template.version ? template.version.version_name : undefined,
       number: template.version ? template.version.version_number : undefined,
       baseTemplateId: template.version && template.version.base_template ? template.version.base_template.id : undefined,
     }
+
+    const permissions = template.permissions && template.permissions.permission
+      ? Permissions.toInternal({ permissions: template.permissions.permission })
+      : []
 
     return cleanUndefined({
       id: template.id,
@@ -406,7 +406,6 @@ const Template = {
         name: template.time_zone.name,
         offset: template.time_zone.utc_offset,
       },
-      permits,
 
       nics: template.nics && template.nics.nic
         ? template.nics.nic.map(
@@ -419,6 +418,11 @@ const Template = {
           da => DiskAttachment.toInternal({ attachment: da, disk: da.disk })
         )
         : undefined,
+
+      // roles are required to calculate permits and 'canUse*', therefore its done in sagas
+      permissions,
+      userPermits: new Set(),
+      canUserUseTemplate: false,
     })
   },
 
@@ -554,11 +558,28 @@ const DiskAttachment = {
 //
 const DataCenter = {
   toInternal ({ dataCenter }: { dataCenter: ApiDataCenterType }): DataCenterType {
-    // TODO Add nested permissions support when BZ 1639784 will be done
+    const permissions = dataCenter.permissions && dataCenter.permissions.permission
+      ? Permissions.toInternal({ permissions: dataCenter.permissions.permission })
+      : []
+
+    const storageDomains = dataCenter.storage_domains && dataCenter.storage_domains.storage_domain
+      ? dataCenter.storage_domains.storage_domain.reduce((acc, storageDomain) => {
+        acc[storageDomain.id] = {
+          id: storageDomain.id,
+          name: storageDomain.name,
+          status: storageDomain.status,
+          type: storageDomain.type,
+        }
+        return acc
+      }, {})
+      : {}
+
     return {
       id: dataCenter.id,
       name: dataCenter.name,
       status: dataCenter.status,
+      storageDomains,
+      permissions,
     }
   },
 
@@ -569,6 +590,10 @@ const DataCenter = {
 //
 const StorageDomain = {
   toInternal ({ storageDomain }: { storageDomain: ApiStorageDomainType }): StorageDomainType {
+    const permissions = storageDomain.permissions && storageDomain.permissions.permission
+      ? Permissions.toInternal({ permissions: storageDomain.permissions.permission })
+      : []
+
     return {
       id: storageDomain.id,
       name: storageDomain.name,
@@ -584,6 +609,11 @@ const StorageDomain = {
       statusPerDataCenter: storageDomain.status && storageDomain.data_center
         ? { [storageDomain.data_center.id]: storageDomain.status }
         : { },
+
+      // roles are required to calculate permits and 'canUse*', therefore its done in sagas
+      permissions,
+      userPermits: new Set(),
+      canUserUseDomain: false,
     }
   },
 
@@ -627,9 +657,10 @@ const StorageDomainFile = {
 //
 const Cluster = {
   toInternal ({ cluster }: { cluster: ApiClusterType }): ClusterType {
-    const permits = cluster.permissions && cluster.permissions.permission
-      ? getUserPermits(Permissions.toInternal({ permissions: cluster.permissions.permission }))
-      : new Set()
+    const permissions = cluster.permissions && cluster.permissions.permission
+      ? Permissions.toInternal({ permissions: cluster.permissions.permission })
+      : []
+
     const c: Object = {
       id: cluster.id,
       name: cluster.name,
@@ -644,8 +675,11 @@ const Cluster = {
             ? cluster['memory_policy']['over_commit']['percent']
             : 100,
       },
-      canUserUseCluster: canUserUseCluster(permits),
-      permits,
+
+      // roles are required to calculate permits and 'canUse*', therefore its done in sagas
+      permissions,
+      userPermits: new Set(),
+      canUserUseCluster: false,
     }
 
     if (cluster.networks && cluster.networks.network && cluster.networks.network.length > 0) {
@@ -710,6 +744,10 @@ const Nic = {
 //
 const VNicProfile = {
   toInternal ({ vnicProfile }: { vnicProfile: ApiVnicProfileType }): VnicProfileType {
+    const permissions = vnicProfile.permissions && vnicProfile.permissions.permission
+      ? Permissions.toInternal({ permissions: vnicProfile.permissions.permission })
+      : []
+
     const vnicProfileInternal = {
       id: vnicProfile.id,
       name: vnicProfile.name,
@@ -720,19 +758,15 @@ const VNicProfile = {
         name: vnicProfile.network.name,
         dataCenterId: vnicProfile.network.data_center && vnicProfile.network.data_center.id,
       },
+
+      // roles are required to calculate permits and 'canUse*', therefore its done in sagas
+      permissions,
+      userPermits: new Set(),
       canUserUseProfile: false,
-      permits: new Set(),
     }
 
     if (vnicProfile.network.name) {
       vnicProfileInternal.network.name = vnicProfile.network.name
-    }
-
-    if (vnicProfile.permissions && vnicProfile.permissions.permission) {
-      vnicProfileInternal.permits = getUserPermits(Permissions.toInternal({
-        permissions: vnicProfile.permissions.permission,
-      }))
-      vnicProfileInternal.canUserUseProfile = canUserUseVnicProfile(vnicProfileInternal.permits)
     }
 
     return vnicProfileInternal
@@ -851,14 +885,40 @@ const VmSessions = {
   toApi: undefined,
 }
 
+//
+//
 const Permissions = {
   toInternal ({ permissions }: { permissions: Array<ApiPermissionType> }): Array<PermissionType> {
     return permissions.map(permission => ({
       name: permission.role.name,
       userId: permission.user && permission.user.id,
       groupId: permission.group && permission.group.id,
+      roleId: permission.role && permission.role.id,
       permits: permission.role.permits ? permission.role.permits.permit.map(permit => ({ name: permit.name })) : [],
     }))
+  },
+
+  toApi: undefined,
+}
+
+//
+//
+const Role = {
+  toInternal ({ role }: { role: ApiRoleType }): RoleType {
+    const permits = role.permits && role.permits.permit && Array.isArray(role.permits.permit)
+      ? role.permits.permit.map(permit => ({
+        id: permit.id,
+        administrative: convertBool(permit.administrative),
+        name: permit.name,
+      }))
+      : []
+
+    return {
+      id: role.id,
+      administrative: convertBool(role.administrative),
+      name: role.name,
+      permits,
+    }
   },
 
   toApi: undefined,
@@ -881,6 +941,8 @@ const CloudInit = {
   toApi: undefined,
 }
 
+//
+//
 const Event = {
   toInternal ({ event }: { event: ApiEventType }): EventType {
     return {
@@ -920,4 +982,5 @@ export {
   CloudInit,
   Permissions,
   Event,
+  Role,
 }

@@ -1,6 +1,7 @@
 import {
   call,
   put,
+  select,
 } from 'redux-saga/effects'
 
 import AppConfiguration from '_/config'
@@ -68,6 +69,7 @@ export function* callExternalAction (methodName, method, action = {}, canBeMissi
     return { error: e }
   }
 }
+
 export function* doCheckTokenExpired (action) {
   try {
     yield call(Api.getOvirtApiMeta, action.payload)
@@ -164,9 +166,42 @@ export function* fetchPermits ({ entityType, id }) {
 }
 
 export const PermissionsType = {
-  STORAGE_DOMAIN_TYPE: 'StorageDomain',
-  CLUSTER_TYPE: 'Cluster',
-  VNIC_PROFILE_TYPE: 'VnicProfile',
   DISK_TYPE: 'Disk',
-  TEMPLATE_TYPE: 'Template',
+}
+
+/**
+ * Convert an entity's set of permissions to a set of permits for the app's current
+ * user by mapping the permissions through their assigned roles to the permits.
+ *
+ * NOTE: If the user is an admin user the user's group and id membership must be
+ * explicitly checked.
+ */
+export function* entityPermissionsToUserPermits (entity) {
+  const permissions = entity.permissions
+    ? Array.isArray(entity.permissions) ? entity.permissions : [entity.permissions]
+    : []
+
+  const userFilter = yield select(state => state.config.get('filter'))
+  const userGroups = yield select(state => state.config.get('userGroups'))
+  const userId = yield select(state => state.config.getIn(['user', 'id']))
+  const roles = yield select(state => state.roles)
+
+  const permitNames = []
+  for (const permission of permissions) {
+    if (userFilter ||
+      (
+        (permission.groupId && userGroups.includes(permission.groupId)) ||
+        (permission.userId && permission.userId === userId)
+      )
+    ) {
+      const role = roles.get(permission.roleId)
+      if (!role) {
+        console.info('Could not find role in redux state, roleId:', permission.roleId)
+      } else {
+        permitNames.push(...role.get('permitNames', []))
+      }
+    }
+  }
+
+  return new Set(permitNames)
 }
