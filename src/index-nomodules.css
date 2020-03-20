@@ -57,10 +57,6 @@ body {
  *         gets shorter or a scrollbar is added to the page
  */
 
-.navbar {
-  min-height: 62px;
-}
-
 .navbar-pf-vertical {
   flex-shrink: 0;
 }
@@ -68,6 +64,10 @@ body {
 .navbar-pf-vertical .nav .nav-item-iconic .badge {
   margin-left: -2px !important;
   margin-right: 0;
+}
+
+.navbar-pf-vertical .nav .nav-item-iconic .caret {
+  margin-left: 4px;
 }
 
 .breadcrumb {
@@ -147,10 +147,6 @@ body {
 .message-dialog-pf .modal-body {
     display: -ms-flexbox;
     display: flex;
-}
-
-.navbar-nav > .dropdown {
-  position: inherit;
 }
 
 .drawer-pf .blank-slate-pf .blank-slate-pf-title {
