@@ -570,16 +570,18 @@
     victory-core "^32.2.3"
     victory-legend "^32.2.3"
 
-"@patternfly/react-console@1.10.22":
-  version "1.10.22"
-  resolved "https://registry.yarnpkg.com/@patternfly/react-console/-/react-console-1.10.22.tgz#c9fc8df8d5f5a1cac19e1fea45af578ae9745aae"
-  integrity sha512-8KVdWUdvzRW20P896LeFUPIHQx9zTw9gzpGGbPVqzqXT4w8KIKDvn0ZeaEOstyCUMSp9vgwsvgjqmNZPLM33jw==
+"@patternfly/react-console@2.0.14":
+  version "2.0.14"
+  resolved "https://registry.yarnpkg.com/@patternfly/react-console/-/react-console-2.0.14.tgz#d9c5f91fb4c2c4711ed7972d09f4a3ccabdc2643"
+  integrity sha512-e2cH2EGoy4iu6LprG8wNIkSXlmqIoCFsz7NaBOvPHe41syh2KGkK0uhvZ+e4NjTIzZKIXW3FKCdh1YSUidXrCA==
   dependencies:
     "@novnc/novnc" "^1.0.0"
+    "@spice-project/spice-html5" "^0.2.1"
     blob-polyfill "^3.0.20180112"
     classnames "^2.2.5"
     file-saver "^1.3.8"
-    xterm "^3.3.0"
+    xterm "^4.0.0"
+    xterm-addon-fit "^0.2.1"
 
 "@patternfly/react-core@3.87.3":
   version "3.87.3"
@@ -702,6 +704,11 @@
     into-stream "^5.0.0"
     lodash "^4.17.4"
     read-pkg-up "^6.0.0"
+
+"@spice-project/spice-html5@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@spice-project/spice-html5/-/spice-html5-0.2.1.tgz#9452fc7435a8b1c67937d86ea3b6d6d7e0616725"
+  integrity sha512-NY86i+x/0ldKK89enXghsXCzWwfb5DQ91hQFu9hbyLcAfCVn+ZKoYsw7xUWX6/HQBRrdu/4F1id7SdOwNqpG9g==
 
 "@types/babel__core@^7.1.0":
   version "7.1.3"
@@ -13505,10 +13512,15 @@ xtend@~2.1.1:
   dependencies:
     object-keys "~0.4.0"
 
-xterm@^3.3.0:
-  version "3.14.5"
-  resolved "https://registry.yarnpkg.com/xterm/-/xterm-3.14.5.tgz#c9d14e48be6873aa46fb429f22f2165557fd2dea"
-  integrity sha512-DVmQ8jlEtL+WbBKUZuMxHMBgK/yeIZwkXB81bH+MGaKKnJGYwA+770hzhXPfwEIokK9On9YIFPRleVp/5G7z9g==
+xterm-addon-fit@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/xterm-addon-fit/-/xterm-addon-fit-0.2.1.tgz#353f43921eb78e3f9ad3f3afbb14e7ac183ca738"
+  integrity sha512-BlR57O3t1/bmVcnS81bn9ZnNf+GiGNbeXdNUKSBa9tKEwNUMcU3S+KFLIRv7rm1Ty0D5pMOu0vbz/RDorKRwKQ==
+
+xterm@^4.0.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/xterm/-/xterm-4.4.0.tgz#5915d3c4c8800fadbcf555a0a603c672ab9df589"
+  integrity sha512-JGIpigWM3EBWvnS3rtBuefkiToIILSK1HYMXy4BCsUpO+O4UeeV+/U1AdAXgCB6qJrnPNb7yLgBsVCQUNMteig==
 
 y18n@^3.2.1:
   version "3.2.1"

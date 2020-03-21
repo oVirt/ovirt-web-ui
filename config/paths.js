@@ -42,5 +42,6 @@ module.exports = {
   appVersionJs: resolveApp('src/version.js'),
   ownNodeModules: resolveApp('node_modules'),
   nodePaths: nodePaths,
-  novnc: resolveApp('node_modules/@novnc/novnc')
+  novnc: resolveApp('node_modules/@novnc/novnc'),
+  spiceHtml5: resolveApp('node_modules/@spice-project/spice-html5')
 }

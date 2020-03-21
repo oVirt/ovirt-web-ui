@@ -70,7 +70,7 @@
   },
   "dependencies": {
     "@patternfly/react-charts": "4.4.17",
-    "@patternfly/react-console": "1.10.22",
+    "@patternfly/react-console": "2.0.14",
     "@patternfly/react-tokens": "2.6.9",
     "@patternfly/react-core": "3.87.3",
     "babel-polyfill": "6.26.0",
