@@ -4,7 +4,7 @@ import type {
   DiskType,
   NicType,
   SnapshotType,
-  VmType, ApiVmType,
+  VmType,
 } from './types'
 
 import Selectors from '../selectors'
@@ -34,10 +34,6 @@ const OvirtApi = {
   // ---- Data transform functions (API -> internal, internal -> API)
   //
   //
-  vmToInternal ({ vm, getSubResources = false }: { vm: ApiVmType, getSubResources: boolean }): VmType {
-    return Transforms.VM.toInternal({ vm, includeSubResources: getSubResources })
-  },
-
   poolToInternal: Transforms.Pool.toInternal,
 
   diskToInternal: Transforms.DiskAttachment.toInternal,
@@ -570,6 +566,14 @@ function getOptionWithoutDefault (optionName: string, version: string): Promise<
     })
 }
 
+// export default new Proxy(OvirtApi, {
+//   get (target: Object, prop: string, receiver: Object): any {
+//     if (typeof target[prop] === 'function') {
+//       console.info(`getting OvirtApi.${prop}`)
+//     }
+//     return Reflect.get(...arguments)
+//   },
+// })
 export default OvirtApi
 export {
   Transforms,

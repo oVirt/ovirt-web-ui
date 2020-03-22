@@ -56,6 +56,7 @@ import { fetchRoles } from './roles'
 import { fetchServerConfiguredValues } from './server-configs'
 import { fetchDataCentersAndStorageDomains, fetchIsoFiles } from './storageDomains'
 import { loadIconsFromLocalStorage } from './osIcons'
+import { transformAndPermitVm } from './index'
 
 import { loadFromLocalStorage } from '_/storage'
 
@@ -230,7 +231,7 @@ function* autoConnectCheck () {
     if (vm && vm.error && vm.error.status === 404) {
       OptionsManager.clearAutoConnect()
     } else if (vm && vm.id && vm.status !== 'down') {
-      const internalVm = Api.vmToInternal({ vm })
+      const internalVm = yield transformAndPermitVm(vm)
       yield put(updateVms({ vms: [internalVm] }))
       yield downloadVmConsole(downloadConsole({ vmId, hasGuestAgent: internalVm.ssoGuestAgent }))
     }

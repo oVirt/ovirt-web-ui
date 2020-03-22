@@ -86,15 +86,6 @@ export function* getRDPVm (action) {
 
 // -----
 
-export function* fetchConsoleVmMeta ({ vmId }) {
-  const consoles = yield callExternalAction('consoles', Api.consoles, { type: 'INTERNAL_CONSOLES', payload: { vmId } })
-
-  if (consoles && consoles['graphics_console']) { // && consoles['graphics_console'].length > 0) {
-    return Api.consolesToInternal({ consoles })
-  }
-  return []
-}
-
 /**
  * Check the sessions on a VM and if someone other then the given user has an open
  * console, flag the console as "in use" requiring manual confirmation to open the

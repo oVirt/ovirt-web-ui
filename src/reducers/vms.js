@@ -59,6 +59,7 @@ const vms = actionReducer(initialState, {
       if (!state.getIn(['vms', vm.id])) {
         state = state.set('notAllPagesLoaded', true)
       }
+
       updates[vm.id] = vm
       updates[vm.id].actionResults = state.getIn(['vms', vm.id, 'actionResults'], EMPTY_MAP).toJS()
 
@@ -72,8 +73,13 @@ const vms = actionReducer(initialState, {
         updates[vm.id].sessions = state.getIn(['vms', vm.id, 'sessions'], EMPTY_ARRAY).toJS()
         updates[vm.id].snapshots = state.getIn(['vms', vm.id, 'snapshots'], EMPTY_ARRAY).toJS()
         updates[vm.id].statistics = state.getIn(['vms', vm.id, 'statistics'], EMPTY_MAP).toJS()
+
         updates[vm.id].permissions = state.getIn(['vms', vm.id, 'permissions'], EMPTY_ARRAY).toJS()
+        updates[vm.id].userPermits = state.getIn(['vms', vm.id, 'userPermits'], EMPTY_ARRAY).toJS()
+        updates[vm.id].canUserChangeCd = state.getIn(['vms', vm.id, 'canUserChangeCd'], true)
         updates[vm.id].canUserEditVm = state.getIn(['vms', vm.id, 'canUserEditVm'], false)
+        updates[vm.id].canUserManipulateSnapshots = state.getIn(['vms', vm.id, 'canUserManipulateSnapshots'], false)
+        updates[vm.id].canUserEditVmStorage = state.getIn(['vms', vm.id, 'canUserEditVmStorage'], false)
       }
     })
 
