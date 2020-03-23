@@ -22,9 +22,9 @@ class Vms extends React.Component {
     this.loadMore = this.loadMore.bind(this)
   }
 
-  loadMore () {
+  loadMore (scrollPage) {
     if (this.props.vms.get('notAllPagesLoaded')) {
-      this.props.onUpdate(this.props.vms.get('page') + 1)
+      this.props.fetchPage(this.props.vms.get('page') + 1)
     }
   }
 
@@ -42,11 +42,13 @@ class Vms extends React.Component {
 
     const vmsPoolsMerge = [ ...sortedVms, ...sortedPools ].sort(sortFunction(sort))
 
+    const hasMore = vms.get('notAllPagesLoaded')
+
     return (
       <InfiniteScroll
         loadMore={this.loadMore}
         isReverse={!sort.isAsc}
-        hasMore={vms.get('notAllPagesLoaded')}
+        hasMore={hasMore}
         loader={<Loader key='infinite-scroll-loader' size={SIZES.LARGE} />}
         useWindow={false}
       >
@@ -69,7 +71,7 @@ class Vms extends React.Component {
 Vms.propTypes = {
   vms: PropTypes.object.isRequired,
   alwaysShowPoolCard: PropTypes.bool,
-  onUpdate: PropTypes.func.isRequired,
+  fetchPage: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -78,6 +80,6 @@ export default connect(
     alwaysShowPoolCard: !state.config.get('filter'),
   }),
   (dispatch) => ({
-    onUpdate: (page) => dispatch(getByPage({ page })),
+    fetchPage: (page) => dispatch(getByPage({ page })),
   })
 )(Vms)
