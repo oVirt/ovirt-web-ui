@@ -1,5 +1,15 @@
 .panel-body {
-    border-bottom: 1px solid #d1d1d1;
     padding: 0;
     background-color: #fff;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.notifications-list {
+    overflow-y: auto;
+}
+
+.action-panel {
+    border-top: solid 1px #d1d1d1;
 }
