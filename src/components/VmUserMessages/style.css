@@ -6,16 +6,12 @@
     flex-direction: column;
 }
 
-.drawer-pf-notifications-list {
-    border: solid 1px #d1d1d1 !important;
-    padding: 10px 0 !important;
-    margin: 0;
+.notifications-list {
     overflow-y: auto;
 }
 
-.drawer-pf-action-clear-notification-list {
-    flex: auto;
-    overflow-y: auto;
+.action-panel {
+    border-top: solid 1px #d1d1d1;
 }
 
 .usermessages-icon {

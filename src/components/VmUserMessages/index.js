@@ -85,7 +85,7 @@ class VmUserMessages extends React.Component {
         <NotificationDrawer hide={!this.state.show} expanded={this.state.expanded}>
           <NotificationDrawer.Title onCloseClick={this.handleToggle} onExpandClick={this.handleExpand} />
           <NotificationDrawer.PanelBody className={style['panel-body']}>
-            <div className={style['drawer-pf-notifications-list']}>
+            <div className={style['notifications-list']}>
               {messagesList}
             </div>
             { messagesCount > 0 &&
