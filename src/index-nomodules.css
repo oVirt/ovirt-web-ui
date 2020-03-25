@@ -62,7 +62,8 @@ body {
 }
 
 .navbar-pf-vertical .nav .nav-item-iconic .badge {
-  margin-left: -2px !important;
+  margin-left: -1px;
+  margin-top: -6px;
   margin-right: 0;
 }
 
