@@ -243,7 +243,7 @@ class VmActions extends React.Component {
       },
       {
         priority: 1,
-        actionDisabled: isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole']),
+        actionDisabled: isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole']) || vm.get('consoles').isEmpty(),
         shortTitle: msg.console(),
         tooltip: consoleProtocol,
         className: 'btn btn-default',
