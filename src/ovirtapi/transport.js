@@ -70,14 +70,14 @@ function httpGet ({ url, custHeaders = {} }: GetRequestType): Promise<Object> {
     ...custHeaders,
   }
 
-  console.log(`http GET[${myCounter}] -> url: "${url}", headers: ${logHeaders(headers)}`)
+  console.log(`http GET[${myCounter}] 🡒 url: "${url}", headers: ${logHeaders(headers)}`)
   return $.ajax(url, {
     type: 'GET',
     headers,
   })
     .then((data: Object): Object => {
       notifyStop(requestId)
-      console.log(`http GET[${myCounter}] <- data:`, data)
+      console.log(`http GET[${myCounter}] 🡐 data:`, data)
       return data
     })
     .catch((data: Object): Promise<Object> => {

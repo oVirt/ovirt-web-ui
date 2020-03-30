@@ -59,21 +59,29 @@ const vms = actionReducer(initialState, {
       if (!state.getIn(['vms', vm.id])) {
         state = state.set('notAllPagesLoaded', true)
       }
+
       updates[vm.id] = vm
       updates[vm.id].actionResults = state.getIn(['vms', vm.id, 'actionResults'], EMPTY_MAP).toJS()
 
       if (copySubResources) {
-        updates[vm.id].cdrom = state.getIn(['vms', vm.id, 'cdrom'], Immutable.fromJS({ file: { id: '' } })).toJS()
+        // Only copy consoles if the VM does not already have any
         updates[vm.id].consoles = vm.consoles.length === 0
           ? state.getIn(['vms', vm.id, 'consoles'], EMPTY_ARRAY).toJS()
           : vm.consoles
+
+        updates[vm.id].cdrom = state.getIn(['vms', vm.id, 'cdrom'], Immutable.fromJS({ file: { id: '' } })).toJS()
         updates[vm.id].disks = state.getIn(['vms', vm.id, 'disks'], EMPTY_ARRAY).toJS()
         updates[vm.id].nics = state.getIn(['vms', vm.id, 'nics'], EMPTY_ARRAY).toJS()
         updates[vm.id].sessions = state.getIn(['vms', vm.id, 'sessions'], EMPTY_ARRAY).toJS()
         updates[vm.id].snapshots = state.getIn(['vms', vm.id, 'snapshots'], EMPTY_ARRAY).toJS()
         updates[vm.id].statistics = state.getIn(['vms', vm.id, 'statistics'], EMPTY_MAP).toJS()
+
         updates[vm.id].permissions = state.getIn(['vms', vm.id, 'permissions'], EMPTY_ARRAY).toJS()
+        updates[vm.id].userPermits = state.getIn(['vms', vm.id, 'userPermits'], EMPTY_ARRAY).toJS()
+        updates[vm.id].canUserChangeCd = state.getIn(['vms', vm.id, 'canUserChangeCd'], true)
         updates[vm.id].canUserEditVm = state.getIn(['vms', vm.id, 'canUserEditVm'], false)
+        updates[vm.id].canUserManipulateSnapshots = state.getIn(['vms', vm.id, 'canUserManipulateSnapshots'], false)
+        updates[vm.id].canUserEditVmStorage = state.getIn(['vms', vm.id, 'canUserEditVmStorage'], false)
       }
     })
 
@@ -211,22 +219,18 @@ const vms = actionReducer(initialState, {
   },
 
   [UPDATE_VMPOOLS_COUNT] (state) {
-    state.get('pools').toList().map(pool => {
-      state = state.setIn(['pools', pool.get('id'), 'vmsCount'], 0)
-    })
+    state = state.update('pools', pools => pools.map(pool => pool.set('vmsCount', 0)))
 
-    state.get('vms').toList().map(vm => {
-      // Check if vm is in actual pool and its down, checking for down vms is for not count that vms in admin mode
-      if (
-        vm.getIn(['pool', 'id']) &&
-        (
-          vm.get('status') !== 'down' ||
-          state.getIn(['pools', vm.getIn(['pool', 'id']), 'type']) === 'manual'
-        )
-      ) {
-        state = state.updateIn(['pools', vm.getIn(['pool', 'id']), 'vmsCount'], count => count + 1)
+    state.get('vms').map(vm => {
+      const poolId = vm.getIn(['pool', 'id'])
+      if (poolId && state.getIn(['pools', poolId])) {
+        // VM is in a known pool ... down VMs don't count against the user total unless it is a manual pool
+        if (vm.get('status') !== 'down' || state.getIn(['pools', poolId, 'type']) === 'manual') {
+          state = state.updateIn(['pools', poolId, 'vmsCount'], count => count + 1)
+        }
       }
     })
+
     return state
   },
 

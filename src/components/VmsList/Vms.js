@@ -22,9 +22,9 @@ class Vms extends React.Component {
     this.loadMore = this.loadMore.bind(this)
   }
 
-  loadMore () {
+  loadMore (scrollPage) {
     if (this.props.vms.get('notAllPagesLoaded')) {
-      this.props.onUpdate(this.props.vms.get('page') + 1)
+      this.props.fetchPage(this.props.vms.get('page') + 1)
     }
   }
 
@@ -35,25 +35,35 @@ class Vms extends React.Component {
 
     const filters = vms.get('filters').toJS()
 
-    const sortedVms = vms.get('vms').filter(vm => filterVms(vm, filters)).toList().map(vm => vm.set('isVm', true))
-    const sortedPools = vms.get('pools')
+    // Filter the VMs (1. apply the filter bar criteria, 2. only show Pool VMs if the Pool exists)
+    const filteredVms = vms.get('vms')
+      .filter(vm => filterVms(vm, filters))
+      .filter(vm => vm.getIn(['pool', 'id'], false) ? !!vms.getIn(['pools', vm.getIn(['pool', 'id'])], false) : true)
+      .toList()
+      .map(vm => vm.set('isVm', true))
+
+    // Filter the Pools (only show a Pool card if the user can currently 'Take' a VM from it)
+    const filteredPools = vms.get('pools')
       .filter(pool => alwaysShowPoolCard || (pool.get('vmsCount') < pool.get('maxUserVms') && pool.get('size') > 0 && filterVms(pool, filters)))
       .toList()
 
-    const vmsPoolsMerge = [ ...sortedVms, ...sortedPools ].sort(sortFunction(sort))
+    // Display the VMs and Pools together, sorted nicely
+    const vmsAndPools = [ ...filteredVms, ...filteredPools ].sort(sortFunction(sort))
+
+    const hasMore = vms.get('notAllPagesLoaded')
 
     return (
       <InfiniteScroll
         loadMore={this.loadMore}
         isReverse={!sort.isAsc}
-        hasMore={vms.get('notAllPagesLoaded')}
+        hasMore={hasMore}
         loader={<Loader key='infinite-scroll-loader' size={SIZES.LARGE} />}
         useWindow={false}
       >
         <ScrollPositionHistory uniquePrefix='vms-list' scrollContainerSelector='#page-router-render-component'>
           <div className='container-fluid container-cards-pf'>
             <div className={`row row-cards-pf ${style['cards-container']}`}>
-              {vmsPoolsMerge.map(instance =>
+              {vmsAndPools.map(instance =>
                 instance.get('isVm')
                   ? <Vm vm={instance} key={instance.get('id')} />
                   : <Pool pool={instance} key={instance.get('id')} />
@@ -69,7 +79,7 @@ class Vms extends React.Component {
 Vms.propTypes = {
   vms: PropTypes.object.isRequired,
   alwaysShowPoolCard: PropTypes.bool,
-  onUpdate: PropTypes.func.isRequired,
+  fetchPage: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -78,6 +88,6 @@ export default connect(
     alwaysShowPoolCard: !state.config.get('filter'),
   }),
   (dispatch) => ({
-    onUpdate: (page) => dispatch(getByPage({ page })),
+    fetchPage: (page) => dispatch(getByPage({ page })),
   })
 )(Vms)

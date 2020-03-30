@@ -27,14 +27,6 @@ import type {
   ApiRoleType, RoleType,
 } from './types'
 
-import {
-  canUserChangeCd,
-  canUserEditVm,
-  canUserEditVmStorage,
-  getUserPermits,
-  canUserManipulateSnapshots,
-} from '../utils'
-
 import { isWindows } from '_/helpers'
 
 function vCpusCount ({ cpu }: { cpu: Object }): number {
@@ -95,7 +87,11 @@ function getPoolColor (id: string): string {
 //
 //
 const VM = {
-  toInternal ({ vm, includeSubResources = false }: { vm: ApiVmType, includeSubResources?: boolean }): VmType {
+  toInternal ({ vm }: { vm: ApiVmType }): VmType {
+    const permissions = vm.permissions && vm.permissions.permission
+      ? Permissions.toInternal({ permissions: vm.permissions.permission })
+      : []
+
     const parsedVm: Object = {
       name: vm['name'],
       description: vm['description'],
@@ -166,10 +162,6 @@ const VM = {
       sessions: [],
       nics: [],
       statistics: [],
-      permits: new Set(),
-      canUserChangeCd: true,
-      canUserEditVm: false,
-      canUserManipulateSnapshots: false,
 
       ssoGuestAgent: vm.sso.methods && vm.sso.methods.method && vm.sso.methods.method.length > 0 && vm.sso.methods.method.findIndex(method => method.id === 'guest_agent') > -1,
       display: {
@@ -181,52 +173,48 @@ const VM = {
         name: vm.time_zone.name,
         offset: vm.time_zone.utc_offset,
       },
+
+      // roles are required to calculate permits and 'canUse*', therefore its done in sagas
+      permissions,
+      userPermits: new Set(),
+      canUserChangeCd: true,
+      canUserEditVm: false,
+      canUserManipulateSnapshots: false,
+      canUserEditVmStorage: false,
     }
 
-    if (includeSubResources) {
-      if (vm.cdroms && vm.cdroms.cdrom) {
-        parsedVm.cdrom = CdRom.toInternal({ cdrom: vm.cdroms.cdrom[0] }) // in oVirt there is always exactly 1 cdrom
-      }
+    if (vm.cdroms && vm.cdroms.cdrom) {
+      parsedVm.cdrom = CdRom.toInternal({ cdrom: vm.cdroms.cdrom[0] }) // in oVirt there is always exactly 1 cdrom
+    }
 
-      if (vm.graphics_consoles && vm.graphics_consoles.graphics_console) {
-        parsedVm.consoles = VmConsoles.toInternal({ consoles: vm.graphics_consoles })
-      }
+    if (vm.graphics_consoles && vm.graphics_consoles.graphics_console) {
+      parsedVm.consoles = VmConsoles.toInternal({ consoles: vm.graphics_consoles })
+    }
 
-      if (vm.disk_attachments && vm.disk_attachments.disk_attachment) {
-        parsedVm.disks = vm.disk_attachments.disk_attachment.map(
-          attachment => DiskAttachment.toInternal({ attachment, disk: attachment.disk })
-        )
-      }
+    if (vm.disk_attachments && vm.disk_attachments.disk_attachment) {
+      parsedVm.disks = vm.disk_attachments.disk_attachment.map(
+        attachment => DiskAttachment.toInternal({ attachment, disk: attachment.disk })
+      )
+    }
 
-      if (vm.nics && vm.nics.nic) {
-        parsedVm.nics = vm.nics.nic.map(
-          nic => Nic.toInternal({ nic })
-        )
-      }
+    if (vm.nics && vm.nics.nic) {
+      parsedVm.nics = vm.nics.nic.map(
+        nic => Nic.toInternal({ nic })
+      )
+    }
 
-      if (vm.sessions && vm.sessions.session) {
-        parsedVm.sessions = VmSessions.toInternal({ sessions: vm.sessions })
-      }
+    if (vm.sessions && vm.sessions.session) {
+      parsedVm.sessions = VmSessions.toInternal({ sessions: vm.sessions })
+    }
 
-      if (vm.snapshots && vm.snapshots.snapshot) {
-        parsedVm.snapshots = vm.snapshots.snapshot.map(
-          snapshot => Snapshot.toInternal({ snapshot })
-        )
-      }
+    if (vm.snapshots && vm.snapshots.snapshot) {
+      parsedVm.snapshots = vm.snapshots.snapshot.map(
+        snapshot => Snapshot.toInternal({ snapshot })
+      )
+    }
 
-      if (vm.statistics && vm.statistics.statistic) {
-        parsedVm.statistics = VmStatistics.toInternal({ statistics: vm.statistics.statistic })
-      }
-
-      if (vm.permissions && vm.permissions.permission) {
-        parsedVm.permits = getUserPermits(Permissions.toInternal({
-          permissions: vm.permissions.permission,
-        }))
-        parsedVm.canUserChangeCd = canUserChangeCd(parsedVm.permits)
-        parsedVm.canUserEditVm = canUserEditVm(parsedVm.permits)
-        parsedVm.canUserManipulateSnapshots = canUserManipulateSnapshots(parsedVm.permits)
-        parsedVm.canUserEditVmStorage = canUserEditVmStorage(parsedVm.permits)
-      }
+    if (vm.statistics && vm.statistics.statistic) {
+      parsedVm.statistics = VmStatistics.toInternal({ statistics: vm.statistics.statistic })
     }
 
     return parsedVm

@@ -24,11 +24,8 @@ import {
   SET_FILTERS,
   SET_OVIRT_API_VERSION,
   SET_VM_ACTION_RESULT,
-  SET_VM_CDROM,
-  SET_VM_CONSOLES,
   SET_VM_DISKS,
   SET_VM_NICS,
-  SET_VM_SESSIONS,
   SET_VM_SNAPSHOTS,
   SET_VM_SORT,
   SHUTDOWN_VM,
@@ -328,26 +325,6 @@ export function vmActionInProgress ({ vmId, name, started }) {
   }
 }
 
-export function setVmConsoles ({ vmId, consoles }) {
-  return {
-    type: SET_VM_CONSOLES,
-    payload: {
-      vmId,
-      consoles,
-    },
-  }
-}
-
-export function setVmSessions ({ vmId, sessions }) {
-  return {
-    type: SET_VM_SESSIONS,
-    payload: {
-      vmId,
-      sessions,
-    },
-  }
-}
-
 export function setVmSnapshots ({ vmId, snapshots }) {
   return {
     type: SET_VM_SNAPSHOTS,
@@ -375,16 +352,6 @@ export function setChanged ({ value }) {
     type: SET_CHANGED,
     payload: {
       value,
-    },
-  }
-}
-
-export function setVmCdRom ({ cdrom, vmId }) {
-  return {
-    type: SET_VM_CDROM,
-    payload: {
-      cdrom,
-      vmId,
     },
   }
 }

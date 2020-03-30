@@ -11,7 +11,7 @@ import {
 } from 'redux-saga/effects'
 import { push } from 'connected-react-router'
 
-import Api from '_/ovirtapi'
+import Api, { Transforms } from '_/ovirtapi'
 import AppConfiguration from '_/config'
 import { saveToLocalStorage } from '_/storage'
 
@@ -29,9 +29,7 @@ import {
   updateVms,
   removeVms,
   vmActionInProgress,
-  setVmConsoles,
   removeMissingVms,
-  setVmSessions,
 
   getSingleVm,
   selectVmDetail as actionSelectVmDetail,
@@ -52,7 +50,6 @@ import {
   getPoolsByCount,
   getIsoFiles,
   getConsoleOptions as actionGetConsoleOptions,
-  setVmCdRom,
   setVmNics,
   removeActiveRequest,
   stopSchedulerFixedDelay,
@@ -63,9 +60,9 @@ import {
 
 import {
   callExternalAction,
-  compareVersion,
   delay,
   doCheckTokenExpired,
+  entityPermissionsToUserPermits,
   foreach,
   fetchPermits,
   PermissionsType,
@@ -78,7 +75,6 @@ import {
   getConsoleOptions,
   saveConsoleOptions,
   getRDPVm,
-  fetchConsoleVmMeta,
   openConsoleModal,
 } from './console'
 
@@ -118,10 +114,11 @@ import {
 } from '_/constants'
 
 import {
+  canUserChangeCd,
   canUserEditDisk,
   canUserEditVm,
   canUserEditVmStorage,
-  getUserPermits,
+  canUserManipulateSnapshots,
   isNumber,
 } from '_/utils'
 
@@ -134,18 +131,10 @@ const vmFetchAdditionalList =
     'nics',
     'snapshots',
     'statistics',
-    'permissions.role.permits',
+    'permissions',
   ]
 
 export const EVERYONE_GROUP_ID = 'eee00000-0000-0000-0000-123456789eee'
-
-/**
- * Compare the current oVirt version (held in redux) to the given version.
- */
-function* compareVersionToCurrent ({ major, minor }) {
-  const current = yield select(state => state.config.get('oVirtApiVersion').toJS())
-  return compareVersion(current, { major, minor })
-}
 
 function* fetchByPage (action) {
   yield put(setChanged({ value: false }))
@@ -165,7 +154,7 @@ function* getIdsByType (type) {
   return ids
 }
 
-export function* refreshMainPage ({ shallowFetch, page }) {
+function* refreshMainPage ({ shallowFetch, page }) {
   shallowFetch = !!shallowFetch
 
   // refresh VMs and remove any that haven't been refreshed
@@ -239,19 +228,17 @@ const pagesRefreshers = {
 }
 
 function* refreshData (action) {
-  console.log('refreshData(): ', action.payload)
-
   const currentPage = yield select(state => state.config.get('currentPage'))
+  const refreshType =
+    currentPage.type === NO_REFRESH_TYPE ? null
+      : currentPage.type === undefined ? MAIN_PAGE_TYPE
+        : currentPage.type
 
-  if (currentPage.type !== NO_REFRESH_TYPE) {
-    if (currentPage.type === undefined) {
-      yield pagesRefreshers[MAIN_PAGE_TYPE](action.payload)
-    } else {
-      yield pagesRefreshers[currentPage.type](Object.assign({ id: currentPage.id }, action.payload))
-    }
+  console.info('refreshData() 🡒 payload:', action.payload, 'currentPage:', currentPage, 'refreshType:', refreshType)
+  if (refreshType) {
+    yield pagesRefreshers[refreshType](Object.assign({ id: currentPage.id }, action.payload))
   }
-
-  console.log('refreshData(): finished')
+  console.info('refreshData() 🡒 finished')
 }
 
 /**
@@ -266,29 +253,30 @@ function* changePage (action) {
   }))
 }
 
-function* fetchVmsByPage (action) {
-  const isOvirtGTE42 = yield compareVersionToCurrent({ major: 4, minor: 2 })
-  if (isOvirtGTE42) {
-    yield fetchVmsByPageV42(action)
-  } else {
-    yield fetchVmsByPageVLower(action)
-  }
-  yield put(updateVmsPoolsCount())
+export function* transformAndPermitVm (vm) {
+  const internalVm = Transforms.VM.toInternal({ vm })
+  internalVm.userPermits = yield entityPermissionsToUserPermits(internalVm)
+
+  internalVm.canUserChangeCd = canUserChangeCd(internalVm.userPermits)
+  internalVm.canUserEditVm = canUserEditVm(internalVm.userPermits)
+  internalVm.canUserManipulateSnapshots = canUserManipulateSnapshots(internalVm.userPermits)
+  internalVm.canUserEditVmStorage = canUserEditVmStorage(internalVm.userPermits)
+
+  return internalVm
 }
 
 /**
- * Fetch VMs with additional nested data requested (on ovirt 4.2 and later)
+ * Fetch VMs with additional nested data requested
  */
-function* fetchVmsByPageV42 (action) {
+function* fetchVmsByPage (action) {
   const { shallowFetch, page } = action.payload
 
   action.payload.additional = shallowFetch ? ['graphics_consoles'] : vmFetchAdditionalList
 
-  // TODO: paging: split this call to a loop per up to 25 VMs
-  const allVms = yield callExternalAction('getVmsByPage', Api.getVmsByPage, action)
-  if (allVms && allVms['vm']) { // array
-    const internalVms = allVms.vm.map(vm => Api.vmToInternal({ vm, getSubResources: true }))
-    yield put(updateVms({ vms: internalVms, copySubResources: false, page: page }))
+  const vmsOnPage = yield callExternalAction('getVmsByPage', Api.getVmsByPage, action)
+  if (vmsOnPage && vmsOnPage['vm']) {
+    const internalVms = yield all(vmsOnPage.vm.map(transformAndPermitVm))
+    yield put(updateVms({ vms: internalVms, copySubResources: shallowFetch, page }))
     yield fetchUnknownIcons({ vms: internalVms })
 
     // NOTE: No need to fetch the current=true cdrom info at this point. The cdrom info
@@ -297,94 +285,37 @@ function* fetchVmsByPageV42 (action) {
     //       appropriate cdrom info based on the VM's state. See `fetchSingleVm` for more
     //       details.
   }
-}
 
-/**
- * Fetch VMs and individually fetch nested data as requested (on ovirt 4.1 and earlier)
- */
-function* fetchVmsByPageVLower (action) {
-  const { shallowFetch, page } = action.payload
-
-  // TODO: paging: split this call to a loop per up to 25 vms
-  const allVms = yield callExternalAction('getVmsByPage', Api.getVmsByPage, action)
-  if (allVms && allVms['vm']) { // array
-    const internalVms = allVms.vm.map(vm => Api.vmToInternal({ vm }))
-
-    yield put(updateVms({ vms: internalVms, copySubResources: true, page: page }))
-    yield fetchUnknownIcons({ vms: internalVms })
-
-    if (!shallowFetch) {
-      yield fetchConsoleMetadatas({ vms: internalVms })
-      yield fetchDisks({ vms: internalVms })
-      yield fetchVmsCdRom({ vms: internalVms, current: false })
-      yield fetchVmsNics({ vms: internalVms })
-      yield fetchVmsSessions({ vms: internalVms })
-      yield fetchVmsSnapshots({ vms: internalVms })
-      // TODO: Support <4.2 for statistics?
-    } else {
-      console.log('getVmsByPage() shallow fetch requested - skipping other resources')
-    }
-  }
+  yield put(updateVmsPoolsCount())
 }
 
 /**
  * Fetch a given number of VMs (**action.payload.count**).
  */
 function* fetchVmsByCount (action) {
-  const isOvirtGTE42 = yield compareVersionToCurrent({ major: 4, minor: 2 })
-  if (isOvirtGTE42) {
-    return yield fetchVmsByCountV42(action)
-  } else {
-    return yield fetchVmsByCountVLower(action)
-  }
-}
-
-function* fetchVmsByCountV42 (action) {
   const { shallowFetch } = action.payload
   const fetchedVmIds = []
 
   action.payload.additional = shallowFetch ? [ 'graphics_consoles' ] : vmFetchAdditionalList
 
   const allVms = yield callExternalAction('getVmsByCount', Api.getVmsByCount, action)
-  if (allVms && allVms['vm']) { // array
-    const internalVms = allVms.vm.map(vm => Api.vmToInternal({ vm, getSubResources: true }))
-    internalVms.forEach(vm => fetchedVmIds.push(vm.id))
+  if (allVms && allVms['vm']) {
+    const internalVms = []
+    for (const vm of allVms.vm) {
+      const internalVm = yield transformAndPermitVm(vm)
+      fetchedVmIds.push(internalVm.id)
+      internalVms.push(internalVm)
+    }
+    console.log('internalVms:', internalVms)
 
-    yield put(updateVms({ vms: internalVms, copySubResources: true }))
+    yield put(updateVms({ vms: internalVms, copySubResources: shallowFetch }))
     yield fetchUnknownIcons({ vms: internalVms })
 
-    // NOTE: No need to fetch the current=true cdrom info at this point. See `fetchVmsByPageV42`
+    // NOTE: No need to fetch the current=true cdrom info at this point. See `fetchVmsByPage`
     //       or `fetchSingleVm` for more details.
   }
-  return fetchedVmIds
-}
 
-function* fetchVmsByCountVLower (action) {
-  const { shallowFetch } = action.payload
-  const fetchedVmIds = []
-
-  // TODO: paging: split this call to a loop per up to 25 vms
-  const allVms = yield callExternalAction('getVmsByCount', Api.getVmsByCount, action)
-  if (allVms && allVms['vm']) { // array
-    const internalVms = allVms.vm.map(vm => Api.vmToInternal({ vm }))
-    internalVms.forEach(vm => fetchedVmIds.push(vm.id))
-
-    yield put(updateVms({ vms: internalVms, copySubResources: true }))
-    yield fetchUnknownIcons({ vms: internalVms })
-
-    if (!shallowFetch) {
-      yield fetchConsoleMetadatas({ vms: internalVms })
-      yield fetchDisks({ vms: internalVms })
-      yield fetchVmsCdRom({ vms: internalVms, current: false })
-      yield fetchVmsNics({ vms: internalVms })
-      yield fetchVmsSessions({ vms: internalVms })
-      yield fetchVmsSnapshots({ vms: internalVms })
-      // TODO: Support <4.2 for statistics?
-    } else {
-      console.log('fetchVmsByCountVLower() shallow fetch requested - skipping other resources')
-    }
-  }
-
+  yield put(updateVmsPoolsCount())
   return fetchedVmIds
 }
 
@@ -397,40 +328,18 @@ function* putPermissionsInDisk (disk) {
 export function* fetchSingleVm (action) {
   const { vmId, shallowFetch } = action.payload
 
-  const isOvirtGTE42 = compareVersionToCurrent({ major: 4, minor: 2 })
-  action.payload.additional = [ 'graphics_consoles' ]
-  if (isOvirtGTE42 && !shallowFetch) {
-    action.payload.additional = vmFetchAdditionalList
-  }
+  action.payload.additional = shallowFetch ? [ 'graphics_consoles' ] : vmFetchAdditionalList
 
   const vm = yield callExternalAction('getVm', Api.getVm, action, true)
   let internalVm = null
   if (vm && vm.id) {
-    const isFilter = yield select(state => state.config.get('filter'))
-    internalVm = Api.vmToInternal({ vm, getSubResources: isOvirtGTE42 })
+    internalVm = yield transformAndPermitVm(vm)
 
     // If the VM is running, we want to display the current=true cdrom info. Due
     // to an API restriction, current=true cdrom info cannot currently (Aug-2018)
     // be accessed via the additional fetch list on the VM. Fetch it directly.
-    if (isOvirtGTE42 && !shallowFetch && internalVm.status === 'up') {
+    if (!shallowFetch && internalVm.status === 'up') {
       internalVm.cdrom = yield fetchVmCdRom({ vmId: internalVm.id, current: true })
-    }
-
-    if (isOvirtGTE42 && !shallowFetch && !isFilter) {
-      internalVm.permits = getUserPermits(yield fetchVmPermissions({ vmId: internalVm.id }))
-    }
-
-    if (!isOvirtGTE42 && !shallowFetch) {
-      internalVm.cdrom = yield fetchVmCdRom({ vmId: internalVm.id, current: internalVm.status === 'up' })
-      internalVm.consoles = yield fetchConsoleVmMeta({ vmId: internalVm.id })
-      internalVm.nics = yield fetchVmNics({ vmId: internalVm.id })
-      internalVm.disks = yield fetchVmDisks({ vmId: internalVm.id })
-      internalVm.sessions = yield fetchVmSessions({ vmId: internalVm.id })
-      internalVm.permits = getUserPermits(yield fetchVmPermissions({ vmId: internalVm.id }))
-      internalVm.canUserEditVm = canUserEditVm(internalVm.permits)
-      internalVm.canUserEditVmStorage = canUserEditVmStorage(internalVm.permits)
-      // TODO: Support <4.2 for snapshots?
-      // TODO: Support <4.2 for statistics?
     }
 
     if (!shallowFetch) {
@@ -465,7 +374,7 @@ function* fetchPoolsByCount (action) {
   const fetchedPoolIds = []
 
   const allPools = yield callExternalAction('getPoolsByCount', Api.getPoolsByCount, action)
-  if (allPools && allPools['vm_pool']) { // array
+  if (allPools && allPools['vm_pool']) {
     const internalPools = allPools.vm_pool.map(pool => Api.poolToInternal({ pool }))
     internalPools.forEach(pool => fetchedPoolIds.push(pool.id))
 
@@ -479,7 +388,7 @@ function* fetchPoolsByCount (action) {
 function* fetchPoolsByPage (action) {
   const allPools = yield callExternalAction('getPoolsByPage', Api.getPoolsByPage, action)
 
-  if (allPools && allPools['vm_pool']) { // array
+  if (allPools && allPools['vm_pool']) {
     const internalPools = allPools.vm_pool.map(pool => Api.poolToInternal({ pool }))
 
     yield put(updatePools({ pools: internalPools }))
@@ -505,13 +414,6 @@ function* fetchSinglePool (action) {
   return internalPool
 }
 
-function* fetchVmsSessions ({ vms }) {
-  yield * foreach(vms, function* (vm) {
-    const sessionsInternal = yield fetchVmSessions({ vmId: vm.id })
-    yield put(setVmSessions({ vmId: vm.id, sessions: sessionsInternal }))
-  })
-}
-
 /*
  * Fetch a VM's cdrom configuration based on the status of the VM. A running VM's cdrom
  * info comes from "current=true" while a non-running VM's cdrom info comes from the
@@ -525,24 +427,6 @@ function* fetchVmCdRom ({ vmId, current }) {
     cdromInternal = Api.cdRomToInternal({ cdrom })
   }
   return cdromInternal
-}
-
-/*
- * For each given VM, first fetch the appropriate __current__ cdrom info, then push the
- * info to VM reducers for the redux store.
- */
-function* fetchVmsCdRom ({ vms, current }) {
-  yield * foreach(vms, function* (vm) {
-    const cdrom = yield fetchVmCdRom({ vmId: vm.id, current })
-    yield put(setVmCdRom({ vmId: vm.id, cdrom }))
-  })
-}
-
-function* fetchConsoleMetadatas ({ vms }) {
-  yield * foreach(vms, function* (vm) {
-    const consolesInternal = yield fetchConsoleVmMeta({ vmId: vm.id })
-    yield put(setVmConsoles({ vmId: vm.id, consoles: consolesInternal }))
-  })
 }
 
 export function* fetchDisks ({ vms }) {
@@ -724,13 +608,6 @@ function* saveFilters (actions) {
   yield put(setVmsFilters({ filters }))
 }
 
-function* fetchVmsNics ({ vms }) {
-  yield all(vms.map((vm) => call(function* () {
-    const nicsInternal = yield fetchVmNics({ vmId: vm.id })
-    yield put(setVmNics({ vmId: vm.id, nics: nicsInternal }))
-  })))
-}
-
 function* fetchVmNics ({ vmId }) {
   const nics = yield callExternalAction('getVmsNic', Api.getVmsNic, { type: 'GET_VM_NICS', payload: { vmId } })
 
@@ -739,10 +616,6 @@ function* fetchVmNics ({ vmId }) {
     return nicsInternal
   }
   return []
-}
-
-function* fetchVmsSnapshots ({ vms }) {
-  yield all(vms.map((vm) => call(fetchVmSnapshots, { vmId: vm.id })))
 }
 
 export function* fetchVmSnapshots ({ vmId }) {
@@ -857,13 +730,13 @@ export function* rootSaga () {
     takeEvery(START_SCHEDULER_FIXED_DELAY, startSchedulerWithFixedDelay),
     // STOP_SCHEDULER_FIXED_DELAY is taken by `schedulerWithFixedDelay()`
     throttle(1000, REFRESH_DATA, refreshData),
+    takeLatest(CHANGE_PAGE, changePage),
 
     throttle(100, GET_BY_PAGE, fetchByPage),
-    throttle(100, GET_VMS_BY_PAGE, fetchVmsByPage),
     throttle(100, GET_VMS_BY_COUNT, fetchVmsByCount),
+    throttle(100, GET_VMS_BY_PAGE, fetchVmsByPage),
     throttle(100, GET_POOLS_BY_COUNT, fetchPoolsByCount),
     throttle(100, GET_POOLS_BY_PAGE, fetchPoolsByPage),
-    takeLatest(CHANGE_PAGE, changePage),
 
     takeLatest(GET_ALL_EVENTS, fetchAllEvents),
     takeEvery(DISMISS_EVENT, dismissEvent),
