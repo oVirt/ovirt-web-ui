@@ -19,20 +19,19 @@ Please report bugs and feature requests to the [GitHub issue tracker](https://gi
     - example: https://engine.local/ovirt-engine
   - Have packages `autoconf`, `automake` and `libtool` installed
   - Have `yarn` installed
-  - Not strictly required but **suggested**, use the `ovirt-engine-*` packages
+  - Not strictly required but **suggested**, use the `ovirt-engine-nodejs-modules` package
   - `git clone` the repository
 
 
 #### ovirt-engine packages
-Install `ovirt-engine-nodejs`, `ovirt-engine-nodejs-modules` from the `ovirt/tested`
-yum repo for your platform to use the same packages that will be used by CI to build
-the app.  (See [BZ 1427045](https://bugzilla.redhat.com/show_bug.cgi?id=1427045))
+Install `ovirt-engine-nodejs-modules` from the `ovirt/tested` yum repo for your platform
+to use the same packages that will be used by CI to build the app.
 
-    REPO=fc28 # or the appropriate release and version for you
+    REPO=fc30 # or the appropriate release and version for you
     dnf config-manager --add-repo http://resources.ovirt.org/repos/ovirt/tested/master/rpm/$REPO
-    dnf install ovirt-engine-nodejs ovirt-engine-nodejs-modules
+    dnf install ovirt-engine-nodejs-modules
 
-To set PATH and the project's `node_modules` directory based on yarn offline cache
+To set PATH and use yarn, the yarn offline cache provided by `ovirt-engine-nodejs-modules`
 and use these packages for development or building use:
 
     source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh
@@ -45,7 +44,9 @@ the offline mirror added by `setup-env.sh`:
 
 **NOTE:** During development it is not necessary to limit your environment to the offline
 yarn repo provided by `ovirt-engine-nodejs-modules`.  However, it is recommended to run a
-full build to verify no dependency errors will be introduced by your change.
+full build to verify no dependency errors will be introduced by your change.  oVirt
+STDCI will fail if `ovirt-engine-nodejs-modules` needs to be updated with changes made
+to `package.json` or `yarn.lock` in a new pull request.
 
 
 ### Development mode
@@ -79,6 +80,19 @@ at `$HOME/new-branding`, start the dev server like this:
     BRANDING=$HOME/new-branding \
     yarn start
 
+#### Keep-alive
+Under normal circumstances, the token generated when the dev server starts will
+expire after non-use.  That interval is determined by setting on the ovirt-engine.  If
+you do not want the dev server session to expire when the UI does the non-activity
+logout, the `KEEP_ALIVE` environment variable may be used.  This will keep the dev
+server's session alive by pining the rest api at the specified minute interval.  For
+example, running the dev server like this will have it ping the rest api every 20 minutes,
+keeping the session alive even if the UI is logged out or closed:
+
+    ENGINE_URL=https://my.ovirt.instance/ovirt-engine \
+    KEEP_ALIVE=20 \
+    yarn start
+
 ## Production Builds
 
 ### Build static assets
@@ -103,22 +117,24 @@ This allows you to run VM Portal deployed directly in an ovirt-engine developmen
 
 ### Build RPM
 There are at least 4 ways to build the RPM for the project:
-  1. Manually with `make rpm`
+  1. Manually with `make rpm`:
 
     source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh
     ./autogen.sh --prefix=/usr --datarootdir=/share
     make rpm
 
   2. Use [mock_runner](https://ovirt-infra-docs.readthedocs.io/en/latest/CI/Using_mock_runner/index.html)
-     to run CI build artifacts locally (this method is cleanest since it runs in a chroot)
+     to run CI build artifacts locally (this method is cleanest since it runs in a chroot).
 
   3. Each pull request push will automatically have RPMs built (the check-patch,
      check-merged, and build-artifact stages all use the same script: `automation/build.sh`)
-     by [oVirt infra STDCI](https://ovirt-infra-docs.readthedocs.io/en/latest/CI/Build_and_test_standards/index.html)
+     by [oVirt infra STDCI](https://ovirt-infra-docs.readthedocs.io/en/latest/CI/Build_and_test_standards/index.html).
+     The most recent build on the master branch is available on
+     [STDCI last successful build artifacts](https://jenkins.ovirt.org/job/oVirt_ovirt-web-ui_standard-on-ghpush/lastSuccessfulBuild/artifact/).
 
   4. Post the comment "`ci build please`" to the GitHub Pull Request for an on-demand
      CI build artifacts build. Reference
-     [manual functionality of the oVirt CI system](https://ovirt-infra-docs.readthedocs.io/en/latest/CI/Using_STDCI_with_GitHub/index.html#manual-functionality-of-the-ovirt-ci-system)
+     [manual functionality of the oVirt CI system](https://ovirt-infra-docs.readthedocs.io/en/latest/CI/Using_STDCI_with_GitHub/index.html#manual-functionality-of-the-ovirt-ci-system).
 
 
 ### RPM Installation
