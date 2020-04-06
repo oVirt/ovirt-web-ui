@@ -48,6 +48,49 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Mon Apr 6 2020 Sharon Gratch <sgratchk@redhat.com> - 1.6.1-1
+ - fixed saving NIC with empty VNIC Profile
+ - make the vm poratl more responsive for browser resizing, set minimum card widths and fixed alignments.
+ - add kebob actions menu and changed Shutdown button type to default in VM's dashboard
+ - disable auto log out when the "UserSessionTimeOut" config value is set to value of -1
+ - tooltip Code Refactoring, including using one type of style for tooltips on CardEditButton
+ - added a tooltip for the 'Disk Edit' Dialog.
+ - replaced Patternfly 3 charts with Patternfly 4
+ - fixed wrong html element ids for the VM and Pool
+ - changed 'automation/build.repos' location for matching the STDCI V2 used by ovirt-engine-nodejs-modules
+ - allowed use of alternate branding by the DEV server
+ - Fixed hover texts in masthead
+ - updated build to use yarn from ovirt-engine-nodejs-modules
+ - hid host info from non-admin users
+ - fixed Windows VM creation timezone bug such that if template/vm time zone format isn't compatible with VM OS, time zone is changed to default
+ - updated autogen/automake configurations and yarn integration
+ - removed 'ovirt-4.2' from STDCI release branch config
+ - updated title and warning messages for 'Remove VM' confirmation modal
+ - pool and pool vms redesign
+ - added toast notifications for Start/Shutdown VM requests.
+ - added documentation link and updated report issues url for the 'About' dialog
+ - hanlded 404 errors
+ - Added better handling for token expiration by redesign of the log out component and support Patternfly 4
+ - refactored the user messages
+ - fixed typo in pool allocated VMs tooltip message
+ - changed the VM card list page so that if a VM is running then default action item is set openning the VM console
+ - redesign create vm - using a new create VM Wizard.
+ - Added a "full screen" mode for the webvnc console.
+ - fixed a bug that the disk create modal didn't show the storage domains
+ - added an external service button to the VM's action panel
+ - updated branding and navbar masthead for allowing branding to continue to use the same CSS class names
+ - fixed the navbar icons layout
+ - fetched roles and permit at login and do entity permission to permit mapping on frontend
+ - changed VM details Disks card disk sort order to sort by disk name only
+ - replaced local VncConsole by patternfly VncConsole
+ - fixed Pool handling and refactor VM loading bugs
+ - added scrollbar to the notification menu
+ - disabled the Console action on a headless VM
+ - updated DEVELOPERS.md
+ - updated zanata server and version
+ - created script for auto checking of the translation file
+ - updated translations for ovirt 4.4
+
 * Tue Aug 27 2019 Michal Skrivanek <michal.skrivanek@redhat.com> - 1.6.0-1
  - updated translations
  - limit CD/ISO list by data center
