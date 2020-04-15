@@ -48,7 +48,7 @@ class GlobalErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <div>
-          <nav className='navbar obrand_mastheadBackground obrand_topBorder navbar-pf-vertical'>
+          <nav className='navbar navbar-pf-vertical obrand_masthead'>
             <div className='navbar-header'>
               <a href='/' className='navbar-brand obrand_headerLogoLink' id='pageheader-logo'>
                 <img className='obrand_mastheadLogo' src={branding.resourcesUrls.clearGif} />
