@@ -93,9 +93,12 @@ function* login (action) {
 
   // API checks passed.  Load user data and the initial app data
   console.group('Login Data Fetch')
+
   console.group('user checks and server config')
-  yield checkUserFilterPermissions()
-  yield fetchServerConfiguredValues()
+  yield all([
+    call(checkUserFilterPermissions),
+    call(fetchServerConfiguredValues),
+  ])
   console.log('\u2714 login checks and server config fetches are done:',
     yield select(state => pick(
       state.config.toJS(),
