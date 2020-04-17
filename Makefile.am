@@ -76,8 +76,10 @@ rpm:	srpm
 	@echo "rpm(s) available at '$(TMPREPOS)'"
 	@echo
 
+snapshot-rpm: SNAPSHOT_DATE = $(shell date --utc +%Y%m%d)
+snapshot-rpm: SNAPSHOT_COMMIT ?= $(shell git log -1 --pretty=format:%h)
 snapshot-rpm:
-	make rpm RELEASE_SUFFIX=".$$(date --utc +%Y%m%d).git$$(git log --no-merges -1 --pretty=format:%h)"
+	make rpm RELEASE_SUFFIX=".$(SNAPSHOT_DATE).git$(SNAPSHOT_COMMIT)"
 
 publish:
 	mkdir -p $(OVIRT_CACHE_DIR)
