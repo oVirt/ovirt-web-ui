@@ -26,6 +26,7 @@ import {
   SET_VM_ACTION_RESULT,
   SET_VM_DISKS,
   SET_VM_NICS,
+  SET_VM_SESSIONS,
   SET_VM_SNAPSHOTS,
   SET_VM_SORT,
   SHUTDOWN_VM,
@@ -321,6 +322,16 @@ export function vmActionInProgress ({ vmId, name, started }) {
       vmId,
       name,
       started,
+    },
+  }
+}
+
+export function setVmSessions ({ vmId, sessions }) {
+  return {
+    type: SET_VM_SESSIONS,
+    payload: {
+      vmId,
+      sessions,
     },
   }
 }
