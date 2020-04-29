@@ -21,6 +21,15 @@ export PATH="/usr/share/ovirt-engine-nodejs/bin:/usr/share/ovirt-engine-nodejs-m
 
 ./autogen.sh --prefix=/usr --datarootdir=/share
 if [[ "${version_release}" == "0" ]]; then
+  IFS='|' read -ra HEAD  <<< $(git log -1 --pretty=tformat:"%H|%ce|%s" )
+  IFS='|' read -ra HEAD_ <<< $(git log -1 --pretty=tformat:"%H|%ce|%s" --skip=1)
+
+  pr_merge_email="noreply@github.com"
+  pr_merge_commit="^Merge ${HEAD_[0]} into [0-9a-f]{40}$"
+  if [[ ${HEAD[1]} == $pr_merge_email ]] && [[ ${HEAD[2]} =~ $pr_merge_commit ]]; then
+    export SNAPSHOT_COMMIT="${HEAD_[0]:0:7}"
+  fi
+
   make snapshot-rpm
 else
   make rpm
