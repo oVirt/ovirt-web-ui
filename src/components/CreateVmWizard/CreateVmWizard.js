@@ -127,6 +127,7 @@ class CreateVmWizard extends React.Component {
           <BasicSettings
             id='create-vm-wizard-basic'
             data={this.state.steps.basic}
+            defaultValues={DEFAULT_STATE.steps.basic}
 
             onUpdate={({ valid = false, partialUpdate = {} }) => {
               this.handleBasicOnUpdate(partialUpdate)
