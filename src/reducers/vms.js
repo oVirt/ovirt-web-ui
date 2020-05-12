@@ -14,7 +14,6 @@ import {
   SET_VM_SORT,
   SET_VM_ACTION_RESULT,
   SET_VM_CDROM,
-  SET_VM_CONSOLES,
   SET_VM_DISKS,
   SET_VM_NICS,
   SET_VM_SESSIONS,
@@ -162,9 +161,6 @@ const vms = actionReducer(initialState, {
       console.error(`vms.setVmNics() reducer: vmId ${vmId} not found`)
     }
     return state
-  },
-  [SET_VM_CONSOLES] (state, { payload: { vmId, consoles } }) {
-    return state.setIn(['vms', vmId, 'consoles'], Immutable.fromJS(consoles))
   },
   [SET_VM_SESSIONS] (state, { payload: { vmId, sessions } }) {
     let consoleInUse = false
