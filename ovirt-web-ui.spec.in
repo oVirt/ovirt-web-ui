@@ -48,6 +48,15 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Tue May 12 2020 Sharon Gratch <sgratchk@redhat.com> - 1.6.2-1
+ - fix a bug in which VM Portal fails to initialize if the environment contains an Export storage domain
+ - fix a bug in which opening a VM console of type SPICE or VNC is always failing
+ - fix VMs filter results to include all VMs with entered string exists anywhere inside the Vm name and not just the prefix
+ - change the snapshots rpm file names to contain the latest commit hash
+ - apply ovirt 4.4 branding changes to the error page as well
+ - yarn dependencies update
+ - translations update
+
 * Mon Apr 6 2020 Sharon Gratch <sgratchk@redhat.com> - 1.6.1-1
  - fixed saving NIC with empty VNIC Profile
  - make the vm poratl more responsive for browser resizing, set minimum card widths and fixed alignments.
