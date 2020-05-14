@@ -262,7 +262,7 @@ class CreateVmWizard extends React.Component {
 
   handleBasicOnUpdate (partialUpdate) {
     const { provisionSource, templateId } = this.state.steps.basic
-    const { provisionSource_, templateId_ } = partialUpdate
+    const { provisionSource: provisionSource_, templateId: templateId_ } = partialUpdate
 
     this.setState(state => {
       const extraUpdates = {}
