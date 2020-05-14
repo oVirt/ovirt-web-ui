@@ -47,12 +47,7 @@ function* removeDisk (action) {
   }
 
   yield put(addDiskRemovalPendingTask(diskId))
-  const diskRemoved = yield waitForDiskAttachment(
-    vmToRefreshId,
-    diskId,
-    attachment => attachment.error && attachment.error.status === 404,
-    true
-  )
+  const diskRemoved = yield waitForDiskToBeRemoved(vmToRefreshId, diskId)
   yield put(removeDiskRemovalPendingTask(diskId))
 
   if (diskRemoved && vmToRefreshId) {
@@ -103,8 +98,29 @@ function* clearBootableFlagOnVm (vmId, currentDisk) {
     if (result.error) {
       console.error('Problem removing the bootable flag :shrug:', result.error)
     }
+
+    yield waitForDiskToNotBeBootable(vmId, bootableDisk.get('id'))
   }
 }
+
+function* waitForDiskToBeRemoved (vmId, attachmentId) {
+  return yield waitForDiskAttachment(
+    vmId,
+    attachmentId,
+    attachment => attachment.error && attachment.error.status === 404,
+    true
+  )
+}
+
+function* waitForDiskToNotBeBootable (vmId, attachmentId) {
+  return yield waitForDiskAttachment(
+    vmId,
+    attachmentId,
+    attachment => attachment.bootable === 'false',
+    true
+  )
+}
+
 function* waitForDiskToBeUnlocked (vmId, attachmentId) {
   return yield waitForDiskAttachment(
     vmId,
@@ -113,7 +129,7 @@ function* waitForDiskToBeUnlocked (vmId, attachmentId) {
   )
 }
 
-// TODO: drop polling in favor of events (see https://github.com/oVirt/ovirt-web-ui/pull/390)
+// NOTE: test() is given the untransformed API version of the attachment
 function* waitForDiskAttachment (vmId, attachmentId, test, canBeMissing = false) {
   let metTest = false
 
