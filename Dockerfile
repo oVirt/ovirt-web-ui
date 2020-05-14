@@ -11,6 +11,7 @@ COPY src /web-ui/src
 COPY branding /web-ui/branding
 
 WORKDIR /web-ui
-RUN yarn install
+RUN yarn config set network-timeout 90000
+RUN yarn install || yarn install || yarn install
 
 ENTRYPOINT ["yarn", "start"]
