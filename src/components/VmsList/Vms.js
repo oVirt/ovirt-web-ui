@@ -44,7 +44,7 @@ class Vms extends React.Component {
 
     // Filter the Pools (only show a Pool card if the user can currently 'Take' a VM from it)
     const filteredPools = vms.get('pools')
-      .filter(pool => alwaysShowPoolCard || (pool.get('vmsCount') < pool.get('maxUserVms') && pool.get('size') > 0 && filterVms(pool, filters)))
+      .filter(pool => (alwaysShowPoolCard || (pool.get('vmsCount') < pool.get('maxUserVms') && pool.get('size') > 0)) && filterVms(pool, filters))
       .toList()
 
     // Display the VMs and Pools together, sorted nicely
