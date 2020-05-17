@@ -25,6 +25,7 @@ import _TableInlineEditRow from './_TableInlineEditRow'
 import SelectBox from '_/components/SelectBox'
 
 import style from './style.css'
+import OverlayTooltip from '_/components/OverlayTooltip'
 
 const NIC_INTERFACES = createNicInterfacesList()
 const NIC_INTERFACE_DEFAULT = 'virtio'
@@ -34,9 +35,11 @@ export const NicNameWithLabels = ({ id, nic }) => {
   return <React.Fragment>
     <span id={`${idPrefix}-name`}>{ nic.name }</span>
     { nic.isFromTemplate &&
-      <Label id={`${idPrefix}-from-template`} className={style['nic-label']}>
-        T
-      </Label>
+      <OverlayTooltip id={`${idPrefix}-template-defined-badge`} tooltip={msg.templateDefined()} placement='top'>
+        <Label id={`${idPrefix}-from-template`} className={style['nic-label']}>
+          T
+        </Label>
+      </OverlayTooltip>
     }
   </React.Fragment>
 }
