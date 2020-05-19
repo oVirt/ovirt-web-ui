@@ -111,6 +111,10 @@
   display: flex;
   align-items: center;
 }
+.disk-size-form-control-edit {
+  width: 0;
+  flex-grow: 1;
+}
 
 .disk-size-edit .disk-size-edit-label {
   margin: 0 3px;
