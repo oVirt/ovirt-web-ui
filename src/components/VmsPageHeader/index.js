@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
 
 import VmUserMessages from '../VmUserMessages'
+import Bellicon from '../VmUserMessages/Bellicon'
 import UserMenu from './UserMenu'
 import Header from '../Header'
 import { hrefWithoutHistory } from '_/helpers'
@@ -16,10 +17,13 @@ import OverlayTooltip from '../OverlayTooltip'
  * Main application header on top of the page
  */
 const VmsPageHeader = ({ page, onRefresh }) => {
+  const [show, setShow] = useState(false)
   const idPrefix = `pageheader`
+
   return (
     <Header>
       <div className='collapse navbar-collapse'>
+        <VmUserMessages show={show} onClose={() => setShow(!show)} />
         <ul className='nav navbar-nav navbar-right navbar-iconic'>
           <li>
             <OverlayTooltip id={`${idPrefix}-tooltip`} tooltip={msg.refresh()} placement='bottom'>
@@ -29,7 +33,7 @@ const VmsPageHeader = ({ page, onRefresh }) => {
             </OverlayTooltip>
           </li>
           <UserMenu />
-          <VmUserMessages />
+          <Bellicon handleclick={() => setShow(!show)} />
         </ul>
       </div>
     </Header>
