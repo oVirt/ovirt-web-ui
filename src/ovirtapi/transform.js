@@ -510,18 +510,20 @@ const DiskAttachment = {
   },
 
   // NOTE: This will only work if disk.type == "image"
-  toApi ({ disk }: { disk: DiskType }): ApiDiskAttachmentType {
+  toApi ({ disk, attachmentOnly = false }: { disk: DiskType, attachmentOnly?: boolean }): ApiDiskAttachmentType {
     // if (disk.type !== 'image') throw Error('Only image type disks can be converted to API data')
 
-    return {
+    const forApi: ApiDiskAttachmentType = {
       // disk_attachment part
       id: disk.attachmentId,
       active: disk.active,
       bootable: disk.bootable,
       interface: disk.iface,
+    }
 
-      // disk part
-      disk: {
+    // disk part
+    if (!attachmentOnly) {
+      forApi.disk = {
         id: disk.id,
         alias: disk.name,
 
@@ -537,8 +539,10 @@ const DiskAttachment = {
             },
           ],
         },
-      },
+      }
     }
+
+    return cleanUndefined(forApi)
   },
 }
 

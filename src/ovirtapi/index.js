@@ -457,7 +457,8 @@ const OvirtApi = {
 
   // disk update is async
   // http://ovirt.github.io/ovirt-engine-api-model/master/#services/disk/methods/update
-  updateDiskAttachment ({ vmId, disk }: { vmId: string, disk: DiskType }): Promise<Object> {
+  // http://ovirt.github.io/ovirt-engine-api-model/master/#services/disk_attachment/methods/update
+  updateDiskAttachment ({ vmId, disk, attachmentOnly = false }: { vmId: string, disk: DiskType, attachmentOnly: boolean }): Promise<Object> {
     assertLogin({ methodName: 'updateDiskAttachment' })
 
     const attachmentId = disk.attachmentId
@@ -465,7 +466,7 @@ const OvirtApi = {
       throw new Error('DiskType.attachmentId is required to update the disk')
     }
 
-    const payload = Transforms.DiskAttachment.toApi({ disk })
+    const payload = Transforms.DiskAttachment.toApi({ disk, attachmentOnly })
     const input = JSON.stringify(payload)
 
     return httpPut({

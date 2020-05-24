@@ -21,12 +21,16 @@ export function* createDiskForVm (action) {
   yield put(setNewDiskDialogProgressIndicator(true))
   const vmId = action.payload.vmId
 
+  let originalBootableDisk
   if (action.payload.disk.bootable) {
-    yield clearBootableFlagOnVm(vmId)
+    originalBootableDisk = yield clearBootableFlagOnVm(vmId)
   }
 
   const result = yield callExternalAction('addDiskAttachment', Api.addDiskAttachment, action)
   if (result.error) {
+    if (originalBootableDisk) {
+      yield updateDiskAttachmentBootable(vmId, originalBootableDisk, true)
+    }
     const errorText = extractErrorText(result.error)
     yield put(setNewDiskDialogErrorText(errorText))
   } else {
@@ -83,23 +87,28 @@ function* clearBootableFlagOnVm (vmId, currentDisk) {
   const bootableDisk = vmDisks.find(disk => disk.get('bootable'))
 
   if (bootableDisk && (!currentDisk || bootableDisk.get('id') !== currentDisk.id)) {
-    const removeBootable = bootableDisk.toJS()
-    removeBootable.bootable = false
+    yield updateDiskAttachmentBootable(vmId, bootableDisk.get('id'), false)
+    return bootableDisk.get('id')
+  }
+}
 
-    // NOTE: Only the attachment needs to be adjusted, but since we put the attachment
-    //       and the disk information together, we'd need to update the Api call to get
-    //       a clean attachment only update.  However, it shouldn't cause any problem
-    //       to just send the whole disk back without changes.
-    const result = yield callExternalAction(
-      'updateDiskAttachment',
-      Api.updateDiskAttachment,
-      { payload: { disk: removeBootable, vmId } }
-    )
-    if (result.error) {
-      console.error('Problem removing the bootable flag :shrug:', result.error)
-    }
+/**
+ * Update the given VM's disk attachment bootable flag and wait for the value to be
+ * changed (async only operation + poll until desired result = simulated sync operation)
+ */
+function* updateDiskAttachmentBootable (vmId, diskAttachmentId, isBootable) {
+  const result = yield callExternalAction('updateDiskAttachment', Api.updateDiskAttachment, {
+    payload: {
+      disk: { attachmentId: diskAttachmentId, bootable: isBootable },
+      vmId,
+      attachmentOnly: true,
+    },
+  })
 
-    yield waitForDiskToNotBeBootable(vmId, bootableDisk.get('id'))
+  if (result.error) {
+    console.error('Problem removing the bootable flag :shrug:', result.error)
+  } else {
+    yield waitForDiskToMatchBootable(vmId, diskAttachmentId, isBootable)
   }
 }
 
@@ -112,11 +121,11 @@ function* waitForDiskToBeRemoved (vmId, attachmentId) {
   )
 }
 
-function* waitForDiskToNotBeBootable (vmId, attachmentId) {
+function* waitForDiskToMatchBootable (vmId, attachmentId, isBootable) {
   return yield waitForDiskAttachment(
     vmId,
     attachmentId,
-    attachment => attachment.bootable === 'false',
+    attachment => attachment.bootable === (isBootable ? 'true' : 'false'),
     true
   )
 }
