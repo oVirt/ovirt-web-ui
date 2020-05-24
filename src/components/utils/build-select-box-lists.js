@@ -175,12 +175,15 @@ function createVNicProfileList (vnicProfiles, { dataCenterId = null, cluster = n
 }
 
 /**
- * Return a list of the disk format types available to DiskAttachments ready for use in a
- * __SelectBox__.  This list is static and corresponds to the relevant entries in:
+ * Return a list of the disk types, a combine value for __disk format__ and __sparse__
+ * Disk attributes, ready for use in a __SelectBox__.  This list is static and corresponds
+ * to the relevant entries on the Disk type in the REST API:
  *
- *    http://ovirt.github.io/ovirt-engine-api-model/master/#types/disk_format
+ *   - http://ovirt.github.io/ovirt-engine-api-model/master/#types/disk attributes:
+ *     - sparse (boolean)
+ *     - format (http://ovirt.github.io/ovirt-engine-api-model/master/#types/disk_format)
  */
-function createDiskFormatList () {
+function createDiskTypeList () {
   return [
     {
       id: 'raw',
@@ -247,7 +250,7 @@ export {
   createTemplateList,
   createVNicProfileList,
 
-  createDiskFormatList,
+  createDiskTypeList,
   createDiskInterfacesList,
   createNicInterfacesList,
 }

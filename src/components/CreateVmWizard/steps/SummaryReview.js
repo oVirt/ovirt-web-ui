@@ -125,9 +125,9 @@ const ReviewStorage = ({ id, storageDomains, storage }) => {
           </div>
           <div className={style['review-entity-info']}>
             {
-              disk.format === 'cow' ? msg.diskEditorFormatOptionCow()
-                : disk.format === 'raw' ? msg.diskEditorFormatOptionRaw()
-                  : disk.format
+              disk.diskType === 'cow' ? msg.diskEditorFormatOptionCow()
+                : disk.diskType === 'raw' ? msg.diskEditorFormatOptionRaw()
+                  : disk.diskType
             }
           </div>
           {/* TODO: Include disk interface? */}

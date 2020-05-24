@@ -351,7 +351,7 @@ class CreateVmWizard extends React.Component {
                   bootable: disk.get('bootable'),
                   iface: disk.get('iface'),
                   type: disk.get('type'), // [ image | lun | cinder ]
-                  format: disk.get('format'), // [ cow | raw ]
+                  diskType: disk.get('sparse') ? 'cow' : 'raw', // constrain to values from createDiskTypeList()
                   size: disk.get('provisionedSize'), // bytes
                   isFromTemplate: true,
                 }))
