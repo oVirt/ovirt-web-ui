@@ -63,6 +63,10 @@ function* composeAndCreateVm ({ payload: { basic, nics, disks }, meta: { correla
     name: basic.name,
     os: { type: osType },
     type: basic.optimizedFor,
+    time_zone: {
+      name: basic.timeZone.name,
+      utc_offset: basic.timeZone.offset,
+    },
 
     initialization: basic.cloudInitEnabled
       ? {
