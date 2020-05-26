@@ -44,7 +44,7 @@ const DEFAULT_STATE = {
  * Given the set of clusters and VM templates available to the user, build the initial
  * new VM state for the create wizard.
  */
-function getInitialState (clusters, templates, blankTemplateId) {
+function getInitialState (clusters, templates, blankTemplateId, operatingSystems) {
   // 1 cluster available? select it by default
   let clusterId
   if (clusters.size === 1) {
@@ -62,10 +62,29 @@ function getInitialState (clusters, templates, blankTemplateId) {
       templateId = blankTemplateId
     }
   }
+  const blankTemplate = templates.get(blankTemplateId)
+  let blankTemplateValues = {}
 
+  if (blankTemplate) {
+    const osName = (blankTemplate.get('os')).get('type')
+    const operatingSystem = operatingSystems.find(os => os.get('name') === osName)
+    const operatingSystemId = operatingSystem.get('id')
+    const memoryInB = blankTemplate.get('memory')
+    const cpus = blankTemplate.getIn([ 'cpu', 'vCPUs' ])
+    const initEnabled = blankTemplate.getIn([ 'cloudInit', 'enabled' ])
+
+    blankTemplateValues = {
+      operatingSystemId,
+      memory: memoryInB / (1024 ** 2), // bytes to MiB
+      cpus,
+      initEnabled,
+    }
+  }
   const state = merge(
     {},
     DEFAULT_STATE,
+    { basicDefaultValues: merge({}, DEFAULT_STATE.steps.basic, blankTemplateValues) },
+    { steps: { basic: blankTemplateValues } },
     {
       steps: {
         basic: {
@@ -106,7 +125,7 @@ class CreateVmWizard extends React.Component {
   constructor (props) {
     super(props)
 
-    this.state = getInitialState(props.clusters, props.templates, props.blankTemplateId)
+    this.state = getInitialState(props.clusters, props.templates, props.blankTemplateId, props.operatingSystems)
     this.hideAndResetState = this.hideAndResetState.bind(this)
     this.hideAndNavigate = this.hideAndNavigate.bind(this)
     this.handleBasicOnUpdate = this.handleBasicOnUpdate.bind(this)
@@ -127,7 +146,7 @@ class CreateVmWizard extends React.Component {
           <BasicSettings
             id='create-vm-wizard-basic'
             data={this.state.steps.basic}
-            defaultValues={DEFAULT_STATE.steps.basic}
+            defaultValues={this.state.basicDefaultValues}
 
             onUpdate={({ valid = false, partialUpdate = {} }) => {
               this.handleBasicOnUpdate(partialUpdate)
@@ -230,9 +249,9 @@ class CreateVmWizard extends React.Component {
   }
 
   hideAndResetState () {
-    const { onHide, clusters, templates, blankTemplateId } = this.props
+    const { onHide, clusters, templates, blankTemplateId, operatingSystems } = this.props
 
-    this.setState(getInitialState(clusters, templates, blankTemplateId))
+    this.setState(getInitialState(clusters, templates, blankTemplateId, operatingSystems))
     merge(this.wizardStepsMap, {
       basic: {
         preventEnter: false,
@@ -477,6 +496,7 @@ CreateVmWizard.propTypes = {
   blankTemplateId: PropTypes.string.isRequired,
   userMessages: PropTypes.object.isRequired,
   actionResults: PropTypes.object.isRequired,
+  operatingSystems: PropTypes.object.isRequired,
 
   onCreate: PropTypes.func,
   navigateToVm: PropTypes.func,
@@ -489,6 +509,7 @@ export default connect(
     blankTemplateId: state.config.get('blankTemplateId'),
     userMessages: state.userMessages,
     actionResults: state.vms.get('correlationResult'),
+    operatingSystems: state.operatingSystems,
   }),
   (dispatch) => ({
     onCreate: (basic, nics, disks, correlationId) => dispatch(
