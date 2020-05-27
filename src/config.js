@@ -10,7 +10,7 @@ const AppConfiguration = {
   applicationContext: '', // url where ovirt is available ('' is web server root)
   applicationURL: '/', // url where this app is available (dev server path or webapp context root)
   applicationLogoutURL: '', // url to invalidate the user's SSO token ('' skips SSO token invalidation)
-  pageLimit: 8,
+  pageLimit: 20,
   schedulerFixedDelayInSeconds: 60,
 
   consoleClientResourcesURL: 'https://www.ovirt.org/documentation/admin-guide/virt/console-client-resources/',
