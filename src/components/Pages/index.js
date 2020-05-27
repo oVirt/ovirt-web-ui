@@ -13,7 +13,7 @@ import Handler404 from '_/Handler404'
 /**
  * Route component (for PageRouter) to view the list of VMs and Pools
  */
-const VmsPage = () => {
+const VmsListPage = () => {
   return <VmsList />
 }
 
@@ -104,5 +104,5 @@ const VmConsolePageConnected = connect(
 export {
   VmConsolePageConnected as VmConsolePage,
   VmDetailsPageConnected as VmDetailsPage,
-  VmsPage,
+  VmsListPage,
 }
