@@ -89,7 +89,7 @@ publish:
 distclean-local:
 	rm -rf ${DISTCLEANDIRS}
 
-.PHONY: rpms publish srpms all ovirt-web-ui
+.PHONY: srpm rpm snapshot-rpm publish ovirt-web-ui
 
 all: ovirt-web-ui
 
