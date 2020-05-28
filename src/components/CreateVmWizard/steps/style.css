@@ -139,7 +139,11 @@
    flex-direction: column;
    justify-content: center;
    align-items: center;
- }
+}
+
+.review-progress :global(.alert) {
+  margin: 20px 0;
+}
 
 .review-progress .review-icon-container {
   height: 60px;
