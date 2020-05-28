@@ -1,6 +1,6 @@
 /* eslint-env jest */
 
-import { sortDisksForDisplay } from './utils'
+import { sortDisksForDisplay } from './disks'
 import { fromJS } from 'immutable'
 
 const samples = [

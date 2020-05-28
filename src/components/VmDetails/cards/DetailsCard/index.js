@@ -32,8 +32,8 @@ import {
   FormControl,
   Icon,
 } from 'patternfly-react'
-import Switch from '../../../Switch'
-import SelectBox from '../../../SelectBox'
+import Switch from '_/components/Switch'
+import SelectBox from '_/components/SelectBox'
 import BaseCard from '../../BaseCard'
 
 import { Grid, Row, Col } from '_/components/Grid'
