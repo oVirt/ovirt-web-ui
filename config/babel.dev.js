@@ -4,6 +4,7 @@ var findCacheDir = require('find-cache-dir')
 module.exports = {
   // Don't try to find .babelrc because we want to force this configuration.
   babelrc: false,
+
   // This is a feature of `babel-loader` for webpack (not Babel itself).
   // It enables caching results in ./node_modules/.cache/react-scripts/
   // directory for faster rebuilds. We use findCacheDir() because of:
@@ -11,12 +12,14 @@ module.exports = {
   cacheDirectory: findCacheDir({
     name: 'react-scripts',
   }),
+
   presets: [
     // Latest stable ECMAScript features
     require.resolve('babel-preset-latest'),
     // JSX, Flow
     require.resolve('babel-preset-react'),
   ],
+
   plugins: [
     // class { handleClick = () => { } }
     require.resolve('babel-plugin-transform-class-properties'),
@@ -32,9 +35,6 @@ module.exports = {
       helpers: false,
       polyfill: false,
       regenerator: true,
-      // Resolve the Babel runtime relative to the config.
-      // You can safely remove this after ejecting:
-      moduleName: path.dirname(require.resolve('babel-runtime/package')),
     }],
   ],
 }
