@@ -19,8 +19,7 @@ import NicLinkStateIcon from './NicLinkStateIcon'
 import { msg } from '_/intl'
 import style from './style.css'
 import { createNicInterfacesList, createVNicProfileList } from '_/components/utils'
-
-const EMPTY_ID = ''
+import { EMPTY_VNIC_PROFILE_ID } from '_/constants'
 
 const NIC_INTERFACES = createNicInterfacesList()
 const NIC_INTERFACE_DEFAULT = 'virtio'
@@ -56,7 +55,7 @@ class NicEditor extends Component {
       id: undefined,
       values: {
         name: props.nextNicName,
-        vnicProfileId: EMPTY_ID,
+        vnicProfileId: EMPTY_VNIC_PROFILE_ID,
         interface: NIC_INTERFACE_DEFAULT,
         linked: true,
       },
@@ -95,7 +94,7 @@ class NicEditor extends Component {
         id: undefined,
         values: {
           name: this.props.nextNicName,
-          vnicProfileId: EMPTY_ID,
+          vnicProfileId: EMPTY_VNIC_PROFILE_ID,
           interface: NIC_INTERFACE_DEFAULT,
           linked: true,
         },
@@ -149,14 +148,7 @@ class NicEditor extends Component {
 
     const createMode = !this.props.nic
 
-    const vnicList = [
-      {
-        id: EMPTY_ID,
-        value: msg.vnicProfileEmpty(),
-      },
-      ...createVNicProfileList(vnicProfileList),
-    ]
-
+    const vnicList = createVNicProfileList(vnicProfileList)
     const nicInterface = NIC_INTERFACES.find(ni => ni.id === this.state.values.interface)
     const canChangeInterface =
       createMode ||

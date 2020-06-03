@@ -15,6 +15,7 @@ import BasicSettings from './steps/BasicSettings'
 import Networking from './steps/Networking'
 import Storage from './steps/Storage'
 import SummaryReview from './steps/SummaryReview'
+import { EMPTY_VNIC_PROFILE_ID } from '_/constants'
 
 const DEFAULT_STATE = {
   activeStepIndex: 0,
@@ -336,7 +337,7 @@ class CreateVmWizard extends React.Component {
                 .map(nic => ({
                   id: nic.get('id'),
                   name: nic.get('name'),
-                  vnicProfileId: nic.getIn(['vnicProfile', 'id']),
+                  vnicProfileId: nic.getIn(['vnicProfile', 'id']) || EMPTY_VNIC_PROFILE_ID,
                   deviceType: nic.get('interface'),
                   isFromTemplate: true,
                 }))

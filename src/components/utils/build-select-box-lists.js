@@ -5,6 +5,7 @@ import {
 } from '_/helpers'
 import { enumMsg, msg } from '_/intl'
 import { convertValue } from '_/utils'
+import { EMPTY_VNIC_PROFILE_ID } from '_/constants'
 
 /**
  * Return a normalized and sorted list of clusters ready for use in a __SelectBox__ from
@@ -170,6 +171,7 @@ function createVNicProfileList (vnicProfiles, { dataCenterId = null, cluster = n
       }))
       .sort((a, b) => localeCompare(a.value, b.value))
       .toJS()
+  vnicList.unshift({ id: EMPTY_VNIC_PROFILE_ID, value: msg.vnicProfileEmpty() }) // always add an empty/unassigned option to the list, unassigned is always a valid value for a Nic's vnicProfile
 
   return vnicList
 }
