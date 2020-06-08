@@ -255,7 +255,6 @@ class BasicSettings extends React.Component {
       case 'templateId':
         const template = this.props.templates.find(t => t.get('id') === value)
         changes.templateId = template.get('id')
-        changes.timeZone = template.get('timeZone').toJS()
 
         changes.memory = template.get('memory') / (1024 ** 2) // stored in bytes, input in Mib
         changes.cpus = template.getIn([ 'cpu', 'vCPUs' ])
@@ -264,6 +263,8 @@ class BasicSettings extends React.Component {
           .find(os => os.get('name') === template.getIn([ 'os', 'type' ]))
           .get('id')
 
+        // Check template's timezone compatibility with the template's OS, set the timezone corresponding to the template's OS
+        changes.timeZone = this.checkTimeZone(changes.operatingSystemId, changes.templateId)
         changes.cloudInitEnabled = template.getIn(['cloudInit', 'enabled'])
         changes.initHostname = template.getIn(['cloudInit', 'hostName'])
         changes.initSshKeys = template.getIn(['cloudInit', 'sshAuthorizedKeys'])
