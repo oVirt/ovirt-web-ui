@@ -14,6 +14,7 @@ import {
 
 import {
   Button,
+  Checkbox,
   DropdownKebab,
   EmptyState,
   FieldLevelHelp,
@@ -98,6 +99,9 @@ class Storage extends React.Component {
     this.onDeleteRow = this.onDeleteRow.bind(this)
     this.onEditDisk = this.onEditDisk.bind(this)
     this.rowRenderProps = this.rowRenderProps.bind(this)
+    this.bootableInfo = this.bootableInfo.bind(this)
+    this.isBootableDiskTemplate = this.isBootableDiskTemplate.bind(this)
+    this.isEditingMode = this.isEditingMode.bind(this)
 
     this.state = {
       editing: {},
@@ -124,6 +128,7 @@ class Storage extends React.Component {
 
       renderValue: (value, additionalData) => {
         const { column } = additionalData
+
         return (
           <Table.Cell>
             { column.valueView ? column.valueView(value, additionalData) : value }
@@ -173,6 +178,42 @@ class Storage extends React.Component {
                 onBlur={e => this.handleCellChange(rowData, 'name', e.target.value)}
               />
             )
+        },
+      },
+
+      // Bootable column - displayed only when editing disk
+      // Note: only one disk can be bootable at a time
+      {
+        header: {
+          label: msg.createVmStorageTableHeaderBootable(),
+          formatters: [(...formatArgs) => this.isEditingMode() && headerFormatText(...formatArgs)],
+          props: {
+            style: {
+              width: '5%',
+            },
+          },
+        },
+        cell: {
+          formatters: [(...formatArgs) => this.isEditingMode() && inlineEditFormatter(...formatArgs)],
+        },
+        valueView: null,
+        editView: (value, { rowData }) => {
+          return <div className={style['disk-bootable-edit']}>
+            { !this.isBootableDiskTemplate() &&
+              <Checkbox
+                aria-label='bootable checkbox'
+                checked={this.state.editing[rowData.id].bootable}
+                id={`${idPrefix}-bootable`}
+                onChange={e => this.handleCellChange(rowData, 'bootable', e.target.checked)}
+                title='Bootable flag'
+              />
+            }
+            <FieldLevelHelp
+              content={this.bootableInfo(rowData.bootable)}
+              inline
+              className={style['disk-size-edit-label']}
+            />
+          </div>
         },
       },
 
@@ -316,7 +357,7 @@ class Storage extends React.Component {
           formatters: [
             (value, { rowData, rowIndex }) => {
               const hideKebab = this.state.creating === rowData.id
-              const actionsDisabled = !!this.state.creating || Object.keys(this.state.editing).length > 0 || rowData.isFromTemplate
+              const actionsDisabled = !!this.state.creating || this.isEditingMode() || rowData.isFromTemplate
               const templateDefined = rowData.isFromTemplate
               const kebabId = `${idPrefix}-kebab-${rowData.name}`
 
@@ -360,6 +401,35 @@ class Storage extends React.Component {
         },
       },
     ]
+  }
+
+  // return boolean value to answer if we are editing a Disk or not
+  isEditingMode () {
+    return Object.keys(this.state.editing).length > 0
+  }
+
+  // return true if there's any disk set as bootable and if it's a template disk
+  isBootableDiskTemplate () {
+    const bootableDisk = this.props.disks.find(disk => disk.bootable)
+    const templateDisk = this.props.disks.find(disk => disk.isFromTemplate)
+
+    return bootableDisk && templateDisk && bootableDisk === templateDisk
+  }
+
+  // set appropriate tooltip message regarding setting bootable flag
+  bootableInfo (isActualDiskBootable) {
+    const bootableDisk = this.props.disks.find(disk => disk.bootable)
+
+    if (this.isBootableDiskTemplate()) {
+      // template based disk cannot be edited so bootable flag cannot be removed from it
+      return msg.createVmStorageNoEditBootableMessage({ diskName: bootableDisk.name })
+    } else if (bootableDisk && !isActualDiskBootable) {
+      // actual bootable disk isn't template based or the disk which is being edited, moving bootable flag from the bootable disk allowed
+      return msg.diskEditorBootableChangeMessage({ diskName: bootableDisk.name })
+    }
+
+    // no any bootable disk yet (or the disk which is being edited is bootable but not a template disk), adding/editing bootable flag allowed
+    return msg.createVmStorageBootableMessage()
   }
 
   onCreateDisk () {
@@ -428,6 +498,14 @@ class Storage extends React.Component {
   handleRowConfirmChange (rowData) {
     const actionCreate = !!this.state.creating && this.state.creating === rowData.id
     const editedRow = this.state.editing[rowData.id]
+    let bootableDisk = this.props.disks.find(disk => disk.bootable)
+
+    // if the actual disk was set as bootable but there's already another bootable one
+    if (editedRow.bootable && bootableDisk) {
+      // no need to check if there's any bootable template disk, we cannot edit bootable flag of disks if there's any bootable template disk
+      bootableDisk.bootable = false // update the previously bootable disk, remove the bootable flag from it
+      this.props.onUpdate({ update: bootableDisk })
+    }
 
     // TODO: Add field level validation for the edit or create fields
 
@@ -473,7 +551,7 @@ class Storage extends React.Component {
 
     const storageDomainList = createStorageDomainList(storageDomains)
     const filteredStorageDomainList = createStorageDomainList(storageDomains, dataCenterId)
-    const enableCreate = storageDomainList.length > 0 && Object.keys(this.state.editing).length === 0
+    const enableCreate = storageDomainList.length > 0 && !this.isEditingMode()
 
     const diskList = disks
       .sort((a, b) => // template based then by bootable then by name
