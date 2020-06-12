@@ -260,7 +260,7 @@ class Storage extends React.Component {
           formatters: [headerFormatText],
           props: {
             style: {
-              width: '20%',
+              width: '25%',
             },
           },
         },
@@ -348,7 +348,7 @@ class Storage extends React.Component {
           formatters: [headerFormatText],
           props: {
             style: {
-              width: '40px',
+              width: '20px',
             },
           },
         },
