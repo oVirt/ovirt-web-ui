@@ -22,6 +22,7 @@ export function adjustVVFile ({ data, options, usbFilter, isSpice }) {
 
   if (usbFilter) {
     data = data.replace(/^\[virt-viewer\]$/mg, `[virt-viewer]\nusb-filter=${usbFilter}`)
+    data = data.replace(/^usb-filter=null\n/mg, '') // remove an extra 'usb-filter=null' line if present
   }
 
   if (options && isSpice) {
