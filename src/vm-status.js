@@ -3,7 +3,7 @@ export function canStart (state) {
 }
 
 export function canShutdown (state) {
-  return ['up', 'migrating', 'reboot_in_progress', 'paused', 'powering_up', 'powering_down', 'not_responding'].includes(state)
+  return ['up', 'migrating', 'reboot_in_progress', 'paused', 'powering_up', 'powering_down', 'not_responding', 'suspended'].includes(state)
 }
 
 export function canRestart (state) {
