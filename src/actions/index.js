@@ -11,6 +11,7 @@ import {
   SET_CPU_TOPOLOGY_OPTIONS,
   SET_CURRENT_PAGE,
   SET_DEFAULT_TIMEZONE,
+  SET_USB_AUTOSHARE,
   SET_USB_FILTER,
   SET_USER_FILTER_PERMISSION,
   SET_USER_GROUPS,
@@ -147,6 +148,15 @@ export function setUSBFilter ({ usbFilter }) {
     type: SET_USB_FILTER,
     payload: {
       usbFilter,
+    },
+  }
+}
+
+export function setSpiceUsbAutoShare (usbAutoshare) {
+  return {
+    type: SET_USB_AUTOSHARE,
+    payload: {
+      usbAutoshare,
     },
   }
 }

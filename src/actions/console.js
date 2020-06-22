@@ -10,11 +10,12 @@ import {
   SET_LOGON_CONSOLE_MODAL_STATE,
 } from '../constants'
 
-export function openConsoleModal ({ vmId, usbFilter, userId, consoleId, hasGuestAgent, openInPage, isNoVNC, modalId }) {
+export function openConsoleModal ({ vmId, usbAutoshare, usbFilter, userId, consoleId, hasGuestAgent, openInPage, isNoVNC, modalId }) {
   return {
     type: OPEN_CONSOLE_MODAL,
     payload: {
       vmId,
+      usbAutoshare,
       usbFilter,
       userId,
       consoleId,
@@ -36,12 +37,13 @@ export function setActiveConsole ({ vmId, consoleId }) {
   }
 }
 
-export function downloadConsole ({ vmId, consoleId, usbFilter, hasGuestAgent, skipSSO, openInPage, isNoVNC, modalId }) {
+export function downloadConsole ({ vmId, consoleId, usbAutoshare, usbFilter, hasGuestAgent, skipSSO, openInPage, isNoVNC, modalId }) {
   return {
     type: DOWNLOAD_CONSOLE_VM,
     payload: {
       vmId,
       consoleId,
+      usbAutoshare,
       usbFilter,
       hasGuestAgent,
       skipSSO,

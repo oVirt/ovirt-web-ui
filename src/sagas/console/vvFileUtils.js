@@ -1,5 +1,5 @@
 
-export function adjustVVFile ({ data, options, usbFilter, isSpice }) {
+export function adjustVVFile ({ data, options, usbAutoshare, usbFilter, isSpice }) {
   // __options__ can either be a plain JS object or ImmutableJS Map
   console.log('adjustVVFile options:', options)
 
@@ -29,6 +29,9 @@ export function adjustVVFile ({ data, options, usbFilter, isSpice }) {
     const smartcardEnabled = options.get ? options.get('smartcardEnabled') : options.smartcardEnabled
     data = data.replace(/^enable-smartcard=[01]$/mg, `enable-smartcard=${smartcardEnabled ? 1 : 0}`)
   }
+
+  // make USB Auto-Share to be enabled/disabled in VM Portal according to the SpiceUsbAutoShare config value
+  data = data.replace(/^enable-usb-autoshare=.*$/mg, `enable-usb-autoshare=${usbAutoshare ? 1 : 0}`)
 
   console.log('adjustVVFile data after adjustment:', data)
   return data

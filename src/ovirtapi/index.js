@@ -435,6 +435,13 @@ const OvirtApi = {
     })
   },
 
+  getSpiceUsbAutoShare (): Promise<Object> {
+    assertLogin({ methodName: 'getSpiceUsbAutoShare' })
+    return httpGet({
+      url: `${AppConfiguration.applicationContext}/api/options/SpiceUsbAutoShare`,
+    })
+  },
+
   // async operation
   removeDisk (diskId: string): Promise<Object> {
     assertLogin({ methodName: 'removeDisk' })
