@@ -5,7 +5,6 @@ import {
   CHECK_TOKEN_EXPIRED,
   GET_BY_PAGE,
   GET_OPTION,
-  GET_USB_FILTER,
   GET_USER_GROUPS,
   GET_VM,
   SET_ADMINISTRATOR,
@@ -150,10 +149,6 @@ export function setUSBFilter ({ usbFilter }) {
       usbFilter,
     },
   }
-}
-
-export function getUSBFilter () {
-  return { type: GET_USB_FILTER }
 }
 
 /**
