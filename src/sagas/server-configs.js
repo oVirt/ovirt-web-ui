@@ -31,7 +31,7 @@ export function* fetchServerConfiguredValues () {
     callGetOption('MaxNumOfThreadsPerCpu', optionVersion, 16),
     callGetOption('MaxNumOfVmCpus', optionVersion, 1),
 
-    callExternalAction('getSpiceUsbAutoShare', Api.getSpiceUsbAutoShare, {}),
+    callGetOption('SpiceUsbAutoShare', 'general', 1),
     callExternalAction('getUSBFilter', Api.getUSBFilter, {}),
 
     callGetOption('UserSessionTimeOutInterval', 'general', 30),
@@ -50,8 +50,7 @@ export function* fetchServerConfiguredValues () {
   }))
 
   if (usbAutoShare) {
-    const autoShareValue = usbAutoShare.values.system_option_value[0].value === 'true'
-    yield put(setSpiceUsbAutoShare(autoShareValue))
+    yield put(setSpiceUsbAutoShare(usbAutoShare))
   }
 
   if (usbFilter) {
