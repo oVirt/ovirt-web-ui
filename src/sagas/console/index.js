@@ -34,7 +34,6 @@ import { INIT_CONSOLE, DOWNLOAD_CONSOLE } from '_/constants'
 export function* downloadVmConsole (action) {
   let { modalId, vmId, consoleId, usbAutoshare, usbFilter, hasGuestAgent, skipSSO, openInPage, isNoVNC } = action.payload
 
-  let isSpice = false
   if (hasGuestAgent && !skipSSO) {
     let result = yield callExternalAction('vmLogon', Api.vmLogon, { payload: { vmId } }, true)
     if (!result || result.status !== 'complete') {
@@ -58,7 +57,7 @@ export function* downloadVmConsole (action) {
         options = yield getConsoleOptions(getConsoleOptionsAction({ vmId }))
       }
 
-      data = adjustVVFile({ data, options, usbAutoshare, usbFilter, isSpice })
+      data = adjustVVFile({ data, options, usbAutoshare, usbFilter })
       fileDownload({ data, fileName: `console.vv`, mimeType: 'application/x-virt-viewer' })
       yield put(setConsoleStatus({ vmId, status: DOWNLOAD_CONSOLE }))
     } else {

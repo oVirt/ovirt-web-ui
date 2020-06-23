@@ -1,5 +1,5 @@
 
-export function adjustVVFile ({ data, options, usbAutoshare, usbFilter, isSpice }) {
+export function adjustVVFile ({ data, options, usbAutoshare, usbFilter }) {
   // __options__ can either be a plain JS object or ImmutableJS Map
   console.log('adjustVVFile options:', options)
 
@@ -20,7 +20,9 @@ export function adjustVVFile ({ data, options, usbAutoshare, usbFilter, isSpice 
     data = data.replace(/^\[virt-viewer\]$/mg, `[virt-viewer]\n${text}`) // ending \n is already there
   }
 
-  if (usbFilter) {
+  const isSpice = data.indexOf('type=spice') > -1
+
+  if (usbFilter && isSpice) {
     data = data.replace(/^\[virt-viewer\]$/mg, `[virt-viewer]\nusb-filter=${usbFilter}`)
     data = data.replace(/^usb-filter=null\n/mg, '') // remove an extra 'usb-filter=null' line if present
   }
