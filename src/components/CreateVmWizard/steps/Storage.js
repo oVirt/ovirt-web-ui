@@ -201,6 +201,7 @@ class Storage extends React.Component {
               id={`${idPrefix}-${value}-size-edit`}
               type='number'
               defaultValue={sizeGiB}
+              className={style['disk-size-form-control-edit']}
               onBlur={e => this.handleCellChange(rowData, 'size', e.target.value)}
             />
             <span className={style['disk-size-edit-label']}>GiB</span>
