@@ -575,6 +575,7 @@ export const messages: { [messageId: string]: MessageType } = {
   sysPrepOptions: 'SysPrep Options',
   takeVm: 'Take a Virtual Machine',
   template: 'Template',
+  templateDefined: 'Template Defined',
   timeAgo: '{time} ago',
   timezone: 'Timezone',
   thisOperationCantBeUndone: 'This operation cannot be undone.',

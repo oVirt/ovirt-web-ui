@@ -26,6 +26,7 @@ import _TableInlineEditRow from './_TableInlineEditRow'
 import SelectBox from '_/components/SelectBox'
 
 import style from './style.css'
+import OverlayTooltip from '_/components/OverlayTooltip'
 
 function getDefaultFormatType (vmOptimizedFor) {
   const format =
@@ -57,9 +58,11 @@ export const DiskNameWithLabels = ({ id, disk }) => {
   return <React.Fragment>
     <span id={`${idPrefix}-name`}>{ disk.name }</span>
     { disk.isFromTemplate &&
-      <TooltipLabel id={`${idPrefix}-from-template`}>
-        T
-      </TooltipLabel>
+      <OverlayTooltip id={`${idPrefix}-template-defined-badge`} tooltip={msg.templateDefined()} placement='top'>
+        <Label id={`${idPrefix}-from-template`} className={`${style['disk-label']}`}>
+          T
+        </Label>
+      </OverlayTooltip>
     }
     { disk.bootable &&
       <Label id={`${idPrefix}-bootable`} className={style['disk-label']} bsStyle='info'>
