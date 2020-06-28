@@ -28,13 +28,10 @@ import {
 import { actionReducer, removeMissingItems } from './utils'
 import { sortFields } from '_/utils'
 
-const EMPTY_MAP = Immutable.fromJS({})
-const EMPTY_ARRAY = Immutable.fromJS([])
-
 const initialState = Immutable.fromJS({
   vms: {},
   pools: {},
-  filters: EMPTY_MAP,
+  filters: {},
   sort: { ...sortFields[0], isAsc: true },
 
   page: 1,
@@ -51,36 +48,39 @@ const initialState = Immutable.fromJS({
 })
 
 const vms = actionReducer(initialState, {
+
+  // vms come in as Internal transformed JS objects that will be pushed to ImmutableJS
+  //     objects after an optional merge with existing vm data
   [UPDATE_VMS] (state, { payload: { vms, copySubResources, page } }) {
     const updates = {}
 
     vms.forEach(vm => {
-      if (!state.getIn(['vms', vm.id])) {
+      const existingVm = state.hasIn(['vms', vm.id]) ? state.getIn(['vms', vm.id]).toJS() : false
+      if (!existingVm) {
         state = state.set('notAllPagesLoaded', true)
       }
 
       updates[vm.id] = vm
-      updates[vm.id].actionResults = state.getIn(['vms', vm.id, 'actionResults'], EMPTY_MAP).toJS()
+      updates[vm.id].actionResults = (existingVm && existingVm.actionResults) || {}
 
-      if (copySubResources) {
+      // Copy across the VM_FETCH_ADDITIONAL_DEEP values from the existingVm
+      if (existingVm && copySubResources) {
         // Only copy consoles if the VM does not already have any
-        updates[vm.id].consoles = vm.consoles.length === 0
-          ? state.getIn(['vms', vm.id, 'consoles'], EMPTY_ARRAY).toJS()
-          : vm.consoles
+        updates[vm.id].consoles = vm.consoles.length === 0 ? existingVm.consoles || [] : vm.consoles
 
-        updates[vm.id].cdrom = state.getIn(['vms', vm.id, 'cdrom'], Immutable.fromJS({ file: { id: '' } })).toJS()
-        updates[vm.id].disks = state.getIn(['vms', vm.id, 'disks'], EMPTY_ARRAY).toJS()
-        updates[vm.id].nics = state.getIn(['vms', vm.id, 'nics'], EMPTY_ARRAY).toJS()
-        updates[vm.id].sessions = state.getIn(['vms', vm.id, 'sessions'], EMPTY_ARRAY).toJS()
-        updates[vm.id].snapshots = state.getIn(['vms', vm.id, 'snapshots'], EMPTY_ARRAY).toJS()
-        updates[vm.id].statistics = state.getIn(['vms', vm.id, 'statistics'], EMPTY_MAP).toJS()
+        updates[vm.id].cdrom = existingVm.cdrom || { file: { id: '' } }
+        updates[vm.id].disks = existingVm.disks || []
+        updates[vm.id].nics = existingVm.nics || []
+        updates[vm.id].sessions = existingVm.sessions || []
+        updates[vm.id].snapshots = existingVm.snapshots || []
+        updates[vm.id].statistics = existingVm.statistics || []
 
-        updates[vm.id].permissions = state.getIn(['vms', vm.id, 'permissions'], EMPTY_ARRAY).toJS()
-        updates[vm.id].userPermits = state.getIn(['vms', vm.id, 'userPermits'], EMPTY_ARRAY).toJS()
-        updates[vm.id].canUserChangeCd = state.getIn(['vms', vm.id, 'canUserChangeCd'], true)
-        updates[vm.id].canUserEditVm = state.getIn(['vms', vm.id, 'canUserEditVm'], false)
-        updates[vm.id].canUserManipulateSnapshots = state.getIn(['vms', vm.id, 'canUserManipulateSnapshots'], false)
-        updates[vm.id].canUserEditVmStorage = state.getIn(['vms', vm.id, 'canUserEditVmStorage'], false)
+        updates[vm.id].permissions = existingVm.permissions || []
+        updates[vm.id].userPermits = existingVm.userPermits || []
+        updates[vm.id].canUserChangeCd = !!existingVm.canUserChangeCd
+        updates[vm.id].canUserEditVm = !!existingVm.canUserEditVm
+        updates[vm.id].canUserManipulateSnapshots = !!existingVm.canUserManipulateSnapshots
+        updates[vm.id].canUserEditVmStorage = !!existingVm.canUserEditVmStorage
       }
     })
 
@@ -261,7 +261,7 @@ const vms = actionReducer(initialState, {
     return state.set('notAllPagesLoaded', value)
   },
   [LOGOUT] (state) { // see the config() reducer
-    return state.set('vms', EMPTY_MAP)
+    return state.set('vms', Immutable.fromJS({}))
   },
   [SET_FILTERS] (state, { payload: { filters } }) { // see the config() reducer
     return state.set('filters', Immutable.fromJS(filters))

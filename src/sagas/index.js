@@ -122,17 +122,20 @@ import {
   isNumber,
 } from '_/utils'
 
-const vmFetchAdditionalList =
-  [
-    'cdroms',
-    'sessions',
-    'disk_attachments.disk',
-    'graphics_consoles',
-    'nics',
-    'snapshots',
-    'statistics',
-    'permissions',
-  ]
+const VM_FETCH_ADDITIONAL_DEEP = [
+  'cdroms',
+  'disk_attachments.disk',
+  'graphics_consoles',
+  'nics',
+  'permissions',
+  'sessions',
+  'snapshots',
+  'statistics',
+]
+
+const VM_FETCH_ADDITIONAL_SHALLOW = [
+  'graphics_consoles',
+]
 
 export const EVERYONE_GROUP_ID = 'eee00000-0000-0000-0000-123456789eee'
 
@@ -271,7 +274,7 @@ export function* transformAndPermitVm (vm) {
 function* fetchVmsByPage (action) {
   const { shallowFetch, page } = action.payload
 
-  action.payload.additional = shallowFetch ? ['graphics_consoles'] : vmFetchAdditionalList
+  action.payload.additional = shallowFetch ? VM_FETCH_ADDITIONAL_SHALLOW : VM_FETCH_ADDITIONAL_DEEP
 
   const vmsOnPage = yield callExternalAction('getVmsByPage', Api.getVmsByPage, action)
   if (vmsOnPage && vmsOnPage['vm']) {
@@ -296,7 +299,7 @@ function* fetchVmsByCount (action) {
   const { shallowFetch } = action.payload
   const fetchedVmIds = []
 
-  action.payload.additional = shallowFetch ? [ 'graphics_consoles' ] : vmFetchAdditionalList
+  action.payload.additional = shallowFetch ? VM_FETCH_ADDITIONAL_SHALLOW : VM_FETCH_ADDITIONAL_DEEP
 
   const allVms = yield callExternalAction('getVmsByCount', Api.getVmsByCount, action)
   if (allVms && allVms['vm']) {
@@ -328,7 +331,7 @@ function* putPermissionsInDisk (disk) {
 export function* fetchSingleVm (action) {
   const { vmId, shallowFetch } = action.payload
 
-  action.payload.additional = shallowFetch ? [ 'graphics_consoles' ] : vmFetchAdditionalList
+  action.payload.additional = shallowFetch ? VM_FETCH_ADDITIONAL_SHALLOW : VM_FETCH_ADDITIONAL_DEEP
 
   const vm = yield callExternalAction('getVm', Api.getVm, action, true)
   let internalVm = null
