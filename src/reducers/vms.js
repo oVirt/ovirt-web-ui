@@ -260,6 +260,7 @@ const vms = actionReducer(initialState, {
   [SET_CHANGED] (state, { payload: { value } }) {
     return state.set('notAllPagesLoaded', value)
   },
+
   [LOGOUT] (state) { // see the config() reducer
     return state.set('vms', Immutable.fromJS({}))
   },
