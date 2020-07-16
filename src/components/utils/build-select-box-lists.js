@@ -186,11 +186,11 @@ function createVNicProfileList (vnicProfiles, { dataCenterId = null, cluster = n
 function createDiskTypeList () {
   return [
     {
-      id: 'raw',
+      id: 'pre',
       value: msg.diskEditorFormatOptionRaw(),
     },
     {
-      id: 'cow',
+      id: 'thin',
       value: msg.diskEditorFormatOptionCow(),
     },
   ]

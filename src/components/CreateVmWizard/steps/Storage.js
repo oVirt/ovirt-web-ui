@@ -31,9 +31,9 @@ import OverlayTooltip from '_/components/OverlayTooltip'
 
 function getDefaultDiskType (vmOptimizedFor) {
   const diskType =
-    vmOptimizedFor === 'highperformance' ? 'raw'
-      : vmOptimizedFor === 'server' ? 'raw'
-        : 'cow'
+    vmOptimizedFor === 'highperformance' ? 'pre'
+      : vmOptimizedFor === 'server' ? 'pre'
+        : 'thin'
 
   return diskType
 }
@@ -573,8 +573,8 @@ class Storage extends React.Component {
             isOk: isSdOk,
             name: sd && sd.value,
           },
-          diskTypeLabel: disk.diskType === 'cow' ? msg.diskEditorFormatOptionCow()
-            : disk.diskType === 'raw' ? msg.diskEditorFormatOptionRaw()
+          diskTypeLabel: disk.diskType === 'thin' ? msg.diskEditorFormatOptionCow()
+            : disk.diskType === 'pre' ? msg.diskEditorFormatOptionRaw()
               : disk.diskType,
           iface: enumMsg('DiskInterface', disk.iface),
         }

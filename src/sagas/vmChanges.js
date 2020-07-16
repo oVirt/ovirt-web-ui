@@ -158,7 +158,7 @@ function* composeAndCreateVm ({ payload: { basic, nics, disks }, meta: { correla
         name: disk.name,
         type: 'image',
         format: 'raw', // Match webadmin behavior, disks are created as 'raw'
-        sparse: disk.diskType === 'cow',
+        sparse: disk.diskType === 'thin',
         provisionedSize: disk.size,
 
         storageDomainId: disk.storageDomainId,

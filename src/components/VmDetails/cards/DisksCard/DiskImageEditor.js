@@ -32,7 +32,7 @@ const DISK_DEFAULTS = {
   type: 'image',
   bootable: false,
 
-  diskType: 'cow', // constrain to values in DISK_TYPES
+  diskType: 'thin', // constrain to values in DISK_TYPES
 
   provisionedSize: 1 * 1024 ** 3,
 }
@@ -124,7 +124,7 @@ class DiskImageEditor extends Component {
           // NOTE: Key the diskType from the disk's sparse flag.  Since webadmin always
           //       uses raw when creating disks, when editing a disk, this is the most
           //       reliable way to determine the thin vs preallocated status.
-          diskType: disk.get('sparse') ? 'cow' : 'raw',
+          diskType: disk.get('sparse') ? 'thin' : 'pre',
         },
       }
       : { // new
@@ -188,7 +188,7 @@ class DiskImageEditor extends Component {
 
       // the __diskType__ field maps to format + sparse REST Disk attributes
       format: 'raw', // Match webadmin behavior, disks are created as 'raw'
-      sparse: this.state.values.diskType === 'cow',
+      sparse: this.state.values.diskType === 'thin',
     }
 
     if (disk && disk.get('type') !== 'image') {
@@ -448,8 +448,8 @@ class DiskImageEditor extends Component {
                 }
                 { !createMode && !isDirectLUN &&
                   <div id={`${idPrefix}-format`} className={style['editor-field-read-only']}>
-                    { this.state.values.diskType === 'raw' && msg.diskEditorFormatOptionRaw() }
-                    { this.state.values.diskType === 'cow' && msg.diskEditorFormatOptionCow() }
+                    { this.state.values.diskType === 'pre' && msg.diskEditorFormatOptionRaw() }
+                    { this.state.values.diskType === 'thin' && msg.diskEditorFormatOptionCow() }
                   </div>
                 }
                 { isDirectLUN &&
