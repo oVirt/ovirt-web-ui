@@ -426,13 +426,13 @@ class DiskImageEditor extends Component {
             {/* Disk Type (thin vs preallocated) */}
             <FormGroup controlId={`${idPrefix}-format`}>
               <LabelCol sm={3}>
-                { msg.diskEditorFormatLabel() }
+                { msg.diskEditorDiskTypeLabel() }
                 <FieldLevelHelp
                   inline
                   content={
                     createMode
-                      ? msg.diskEditorFormatCreateHelp()
-                      : msg.diskEditorFormatCantChangeHelp()
+                      ? msg.diskEditorDiskTypeCreateHelp()
+                      : msg.diskEditorDiskTypeCantChangeHelp()
                   }
                   buttonClass={style['editor-field-help']}
                 />
@@ -448,13 +448,13 @@ class DiskImageEditor extends Component {
                 }
                 { !createMode && !isDirectLUN &&
                   <div id={`${idPrefix}-format`} className={style['editor-field-read-only']}>
-                    { this.state.values.diskType === 'pre' && msg.diskEditorFormatOptionRaw() }
-                    { this.state.values.diskType === 'thin' && msg.diskEditorFormatOptionCow() }
+                    { this.state.values.diskType === 'pre' && msg.diskEditorDiskTypeOptionPre() }
+                    { this.state.values.diskType === 'thin' && msg.diskEditorDiskTypeOptionThin() }
                   </div>
                 }
                 { isDirectLUN &&
                   <div id={`${idPrefix}-format`} className={style['editor-field-read-only']}>
-                    { msg.diskEditorFormatNotAvailable() }
+                    { msg.diskEditorDiskTypeNotAvailable() }
                   </div>
                 }
               </Col>

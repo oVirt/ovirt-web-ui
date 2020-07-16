@@ -573,8 +573,8 @@ class Storage extends React.Component {
             isOk: isSdOk,
             name: sd && sd.value,
           },
-          diskTypeLabel: disk.diskType === 'thin' ? msg.diskEditorFormatOptionCow()
-            : disk.diskType === 'pre' ? msg.diskEditorFormatOptionRaw()
+          diskTypeLabel: disk.diskType === 'thin' ? msg.diskEditorDiskTypeOptionThin()
+            : disk.diskType === 'pre' ? msg.diskEditorDiskTypeOptionPre()
               : disk.diskType,
           iface: enumMsg('DiskInterface', disk.iface),
         }

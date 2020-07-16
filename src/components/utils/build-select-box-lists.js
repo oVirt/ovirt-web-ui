@@ -187,11 +187,11 @@ function createDiskTypeList () {
   return [
     {
       id: 'pre',
-      value: msg.diskEditorFormatOptionRaw(),
+      value: msg.diskEditorDiskTypeOptionPre(),
     },
     {
       id: 'thin',
-      value: msg.diskEditorFormatOptionCow(),
+      value: msg.diskEditorDiskTypeOptionThin(),
     },
   ]
 }
