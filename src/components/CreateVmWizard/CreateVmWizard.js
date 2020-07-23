@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { Wizard, Button, Icon } from 'patternfly-react'
 import NavigationConfirmationModal from '../NavigationConfirmationModal'
 import merge from 'lodash/merge'
+import isEmpty from 'lodash/isEmpty'
 import { List } from 'immutable'
 
 import * as Actions from '_/actions'
@@ -177,7 +178,12 @@ class CreateVmWizard extends React.Component {
 
             onUpdate={({ valid = true, ...updatePayload }) => {
               this.handleListOnUpdate('network', 'nics', updatePayload)
+
+              const isPreventExitChanged = this.wizardStepsMap.network.preventExit === valid
               this.wizardStepsMap.network.preventExit = !valid
+              if (isEmpty(updatePayload) && isPreventExitChanged) {
+                this.forceUpdate()
+              }
             }}
           />
         ),
@@ -199,7 +205,12 @@ class CreateVmWizard extends React.Component {
 
             onUpdate={({ valid = true, ...updatePayload }) => {
               this.handleListOnUpdate('storage', 'disks', updatePayload)
+
+              const isPreventExitChanged = this.wizardStepsMap.storage.preventExit === valid
               this.wizardStepsMap.storage.preventExit = !valid
+              if (isEmpty(updatePayload) && isPreventExitChanged) {
+                this.forceUpdate()
+              }
             }}
           />
         ),
@@ -385,6 +396,10 @@ class CreateVmWizard extends React.Component {
   }
 
   handleListOnUpdate (stepName, listName, { remove, update, create }, setStateCallback) {
+    if (!remove && !update && !create) {
+      return
+    }
+
     this.setState(state => {
       let list = this.state.steps[stepName][listName].slice(0)
 
