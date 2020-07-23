@@ -216,6 +216,7 @@ module.exports = {
       filename: 'index.html',
       inject: true,
       template: `!!handlebars!${paths.appHtml}`,
+      publicPath: '/',
       jspSSO: false,
     }),
 

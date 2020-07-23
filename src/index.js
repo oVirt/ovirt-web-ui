@@ -81,16 +81,22 @@ function fetchToken (): { token: string, username: string, domain: string, userI
 }
 
 function addBrandedResources () {
-  addLinkElement('shortcut icon', branding.resourcesUrls.favicon)
-  addLinkElement('stylesheet', branding.resourcesUrls.brandStylesheet)
-  addLinkElement('stylesheet', branding.resourcesUrls.baseStylesheet)
+  addLinkElement('branding-favicon', 'shortcut icon', branding.resourcesUrls.favicon)
+  addLinkElement('branding-brand-style', 'stylesheet', branding.resourcesUrls.brandStylesheet)
+  addLinkElement('branding-base-style', 'stylesheet', branding.resourcesUrls.baseStylesheet)
 }
 
-function addLinkElement (rel: string, href: string) {
-  const linkElement = window.document.createElement('link')
-  linkElement.rel = rel
-  linkElement.href = href
-  window.document.head.appendChild(linkElement)
+function addLinkElement (id: string, rel: string, href: string) {
+  const link = window.document.querySelector(`head link#${id}[rel='${rel}']`)
+  if (link) {
+    link.href = href
+  } else {
+    const newLink = window.document.createElement('link')
+    newLink.id = id
+    newLink.rel = rel
+    newLink.href = href
+    window.document.head.appendChild(newLink)
+  }
 }
 
 function SagaErrorBridge (storeRootTask: Task) {

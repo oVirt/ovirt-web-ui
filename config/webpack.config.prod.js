@@ -213,6 +213,7 @@ module.exports = {
       filename: 'index.jsp',
       inject: true,
       template: `!!handlebars!${paths.appHtml}`,
+      publicPath,
       jspSSO: true,
       minify: {
         removeComments: true,
