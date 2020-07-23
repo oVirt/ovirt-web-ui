@@ -206,8 +206,20 @@ function* schedulerWithFixedDelay (delayInSeconds = AppConfiguration.schedulerFi
   }
 }
 
+/**
+ * When ovirt-web-ui is installed to ovirt-engine, a logout should push the user to the
+ * base ovirt welcome page.  But when running in dev mode or via container, the logout
+ * page is displayed.  In that case, we want to make sure the page is set to something
+ * appropriate and that background refreshing is no longer done.
+ */
+function* logoutAndCancelScheduler () {
+  yield put(Actions.setCurrentPage({ type: C.NO_REFRESH_TYPE }))
+  yield put(Actions.stopSchedulerFixedDelay())
+}
+
 export default [
   takeEvery(C.START_SCHEDULER_FIXED_DELAY, startSchedulerWithFixedDelay),
   throttle(5000, C.REFRESH_DATA, refreshData),
   takeLatest(C.CHANGE_PAGE, changePage),
+  takeEvery(C.LOGOUT, logoutAndCancelScheduler),
 ]
