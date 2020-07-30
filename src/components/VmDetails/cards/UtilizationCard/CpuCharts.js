@@ -25,8 +25,8 @@ import NoLiveData from './NoLiveData'
  * as a sparkline. Sparkline vales to go from oldest far left to most current on far
  * right.
  */
-const CpuCharts = ({ cpuStats, isRunning, id }) => {
-  const cpuUsed = cpuStats['current.guest'].datum
+const CpuCharts = ({ cpuStats, isRunning, id, vcpus }) => {
+  const cpuUsed = cpuStats['current.total'].datum / vcpus // the average value considering the number of VM CPUs, same as in Admin Portal
   const cpuAvailable = 100 - cpuUsed
 
   // NOTE: CPU history comes sorted from newest to oldest
@@ -83,6 +83,7 @@ CpuCharts.propTypes = {
   id: PropTypes.string.isRequired,
   cpuStats: PropTypes.object.isRequired,
   isRunning: PropTypes.bool,
+  vcpus: PropTypes.number.isRequired,
 }
 
 export default CpuCharts

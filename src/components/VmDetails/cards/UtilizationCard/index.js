@@ -19,6 +19,8 @@ const UtilizationCard = ({ vm }) => {
   const stats = vm.has('statistics') ? vm.get('statistics').toJS() : undefined
   const isRunning = [ 'up' ].includes(vm.get('status'))
 
+  const vCpus = vm.getIn(['cpu', 'vCPUs'])
+
   const idPrefix = 'vmdetail-utilization'
 
   return (
@@ -33,7 +35,7 @@ const UtilizationCard = ({ vm }) => {
           <Col className={style['row-col-charts-box']}>
             <Col className={style['col-charts-box']}>
               { stats.cpu
-                ? <CpuCharts cpuStats={stats.cpu} isRunning={isRunning} id={`${idPrefix}-cpu`} />
+                ? <CpuCharts cpuStats={stats.cpu} isRunning={isRunning} id={`${idPrefix}-cpu`} vcpus={vCpus} />
                 : <NoLiveData message={msg.loadingTripleDot()} id={`${idPrefix}-cpu-no-data`} />
               }
             </Col>
