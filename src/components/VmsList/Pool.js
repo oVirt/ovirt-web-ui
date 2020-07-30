@@ -1,20 +1,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import BaseCard from './BaseCard'
-import { FieldLevelHelp } from 'patternfly-react'
-
-import sharedStyle from '../sharedStyle.css'
-
-import VmActions from '../VmActions'
 
 import { startPool } from '_/actions'
 import { msg } from '_/intl'
-import { getOsHumanName } from '../utils'
+import { getOsHumanName } from '_/components/utils'
 
+import { FieldLevelHelp } from 'patternfly-react'
+import BaseCard from './BaseCard'
+import VmActions from '../VmActions'
+
+import sharedStyle from '../sharedStyle.css'
 import style from './style.css'
+
 /**
  * Single icon-card in the list for a Pool
  */
@@ -39,7 +38,7 @@ const Pool = ({ pool, icons, onStart }) => {
           <dt>{msg.availableVmsFromPool()}</dt><dd>{pool.get('maxUserVms')}</dd>
         </dl>
       </BaseCard.Status>
-      <VmActions isOnCard vm={pool.get('vm')} onStart={onStart} pool={pool} idPrefix={idPrefix} />
+      <VmActions isOnCard vm={pool.get('vm')} pool={pool} onStart={onStart} idPrefix={idPrefix} />
     </BaseCard>
   )
 }

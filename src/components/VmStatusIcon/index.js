@@ -5,7 +5,7 @@ import { Icon } from 'patternfly-react'
 import style from './style.css'
 
 /* eslint-disable key-spacing, no-multi-spaces */
-const VM_STATE_TO_ICON = {
+const VM_STATUS_TO_ICON = {
   'up'                : { type: 'pf', name: 'on-running',         tooltip: 'The VM is running.', className: style['green'] },
   'powering_up'       : { type: 'pf', name: 'in-progress',        tooltip: 'The VM is powering up.' },
   'down'              : { type: 'pf', name: 'off',                tooltip: 'The VM is down.' },
@@ -29,8 +29,8 @@ const VM_STATE_TO_ICON = {
 /**
  * Status-dependent icon for a VM
  */
-const VmStatusIcon = ({ state, className = undefined }) => {
-  const iconData = VM_STATE_TO_ICON[state] || VM_STATE_TO_ICON.__default__
+const VmStatusIcon = ({ status, className = undefined }) => {
+  const iconData = VM_STATUS_TO_ICON[status] || VM_STATUS_TO_ICON.__default__
   const classNames =
     iconData.className && className ? `${iconData.className} ${className}`
       : iconData.className && !className ? `${iconData.className}`
@@ -40,7 +40,7 @@ const VmStatusIcon = ({ state, className = undefined }) => {
   return <Icon type={iconData.type} name={iconData.name} className={classNames} title={iconData.tooltip} />
 }
 VmStatusIcon.propTypes = {
-  state: PropTypes.string.isRequired,
+  status: PropTypes.string.isRequired,
   className: PropTypes.string,
 }
 
