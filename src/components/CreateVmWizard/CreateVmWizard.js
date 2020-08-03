@@ -2,9 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Wizard, Button, Icon } from 'patternfly-react'
-import NavigationConfirmationModal from '../NavigationConfirmationModal'
-import merge from 'lodash/merge'
-import isEmpty from 'lodash/isEmpty'
+import produce from 'immer'
 import { List } from 'immutable'
 
 import * as Actions from '_/actions'
@@ -12,6 +10,7 @@ import { generateUnique } from '_/helpers'
 import { msg } from '_/intl'
 import { createTemplateList } from '_/components/utils'
 
+import NavigationConfirmationModal from '../NavigationConfirmationModal'
 import BasicSettings from './steps/BasicSettings'
 import Networking from './steps/Networking'
 import Storage from './steps/Storage'
@@ -19,6 +18,7 @@ import SummaryReview from './steps/SummaryReview'
 
 const DEFAULT_STATE = {
   activeStepIndex: 0,
+
   steps: {
     basic: {
       operatingSystemId: '0', // "Other OS"
@@ -35,6 +35,27 @@ const DEFAULT_STATE = {
     storage: {
       disks: [],
       updated: 0,
+    },
+  },
+
+  wizardUpdated: false,
+  showCloseWizardDialog: false,
+  stepNavigation: {
+    basic: {
+      preventEnter: false,
+      preventExit: true,
+    },
+    network: {
+      preventEnter: false,
+      preventExit: false,
+    },
+    storage: {
+      preventEnter: false,
+      preventExit: false,
+    },
+    review: {
+      preventEnter: false,
+      preventExit: false,
     },
   },
 
@@ -82,23 +103,22 @@ function getInitialState (clusters, templates, blankTemplateId, operatingSystems
       initEnabled,
     }
   }
-  const state = merge(
-    {
-      wizardUpdated: false,
-      showCloseWizardDialog: false,
-    },
-    DEFAULT_STATE,
-    { basicDefaultValues: merge({}, DEFAULT_STATE.steps.basic, blankTemplateValues) },
-    { steps: { basic: blankTemplateValues } },
-    {
-      steps: {
-        basic: {
-          clusterId,
-          provisionSource,
-          templateId,
-        },
-      },
-    })
+
+  const state = produce(DEFAULT_STATE, draft => {
+    draft.basicDefaultValues = {
+      ...DEFAULT_STATE.steps.basic,
+      ...blankTemplateValues,
+    }
+
+    draft.steps.basic = {
+      ...draft.steps.basic,
+      ...blankTemplateValues,
+      clusterId,
+      provisionSource,
+      templateId,
+    }
+  })
+
   return state
 }
 
@@ -143,11 +163,10 @@ class CreateVmWizard extends React.Component {
     this.hideCloseWizardDialog = this.hideCloseWizardDialog.bind(this)
     this.showCloseWizardDialog = this.showCloseWizardDialog.bind(this)
 
-    this.wizardStepsMap = {
-      basic: {
+    this.wizardSteps = [
+      {
+        id: 'basic',
         title: msg.createVmWizardStepTitleBasic(),
-        preventEnter: false,
-        preventExit: true,
 
         render: () => (
           <BasicSettings
@@ -157,17 +176,18 @@ class CreateVmWizard extends React.Component {
 
             onUpdate={({ valid = false, partialUpdate = {} }) => {
               this.handleBasicOnUpdate(partialUpdate)
-              this.wizardStepsMap.basic.preventExit = !valid
+              this.setState(produce(draft => {
+                draft.stepNavigation.basic.preventExit = !valid
+              }))
             }}
           />
         ),
         onExit: this.handleBasicOnExit,
       },
 
-      network: {
+      {
+        id: 'network',
         title: msg.createVmWizardStepTitleNetwork(),
-        preventEnter: false,
-        preventExit: false,
 
         render: () => (
           <Networking
@@ -178,21 +198,17 @@ class CreateVmWizard extends React.Component {
 
             onUpdate={({ valid = true, ...updatePayload }) => {
               this.handleListOnUpdate('network', 'nics', updatePayload)
-
-              const isPreventExitChanged = this.wizardStepsMap.network.preventExit === valid
-              this.wizardStepsMap.network.preventExit = !valid
-              if (isEmpty(updatePayload) && isPreventExitChanged) {
-                this.forceUpdate()
-              }
+              this.setState(produce(draft => {
+                draft.stepNavigation.network.preventExit = !valid
+              }))
             }}
           />
         ),
       },
 
-      storage: {
+      {
+        id: 'storage',
         title: msg.createVmWizardStepTitleStorage(),
-        preventEnter: false,
-        preventExit: false,
 
         render: () => (
           <Storage
@@ -205,21 +221,17 @@ class CreateVmWizard extends React.Component {
 
             onUpdate={({ valid = true, ...updatePayload }) => {
               this.handleListOnUpdate('storage', 'disks', updatePayload)
-
-              const isPreventExitChanged = this.wizardStepsMap.storage.preventExit === valid
-              this.wizardStepsMap.storage.preventExit = !valid
-              if (isEmpty(updatePayload) && isPreventExitChanged) {
-                this.forceUpdate()
-              }
+              this.setState(produce(draft => {
+                draft.stepNavigation.storage.preventExit = !valid
+              }))
             }}
           />
         ),
       },
 
-      review: {
+      {
+        id: 'review',
         title: msg.createVmWizardStepTitleReview(),
-        preventEnter: false,
-        preventExit: false,
 
         render: () => {
           const { correlationId } = this.state
@@ -253,25 +265,20 @@ class CreateVmWizard extends React.Component {
           />
         },
         onExit: () => {
-          this.setState({ correlationId: null })
+          this.setState(produce(draft => { draft.correlationId = null }))
         },
       },
-    }
-    this.wizardSteps = [
-      this.wizardStepsMap.basic,
-      this.wizardStepsMap.network,
-      this.wizardStepsMap.storage,
-      this.wizardStepsMap.review,
     ]
   }
+
   hideCloseWizardDialog () {
-    this.setState({ showCloseWizardDialog: false })
+    this.setState(produce(draft => { draft.showCloseWizardDialog = false }))
   }
 
   showCloseWizardDialog () {
     const { wizardUpdated } = this.state
     if (wizardUpdated) {
-      this.setState({ showCloseWizardDialog: true })
+      this.setState(produce(draft => { draft.showCloseWizardDialog = true }))
     } else {
       this.hideAndResetState()
     }
@@ -279,27 +286,7 @@ class CreateVmWizard extends React.Component {
 
   hideAndResetState () {
     const { onHide, clusters, templates, blankTemplateId, operatingSystems } = this.props
-
     this.setState(getInitialState(clusters, templates, blankTemplateId, operatingSystems))
-    merge(this.wizardStepsMap, {
-      basic: {
-        preventEnter: false,
-        preventExit: true,
-      },
-      network: {
-        preventEnter: false,
-        preventExit: false,
-      },
-      storage: {
-        preventEnter: false,
-        preventExit: false,
-      },
-      review: {
-        preventEnter: false,
-        preventExit: false,
-      },
-    })
-
     onHide()
   }
 
@@ -310,30 +297,22 @@ class CreateVmWizard extends React.Component {
   }
 
   handleBasicOnUpdate (partialUpdate) {
-    const { provisionSource, templateId } = this.state.steps.basic
-    const { provisionSource: provisionSource_, templateId: templateId_ } = partialUpdate
+    this.setState(produce(draft => {
+      for (const [key, val] of Object.entries(partialUpdate)) {
+        draft.steps.basic[key] = val
+      }
 
-    this.setState(state => {
-      const extraUpdates = {}
+      draft.wizardUpdated = true
+
+      // reset network and storage updates if the provision source or selected template changes
+      const { provisionSource, templateId } = draft.steps.basic
+      const { provisionSource: provisionSource_, templateId: templateId_ } = partialUpdate
+
       if (provisionSource !== provisionSource_ || templateId !== templateId_) {
-        // reset network and storage updates if the provision source or selected template changes
-        extraUpdates.network = merge({}, state.steps.network, { updated: 0 })
-        extraUpdates.storage = merge({}, state.steps.storage, { updated: 0 })
+        draft.steps.network.updated = 0
+        draft.steps.storage.updated = 0
       }
-
-      return {
-        ...state,
-        wizardUpdated: true,
-        steps: {
-          ...state.steps,
-          basic: {
-            ...state.steps.basic,
-            ...partialUpdate,
-          },
-          ...extraUpdates,
-        },
-      }
-    })
+    }))
   }
 
   /**
@@ -345,13 +324,12 @@ class CreateVmWizard extends React.Component {
     const resetDisks = this.state.steps.storage.updated === 0
 
     if (resetNics || resetDisks) {
-      this.setState(state => {
-        const template = this.props.templates.get(this.state.steps.basic.templateId)
-        const update = { steps: { ...state.steps } }
+      this.setState(produce(draft => {
+        const template = this.props.templates.get(draft.steps.basic.templateId)
 
         if (resetNics) {
-          update.steps.network = {
-            updated: (state.steps.network.updated + 1),
+          draft.steps.network = {
+            updated: (draft.steps.network.updated + 1),
             nics: !template
               ? []
               : template.get('nics', List())
@@ -367,8 +345,8 @@ class CreateVmWizard extends React.Component {
         }
 
         if (resetDisks) {
-          update.steps.storage = {
-            updated: (state.steps.storage.updated + 1),
+          draft.steps.storage = {
+            updated: (draft.steps.storage.updated + 1),
             disks: !template
               ? []
               : template.get('disks', List())
@@ -378,6 +356,7 @@ class CreateVmWizard extends React.Component {
 
                   diskId: disk.get('id'),
                   storageDomainId: disk.get('storageDomainId'),
+                  canUserUseStorageDomain: this.props.storageDomains.getIn([ disk.get('storageDomainId'), 'canUserUseDomain' ], false),
 
                   bootable: disk.get('bootable'),
                   iface: disk.get('iface'),
@@ -389,74 +368,62 @@ class CreateVmWizard extends React.Component {
                 .toJS(),
           }
         }
-
-        return update
-      })
+      }))
     }
   }
 
-  handleListOnUpdate (stepName, listName, { remove, update, create }, setStateCallback) {
+  handleListOnUpdate (stepName, listName, { remove, update, create } = {}) {
     if (!remove && !update && !create) {
       return
     }
 
-    this.setState(state => {
-      let list = this.state.steps[stepName][listName].slice(0)
+    this.setState(produce(draft => {
+      draft.wizardUpdated = true
+      const step = draft.steps[stepName]
 
       if (remove) {
-        list = list.filter(item => item.id !== remove)
+        step[listName] = step[listName].filter(item => item.id !== remove)
       }
 
       if (update) {
-        const toUpdate = list.findIndex(item => item.id === update.id)
-        if (toUpdate >= 0) {
-          list[toUpdate] = { ...list[toUpdate], ...update }
+        const toUpdate = step[listName].find(item => item.id === update.id)
+        if (toUpdate) {
+          for (const [key, val] of Object.entries(update)) {
+            toUpdate[key] = val
+          }
         }
       }
 
       if (create) {
-        list.push(create)
+        step[listName].push(create)
       }
 
-      const newState = {
-        ...state,
-        wizardUpdated: true,
-        steps: {
-          ...state.steps,
-          [stepName]: {
-            ...state.steps[stepName],
-            [listName]: list,
-            updated: (state.steps[stepName].updated + 1),
-          },
-        },
-      }
-      return newState
-    },
-    setStateCallback)
+      step.updated = step.updated + 1
+    }))
   }
 
   handleCreateVm () {
     const correlationId = generateUnique('CreateVmWizard_')
     const { basic, network: { nics }, storage: { disks } } = this.state.steps
 
-    this.setState({ correlationId })
+    this.setState(produce(draft => { draft.correlationId = correlationId }))
     this.props.onCreate(basic, nics, disks, correlationId)
   }
 
   wizardGoToStep (newStepIndex) {
-    const { activeStepIndex } = this.state
+    const { activeStepIndex, stepNavigation } = this.state
     const activeStep = this.wizardSteps[activeStepIndex]
     const newStep = this.wizardSteps[newStepIndex]
 
     // make sure we can leave the current step and enter the new step
-    if (activeStep.preventExit || newStep.preventEnter) return
+    if (stepNavigation[activeStep.id].preventExit || stepNavigation[newStep.id].preventEnter) return
 
     // run and the current step's `onExit()`
     if (activeStep.onExit) {
       activeStep.onExit()
     }
 
-    this.setState({ activeStepIndex: newStepIndex })
+    this.setState(produce(draft => { draft.activeStepIndex = newStepIndex }))
   }
 
   wizardClickBack () {
@@ -468,12 +435,12 @@ class CreateVmWizard extends React.Component {
   }
 
   render () {
-    const { activeStepIndex, correlationId } = this.state
+    const { activeStepIndex, stepNavigation, correlationId } = this.state
     const activeStep = this.wizardSteps[activeStepIndex]
     const vmCreateWorking = correlationId !== null && !this.props.actionResults.has(correlationId)
     const vmCreateStarted = correlationId !== null && !!this.props.actionResults.get(correlationId)
 
-    const isReviewStep = this.wizardSteps[activeStepIndex] === this.wizardStepsMap.review
+    const isReviewStep = this.wizardSteps[activeStepIndex].id === 'review'
     const isPrimaryNext = !isReviewStep
     const isPrimaryCreate = isReviewStep && !vmCreateStarted
     const isPrimaryClose = isReviewStep && vmCreateStarted
@@ -513,7 +480,7 @@ class CreateVmWizard extends React.Component {
                 : isPrimaryCreate ? this.handleCreateVm
                   : this.hideAndNavigate
             }
-            disabled={activeStep.preventExit || vmCreateWorking}
+            disabled={stepNavigation[activeStep.id].preventExit || vmCreateWorking}
           >
             { isPrimaryNext && msg.createVmWizardButtonNext() }
             { isPrimaryCreate && msg.createVmWizardButtonCreate() }
@@ -526,7 +493,7 @@ class CreateVmWizard extends React.Component {
       <NavigationConfirmationModal
         show={showCloseWizardDialog}
         onYes={() => {
-          this.setState({ showCloseWizardDialog: false })
+          this.setState(produce(draft => { draft.showCloseWizardDialog = false }))
           this.hideAndResetState()
         }}
         onNo={this.hideCloseWizardDialog}
@@ -539,6 +506,7 @@ CreateVmWizard.propTypes = {
   onHide: PropTypes.func,
 
   clusters: PropTypes.object.isRequired,
+  storageDomains: PropTypes.object.isRequired,
   templates: PropTypes.object.isRequired,
   blankTemplateId: PropTypes.string.isRequired,
   userMessages: PropTypes.object.isRequired,
@@ -552,6 +520,7 @@ CreateVmWizard.propTypes = {
 export default connect(
   (state) => ({
     clusters: state.clusters,
+    storageDomains: state.storageDomains,
     templates: state.templates,
     blankTemplateId: state.config.get('blankTemplateId'),
     userMessages: state.userMessages,
