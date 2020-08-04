@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { Button } from 'patternfly-react'
 
 import * as Actions from '_/actions'
-import { DIALOG_PAGE_TYPE } from '_/constants'
+import { CREATE_PAGE_TYPE } from '_/constants'
 import { msg } from '_/intl'
 import CreateVmWizard from './CreateVmWizard'
 
@@ -24,7 +24,7 @@ class AddVmButton extends React.Component {
       showCreateWizard: true,
       previousPageType: this.props.config.get('currentPage').type,
     })
-    this.props.changePage(DIALOG_PAGE_TYPE)
+    this.props.changePage(CREATE_PAGE_TYPE)
   }
 
   closeCreateWizard () {

@@ -1,3 +1,4 @@
+import AppConfiguration from '_/config'
 import {
   ADD_VM_NIC,
   CHANGE_VM_CDROM,
@@ -7,9 +8,9 @@ import {
   EDIT_VM_NIC,
   EDIT_VM,
   GET_RDP_VM,
+  GET_VM,
   GET_VM_CDROM,
-  GET_VMS_BY_COUNT,
-  GET_VMS_BY_PAGE,
+  GET_VMS,
   LOGIN_SUCCESSFUL,
   LOGIN,
   LOGOUT,
@@ -54,11 +55,10 @@ export function login ({ username, domain, token, userId }) {
 /**
  * I.e. the Refresh button is clicked or scheduler event occurred (polling)
  */
-export function refresh ({ page, shallowFetch = false, onNavigation = false, onSchedule = false }) {
+export function refresh ({ shallowFetch = false, onNavigation = false, onSchedule = false }) {
   return {
     type: REFRESH_DATA,
     payload: {
-      page,
       shallowFetch,
       onNavigation,
       onSchedule,
@@ -75,19 +75,30 @@ export function navigateToVmDetails (vmId) {
   }
 }
 
+export function getSingleVm ({ vmId, shallowFetch = false }) {
+  return {
+    type: GET_VM,
+    payload: {
+      vmId,
+      shallowFetch,
+    },
+  }
+}
+
 export function getVmsByPage ({ page, shallowFetch = true }) {
   return {
-    type: GET_VMS_BY_PAGE,
+    type: GET_VMS,
     payload: {
       shallowFetch,
       page,
+      count: AppConfiguration.pageLimit,
     },
   }
 }
 
 export function getVmsByCount ({ count, shallowFetch = true }) {
   return {
-    type: GET_VMS_BY_COUNT,
+    type: GET_VMS,
     payload: {
       shallowFetch,
       count,
@@ -243,25 +254,19 @@ export function logout (isManual = false) {
 
 /**
  * Update or Add
- * @param vms - array of vms
- * @returns {{type: string, payload: {vms: *}}}
  */
-export function updateVms ({ vms, copySubResources = false, page = null }) {
+export function updateVms ({ vms, copySubResources = false }) {
   return {
     type: UPDATE_VMS,
     payload: {
       vms,
       copySubResources,
-      page,
     },
   }
 }
 
 /**
  * Remove VMs from store.
- *
- * @param vmIds array
- * @returns {{type: string, payload: {vmIds: *}}}
  */
 export function removeVms ({ vmIds }) {
   return {
@@ -274,8 +279,6 @@ export function removeVms ({ vmIds }) {
 
 /**
  * Remove all VMs from store which ID is not listed among vmIdsToPreserve
- * @param vmIdsToPreserve
- * @returns {{type: string, payload: {vmIds: *}}}
  */
 export function removeMissingVms ({ vmIdsToPreserve }) {
   return {

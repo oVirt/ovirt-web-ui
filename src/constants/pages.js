@@ -1,5 +1,5 @@
 export const CONSOLE_PAGE_TYPE = 'consolePage'
+export const CREATE_PAGE_TYPE = 'createPage'
 export const DETAIL_PAGE_TYPE = 'detailPage'
-export const DIALOG_PAGE_TYPE = 'dialogPage'
-export const MAIN_PAGE_TYPE = 'mainPage'
+export const LIST_PAGE_TYPE = 'listPage'
 export const NO_REFRESH_TYPE = 'noRefreshPage'

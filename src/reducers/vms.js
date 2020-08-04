@@ -8,9 +8,7 @@ import {
   REMOVE_MISSING_VMS,
   REMOVE_POOLS,
   REMOVE_VMS,
-  SET_CHANGED,
   SET_FILTERS,
-  SET_PAGE,
   SET_VM_SORT,
   SET_VM_ACTION_RESULT,
   SET_VM_CDROM,
@@ -18,6 +16,7 @@ import {
   SET_VM_NICS,
   SET_VM_SESSIONS,
   SET_VM_SNAPSHOTS,
+  UPDATE_PAGING_DATA,
   UPDATE_POOLS,
   UPDATE_VM_SNAPSHOT,
   UPDATE_VMPOOLS_COUNT,
@@ -34,15 +33,13 @@ const initialState = Immutable.fromJS({
   filters: {},
   sort: { ...sortFields[0], isAsc: true },
 
-  page: 1,
-
   missedVms: Immutable.Set(),
 
-  /**
-   * true ~ we need to fetch further vms and pools
-   * false ~ all visible entities already fetched
-   */
-  notAllPagesLoaded: true,
+  vmsPage: 0,
+  vmsExpectMorePages: true,
+
+  poolsPage: 0,
+  poolsExpectMorePages: true,
 
   correlationResult: {},
 })
@@ -51,14 +48,11 @@ const vms = actionReducer(initialState, {
 
   // vms come in as Internal transformed JS objects that will be pushed to ImmutableJS
   //     objects after an optional merge with existing vm data
-  [UPDATE_VMS] (state, { payload: { vms, copySubResources, page } }) {
+  [UPDATE_VMS] (state, { payload: { vms, copySubResources } }) {
     const updates = {}
 
     vms.forEach(vm => {
       const existingVm = state.hasIn(['vms', vm.id]) ? state.getIn(['vms', vm.id]).toJS() : false
-      if (!existingVm) {
-        state = state.set('notAllPagesLoaded', true)
-      }
 
       updates[vm.id] = vm
       updates[vm.id].actionResults = (existingVm && existingVm.actionResults) || {}
@@ -85,9 +79,6 @@ const vms = actionReducer(initialState, {
     })
 
     let st = state.mergeIn(['vms'], Immutable.fromJS(updates))
-    if (page) {
-      st = st.set('page', page)
-    }
 
     const vmsIds = Object.keys(updates)
     st = st.set('missedVms', st.get('missedVms').subtract(vmsIds))
@@ -130,6 +121,7 @@ const vms = actionReducer(initialState, {
     }
     return state
   },
+
   [SET_VM_SNAPSHOTS] (state, { payload: { vmId, snapshots } }) {
     if (state.getIn(['vms', vmId])) {
       return state.setIn(['vms', vmId, 'snapshots'], Immutable.fromJS(snapshots)) // deep immutable
@@ -154,6 +146,7 @@ const vms = actionReducer(initialState, {
     console.error(`vms.setVmSnapshots() reducer: vmId ${vmId} not found`)
     return state
   },
+
   [SET_VM_NICS] (state, { payload: { vmId, nics } }) {
     if (state.getIn(['vms', vmId])) {
       return state.setIn(['vms', vmId, 'nics'], Immutable.fromJS(nics)) // deep immutable
@@ -162,6 +155,7 @@ const vms = actionReducer(initialState, {
     }
     return state
   },
+
   [SET_VM_SESSIONS] (state, { payload: { vmId, sessions } }) {
     let consoleInUse = false
     for (var i in sessions) {
@@ -173,6 +167,7 @@ const vms = actionReducer(initialState, {
     state = state.setIn(['vms', vmId, 'sessions'], Immutable.fromJS(sessions))
     return state.setIn(['vms', vmId, 'consoleInUse'], consoleInUse)
   },
+
   [VM_ACTION_IN_PROGRESS] (state, { payload: { vmId, name, started } }) {
     if (state.getIn(['vms', vmId])) {
       return state.setIn(['vms', vmId, 'actionInProgress', name], started)
@@ -183,13 +178,9 @@ const vms = actionReducer(initialState, {
   [UPDATE_POOLS] (state, { payload: { pools } }) {
     const updates = {}
     pools.forEach(pool => {
-      if (!state.getIn(['pools', pool.id])) {
-        state = state.set('notAllPagesLoaded', true)
-      }
       updates[pool.id] = pool
     })
     const imUpdates = Immutable.fromJS(updates)
-
     return state.mergeIn(['pools'], imUpdates)
   },
   [REMOVE_POOLS] (state, { payload: { poolIds } }) {
@@ -254,11 +245,18 @@ const vms = actionReducer(initialState, {
     return state
   },
 
-  [SET_PAGE] (state, { payload: { page } }) {
-    return state.set('page', page)
-  },
-  [SET_CHANGED] (state, { payload: { value } }) {
-    return state.set('notAllPagesLoaded', value)
+  [UPDATE_PAGING_DATA] (state, { payload: { vmsPage, vmsExpectMorePages, poolsPage, poolsExpectMorePages } }) {
+    if (vmsPage) {
+      state = state.set('vmsPage', vmsPage)
+    }
+    state = state.set('vmsExpectMorePages', vmsExpectMorePages)
+
+    if (poolsPage) {
+      state = state.set('poolsPage', poolsPage)
+    }
+    state = state.set('poolsExpectMorePages', poolsExpectMorePages)
+
+    return state
   },
 
   [LOGOUT] (state) { // see the config() reducer

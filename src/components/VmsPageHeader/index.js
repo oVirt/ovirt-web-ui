@@ -16,7 +16,7 @@ import OverlayTooltip from '../OverlayTooltip'
 /**
  * Main application header on top of the page
  */
-const VmsPageHeader = ({ page, onRefresh }) => {
+const VmsPageHeader = ({ onRefresh }) => {
   const [show, setShow] = useState(false)
   const idPrefix = `pageheader`
 
@@ -27,7 +27,7 @@ const VmsPageHeader = ({ page, onRefresh }) => {
         <ul className='nav navbar-nav navbar-right navbar-iconic'>
           <li>
             <OverlayTooltip id={`${idPrefix}-tooltip`} tooltip={msg.refresh()} placement='bottom'>
-              <a href='#' className='nav-item-iconic' onClick={hrefWithoutHistory(() => onRefresh(page))} id={`${idPrefix}-refresh`}>
+              <a href='#' className='nav-item-iconic' onClick={hrefWithoutHistory(() => onRefresh())} id={`${idPrefix}-refresh`}>
                 <i className='fa fa-refresh' />
               </a>
             </OverlayTooltip>
@@ -40,15 +40,12 @@ const VmsPageHeader = ({ page, onRefresh }) => {
   )
 }
 VmsPageHeader.propTypes = {
-  page: PropTypes.number.isRequired,
   onRefresh: PropTypes.func.isRequired,
 }
 
 export default connect(
-  (state) => ({
-    page: state.vms.get('page'), // number of pages to request refresh
-  }),
+  (state) => ({ }),
   (dispatch) => ({
-    onRefresh: (page) => dispatch(refresh({ shallowFetch: false, page })),
+    onRefresh: (page) => dispatch(refresh({ shallowFetch: false })),
   })
 )(VmsPageHeader)

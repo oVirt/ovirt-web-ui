@@ -22,7 +22,7 @@ import sagasVmChanges from './vmChanges'
 import sagasVmSnapshots from '_/components/VmDetails/cards/SnapshotsCard/sagas'
 
 import {
-  setChanged,
+  updatePagingData,
   setVmDisks,
   updateVms,
   removeVms,
@@ -79,11 +79,9 @@ import {
   GET_ALL_EVENTS,
   GET_BY_PAGE,
   GET_CONSOLE_OPTIONS,
-  GET_POOLS_BY_COUNT,
-  GET_POOLS_BY_PAGE,
+  GET_POOLS,
   GET_RDP_VM,
-  GET_VMS_BY_COUNT,
-  GET_VMS_BY_PAGE,
+  GET_VMS,
   SAVE_CONSOLE_OPTIONS,
   SAVE_FILTERS,
   SELECT_POOL_DETAIL,
@@ -98,6 +96,7 @@ import {
   canUserEditVmStorage,
   canUserManipulateSnapshots,
 } from '_/utils'
+import AppConfiguration from '_/config'
 
 const VM_FETCH_ADDITIONAL_DEEP = [
   'cdroms',
@@ -128,25 +127,76 @@ export function* transformAndPermitVm (vm) {
   return internalVm
 }
 
-export function* fetchByPage (action) {
-  console.info(`fetchByPage, page: ${action.payload.page}`)
-  yield put(setChanged({ value: false }))
-  yield fetchVmsByPage(action)
-  yield fetchPoolsByPage(action)
+function* putPermissionsInDisk (disk) {
+  disk.permits = yield fetchPermits({ entityType: PermissionsType.DISK_TYPE, id: disk.id })
+  disk.canUserEditDisk = canUserEditDisk(disk.permits)
+  return disk
 }
 
 /**
- * Fetch VMs with additional nested data requested
+ * Fetch VMs and Pools in a paged manner, and track if any more pages are (expected to
+ * be) available,
  */
-export function* fetchVmsByPage (action) {
-  const { shallowFetch, page } = action.payload
+export function* fetchByPage () {
+  const [
+    vmsPage,
+    vmsExpectMorePages,
+    poolsPage,
+    poolsExpectMorePages,
+  ] = yield select(({ vms }) => [
+    vms.get('vmsPage'), !!vms.get('vmsExpectMorePages'),
+    vms.get('poolsPage'), !!vms.get('poolsExpectMorePages'),
+  ])
 
-  action.payload.additional = shallowFetch ? VM_FETCH_ADDITIONAL_SHALLOW : VM_FETCH_ADDITIONAL_DEEP
+  function* currentVmsIds ({ payload: { count, page } }) {
+    const start = count * page
+    const end = start + count
+    return Array.from(yield select(state => state.vms.get('vms').keys())).slice(start, end)
+  }
 
-  const vmsOnPage = yield callExternalAction('getVmsByPage', Api.getVmsByPage, action)
-  if (vmsOnPage && vmsOnPage['vm']) {
-    const internalVms = yield all(vmsOnPage.vm.map(transformAndPermitVm))
-    yield put(updateVms({ vms: internalVms, copySubResources: shallowFetch, page }))
+  function* currentPoolsIds ({ payload: { count, page } }) {
+    const start = count * page
+    const end = start + count
+    return Array.from(yield select(state => state.vms.get('pools').keys())).slice(start, end)
+  }
+
+  //
+  // If more pages are expected, fetch the next page and grab the ids fetched
+  // If no more pages are expected, grab the current page of ids from the redux store
+  //
+  const count = AppConfiguration.pageLimit
+  const [ vms, pools ] = yield all([
+    call(vmsExpectMorePages ? fetchVms : currentVmsIds, { payload: { count, page: vmsPage + 1 } }),
+    call(poolsExpectMorePages ? fetchPools : currentPoolsIds, { payload: { count, page: poolsPage + 1 } }),
+  ])
+
+  //
+  // Since the REST API doesn't give a record count in paginated responses, we have
+  // to guess if there is more to fetch.  Assume there is more to fetch if the page
+  // of ids fetched/accessed is full.
+  //
+  yield put(updatePagingData({
+    vmsPage: vmsExpectMorePages ? vmsPage + 1 : undefined,
+    vmsExpectMorePages: vms.length >= count,
+    poolsPage: poolsExpectMorePages ? poolsPage + 1 : undefined,
+    poolsExpectMorePages: pools.length >= count,
+  }))
+}
+
+export function* fetchVms ({ payload: { count, page, shallowFetch = true } }) {
+  const fetchedVmIds = []
+
+  const additional = shallowFetch ? VM_FETCH_ADDITIONAL_SHALLOW : VM_FETCH_ADDITIONAL_DEEP
+  const apiVms = yield callExternalAction('getVms', Api.getVms, { payload: { count, page, additional } })
+  if (apiVms && apiVms['vm']) {
+    const internalVms = []
+    for (const apiVm of apiVms.vm) {
+      const internalVm = yield transformAndPermitVm(apiVm)
+      fetchedVmIds.push(internalVm.id)
+      internalVms.push(internalVm)
+    }
+
+    yield put(updateVms({ vms: internalVms, copySubResources: shallowFetch }))
     yield fetchUnknownIcons({ vms: internalVms })
 
     // NOTE: No need to fetch the current=true cdrom info at this point. The cdrom info
@@ -157,41 +207,7 @@ export function* fetchVmsByPage (action) {
   }
 
   yield put(updateVmsPoolsCount())
-}
-
-/**
- * Fetch a given number of VMs (**action.payload.count**).
- */
-export function* fetchVmsByCount (action) {
-  const { shallowFetch } = action.payload
-  const fetchedVmIds = []
-
-  action.payload.additional = shallowFetch ? VM_FETCH_ADDITIONAL_SHALLOW : VM_FETCH_ADDITIONAL_DEEP
-
-  const allVms = yield callExternalAction('getVmsByCount', Api.getVmsByCount, action)
-  if (allVms && allVms['vm']) {
-    const internalVms = []
-    for (const vm of allVms.vm) {
-      const internalVm = yield transformAndPermitVm(vm)
-      fetchedVmIds.push(internalVm.id)
-      internalVms.push(internalVm)
-    }
-
-    yield put(updateVms({ vms: internalVms, copySubResources: shallowFetch }))
-    yield fetchUnknownIcons({ vms: internalVms })
-
-    // NOTE: No need to fetch the current=true cdrom info at this point. See `fetchVmsByPage`
-    //       or `fetchSingleVm` for more details.
-  }
-
-  yield put(updateVmsPoolsCount())
   return fetchedVmIds
-}
-
-function* putPermissionsInDisk (disk) {
-  disk.permits = yield fetchPermits({ entityType: PermissionsType.DISK_TYPE, id: disk.id })
-  disk.canUserEditDisk = canUserEditDisk(disk.permits)
-  return disk
 }
 
 export function* fetchSingleVm (action) {
@@ -239,12 +255,12 @@ export function* fetchSingleVm (action) {
   return internalVm
 }
 
-export function* fetchPoolsByCount (action) {
+export function* fetchPools (action) {
   const fetchedPoolIds = []
 
-  const allPools = yield callExternalAction('getPoolsByCount', Api.getPoolsByCount, action)
-  if (allPools && allPools['vm_pool']) {
-    const internalPools = allPools.vm_pool.map(pool => Api.poolToInternal({ pool }))
+  const apiPools = yield callExternalAction('getPools', Api.getPools, action)
+  if (apiPools && apiPools['vm_pool']) {
+    const internalPools = apiPools.vm_pool.map(pool => Api.poolToInternal({ pool }))
     internalPools.forEach(pool => fetchedPoolIds.push(pool.id))
 
     yield put(updatePools({ pools: internalPools }))
@@ -252,17 +268,6 @@ export function* fetchPoolsByCount (action) {
   }
 
   return fetchedPoolIds
-}
-
-export function* fetchPoolsByPage (action) {
-  const allPools = yield callExternalAction('getPoolsByPage', Api.getPoolsByPage, action)
-
-  if (allPools && allPools['vm_pool']) {
-    const internalPools = allPools.vm_pool.map(pool => Api.poolToInternal({ pool }))
-
-    yield put(updatePools({ pools: internalPools }))
-    yield put(updateVmsPoolsCount())
-  }
 }
 
 export function* fetchSinglePool (action) {
@@ -478,8 +483,7 @@ function* saveFilters (actions) {
 }
 
 function* fetchVmNics ({ vmId }) {
-  const nics = yield callExternalAction('getVmsNic', Api.getVmsNic, { type: 'GET_VM_NICS', payload: { vmId } })
-
+  const nics = yield callExternalAction('getVmNic', Api.getVmNic, { type: 'GET_VM_NICS', payload: { vmId } })
   if (nics && nics['nic']) {
     const nicsInternal = nics.nic.map(nic => Api.nicToInternal({ nic }))
     return nicsInternal
@@ -546,10 +550,8 @@ export function* rootSaga () {
     takeEvery(DELAYED_REMOVE_ACTIVE_REQUEST, delayedRemoveActiveRequest),
 
     throttle(100, GET_BY_PAGE, fetchByPage),
-    throttle(100, GET_VMS_BY_COUNT, fetchVmsByCount),
-    throttle(100, GET_VMS_BY_PAGE, fetchVmsByPage),
-    throttle(100, GET_POOLS_BY_COUNT, fetchPoolsByCount),
-    throttle(100, GET_POOLS_BY_PAGE, fetchPoolsByPage),
+    throttle(100, GET_VMS, fetchVms),
+    throttle(100, GET_POOLS, fetchPools),
 
     takeLatest(GET_ALL_EVENTS, fetchAllEvents),
     takeEvery(DISMISS_EVENT, dismissEvent),

@@ -4,8 +4,8 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
-import { Grid } from 'patternfly-react'
-import Vms from './Vms'
+import { EmptyState } from 'patternfly-react'
+import VmCardList from './VmCardList'
 import { msg } from '_/intl'
 
 /**
@@ -21,19 +21,11 @@ const VmLoading = () => {
 const NoVmAvailable = () => {
   const idPrefix = 'no-vm'
   return (
-    <Grid fluid>
-      <div className='blank-slate-pf'>
-        <div className='blank-slate-pf-icon'>
-          <span className='pficon pficon pficon-add-circle-o' id={`${idPrefix}-icon`} />
-        </div>
-        <h1 id={`${idPrefix}-title`}>
-          {msg.noVmAvailable()}
-        </h1>
-        <p id={`${idPrefix}-text`}>
-          {msg.noVmAvailableForLoggedUser()}
-        </p>
-      </div>
-    </Grid>
+    <EmptyState>
+      <EmptyState.Icon id={`${idPrefix}-icon`} />
+      <EmptyState.Title id={`${idPrefix}-title`}>{msg.noVmAvailable()}</EmptyState.Title>
+      <EmptyState.Info id={`${idPrefix}-text`}>{msg.noVmAvailableForLoggedUser()}</EmptyState.Info>
+    </EmptyState>
   )
 }
 
@@ -44,7 +36,7 @@ const VmsList = ({ vms, requestActive }) => {
   let el = null
 
   if (haveVms || havePools) {
-    el = <Vms />
+    el = <VmCardList />
   } else if (requestActive) {
     el = <VmLoading />
   } else {
