@@ -520,6 +520,7 @@ class Storage extends React.Component {
 
   // Cancel the creation or editing of a row by throwing out edit state
   handleRowCancelChange (rowData) {
+    this.components = undefined
     this.setState(state => {
       const editing = state.editing
       delete editing[rowData.id]
@@ -584,6 +585,12 @@ class Storage extends React.Component {
           : !a.isFromTemplate && b.isFromTemplate ? 1
             : localeCompare(a.name, b.name)
       )
+    const components = {
+      body: {
+        row: _TableInlineEditRow, // Table.InlineEditRow,
+      },
+    }
+    this.components = this.components || components // if the table should (re)render the value of this.components should be undefined
 
     return <div className={style['settings-container']} id={idPrefix}>
       { diskList.length === 0 && <React.Fragment>
@@ -613,11 +620,7 @@ class Storage extends React.Component {
             dataTable
             inlineEdit
             columns={this.columns}
-            components={{
-              body: {
-                row: _TableInlineEditRow, // Table.InlineEditRow,
-              },
-            }}
+            components={this.components}
           >
             <Table.Header />
             <Table.Body
