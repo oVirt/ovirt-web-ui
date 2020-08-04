@@ -554,11 +554,6 @@ class Storage extends React.Component {
     const enableCreate = storageDomainList.length > 0 && !this.isEditingMode()
 
     const diskList = disks
-      .sort((a, b) => // template based then by name
-        a.isFromTemplate && !b.isFromTemplate ? -1
-          : !a.isFromTemplate && b.isFromTemplate ? 1
-            : localeCompare(a.name, b.name)
-      )
       .concat(this.state.creating ? [ this.state.editing[this.state.creating] ] : [])
       .map(disk => {
         const sd = storageDomainList.find(sd => sd.id === disk.storageDomainId)
@@ -579,6 +574,11 @@ class Storage extends React.Component {
           iface: enumMsg('DiskInterface', disk.iface),
         }
       })
+      .sort((a, b) => // template based then by name
+        a.isFromTemplate && !b.isFromTemplate ? -1
+          : !a.isFromTemplate && b.isFromTemplate ? 1
+            : localeCompare(a.name, b.name)
+      )
 
     return <div className={style['settings-container']} id={idPrefix}>
       { diskList.length === 0 && <React.Fragment>
