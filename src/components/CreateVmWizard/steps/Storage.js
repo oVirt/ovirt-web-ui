@@ -330,7 +330,7 @@ class Storage extends React.Component {
                 }
 
                 { !hideKebab && !templateDefined &&
-                  <Table.Cell>
+                  <Table.Cell className={style['kebab-menu-cell']}>
                     <DropdownKebab
                       id={kebabId}
                       className={style['action-kebab']}
