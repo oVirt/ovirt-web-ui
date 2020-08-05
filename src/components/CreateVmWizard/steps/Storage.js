@@ -554,12 +554,10 @@ class Storage extends React.Component {
     const enableCreate = storageDomainList.length > 0 && !this.isEditingMode()
 
     const diskList = disks
-      .sort((a, b) => // template based then by bootable then by name
+      .sort((a, b) => // template based then by name
         a.isFromTemplate && !b.isFromTemplate ? -1
           : !a.isFromTemplate && b.isFromTemplate ? 1
-            : a.bootable && !b.bootable ? -1
-              : !a.bootable && b.bootable ? 1
-                : localeCompare(a.name, b.name)
+            : localeCompare(a.name, b.name)
       )
       .concat(this.state.creating ? [ this.state.editing[this.state.creating] ] : [])
       .map(disk => {
