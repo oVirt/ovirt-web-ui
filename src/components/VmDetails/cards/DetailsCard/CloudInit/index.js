@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Switch from '../../../../Switch'
+import Switch from '_/components/Switch'
 import { msg } from '_/intl'
 import FieldRow from '../FieldRow'
 import CloudInitForm from './CloudInitForm'

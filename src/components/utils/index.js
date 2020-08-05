@@ -1,5 +1,6 @@
 export * from './build-select-box-lists'
 export * from './cpu-topology'
+export * from './disks'
 export * from './suggest-names'
 export * from './utils'
 export * from './validation'
