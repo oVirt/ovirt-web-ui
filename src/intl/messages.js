@@ -189,15 +189,15 @@ export const messages: { [messageId: string]: MessageType } = {
   diskEditorBootableLabel: 'Bootable',
   diskEditorBootableChangeMessage: 'Only one disk can be bootable at a time. The bootable flag will be removed from "{diskName}" and placed on this disk.',
   diskEditorDiskDeletingTooltip: 'The disk is being deleted.',
-  diskEditorFormatCantChangeHelp: 'Disk type cannot be changed after it has been created.',
-  diskEditorFormatCreateHelp: 'Once you have selected a disk type, you will not be able to change it.',
-  diskEditorFormatLabel: 'Disk Type',
-  diskEditorFormatNotAvailable: 'N/A',
-  diskEditorFormatOptionRaw: {
+  diskEditorDiskTypeCantChangeHelp: 'Disk type cannot be changed after it has been created.',
+  diskEditorDiskTypeCreateHelp: 'Once you have selected a disk type, you will not be able to change it.',
+  diskEditorDiskTypeLabel: 'Disk Type',
+  diskEditorDiskTypeNotAvailable: 'N/A',
+  diskEditorDiskTypeOptionPre: {
     message: 'Preallocated',
     description: 'Select list option for raw / preallocated format disk images',
   },
-  diskEditorFormatOptionCow: {
+  diskEditorDiskTypeOptionThin: {
     message: 'Thin Provision',
     description: 'Select list option for qcow / thin provisioned format disk images',
   },

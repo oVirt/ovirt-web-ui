@@ -108,9 +108,9 @@ function* composeAndCreateVm ({ payload: { basic, nics, disks }, meta: { correla
           : vm.cpu.topology,
       },
     })
-
-    // TODO: TimeZone handling (https://github.com/oVirt/ovirt-web-ui/pull/1118)
   }
+
+  // TODO: TimeZone handling (https://github.com/oVirt/ovirt-web-ui/pull/1118)
 
   /*
    * NOTE: The VM create REST service does not handle adding NICs or Disks. Until
@@ -157,8 +157,8 @@ function* composeAndCreateVm ({ payload: { basic, nics, disks }, meta: { correla
 
         name: disk.name,
         type: 'image',
-        format: disk.format,
-        sparse: disk.format === 'cow',
+        format: 'raw', // Match webadmin behavior, disks are created as 'raw'
+        sparse: disk.diskType === 'thin',
         provisionedSize: disk.size,
 
         storageDomainId: disk.storageDomainId,

@@ -7,7 +7,7 @@ import { isNumber, convertValue } from '_/utils'
 import { BASIC_DATA_SHAPE, STORAGE_SHAPE } from '../dataPropTypes'
 
 import {
-  createDiskFormatList,
+  createDiskTypeList,
   createStorageDomainList,
   suggestDiskName,
 } from '_/components/utils'
@@ -29,13 +29,13 @@ import SelectBox from '_/components/SelectBox'
 import style from './style.css'
 import OverlayTooltip from '_/components/OverlayTooltip'
 
-function getDefaultFormatType (vmOptimizedFor) {
-  const format =
-    vmOptimizedFor === 'highperformance' ? 'raw'
-      : vmOptimizedFor === 'server' ? 'raw'
-        : 'cow'
+function getDefaultDiskType (vmOptimizedFor) {
+  const diskType =
+    vmOptimizedFor === 'highperformance' ? 'pre'
+      : vmOptimizedFor === 'server' ? 'pre'
+        : 'thin'
 
-  return format
+  return diskType
 }
 
 const TooltipLabel = ({ id, className, bsStyle = 'default', children }) =>
@@ -316,24 +316,24 @@ class Storage extends React.Component {
             },
           },
         },
-        property: 'formatLabel',
+        property: 'diskTypeLabel',
         cell: {
           formatters: [inlineEditFormatter],
         },
         editView: (value, { rowData }) => {
           const row = this.state.editing[rowData.id]
 
-          const formatList = createDiskFormatList()
-          if (!row.format || row.format === '_') {
-            formatList.unshift({ id: '_', value: `-- ${msg.createVmStorageSelectDiskType()} --` })
+          const typeList = createDiskTypeList()
+          if (!row.diskType || row.diskType === '_') {
+            typeList.unshift({ id: '_', value: `-- ${msg.createVmStorageSelectDiskType()} --` })
           }
 
           return (
             <SelectBox
-              id={`${idPrefix}-${value}-format-edit`}
-              items={formatList}
-              selected={row.format || '_'}
-              onChange={value => this.handleCellChange(rowData, 'format', value)}
+              id={`${idPrefix}-${value}-diskType-edit`}
+              items={typeList}
+              selected={row.diskType || '_'}
+              onChange={value => this.handleCellChange(rowData, 'diskType', value)}
             />
           )
         },
@@ -454,7 +454,7 @@ class Storage extends React.Component {
           bootable: false,
           iface: 'virtio_scsi',
           type: 'image',
-          format: getDefaultFormatType(this.props.optimizedFor),
+          diskType: getDefaultDiskType(this.props.optimizedFor),
 
           size: 0,
         },
@@ -573,9 +573,9 @@ class Storage extends React.Component {
             isOk: isSdOk,
             name: sd && sd.value,
           },
-          formatLabel: disk.format === 'cow' ? msg.diskEditorFormatOptionCow()
-            : disk.format === 'raw' ? msg.diskEditorFormatOptionRaw()
-              : disk.format,
+          diskTypeLabel: disk.diskType === 'thin' ? msg.diskEditorDiskTypeOptionThin()
+            : disk.diskType === 'pre' ? msg.diskEditorDiskTypeOptionPre()
+              : disk.diskType,
           iface: enumMsg('DiskInterface', disk.iface),
         }
       })
