@@ -89,7 +89,7 @@ publish:
 distclean-local:
 	rm -rf ${DISTCLEANDIRS}
 
-.PHONY: rpms publish srpms all ovirt-web-ui
+.PHONY: srpm rpm snapshot-rpm publish ovirt-web-ui
 
 all: ovirt-web-ui
 
@@ -100,17 +100,29 @@ ovirt-web-ui:
 	cp -rpv packaging/* build/
 	mv build/static build/index.jsp build/ovirt-web-ui.config build/ovirt-web-ui.war/
 
+#
+# Do the work of installing ovirt-web-ui to an ovirt-engine instance:
+#    install share/ovirt-web-ui/ovirt-web-ui.war/
+#    install share/ovirt-web-ui/branding/
+#    link etc/ovirt-web-ui/branding/00-ovirt.brand -> share/ovirt-web-ui/branding
+#    link share/ovirt-engine/ovirt-web-ui.war -> share/ovirt-web-ui/ovirt-web-ui.war
+#    install etc/ovirt-engine/engine.conf.d/*
+#
+install-data-local: dest_web-ui = $(DESTDIR)$(USER_PORTAL_DIR)
+install-data-local: dest_engine = $(DESTDIR)$(OVIRT_ENGINE_DIR)
+install-data-local: dest_etc = $(DESTDIR)$(sysconfdir)
 install-data-local:
-	$(MKDIR_P) $(DESTDIR)$(USER_PORTAL_DIR)/branding/ovirt
-	$(MKDIR_P) $(DESTDIR)$(OVIRT_ENGINE_DIR)
-	$(MKDIR_P) $(DESTDIR)$(sysconfdir)/ovirt-web-ui/branding
-	cp -rpv build/ovirt-web-ui.war $(DESTDIR)$(USER_PORTAL_DIR)
-	cp -rpvT build/branding $(DESTDIR)$(USER_PORTAL_DIR)/branding/ovirt
-	cp -rpv build/etc/* $(DESTDIR)$(sysconfdir)
-	ln -sfr $(DESTDIR)$(USER_PORTAL_DIR)/ovirt-web-ui.war $(DESTDIR)$(OVIRT_ENGINE_DIR)/ovirt-web-ui.war
-	ln -sfr $(DESTDIR)$(USER_PORTAL_DIR)/branding/ovirt $(DESTDIR)$(sysconfdir)/ovirt-web-ui/branding/00-ovirt.brand
+	[[ -e "$(dest_web-ui)" ]] || install -d -m 0755 "$(dest_web-ui)"
+	cp -rpv build/ovirt-web-ui.war "$(dest_web-ui)"
+	cp -rpv build/branding "$(dest_web-ui)"
+
+	[[ -e "$(dest_etc)/ovirt-web-ui/branding" ]] || install -d -m 0755 "$(dest_etc)/ovirt-web-ui/branding"
+	ln -sfrn "$(dest_web-ui)/branding" "$(dest_etc)/ovirt-web-ui/branding/00-ovirt.brand"
+
+	[[ -e "$(dest_engine)" ]] || install -d -m 0755 "$(dest_engine)"
+	ln -sfrn "$(dest_web-ui)/ovirt-web-ui.war" "$(dest_engine)/ovirt-web-ui.war"
+
+	cp -rpv build/etc/* "$(dest_etc)"
 
 check-local:
 	$(YARN) test
-
-# vim: ts=2

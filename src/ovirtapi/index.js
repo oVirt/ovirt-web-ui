@@ -131,24 +131,22 @@ const OvirtApi = {
     }
     return httpGet({ url })
   },
-  getVmsByPage ({ page, additional }: { page: number, additional: Array<string> }): Promise<Object> {
-    assertLogin({ methodName: 'getVmsByPage' })
-    let url = `${AppConfiguration.applicationContext}/api/vms/;max=${AppConfiguration.pageLimit}?search=SORTBY NAME ASC page ${page}`
-    if (additional && additional.length > 0) {
-      url += `&follow=${additional.join(',')}`
-    }
-    return httpGet({ url })
-  },
-  getVmsByCount ({ count, additional }: { count: number, additional: Array<string> }): Promise<Object> {
-    assertLogin({ methodName: 'getVmsByCount' })
-    let url = `${AppConfiguration.applicationContext}/api/vms/;max=${count}?search=SORTBY NAME ASC`
-    if (additional && additional.length > 0) {
-      url += `&follow=${additional.join(',')}`
-    }
+  getVms ({ count, page, additional }: { count?: number, page?: number, additional?: Array<string> }): Promise<Object> {
+    assertLogin({ methodName: 'getAllVms' })
+    const max = count ? `;max=${count}` : ''
+    const params =
+      [
+        page ? 'search=' + encodeURIComponent(`SORTBY NAME ASC page ${page}`) : '',
+        additional && additional.length > 0 ? 'follow=' + encodeURIComponent(`${additional.join(',')}`) : '',
+      ]
+        .filter(p => !!p)
+        .join('&')
+
+    const url = `${AppConfiguration.applicationContext}/api/vms${max}${params ? '?' : ''}${params}`
     return httpGet({ url })
   },
 
-  // --- VM actions
+  // ---- VM actions
   addNewVm ({
     vm,
     transformInput = true,
@@ -332,6 +330,7 @@ const OvirtApi = {
     assertLogin({ methodName: 'dismissEvent' })
     return httpDelete({ url: `${AppConfiguration.applicationContext}/api/events/${eventId}` })
   },
+
   checkFilter (): Promise<Object> {
     assertLogin({ methodName: 'checkFilter' })
     return httpGet({
@@ -343,19 +342,23 @@ const OvirtApi = {
     })
   },
 
-  getPoolsByPage ({ page }: { page: number }): Promise<Object> {
-    assertLogin({ methodName: 'getPoolsByPage' })
-    const url = `${AppConfiguration.applicationContext}/api/vmpools/;max=${AppConfiguration.pageLimit}?search=SORTBY NAME ASC page ${page}`
-    return httpGet({ url })
-  },
-  getPoolsByCount ({ count }: { count: number }): Promise<Object> {
-    assertLogin({ methodName: 'getPoolsByCount' })
-    const url = `${AppConfiguration.applicationContext}/api/vmpools/;max=${count}`
-    return httpGet({ url })
-  },
   getPool ({ poolId }: PoolIdType): Promise<Object> {
     assertLogin({ methodName: 'getPool' })
     const url = `${AppConfiguration.applicationContext}/api/vmpools/${poolId}`
+    return httpGet({ url })
+  },
+  getPools ({ count, page, additional }: { count?: number, page?: number, additional?: Array<string> }): Promise<Object> {
+    assertLogin({ methodName: 'getPools' })
+    const max = count ? `;max=${count}` : ''
+    const params =
+      [
+        page ? 'search=' + encodeURIComponent(`SORTBY NAME ASC page ${page}`) : '',
+        additional && additional.length > 0 ? 'follow=' + encodeURIComponent(`${additional.join(',')}`) : '',
+      ]
+        .filter(p => !!p)
+        .join('&')
+
+    const url = `${AppConfiguration.applicationContext}/api/vmpools${max}${params ? '?' : ''}${params}`
     return httpGet({ url })
   },
   startPool ({ poolId }: PoolIdType): Promise<Object> {
@@ -457,7 +460,8 @@ const OvirtApi = {
 
   // disk update is async
   // http://ovirt.github.io/ovirt-engine-api-model/master/#services/disk/methods/update
-  updateDiskAttachment ({ vmId, disk }: { vmId: string, disk: DiskType }): Promise<Object> {
+  // http://ovirt.github.io/ovirt-engine-api-model/master/#services/disk_attachment/methods/update
+  updateDiskAttachment ({ vmId, disk, attachmentOnly = false }: { vmId: string, disk: DiskType, attachmentOnly: boolean }): Promise<Object> {
     assertLogin({ methodName: 'updateDiskAttachment' })
 
     const attachmentId = disk.attachmentId
@@ -465,7 +469,7 @@ const OvirtApi = {
       throw new Error('DiskType.attachmentId is required to update the disk')
     }
 
-    const payload = Transforms.DiskAttachment.toApi({ disk })
+    const payload = Transforms.DiskAttachment.toApi({ disk, attachmentOnly })
     const input = JSON.stringify(payload)
 
     return httpPut({
@@ -516,8 +520,8 @@ const OvirtApi = {
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vnicprofiles?follow=network,permissions` })
   },
 
-  getVmsNic ({ vmId }: { vmId: string }): Promise<Object> {
-    assertLogin({ methodName: 'getVmsNic' })
+  getVmNic ({ vmId }: { vmId: string }): Promise<Object> {
+    assertLogin({ methodName: 'getVmNic' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/nics` })
   },
   getAllNetworks (): Promise<Object> {

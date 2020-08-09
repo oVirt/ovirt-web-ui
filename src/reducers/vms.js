@@ -8,17 +8,15 @@ import {
   REMOVE_MISSING_VMS,
   REMOVE_POOLS,
   REMOVE_VMS,
-  SET_CHANGED,
   SET_FILTERS,
-  SET_PAGE,
   SET_VM_SORT,
   SET_VM_ACTION_RESULT,
   SET_VM_CDROM,
-  SET_VM_CONSOLES,
   SET_VM_DISKS,
   SET_VM_NICS,
   SET_VM_SESSIONS,
   SET_VM_SNAPSHOTS,
+  UPDATE_PAGING_DATA,
   UPDATE_POOLS,
   UPDATE_VM_SNAPSHOT,
   UPDATE_VMPOOLS_COUNT,
@@ -29,66 +27,58 @@ import {
 import { actionReducer, removeMissingItems } from './utils'
 import { sortFields } from '_/utils'
 
-const EMPTY_MAP = Immutable.fromJS({})
-const EMPTY_ARRAY = Immutable.fromJS([])
-
 const initialState = Immutable.fromJS({
   vms: {},
   pools: {},
-  filters: EMPTY_MAP,
+  filters: {},
   sort: { ...sortFields[0], isAsc: true },
-
-  page: 1,
 
   missedVms: Immutable.Set(),
 
-  /**
-   * true ~ we need to fetch further vms and pools
-   * false ~ all visible entities already fetched
-   */
-  notAllPagesLoaded: true,
+  vmsPage: 0,
+  vmsExpectMorePages: true,
+
+  poolsPage: 0,
+  poolsExpectMorePages: true,
 
   correlationResult: {},
 })
 
 const vms = actionReducer(initialState, {
-  [UPDATE_VMS] (state, { payload: { vms, copySubResources, page } }) {
+
+  // vms come in as Internal transformed JS objects that will be pushed to ImmutableJS
+  //     objects after an optional merge with existing vm data
+  [UPDATE_VMS] (state, { payload: { vms, copySubResources } }) {
     const updates = {}
 
     vms.forEach(vm => {
-      if (!state.getIn(['vms', vm.id])) {
-        state = state.set('notAllPagesLoaded', true)
-      }
+      const existingVm = state.hasIn(['vms', vm.id]) ? state.getIn(['vms', vm.id]).toJS() : false
 
       updates[vm.id] = vm
-      updates[vm.id].actionResults = state.getIn(['vms', vm.id, 'actionResults'], EMPTY_MAP).toJS()
+      updates[vm.id].actionResults = (existingVm && existingVm.actionResults) || {}
 
-      if (copySubResources) {
+      // Copy across the VM_FETCH_ADDITIONAL_DEEP values from the existingVm
+      if (existingVm && copySubResources) {
         // Only copy consoles if the VM does not already have any
-        updates[vm.id].consoles = vm.consoles.length === 0
-          ? state.getIn(['vms', vm.id, 'consoles'], EMPTY_ARRAY).toJS()
-          : vm.consoles
+        updates[vm.id].consoles = vm.consoles.length === 0 ? existingVm.consoles || [] : vm.consoles
 
-        updates[vm.id].cdrom = state.getIn(['vms', vm.id, 'cdrom'], Immutable.fromJS({ file: { id: '' } })).toJS()
-        updates[vm.id].disks = state.getIn(['vms', vm.id, 'disks'], EMPTY_ARRAY).toJS()
-        updates[vm.id].nics = state.getIn(['vms', vm.id, 'nics'], EMPTY_ARRAY).toJS()
-        updates[vm.id].sessions = state.getIn(['vms', vm.id, 'sessions'], EMPTY_ARRAY).toJS()
-        updates[vm.id].snapshots = state.getIn(['vms', vm.id, 'snapshots'], EMPTY_ARRAY).toJS()
-        updates[vm.id].statistics = state.getIn(['vms', vm.id, 'statistics'], EMPTY_MAP).toJS()
+        updates[vm.id].cdrom = existingVm.cdrom || { file: { id: '' } }
+        updates[vm.id].disks = existingVm.disks || []
+        updates[vm.id].nics = existingVm.nics || []
+        updates[vm.id].sessions = existingVm.sessions || []
+        updates[vm.id].snapshots = existingVm.snapshots || []
+        updates[vm.id].statistics = existingVm.statistics || []
 
-        updates[vm.id].permissions = state.getIn(['vms', vm.id, 'permissions'], EMPTY_ARRAY).toJS()
-        updates[vm.id].userPermits = state.getIn(['vms', vm.id, 'userPermits'], EMPTY_ARRAY).toJS()
-        updates[vm.id].canUserChangeCd = state.getIn(['vms', vm.id, 'canUserChangeCd'], true)
-        updates[vm.id].canUserEditVm = state.getIn(['vms', vm.id, 'canUserEditVm'], false)
-        updates[vm.id].canUserManipulateSnapshots = state.getIn(['vms', vm.id, 'canUserManipulateSnapshots'], false)
-        updates[vm.id].canUserEditVmStorage = state.getIn(['vms', vm.id, 'canUserEditVmStorage'], false)
+        updates[vm.id].permissions = existingVm.permissions || []
+        updates[vm.id].userPermits = existingVm.userPermits || []
+        updates[vm.id].canUserChangeCd = !!existingVm.canUserChangeCd
+        updates[vm.id].canUserEditVm = !!existingVm.canUserEditVm
+        updates[vm.id].canUserManipulateSnapshots = !!existingVm.canUserManipulateSnapshots
+        updates[vm.id].canUserEditVmStorage = !!existingVm.canUserEditVmStorage
       }
     })
 
     let st = state.mergeIn(['vms'], Immutable.fromJS(updates))
-    if (page) {
-      st = st.set('page', page)
-    }
 
     const vmsIds = Object.keys(updates)
     st = st.set('missedVms', st.get('missedVms').subtract(vmsIds))
@@ -131,6 +121,7 @@ const vms = actionReducer(initialState, {
     }
     return state
   },
+
   [SET_VM_SNAPSHOTS] (state, { payload: { vmId, snapshots } }) {
     if (state.getIn(['vms', vmId])) {
       return state.setIn(['vms', vmId, 'snapshots'], Immutable.fromJS(snapshots)) // deep immutable
@@ -155,6 +146,7 @@ const vms = actionReducer(initialState, {
     console.error(`vms.setVmSnapshots() reducer: vmId ${vmId} not found`)
     return state
   },
+
   [SET_VM_NICS] (state, { payload: { vmId, nics } }) {
     if (state.getIn(['vms', vmId])) {
       return state.setIn(['vms', vmId, 'nics'], Immutable.fromJS(nics)) // deep immutable
@@ -163,9 +155,7 @@ const vms = actionReducer(initialState, {
     }
     return state
   },
-  [SET_VM_CONSOLES] (state, { payload: { vmId, consoles } }) {
-    return state.setIn(['vms', vmId, 'consoles'], Immutable.fromJS(consoles))
-  },
+
   [SET_VM_SESSIONS] (state, { payload: { vmId, sessions } }) {
     let consoleInUse = false
     for (var i in sessions) {
@@ -177,6 +167,7 @@ const vms = actionReducer(initialState, {
     state = state.setIn(['vms', vmId, 'sessions'], Immutable.fromJS(sessions))
     return state.setIn(['vms', vmId, 'consoleInUse'], consoleInUse)
   },
+
   [VM_ACTION_IN_PROGRESS] (state, { payload: { vmId, name, started } }) {
     if (state.getIn(['vms', vmId])) {
       return state.setIn(['vms', vmId, 'actionInProgress', name], started)
@@ -187,13 +178,9 @@ const vms = actionReducer(initialState, {
   [UPDATE_POOLS] (state, { payload: { pools } }) {
     const updates = {}
     pools.forEach(pool => {
-      if (!state.getIn(['pools', pool.id])) {
-        state = state.set('notAllPagesLoaded', true)
-      }
       updates[pool.id] = pool
     })
     const imUpdates = Immutable.fromJS(updates)
-
     return state.mergeIn(['pools'], imUpdates)
   },
   [REMOVE_POOLS] (state, { payload: { poolIds } }) {
@@ -258,14 +245,22 @@ const vms = actionReducer(initialState, {
     return state
   },
 
-  [SET_PAGE] (state, { payload: { page } }) {
-    return state.set('page', page)
+  [UPDATE_PAGING_DATA] (state, { payload: { vmsPage, vmsExpectMorePages, poolsPage, poolsExpectMorePages } }) {
+    if (vmsPage) {
+      state = state.set('vmsPage', vmsPage)
+    }
+    state = state.set('vmsExpectMorePages', vmsExpectMorePages)
+
+    if (poolsPage) {
+      state = state.set('poolsPage', poolsPage)
+    }
+    state = state.set('poolsExpectMorePages', poolsExpectMorePages)
+
+    return state
   },
-  [SET_CHANGED] (state, { payload: { value } }) {
-    return state.set('notAllPagesLoaded', value)
-  },
+
   [LOGOUT] (state) { // see the config() reducer
-    return state.set('vms', EMPTY_MAP)
+    return state.set('vms', Immutable.fromJS({}))
   },
   [SET_FILTERS] (state, { payload: { filters } }) { // see the config() reducer
     return state.set('filters', Immutable.fromJS(filters))

@@ -1,12 +1,12 @@
 import React from 'react'
 
-import { DETAIL_PAGE_TYPE, MAIN_PAGE_TYPE, CONSOLE_PAGE_TYPE, NO_REFRESH_TYPE } from '_/constants'
+import { DETAIL_PAGE_TYPE, LIST_PAGE_TYPE, CONSOLE_PAGE_TYPE, NO_REFRESH_TYPE } from '_/constants'
 import { msg } from '_/intl'
 
 import PageRouter from './components/PageRouter'
 import Handler404 from './Handler404'
 import { VmDetailToolbar, VmConsoleToolbar, VmsListToolbar } from './components/Toolbar'
-import { VmDetailsPage, VmsPage, VmConsolePage } from './components/Pages'
+import { VmDetailsPage, VmsListPage, VmConsolePage } from './components/Pages'
 
 /**
  * Function get vms object, and return routes object
@@ -27,9 +27,9 @@ export default function getRoutes (vms) {
       {
         path: '/',
         exact: true,
-        component: VmsPage,
+        component: VmsListPage,
         toolbars: (match) => (<VmsListToolbar match={match} vms={vms} key='addbutton' />),
-        type: MAIN_PAGE_TYPE,
+        type: LIST_PAGE_TYPE,
         isToolbarFullWidth: true,
       },
 
@@ -51,6 +51,7 @@ export default function getRoutes (vms) {
           },
         ],
       },
+
       {
         title: '404',
         component: Handler404,

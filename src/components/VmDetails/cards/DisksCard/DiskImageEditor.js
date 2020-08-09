@@ -4,38 +4,40 @@ import { connect } from 'react-redux'
 
 import { msg } from '_/intl'
 import { isNumber } from '_/utils'
-import { createDiskFormatList, createStorageDomainList, isDiskNameValid } from '_/components/utils'
+import { createDiskTypeList, createStorageDomainList, isDiskNameValid } from '_/components/utils'
 
 import {
   Button,
+  Checkbox,
   Col,
   ControlLabel,
   FieldLevelHelp,
   Form,
   FormControl,
   FormGroup,
-  Modal,
   HelpBlock,
+  Modal,
 } from 'patternfly-react'
+import { Alert } from '@patternfly/react-core'
 import SelectBox from '_/components/SelectBox'
 import style from './style.css'
 import OverlayTooltip from '_/components/OverlayTooltip'
 
 const DISK_DEFAULTS = {
   active: true,
-  bootable: false,
   iface: 'virtio_scsi', // virtio | virtio_scsi
 
   id: undefined,
   name: '',
   type: 'image',
-  format: 'cow', // cow | raw
-  sparse: true,
+  bootable: false,
+
+  diskType: 'thin', // constrain to values in DISK_TYPES
 
   provisionedSize: 1 * 1024 ** 3,
 }
 
-const DISK_FORMATS = createDiskFormatList()
+const DISK_TYPES = createDiskTypeList()
 
 const LabelCol = ({ children, ...props }) => {
   return <Col componentClass={ControlLabel} {...props}>
@@ -63,7 +65,7 @@ LabelCol.propTypes = {
  *   - Alias (aka Name) (defaulting to a suggested name)
  *   - Size in GiB
  *   - Storage Domain (defaulted to a suggested storage domain)
- *   - Disk Image Format (Allocation Policy ... Thin Provision vs Preallocated)
+ *   - Disk Type (Thin Provision vs Preallocated)
  *   - (auto-selected and never on the UI): Interface
  *
  * May be changed via Edit for a Disk Image (type == 'image'):
@@ -85,7 +87,8 @@ class DiskImageEditor extends Component {
         alias: props.suggestedName || '',
         size: DISK_DEFAULTS.provisionedSize / 1024 ** 3,
         storageDomain: props.suggestedStorageDomain || '',
-        format: DISK_DEFAULTS.format, // cow vs raw .. Allocation Policy (thin sparse vs preallocated !sparse)?
+        bootable: DISK_DEFAULTS.bootable,
+        diskType: DISK_DEFAULTS.diskType,
       },
       errors: {},
     }
@@ -101,34 +104,41 @@ class DiskImageEditor extends Component {
     this.changeAlias = this.changeAlias.bind(this)
     this.changeSize = this.changeSize.bind(this)
     this.changeStorageDomain = this.changeStorageDomain.bind(this)
-    this.changeFormat = this.changeFormat.bind(this)
+    this.changeBootable = this.changeBootable.bind(this)
+    this.changeDiskType = this.changeDiskType.bind(this)
   }
 
   open (e) {
     e.preventDefault()
     const { disk, suggestedName, suggestedStorageDomain } = this.props
     const { storageDomainSelectList } = this.state
-
     const diskInfo = disk
       ? { // edit
         id: disk.get('id'),
         values: {
           alias: disk.get('name'),
+          bootable: disk.get('bootable'),
           size: 0,
           storageDomain: disk.get('storageDomainId'),
-          format: disk.get('format'),
+
+          // NOTE: Key the diskType from the disk's sparse flag.  Since webadmin always
+          //       uses raw when creating disks, when editing a disk, this is the most
+          //       reliable way to determine the thin vs preallocated status.
+          diskType: disk.get('sparse') ? 'thin' : 'pre',
         },
       }
       : { // new
         id: undefined,
         values: {
           alias: suggestedName,
+          bootable: this.props.vm.get('disks').size > 0 ? DISK_DEFAULTS.bootable : true,
           size: DISK_DEFAULTS.provisionedSize / 1024 ** 3,
           storageDomain:
             (/\w+/.test(suggestedStorageDomain) && suggestedStorageDomain) ||
             (storageDomainSelectList.length > 0 && storageDomainSelectList[0].id) ||
             '',
-          format: DISK_DEFAULTS.format,
+
+          diskType: DISK_DEFAULTS.diskType,
         },
         errors: {},
       }
@@ -145,9 +155,11 @@ class DiskImageEditor extends Component {
     this.setState({ showModal: false })
   }
 
+  // NOTE: Add and edit both can use the same composeDisk() since the add and edit
+  //       sagas will use what they need from the composed disk.  The sagas ultimately
+  //       control the REST calls and data.
   composeDisk () {
     const { vm, disk } = this.props
-
     const vmDiskInSameStorageDomain =
       vm.get('disks') &&
       vm.get('disks').find(disk => disk.get('storageDomainId') === this.state.values.storageDomain)
@@ -161,47 +173,52 @@ class DiskImageEditor extends Component {
       ? disk.get('provisionedSize') + this.state.values.size * 1024 ** 3
       : this.state.values.size * 1024 ** 3
 
+    const bootable = this.state.values.bootable
+
     const newDisk = {
       ...DISK_DEFAULTS,
       attachmentId: disk && disk.get('attachmentId'),
+      storageDomainId: this.state.values.storageDomain,
 
       iface,
-
       id: this.state.id,
       name: this.state.values.alias,
       provisionedSize,
-      storageDomainId: this.state.values.storageDomain,
-      format: this.state.values.format,
-      sparse: this.state.values.format === 'cow',
+      bootable,
+
+      // the __diskType__ field maps to format + sparse REST Disk attributes
+      format: 'raw', // Match webadmin behavior, disks are created as 'raw'
+      sparse: this.state.values.diskType === 'thin',
     }
 
     if (disk && disk.get('type') !== 'image') {
       newDisk.type = disk.get('type')
       newDisk.provisionedSize = undefined
     }
-
     return newDisk
   }
 
   validateField (field = '') {
-    return () => {
-      const errors = {}
-      let isErrors = false
-      switch (field) {
-        case 'alias':
-          if (!isDiskNameValid(this.state.values.alias)) {
-            errors['alias'] = msg.pleaseEnterValidDiskName()
-            isErrors = true
-          }
-          break
-      }
-      this.setState((state) => ({ errors: { ...state.errors, ...errors } }))
-      return isErrors
+    const errors = this.state.errors
+    let isErrorOnField = false
+
+    switch (field) {
+      case 'alias':
+        if (!isDiskNameValid(this.state.values.alias)) {
+          errors['alias'] = msg.pleaseEnterValidDiskName()
+          isErrorOnField = true
+        } else {
+          delete errors['alias']
+        }
+        break
     }
+
+    this.setState((state) => ({ errors }))
+    return isErrorOnField
   }
 
   handleSave () {
-    if (this.validateField('alias')()) {
+    if (!this.isFormValid()) {
       return
     }
     if (!this.props.disk || this.changesMade) {
@@ -212,7 +229,11 @@ class DiskImageEditor extends Component {
   }
 
   changeAlias ({ target: { value } }) {
-    this.setState((state) => ({ values: { ...state.values, alias: value }, errors: { ...state.errors, 'alias': '' } }))
+    this.setState(
+      (state) => ({ values: { ...state.values, alias: value }, errors: { ...state.errors, 'alias': '' } }),
+      () => {
+        this.validateField('alias')
+      })
     this.changesMade = true
   }
 
@@ -223,30 +244,52 @@ class DiskImageEditor extends Component {
     }
   }
 
+  changeBootable (event) {
+    const target = event.target
+    const bootable = target.type === 'checkbox' ? target.checked : target.value
+    this.setState((state) => ({ values: { ...state.values, bootable } }))
+    this.changesMade = true
+  }
+
   changeStorageDomain (value) {
     this.setState((state) => ({ values: { ...state.values, storageDomain: value } }))
     this.changesMade = true
   }
 
-  changeFormat (value) {
-    this.setState((state) => ({ values: { ...state.values, format: value } }))
+  changeDiskType (value) {
+    this.setState((state) => ({ values: { ...state.values, diskType: value } }))
     this.changesMade = true
   }
 
   isFormValid () {
-    const isNotAllFieldFilled = Object.values(this.state.values).reduce((acc, value) => !value ? true : acc, false)
-    const isErrors = Object.values(this.state.errors).reduce((acc, value) => value ? true : acc, false)
-    return isNotAllFieldFilled || isErrors
+    const isErrors = Object.values(this.state.errors).reduce((acc, value) => (value !== undefined) ? true : acc, false)
+    if (isErrors) {
+      return false
+    }
+
+    // make sure that required fields have data
+    const { values } = this.state
+    return !!(this.props.disk
+      // edit mode needs: a change, an alias and a disk size
+      ? this.changesMade && !!values.alias // add size + bootable or leave like that
+      // create mode needs: name, size, storage domain, disk format
+      : values.alias && values.size > 0 && values.storageDomain && values.diskType
+    )
   }
 
   render () {
-    const { idPrefix, disk, trigger } = this.props
+    const { idPrefix, disk, trigger, vm } = this.props
 
     const createMode = !disk
     const isImage = disk && disk.get('type') === 'image'
     const isDirectLUN = disk && disk.get('type') === 'lun'
 
     const diskSize = disk && (disk.get('lunSize') ? disk.get('lunSize') : disk.get('provisionedSize'))
+    const vmIsDown = vm.get('status') === 'down'
+
+    const isThisDiskCurrentBootable = disk && disk.get('bootable')
+    const currentBootableDisk = vm.get('disks').find(disk => disk.get('bootable'))
+    const showBootableChangeAlert = currentBootableDisk && !isThisDiskCurrentBootable && this.state.values.bootable
 
     return <React.Fragment>
       { trigger({ onClick: this.open }) }
@@ -269,7 +312,7 @@ class DiskImageEditor extends Component {
             id={`${idPrefix}-modal-form`}
           >
             {/* Alias */}
-            <FormGroup controlId={`${idPrefix}-alias`} validationState={this.state.errors['alias'] && 'error'}>
+            <FormGroup controlId={`${idPrefix}-alias`} validationState={this.state.errors['alias'] ? 'error' : null}>
               <LabelCol sm={3}>
                 { msg.diskEditorAliasLabel() }
               </LabelCol>
@@ -278,7 +321,6 @@ class DiskImageEditor extends Component {
                   type='text'
                   defaultValue={this.state.values.alias}
                   onChange={this.changeAlias}
-                  onBlur={this.validateField('alias')}
                 />
                 {this.state.errors['alias'] && <HelpBlock>{this.state.errors['alias']}</HelpBlock>}
               </Col>
@@ -322,13 +364,22 @@ class DiskImageEditor extends Component {
                 { !createMode && msg.diskEditorResizeLabel() }
               </LabelCol>
               <Col sm={2}>
-                <OverlayTooltip id={`${idPrefix}-form-tooltip`} tooltip={msg.diskEditorResizeNote()} placement='right'>
+                { createMode &&
                   <FormControl
                     type='number'
                     value={this.state.values.size}
                     onChange={this.changeSize}
                   />
-                </OverlayTooltip>
+                }
+                { !createMode &&
+                  <OverlayTooltip id={`${idPrefix}-form-tooltip`} tooltip={msg.diskEditorResizeNote()} placement='right'>
+                    <FormControl
+                      type='number'
+                      value={this.state.values.size}
+                      onChange={this.changeSize}
+                    />
+                  </OverlayTooltip>
+                }
               </Col>
             </FormGroup>
             }
@@ -372,16 +423,16 @@ class DiskImageEditor extends Component {
               </Col>
             </FormGroup>
 
-            {/* Disk Format */}
+            {/* Disk Type (thin vs preallocated) */}
             <FormGroup controlId={`${idPrefix}-format`}>
               <LabelCol sm={3}>
-                { msg.diskEditorFormatLabel() }
+                { msg.diskEditorDiskTypeLabel() }
                 <FieldLevelHelp
                   inline
                   content={
                     createMode
-                      ? msg.diskEditorFormatCreateHelp()
-                      : msg.diskEditorFormatCantChangeHelp()
+                      ? msg.diskEditorDiskTypeCreateHelp()
+                      : msg.diskEditorDiskTypeCantChangeHelp()
                   }
                   buttonClass={style['editor-field-help']}
                 />
@@ -390,26 +441,60 @@ class DiskImageEditor extends Component {
                 { createMode &&
                   <SelectBox
                     id={`${idPrefix}-format`}
-                    items={DISK_FORMATS}
-                    selected={this.state.format}
-                    onChange={this.changeFormat}
+                    items={DISK_TYPES}
+                    selected={this.state.values.diskType}
+                    onChange={this.changeDiskType}
                   />
                 }
                 { !createMode && !isDirectLUN &&
                   <div id={`${idPrefix}-format`} className={style['editor-field-read-only']}>
-                    { this.state.values.format === 'raw' && msg.diskEditorFormatOptionRaw() }
-                    { this.state.values.format === 'cow' && msg.diskEditorFormatOptionCow() }
+                    { this.state.values.diskType === 'pre' && msg.diskEditorDiskTypeOptionPre() }
+                    { this.state.values.diskType === 'thin' && msg.diskEditorDiskTypeOptionThin() }
                   </div>
                 }
                 { isDirectLUN &&
                   <div id={`${idPrefix}-format`} className={style['editor-field-read-only']}>
-                    { msg.diskEditorFormatNotAvailable() }
+                    { msg.diskEditorDiskTypeNotAvailable() }
                   </div>
                 }
               </Col>
             </FormGroup>
-          </Form>
 
+            {/* Disk Bootable */}
+            <FormGroup controlId={`${idPrefix}-bootable`}>
+              <LabelCol sm={3}>
+                { msg.diskEditorBootableLabel() }
+                {!vmIsDown &&
+                  <FieldLevelHelp
+                    inline
+                    content={msg.bootableEditTooltip()}
+                    buttonClass={style['editor-field-help']}
+                  />
+                }
+              </LabelCol>
+              <Col sm={9}>
+                <Checkbox
+                  checked={this.state.values.bootable}
+                  onChange={this.changeBootable}
+                  id={`${idPrefix}-bootable`}
+                  disabled={!vmIsDown}
+                />
+              </Col>
+            </FormGroup>
+            { showBootableChangeAlert &&
+              <FormGroup controlId={`${idPrefix}-bootable`} className={style['editor-bootable-alert-container']}>
+                <Col sm={3} />
+                <Col sm={9}>
+                  <Alert
+                    className={style['editor-bootable-alert']}
+                    isInline
+                    variant='warning'
+                    title={msg.diskEditorBootableChangeMessage({ diskName: currentBootableDisk.get('name') })}
+                  />
+                </Col>
+              </FormGroup>
+            }
+          </Form>
         </Modal.Body>
         <Modal.Footer>
           <Button
@@ -424,7 +509,7 @@ class DiskImageEditor extends Component {
             id={`${idPrefix}-modal-ok`}
             bsStyle='primary'
             onClick={this.handleSave}
-            disabled={this.isFormValid()}
+            disabled={!this.isFormValid()}
           >
             { msg.ok() }
           </Button>

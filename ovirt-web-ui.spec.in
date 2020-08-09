@@ -48,6 +48,31 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Mon Jul 6 2020 Sharon Gratch <sgratchk@redhat.com> - 1.6.3-1
+ - create VM Wizard - fixed a bug so that nics and disks data resetting happens only when it is supposed to
+ - create VM Wizard - enable resetting of basic settings to baseline defaults when changing the provision source
+ - create VM Wizard - add a tooltip to the "T" badge for Templates disks and nics
+ - create VM Wizard - the Storage Domain menu field width, displayed on a new disk row, is fixed to be aligned
+ - the VM's filter is fixed to return only Pools entities that answer the query result
+ - enable the Shutdown button for a suspended VM
+ - fix a bug of displaying an error in UPDATE_VMS reducer in scheduled refresh done after a manual refresh
+ - fix a bug for enable maximizing of the Notifications drawer
+ - enable setting disk's of exisiting VMs as "Bootable"
+ - change VM/Pool fetch page size and optimize refresh scheduling for improving the loading performance
+ - increase parallel calls during login data fetch for improving the login loading performance
+ - update Dockerfile with yarn network timeout mitigations
+ - refactor Makefile to prevent unexpected symlinks
+ - translations update
+
+* Tue May 12 2020 Sharon Gratch <sgratchk@redhat.com> - 1.6.2-1
+ - fix a bug in which VM Portal fails to initialize if the environment contains an Export storage domain
+ - fix a bug in which opening a VM console of type SPICE or VNC is always failing
+ - fix VMs filter results to include all VMs with entered string exists anywhere inside the Vm name and not just the prefix
+ - change the snapshots rpm file names to contain the latest commit hash
+ - apply ovirt 4.4 branding changes to the error page as well
+ - yarn dependencies update
+ - translations update
+
 * Mon Apr 6 2020 Sharon Gratch <sgratchk@redhat.com> - 1.6.1-1
  - fixed saving NIC with empty VNIC Profile
  - make the vm poratl more responsive for browser resizing, set minimum card widths and fixed alignments.

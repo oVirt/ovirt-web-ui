@@ -5,8 +5,7 @@ import { connect } from 'react-redux'
 import { createDiskForVm, editDiskOnVm, removeDisk } from '_/actions'
 
 import { msg } from '_/intl'
-import { maskForElementId, suggestDiskName } from '_/components/utils'
-import { sortDisksForDisplay } from '_/components/VmDisks/utils'
+import { maskForElementId, suggestDiskName, sortDisksForDisplay } from '_/components/utils'
 
 import { Icon } from 'patternfly-react'
 import { Grid, Row, Col } from '_/components/Grid'

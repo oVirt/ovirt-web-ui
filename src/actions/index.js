@@ -7,7 +7,6 @@ import {
   GET_OPTION,
   GET_USB_FILTER,
   GET_USER_GROUPS,
-  GET_VM,
   SET_ADMINISTRATOR,
   SET_CPU_TOPOLOGY_OPTIONS,
   SET_CURRENT_PAGE,
@@ -20,6 +19,7 @@ import {
   SHOW_TOKEN_EXPIRED_MSG,
   START_SCHEDULER_FIXED_DELAY,
   STOP_SCHEDULER_FIXED_DELAY,
+  UPDATE_PAGING_DATA,
 } from '_/constants'
 
 export * from './error'
@@ -54,19 +54,6 @@ export function startSchedulerFixedDelay (delayInSeconds = AppConfiguration.sche
 
 export function stopSchedulerFixedDelay () {
   return { type: STOP_SCHEDULER_FIXED_DELAY }
-}
-
-/**
- * Not creator of an action. Returned object can't be dispatched to the store.
- */
-export function getSingleVm ({ vmId, shallowFetch = false }) {
-  return {
-    type: GET_VM,
-    payload: {
-      vmId,
-      shallowFetch,
-    },
-  }
 }
 
 export function setUserFilterPermission (filter) {
@@ -133,12 +120,18 @@ export function showTokenExpiredMessage () {
   return { type: SHOW_TOKEN_EXPIRED_MSG }
 }
 
-export function getByPage ({ page, shallowFetch = true }) {
+export function getByPage () {
+  return { type: GET_BY_PAGE }
+}
+
+export function updatePagingData ({ vmsPage, vmsExpectMorePages, poolsPage, poolsExpectMorePages }) {
   return {
-    type: GET_BY_PAGE,
+    type: UPDATE_PAGING_DATA,
     payload: {
-      shallowFetch,
-      page,
+      vmsPage,
+      vmsExpectMorePages,
+      poolsPage,
+      poolsExpectMorePages,
     },
   }
 }

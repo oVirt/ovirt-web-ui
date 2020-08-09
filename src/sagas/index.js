@@ -2,8 +2,6 @@ import {
   all,
   call,
   put,
-  race,
-  take,
   takeEvery,
   takeLatest,
   throttle,
@@ -12,49 +10,39 @@ import {
 import { push } from 'connected-react-router'
 
 import Api, { Transforms } from '_/ovirtapi'
-import AppConfiguration from '_/config'
 import { saveToLocalStorage } from '_/storage'
 
+import sagasRefresh from './background-refresh'
 import sagasDisks from './disks'
 import sagasLogin from './login'
 import sagasOptionsDialog from '_/components/OptionsDialog/sagas'
 import sagasRoles from './roles'
-import sagasStorageDomains, { fetchIsoFiles } from './storageDomains'
+import sagasStorageDomains from './storageDomains'
 import sagasVmChanges from './vmChanges'
 import sagasVmSnapshots from '_/components/VmDetails/cards/SnapshotsCard/sagas'
 
 import {
-  setChanged,
+  updatePagingData,
   setVmDisks,
   updateVms,
   removeVms,
   vmActionInProgress,
-  removeMissingVms,
 
   getSingleVm,
-  selectVmDetail as actionSelectVmDetail,
   setVmSnapshots,
 
   setUserMessages,
   dismissUserMessage,
 
   getSinglePool,
-  removeMissingPools,
   removePools,
   updatePools,
   updateVmsPoolsCount,
   poolActionInProgress,
 
-  refresh,
-  getVmsByCount,
-  getPoolsByCount,
-  getIsoFiles,
-  getConsoleOptions as actionGetConsoleOptions,
   setVmNics,
   removeActiveRequest,
-  stopSchedulerFixedDelay,
   getVmCdRom,
-  setCurrentPage,
   setVmsFilters,
 } from '_/actions'
 
@@ -80,7 +68,6 @@ import {
 
 import {
   ADD_VM_NIC,
-  CHANGE_PAGE,
   OPEN_CONSOLE_MODAL,
   CHECK_TOKEN_EXPIRED,
   CLEAR_USER_MSGS,
@@ -92,25 +79,14 @@ import {
   GET_ALL_EVENTS,
   GET_BY_PAGE,
   GET_CONSOLE_OPTIONS,
-  GET_POOLS_BY_COUNT,
-  GET_POOLS_BY_PAGE,
+  GET_POOLS,
   GET_RDP_VM,
-  GET_VMS_BY_COUNT,
-  GET_VMS_BY_PAGE,
-  REFRESH_DATA,
+  GET_VMS,
   SAVE_CONSOLE_OPTIONS,
   SAVE_FILTERS,
   SELECT_POOL_DETAIL,
   SELECT_VM_DETAIL,
   NAVIGATE_TO_VM_DETAILS,
-  START_SCHEDULER_FIXED_DELAY,
-  STOP_SCHEDULER_FIXED_DELAY,
-
-  CONSOLE_PAGE_TYPE,
-  DETAIL_PAGE_TYPE,
-  DIALOG_PAGE_TYPE,
-  MAIN_PAGE_TYPE,
-  NO_REFRESH_TYPE,
 } from '_/constants'
 
 import {
@@ -119,139 +95,25 @@ import {
   canUserEditVm,
   canUserEditVmStorage,
   canUserManipulateSnapshots,
-  isNumber,
 } from '_/utils'
+import AppConfiguration from '_/config'
 
-const vmFetchAdditionalList =
-  [
-    'cdroms',
-    'sessions',
-    'disk_attachments.disk',
-    'graphics_consoles',
-    'nics',
-    'snapshots',
-    'statistics',
-    'permissions',
-  ]
+const VM_FETCH_ADDITIONAL_DEEP = [
+  'cdroms',
+  'disk_attachments.disk',
+  'graphics_consoles',
+  'nics',
+  'permissions',
+  'sessions',
+  'snapshots',
+  'statistics',
+]
+
+const VM_FETCH_ADDITIONAL_SHALLOW = [
+  'graphics_consoles',
+]
 
 export const EVERYONE_GROUP_ID = 'eee00000-0000-0000-0000-123456789eee'
-
-function* fetchByPage (action) {
-  yield put(setChanged({ value: false }))
-  yield fetchVmsByPage(action)
-  yield fetchPoolsByPage(action)
-}
-
-function* getIdsByType (type) {
-  const ids = yield select(state =>
-    state.vms
-      .get(type)
-      .reduce((entityIds, entity, entityId) => {
-        entityIds.push(entityId)
-        return entityIds
-      }, [])
-  )
-  return ids
-}
-
-function* refreshMainPage ({ shallowFetch, page }) {
-  shallowFetch = !!shallowFetch
-
-  // refresh VMs and remove any that haven't been refreshed
-  const fetchedVmIds = yield fetchVmsByCount(getVmsByCount({
-    count: page * AppConfiguration.pageLimit,
-    shallowFetch,
-  }))
-
-  const vmsIds = yield getIdsByType('vms')
-  const fetchedDirectlyVmIds =
-    (yield all(
-      vmsIds
-        .filter(vmId => !fetchedVmIds.includes(vmId))
-        .map(vmId => call(fetchSingleVm, getSingleVm({ vmId, shallowFetch })))
-    ))
-      .reduce((vmIds, vm) => { if (vm) vmIds.push(vm.id); return vmIds }, [])
-
-  yield put(removeMissingVms({ vmIdsToPreserve: [ ...fetchedVmIds, ...fetchedDirectlyVmIds ] }))
-
-  // refresh Pools and remove any that haven't been refreshed
-  const fetchedPoolIds = yield fetchPoolsByCount(getPoolsByCount({
-    count: page * AppConfiguration.pageLimit,
-  }))
-  const filteredPoolIds = yield getIdsByType('pools')
-  const fetchedDirectlyPoolIds =
-    (yield all(
-      filteredPoolIds
-        .filter(poolId => !fetchedPoolIds.includes(poolId))
-        .map(poolId => call(fetchSinglePool, getSinglePool({ poolId })))
-    ))
-      .reduce((poolIds, pool) => { if (pool) poolIds.push(pool.id); return poolIds }, [])
-
-  yield put(removeMissingPools({ poolIdsToPreserve: [ ...fetchedPoolIds, ...fetchedDirectlyPoolIds ] }))
-
-  // update counts
-  yield put(updateVmsPoolsCount())
-}
-
-function* refreshDetailPage ({ id, onNavigation, onSchedule }) {
-  yield selectVmDetail(actionSelectVmDetail({ vmId: id }))
-  yield getConsoleOptions(actionGetConsoleOptions({ vmId: id }))
-
-  // Load ISO images on manual refresh click only
-  if (!onNavigation && !onSchedule) {
-    yield fetchIsoFiles(getIsoFiles())
-  }
-}
-
-function* refreshDialogPage ({ id, onNavigation, onSchedule }) {
-  if (id) {
-    yield selectVmDetail(actionSelectVmDetail({ vmId: id }))
-  }
-
-  // Load ISO images on manual refresh click only
-  if (!onNavigation && !onSchedule) {
-    yield fetchIsoFiles(getIsoFiles())
-  }
-}
-
-function* refreshConsolePage ({ id }) {
-  if (id) {
-    yield selectVmDetail(actionSelectVmDetail({ vmId: id }))
-  }
-}
-
-const pagesRefreshers = {
-  [MAIN_PAGE_TYPE]: refreshMainPage,
-  [DETAIL_PAGE_TYPE]: refreshDetailPage,
-  [DIALOG_PAGE_TYPE]: refreshDialogPage,
-  [CONSOLE_PAGE_TYPE]: refreshConsolePage,
-}
-
-function* refreshData (action) {
-  const currentPage = yield select(state => state.config.get('currentPage'))
-  const refreshType =
-    currentPage.type === NO_REFRESH_TYPE ? null
-      : currentPage.type === undefined ? MAIN_PAGE_TYPE
-        : currentPage.type
-
-  console.info('refreshData() 🡒 payload:', action.payload, 'currentPage:', currentPage, 'refreshType:', refreshType)
-  if (refreshType) {
-    yield pagesRefreshers[refreshType](Object.assign({ id: currentPage.id }, action.payload))
-  }
-  console.info('refreshData() 🡒 finished')
-}
-
-/**
- * Change the current page type (based on `routes.js`) at the time of navigation to the page.
- */
-function* changePage (action) {
-  yield put(setCurrentPage(action.payload))
-  yield refreshData(refresh({
-    onNavigation: true,
-    shallowFetch: true,
-    page: yield select(state => state.vms.get('page')),
-  }))
-}
 
 export function* transformAndPermitVm (vm) {
   const internalVm = Transforms.VM.toInternal({ vm })
@@ -265,18 +127,76 @@ export function* transformAndPermitVm (vm) {
   return internalVm
 }
 
+function* putPermissionsInDisk (disk) {
+  disk.permits = yield fetchPermits({ entityType: PermissionsType.DISK_TYPE, id: disk.id })
+  disk.canUserEditDisk = canUserEditDisk(disk.permits)
+  return disk
+}
+
 /**
- * Fetch VMs with additional nested data requested
+ * Fetch VMs and Pools in a paged manner, and track if any more pages are (expected to
+ * be) available,
  */
-function* fetchVmsByPage (action) {
-  const { shallowFetch, page } = action.payload
+export function* fetchByPage () {
+  const [
+    vmsPage,
+    vmsExpectMorePages,
+    poolsPage,
+    poolsExpectMorePages,
+  ] = yield select(({ vms }) => [
+    vms.get('vmsPage'), !!vms.get('vmsExpectMorePages'),
+    vms.get('poolsPage'), !!vms.get('poolsExpectMorePages'),
+  ])
 
-  action.payload.additional = shallowFetch ? ['graphics_consoles'] : vmFetchAdditionalList
+  function* currentVmsIds ({ payload: { count, page } }) {
+    const start = count * page
+    const end = start + count
+    return Array.from(yield select(state => state.vms.get('vms').keys())).slice(start, end)
+  }
 
-  const vmsOnPage = yield callExternalAction('getVmsByPage', Api.getVmsByPage, action)
-  if (vmsOnPage && vmsOnPage['vm']) {
-    const internalVms = yield all(vmsOnPage.vm.map(transformAndPermitVm))
-    yield put(updateVms({ vms: internalVms, copySubResources: shallowFetch, page }))
+  function* currentPoolsIds ({ payload: { count, page } }) {
+    const start = count * page
+    const end = start + count
+    return Array.from(yield select(state => state.vms.get('pools').keys())).slice(start, end)
+  }
+
+  //
+  // If more pages are expected, fetch the next page and grab the ids fetched
+  // If no more pages are expected, grab the current page of ids from the redux store
+  //
+  const count = AppConfiguration.pageLimit
+  const [ vms, pools ] = yield all([
+    call(vmsExpectMorePages ? fetchVms : currentVmsIds, { payload: { count, page: vmsPage + 1 } }),
+    call(poolsExpectMorePages ? fetchPools : currentPoolsIds, { payload: { count, page: poolsPage + 1 } }),
+  ])
+
+  //
+  // Since the REST API doesn't give a record count in paginated responses, we have
+  // to guess if there is more to fetch.  Assume there is more to fetch if the page
+  // of ids fetched/accessed is full.
+  //
+  yield put(updatePagingData({
+    vmsPage: vmsExpectMorePages ? vmsPage + 1 : undefined,
+    vmsExpectMorePages: vms.length >= count,
+    poolsPage: poolsExpectMorePages ? poolsPage + 1 : undefined,
+    poolsExpectMorePages: pools.length >= count,
+  }))
+}
+
+export function* fetchVms ({ payload: { count, page, shallowFetch = true } }) {
+  const fetchedVmIds = []
+
+  const additional = shallowFetch ? VM_FETCH_ADDITIONAL_SHALLOW : VM_FETCH_ADDITIONAL_DEEP
+  const apiVms = yield callExternalAction('getVms', Api.getVms, { payload: { count, page, additional } })
+  if (apiVms && apiVms['vm']) {
+    const internalVms = []
+    for (const apiVm of apiVms.vm) {
+      const internalVm = yield transformAndPermitVm(apiVm)
+      fetchedVmIds.push(internalVm.id)
+      internalVms.push(internalVm)
+    }
+
+    yield put(updateVms({ vms: internalVms, copySubResources: shallowFetch }))
     yield fetchUnknownIcons({ vms: internalVms })
 
     // NOTE: No need to fetch the current=true cdrom info at this point. The cdrom info
@@ -287,48 +207,13 @@ function* fetchVmsByPage (action) {
   }
 
   yield put(updateVmsPoolsCount())
-}
-
-/**
- * Fetch a given number of VMs (**action.payload.count**).
- */
-function* fetchVmsByCount (action) {
-  const { shallowFetch } = action.payload
-  const fetchedVmIds = []
-
-  action.payload.additional = shallowFetch ? [ 'graphics_consoles' ] : vmFetchAdditionalList
-
-  const allVms = yield callExternalAction('getVmsByCount', Api.getVmsByCount, action)
-  if (allVms && allVms['vm']) {
-    const internalVms = []
-    for (const vm of allVms.vm) {
-      const internalVm = yield transformAndPermitVm(vm)
-      fetchedVmIds.push(internalVm.id)
-      internalVms.push(internalVm)
-    }
-    console.log('internalVms:', internalVms)
-
-    yield put(updateVms({ vms: internalVms, copySubResources: shallowFetch }))
-    yield fetchUnknownIcons({ vms: internalVms })
-
-    // NOTE: No need to fetch the current=true cdrom info at this point. See `fetchVmsByPage`
-    //       or `fetchSingleVm` for more details.
-  }
-
-  yield put(updateVmsPoolsCount())
   return fetchedVmIds
-}
-
-function* putPermissionsInDisk (disk) {
-  disk.permits = yield fetchPermits({ entityType: PermissionsType.DISK_TYPE, id: disk.id })
-  disk.canUserEditDisk = canUserEditDisk(disk.permits)
-  return disk
 }
 
 export function* fetchSingleVm (action) {
   const { vmId, shallowFetch } = action.payload
 
-  action.payload.additional = shallowFetch ? [ 'graphics_consoles' ] : vmFetchAdditionalList
+  action.payload.additional = shallowFetch ? VM_FETCH_ADDITIONAL_SHALLOW : VM_FETCH_ADDITIONAL_DEEP
 
   const vm = yield callExternalAction('getVm', Api.getVm, action, true)
   let internalVm = null
@@ -370,12 +255,12 @@ export function* fetchSingleVm (action) {
   return internalVm
 }
 
-function* fetchPoolsByCount (action) {
+export function* fetchPools (action) {
   const fetchedPoolIds = []
 
-  const allPools = yield callExternalAction('getPoolsByCount', Api.getPoolsByCount, action)
-  if (allPools && allPools['vm_pool']) {
-    const internalPools = allPools.vm_pool.map(pool => Api.poolToInternal({ pool }))
+  const apiPools = yield callExternalAction('getPools', Api.getPools, action)
+  if (apiPools && apiPools['vm_pool']) {
+    const internalPools = apiPools.vm_pool.map(pool => Api.poolToInternal({ pool }))
     internalPools.forEach(pool => fetchedPoolIds.push(pool.id))
 
     yield put(updatePools({ pools: internalPools }))
@@ -385,18 +270,7 @@ function* fetchPoolsByCount (action) {
   return fetchedPoolIds
 }
 
-function* fetchPoolsByPage (action) {
-  const allPools = yield callExternalAction('getPoolsByPage', Api.getPoolsByPage, action)
-
-  if (allPools && allPools['vm_pool']) {
-    const internalPools = allPools.vm_pool.map(pool => Api.poolToInternal({ pool }))
-
-    yield put(updatePools({ pools: internalPools }))
-    yield put(updateVmsPoolsCount())
-  }
-}
-
-function* fetchSinglePool (action) {
+export function* fetchSinglePool (action) {
   const { poolId } = action.payload
 
   const pool = yield callExternalAction('getPool', Api.getPool, action, true)
@@ -609,8 +483,7 @@ function* saveFilters (actions) {
 }
 
 function* fetchVmNics ({ vmId }) {
-  const nics = yield callExternalAction('getVmsNic', Api.getVmsNic, { type: 'GET_VM_NICS', payload: { vmId } })
-
+  const nics = yield callExternalAction('getVmNic', Api.getVmNic, { type: 'GET_VM_NICS', payload: { vmId } })
   if (nics && nics['nic']) {
     const nicsInternal = nics.nic.map(nic => Api.nicToInternal({ nic }))
     return nicsInternal
@@ -664,59 +537,6 @@ function* delayedRemoveActiveRequest ({ payload: requestId }) {
   yield put(removeActiveRequest(requestId))
 }
 
-function* startSchedulerWithFixedDelay (action) {
-  // if a scheduler is already running, stop it
-  yield put(stopSchedulerFixedDelay())
-
-  // run a new scheduler
-  yield schedulerWithFixedDelay(action.payload.delayInSeconds)
-}
-
-let _SchedulerCount = 0
-
-function* schedulerWithFixedDelay (delayInSeconds = AppConfiguration.schedulerFixedDelayInSeconds) {
-  if (!isNumber(delayInSeconds) || delayInSeconds <= 0) {
-    return
-  }
-
-  const myId = _SchedulerCount++
-  console.log(`⏰ schedulerWithFixedDelay[${myId}] starting fixed delay scheduler`)
-
-  let enabled = true
-  while (enabled) {
-    console.log(`⏰ schedulerWithFixedDelay[${myId}] stoppable delay for: ${delayInSeconds}`)
-    const { stopped } = yield race({
-      stopped: take(STOP_SCHEDULER_FIXED_DELAY),
-      fixedDelay: call(delay, (delayInSeconds * 1000)),
-    })
-
-    const isTokenExpired = yield select(state => state.config.get('isTokenExpired'))
-    if (isTokenExpired) {
-      enabled = false
-      console.log(`⏰ schedulerWithFixedDelay[${myId}] scheduler has been stopped due token expiration`)
-      continue
-    }
-
-    if (stopped) {
-      enabled = false
-      console.log(`⏰ schedulerWithFixedDelay[${myId}] scheduler has been stopped`)
-    } else {
-      console.log(`⏰ schedulerWithFixedDelay[${myId}] running after delay of: ${delayInSeconds}`)
-
-      const oVirtVersion = yield select(state => state.config.get('oVirtApiVersion'))
-      if (oVirtVersion.get('passed')) {
-        yield refreshData(refresh({
-          onSchedule: true,
-          shallowFetch: true,
-          page: yield select(state => state.vms.get('page')),
-        }))
-      } else {
-        console.log(`⏰ schedulerWithFixedDelay[${myId}] event skipped since oVirt API version does not match`)
-      }
-    }
-  }
-}
-
 function* navigateToVmDetails ({ payload: { vmId } }) {
   yield put(push(`/vm/${vmId}`))
 }
@@ -724,19 +544,14 @@ function* navigateToVmDetails ({ payload: { vmId } }) {
 export function* rootSaga () {
   yield all([
     ...sagasLogin,
+    ...sagasRefresh,
+
     takeLatest(CHECK_TOKEN_EXPIRED, doCheckTokenExpired),
     takeEvery(DELAYED_REMOVE_ACTIVE_REQUEST, delayedRemoveActiveRequest),
 
-    takeEvery(START_SCHEDULER_FIXED_DELAY, startSchedulerWithFixedDelay),
-    // STOP_SCHEDULER_FIXED_DELAY is taken by `schedulerWithFixedDelay()`
-    throttle(1000, REFRESH_DATA, refreshData),
-    takeLatest(CHANGE_PAGE, changePage),
-
     throttle(100, GET_BY_PAGE, fetchByPage),
-    throttle(100, GET_VMS_BY_COUNT, fetchVmsByCount),
-    throttle(100, GET_VMS_BY_PAGE, fetchVmsByPage),
-    throttle(100, GET_POOLS_BY_COUNT, fetchPoolsByCount),
-    throttle(100, GET_POOLS_BY_PAGE, fetchPoolsByPage),
+    throttle(100, GET_VMS, fetchVms),
+    throttle(100, GET_POOLS, fetchPools),
 
     takeLatest(GET_ALL_EVENTS, fetchAllEvents),
     takeEvery(DISMISS_EVENT, dismissEvent),

@@ -40,9 +40,6 @@ OvirtApi = {
     }
     return Promise.reject('')
   },
-  getVmsByCount ({ count }) {
-    return Promise.resolve(vms.slice(0, count))
-  },
   shutdown ({ vmId, force }) {
     OvirtApi._assertLogin({ methodName: 'shutdown' })
     const action = '<action />'

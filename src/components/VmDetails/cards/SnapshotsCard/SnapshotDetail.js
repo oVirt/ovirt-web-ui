@@ -14,10 +14,9 @@ import style from './style.css'
 
 import { msg } from '_/intl'
 
-import Selectors from '../../../../selectors'
+import Selectors from '_/selectors'
 import { templateNameRenderer, getFormatedDateTime, userFormatOfBytes, localeCompare } from '_/helpers'
-import { getOsHumanName } from '../../../utils'
-import { sortDisksForDisplay } from '../../../VmDisks/utils'
+import { getOsHumanName, sortDisksForDisplay } from '_/components/utils'
 
 import RestoreConfirmationModal from './RestoreConfirmationModal'
 

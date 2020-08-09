@@ -1,4 +1,4 @@
-import { takeEvery, put } from 'redux-saga/effects'
+import { takeEvery, put, select } from 'redux-saga/effects'
 
 import { CREATE_DISK_FOR_VM, REMOVE_DISK, EDIT_VM_DISK } from '../constants'
 import Api from '../ovirtapi'
@@ -21,8 +21,16 @@ export function* createDiskForVm (action) {
   yield put(setNewDiskDialogProgressIndicator(true))
   const vmId = action.payload.vmId
 
+  let originalBootableDisk
+  if (action.payload.disk.bootable) {
+    originalBootableDisk = yield clearBootableFlagOnVm(vmId)
+  }
+
   const result = yield callExternalAction('addDiskAttachment', Api.addDiskAttachment, action)
   if (result.error) {
+    if (originalBootableDisk) {
+      yield updateDiskAttachmentBootable(vmId, originalBootableDisk, true)
+    }
     const errorText = extractErrorText(result.error)
     yield put(setNewDiskDialogErrorText(errorText))
   } else {
@@ -43,12 +51,7 @@ function* removeDisk (action) {
   }
 
   yield put(addDiskRemovalPendingTask(diskId))
-  const diskRemoved = yield waitForDiskAttachment(
-    vmToRefreshId,
-    diskId,
-    attachment => attachment.error && attachment.error.status === 404,
-    true
-  )
+  const diskRemoved = yield waitForDiskToBeRemoved(vmToRefreshId, diskId)
   yield put(removeDiskRemovalPendingTask(diskId))
 
   if (diskRemoved && vmToRefreshId) {
@@ -58,14 +61,16 @@ function* removeDisk (action) {
 
 function* editDiskOnVm (action) {
   const { disk, vmId } = action.payload
-
-  // only allow editing name and provisionedSize
+  // only allow editing name, provisionedSize and bootable
   const editableFieldsDisk = {
     attachmentId: disk.attachmentId,
     id: disk.id,
     name: disk.name,
     provisionedSize: disk.provisionedSize, // only for type === 'image'
+    bootable: disk.bootable,
   }
+
+  yield clearBootableFlagOnVm(vmId, disk)
 
   action.payload.disk = editableFieldsDisk
   const result = yield callExternalAction('updateDiskAttachment', Api.updateDiskAttachment, action)
@@ -77,6 +82,54 @@ function* editDiskOnVm (action) {
   yield fetchDisks({ vms: [ { id: vmId } ] })
 }
 
+function* clearBootableFlagOnVm (vmId, currentDisk) {
+  const vmDisks = yield select(state => state.vms.getIn([ 'vms', vmId, 'disks' ]))
+  const bootableDisk = vmDisks.find(disk => disk.get('bootable'))
+
+  if (bootableDisk && (!currentDisk || bootableDisk.get('id') !== currentDisk.id)) {
+    yield updateDiskAttachmentBootable(vmId, bootableDisk.get('id'), false)
+    return bootableDisk.get('id')
+  }
+}
+
+/**
+ * Update the given VM's disk attachment bootable flag and wait for the value to be
+ * changed (async only operation + poll until desired result = simulated sync operation)
+ */
+function* updateDiskAttachmentBootable (vmId, diskAttachmentId, isBootable) {
+  const result = yield callExternalAction('updateDiskAttachment', Api.updateDiskAttachment, {
+    payload: {
+      disk: { attachmentId: diskAttachmentId, bootable: isBootable },
+      vmId,
+      attachmentOnly: true,
+    },
+  })
+
+  if (result.error) {
+    console.error('Problem removing the bootable flag :shrug:', result.error)
+  } else {
+    yield waitForDiskToMatchBootable(vmId, diskAttachmentId, isBootable)
+  }
+}
+
+function* waitForDiskToBeRemoved (vmId, attachmentId) {
+  return yield waitForDiskAttachment(
+    vmId,
+    attachmentId,
+    attachment => attachment.error && attachment.error.status === 404,
+    true
+  )
+}
+
+function* waitForDiskToMatchBootable (vmId, attachmentId, isBootable) {
+  return yield waitForDiskAttachment(
+    vmId,
+    attachmentId,
+    attachment => attachment.bootable === (isBootable ? 'true' : 'false'),
+    true
+  )
+}
+
 function* waitForDiskToBeUnlocked (vmId, attachmentId) {
   return yield waitForDiskAttachment(
     vmId,
@@ -85,7 +138,7 @@ function* waitForDiskToBeUnlocked (vmId, attachmentId) {
   )
 }
 
-// TODO: drop polling in favor of events (see https://github.com/oVirt/ovirt-web-ui/pull/390)
+// NOTE: test() is given the untransformed API version of the attachment
 function* waitForDiskAttachment (vmId, attachmentId, test, canBeMissing = false) {
   let metTest = false
 

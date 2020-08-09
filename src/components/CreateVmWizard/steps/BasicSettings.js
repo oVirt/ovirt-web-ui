@@ -208,6 +208,11 @@ class BasicSettings extends React.Component {
         changes.provisionSource = value
         changes.isoImage = undefined
         changes.templateId = undefined
+        changes.operatingSystemId = this.props.defaultValues.operatingSystemId
+        changes.memory = this.props.defaultValues.memory
+        changes.cpus = this.props.defaultValues.cpus
+        changes.optimizedFor = this.props.defaultValues.optimizedFor
+        changes.cloudInitEnabled = this.props.defaultValues.initEnabled
         break
 
       case 'templateId':
@@ -507,6 +512,7 @@ class BasicSettings extends React.Component {
 BasicSettings.propTypes = {
   id: PropTypes.string,
   data: PropTypes.shape(BASIC_DATA_SHAPE),
+  defaultValues: PropTypes.shape(BASIC_DATA_SHAPE),
 
   dataCenters: PropTypes.object.isRequired,
   clusters: PropTypes.object.isRequired,

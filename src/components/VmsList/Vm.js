@@ -1,20 +1,17 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
+
+import { startVm } from '_/actions'
+import { enumMsg } from '_/intl'
+import { getOsHumanName, getVmIcon } from '_/components/utils'
+
 import BaseCard from './BaseCard'
-
-import sharedStyle from '../sharedStyle.css'
-
 import VmActions from '../VmActions'
 import VmStatusIcon from '../VmStatusIcon'
 
-import { startVm } from '_/actions'
-
-import { getOsHumanName, getVmIcon } from '../utils'
-import { enumMsg } from '_/intl'
-
+import sharedStyle from '../sharedStyle.css'
 import style from './style.css'
 
 /**
@@ -22,16 +19,14 @@ import style from './style.css'
  */
 const Vm = ({ vm, icons, os, vms, onStart }) => {
   const idPrefix = `vm-${vm.get('name')}`
-  const state = vm.get('status')
-  const stateValue = enumMsg('VmStatus', state)
   const osName = getOsHumanName(vm.getIn(['os', 'type']))
   const icon = getVmIcon(icons, os, vm)
+  const status = vm.get('status')
+  const statusValue = enumMsg('VmStatus', status)
+
   const poolId = vm.getIn(['pool', 'id'])
   const isPoolVm = !!poolId
-  let pool = null
-  if (isPoolVm) {
-    pool = vms.getIn(['pools', poolId])
-  }
+  const pool = isPoolVm ? vms.getIn(['pools', poolId]) : null
 
   return (
     <BaseCard idPrefix={idPrefix}>
@@ -42,7 +37,7 @@ const Vm = ({ vm, icons, os, vms, onStart }) => {
       <BaseCard.Icon url={`/vm/${vm.get('id')}`} icon={icon} />
       <BaseCard.Title url={`/vm/${vm.get('id')}`} name={vm.get('name')} />
       <BaseCard.Status>
-        <VmStatusIcon state={state} />&nbsp;{stateValue}
+        <VmStatusIcon status={status} />&nbsp;{statusValue}
       </BaseCard.Status>
       <VmActions isOnCard vm={vm} pool={pool} onStart={onStart} idPrefix={idPrefix} />
     </BaseCard>

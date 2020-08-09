@@ -30,18 +30,6 @@
   cursor: pointer;
 }
 
-/* For DetailContainer (in VmDetail and VmDialog) */
-.move-left-detail {
-  height: 100%;
-  display: block;
-  width: 95%;
-  opacity: 1;
-}
-
-.detail-z-index {
-  z-index: 1050;
-}
-
 /* For Toast Notifications */
 .toast-margin-top {
     margin-top: 0;

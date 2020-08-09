@@ -10,7 +10,6 @@ import {
   loginSuccessful,
   loginFailed,
   appConfigured,
-  startSchedulerFixedDelay,
 
   failedExternalAction,
   setOvirtApiVersion,
@@ -93,9 +92,12 @@ function* login (action) {
 
   // API checks passed.  Load user data and the initial app data
   console.group('Login Data Fetch')
+
   console.group('user checks and server config')
-  yield checkUserFilterPermissions()
-  yield fetchServerConfiguredValues()
+  yield all([
+    call(checkUserFilterPermissions),
+    call(fetchServerConfiguredValues),
+  ])
   console.log('\u2714 login checks and server config fetches are done:',
     yield select(state => pick(
       state.config.toJS(),
@@ -106,8 +108,11 @@ function* login (action) {
   yield initialLoad()
   console.groupEnd('Login Data Fetch')
 
+  // The first page of VMs and Pools are loaded by the background-refresh sagas when the
+  // `react-router-config` loads the route '/'.  Loading of additional pages is handled by
+  // user interaction (scrolling) on the `Vms` card view component.
+
   yield put(appConfigured())
-  yield put(startSchedulerFixedDelay())
   yield autoConnectCheck()
   yield put(getAllEvents())
 }
@@ -220,8 +225,7 @@ function* initialLoad () {
   console.log('\u2714 data loads that require storage domains are complete')
   console.groupEnd('needs storage domains')
 
-  // The `Vms` card view component will take care of loading pages of VMs and Pools as needed.
-  // Loading VMs and Pools here is not necessary and will cause issues with `Vms`'s loading.
+  // Vms and Pools are loaded as needed / accessed
 }
 
 function* autoConnectCheck () {
