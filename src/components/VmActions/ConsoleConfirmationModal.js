@@ -22,6 +22,7 @@ class ConsoleConfirmationModal extends React.Component {
     this.modalId = generateUnique(`${props.vm.get('id')} ${props.consoleId}`)
     if (props.show) {
       props.onOpen({
+        usbAutoshare: props.config.get('usbAutoshare'),
         usbFilter: props.config.get('usbFilter'),
         userId: props.config.getIn(['user', 'id']),
         modalId: this.modalId,
@@ -33,6 +34,7 @@ class ConsoleConfirmationModal extends React.Component {
     if (prevProps.show !== this.props.show && this.props.show) {
       this.modalId = generateUnique(`${this.props.vm.get('id')} ${this.props.consoleId}`)
       this.props.onOpen({
+        usbAutoshare: this.props.config.get('usbAutoshare'),
         usbFilter: this.props.config.get('usbFilter'),
         userId: this.props.config.getIn(['user', 'id']),
         modalId: this.modalId,
@@ -51,6 +53,7 @@ class ConsoleConfirmationModal extends React.Component {
 
   onConsoleDownload (skipSSO = false) {
     this.props.onDownloadConsole({
+      usbAutoshare: this.props.config.get('usbAutoshare'),
       usbFilter: this.props.config.get('usbFilter'),
       skipSSO,
       userId: this.props.config.getIn(['user', 'id']),
@@ -112,9 +115,10 @@ export default connect(
     consoles: state.consoles,
   }),
   (dispatch, { vm, consoleId, isNoVNC, isConsolePage }) => ({
-    onOpen: ({ usbFilter, userId, modalId }) => {
+    onOpen: ({ usbAutoshare, usbFilter, userId, modalId }) => {
       dispatch(openConsoleModal({
         vmId: vm.get('id'),
+        usbAutoshare,
         usbFilter,
         userId,
         consoleId,
@@ -127,9 +131,10 @@ export default connect(
     onConsoleSessionConfirmaClose: ({ modalId }) => {
       dispatch(closeConsoleModal({ modalId }))
     },
-    onDownloadConsole: ({ usbFilter, skipSSO, userId, modalId }) => {
+    onDownloadConsole: ({ usbAutoshare, usbFilter, skipSSO, userId, modalId }) => {
       dispatch(downloadConsole({
         vmId: vm.get('id'),
+        usbAutoshare,
         usbFilter,
         consoleId,
         hasGuestAgent: vm.get('ssoGuestAgent'),

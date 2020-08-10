@@ -10,6 +10,7 @@ import {
   SET_CPU_TOPOLOGY_OPTIONS,
   SET_DEFAULT_TIMEZONE,
   SET_OVIRT_API_VERSION,
+  SET_USB_AUTOSHARE,
   SET_USB_FILTER,
   SET_USER_FILTER_PERMISSION,
   SET_USER_GROUPS,
@@ -36,6 +37,7 @@ const initialState = Immutable.fromJS({
   isFilterChecked: false,
   administrator: false,
   userSessionTimeoutInterval: null,
+  usbAutoshare: null,
   usbFilter: null,
   userGroups: [],
   currentPage: {},
@@ -83,6 +85,9 @@ const config = actionReducer(initialState, {
   },
   [SHOW_TOKEN_EXPIRED_MSG] (state) {
     return state.set('isTokenExpired', true)
+  },
+  [SET_USB_AUTOSHARE] (state, { payload: { usbAutoshare } }) {
+    return state.set('usbAutoshare', usbAutoshare)
   },
   [SET_USB_FILTER] (state, { payload: { usbFilter } }) {
     return state.set('usbFilter', usbFilter)

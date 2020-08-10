@@ -5,12 +5,12 @@ import {
   CHECK_TOKEN_EXPIRED,
   GET_BY_PAGE,
   GET_OPTION,
-  GET_USB_FILTER,
   GET_USER_GROUPS,
   SET_ADMINISTRATOR,
   SET_CPU_TOPOLOGY_OPTIONS,
   SET_CURRENT_PAGE,
   SET_DEFAULT_TIMEZONE,
+  SET_USB_AUTOSHARE,
   SET_USB_FILTER,
   SET_USER_FILTER_PERMISSION,
   SET_USER_GROUPS,
@@ -145,8 +145,13 @@ export function setUSBFilter ({ usbFilter }) {
   }
 }
 
-export function getUSBFilter () {
-  return { type: GET_USB_FILTER }
+export function setSpiceUsbAutoShare (usbAutoshare) {
+  return {
+    type: SET_USB_AUTOSHARE,
+    payload: {
+      usbAutoshare,
+    },
+  }
 }
 
 /**

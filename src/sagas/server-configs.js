@@ -5,6 +5,7 @@ import {
   getOption,
   setCpuTopologyOptions,
   setDefaultTimezone,
+  setSpiceUsbAutoShare,
   setUSBFilter,
   setUserSessionTimeoutInternal,
   setWebsocket,
@@ -20,7 +21,7 @@ export function* fetchServerConfiguredValues () {
 
   const [
     maxNumberOfSockets, maxNumberOfCores, maxNumberOfThreads, maxNumOfVmCpus,
-    usbFilter,
+    usbAutoShare, usbFilter,
     userSessionTimeout,
     defaultGeneralTimezone, defaultWindowsTimezone,
     websocketProxy,
@@ -30,6 +31,7 @@ export function* fetchServerConfiguredValues () {
     callGetOption('MaxNumOfThreadsPerCpu', optionVersion, 16),
     callGetOption('MaxNumOfVmCpus', optionVersion, 1),
 
+    callGetOption('SpiceUsbAutoShare', 'general', 1),
     callExternalAction('getUSBFilter', Api.getUSBFilter, {}),
 
     callGetOption('UserSessionTimeOutInterval', 'general', 30),
@@ -46,6 +48,10 @@ export function* fetchServerConfiguredValues () {
     maxNumberOfThreads: parseInt(maxNumberOfThreads, 10),
     maxNumOfVmCpus: parseInt(maxNumOfVmCpus, 10),
   }))
+
+  if (usbAutoShare) {
+    yield put(setSpiceUsbAutoShare(usbAutoShare))
+  }
 
   if (usbFilter) {
     yield put(setUSBFilter({ usbFilter }))

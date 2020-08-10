@@ -32,9 +32,8 @@ import { INIT_CONSOLE, DOWNLOAD_CONSOLE } from '_/constants'
  * Push a virt-viewer connection file (__console.vv__) to connect a user to a VM's console
  */
 export function* downloadVmConsole (action) {
-  let { modalId, vmId, consoleId, usbFilter, hasGuestAgent, skipSSO, openInPage, isNoVNC } = action.payload
+  let { modalId, vmId, consoleId, usbAutoshare, usbFilter, hasGuestAgent, skipSSO, openInPage, isNoVNC } = action.payload
 
-  let isSpice = false
   if (hasGuestAgent && !skipSSO) {
     let result = yield callExternalAction('vmLogon', Api.vmLogon, { payload: { vmId } }, true)
     if (!result || result.status !== 'complete') {
@@ -58,7 +57,7 @@ export function* downloadVmConsole (action) {
         options = yield getConsoleOptions(getConsoleOptionsAction({ vmId }))
       }
 
-      data = adjustVVFile({ data, options, usbFilter, isSpice })
+      data = adjustVVFile({ data, options, usbAutoshare, usbFilter })
       fileDownload({ data, fileName: `console.vv`, mimeType: 'application/x-virt-viewer' })
       yield put(setConsoleStatus({ vmId, status: DOWNLOAD_CONSOLE }))
     } else {
@@ -92,7 +91,7 @@ export function* getRDPVm (action) {
  * console (which will disconnect the other user's existing session).
  */
 export function* openConsoleModal (action) {
-  let { modalId, vmId, usbFilter, userId, hasGuestAgent, consoleId, isNoVNC, openInPage } = action.payload
+  let { modalId, vmId, usbAutoshare, usbFilter, userId, hasGuestAgent, consoleId, isNoVNC, openInPage } = action.payload
   yield put(setNewConsoleModal({ modalId, vmId, consoleId }))
   const sessionsInternal = yield fetchVmSessions({ vmId })
   const consoleUsers = sessionsInternal && sessionsInternal
@@ -106,6 +105,7 @@ export function* openConsoleModal (action) {
     yield put(downloadConsole({
       modalId,
       vmId,
+      usbAutoshare,
       usbFilter,
       hasGuestAgent,
       consoleId,
