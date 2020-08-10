@@ -49,7 +49,12 @@ export function fileDownload ({ data, fileName = 'myFile.dat', mimeType = 'appli
       return navigator.msSaveBlob(new Blob([data], { type: mimeType }), fileName)
     } else if ('download' in a) { // html5 A[download]
       a.href = `data:${mimeType},${encodeURIComponent(data)}`
-      a.setAttribute('download', fileName)
+
+      // set the 'download' attribute for <a> element; we don't want to set it for FF
+      if (navigator.userAgent.indexOf('Firefox') === -1) {
+        a.setAttribute('download', fileName)
+      }
+
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
