@@ -384,11 +384,6 @@ class Networking extends React.Component {
     const enableCreate = vnicList.length > 0 && Object.keys(this.state.editing).length === 0
 
     const nicList = nics
-      .sort((a, b) =>
-        a.isFromTemplate && !b.isFromTemplate ? -1
-          : !a.isFromTemplate && b.isFromTemplate ? 1
-            : localeCompare(a.name, b.name)
-      )
       .concat(this.state.creating ? [ this.state.editing[this.state.creating] ] : [])
       .map(nic => ({
         ...nic,
@@ -397,6 +392,11 @@ class Networking extends React.Component {
           : msg.createVmNetUnknownVnicProfile(),
         device: enumMsg('NicInterface', nic.deviceType),
       }))
+      .sort((a, b) =>
+        a.isFromTemplate && !b.isFromTemplate ? -1
+          : !a.isFromTemplate && b.isFromTemplate ? 1
+            : localeCompare(a.name, b.name)
+      )
 
     return <div className={style['settings-container']} id={idPrefix}>
       { nicList.length === 0 && <React.Fragment>
