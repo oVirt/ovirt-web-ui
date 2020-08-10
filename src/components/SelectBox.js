@@ -27,6 +27,7 @@ class SelectBox extends React.Component {
       items: getItems(props),
     }
     this.handleChange = this.handleChange.bind(this)
+    this.getValidationClass = this.getValidationClass.bind(this)
   }
 
   componentWillReceiveProps (nextProps) {
@@ -44,15 +45,26 @@ class SelectBox extends React.Component {
     }
   }
 
+  getValidationClass () {
+    const { validationState } = this.props
+    switch (validationState) {
+      case 'error':
+        return style['selectBox-has-error']
+      default:
+        return ''
+    }
+  }
+
   render () {
     const { id } = this.props
 
     const selectedItem = this.state.items.find(item => item.id === this.state.selected)
+    const validationClass = this.getValidationClass()
 
     return (
       <div style={{ width: '100%' }} id={id}>
         <div className='dropdown'>
-          <button className={`btn btn-default dropdown-toggle ${style['dropdown-button']}`} type='button' data-toggle='dropdown' id={`${id}-button-toggle`}>
+          <button className={`btn btn-default dropdown-toggle ${style['dropdown-button']} ${validationClass}`} type='button' data-toggle='dropdown' id={`${id}-button-toggle`}>
             <span className={style['dropdown-button-text']} id={`${id}-button-text`} title={selectedItem && selectedItem.value}>
               {selectedItem ? selectedItem.value : NOBREAK_SPACE}
             </span>
@@ -83,6 +95,7 @@ SelectBox.propTypes = {
   /* eslint-enable react/no-unused-prop-types */
   onChange: PropTypes.func.isRequired, // (selectedId: string) => any
   id: PropTypes.string,
+  validationState: PropTypes.oneOf([ false, 'default', 'error' ]),
 }
 
 export default SelectBox
