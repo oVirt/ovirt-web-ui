@@ -224,7 +224,7 @@ class Storage extends React.Component {
           formatters: [headerFormatText],
           props: {
             style: {
-              width: '10%',
+              width: '15%',
             },
           },
         },
@@ -249,6 +249,10 @@ class Storage extends React.Component {
               onBlur={e => this.handleCellChange(rowData, 'size', e.target.value)}
             />
             <span className={style['disk-size-edit-label']}>GiB</span>
+            <FieldLevelHelp
+              inline
+              content={msg.diskEditorSizeCreateHelp()}
+            />
           </div>
         },
       },
@@ -346,6 +350,7 @@ class Storage extends React.Component {
         header: {
           label: '',
           formatters: [headerFormatText],
+
           props: {
             style: {
               width: '20px',
