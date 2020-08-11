@@ -221,7 +221,7 @@ class BasicSettings extends React.Component {
 
   validateVmName () {
     const name = this.props.data.name
-    return name === undefined || name.length === 0 || isVmNameValid(name) ? null : 'error'
+    return name === undefined || name.length === 0 || !isVmNameValid(name) ? 'error' : null
   }
 
   // Calculate the proper number of virtual sockets, cores per virtual socket, threads per core according to the number of virtual CPUs
@@ -354,6 +354,10 @@ class BasicSettings extends React.Component {
   render () {
     const idPrefix = this.props.id || 'create-vm-wizard-basic'
     const { data, clusters, maxNumOfSockets, maxNumOfCores, maxNumOfThreads } = this.props
+    const indicators = {
+      name: this.validateVmName(),
+    }
+
     const clusterList =
       createClusterList(clusters)
         .map(cluster => ({
@@ -362,6 +366,9 @@ class BasicSettings extends React.Component {
         }))
     if (!isValidUid(data.clusterId)) {
       clusterList.unshift({ id: '_', value: `-- ${msg.createVmWizardSelectCluster()} --` })
+      indicators.cluster = !indicators.name && 'error'
+    } else {
+      delete indicators.cluster
     }
 
     const provisionSourceList =
@@ -371,6 +378,9 @@ class BasicSettings extends React.Component {
       ]
     if (!isValidSource(data.provisionSource)) {
       provisionSourceList.unshift({ id: '_', value: `-- ${msg.createVmWizardSelectProvisionSource()} --` })
+      indicators.provisionSource = !indicators.cluster && 'error'
+    } else {
+      delete indicators.provisionSource
     }
 
     const enableOsSelect = isValidUid(data.clusterId) && [ 'iso', 'template' ].includes(data.provisionSource)
@@ -389,6 +399,9 @@ class BasicSettings extends React.Component {
       : [ { id: '_', value: `-- ${msg.createVmWizardSelectClusterBeforeISO()} --` } ]
     if (enableIsoSelect && !isValidUid(data.isoImage)) {
       isoList.unshift({ id: '_', value: `-- ${msg.createVmWizardSelectISO()} --` })
+      indicators.isoList = !indicators.provisionSource && !indicators.name && 'error'
+    } else {
+      delete indicators.isoList
     }
 
     const enableTemplateSelect = data.provisionSource === 'template'
@@ -397,6 +410,9 @@ class BasicSettings extends React.Component {
       : [ { id: '_', value: `-- ${msg.createVmWizardSelectClusterBeforeTemplate()} --` } ]
     if (enableTemplateSelect && isValidUid(data.clusterId) && !isValidUid(data.templateId)) {
       templateList.unshift({ id: '_', value: `-- ${msg.createVmWizardSelectTemplate()} --` })
+      indicators.template = !indicators.provisionSource && !indicators.name && 'error'
+    } else {
+      delete indicators.template
     }
 
     const enableCloudInit = data.cloudInitEnabled && isOsLinux(data.operatingSystemId, this.props.operatingSystems)
@@ -420,7 +436,7 @@ class BasicSettings extends React.Component {
     return <Form horizontal id={idPrefix}>
       <Grid className={style['settings-container']}>
         {/* -- VM name and where it will live -- */}
-        <FieldRow label={msg.name()} id={`${idPrefix}-name`} required validationState={this.validateVmName()}>
+        <FieldRow label={msg.name()} id={`${idPrefix}-name`} required validationState={indicators.name}>
           <FormControl
             id={`${idPrefix}-name-edit`}
             autoComplete='off'
@@ -445,6 +461,7 @@ class BasicSettings extends React.Component {
             items={clusterList}
             selected={data.clusterId || '_'}
             onChange={selectedId => this.handleChange('clusterId', selectedId)}
+            validationState={indicators.cluster}
           />
         </FieldRow>
 
@@ -466,6 +483,7 @@ class BasicSettings extends React.Component {
               items={isoList}
               selected={data.isoImage || '_'}
               onChange={selectedId => this.handleChange('isoImage', selectedId)}
+              validationState={indicators.isoList}
             />
           </FieldRow>
         }
@@ -478,6 +496,7 @@ class BasicSettings extends React.Component {
               items={templateList}
               selected={data.templateId || '_'}
               onChange={selectedId => this.handleChange('templateId', selectedId)}
+              validationState={indicators.template}
             />
           </FieldRow>
         }
