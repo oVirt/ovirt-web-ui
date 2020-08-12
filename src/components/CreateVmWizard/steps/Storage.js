@@ -503,13 +503,15 @@ class Storage extends React.Component {
   handleRowConfirmChange (rowData) {
     const actionCreate = !!this.state.creating && this.state.creating === rowData.id
     const editedRow = this.state.editing[rowData.id]
-    let bootableDisk = this.props.disks.find(disk => disk.bootable)
 
-    // if the actual disk was set as bootable but there's already another bootable one
-    if (editedRow.bootable && bootableDisk) {
-      // no need to check if there's any bootable template disk, we cannot edit bootable flag of disks if there's any bootable template disk
-      bootableDisk.bootable = false // update the previously bootable disk, remove the bootable flag from it
-      this.props.onUpdate({ update: bootableDisk })
+    // if the edited disk is set bootable, make sure to remove bootable from the other disks
+    if (editedRow.bootable) {
+      const previousBootableDisk = this.props.disks.find(disk => disk.bootable)
+      if (previousBootableDisk) {
+        this.props.onUpdate({
+          update: { id: previousBootableDisk.id, bootable: false },
+        })
+      }
     }
 
     // TODO: Add field level validation for the edit or create fields
