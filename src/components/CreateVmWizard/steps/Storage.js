@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { msg, enumMsg } from '_/intl'
+import { msg } from '_/intl'
 import { localeCompare, generateUnique } from '_/helpers'
 import { isNumber, convertValue } from '_/utils'
 import { BASIC_DATA_SHAPE, STORAGE_SHAPE } from '../dataPropTypes'
@@ -343,8 +343,6 @@ class Storage extends React.Component {
         },
       },
 
-      // TODO: Include disk interface?
-
       // actions
       {
         header: {
@@ -578,7 +576,6 @@ class Storage extends React.Component {
           diskTypeLabel: disk.diskType === 'thin' ? msg.diskEditorDiskTypeOptionThin()
             : disk.diskType === 'pre' ? msg.diskEditorDiskTypeOptionPre()
               : disk.diskType,
-          iface: enumMsg('DiskInterface', disk.iface),
         }
       })
       .sort((a, b) => // template based then by name
