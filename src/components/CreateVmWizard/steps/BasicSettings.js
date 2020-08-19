@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { localeCompare } from '_/helpers'
+import { localeCompare, isWindows } from '_/helpers'
 import { msg } from '_/intl'
 import { isNumberInRange } from '_/utils'
 import { BASIC_DATA_SHAPE } from '../dataPropTypes'
@@ -18,6 +18,8 @@ import {
 import { Form, FormControl, Checkbox } from 'patternfly-react'
 import { Grid, Row, Col } from '_/components/Grid'
 import SelectBox from '_/components/SelectBox'
+
+import timezones from '_/components/utils/timezones.json'
 
 import style from './style.css'
 
@@ -113,6 +115,7 @@ export const optimizedForMap = {
 class BasicSettings extends React.Component {
   constructor (props) {
     super(props)
+    this.checkTimeZone = this.checkTimeZone.bind(this)
     this.handleChange = this.handleChange.bind(this)
     this.validateForm = this.validateForm.bind(this)
     this.validateVmName = this.validateVmName.bind(this)
@@ -125,6 +128,35 @@ class BasicSettings extends React.Component {
         'startOnCreation', 'cloudInitEnabled',
       ],
     }
+  }
+
+  checkTimeZone (osId, templateId) {
+    const { defaultGeneralTimezone, defaultWindowsTimezone } = this.props
+    const template = templateId ? this.props.templates.get(templateId) : undefined
+
+    let timeZone = {
+      name: defaultGeneralTimezone,
+    }
+    const osType = this.props.operatingSystems.getIn([ osId, 'name' ])
+
+    if (template && template.getIn(['timeZone', 'name'])) {
+      timeZone = template.get('timeZone').toJS()
+    }
+
+    const isWindowsTimeZone = timeZone && timezones.find(timezone => timezone.id === timeZone.name)
+    const isWindowsVm = isWindows(osType)
+
+    if (isWindowsVm && !isWindowsTimeZone) {
+      timeZone = {
+        name: defaultWindowsTimezone,
+      }
+    }
+    if (!isWindowsVm && isWindowsTimeZone) {
+      timeZone = {
+        name: defaultGeneralTimezone,
+      }
+    }
+    return timeZone
   }
 
   validateForm (dataSet) {
@@ -213,6 +245,11 @@ class BasicSettings extends React.Component {
         changes.cpus = this.props.defaultValues.cpus
         changes.optimizedFor = this.props.defaultValues.optimizedFor
         changes.cloudInitEnabled = this.props.defaultValues.initEnabled
+
+        // when changing Provision type to ISO, set the default time zone according to the OS
+        if (changes.provisionSource === 'iso') {
+          changes.timeZone = this.checkTimeZone(changes.operatingSystemId, changes.templateId)
+        }
         break
 
       case 'templateId':
@@ -226,11 +263,18 @@ class BasicSettings extends React.Component {
           .find(os => os.get('name') === template.getIn([ 'os', 'type' ]))
           .get('id')
 
+        // Check template's timezone compatibility with the template's OS, set the timezone corresponding to the template's OS
+        changes.timeZone = this.checkTimeZone(changes.operatingSystemId, changes.templateId)
         changes.cloudInitEnabled = template.getIn(['cloudInit', 'enabled'])
         changes.initHostname = template.getIn(['cloudInit', 'hostName'])
         changes.initSshKeys = template.getIn(['cloudInit', 'sshAuthorizedKeys'])
         changes.initTimezone = template.getIn(['cloudInit', 'timezone'])
         changes.initCustomScript = template.getIn(['cloudInit', 'customScript'])
+        break
+
+      case 'operatingSystemId':
+        changes[field] = value
+        changes.timeZone = this.checkTimeZone(value, this.props.data.templateId)
         break
 
       case 'memory':
@@ -524,6 +568,9 @@ BasicSettings.propTypes = {
   maxMemorySizeInMiB: PropTypes.number.isRequired,
 
   onUpdate: PropTypes.func.isRequired,
+
+  defaultGeneralTimezone: PropTypes.string.isRequired,
+  defaultWindowsTimezone: PropTypes.string.isRequired,
 }
 
 export default connect(
@@ -536,5 +583,7 @@ export default connect(
     storageDomains: state.storageDomains,
     maxNumOfVmCpus: state.config.get('maxNumOfVmCpus', 384),
     maxMemorySizeInMiB: 4194304, // TODO: 4TiB, no config option pulled as of 2019-Mar-22
+    defaultGeneralTimezone: state.config.get('defaultGeneralTimezone'),
+    defaultWindowsTimezone: state.config.get('defaultWindowsTimezone'),
   })
 )(BasicSettings)

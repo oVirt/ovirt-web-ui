@@ -54,6 +54,7 @@ const ReviewBasic = ({ id, dataCenters, clusters, isos, templates, operatingSyst
       </React.Fragment>
     }
 
+    <Item id={`${id}-timezone`} label={msg.timezone()}>{basic.timeZone.name}</Item>
     <Item id={`${id}-os`} label={msg.operatingSystem()}>{vmOS.get('description')}</Item>
     <Item id={`${id}-memory`} label={msg.memory()}>{userFormatOfBytes(basic.memory, 'MiB').str}</Item>
     <Item id={`${id}-cpus`} label={msg.cpus()}>
