@@ -18,6 +18,7 @@ import {
   DropdownKebab,
   EmptyState,
   FieldLevelHelp,
+  FormGroup,
   FormControl,
   MenuItem,
   Table,
@@ -239,15 +240,24 @@ class Storage extends React.Component {
         editView: (value, { rowData }) => {
           const row = this.state.editing[rowData.id]
           const sizeGiB = row.size / (1024 ** 3)
+          const { invalidSizeValue } = row
 
           return <div className={style['disk-size-edit']}>
-            <FormControl
-              id={`${idPrefix}-${value}-size-edit`}
-              type='number'
-              defaultValue={sizeGiB}
-              className={style['disk-size-form-control-edit']}
-              onBlur={e => this.handleCellChange(rowData, 'size', e.target.value)}
-            />
+            <FormGroup
+              validationState={invalidSizeValue && 'error'}
+              className={style['form-group-edit']}
+            >
+              <FormControl
+                id={`${idPrefix}-${value}-size-edit`}
+                type='number'
+                min={this.props.minDiskSizeInGiB}
+                max={this.props.maxDiskSizeInGiB}
+                step={1}
+                value={sizeGiB}
+                className={style['disk-size-form-control-edit']}
+                onChange={e => this.handleCellChange(rowData, 'size', e.target.value)}
+              />
+            </FormGroup>
             <span className={style['disk-size-edit-label']}>GiB</span>
             <FieldLevelHelp
               inline
@@ -437,9 +447,17 @@ class Storage extends React.Component {
 
   onCreateDisk () {
     const newId = generateUnique('NEW_')
+    const {
+      minDiskSizeInGiB: diskInitialSizeInGib,
+      storageDomains,
+      dataCenterId,
+      vmName,
+      disks,
+      optimizedFor,
+    } = this.props
 
     // If only 1 storage domain is available, select it automatically
-    const storageDomainList = createStorageDomainList(this.props.storageDomains, this.props.dataCenterId)
+    const storageDomainList = createStorageDomainList(storageDomains, dataCenterId)
     const storageDomainId = storageDomainList.length === 1 ? storageDomainList[0].id : '_'
 
     // Setup a new disk in the editing hash
@@ -449,7 +467,7 @@ class Storage extends React.Component {
         ...state.editing,
         [newId]: {
           id: newId,
-          name: suggestDiskName(this.props.vmName, this.props.disks),
+          name: suggestDiskName(vmName, disks),
 
           diskId: '_',
           storageDomainId,
@@ -457,12 +475,13 @@ class Storage extends React.Component {
           bootable: false,
           iface: 'virtio_scsi',
           type: 'image',
-          diskType: getDefaultDiskType(this.props.optimizedFor),
+          diskType: getDefaultDiskType(optimizedFor),
 
-          size: 0,
+          size: (diskInitialSizeInGib * 1024 ** 3),
         },
       },
     }))
+    this.props.onUpdate({ valid: false })
   }
 
   onEditDisk (rowData) {
@@ -472,6 +491,7 @@ class Storage extends React.Component {
         [rowData.id]: rowData,
       },
     }))
+    this.props.onUpdate({ valid: false })
   }
 
   onDeleteRow (rowData) {
@@ -479,13 +499,19 @@ class Storage extends React.Component {
   }
 
   handleCellChange (rowData, field, value) {
+    const editingRow = this.state.editing[rowData.id]
     if (field === 'size') {
-      if (isNumber(value) && value > 0 && value <= this.props.maxDiskSizeInGiB) {
-        value = +value * (1024 ** 3) // GiB to B
+      if (!isNumber(value)) return
+
+      const { minDiskSizeInGiB, maxDiskSizeInGiB } = this.props
+      if (value >= minDiskSizeInGiB && value <= maxDiskSizeInGiB) {
+        delete editingRow.invalidSizeValue
+      } else {
+        editingRow.invalidSizeValue = true
       }
+      value = +value * (1024 ** 3) // GiB to B
     }
 
-    const editingRow = this.state.editing[rowData.id]
     if (editingRow) {
       editingRow[field] = value
       this.setState(state => ({
@@ -501,6 +527,8 @@ class Storage extends React.Component {
   handleRowConfirmChange (rowData) {
     const actionCreate = !!this.state.creating && this.state.creating === rowData.id
     const editedRow = this.state.editing[rowData.id]
+
+    if (editedRow.invalidSizeValue) return
 
     // if the edited disk is set bootable, make sure to remove bootable from the other disks
     if (editedRow.bootable) {
@@ -529,6 +557,7 @@ class Storage extends React.Component {
         editing,
       }
     })
+    this.props.onUpdate({ valid: true })
   }
 
   // Create props for each row that will be passed to the row component (TableInlineEditRow)
@@ -647,7 +676,7 @@ Storage.propTypes = {
   cluster: PropTypes.object.isRequired,
   storageDomains: PropTypes.object.isRequired,
   maxDiskSizeInGiB: PropTypes.number.isRequired,
-
+  minDiskSizeInGiB: PropTypes.number.isRequired,
   onUpdate: PropTypes.func.isRequired,
 }
 
@@ -656,5 +685,6 @@ export default connect(
     cluster: state.clusters.get(clusterId),
     storageDomains: state.storageDomains,
     maxDiskSizeInGiB: 4096, // TODO: 4TiB, no config option pulled as of 2019-Mar-22
+    minDiskSizeInGiB: 1,
   })
 )(Storage)
