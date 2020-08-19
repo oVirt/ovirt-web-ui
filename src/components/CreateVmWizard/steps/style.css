@@ -144,6 +144,10 @@
   font-size: 75%;
 }
 
+table tbody tr td.kebab-menu-cell {
+  padding: 2px 10px 1px;
+}
+
 /*
  * Summary Review
  */
