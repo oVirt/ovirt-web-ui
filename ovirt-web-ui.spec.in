@@ -17,7 +17,7 @@ Source0:        https://github.com/oVirt/ovirt-web-ui/archive/%{source_basename}
 BuildArch: noarch
 
 # nodejs-modules embeds yarn and requires nodejs
-BuildRequires: ovirt-engine-nodejs-modules >= 2.0.32-1
+BuildRequires: ovirt-engine-nodejs-modules >= 2.0.33-1
 
 %description
 This package provides the VM Portal for %{product}.
@@ -48,6 +48,22 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Wed Aug 19 2020 Sharon Gratch <sgratchk@redhat.com> - 1.6.4-1
+ - create VM Wizard - prevent the dialog from being closed without a confirmation
+ - create VM Wizard - add a tooltip message to Disk size field on edit mode
+ - create VM Wizard - allow valid only calls to onUpdate functions
+ - create VM Wizard - support setting disks as bootable
+ - create VM Wizard - adjust table rows spacers for consistency between edit and create modes
+ - support VM Card List pagination and infinite scrolling
+ - set usb-filter and enable-usb-autoshare entries in console.vv properly
+ - automatically open console.vv with virt-viewer when clicking on VM console, if it's set to default application on Firefox
+ - fix disk creation for an existing VM to support all allocation policies and also set default to "Thin Provision"
+ - remove Components that are no longer used
+ - on logout, set the page to NO_REFRESH and stop the scheduler
+ - add initial favicon to index.hbs, branding and config updates as needed
+ - update dependencies of jquery and lodash
+ - translations update 2020-July-02
+
 * Mon Jul 6 2020 Sharon Gratch <sgratchk@redhat.com> - 1.6.3-1
  - create VM Wizard - fixed a bug so that nics and disks data resetting happens only when it is supposed to
  - create VM Wizard - enable resetting of basic settings to baseline defaults when changing the provision source
