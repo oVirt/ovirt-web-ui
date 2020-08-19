@@ -20,7 +20,7 @@ define([VERSION_MAJOR], [1])
 define([VERSION_MINOR], [6])
 define([VERSION_FIX], [4])
 define([VERSION_NUMBER], VERSION_MAJOR[.]VERSION_MINOR[.]VERSION_FIX)
-define([VERSION_RELEASE], [0])
+define([VERSION_RELEASE], [1])
 
 AC_INIT([ovirt-web-ui], VERSION_NUMBER, [gshereme@redhat.com])
 PACKAGE_RPM_VERSION="VERSION_NUMBER"
