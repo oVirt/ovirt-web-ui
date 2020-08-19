@@ -112,7 +112,6 @@
   align-items: center;
 }
 .disk-size-form-control-edit {
-  width: 0;
   flex-grow: 1;
 }
 
@@ -154,6 +153,10 @@ table tbody tr td.kebab-menu-cell {
 .review-content {
   margin: 0 auto;
   width: 80%;
+}
+
+.form-group-edit{
+  margin-bottom: 0;
 }
 
 .review-progress {

@@ -464,7 +464,11 @@ class CreateVmWizard extends React.Component {
           <Button bsStyle='default' onClick={this.showCloseWizardDialog}>
             { msg.createVmWizardButtonCancel() }
           </Button>
-          <Button bsStyle='default' onClick={this.wizardClickBack} disabled={activeStepIndex === 0 || isPrimaryClose}>
+          <Button
+            bsStyle='default'
+            onClick={this.wizardClickBack}
+            disabled={activeStepIndex === 0 || isPrimaryClose || stepNavigation[activeStep.id].preventExit}
+          >
             <Icon type='fa' name='angle-left' />
             { msg.createVmWizardButtonBack() }
           </Button>
