@@ -1,8 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
 import { connect } from 'react-redux'
-
 import { msg } from '_/intl'
 
 import { Modal } from 'patternfly-react'
@@ -14,7 +12,7 @@ const LegalInfo = () => {
   if (fixedStrings.LEGAL_INFO_LINK_TEXT && fixedStrings.LEGAL_INFO_LINK_URL) {
     return (
       <div className='trademark-pf' id={`${idPrefix}-trademark`}>
-        {fixedStrings.LEGAL_INFO} &nbsp;
+        {fixedStrings.LEGAL_INFO}&nbsp;
         <a href={fixedStrings.LEGAL_INFO_LINK_URL} target='_blank' id={`${idPrefix}-link`}>{fixedStrings.LEGAL_INFO_LINK_TEXT}</a>
       </div>
     )
@@ -31,25 +29,32 @@ class AboutDialog extends React.Component {
     super(props)
     this.state = { openModal: false }
   }
-  render () {
-    // TODO: link documentation: https://github.com/oVirt/ovirt-web-ui/issues/134
-    // TODO: oVirt API version
 
+  render () {
     const { oVirtApiVersion } = this.props
     const idPrefix = `about`
-    const trackText = fixedStrings.ISSUES_TRACKER_TEXT || 'Github Issue Tracker'
-    const trackUrl = fixedStrings.ISSUES_TRACKER_URL || 'https://github.com/oVirt/ovirt-web-ui/issues'
-    const reportLink = msg.aboutDialogReportIssuesLink({
-      link: `<strong><a href='${trackUrl}' target='_blank' id='${idPrefix}-issues-link'>${trackText}</a></strong>`,
+
+    const webUiVersionText = msg.aboutDialogVersion({
+      version: `<strong id='${idPrefix}-version-value'>${Product.version}-${Product.release}</strong>`,
     })
 
     let apiVersion = 'unknown'
     if (oVirtApiVersion && oVirtApiVersion.get('major')) {
       apiVersion = `${oVirtApiVersion.get('major')}.${oVirtApiVersion.get('minor')}`
     }
+    const apiVersionText = msg.aboutDialogApiVersion({
+      brandName: fixedStrings.BRAND_NAME,
+      version: `<strong id='${idPrefix}-apiversion-value'>${apiVersion}</strong>`,
+    })
+
+    const trackText = fixedStrings.ISSUES_TRACKER_TEXT || 'Github Issue Tracker'
+    const trackUrl = fixedStrings.ISSUES_TRACKER_URL || 'https://github.com/oVirt/ovirt-web-ui/issues'
+    const reportLink = msg.aboutDialogReportIssuesLink({
+      link: `<a href='${trackUrl}' target='_blank' id='${idPrefix}-issues-link'><strong>${trackText}</strong></a>`,
+    })
 
     const docLink = msg.aboutDialogDocumentationLink({
-      link: `<strong><a href='${fixedStrings.DOCUMENTATION_LINK}' target='_blank' id='${idPrefix}-documentation-link'>${msg.aboutDialogDocumentationText()}</a></strong>`,
+      link: `<a href='${fixedStrings.DOCUMENTATION_LINK}' target='_blank' id='${idPrefix}-documentation-link'><strong>${msg.aboutDialogDocumentationText()}</strong></a>`,
     })
 
     return (
@@ -61,11 +66,15 @@ class AboutDialog extends React.Component {
               <Modal.CloseButton onClick={() => this.setState({ openModal: false })} />
             </Modal.Header>
             <Modal.Body>
-              <h1 id={`${idPrefix}-title`}>{fixedStrings.BRAND_NAME} VM Portal</h1>
+              <h1 id={`${idPrefix}-title`}>{fixedStrings.BRAND_NAME} {msg.vmPortal()}</h1>
               <div className='product-versions-pf'>
                 <ul className='list-unstyled'>
-                  <li id={`${idPrefix}-version`}>Version <strong id={`${idPrefix}-version-value`}>{Product.version}-{Product.release}</strong></li>
-                  <li id={`${idPrefix}-apiversion`}>{fixedStrings.BRAND_NAME} API Version <strong id={`${idPrefix}-apiversion-value`}>{apiVersion}</strong></li>
+                  <li id={`${idPrefix}-version`}>
+                    <div dangerouslySetInnerHTML={{ __html: webUiVersionText }} />
+                  </li>
+                  <li id={`${idPrefix}-apiversion`}>
+                    <div dangerouslySetInnerHTML={{ __html: apiVersionText }} />
+                  </li>
                   {fixedStrings.DOCUMENTATION_LINK &&
                     <li id={`${idPrefix}-documentation`}>
                       <span dangerouslySetInnerHTML={{ __html: docLink }} />
