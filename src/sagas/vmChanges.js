@@ -8,8 +8,6 @@ import * as C from '_/constants'
 import { arrayMatch } from '_/utils'
 import { msg } from '_/intl'
 
-import { getTopology } from '_/components/utils'
-
 import { callExternalAction, delay, delayInMsSteps } from './utils'
 import { startProgress, stopProgress, addVmNic, fetchSingleVm } from './index'
 import { createDiskForVm } from './disks'
@@ -26,22 +24,6 @@ function* createMemoryPolicyFromCluster (clusterId, memorySize) {
   return memoryPolicy
 }
 
-function* createCpuTopology (vcpu) {
-  const maxNumberOfSockets = yield select(state => state.config.get('maxNumberOfSockets'))
-  const maxNumberOfCores = yield select(state => state.config.get('maxNumberOfCores'))
-  const maxNumberOfThreads = yield select(state => state.config.get('maxNumberOfThreads'))
-
-  const topology = getTopology({
-    value: vcpu,
-    max: {
-      sockets: maxNumberOfSockets,
-      cores: maxNumberOfCores,
-      threads: maxNumberOfThreads,
-    },
-  })
-  return topology
-}
-
 /**
  * Compose the VM as JSON consumable directly by the REST API and
  * send it to be created.
@@ -56,7 +38,7 @@ function* composeAndCreateVm ({ payload: { basic, nics, disks }, meta: { correla
   // Common parts
   const vm = {
     cluster: { id: basic.clusterId },
-    cpu: { topology: yield createCpuTopology(basic.cpus) },
+    cpu: { topology: basic.topology },
     description: basic.description,
     memory_policy: memoryPolicy,
     memory,

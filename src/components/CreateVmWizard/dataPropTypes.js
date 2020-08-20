@@ -24,6 +24,12 @@ export const BASIC_DATA_SHAPE = {
   initTimezone: PropTypes.string,
   initAdminPassword: PropTypes.string,
   initCustomScript: PropTypes.string,
+
+  topology: PropTypes.exact({
+    cores: PropTypes.number.isRequired,
+    sockets: PropTypes.number.isRequired,
+    threads: PropTypes.number.isRequired,
+  }),
 }
 
 // interface is subset of: http://ovirt.github.io/ovirt-engine-api-model/master/#types/nic_interface

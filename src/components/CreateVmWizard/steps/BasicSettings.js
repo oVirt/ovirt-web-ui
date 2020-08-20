@@ -11,11 +11,13 @@ import {
   createIsoList,
   createOsList,
   createTemplateList,
+  getTopology,
+  getTopologyPossibleValues,
   isHostNameValid,
   isVmNameValid,
 } from '_/components/utils'
 
-import { Form, FormControl, Checkbox } from 'patternfly-react'
+import { ExpandCollapse, Form, FormControl, Checkbox } from 'patternfly-react'
 import { Grid, Row, Col } from '_/components/Grid'
 import SelectBox from '_/components/SelectBox'
 
@@ -116,9 +118,11 @@ class BasicSettings extends React.Component {
   constructor (props) {
     super(props)
     this.checkTimeZone = this.checkTimeZone.bind(this)
+    this.getTopologySettings = this.getTopologySettings.bind(this)
     this.handleChange = this.handleChange.bind(this)
     this.validateForm = this.validateForm.bind(this)
     this.validateVmName = this.validateVmName.bind(this)
+    this.mapVCpuTopologyItems = this.mapVCpuTopologyItems.bind(this)
 
     this.fields = {
       select: [
@@ -202,6 +206,20 @@ class BasicSettings extends React.Component {
     return name === undefined || name.length === 0 || isVmNameValid(name) ? null : 'error'
   }
 
+  // Calculate the proper number of virtual sockets, cores per virtual socket, threads per core according to the number of virtual CPUs
+  // any change of the number of vCpus in the Basic settings requires recalculation of the numer of cores, sockets, threads
+  getTopologySettings (vcpus, force = {}) {
+    return getTopology({
+      value: vcpus,
+      max: {
+        sockets: this.props.maxNumOfSockets,
+        cores: this.props.maxNumOfCores,
+        threads: this.props.maxNumOfThreads,
+      },
+      force: force,
+    })
+  }
+
   handleChange (field, value, extra) {
     // normalize the value for drop downs with a "-- Select --" option
     if (this.fields.select.includes(field) && value === '_') {
@@ -243,6 +261,7 @@ class BasicSettings extends React.Component {
         changes.operatingSystemId = this.props.defaultValues.operatingSystemId
         changes.memory = this.props.defaultValues.memory
         changes.cpus = this.props.defaultValues.cpus
+        changes.topology = this.props.defaultValues.topology
         changes.optimizedFor = this.props.defaultValues.optimizedFor
         changes.cloudInitEnabled = this.props.defaultValues.initEnabled
 
@@ -255,9 +274,9 @@ class BasicSettings extends React.Component {
       case 'templateId':
         const template = this.props.templates.find(t => t.get('id') === value)
         changes.templateId = template.get('id')
-
         changes.memory = template.get('memory') / (1024 ** 2) // stored in bytes, input in Mib
         changes.cpus = template.getIn([ 'cpu', 'vCPUs' ])
+        changes.topology = template.getIn([ 'cpu', 'topology' ]).toJS()
         changes.optimizedFor = template.get('type', this.props.data.optimizedFor)
         changes.operatingSystemId = this.props.operatingSystems
           .find(os => os.get('name') === template.getIn([ 'os', 'type' ]))
@@ -287,6 +306,12 @@ class BasicSettings extends React.Component {
         if (isNumberInRange(value, 0, this.props.maxNumOfVmCpus)) {
           changes.cpus = +value
         }
+
+        changes.topology = this.getTopologySettings(changes.cpus)
+        break
+
+      case 'topology': // number of sockets, cores or threads changed by the user in Advanced Options section
+        changes[field] = this.getTopologySettings(this.props.data.cpus, { [extra.vcpu]: +value })
         break
 
       default:
@@ -299,12 +324,20 @@ class BasicSettings extends React.Component {
     }
   }
 
+  mapVCpuTopologyItems (items) {
+    return items.map(i =>
+      ({
+        id: i.toString(),
+        value: i.toString(),
+      })
+    )
+  }
+
   render () {
     const idPrefix = this.props.id || 'create-vm-wizard-basic'
-    const data = this.props.data
-
+    const { data, clusters, maxNumOfSockets, maxNumOfCores, maxNumOfThreads } = this.props
     const clusterList =
-      createClusterList(this.props.clusters)
+      createClusterList(clusters)
         .map(cluster => ({
           id: cluster.id,
           value: `${cluster.value} (${this.props.dataCenters.find(dc => dc.id === cluster.datacenter).name})`,
@@ -324,7 +357,7 @@ class BasicSettings extends React.Component {
 
     const enableOsSelect = isValidUid(data.clusterId) && [ 'iso', 'template' ].includes(data.provisionSource)
     const operatingSystemList = enableOsSelect
-      ? createOsList(data.clusterId, this.props.clusters, this.props.operatingSystems)
+      ? createOsList(data.clusterId, clusters, this.props.operatingSystems)
       : [ { id: '_', value: `-- ${msg.createVmWizardSelectClusterBeforeOS()} --` } ]
 
     const enableIsoSelect = data.provisionSource === 'iso' && isValidUid(data.dataCenterId)
@@ -350,6 +383,14 @@ class BasicSettings extends React.Component {
 
     const enableCloudInit = data.cloudInitEnabled && isOsLinux(data.operatingSystemId, this.props.operatingSystems)
     const enableSysPrep = data.cloudInitEnabled && isOsWindows(data.operatingSystemId, this.props.operatingSystems)
+
+    // for Advanced CPU Topology Options expand/collapse section
+    const vCpuTopologyDividers = getTopologyPossibleValues({
+      value: data.cpus,
+      maxNumberOfSockets: maxNumOfSockets,
+      maxNumberOfCores: maxNumOfCores,
+      maxNumberOfThreads: maxNumOfThreads,
+    })
 
     // ----- RENDER -----
     return <Form horizontal id={idPrefix}>
@@ -437,7 +478,6 @@ class BasicSettings extends React.Component {
           />
         </FieldRow>
 
-        {/* TODO: Add CPU topology setup like in Details card */}
         <FieldRow label={msg.cpus()} id={`${idPrefix}-cpus`} required>
           <FormControl
             id={`${idPrefix}-cpus-edit`}
@@ -548,6 +588,39 @@ class BasicSettings extends React.Component {
           </React.Fragment>
         }
       </Grid>
+
+      {/* Advanced CPU Topology Options */}
+      <ExpandCollapse id={`${idPrefix}-advanced-options`} textCollapsed={msg.advancedCpuTopologyOptions()} textExpanded={msg.advancedCpuTopologyOptions()}>
+        <Grid className={style['settings-container']}>
+          <FieldRow label={msg.virtualSockets()} id={`${idPrefix}-topology-sockets`}>
+            <SelectBox
+              id={`${idPrefix}-topology-sockets-edit`}
+              items={this.mapVCpuTopologyItems(vCpuTopologyDividers.sockets)}
+              selected={data.topology.sockets.toString()}
+              onChange={selectedId => { this.handleChange('topology', selectedId, { vcpu: 'sockets' }) }}
+            />
+          </FieldRow>
+          <FieldRow label={msg.coresPerSockets()} id={`${idPrefix}-topology-cores`}>
+            <SelectBox
+              id={`${idPrefix}-topology-cores-edit`}
+              items={this.mapVCpuTopologyItems(vCpuTopologyDividers.cores)}
+              selected={data.topology.cores.toString()}
+              onChange={selectedId => { this.handleChange('topology', selectedId, { vcpu: 'cores' }) }}
+            />
+          </FieldRow>
+          <FieldRow
+            label={msg.threadsPerCores()}
+            id={`${idPrefix}-topology-threads`}
+          >
+            <SelectBox
+              id={`${idPrefix}-topology-threads-edit`}
+              items={this.mapVCpuTopologyItems(vCpuTopologyDividers.threads)}
+              selected={data.topology.threads.toString()}
+              onChange={selectedId => { this.handleChange('topology', selectedId, { vcpu: 'threads' }) }}
+            />
+          </FieldRow>
+        </Grid>
+      </ExpandCollapse>
     </Form>
   }
 }
@@ -565,6 +638,10 @@ BasicSettings.propTypes = {
   storageDomains: PropTypes.object.isRequired,
   maxNumOfVmCpus: PropTypes.number.isRequired,
   maxMemorySizeInMiB: PropTypes.number.isRequired,
+
+  maxNumOfSockets: PropTypes.number.isRequired,
+  maxNumOfCores: PropTypes.number.isRequired,
+  maxNumOfThreads: PropTypes.number.isRequired,
 
   onUpdate: PropTypes.func.isRequired,
 
@@ -584,5 +661,8 @@ export default connect(
     maxMemorySizeInMiB: 4194304, // TODO: 4TiB, no config option pulled as of 2019-Mar-22
     defaultGeneralTimezone: state.config.get('defaultGeneralTimezone'),
     defaultWindowsTimezone: state.config.get('defaultWindowsTimezone'),
+    maxNumOfSockets: state.config.get('maxNumberOfSockets'),
+    maxNumOfCores: state.config.get('maxNumberOfCores'),
+    maxNumOfThreads: state.config.get('maxNumberOfThreads'),
   })
 )(BasicSettings)

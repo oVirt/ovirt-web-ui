@@ -378,9 +378,9 @@ const Template = {
       cpu: {
         vCPUs: vCpusCount({ cpu: template.cpu }),
         topology: {
-          cores: template.cpu.topology.cores,
-          sockets: template.cpu.topology.sockets,
-          threads: template.cpu.topology.threads,
+          cores: convertInt(template.cpu.topology.cores),
+          sockets: convertInt(template.cpu.topology.sockets),
+          threads: convertInt(template.cpu.topology.threads),
         },
       },
 
