@@ -96,12 +96,14 @@ function getInitialState (clusters, templates, blankTemplateId, operatingSystems
     const memoryInB = blankTemplate.get('memory')
     const cpus = blankTemplate.getIn([ 'cpu', 'vCPUs' ])
     const initEnabled = blankTemplate.getIn([ 'cloudInit', 'enabled' ])
+    const topology = blankTemplate.getIn([ 'cpu', 'topology' ]).toJS()
 
     blankTemplateValues = {
       operatingSystemId,
       memory: memoryInB / (1024 ** 2), // bytes to MiB
       cpus,
       initEnabled,
+      topology,
     }
   }
 

@@ -39,6 +39,7 @@ export const messages: { [messageId: string]: MessageType } = {
     message: 'Advanced Options',
     description: 'Label used on forms when there are a set of fields that are initially hidden and require a click to view.',
   },
+  advancedCpuTopologyOptions: 'Advanced CPU Topology Options',
   alias: {
     message: 'Alias',
     description: 'In sense of "human friendly name"',
