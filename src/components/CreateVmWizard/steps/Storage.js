@@ -104,6 +104,12 @@ class Storage extends React.Component {
     this.isBootableDiskTemplate = this.isBootableDiskTemplate.bind(this)
     this.isEditingMode = this.isEditingMode.bind(this)
 
+    const invalidDisk = props.disks.find(disk => (disk.isFromTemplate && !disk.canUserUseStorageDomain))
+
+    if (invalidDisk) {
+      props.onUpdate({ valid: false })
+    }
+
     this.state = {
       editing: {},
       creating: false,
@@ -285,11 +291,26 @@ class Storage extends React.Component {
           const {
             storageDomainId: id,
             storageDomain: sd,
+            createdFromInvalidTemplate,
+            isFromTemplate,
           } = rowData
 
-          // TODO: if the disk's storage domain is not available to the user, highlight it
-          // TODO: like a validation error and force editing the SD before allowing the user to move
-          // TODO: forward to the next wizard step
+          if ((isFromTemplate && !sd.isOk) || createdFromInvalidTemplate) {
+            const { storageDomains, dataCenterId } = props
+            const storageDomainList = createStorageDomainList(storageDomains, dataCenterId, true)
+            if (!sd.isOk) {
+              storageDomainList.unshift({ id: '_', value: `-- ${msg.createVmStorageSelectStorageDomain()} --` })
+            }
+            return <SelectBox
+              id={`${idPrefix}-${rowData.id}-storage-domain-edit`}
+              items={storageDomainList}
+              selected={sd.isOk ? rowData.storageDomainId : '_'}
+              validationState={!sd.isOk && 'error'}
+              onChange={value => {
+                this.props.onUpdate({ valid: true, update: { ...rowData, storageDomainId: value } })
+              }}
+            />
+          }
           return <React.Fragment>
             { id === '_'
               ? `-- ${msg.createVmStorageSelectStorageDomain()} --`
@@ -304,7 +325,7 @@ class Storage extends React.Component {
           const storageDomainList = createStorageDomainList(storageDomains, dataCenterId, true)
           const row = this.state.editing[rowData.id]
 
-          if (storageDomainList.length > 1 || row.storageDomain === '_') {
+          if (storageDomainList.length > 1 || row.storageDomainId === '_') {
             storageDomainList.unshift({ id: '_', value: `-- ${msg.createVmStorageSelectStorageDomain()} --` })
           }
 
@@ -314,6 +335,7 @@ class Storage extends React.Component {
               items={storageDomainList}
               selected={row.storageDomainId}
               onChange={value => this.handleCellChange(rowData, 'storageDomainId', value)}
+              validationState={row.storageDomainId === '_' && 'error'}
             />
           )
         },
@@ -531,7 +553,7 @@ class Storage extends React.Component {
     const actionCreate = !!this.state.creating && this.state.creating === rowData.id
     const editedRow = this.state.editing[rowData.id]
 
-    if (editedRow.invalidSizeValue) return
+    if (editedRow.invalidSizeValue || editedRow.storageDomainId === '_') return
 
     // if the edited disk is set bootable, make sure to remove bootable from the other disks
     if (editedRow.bootable) {
