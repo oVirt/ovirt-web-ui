@@ -8,7 +8,7 @@ import { List } from 'immutable'
 import * as Actions from '_/actions'
 import { generateUnique } from '_/helpers'
 import { msg } from '_/intl'
-import { createTemplateList } from '_/components/utils'
+import { createStorageDomainList, createTemplateList } from '_/components/utils'
 
 import NavigationConfirmationModal from '../NavigationConfirmationModal'
 import BasicSettings from './steps/BasicSettings'
@@ -345,6 +345,7 @@ class CreateVmWizard extends React.Component {
         }
 
         if (resetDisks) {
+          const filteredStorageDomainList = createStorageDomainList(this.props.storageDomains, this.state.steps.basic.dataCenterId)
           draft.steps.storage = {
             updated: (draft.steps.storage.updated + 1),
             disks: !template
@@ -357,6 +358,7 @@ class CreateVmWizard extends React.Component {
                   diskId: disk.get('id'),
                   storageDomainId: disk.get('storageDomainId'),
                   canUserUseStorageDomain: this.props.storageDomains.getIn([ disk.get('storageDomainId'), 'canUserUseDomain' ], false),
+                  createdFromInvalidTemplate: !filteredStorageDomainList.find(sd => sd.id === disk.get('storageDomainId')),
 
                   bootable: disk.get('bootable'),
                   iface: disk.get('iface'),
