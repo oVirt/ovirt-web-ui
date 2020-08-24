@@ -612,6 +612,10 @@ export const messages: { [messageId: string]: MessageType } = {
   upload: 'Upload',
   uploadIconFilesizeTooLarge: 'Image size should be {maxIconSize} KiB or less.',
   uploadIconNotImage: 'Icon should be an image.',
+  uptimeDuration: {
+    message: '(up {uptime})',
+    description: 'contain a VM\'s formatted uptime duration string',
+  },
   utilization: { message: 'Utilization', description: 'Title of Utilization card on VM Details' },
   utilizationCardAllocated: 'Allocated',
   utilizationCardAvailable: 'Available',
