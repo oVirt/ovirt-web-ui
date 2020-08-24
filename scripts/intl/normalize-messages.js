@@ -1,29 +1,7 @@
-// @flow
-
 import fs from 'fs'
 import path from 'path'
-
 import chalk from 'chalk'
 import stableStringify from 'json-stable-stringify-without-jsonify'
-import { table } from 'table'
-
-import { messages as englishMessages } from '../../src/intl/messages'
-
-const SOURCE = path.join('extra', 'from-zanata', 'translated-messages.json')
-const DESTINATION = path.join('src', 'intl', 'translated-messages.json')
-
-function main() {
-  const stringContent = fs.readFileSync(SOURCE, { encoding: 'utf8' })
-  const parsedContent = JSON.parse(stringContent)
-  removeEmptyMessages(parsedContent)
-
-  const pretty = stableStringify(parsedContent, {
-    space: '  ',
-    cmp: (a, b) => { return a.key > b.key ? 1 : -1 }
-  }) + '\n'
-  fs.writeFileSync(DESTINATION, pretty)
-  console.log(chalk.green(`[normalize-messages.js] ${DESTINATION} written ✔`))
-}
 
 /**
  * Sometimes Zanata returns empty string. These are removed for the app to be able to
@@ -43,4 +21,29 @@ function removeEmptyMessages(translations) {
   })
 }
 
-main()
+function normalize(source, destination) {
+  console.log(chalk.green(`> [normalize-messages.js] write file -> ${destination} ✔`))
+  const stringContent = fs.readFileSync(source, { encoding: 'utf8' })
+  const parsedContent = JSON.parse(stringContent)
+  removeEmptyMessages(parsedContent)
+  const serializedContent = stableStringify(parsedContent, { space: 2 }) + '\n'
+
+  const pretty = stableStringify(parsedContent, {
+    space: '  ',
+    cmp: (a, b) => { return a.key > b.key ? 1 : -1 }
+  }) + '\n'
+
+  fs.writeFileSync(destination, pretty)
+  console.log()
+}
+
+normalize(
+  path.join('extra', 'from-zanata', 'translated-messages.json'),
+  path.join('src', 'intl', 'translated-messages.json')
+)
+
+normalize(
+  path.join('extra', 'from-zanata', 'translated-time-durations.json'),
+  path.join('src', 'intl', 'translated-time-durations.json')
+)
+
