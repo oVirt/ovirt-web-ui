@@ -10,6 +10,8 @@ import {
   createVNicProfileList,
   sortNicsDisks,
   suggestNicName,
+  isNicNameUnique,
+  isNicNameValid,
 } from '_/components/utils'
 
 import {
@@ -18,6 +20,8 @@ import {
   EmptyState,
   FieldLevelHelp,
   FormControl,
+  FormGroup,
+  HelpBlock,
   Label,
   MenuItem,
   Table,
@@ -73,8 +77,13 @@ class Networking extends React.Component {
     this.onDeleteRow = this.onDeleteRow.bind(this)
     this.onEditNic = this.onEditNic.bind(this)
     this.rowRenderProps = this.rowRenderProps.bind(this)
+    this.isVnicNameUniqueAndValid = this.isVnicNameUniqueAndValid.bind(this)
 
     this.state = {
+      editingErrors: {
+        nicInvalidName: false,
+        nicDuplicateName: false,
+      },
       editing: {},
       creating: false,
     }
@@ -136,14 +145,24 @@ class Networking extends React.Component {
         },
         editView: (value, { rowData }) => {
           const row = this.state.editing[rowData.id]
+          const { nicInvalidName, nicDuplicateName } = this.state.editingErrors
+          const validAndUniqueName = !nicInvalidName && !nicDuplicateName
 
           return (
-            <FormControl
-              id={`${idPrefix}-${value}-name-edit`}
-              type='text'
-              defaultValue={row.name}
-              onBlur={e => this.handleCellChange(rowData, 'name', e.target.value)}
-            />
+            <FormGroup
+              validationState={validAndUniqueName ? null : 'error'}
+              className={style['form-group-edit']}
+            >
+              <FormControl
+                id={`${idPrefix}-${value}-name-edit`}
+                type='text'
+                defaultValue={row.name}
+                onChange={e => this.handleCellChange(rowData, 'name', e.target.value)}
+              />
+              {!validAndUniqueName &&
+              <HelpBlock>{msg.createVmWizardNetVNICNameRules()}</HelpBlock>
+              }
+            </FormGroup>
           )
         },
       },
@@ -278,6 +297,11 @@ class Networking extends React.Component {
     ]
   }
 
+  isVnicNameUniqueAndValid (editingRow) {
+    const { nics } = this.props
+    return { unique: isNicNameUnique(nics, editingRow), valid: isNicNameValid(editingRow.name) }
+  }
+
   onCreateNic () {
     const newId = generateUnique('NEW_')
     const nextNicName = suggestNicName(this.props.nics)
@@ -305,6 +329,7 @@ class Networking extends React.Component {
         },
       },
     }))
+    this.props.onUpdate({ valid: false })
   }
 
   onEditNic (rowData) {
@@ -314,6 +339,7 @@ class Networking extends React.Component {
         [rowData.id]: rowData,
       },
     }))
+    this.props.onUpdate({ valid: false })
   }
 
   onDeleteRow (rowData) {
@@ -322,9 +348,20 @@ class Networking extends React.Component {
 
   handleCellChange (rowData, field, value) {
     const editingRow = this.state.editing[rowData.id]
+
     if (editingRow) {
       editingRow[field] = value
+      const editingErrors = {}
+      if (field === 'name') {
+        const { unique, valid } = this.isVnicNameUniqueAndValid(editingRow)
+        editingErrors.nicInvalidName = !valid
+        editingErrors.nicDuplicateName = !unique
+      }
       this.setState(state => ({
+        editingErrors: {
+          ...state.editingErrors,
+          ...editingErrors,
+        },
         editing: {
           ...state.editing,
           [rowData.id]: editingRow,
@@ -338,10 +375,15 @@ class Networking extends React.Component {
     const actionCreate = !!this.state.creating && this.state.creating === rowData.id
     const editedRow = this.state.editing[rowData.id]
 
-    // TODO: Add field level validation for the edit or create fields
+    let editingErrors = false
+    for (const errorKey of this.state.editingErrors) {
+      editingErrors = editingErrors || this.state.editingErrors[errorKey]
+    }
 
-    this.props.onUpdate({ [actionCreate ? 'create' : 'update']: editedRow })
-    this.handleRowCancelChange(rowData)
+    if (!editingErrors) {
+      this.props.onUpdate({ [actionCreate ? 'create' : 'update']: editedRow })
+      this.handleRowCancelChange(rowData)
+    }
   }
 
   // Cancel the creation or editing of a row by throwing out edit state
@@ -351,10 +393,15 @@ class Networking extends React.Component {
       const editing = state.editing
       delete editing[rowData.id]
       return {
+        editingErrors: {
+          nicInvalidName: false,
+          nicDuplicateName: false,
+        },
         creating: false,
         editing,
       }
     })
+    this.props.onUpdate({ valid: true })
   }
 
   // Create props for each row that will be passed to the row component (TableInlineEditRow)

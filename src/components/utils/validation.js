@@ -90,3 +90,23 @@ export function isVmNameValid (nameCandidate: string): boolean {
 export function isDiskNameValid (nameCandidate: string): boolean {
   return isVmNameValid(nameCandidate)
 }
+
+/**
+ * check if the name's length between 1 to 50 characters
+ * and contains only uppercase, lowercase, hyphens and underscores
+ */
+export function isNicNameValid (name: string): boolean {
+  return /^[a-zA-Z0-9_\-\\.]{1,50}$/.test(name)
+}
+
+/**
+ * check if the nicEditing name is unique to the given nicList
+ */
+export function isNicNameUnique (nicList: Object, nicEditing: Object): boolean {
+  const nicsMatchEditingName = nicList.filter((nic) => nic.name === nicEditing.name)
+
+  const nameUnique = nicsMatchEditingName.length === 0 ||
+    (nicsMatchEditingName.length === 1 && nicsMatchEditingName[0].id === nicEditing.id)
+
+  return nameUnique
+}

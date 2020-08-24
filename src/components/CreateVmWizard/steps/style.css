@@ -147,6 +147,10 @@ table tbody tr td.kebab-menu-cell {
   padding: 2px 10px 1px;
 }
 
+.form-group-edit{
+  margin-bottom: 0;
+}
+
 /*
  * Summary Review
  */

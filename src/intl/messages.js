@@ -165,6 +165,7 @@ export const messages: { [messageId: string]: MessageType } = {
   createVmWizardStepTitleNetwork: 'Networking',
   createVmWizardStepTitleReview: 'Review',
   createVmWizardStepTitleStorage: 'Storage',
+  createVmWizardNetVNICNameRules: 'NIC name must be unique, 50 or less alphanumeric characters or "-_."',
   currentlyInsertedIsoInCdDrive: 'Currently inserted ISO in CD drive',
   customIcon: 'Custom icon of the virtual machine.',
   customScript: 'Custom script',
