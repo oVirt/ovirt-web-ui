@@ -9,6 +9,6 @@
     <trans-dir>extra/from-zanata</trans-dir>
 
     <rules>
-        <rule pattern="**/*.pot">{path}/{locale}.po</rule>
+        <rule pattern="**/*.pot">{path}/{filename}/{locale}.po</rule>
     </rules>
 </config>

@@ -1,15 +1,7 @@
-  // @flow
-
 import fs from 'fs'
 import path from 'path'
-
-import {sync as mkdirpSync} from 'mkdirp'
+import { sync as mkdirpSync } from 'mkdirp'
 import chalk from 'chalk'
-
-import {messages} from '../../src/intl/messages';
-
-const OUTPUT_DIR = path.join('extra', 'to-zanata')
-const OUTPUT_FILE = path.join(OUTPUT_DIR, 'messages.json')
 
 function normalizeMessages(messages) {
   return Object.keys(messages)
@@ -38,11 +30,22 @@ function toReactIntlMessageDescriptor(messageId, messageValue) {
   }
 }
 
-function main() {
-  const reactIntlMessages = normalizeMessages(messages)
-  mkdirpSync(OUTPUT_DIR)
-  fs.writeFileSync(OUTPUT_FILE, JSON.stringify(reactIntlMessages, null, 4))
-  console.log(chalk.green(`[extract-messages.js] ${OUTPUT_FILE} written ✔️`))
+function extractMessages(messages, destDir, destFile) {
+  console.log(chalk.green(`> [extract-messages.js] write file -> ${destFile} ✔️`))
+  const json2poMessages = normalizeMessages(messages)
+  mkdirpSync(destDir)
+  fs.writeFileSync(destFile, JSON.stringify(json2poMessages, null, 4))
+  console.log()
 }
 
-main()
+extractMessages(
+  require('../../src/intl/messages').messages,
+  path.join('extra', 'to-zanata'),
+  path.join('extra', 'to-zanata', 'messages.json')
+)
+
+extractMessages(
+  require('../../src/intl/time-durations').timeDurations,
+  path.join('extra', 'to-zanata'),
+  path.join('extra', 'to-zanata', 'time-durations.json')
+)

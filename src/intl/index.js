@@ -2,30 +2,30 @@
 
 import IntlMessageFormat from 'intl-messageformat'
 import { addLocaleData } from 'react-intl'
-import enLocalData from 'react-intl/locale-data/en'
+
+import csLocalData from 'react-intl/locale-data/cs'
 import deLocalData from 'react-intl/locale-data/de'
-import frLocalData from 'react-intl/locale-data/fr'
+import enLocalData from 'react-intl/locale-data/en'
 import esLocalData from 'react-intl/locale-data/es'
-import koLocalData from 'react-intl/locale-data/ko'
+import frLocalData from 'react-intl/locale-data/fr'
 import itLocalData from 'react-intl/locale-data/it'
 import jaLocalData from 'react-intl/locale-data/ja'
+import koLocalData from 'react-intl/locale-data/ko'
 import ptLocalData from 'react-intl/locale-data/pt'
-import ruLocalData from 'react-intl/locale-data/ru'
 import zhLocalData from 'react-intl/locale-data/zh'
-import csLocalData from 'react-intl/locale-data/cs'
-import huLocalData from 'react-intl/locale-data/hu'
-import heLocalData from 'react-intl/locale-data/he'
 
+import { setupMomentTranslations } from './time-durations'
 import { messages, type MessageIdType, type MessageType } from './messages'
-// expected translations ['de', 'fr', 'es', 'ko', 'it', 'ja', 'pt-BR', 'ru', 'zh-CN']
 import translatedMessages from './translated-messages.json'
 
-const DEFAULT_LOCALE = 'en'
+export const DEFAULT_LOCALE = 'en'
 
 /**
  * Currently selected locale
  */
 export const locale: string = getLocaleFromUrl() || getBrowserLocale() || DEFAULT_LOCALE
+console.log(`App locale: ${locale}`)
+setupMomentTranslations(locale, DEFAULT_LOCALE)
 
 function getBrowserLocale (): ?string {
   if (window.navigator.language) {
@@ -182,19 +182,16 @@ export function enumMsg (enumId: string, enumItem: string): string {
  * Exported for tests purposes only
  */
 export const localeDataMap = {
-  en: enLocalData,
-  de: deLocalData,
-  fr: frLocalData,
-  es: esLocalData,
-  ko: koLocalData,
-  it: itLocalData,
-  ja: jaLocalData,
+  'cs': csLocalData,
+  'de': deLocalData,
+  'en': enLocalData,
+  'es': esLocalData,
+  'fr': frLocalData,
+  'it': itLocalData,
+  'ja': jaLocalData,
+  'ko': koLocalData,
   'pt-BR': ptLocalData,
-  ru: ruLocalData,
   'zh-CN': zhLocalData,
-  cs: csLocalData,
-  hu: huLocalData,
-  he: heLocalData,
 }
 
 function initializeReactIntl () {
