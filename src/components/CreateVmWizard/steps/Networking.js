@@ -2,12 +2,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { msg, enumMsg } from '_/intl'
-import { localeCompare, generateUnique } from '_/helpers'
+import { generateUnique } from '_/helpers'
 import { NIC_SHAPE } from '../dataPropTypes'
 
 import {
   createNicInterfacesList,
   createVNicProfileList,
+  sortNicsDisks,
   suggestNicName,
 } from '_/components/utils'
 
@@ -384,12 +385,7 @@ class Networking extends React.Component {
     const vnicList = createVNicProfileList(vnicProfiles, { dataCenterId, cluster })
     const enableCreate = vnicList.length > 0 && Object.keys(this.state.editing).length === 0
 
-    const nicList = [...nics]
-      .sort((a, b) => // template based then by name.
-        a.isFromTemplate && !b.isFromTemplate ? -1
-          : !a.isFromTemplate && b.isFromTemplate ? 1
-            : localeCompare(a.name, b.name)
-      )
+    const nicList = sortNicsDisks([...nics])
       .concat(this.state.creating ? [ this.state.editing[this.state.creating] ] : [])
       .map(nic => ({
         ...(this.state.editing[nic.id] ? this.state.editing[nic.id] : nic),
