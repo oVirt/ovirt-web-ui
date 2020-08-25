@@ -6,6 +6,7 @@ import { Alert, Icon, Spinner, Label } from 'patternfly-react'
 import { msg, enumMsg } from '_/intl'
 import { templateNameRenderer, userFormatOfBytes } from '_/helpers'
 import { Grid, Row, Col } from '_/components/Grid'
+import { sortNicsDisks } from '_/components/utils'
 
 import { BASIC_DATA_SHAPE, NIC_SHAPE, STORAGE_SHAPE } from '../dataPropTypes'
 import { optimizedForMap } from './BasicSettings'
@@ -205,8 +206,13 @@ class SummaryReview extends React.Component {
   render () {
     const id = this.props.id ? `${this.props.id}-review` : 'create-vm-wizard-review'
     const {
+      network,
+      storage,
       progress = { inProgress: false },
     } = this.props
+
+    const disksList = sortNicsDisks([...storage]) // Sort the template based ones first, then by name
+    const nicsList = sortNicsDisks([...network])
 
     return <div className={style['review-content']}>
       { (!progress.inProgress && !progress.result) &&
@@ -283,12 +289,12 @@ class SummaryReview extends React.Component {
             <ReviewNetworking
               id={`${id}-network`}
               vnicProfiles={this.props.vnicProfiles}
-              network={this.props.network}
+              network={nicsList}
             />
             <ReviewStorage
               id={`${id}-storage`}
               storageDomains={this.props.storageDomains}
-              storage={this.props.storage}
+              storage={disksList}
             />
             <ReviewAdvanced
               id={`${id}-advanced`}
