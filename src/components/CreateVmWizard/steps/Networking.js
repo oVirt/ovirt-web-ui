@@ -384,20 +384,20 @@ class Networking extends React.Component {
     const vnicList = createVNicProfileList(vnicProfiles, { dataCenterId, cluster })
     const enableCreate = vnicList.length > 0 && Object.keys(this.state.editing).length === 0
 
-    const nicList = nics
+    const nicList = [...nics]
+      .sort((a, b) => // template based then by name.
+        a.isFromTemplate && !b.isFromTemplate ? -1
+          : !a.isFromTemplate && b.isFromTemplate ? 1
+            : localeCompare(a.name, b.name)
+      )
       .concat(this.state.creating ? [ this.state.editing[this.state.creating] ] : [])
       .map(nic => ({
-        ...nic,
+        ...(this.state.editing[nic.id] ? this.state.editing[nic.id] : nic),
         vnic: vnicList.find(vnic => vnic.id === nic.vnicProfileId)
           ? vnicList.find(vnic => vnic.id === nic.vnicProfileId).value
           : msg.createVmNetUnknownVnicProfile(),
         device: enumMsg('NicInterface', nic.deviceType),
       }))
-      .sort((a, b) =>
-        a.isFromTemplate && !b.isFromTemplate ? -1
-          : !a.isFromTemplate && b.isFromTemplate ? 1
-            : localeCompare(a.name, b.name)
-      )
     const components = {
       body: {
         row: _TableInlineEditRow,

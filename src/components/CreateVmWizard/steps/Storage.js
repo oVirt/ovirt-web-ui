@@ -559,9 +559,15 @@ class Storage extends React.Component {
     const filteredStorageDomainList = createStorageDomainList(storageDomains, dataCenterId)
     const enableCreate = storageDomainList.length > 0 && !this.isEditingMode()
 
-    const diskList = disks
+    const diskList = [...disks]
+      .sort((a, b) => // template based then by name.
+        a.isFromTemplate && !b.isFromTemplate ? -1
+          : !a.isFromTemplate && b.isFromTemplate ? 1
+            : localeCompare(a.name, b.name)
+      )
       .concat(this.state.creating ? [ this.state.editing[this.state.creating] ] : [])
       .map(disk => {
+        disk = this.state.editing[disk.id] ? this.state.editing[disk.id] : disk // update editing changes from state after sorting
         const sd = storageDomainList.find(sd => sd.id === disk.storageDomainId)
         const isSdOk = sd && filteredStorageDomainList.find(filtered => filtered.id === sd.id) !== undefined
 
@@ -580,11 +586,6 @@ class Storage extends React.Component {
           iface: enumMsg('DiskInterface', disk.iface),
         }
       })
-      .sort((a, b) => // template based then by name
-        a.isFromTemplate && !b.isFromTemplate ? -1
-          : !a.isFromTemplate && b.isFromTemplate ? 1
-            : localeCompare(a.name, b.name)
-      )
     const components = {
       body: {
         row: _TableInlineEditRow, // Table.InlineEditRow,
