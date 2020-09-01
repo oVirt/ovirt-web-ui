@@ -11,7 +11,6 @@ import {
   Checkbox,
   Col,
   ControlLabel,
-  FieldLevelHelp,
   Form,
   FormControl,
   FormGroup,
@@ -22,6 +21,7 @@ import { Alert } from '@patternfly/react-core'
 import SelectBox from '_/components/SelectBox'
 import style from './style.css'
 import OverlayTooltip from '_/components/OverlayTooltip'
+import InfoToolTip from '_/components/OverlayTooltip/InfoTooltip'
 
 const DISK_DEFAULTS = {
   active: true,
@@ -332,11 +332,7 @@ class DiskImageEditor extends Component {
               <LabelCol sm={3}>
                 { msg.diskEditorSizeEditLabel() }
                 { !isImage &&
-                  <FieldLevelHelp
-                    inline
-                    content={msg.diskEditorSizeCantChangeHelp()}
-                    buttonClass={style['editor-field-help']}
-                  />
+                  <InfoToolTip id={`${idPrefix}-size-tooltip`} tooltip={msg.diskEditorSizeCantChangeHelp()} />
                 }
               </LabelCol>
               <Col sm={9}>
@@ -354,11 +350,7 @@ class DiskImageEditor extends Component {
                 { createMode &&
                   <React.Fragment>
                     {msg.diskEditorSizeLabel()}
-                    <FieldLevelHelp
-                      inline
-                      content={msg.diskEditorSizeCreateHelp()}
-                      buttonClass={style['editor-field-help']}
-                    />
+                    <InfoToolTip id={`${idPrefix}-size-edit-tooltip`} tooltip={msg.diskEditorSizeCreateInfoTooltip()} />
                   </React.Fragment>
                 }
                 { !createMode && msg.diskEditorResizeLabel() }
@@ -388,14 +380,13 @@ class DiskImageEditor extends Component {
             <FormGroup controlId={`${idPrefix}-storage-domain`}>
               <LabelCol sm={3}>
                 { msg.diskEditorStorageDomainLabel() }
-                <FieldLevelHelp
-                  inline
-                  content={
+                <InfoToolTip
+                  id={`${idPrefix}-storage-domain-edit-tooltip`}
+                  tooltip={
                     createMode
                       ? msg.diskEditorStorageDomainCreateHelp()
                       : msg.diskEditorStorageDomainCantChangeHelp()
                   }
-                  buttonClass={style['editor-field-help']}
                 />
               </LabelCol>
               <Col sm={9}>
@@ -427,14 +418,13 @@ class DiskImageEditor extends Component {
             <FormGroup controlId={`${idPrefix}-format`}>
               <LabelCol sm={3}>
                 { msg.diskEditorDiskTypeLabel() }
-                <FieldLevelHelp
-                  inline
-                  content={
+                <InfoToolTip
+                  id={`${idPrefix}-format-tooltip`}
+                  tooltip={
                     createMode
                       ? msg.diskEditorDiskTypeCreateHelp()
                       : msg.diskEditorDiskTypeCantChangeHelp()
                   }
-                  buttonClass={style['editor-field-help']}
                 />
               </LabelCol>
               <Col sm={9}>
@@ -465,10 +455,9 @@ class DiskImageEditor extends Component {
               <LabelCol sm={3}>
                 { msg.diskEditorBootableLabel() }
                 {!vmIsDown &&
-                  <FieldLevelHelp
-                    inline
-                    content={msg.bootableEditTooltip()}
-                    buttonClass={style['editor-field-help']}
+                  <InfoToolTip
+                    id={`${idPrefix}-bootable-edit-tooltip`}
+                    tooltip={msg.bootableEditTooltip()}
                   />
                 }
               </LabelCol>

@@ -3,13 +3,12 @@ import PropTypes from 'prop-types'
 import {
   Icon,
   noop,
-  OverlayTrigger,
-  Tooltip,
 } from 'patternfly-react'
 
 import style from './style.css'
 
 import OverlayTooltip from '../OverlayTooltip'
+import { tooltipPropType, tooltipPositionPropType } from '_/propTypeShapes'
 /**
  * Render the edit icon/button to enable the editing of the content of a card.
  *
@@ -40,30 +39,29 @@ class CardEditButton extends React.Component {
   }
 
   render () {
-    const { tooltip, id, editable, disableTooltip } = this.props
+    const { tooltip, id, editable, disableTooltip, placement = 'top' } = this.props
     const { editEnabled } = this.state
 
     const classes = `${style['card-edit-button']} ${style[editEnabled ? 'card-edit-button-enabled' : 'card-edit-button-disabled']}`
     const myClick = editEnabled ? noop : this.enableEditHandler
 
     if (!editable && disableTooltip) {
-      return <OverlayTrigger
-        overlay={<Tooltip><span>{disableTooltip}</span></Tooltip>}
-        placement='right'
-        trigger={['hover', 'focus']}
-        rootClose={false}
+      return (<OverlayTooltip
+        tooltip={<span>{disableTooltip}</span>}
+        placement={placement}
+        id={`${id}-card-edit-button-tooltip`}
       >
         <a className={`${style['card-edit-button']} ${style['card-edit-button-disabled']}`} id={id}>
           <Icon type='pf' name='edit' />
         </a>
-      </OverlayTrigger>
+      </OverlayTooltip>)
     }
     if (!editable) {
       return null
     }
 
     return (
-      <OverlayTooltip id={`${id}-tooltip`} tooltip={tooltip} placement='bottom'>
+      <OverlayTooltip id={`${id}-tooltip`} tooltip={tooltip} placement={placement}>
         <a id={id} className={classes} onClick={(e) => { e.preventDefault(); myClick() }}>
           <Icon type='pf' name='edit' />
         </a>
@@ -72,12 +70,13 @@ class CardEditButton extends React.Component {
   }
 }
 CardEditButton.propTypes = {
-  tooltip: PropTypes.string,
+  tooltip: tooltipPropType,
   editEnabled: PropTypes.bool,
   editable: PropTypes.bool,
-  disableTooltip: PropTypes.string,
+  disableTooltip: tooltipPropType,
   id: PropTypes.string.isRequired,
   onClick: PropTypes.func,
+  placement: tooltipPositionPropType,
 }
 CardEditButton.defaultProps = {
   tooltip: '',

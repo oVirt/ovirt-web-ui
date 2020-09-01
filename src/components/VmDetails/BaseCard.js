@@ -15,6 +15,7 @@ import {
 
 import style from './style.css'
 import CardEditButton from './CardEditButton'
+import { tooltipPropType, tooltipPositionPropType } from '_/propTypeShapes'
 
 /**
  * Base VM details card.  Support common layouts and view vs edit modes.
@@ -93,6 +94,7 @@ class BaseCard extends React.Component {
       className = '',
       disableSaveButton = false,
       disableTooltip = undefined,
+      editTooltipPlacement = 'top',
     } = this.props
     const editing = editMode === undefined ? this.state.edit : editMode
     const hasHeading = !!title
@@ -111,6 +113,7 @@ class BaseCard extends React.Component {
               editEnabled={editing}
               onClick={this.clickEdit}
               id={`${idPrefix}-button-edit`}
+              placement={editTooltipPlacement}
             />
             <CardTitle>
               {hasIcon && <Icon type={icon.type} name={icon.name} className={style['base-card-title-icon']} />}
@@ -129,6 +132,7 @@ class BaseCard extends React.Component {
               editEnabled={editing}
               onClick={this.clickEdit}
               id={`${idPrefix}-button-edit`}
+              placement={editTooltipPlacement}
             />
           )}
 
@@ -160,8 +164,9 @@ BaseCard.propTypes = {
   editMode: PropTypes.bool,
   editable: PropTypes.bool,
   disableSaveButton: PropTypes.bool,
-  editTooltip: PropTypes.string,
-  disableTooltip: PropTypes.string,
+  editTooltip: tooltipPropType,
+  disableTooltip: tooltipPropType,
+  editTooltipPlacement: tooltipPositionPropType,
 
   onStartEdit: PropTypes.func,
   onCancel: PropTypes.func,

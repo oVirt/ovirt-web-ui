@@ -12,19 +12,19 @@ const diskStateSettings = {
     type: 'fa',
     name: 'arrow-circle-o-up',
     className: style['state-icon-active'],
-    tooltip: msg.diskStateActiveTooltip(),
+    tooltip: `${msg.status()}: ${msg.diskStateActiveTooltip()}`,
   },
   'inactive': {
     type: 'fa',
     name: 'arrow-circle-o-down',
     className: style['state-icon-inactive'],
-    tooltip: msg.diskStateInactiveTooltip(),
+    tooltip: `${msg.status()}: ${msg.diskStateInactiveTooltip()}`,
   },
   'locked': {
     type: 'pf',
     name: 'locked',
     className: style['state-icon-locked'],
-    tooltip: msg.diskStateLockedTooltip(),
+    tooltip: `${msg.status()}: ${msg.diskStateLockedTooltip()}`,
   },
 
 }

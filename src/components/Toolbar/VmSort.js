@@ -5,12 +5,15 @@ import { Sort } from 'patternfly-react'
 
 import { setVmSort } from '_/actions'
 import { sortFields } from '_/utils'
+import OverlayTooltip from '_/components/OverlayTooltip'
+import { msg } from '_/intl'
 
 class VmSort extends React.Component {
   constructor (props) {
     super(props)
     this.updateCurrentSortType = this.updateCurrentSortType.bind(this)
     this.toggleCurrentSortDirection = this.toggleCurrentSortDirection.bind(this)
+    this.getSortTooltipMessage = this.getSortTooltipMessage.bind(this)
   }
 
   updateCurrentSortType (sortType) {
@@ -20,6 +23,13 @@ class VmSort extends React.Component {
   toggleCurrentSortDirection () {
     const sort = this.props.sort
     this.props.onSortChange({ ...sort, isAsc: !sort.isAsc })
+  }
+
+  getSortTooltipMessage () {
+    const { sort: { id, isAsc } } = this.props
+    return id === 'os' || id === 'name'
+      ? (isAsc ? msg.sortAToZ() : msg.sortZToA())
+      : (isAsc ? msg.sortOffFirst() : msg.sortRunningFirst())
   }
 
   render () {
@@ -32,11 +42,17 @@ class VmSort extends React.Component {
           currentSortType={sort}
           onSortTypeSelected={this.updateCurrentSortType}
         />
-        <Sort.DirectionSelector
-          isAscending={sort.isAsc}
-          isNumeric={sort.isNumeric}
-          onClick={this.toggleCurrentSortDirection}
-        />
+        <OverlayTooltip
+          id={'sort-tooltip'}
+          tooltip={this.getSortTooltipMessage()}
+          placement={'bottom'}
+        >
+          <Sort.DirectionSelector
+            isAscending={sort.isAsc}
+            isNumeric={sort.isNumeric}
+            onClick={this.toggleCurrentSortDirection}
+          />
+        </OverlayTooltip>
       </Sort>
     )
   }

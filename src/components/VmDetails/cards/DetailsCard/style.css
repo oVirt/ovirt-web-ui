@@ -65,3 +65,11 @@
 button.field-level-help:global(.popover-pf-info) {
   flex-grow: 0;
 }
+
+/**
+ * CPU tooltip list
+ */
+.cpu-tooltip-list {
+  list-style: disc;
+  padding-left: 30px;
+}

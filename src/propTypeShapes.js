@@ -27,3 +27,8 @@ export const RouterPropTypeShapes = {
     goForward: PropTypes.func,
   }),
 }
+export const tooltipPropType = PropTypes.oneOfType([PropTypes.string, PropTypes.node, PropTypes.oneOf([false])])
+
+export const requiredTooltipPropType = PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired
+
+export const tooltipPositionPropType = PropTypes.oneOf(['top', 'right', 'bottom', 'left', false])

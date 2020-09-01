@@ -31,7 +31,7 @@ const Pool = ({ pool, icons, onStart }) => {
         <span className={style['pool-vm-label']} style={{ backgroundColor: pool.get('color') }}>{ pool.get('name') }</span>
       </BaseCard.Header>
       <BaseCard.Icon icon={icon} />
-      <BaseCard.Title idPrefix={idPrefix} name={pool.get('name')} />
+      <BaseCard.Title idPrefix={idPrefix} name={pool.get('name')} useTooltip={false} />
       <BaseCard.Status idPrefix={idPrefix}>
         <dl className={style['pool-info']}>
           <dt>{msg.allocatedVms()} <FieldLevelHelp content={msg.maxNumberOfVms({ numberOfVms: pool.get('maxUserVms') })} inline /></dt><dd>{pool.get('vmsCount')}</dd>

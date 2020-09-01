@@ -12,13 +12,13 @@ const nicLinkInfoSettings = {
     type: 'fa',
     name: 'arrow-circle-o-up',
     className: style['link-icon-up'],
-    tooltip: msg.nicLinkUpTooltip(),
+    tooltip: msg.nicLinkStatusUp(),
   },
   false: {
     type: 'fa',
     name: 'arrow-circle-o-down',
     className: style['link-icon-down'],
-    tooltip: msg.nicLinkDownTooltip(),
+    tooltip: msg.nicLinkStatusDown(),
   },
 }
 

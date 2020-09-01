@@ -214,7 +214,8 @@ class OverviewCard extends React.Component {
       <BaseCard
         editMode={isEditing}
         editable={isEditable}
-        editTooltip={`Edit ${vm.get('name')}`}
+        editTooltip={msg.edit()}
+        editTooltipPlacement={'bottom'}
         disableTooltip={isPoolVm && isPoolAutomatic ? msg.automaticPoolsNotEditable({ poolName: pool.get('name') }) : undefined}
         idPrefix={idPrefix}
         disableSaveButton={nameError}

@@ -29,7 +29,6 @@ import {
 import {
   Alert,
   ExpandCollapse,
-  FieldLevelHelp,
   FormControl,
   Icon,
 } from 'patternfly-react'
@@ -49,6 +48,7 @@ import FieldRow from './FieldRow'
 import OverlayTooltip from '_/components/OverlayTooltip'
 
 import timezones from '_/components/utils/timezones.json'
+import InfoToolTip from '_/components/OverlayTooltip/InfoTooltip'
 
 function rephraseVmType (vmType) {
   const types = {
@@ -73,7 +73,7 @@ const NotAvailable = ({ tooltip, id }) => (
   <div>
     { tooltip
       ? (
-        <OverlayTooltip id={id} tooltip={tooltip} placement='top'>
+        <OverlayTooltip id={id} tooltip={tooltip}>
           <span>{msg.notAvailable()}</span>
         </OverlayTooltip>
       )
@@ -679,8 +679,9 @@ class DetailsCard extends React.Component {
         editable={canEditDetails || canChangeCd}
         disableTooltip={isPoolVm && isPoolAutomatic ? msg.automaticPoolsNotEditable({ poolName: pool.get('name') }) : undefined}
         editMode={isEditing}
+        editTooltipPlacement={'bottom'}
         idPrefix={idPrefix}
-        editTooltip={msg.cardTooltipEditDetails({ vmName: vm.get('name') })}
+        editTooltip={msg.edit()}
         onStartEdit={this.handleCardOnStartEdit}
         onCancel={this.handleCardOnCancel}
         onSave={this.handleCardOnSave}
@@ -699,7 +700,7 @@ class DetailsCard extends React.Component {
                         {<EllipsisValue tooltip={hostName}>{hostName}</EllipsisValue> || <NotAvailable tooltip={msg.notAvailableUntilRunning()} id={`${idPrefix}-host-not-available`} />}
                       </FieldRow>
                     }
-                    <FieldRow label={msg.ipAddress()} id={`${idPrefix}-ip`}>
+                    <FieldRow label={msg.ipAddress()} id={`${idPrefix}-ip`} >
                       <React.Fragment>
                         { ip4Addresses.length === 0 && ip6Addresses.length === 0 &&
                           <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id={`${idPrefix}-ip-not-available`} />
@@ -728,7 +729,7 @@ class DetailsCard extends React.Component {
                       { isFullEdit && !canChangeCluster &&
                         <div>
                           {clusterName}
-                          <FieldLevelHelp disabled={false} content={msg.clusterCanOnlyChangeWhenVmStopped()} inline />
+                          <InfoToolTip id={`${idPrefix}-info-tooltip`} tooltip={msg.clusterCanOnlyChangeWhenVmStopped()} />
                         </div>
                       }
                       { isFullEdit && canChangeCluster &&
@@ -740,14 +741,8 @@ class DetailsCard extends React.Component {
                         />
                       }
                     </FieldRow>
-                    <FieldRow label={msg.dataCenter()} id={`${idPrefix}-data-center`}>
-                      { !isFullEdit && dataCenterName }
-                      { isFullEdit &&
-                        <div>
-                          {dataCenterName}
-                          <FieldLevelHelp disabled={false} content={msg.dataCenterChangesWithCluster()} inline />
-                        </div>
-                      }
+                    <FieldRow label={msg.dataCenter()} tooltip={isFullEdit && msg.dataCenterChangesWithCluster()} id={`${idPrefix}-data-center`}>
+                      {dataCenterName}
                     </FieldRow>
                   </Grid>
                 </Col>
@@ -761,7 +756,7 @@ class DetailsCard extends React.Component {
                       { isEditing && !canChangeCd &&
                         <div>
                           <EllipsisValue tooltip={cdImageName}>{cdImageName}</EllipsisValue>
-                          <FieldLevelHelp disabled={false} content={msg.cdCanOnlyChangeWhenVmRunning()} inline />
+                          <InfoToolTip id={`${idPrefix}-tooltip`} tooltip={msg.cdCanOnlyChangeWhenVmRunning()} />
                         </div>
                       }
                       { isEditing && canChangeCd &&
@@ -800,11 +795,14 @@ class DetailsCard extends React.Component {
                       label={msg.cpus()}
                       id={`${idPrefix}-cpus`}
                       tooltip={
-                        msg.totalCpuTooltip({
-                          sockets: vCpuTopology.get('sockets'),
-                          cores: vCpuTopology.get('cores'),
-                          threads: vCpuTopology.get('threads'),
-                        })
+                        <div>
+                          <span>The total virtual CPUs include:</span>
+                          <ul className={style['cpu-tooltip-list']} >
+                            <li>{msg.totalSocketsCpuTooltipMessage({ number: vCpuTopology.get('sockets') })}</li>
+                            <li>{msg.totalCoresCpuTooltipMessage({ number: vCpuTopology.get('cores') })}</li>
+                            <li>{msg.totalThreadsCpuTooltipMessage({ number: vCpuTopology.get('threads') })}</li>
+                          </ul>
+                        </div>
                       }>
                       { !isFullEdit && vCpuCount }
                       { isFullEdit &&
@@ -873,7 +871,7 @@ class DetailsCard extends React.Component {
                         <Col cols={12} className={style['col-label']}>
                           <div>
                             <span>{msg.bootOrder()}</span>
-                            <FieldLevelHelp content={msg.bootSequenceTooltip()} inline />
+                            <InfoToolTip id={`${idPrefix}-edit-boot-order-tooltip`} tooltip={msg.SelectTheBootableDeviceTooltip()} />
                           </div>
                         </Col>
                       </Row>

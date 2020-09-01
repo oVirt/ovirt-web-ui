@@ -20,6 +20,7 @@ import { deleteVmSnapshot } from './actions'
 import { formatDateFromNow } from '_/helpers'
 import { getMinimizedString, escapeHtml } from '../../../utils'
 import OverlayTooltip from '_/components/OverlayTooltip'
+import InfoToolTip from '_/components/OverlayTooltip/InfoTooltip'
 const MAX_DESCRIPTION_SIZE = 50
 
 const SnapshotAction = ({ children, className, disabled, id, onClick }) => {
@@ -121,9 +122,10 @@ class SnapshotItem extends React.Component {
           key='info'
         >
           <a id={`${this.props.id}-info`}>
-            <OverlayTooltip placement={this.state.isMobile ? 'right' : 'left'} id={`${this.props.id}-info-tt`} tooltip={msg.details()}>
-              <Icon type='pf' name='info' />
-            </OverlayTooltip>
+            <InfoToolTip
+              id={`${this.props.id}-info-tt`}
+              tooltip={msg.details()}
+            />
           </a>
         </OverlayTrigger>
       )
@@ -138,7 +140,7 @@ class SnapshotItem extends React.Component {
             vmId={this.props.vmId}
             trigger={({ onClick }) => (
               <SnapshotAction key='restore' id={`${this.props.id}-restore`} onClick={onClick} disabled={isRestoreDisabled}>
-                <OverlayTooltip placement={this.state.isMobile ? 'right' : 'left'} id={`${this.props.id}-restore-tt`} tooltip={msg.snapshotRestore()}>
+                <OverlayTooltip id={`${this.props.id}-restore-tt`} tooltip={msg.snapshotRestore()}>
                   <Icon type='fa' name='play-circle' />
                 </OverlayTooltip>
               </SnapshotAction>
@@ -154,7 +156,7 @@ class SnapshotItem extends React.Component {
             onDelete={this.props.onSnapshotDelete}
             trigger={({ onClick }) => (
               <SnapshotAction key='delete' id={`${this.props.id}-delete`} disabled={isActionsDisabled} onClick={onClick}>
-                <OverlayTooltip placement={this.state.isMobile ? 'right' : 'left'} id={`${this.props.id}-delete-tt`} tooltip={msg.snapshotDelete()}>
+                <OverlayTooltip id={`${this.props.id}-delete-tt`} tooltip={msg.snapshotDelete()}>
                   <Icon type='pf' name='delete' />
                 </OverlayTooltip>
               </SnapshotAction>
@@ -174,16 +176,17 @@ class SnapshotItem extends React.Component {
 
       // Status tooltip
       const tooltipId = `${this.props.id}-status-icon-${this.props.snapshot.get('status')}`
-      var tooltipPlacement = this.state.isMobile ? 'right' : 'left'
+      const tooltipPlacement = 'top'
+      const status = `${msg.status()}:`
       switch (this.props.snapshot.get('status')) {
         case 'locked':
-          statusIcon = <StatusTooltip icon={<Icon type='pf' name='locked' />} text={msg.locked()} id={tooltipId} placement={tooltipPlacement} />
+          statusIcon = <StatusTooltip icon={<Icon type='pf' name='locked' />} text={`${status} ${msg.locked()}`} id={tooltipId} placement={tooltipPlacement} />
           break
         case 'in_preview':
-          statusIcon = <StatusTooltip icon={<Icon type='fa' name='eye' />} text={msg.inPreview()} id={tooltipId} placement={tooltipPlacement} />
+          statusIcon = <StatusTooltip icon={<Icon type='fa' name='eye' />} text={`${status} ${msg.inPreview()}`} id={tooltipId} placement={tooltipPlacement} />
           break
         case 'ok':
-          statusIcon = <StatusTooltip icon={<Icon type='pf' name='ok' />} text={msg.ok()} id={tooltipId} placement={tooltipPlacement} />
+          statusIcon = <StatusTooltip icon={<Icon type='pf' name='ok' />} text={`${status} ${msg.ok()}`} id={tooltipId} placement={tooltipPlacement} />
           break
       }
     }

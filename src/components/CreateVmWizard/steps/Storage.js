@@ -262,7 +262,7 @@ class Storage extends React.Component {
             <span className={style['disk-size-edit-label']}>GiB</span>
             <FieldLevelHelp
               inline
-              content={msg.diskEditorSizeCreateHelp()}
+              content={msg.diskEditorSizeCreateInfoTooltip()}
             />
           </div>
         },
