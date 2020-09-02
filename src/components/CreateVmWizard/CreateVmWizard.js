@@ -276,8 +276,8 @@ class CreateVmWizard extends React.Component {
   }
 
   showCloseWizardDialog () {
-    const { wizardUpdated } = this.state
-    if (wizardUpdated) {
+    const { wizardUpdated, correlationId } = this.state
+    if (wizardUpdated && !correlationId) {
       this.setState(produce(draft => { draft.showCloseWizardDialog = true }))
     } else {
       this.hideAndResetState()
