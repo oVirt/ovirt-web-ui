@@ -345,6 +345,7 @@ class Networking extends React.Component {
 
   // Cancel the creation or editing of a row by throwing out edit state
   handleRowCancelChange (rowData) {
+    this.components = undefined // remove the current reference to make the table re-render
     this.setState(state => {
       const editing = state.editing
       delete editing[rowData.id]
@@ -383,20 +384,26 @@ class Networking extends React.Component {
     const vnicList = createVNicProfileList(vnicProfiles, { dataCenterId, cluster })
     const enableCreate = vnicList.length > 0 && Object.keys(this.state.editing).length === 0
 
-    const nicList = nics
+    const nicList = [...nics]
+      .sort((a, b) => // template based then by name.
+        a.isFromTemplate && !b.isFromTemplate ? -1
+          : !a.isFromTemplate && b.isFromTemplate ? 1
+            : localeCompare(a.name, b.name)
+      )
       .concat(this.state.creating ? [ this.state.editing[this.state.creating] ] : [])
       .map(nic => ({
-        ...nic,
+        ...(this.state.editing[nic.id] ? this.state.editing[nic.id] : nic),
         vnic: vnicList.find(vnic => vnic.id === nic.vnicProfileId)
           ? vnicList.find(vnic => vnic.id === nic.vnicProfileId).value
           : msg.createVmNetUnknownVnicProfile(),
         device: enumMsg('NicInterface', nic.deviceType),
       }))
-      .sort((a, b) =>
-        a.isFromTemplate && !b.isFromTemplate ? -1
-          : !a.isFromTemplate && b.isFromTemplate ? 1
-            : localeCompare(a.name, b.name)
-      )
+    const components = {
+      body: {
+        row: _TableInlineEditRow,
+      },
+    }
+    this.components = this.components || components // if the table should (re)render the value of this.components should be undefined
 
     return <div className={style['settings-container']} id={idPrefix}>
       { nicList.length === 0 && <React.Fragment>
@@ -426,11 +433,7 @@ class Networking extends React.Component {
             dataTable
             inlineEdit
             columns={this.columns}
-            components={{
-              body: {
-                row: _TableInlineEditRow,
-              },
-            }}
+            components={this.components}
           >
             <Table.Header />
             <Table.Body
