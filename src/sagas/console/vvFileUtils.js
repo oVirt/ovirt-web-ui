@@ -33,7 +33,7 @@ export function adjustVVFile ({ data, options, usbAutoshare, usbFilter }) {
   }
 
   // make USB Auto-Share to be enabled/disabled in VM Portal according to the SpiceUsbAutoShare config value
-  data = data.replace(/^enable-usb-autoshare=.*$/mg, `enable-usb-autoshare=${usbAutoshare ? 1 : 0}`)
+  data = data.replace(/^enable-usb-autoshare=.*$/mg, `enable-usb-autoshare=${usbAutoshare.toString() === 'true' ? 1 : 0}`)
 
   console.log('adjustVVFile data after adjustment:', data)
   return data
