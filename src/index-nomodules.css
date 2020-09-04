@@ -215,6 +215,10 @@ a.disabled {
   text-align: left;
 }
 
+.product-versions-pf li strong {
+  margin-right: 0;
+}
+
 .vnc-console {
   width: 100%;
   height: 100%;
