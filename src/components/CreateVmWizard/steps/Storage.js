@@ -2,13 +2,14 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { msg } from '_/intl'
-import { localeCompare, generateUnique } from '_/helpers'
+import { generateUnique } from '_/helpers'
 import { isNumber, convertValue } from '_/utils'
 import { BASIC_DATA_SHAPE, STORAGE_SHAPE } from '../dataPropTypes'
 
 import {
   createDiskTypeList,
   createStorageDomainList,
+  sortNicsDisks,
   suggestDiskName,
 } from '_/components/utils'
 
@@ -559,12 +560,7 @@ class Storage extends React.Component {
     const filteredStorageDomainList = createStorageDomainList(storageDomains, dataCenterId)
     const enableCreate = storageDomainList.length > 0 && !this.isEditingMode()
 
-    const diskList = [...disks]
-      .sort((a, b) => // template based then by name.
-        a.isFromTemplate && !b.isFromTemplate ? -1
-          : !a.isFromTemplate && b.isFromTemplate ? 1
-            : localeCompare(a.name, b.name)
-      )
+    const diskList = sortNicsDisks([...disks])
       .concat(this.state.creating ? [ this.state.editing[this.state.creating] ] : [])
       .map(disk => {
         disk = this.state.editing[disk.id] ? this.state.editing[disk.id] : disk // update editing changes from state after sorting
