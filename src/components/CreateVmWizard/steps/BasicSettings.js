@@ -518,13 +518,12 @@ class BasicSettings extends React.Component {
               />
             </FieldRow>
 
-            {/* TODO: Swap out for a proper timezone drop down once PR #1004 is merged */}
             <FieldRow label={msg.sysPrepTimezone()} id={`${idPrefix}-sysPrepTimezone`} vertical>
-              <FormControl
-                id={`${idPrefix}-sysPrepTimezone-edit`}
-                type='text'
-                defaultValue={data.initTimezone}
-                onChange={e => this.handleChange('initTimezone', e.target.value)}
+              <SelectBox
+                id={`${idPrefix}-sysprep-timezone-select`}
+                items={timezones}
+                selected={data.initTimezone}
+                onChange={selectedId => this.handleChange('initTimezone', selectedId)}
               />
             </FieldRow>
 
