@@ -20,8 +20,7 @@ import {
 import { Alert } from '@patternfly/react-core'
 import SelectBox from '_/components/SelectBox'
 import style from './style.css'
-import OverlayTooltip from '_/components/OverlayTooltip'
-import InfoToolTip from '_/components/OverlayTooltip/InfoTooltip'
+import { Tooltip, InfoTooltip } from '_/components/tooltips'
 
 const DISK_DEFAULTS = {
   active: true,
@@ -332,7 +331,7 @@ class DiskImageEditor extends Component {
               <LabelCol sm={3}>
                 { msg.diskEditorSizeEditLabel() }
                 { !isImage &&
-                  <InfoToolTip id={`${idPrefix}-size-tooltip`} tooltip={msg.diskEditorSizeCantChangeHelp()} />
+                  <InfoTooltip id={`${idPrefix}-size-tooltip`} tooltip={msg.diskEditorSizeCantChangeHelp()} />
                 }
               </LabelCol>
               <Col sm={9}>
@@ -350,7 +349,7 @@ class DiskImageEditor extends Component {
                 { createMode &&
                   <React.Fragment>
                     {msg.diskEditorSizeLabel()}
-                    <InfoToolTip id={`${idPrefix}-size-edit-tooltip`} tooltip={msg.diskEditorSizeCreateInfoTooltip()} />
+                    <InfoTooltip id={`${idPrefix}-size-edit-tooltip`} tooltip={msg.diskEditorSizeCreateInfoTooltip()} />
                   </React.Fragment>
                 }
                 { !createMode && msg.diskEditorResizeLabel() }
@@ -364,13 +363,13 @@ class DiskImageEditor extends Component {
                   />
                 }
                 { !createMode &&
-                  <OverlayTooltip id={`${idPrefix}-form-tooltip`} tooltip={msg.diskEditorResizeNote()} placement='right'>
+                  <Tooltip id={`${idPrefix}-form-tooltip`} tooltip={msg.diskEditorResizeNote()} placement='right'>
                     <FormControl
                       type='number'
                       value={this.state.values.size}
                       onChange={this.changeSize}
                     />
-                  </OverlayTooltip>
+                  </Tooltip>
                 }
               </Col>
             </FormGroup>
@@ -380,7 +379,7 @@ class DiskImageEditor extends Component {
             <FormGroup controlId={`${idPrefix}-storage-domain`}>
               <LabelCol sm={3}>
                 { msg.diskEditorStorageDomainLabel() }
-                <InfoToolTip
+                <InfoTooltip
                   id={`${idPrefix}-storage-domain-edit-tooltip`}
                   tooltip={
                     createMode
@@ -418,7 +417,7 @@ class DiskImageEditor extends Component {
             <FormGroup controlId={`${idPrefix}-format`}>
               <LabelCol sm={3}>
                 { msg.diskEditorDiskTypeLabel() }
-                <InfoToolTip
+                <InfoTooltip
                   id={`${idPrefix}-format-tooltip`}
                   tooltip={
                     createMode
@@ -455,7 +454,7 @@ class DiskImageEditor extends Component {
               <LabelCol sm={3}>
                 { msg.diskEditorBootableLabel() }
                 {!vmIsDown &&
-                  <InfoToolTip
+                  <InfoTooltip
                     id={`${idPrefix}-bootable-edit-tooltip`}
                     tooltip={msg.bootableEditTooltip()}
                   />

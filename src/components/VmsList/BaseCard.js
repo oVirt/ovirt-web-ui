@@ -54,18 +54,18 @@ BaseCardIcon.propTypes = {
 
 class BaseCardTitle extends React.Component {
   render () {
-    const { url, name, useTooltip = true } = this.props
+    const { url, name } = this.props
     if (url) {
       return (
         <Link to={url} className={style['vm-detail-link']}>
-          <div className={`${style['vm-name']} ${style['crop']}`} title={useTooltip ? name : undefined} data-toggle='tooltip' id={`${this.context}-name`}>
+          <div className={`${style['vm-name']} ${style['crop']}`} id={`${this.context}-name`}>
             {name}
           </div>
         </Link>
       )
     }
     return (
-      <div className={`${style['vm-name']} ${style['crop']}`} title={useTooltip ? name : undefined} data-toggle='tooltip' id={`${this.context}-name`}>
+      <div className={`${style['vm-name']} ${style['crop']}`} id={`${this.context}-name`}>
         {name}
       </div>
     )
@@ -78,7 +78,6 @@ BaseCardTitle.contextType = IdPrefixContext
 BaseCardTitle.propTypes = {
   name: PropTypes.string.isRequired,
   url: PropTypes.string,
-  useTooltip: PropTypes.bool,
 }
 
 class BaseCardStatus extends React.Component {

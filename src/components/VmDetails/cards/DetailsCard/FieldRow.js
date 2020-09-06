@@ -3,8 +3,7 @@ import PropTypes from 'prop-types'
 
 import { Row, Col } from '_/components/Grid'
 import style from './style.css'
-import InfoToolTip from '_/components/OverlayTooltip/InfoTooltip'
-import { tooltipPropType, tooltipPositionPropType } from '_/propTypeShapes'
+import { InfoTooltip, Tooltip } from '_/components/tooltips'
 
 const FieldRow = ({ label, children, id, tooltip, tooltipPosition }) => (
   <Row className={style['field-row']}>
@@ -12,7 +11,7 @@ const FieldRow = ({ label, children, id, tooltip, tooltipPosition }) => (
       <span>{label}</span>
       {tooltip &&
         <span>
-          <InfoToolTip
+          <InfoTooltip
             id={`${id}-tooltip`}
             tooltip={tooltip}
             placement={tooltipPosition}
@@ -26,9 +25,9 @@ const FieldRow = ({ label, children, id, tooltip, tooltipPosition }) => (
 FieldRow.propTypes = {
   id: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
-  tooltip: tooltipPropType,
+  tooltip: PropTypes.oneOfType(Tooltip.propTypes.tooltip),
   children: PropTypes.node.isRequired,
-  tooltipPosition: tooltipPositionPropType,
+  tooltipPosition: Tooltip.propTypes.placement,
 }
 
 export default FieldRow

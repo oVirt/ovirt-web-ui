@@ -11,7 +11,7 @@ import { Grid, Row, Col } from '_/components/Grid'
 import DeleteConfirmationModal from '../../../VmModals/DeleteConfirmationModal'
 import NicEditor from './NicEditor'
 import NicLinkStateIcon from './NicLinkStateIcon'
-import OverlayTooltip from '_/components/OverlayTooltip'
+import { Tooltip } from '_/components/tooltips'
 import EllipsisValue from '_/components/EllipsisValue'
 
 /**
@@ -82,23 +82,23 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEd
           vnicProfileList={vnicProfileList}
           onSave={onEdit}
           trigger={({ onClick }) => (
-            <OverlayTooltip id={`${idPrefix}-edit-tooltip`} tooltip={msg.nicEditTooltip()}>
+            <Tooltip id={`${idPrefix}-edit-tooltip`} tooltip={msg.nicEditTooltip()}>
               <a id={`${idPrefix}-edit-action`} className={itemStyle['item-action']} onClick={onClick}>
                 <Icon type='pf' name='edit' />
               </a>
-            </OverlayTooltip>
+            </Tooltip>
           )}
         />
       }
       { !canEdit &&
-        <OverlayTooltip id={`${idPrefix}-edit-tooltip-disabled`} tooltip={msg.nicEditDisabledTooltip()}>
+        <Tooltip id={`${idPrefix}-edit-tooltip-disabled`} tooltip={msg.nicEditDisabledTooltip()}>
           <Icon
             type='pf'
             name='edit'
             id={`${idPrefix}-edit-action-disabled`}
             className={`${itemStyle['item-action']} ${itemStyle['item-action-disabled']}`}
           />
-        </OverlayTooltip>
+        </Tooltip>
       }
 
       { canDelete &&
@@ -106,11 +106,11 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEd
           id={`${idPrefix}-delete-modal`}
           onDelete={() => { onDelete(nic.id) }}
           trigger={({ onClick }) => (
-            <OverlayTooltip id={`${idPrefix}-delete-tooltip`} tooltip={msg.nicDeleteTooltip()}>
+            <Tooltip id={`${idPrefix}-delete-tooltip`} tooltip={msg.nicDeleteTooltip()}>
               <a id={`${idPrefix}-delete-action`} className={itemStyle['item-action']} onClick={onClick}>
                 <Icon type='pf' name='delete' />
               </a>
-            </OverlayTooltip>
+            </Tooltip>
           )}
         >
           <span
@@ -123,14 +123,14 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEd
         </DeleteConfirmationModal>
       }
       { !canDelete &&
-        <OverlayTooltip id={`${idPrefix}-delete-tooltip-disabled`} tooltip={msg.nicDeleteDisabledTooltip()}>
+        <Tooltip id={`${idPrefix}-delete-tooltip-disabled`} tooltip={msg.nicDeleteDisabledTooltip()}>
           <Icon
             type='pf'
             name='delete'
             id={`${idPrefix}-delete-action-disabled`}
             className={`${itemStyle['item-action']} ${itemStyle['item-action-disabled']}`}
           />
-        </OverlayTooltip>
+        </Tooltip>
       }
     </span>
     }

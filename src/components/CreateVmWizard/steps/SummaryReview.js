@@ -7,7 +7,7 @@ import { InfoCircleIcon } from '@patternfly/react-icons'
 import { msg, enumMsg } from '_/intl'
 import { templateNameRenderer, userFormatOfBytes } from '_/helpers'
 import { Grid, Row, Col } from '_/components/Grid'
-import OverlayTooltip from '_/components/OverlayTooltip'
+import { Tooltip } from '_/components/tooltips'
 import { sortNicsDisks } from '_/components/utils'
 
 import { BASIC_DATA_SHAPE, NIC_SHAPE, STORAGE_SHAPE } from '../dataPropTypes'
@@ -63,17 +63,22 @@ const ReviewBasic = ({ id, dataCenters, clusters, isos, templates, operatingSyst
     <Item id={`${id}-memory`} label={msg.memory()}>{userFormatOfBytes(basic.memory, 'MiB').str}</Item>
     <Item id={`${id}-cpus`} label={msg.cpus()}>
       { basic.cpus }
-      <OverlayTooltip
+      <Tooltip
         id={`${id}-summary-vcpus-tooltip`}
-        tooltip={msg.totalCpuTooltip({
-          cores: basic.topology.cores,
-          sockets: basic.topology.sockets,
-          threads: basic.topology.threads,
-        })}
+        tooltip={
+          <div>
+            <span>The total virtual CPUs include:</span>
+            <ul className={style['cpu-tooltip-list']} >
+              <li>{msg.totalSocketsCpuTooltipMessage({ number: basic.topology.sockets })}</li>
+              <li>{msg.totalCoresCpuTooltipMessage({ number: basic.topology.cores })}</li>
+              <li>{msg.totalThreadsCpuTooltipMessage({ number: basic.topology.threads })}</li>
+            </ul>
+          </div>
+        }
         placement={'top'}
       >
         <InfoCircleIcon className={style['info-circle-icon']} />
-      </OverlayTooltip>    </Item>
+      </Tooltip>    </Item>
     <Item id={`${id}-optimizedFor`} label={msg.optimizedFor()}>{optimizedForMap[basic.optimizedFor].value}</Item>
   </React.Fragment>
 }

@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 
 import { hrefWithoutHistory } from '_/helpers'
 import { msg } from '_/intl'
-import OverlayTooltip from '../OverlayTooltip'
+import { Tooltip } from '../tooltips'
 
 const Bellicon = ({ userMessages, handleclick }) => {
   const messagesCount = userMessages.get('records').size
@@ -15,13 +15,13 @@ const Bellicon = ({ userMessages, handleclick }) => {
 
   return (
     <li>
-      <OverlayTooltip id={`${idPrefix}-tooltip`} tooltip={msg.notifications()} placement='bottom'>
+      <Tooltip id={`${idPrefix}-tooltip`} tooltip={msg.notifications()} placement='bottom'>
         <a className='dropdown-toggle nav-item-iconic' href='#' onClick={hrefWithoutHistory(handleclick)} id={`${idPrefix}-toggle`}>
           <i className='fa fa-bell' />
           {badgeElement}
           <span className='caret' id={`${idPrefix}-caret`} />
         </a>
-      </OverlayTooltip>
+      </Tooltip>
     </li>
   )
 }

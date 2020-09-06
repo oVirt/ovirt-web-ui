@@ -15,7 +15,7 @@ import {
 
 import style from './style.css'
 import CardEditButton from './CardEditButton'
-import { tooltipPropType, tooltipPositionPropType } from '_/propTypeShapes'
+import { Tooltip } from '_/components/tooltips'
 
 /**
  * Base VM details card.  Support common layouts and view vs edit modes.
@@ -164,9 +164,9 @@ BaseCard.propTypes = {
   editMode: PropTypes.bool,
   editable: PropTypes.bool,
   disableSaveButton: PropTypes.bool,
-  editTooltip: tooltipPropType,
-  disableTooltip: tooltipPropType,
-  editTooltipPlacement: tooltipPositionPropType,
+  editTooltip: PropTypes.oneOfType(Tooltip.propTypes.tooltip),
+  disableTooltip: PropTypes.oneOfType(Tooltip.propTypes.tooltip),
+  editTooltipPlacement: Tooltip.propTypes.placement,
 
   onStartEdit: PropTypes.func,
   onCancel: PropTypes.func,

@@ -11,7 +11,7 @@ import { hrefWithoutHistory } from '_/helpers'
 
 import { refresh } from '_/actions'
 import { msg } from '_/intl'
-import OverlayTooltip from '../OverlayTooltip'
+import { Tooltip } from '../tooltips'
 
 /**
  * Main application header on top of the page
@@ -26,11 +26,11 @@ const VmsPageHeader = ({ onRefresh }) => {
         <VmUserMessages show={show} onClose={() => setShow(!show)} />
         <ul className='nav navbar-nav navbar-right navbar-iconic'>
           <li>
-            <OverlayTooltip id={`${idPrefix}-tooltip`} tooltip={msg.refresh()} placement='bottom'>
+            <Tooltip id={`${idPrefix}-tooltip`} tooltip={msg.refresh()} placement='bottom'>
               <a href='#' className='nav-item-iconic' onClick={hrefWithoutHistory(() => onRefresh())} id={`${idPrefix}-refresh`}>
                 <i className='fa fa-refresh' />
               </a>
-            </OverlayTooltip>
+            </Tooltip>
           </li>
           <UserMenu />
           <Bellicon handleclick={() => setShow(!show)} />

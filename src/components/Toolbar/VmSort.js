@@ -5,7 +5,7 @@ import { Sort } from 'patternfly-react'
 
 import { setVmSort } from '_/actions'
 import { sortFields } from '_/utils'
-import OverlayTooltip from '_/components/OverlayTooltip'
+import { Tooltip } from '_/components/tooltips'
 import { msg } from '_/intl'
 
 class VmSort extends React.Component {
@@ -42,7 +42,7 @@ class VmSort extends React.Component {
           currentSortType={sort}
           onSortTypeSelected={this.updateCurrentSortType}
         />
-        <OverlayTooltip
+        <Tooltip
           id={'sort-tooltip'}
           tooltip={this.getSortTooltipMessage()}
           placement={'bottom'}
@@ -52,7 +52,7 @@ class VmSort extends React.Component {
             isNumeric={sort.isNumeric}
             onClick={this.toggleCurrentSortDirection}
           />
-        </OverlayTooltip>
+        </Tooltip>
       </Sort>
     )
   }

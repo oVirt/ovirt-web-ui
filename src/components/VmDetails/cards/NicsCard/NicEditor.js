@@ -19,7 +19,7 @@ import { msg } from '_/intl'
 import style from './style.css'
 import { createNicInterfacesList, createVNicProfileList } from '_/components/utils'
 import { EMPTY_VNIC_PROFILE_ID } from '_/constants'
-import InfoToolTip from '_/components/OverlayTooltip/InfoTooltip'
+import { InfoTooltip } from '_/components/tooltips'
 
 const NIC_INTERFACES = createNicInterfacesList()
 const NIC_INTERFACE_DEFAULT = 'virtio'
@@ -208,7 +208,7 @@ class NicEditor extends Component {
                 <LabelCol sm={3}>
                   { msg.nicEditorInterfaceLabel() }
                   { !canChangeInterface &&
-                    <InfoToolTip
+                    <InfoTooltip
                       id={`${modalId}-interface-edit-tooltip`}
                       tooltip={msg.nicEditorInterfaceCantEditHelp()}
                     />

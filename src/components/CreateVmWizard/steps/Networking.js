@@ -18,7 +18,6 @@ import {
   Button,
   DropdownKebab,
   EmptyState,
-  FieldLevelHelp,
   FormControl,
   FormGroup,
   HelpBlock,
@@ -30,7 +29,7 @@ import _TableInlineEditRow from './_TableInlineEditRow'
 import SelectBox from '_/components/SelectBox'
 
 import style from './style.css'
-import OverlayTooltip from '_/components/OverlayTooltip'
+import { Tooltip, InfoTooltip } from '_/components/tooltips'
 import { EMPTY_VNIC_PROFILE_ID } from '_/constants'
 
 const NIC_INTERFACES = createNicInterfacesList()
@@ -41,11 +40,11 @@ export const NicNameWithLabels = ({ id, nic }) => {
   return <React.Fragment>
     <span id={`${idPrefix}-name`}>{ nic.name }</span>
     { nic.isFromTemplate &&
-      <OverlayTooltip id={`${idPrefix}-template-defined-badge`} tooltip={msg.templateDefined()} placement='top'>
+      <Tooltip id={`${idPrefix}-template-defined-badge`} tooltip={msg.templateDefined()}>
         <Label id={`${idPrefix}-from-template`} className={style['nic-label']}>
           T
         </Label>
-      </OverlayTooltip>
+      </Tooltip>
     }
   </React.Fragment>
 }
@@ -257,33 +256,36 @@ class Networking extends React.Component {
 
                 { templateDefined &&
                   <Table.Cell className={style['nic-from-template']}>
-                    <FieldLevelHelp content={msg.createVmNetNoEditHelpMessage()} inline />
+                    <InfoTooltip id={`${kebabId}-info-tooltip`} tooltip={msg.createVmNetNoEditHelpMessage()} />
                   </Table.Cell>
                 }
 
                 { !hideKebab && !templateDefined &&
                   <Table.Cell className={style['kebab-menu-cell']}>
-                    <DropdownKebab
-                      id={kebabId}
-                      className={style['action-kebab']}
-                      title={msg.createVmNetEditActions()}
-                      pullRight
-                    >
-                      <MenuItem
-                        id={`${kebabId}-edit`}
-                        onSelect={() => { this.inlineEditController.onActivate({ rowIndex, rowData }) }}
-                        disabled={actionsDisabled}
-                      >
-                        {msg.edit()}
-                      </MenuItem>
-                      <MenuItem
-                        id={`${kebabId}-delete`}
-                        onSelect={() => { this.onDeleteRow(rowData) }}
-                        disabled={actionsDisabled}
-                      >
-                        {msg.delete()}
-                      </MenuItem>
-                    </DropdownKebab>
+                    <Tooltip id={`tooltip-${kebabId}`} tooltip={msg.createVmNetEditActions()} placement={'bottom'}>
+                      <div className={style['kebab-menu-wrapper']}>
+                        <DropdownKebab
+                          id={kebabId}
+                          className={style['action-kebab']}
+                          pullRight
+                        >
+                          <MenuItem
+                            id={`${kebabId}-edit`}
+                            onSelect={() => { this.inlineEditController.onActivate({ rowIndex, rowData }) }}
+                            disabled={actionsDisabled}
+                          >
+                            {msg.edit()}
+                          </MenuItem>
+                          <MenuItem
+                            id={`${kebabId}-delete`}
+                            onSelect={() => { this.onDeleteRow(rowData) }}
+                            disabled={actionsDisabled}
+                          >
+                            {msg.delete()}
+                          </MenuItem>
+                        </DropdownKebab>
+                      </div>
+                    </Tooltip>
                   </Table.Cell>
                 }
               </React.Fragment>

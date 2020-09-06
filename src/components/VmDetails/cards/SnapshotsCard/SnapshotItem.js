@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import {
   Icon,
   OverlayTrigger,
-  Tooltip,
+  Tooltip as PFTooltip,
   noop,
 } from 'patternfly-react'
 
@@ -19,8 +19,7 @@ import SnapshotDetail from './SnapshotDetail'
 import { deleteVmSnapshot } from './actions'
 import { formatDateFromNow } from '_/helpers'
 import { getMinimizedString, escapeHtml } from '../../../utils'
-import OverlayTooltip from '_/components/OverlayTooltip'
-import InfoToolTip from '_/components/OverlayTooltip/InfoTooltip'
+import { Tooltip, InfoTooltip } from '_/components/tooltips'
 const MAX_DESCRIPTION_SIZE = 50
 
 const SnapshotAction = ({ children, className, disabled, id, onClick }) => {
@@ -43,7 +42,7 @@ SnapshotAction.propTypes = {
 }
 
 const StatusTooltip = ({ icon, text, id, placement }) => {
-  return <OverlayTrigger overlay={<Tooltip id={id}>{text}</Tooltip>} placement={placement} trigger={['hover', 'focus']}>
+  return <OverlayTrigger overlay={<PFTooltip id={id}>{text}</PFTooltip>} placement={placement} trigger={['hover', 'focus']}>
     <a>{icon}</a>
   </OverlayTrigger>
 }
@@ -122,7 +121,7 @@ class SnapshotItem extends React.Component {
           key='info'
         >
           <a id={`${this.props.id}-info`}>
-            <InfoToolTip
+            <InfoTooltip
               id={`${this.props.id}-info-tt`}
               tooltip={msg.details()}
             />
@@ -140,9 +139,9 @@ class SnapshotItem extends React.Component {
             vmId={this.props.vmId}
             trigger={({ onClick }) => (
               <SnapshotAction key='restore' id={`${this.props.id}-restore`} onClick={onClick} disabled={isRestoreDisabled}>
-                <OverlayTooltip id={`${this.props.id}-restore-tt`} tooltip={msg.snapshotRestore()}>
+                <Tooltip id={`${this.props.id}-restore-tt`} tooltip={msg.snapshotRestore()}>
                   <Icon type='fa' name='play-circle' />
-                </OverlayTooltip>
+                </Tooltip>
               </SnapshotAction>
             )}
           />
@@ -156,9 +155,9 @@ class SnapshotItem extends React.Component {
             onDelete={this.props.onSnapshotDelete}
             trigger={({ onClick }) => (
               <SnapshotAction key='delete' id={`${this.props.id}-delete`} disabled={isActionsDisabled} onClick={onClick}>
-                <OverlayTooltip id={`${this.props.id}-delete-tt`} tooltip={msg.snapshotDelete()}>
+                <Tooltip id={`${this.props.id}-delete-tt`} tooltip={msg.snapshotDelete()}>
                   <Icon type='pf' name='delete' />
-                </OverlayTooltip>
+                </Tooltip>
               </SnapshotAction>
             )}
           >

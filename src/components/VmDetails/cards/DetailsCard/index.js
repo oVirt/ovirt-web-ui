@@ -45,10 +45,9 @@ import CloudInit from './CloudInit'
 import HotPlugChangeConfirmationModal from './HotPlugConfirmationModal'
 import NextRunChangeConfirmationModal from './NextRunChangeConfirmationModal'
 import FieldRow from './FieldRow'
-import OverlayTooltip from '_/components/OverlayTooltip'
+import { Tooltip, InfoTooltip } from '_/components/tooltips'
 
 import timezones from '_/components/utils/timezones.json'
-import InfoToolTip from '_/components/OverlayTooltip/InfoTooltip'
 
 function rephraseVmType (vmType) {
   const types = {
@@ -73,9 +72,9 @@ const NotAvailable = ({ tooltip, id }) => (
   <div>
     { tooltip
       ? (
-        <OverlayTooltip id={id} tooltip={tooltip}>
+        <Tooltip id={id} tooltip={tooltip}>
           <span>{msg.notAvailable()}</span>
-        </OverlayTooltip>
+        </Tooltip>
       )
       : (
         <span id={id}>{msg.notAvailable()}</span>
@@ -724,12 +723,11 @@ class DetailsCard extends React.Component {
                     <FieldRow label={msg.fqdn()} id={`${idPrefix}-fqdn`}>
                       { <EllipsisValue tooltip={fqdn}>{fqdn}</EllipsisValue> || <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id={`${idPrefix}-fqdn-not-available`} /> }
                     </FieldRow>
-                    <FieldRow label={msg.cluster()} id={`${idPrefix}-cluster`}>
+                    <FieldRow label={msg.cluster()} id={`${idPrefix}-cluster`} tooltip={isFullEdit && !canChangeCluster && msg.clusterCanOnlyChangeWhenVmStopped()} >
                       { !isFullEdit && clusterName }
                       { isFullEdit && !canChangeCluster &&
                         <div>
                           {clusterName}
-                          <InfoToolTip id={`${idPrefix}-info-tooltip`} tooltip={msg.clusterCanOnlyChangeWhenVmStopped()} />
                         </div>
                       }
                       { isFullEdit && canChangeCluster &&
@@ -751,12 +749,11 @@ class DetailsCard extends React.Component {
                     <FieldRow label={msg.template()} id={`${idPrefix}-template`}>
                       { templateName }
                     </FieldRow>
-                    <FieldRow label={isEditing ? msg.changeCd() : msg.cd()} id={`${idPrefix}-cdrom`}>
+                    <FieldRow label={msg.cd()} id={`${idPrefix}-cdrom`} tooltip={isEditing && !canChangeCd && msg.cdCanOnlyChangeWhenVmRunning()} >
                       { !isEditing && <EllipsisValue tooltip={cdImageName}>{cdImageName}</EllipsisValue> }
                       { isEditing && !canChangeCd &&
                         <div>
                           <EllipsisValue tooltip={cdImageName}>{cdImageName}</EllipsisValue>
-                          <InfoToolTip id={`${idPrefix}-tooltip`} tooltip={msg.cdCanOnlyChangeWhenVmRunning()} />
                         </div>
                       }
                       { isEditing && canChangeCd &&
@@ -871,7 +868,7 @@ class DetailsCard extends React.Component {
                         <Col cols={12} className={style['col-label']}>
                           <div>
                             <span>{msg.bootOrder()}</span>
-                            <InfoToolTip id={`${idPrefix}-edit-boot-order-tooltip`} tooltip={msg.SelectTheBootableDeviceTooltip()} />
+                            <InfoTooltip id={`${idPrefix}-edit-boot-order-tooltip`} tooltip={msg.selectTheBootableDeviceTooltip()} />
                           </div>
                         </Col>
                       </Row>
