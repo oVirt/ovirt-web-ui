@@ -17,6 +17,11 @@
   margin-top: 5px;
 }
 
+.field-row-divide {
+  margin-top: 20px;
+  margin-bottom: 5px;
+}
+
 .col-label {
   font-weight: bold;
   padding-left: 15px; /* 20px + -15px + this = px from edge */

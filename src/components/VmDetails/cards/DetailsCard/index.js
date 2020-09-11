@@ -905,7 +905,7 @@ class DetailsCard extends React.Component {
                         />
                       </FieldRow>
                       {/* VCPU Topology */}
-                      <Row className={style['field-row']}>
+                      <Row className={style['field-row-divide']}>
                         <Col cols={12} className={style['col-label']}>
                           <div>
                             <span>{msg.vcpuTopology()}</span>
