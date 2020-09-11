@@ -19,6 +19,7 @@ import { messages, type MessageIdType, type MessageType } from './messages'
 import translatedMessages from './translated-messages.json'
 
 export const DEFAULT_LOCALE = 'en'
+export const DUMMY_LOCALE = 'aa' // NOTE: Used for development and testing
 
 /**
  * Currently selected locale

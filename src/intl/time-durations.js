@@ -13,9 +13,11 @@ import 'moment/locale/zh-cn'
 
 import 'moment-duration-format'
 
+import { DUMMY_LOCALE } from './index'
+
 export function setupMomentTranslations (locale: string, defaultLocale: string) {
-  if (locale === 'aa') {
-    moment.defineLocale('aa', {})
+  if (locale === DUMMY_LOCALE) {
+    moment.defineLocale(DUMMY_LOCALE, {})
   }
 
   const chosen = moment.locale([ locale, defaultLocale ])
@@ -33,7 +35,7 @@ export function setupMomentTranslations (locale: string, defaultLocale: string) 
       durationLabelsStandard: {
         S: t.durationLabelStandard_S || timeDurations.durationLabelStandard_S.message,
         SS: t.durationLabelStandard_SS || timeDurations.durationLabelStandard_SS.message,
-        s: t.durationLabelStandard__s || timeDurations.durationLabelStandard_s.message,
+        s: t.durationLabelStandard_s || timeDurations.durationLabelStandard_s.message,
         ss: t.durationLabelStandard_ss || timeDurations.durationLabelStandard_ss.message,
         m: t.durationLabelStandard_m || timeDurations.durationLabelStandard_m.message,
         mm: t.durationLabelStandard_mm || timeDurations.durationLabelStandard_mm.message,
