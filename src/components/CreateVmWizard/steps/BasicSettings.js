@@ -1,10 +1,18 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { localeCompare, isWindows } from '_/helpers'
+import { localeCompare } from '_/helpers'
 import { msg } from '_/intl'
 import { isNumberInRange } from '_/utils'
 import { BASIC_DATA_SHAPE } from '../dataPropTypes'
+import {
+  handleClusterIdChange,
+  handleProvisionSourceChange,
+  handleTemplateIdChange,
+  checkTimeZone,
+  isOsLinux,
+  isOsWindows,
+} from '../helpers'
 
 import {
   createClusterList,
@@ -112,16 +120,6 @@ function isValidUid (toTest) {
   return toTest && toTest !== '_'
 }
 
-function isOsLinux (operatingSystemId, operatingSystems) {
-  const os = operatingSystems.get(operatingSystemId)
-  return os && !os.get('isWindows')
-}
-
-function isOsWindows (operatingSystemId, operatingSystems) {
-  const os = operatingSystems.get(operatingSystemId)
-  return os && os.get('isWindows')
-}
-
 export const optimizedForMap = {
   'desktop': { id: 'desktop', value: msg.vmType_desktop() },
   'server': { id: 'server', value: msg.vmType_server() },
@@ -135,13 +133,11 @@ export const optimizedForMap = {
 class BasicSettings extends React.Component {
   constructor (props) {
     super(props)
-    this.checkTimeZone = this.checkTimeZone.bind(this)
     this.getTopologySettings = this.getTopologySettings.bind(this)
     this.handleChange = this.handleChange.bind(this)
     this.validateForm = this.validateForm.bind(this)
     this.validateVmName = this.validateVmName.bind(this)
     this.mapVCpuTopologyItems = this.mapVCpuTopologyItems.bind(this)
-    this.handleProvisionSourceChange = this.handleProvisionSourceChange.bind(this)
 
     this.fields = {
       select: [
@@ -151,35 +147,6 @@ class BasicSettings extends React.Component {
         'startOnCreation', 'cloudInitEnabled',
       ],
     }
-  }
-
-  checkTimeZone (osId, templateId) {
-    const { defaultGeneralTimezone, defaultWindowsTimezone } = this.props
-    const template = templateId ? this.props.templates.get(templateId) : undefined
-
-    let timeZone = {
-      name: defaultGeneralTimezone,
-    }
-    const osType = this.props.operatingSystems.getIn([ osId, 'name' ])
-
-    if (template && template.getIn(['timeZone', 'name'])) {
-      timeZone = template.get('timeZone').toJS()
-    }
-
-    const isWindowsTimeZone = timeZone && timezones.find(timezone => timezone.id === timeZone.name)
-    const isWindowsVm = isWindows(osType)
-
-    if (isWindowsVm && !isWindowsTimeZone) {
-      timeZone = {
-        name: defaultWindowsTimezone,
-      }
-    }
-    if (!isWindowsVm && isWindowsTimeZone) {
-      timeZone = {
-        name: defaultGeneralTimezone,
-      }
-    }
-    return timeZone
   }
 
   validateForm (dataSet) {
@@ -239,29 +206,6 @@ class BasicSettings extends React.Component {
     })
   }
 
-  handleProvisionSourceChange (provisionSource) {
-    const changes = {}
-    const { defaultValues } = this.props
-
-    changes.provisionSource = provisionSource
-    changes.isoImage = undefined
-    changes.templateId = undefined
-    changes.operatingSystemId = defaultValues.operatingSystemId
-    changes.memory = defaultValues.memory
-    changes.cpus = defaultValues.cpus
-    changes.topology = defaultValues.topology
-    changes.optimizedFor = defaultValues.optimizedFor
-    changes.cloudInitEnabled = defaultValues.initEnabled
-
-    // when changing Provision type to ISO, set the default time zone according to the OS
-    if (changes.provisionSource === 'iso') {
-      changes.timeZone = this.checkTimeZone(changes.operatingSystemId, changes.templateId)
-      changes.initTimezone = '' // reset the sysprep timezone value, we don't support cloud-init TZ yet
-    }
-
-    return changes
-  }
-
   handleChange (field, value, extra) {
     // normalize the value for drop downs with a "-- Select --" option
     if (this.fields.select.includes(field) && value === '_') {
@@ -276,57 +220,24 @@ class BasicSettings extends React.Component {
     let changes = {}
     switch (field) {
       case 'clusterId':
-        const templateList = value ? createTemplateList(this.props.templates, value) : []
-        changes.dataCenterId = value ? this.props.clusters.getIn([value, 'dataCenterId']) : undefined
-        changes.clusterId = value
-        changes.provisionSource =
-            (templateList.length === 1 && templateList[0].id === this.props.blankTemplateId)
-              ? 'iso'
-              : 'template'
-        changes.templateId = templateList.length === 1 ? this.props.blankTemplateId : undefined
-        changes = { ...changes, ...this.handleProvisionSourceChange(changes.provisionSource) }
+        const { blankTemplateId } = this.props
+        changes = handleClusterIdChange(value, blankTemplateId, this.props)
         break
 
       case 'provisionSource':
-        changes = this.handleProvisionSourceChange(value)
+        const { defaultValues } = this.props
+        changes = handleProvisionSourceChange(value, defaultValues, this.props)
         break
 
       case 'templateId':
-        const template = this.props.templates.find(t => t.get('id') === value)
-        changes.templateId = template.get('id')
-        changes.memory = template.get('memory') / (1024 ** 2) // stored in bytes, input in Mib
-        changes.cpus = template.getIn([ 'cpu', 'vCPUs' ])
-        changes.topology = template.getIn([ 'cpu', 'topology' ]).toJS()
-        changes.optimizedFor = template.get('type', this.props.data.optimizedFor)
-        changes.operatingSystemId = this.props.operatingSystems
-          .find(os => os.get('name') === template.getIn([ 'os', 'type' ]))
-          .get('id')
-
-        // Check template's timezone compatibility with the template's OS, set the timezone corresponding to the template's OS
-        changes.timeZone = this.checkTimeZone(changes.operatingSystemId, changes.templateId)
-        changes.cloudInitEnabled = template.getIn(['cloudInit', 'enabled'])
-        changes.initHostname = template.getIn(['cloudInit', 'hostName'])
-        changes.initSshKeys = template.getIn(['cloudInit', 'sshAuthorizedKeys'])
-        changes.initTimezone = template.getIn(['cloudInit', 'timezone'])
-        changes.initCustomScript = template.getIn(['cloudInit', 'customScript'])
-
-        if (changes.initTimezone && isOsWindows(changes.operatingSystemId, this.props.operatingSystems)) {
-          // Configure Timezone checkbox should be checked if template's timezone set
-          changes.enableInitTimezone = true
-          changes.lastInitTimezone = changes.initTimezone // select template's timezone in the Timezone drop down
-        } else {
-          changes.enableInitTimezone = false
-          changes.initTimezone = ''
-          // select the same default GMT sysprep timezone as in Admin Portal
-          changes.lastInitTimezone = timezones.find(timezone => timezone.value.startsWith('(GMT) Greenwich')).id
-        }
-
+        const { data: { optimizedFor } } = this.props
+        changes = handleTemplateIdChange(value, optimizedFor, this.props)
         break
 
       case 'operatingSystemId':
         changes[field] = value
-        changes.timeZone = this.checkTimeZone(value, this.props.data.templateId)
-
+        const { data: { templateId }, defaultGeneralTimezone, defaultWindowsTimezone } = this.props
+        changes.timeZone = checkTimeZone(value, templateId, defaultGeneralTimezone, defaultWindowsTimezone, this.props)
         // only when changing the OS from one Windows to other Windows
         changes.initTimezone = this.props.data.cloudInitEnabled && this.props.data.enableInitTimezone && isOsWindows(value, this.props.operatingSystems)
           ? this.props.data.lastInitTimezone // set the sysprep timezone as the last selected sysprep timezone
