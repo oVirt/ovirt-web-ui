@@ -1,17 +1,10 @@
 // @flow
-/**
- Flow agreement:
- For simple types, like number, boolean, string and etc.: use lower-case,
- For complex types, like Object, Array and etc.: use first letter in upper-case
- **/
+import '_/logger' // initialize our console logging overlay
 
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import { IntlProvider } from 'react-intl'
 import { type Task } from 'redux-saga'
-
-import '_/logger' // initialize our console logging overlay
 
 import '@patternfly/react-core/dist/styles/base.css'
 import 'patternfly/dist/css/patternfly.css'
@@ -20,7 +13,6 @@ import 'patternfly-react/dist/css/patternfly-react.css'
 import './index-nomodules.css'
 import * as branding from '_/branding'
 
-import { getSelectedMessages, locale } from '_/intl'
 import configureStore from '_/store'
 import Selectors from '_/selectors'
 import AppConfiguration, { readConfiguration } from '_/config'
@@ -42,9 +34,7 @@ function renderApp (store: Object, errorBridge: Object) {
   ReactDOM.render(
     <GlobalErrorBoundary errorBridge={errorBridge} store={store}>
       <Provider store={store}>
-        <IntlProvider locale={locale} messages={getSelectedMessages()}>
-          <App history={store.history} />
-        </IntlProvider>
+        <App history={store.history} />
       </Provider>
     </GlobalErrorBoundary>,
 

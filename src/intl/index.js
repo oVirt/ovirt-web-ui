@@ -20,13 +20,6 @@ export const BASE_LOCALE_SET: Set<string> = new Set([
  */
 export const locale: string = initIntl()
 
-/**
- * For react-intl's `IntlProvider` component
- */
-export function getSelectedMessages (): { [MessageIdType]: string } {
-  return Object.assign({}, defaultMessages, translatedMessages[locale])
-}
-
 function getMessage (id: MessageIdType): string {
   const message = getMessageForLocale(id, locale)
   if (message) {

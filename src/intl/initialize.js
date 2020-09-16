@@ -1,17 +1,5 @@
 // @flow
 
-import { addLocaleData } from 'react-intl'
-import csLocalData from 'react-intl/locale-data/cs'
-import deLocalData from 'react-intl/locale-data/de'
-import enLocalData from 'react-intl/locale-data/en'
-import esLocalData from 'react-intl/locale-data/es'
-import frLocalData from 'react-intl/locale-data/fr'
-import itLocalData from 'react-intl/locale-data/it'
-import jaLocalData from 'react-intl/locale-data/ja'
-import koLocalData from 'react-intl/locale-data/ko'
-import ptLocalData from 'react-intl/locale-data/pt'
-import zhLocalData from 'react-intl/locale-data/zh'
-
 import moment from 'moment'
 import 'moment/locale/cs'
 import 'moment/locale/de'
@@ -32,7 +20,6 @@ export function initIntl (forceLocale: ?string): string {
 
   console.log(`User locale: ${locale}`)
   initMomentTranslations(locale, DEFAULT_LOCALE)
-  initReactIntl(locale)
 
   return locale
 }
@@ -88,35 +75,6 @@ function coerceToSupportedLocale (locale: string): ?string {
 
   const languageOnlyLocale = locale.split(/[-_]/)[0]
   return BASE_LOCALE_SET.has(languageOnlyLocale) ? languageOnlyLocale : null
-}
-
-//
-// react-intl setup
-//
-const REACT_INTL_LOCALE_DATA = {
-  [DEFAULT_LOCALE]: enLocalData,
-  'cs': csLocalData,
-  'de': deLocalData,
-  'en': enLocalData,
-  'es': esLocalData,
-  'fr': frLocalData,
-  'it': itLocalData,
-  'ja': jaLocalData,
-  'ko': koLocalData,
-  'pt-BR': ptLocalData,
-  'zh-CN': zhLocalData,
-}
-
-function initReactIntl (locale: string) {
-  const selectedLocalData = REACT_INTL_LOCALE_DATA[locale]
-  if (!selectedLocalData) {
-    console.log(`Locale being used by react-intl: ${DEFAULT_LOCALE}`)
-    addLocaleData(...REACT_INTL_LOCALE_DATA[DEFAULT_LOCALE])
-    return
-  }
-
-  console.log(`Locale being used by react-intl: ${locale}`)
-  addLocaleData(...selectedLocalData)
 }
 
 //

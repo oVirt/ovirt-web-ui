@@ -98,7 +98,6 @@
     "react-bootstrap": "0.32.1",
     "react-bootstrap-switch": "15.5.3",
     "react-dom": "16.8.6",
-    "react-intl": "2.4.0",
     "react-intl-po": "2.2.2",
     "react-redux": "5.0.7",
     "react-router": "4.2.0",
