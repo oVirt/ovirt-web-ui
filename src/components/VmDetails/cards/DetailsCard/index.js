@@ -234,6 +234,8 @@ class DetailsCard extends React.Component {
 
     let updates = this.state.vm
     const changeQueue = [{ fieldName, value }]
+    const { maxNumberOfSockets, maxNumberOfCores, maxNumberOfThreads } = this.props
+
     for (let change = changeQueue.shift(); change; change = changeQueue.shift()) {
       console.log('processing change', change)
       const { fieldName, value } = change
@@ -333,14 +335,12 @@ class DetailsCard extends React.Component {
           const timeZoneName = updates.getIn(['timeZone', 'name'])
           const isWindowsTimeZone = timezones.find(timezone => timezone.id === timeZoneName)
           const isWindowsVm = isWindows(os.get('name'))
-          const defaultWindowsTimezone = this.props.config.get('defaultWindowsTimezone')
-          const defaultGeneralTimezone = this.props.config.get('defaultGeneralTimezone')
 
           if (isWindowsVm && !isWindowsTimeZone) {
-            changeQueue.push({ fieldName: 'timeZone', value: defaultWindowsTimezone })
+            changeQueue.push({ fieldName: 'timeZone', value: this.props.defaultWindowsTimezone })
           }
           if (!isWindowsVm && isWindowsTimeZone) {
-            changeQueue.push({ fieldName: 'timeZone', value: defaultGeneralTimezone })
+            changeQueue.push({ fieldName: 'timeZone', value: this.props.defaultGeneralTimezone })
           }
           break
 
@@ -358,10 +358,7 @@ class DetailsCard extends React.Component {
           break
 
         case 'cpu':
-          if (isNumber(value) && value > 0 && value <= this.props.config.get('maxNumOfVmCpus')) {
-            const maxNumberOfSockets = this.props.config.get('maxNumberOfSockets')
-            const maxNumberOfCores = this.props.config.get('maxNumberOfCores')
-            const maxNumberOfThreads = this.props.config.get('maxNumberOfThreads')
+          if (isNumber(value) && value > 0 && value <= this.props.maxNumOfVmCpus) {
             let topology = { sockets: value, cores: 1, threads: 1 }
             if (value > maxNumberOfSockets) {
               topology = getTopology({
@@ -385,9 +382,6 @@ class DetailsCard extends React.Component {
           break
 
         case 'topology':
-          const maxNumberOfSockets = this.props.config.get('maxNumberOfSockets')
-          const maxNumberOfCores = this.props.config.get('maxNumberOfCores')
-          const maxNumberOfThreads = this.props.config.get('maxNumberOfThreads')
           let topology = getTopology({
             value: this.state.vm.getIn(['cpu', 'vCPUs']),
             max: {
@@ -579,10 +573,9 @@ class DetailsCard extends React.Component {
   }
 
   render () {
-    const { hosts, clusters, dataCenters, templates, operatingSystems, config, vms } = this.props
+    const { hosts, clusters, dataCenters, templates, operatingSystems, vms, isAdmin } = this.props
     const { vm, isEditing, correlatedMessages, clusterList, isoList } = this.state
 
-    const isAdmin = config.get('administrator')
     const idPrefix = 'vmdetail-details'
 
     const isPoolVm = vm.getIn(['pool', 'id']) !== undefined
@@ -642,11 +635,12 @@ class DetailsCard extends React.Component {
     const THREADS_VCPU = 'threads'
     const vCpuCount = vm.getIn(['cpu', 'vCPUs'])
     const vCpuTopology = vm.getIn(['cpu', 'topology'])
+    const { maxNumberOfSockets, maxNumberOfCores, maxNumberOfThreads } = this.props
     const vCpuTopologyDividers = getTopologyPossibleValues({
       value: vCpuCount,
-      maxNumberOfSockets: config.get('maxNumberOfSockets'),
-      maxNumberOfCores: config.get('maxNumberOfCores'),
-      maxNumberOfThreads: config.get('maxNumberOfThreads'),
+      maxNumberOfSockets: maxNumberOfSockets,
+      maxNumberOfCores: maxNumberOfCores,
+      maxNumberOfThreads: maxNumberOfThreads,
     })
 
     // Boot devices
@@ -945,8 +939,8 @@ class DetailsCard extends React.Component {
                         id={`${idPrefix}-vcpu-topology-threads`}
                         tooltip={
                           isClusterPower8
-                            ? msg.recomendedPower8ValuesForThreads({ threads: config.get('maxNumberOfThreads') })
-                            : msg.recomendedValuesForThreads({ threads: config.get('maxNumberOfThreads') })
+                            ? msg.recomendedPower8ValuesForThreads({ threads: maxNumberOfThreads })
+                            : msg.recomendedValuesForThreads({ threads: maxNumberOfThreads })
                         }>
                         <SelectBox
                           id={`${idPrefix}-vcpu-topology-threads-edit`}
@@ -988,7 +982,13 @@ DetailsCard.propTypes = {
   storageDomains: PropTypes.object.isRequired,
   userMessages: PropTypes.object.isRequired,
   operatingSystems: PropTypes.object.isRequired,
-  config: PropTypes.object.isRequired,
+  isAdmin: PropTypes.bool.isRequired,
+  defaultGeneralTimezone: PropTypes.string.isRequired,
+  defaultWindowsTimezone: PropTypes.string.isRequired,
+  maxNumberOfSockets: PropTypes.number.isRequired,
+  maxNumberOfCores: PropTypes.number.isRequired,
+  maxNumberOfThreads: PropTypes.number.isRequired,
+  maxNumOfVmCpus: PropTypes.number.isRequired,
 
   saveChanges: PropTypes.func.isRequired,
 }
@@ -1004,7 +1004,13 @@ const DetailsCardConnected = connect(
     storageDomains: state.storageDomains,
     userMessages: state.userMessages,
     operatingSystems: state.operatingSystems,
-    config: state.config,
+    isAdmin: state.config.get('administrator'),
+    defaultGeneralTimezone: state.config.get('defaultGeneralTimezone'),
+    defaultWindowsTimezone: state.config.get('defaultWindowsTimezone'),
+    maxNumberOfSockets: state.config.get('maxNumberOfSockets'),
+    maxNumberOfCores: state.config.get('maxNumberOfCores'),
+    maxNumberOfThreads: state.config.get('maxNumberOfThreads'),
+    maxNumOfVmCpus: state.config.get('maxNumOfVmCpus'),
   }),
   (dispatch) => ({
     saveChanges: (minimalVmChanges, restartAfterEdit, nextRun, correlationId) =>
