@@ -16,8 +16,12 @@ function main() {
   const stringContent = fs.readFileSync(SOURCE, { encoding: 'utf8' })
   const parsedContent = JSON.parse(stringContent)
   removeEmptyMessages(parsedContent)
-  const serializedContent = stableStringify(parsedContent, { space: 2 }) + '\n'
-  fs.writeFileSync(DESTINATION, serializedContent)
+
+  const pretty = stableStringify(parsedContent, {
+    space: '  ',
+    cmp: (a, b) => { return a.key > b.key ? 1 : -1 }
+  }) + '\n'
+  fs.writeFileSync(DESTINATION, pretty)
   console.log(chalk.green(`[normalize-messages.js] ${DESTINATION} written ✔`))
 }
 
