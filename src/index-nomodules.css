@@ -233,3 +233,19 @@ a.disabled {
 textarea {
   resize: vertical;
 }
+
+/*
+ * For Advanced Options/ExpandCollapse pf3 component
+ */
+
+.expand-collapse-pf {
+  margin-top: 15px;
+}
+
+.expand-collapse-pf-link-container {
+  margin-bottom: 15px;
+}
+
+.expand-collapse-pf-link-container > .btn.btn-link {
+  padding-left: 0;
+}
