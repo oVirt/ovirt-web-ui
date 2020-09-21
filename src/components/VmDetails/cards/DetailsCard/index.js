@@ -28,6 +28,7 @@ import {
 
 import {
   Alert,
+  ExpandCollapse,
   FieldLevelHelp,
   FormControl,
   Icon,
@@ -38,7 +39,6 @@ import BaseCard from '../../BaseCard'
 
 import { Grid, Row, Col } from '_/components/Grid'
 import EllipsisValue from '_/components/EllipsisValue'
-import ExpandCollapseSection from '_/components/ExpandCollapseSection'
 
 import style from './style.css'
 
@@ -839,7 +839,7 @@ class DetailsCard extends React.Component {
               </Row>
             </Grid>
             {/* Advanced options */}
-            { isFullEdit && <ExpandCollapseSection id={`${idPrefix}-advanced-options`} sectionHeader={msg.advancedOptions()}>
+            { isFullEdit && <ExpandCollapse id={`${idPrefix}-advanced-options`} textCollapsed={msg.advancedOptions()} textExpanded={msg.advancedOptions()}>
               <Grid className={style['details-container']}>
                 <Row>
                   {/* First column */}
@@ -956,7 +956,7 @@ class DetailsCard extends React.Component {
                   </Col>
                 </Row>
               </Grid>
-            </ExpandCollapseSection> }
+            </ExpandCollapse> }
 
             { correlatedMessages && correlatedMessages.size > 0 &&
               correlatedMessages.map((message, key) =>
