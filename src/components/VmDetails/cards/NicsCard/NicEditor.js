@@ -5,6 +5,7 @@ import {
   Button,
   Col,
   ControlLabel,
+  ExpandCollapse,
   FieldLevelHelp,
   Form,
   FormControl,
@@ -13,7 +14,6 @@ import {
   Radio,
 } from 'patternfly-react'
 import SelectBox from '../../../SelectBox'
-import ExpandCollapseSection from '../../../ExpandCollapseSection'
 import NicLinkStateIcon from './NicLinkStateIcon'
 
 import { msg } from '_/intl'
@@ -211,7 +211,7 @@ class NicEditor extends Component {
               </Col>
             </FormGroup>
 
-            <ExpandCollapseSection id='nic-edit-advanced-options' sectionHeader={msg.advancedOptions()}>
+            <ExpandCollapse id='nic-edit-advanced-options' textCollapsed={msg.advancedOptions()} textExpanded={msg.advancedOptions()}>
               <FormGroup controlId={`${modalId}-interface`}>
                 <LabelCol sm={3}>
                   { msg.nicEditorInterfaceLabel() }
@@ -262,7 +262,7 @@ class NicEditor extends Component {
                   </Radio>
                 </Col>
               </FormGroup>
-            </ExpandCollapseSection>
+            </ExpandCollapse>
           </Form>
 
         </Modal.Body>
