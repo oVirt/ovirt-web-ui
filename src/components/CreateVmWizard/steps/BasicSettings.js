@@ -220,13 +220,11 @@ class BasicSettings extends React.Component {
     let changes = {}
     switch (field) {
       case 'clusterId':
-        const { blankTemplateId } = this.props
-        changes = handleClusterIdChange(value, blankTemplateId, this.props)
+        changes = handleClusterIdChange(value, this.props)
         break
 
       case 'provisionSource':
-        const { defaultValues } = this.props
-        changes = handleProvisionSourceChange(value, defaultValues, this.props)
+        changes = handleProvisionSourceChange(value, this.props)
         break
 
       case 'templateId':
@@ -236,8 +234,8 @@ class BasicSettings extends React.Component {
 
       case 'operatingSystemId':
         changes[field] = value
-        const { data: { templateId }, defaultGeneralTimezone, defaultWindowsTimezone } = this.props
-        changes.timeZone = checkTimeZone(value, templateId, defaultGeneralTimezone, defaultWindowsTimezone, this.props)
+        const { data: { templateId } } = this.props
+        changes.timeZone = checkTimeZone(value, templateId, this.props)
         // only when changing the OS from one Windows to other Windows
         changes.initTimezone = this.props.data.cloudInitEnabled && this.props.data.enableInitTimezone && isOsWindows(value, this.props.operatingSystems)
           ? this.props.data.lastInitTimezone // set the sysprep timezone as the last selected sysprep timezone
@@ -634,12 +632,15 @@ class BasicSettings extends React.Component {
 BasicSettings.propTypes = {
   id: PropTypes.string,
   data: PropTypes.shape(BASIC_DATA_SHAPE),
+  // todo remove the 'eslint-disable-next-line' below when updating the eslint to newer version
+  // eslint-disable-next-line react/no-unused-prop-types
   defaultValues: PropTypes.shape(BASIC_DATA_SHAPE),
 
   dataCenters: PropTypes.object.isRequired,
   clusters: PropTypes.object.isRequired,
   operatingSystems: PropTypes.object.isRequired,
   templates: PropTypes.object.isRequired,
+  // eslint-disable-next-line react/no-unused-prop-types
   blankTemplateId: PropTypes.string.isRequired,
   storageDomains: PropTypes.object.isRequired,
   maxNumOfVmCpus: PropTypes.number.isRequired,
@@ -651,7 +652,9 @@ BasicSettings.propTypes = {
 
   onUpdate: PropTypes.func.isRequired,
 
+  // eslint-disable-next-line react/no-unused-prop-types
   defaultGeneralTimezone: PropTypes.string.isRequired,
+  // eslint-disable-next-line react/no-unused-prop-types
   defaultWindowsTimezone: PropTypes.string.isRequired,
 }
 
