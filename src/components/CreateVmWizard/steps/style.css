@@ -231,3 +231,7 @@ table tbody tr td.kebab-menu-cell {
   border-left: 1px solid #eee;
   padding-left: 10px;
 }
+
+.info-circle-icon {
+  margin-left: 3px;
+}

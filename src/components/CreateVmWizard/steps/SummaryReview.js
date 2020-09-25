@@ -2,10 +2,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Alert, Icon, Spinner, Label } from 'patternfly-react'
+import { InfoCircleIcon } from '@patternfly/react-icons'
 
 import { msg, enumMsg } from '_/intl'
 import { templateNameRenderer, userFormatOfBytes } from '_/helpers'
 import { Grid, Row, Col } from '_/components/Grid'
+import OverlayTooltip from '_/components/OverlayTooltip'
 import { sortNicsDisks } from '_/components/utils'
 
 import { BASIC_DATA_SHAPE, NIC_SHAPE, STORAGE_SHAPE } from '../dataPropTypes'
@@ -61,8 +63,17 @@ const ReviewBasic = ({ id, dataCenters, clusters, isos, templates, operatingSyst
     <Item id={`${id}-memory`} label={msg.memory()}>{userFormatOfBytes(basic.memory, 'MiB').str}</Item>
     <Item id={`${id}-cpus`} label={msg.cpus()}>
       { basic.cpus }
-      {/* TODO: Include topology (as a popover?) */}
-    </Item>
+      <OverlayTooltip
+        id={`${id}-summary-vcpus-tooltip`}
+        tooltip={msg.totalCpuTooltip({
+          cores: basic.topology.cores,
+          sockets: basic.topology.sockets,
+          threads: basic.topology.threads,
+        })}
+        placement={'top'}
+      >
+        <InfoCircleIcon className={style['info-circle-icon']} />
+      </OverlayTooltip>    </Item>
     <Item id={`${id}-optimizedFor`} label={msg.optimizedFor()}>{optimizedForMap[basic.optimizedFor].value}</Item>
   </React.Fragment>
 }
