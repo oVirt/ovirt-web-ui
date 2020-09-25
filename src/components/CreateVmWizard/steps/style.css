@@ -59,6 +59,10 @@
   margin-left: -15px;
 }
 
+.topology-column {
+  max-width: 40%;
+}
+
 /*
  * Networking
  */
