@@ -35,6 +35,8 @@ const FieldRow = ({
   rowClassName = '',
   vertical = false,
   validationState = null,
+  labelCols = 3,
+  fieldCols = 7,
   children,
 }) => (
   <Row className={`
@@ -47,7 +49,7 @@ const FieldRow = ({
   >
     { vertical &&
       <React.Fragment>
-        <Col offset={3} cols={7} className={style['col-data']} id={id}>
+        <Col offset={labelCols} cols={fieldCols} className={style['col-data']} id={id}>
           <div className={style['col-label-vertical']}>
             {label}
           </div>
@@ -57,10 +59,10 @@ const FieldRow = ({
     }
     { !vertical &&
       <React.Fragment>
-        <Col cols={3} className={`control-label ${style['col-label']}`}>
+        <Col cols={labelCols} className={`control-label ${style['col-label']}`}>
           {label}
         </Col>
-        <Col cols={7} className={style['col-data']} id={id}>{children}</Col>
+        <Col cols={fieldCols} className={style['col-data']} id={id}>{children}</Col>
       </React.Fragment>
     }
   </Row>
@@ -72,6 +74,8 @@ FieldRow.propTypes = {
   rowClassName: PropTypes.string,
   vertical: PropTypes.bool,
   validationState: PropTypes.oneOf(['success', 'warning', 'error', null]),
+  labelCols: PropTypes.number,
+  fieldCols: PropTypes.number,
   children: PropTypes.node.isRequired,
 }
 
@@ -592,38 +596,33 @@ class BasicSettings extends React.Component {
       {/* Advanced CPU Topology Options */}
       <ExpandCollapse id={`${idPrefix}-advanced-options`} textCollapsed={msg.advancedCpuTopologyOptions()} textExpanded={msg.advancedCpuTopologyOptions()}>
         <Grid className={style['settings-container']}>
-          <FieldRow label={msg.virtualSockets()} id={`${idPrefix}-topology-sockets`}>
-            <div className={style['topology-column']}>
-              <SelectBox
-                id={`${idPrefix}-topology-sockets-edit`}
-                items={this.mapVCpuTopologyItems(vCpuTopologyDividers.sockets)}
-                selected={data.topology.sockets.toString()}
-                onChange={selectedId => { this.handleChange('topology', selectedId, { vcpu: 'sockets' }) }}
-              />
-            </div>
+          <FieldRow fieldCols={3} label={msg.virtualSockets()} id={`${idPrefix}-topology-sockets`}>
+            <SelectBox
+              id={`${idPrefix}-topology-sockets-edit`}
+              items={this.mapVCpuTopologyItems(vCpuTopologyDividers.sockets)}
+              selected={data.topology.sockets.toString()}
+              onChange={selectedId => { this.handleChange('topology', selectedId, { vcpu: 'sockets' }) }}
+            />
           </FieldRow>
-          <FieldRow label={msg.coresPerSockets()} id={`${idPrefix}-topology-cores`}>
-            <div className={style['topology-column']}>
-              <SelectBox
-                id={`${idPrefix}-topology-cores-edit`}
-                items={this.mapVCpuTopologyItems(vCpuTopologyDividers.cores)}
-                selected={data.topology.cores.toString()}
-                onChange={selectedId => { this.handleChange('topology', selectedId, { vcpu: 'cores' }) }}
-              />
-            </div>
+          <FieldRow fieldCols={3} label={msg.coresPerSockets()} id={`${idPrefix}-topology-cores`}>
+            <SelectBox
+              id={`${idPrefix}-topology-cores-edit`}
+              items={this.mapVCpuTopologyItems(vCpuTopologyDividers.cores)}
+              selected={data.topology.cores.toString()}
+              onChange={selectedId => { this.handleChange('topology', selectedId, { vcpu: 'cores' }) }}
+            />
           </FieldRow>
           <FieldRow
+            fieldCols={3}
             label={msg.threadsPerCores()}
             id={`${idPrefix}-topology-threads`}
           >
-            <div className={style['topology-column']}>
-              <SelectBox
-                id={`${idPrefix}-topology-threads-edit`}
-                items={this.mapVCpuTopologyItems(vCpuTopologyDividers.threads)}
-                selected={data.topology.threads.toString()}
-                onChange={selectedId => { this.handleChange('topology', selectedId, { vcpu: 'threads' }) }}
-              />
-            </div>
+            <SelectBox
+              id={`${idPrefix}-topology-threads-edit`}
+              items={this.mapVCpuTopologyItems(vCpuTopologyDividers.threads)}
+              selected={data.topology.threads.toString()}
+              onChange={selectedId => { this.handleChange('topology', selectedId, { vcpu: 'threads' }) }}
+            />
           </FieldRow>
         </Grid>
       </ExpandCollapse>
