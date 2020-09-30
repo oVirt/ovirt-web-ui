@@ -1,89 +1,27 @@
 // @flow
 
 import IntlMessageFormat from 'intl-messageformat'
-import { addLocaleData } from 'react-intl'
+import { initIntl } from './initialize'
 
-import csLocalData from 'react-intl/locale-data/cs'
-import deLocalData from 'react-intl/locale-data/de'
-import enLocalData from 'react-intl/locale-data/en'
-import esLocalData from 'react-intl/locale-data/es'
-import frLocalData from 'react-intl/locale-data/fr'
-import itLocalData from 'react-intl/locale-data/it'
-import jaLocalData from 'react-intl/locale-data/ja'
-import koLocalData from 'react-intl/locale-data/ko'
-import ptLocalData from 'react-intl/locale-data/pt'
-import zhLocalData from 'react-intl/locale-data/zh'
-
-import { setupMomentTranslations } from './time-durations'
 import { messages, type MessageIdType, type MessageType } from './messages'
 import translatedMessages from './translated-messages.json'
 
-export const DEFAULT_LOCALE = 'en'
-export const DUMMY_LOCALE = 'aa' // NOTE: Used for development and testing
+export const DEFAULT_LOCALE: string = 'en'
+
+export const DUMMY_LOCALE: string = 'aa' // NOTE: Used for development and testing
+
+export const BASE_LOCALE_SET: Set<string> = new Set([
+  DEFAULT_LOCALE,
+  'cs', 'de', 'es', 'fr', 'it', 'ja', 'ko', 'pt-BR', 'zh-CN',
+])
 
 /**
  * Currently selected locale
  */
-export const locale: string = getLocaleFromUrl() || getBrowserLocale() || DEFAULT_LOCALE
-console.log(`App locale: ${locale}`)
-setupMomentTranslations(locale, DEFAULT_LOCALE)
-
-function getBrowserLocale (): ?string {
-  if (window.navigator.language) {
-    const locale = coerceToSupportedLocale(window.navigator.language)
-    if (locale) {
-      return locale
-    }
-  }
-  if (window.navigator.languages) {
-    window.navigator.languages.forEach(browserLocale => {
-      const locale = coerceToSupportedLocale(browserLocale)
-      if (locale) {
-        return locale
-      }
-    })
-  }
-  return null
-}
-
-function getLocaleFromUrl (): ?string {
-  const localeMatch = /locale=(\w{2}([-_]\w{2})?)/.exec(window.location.search)
-  if (localeMatch === null) {
-    return null
-  }
-  const locale = localeMatch[1]
-  return coerceToSupportedLocale(locale)
-}
-
-function coerceToSupportedLocale (locale: string): ?string {
-  if (/^en/.test(locale)) {
-    return 'en'
-  }
-  if (getSupportedTranslatedLocales().has(locale)) {
-    return locale
-  }
-  const languageOnlyLocale = getLocaleLanguage(locale)
-  return getSupportedTranslatedLanguageOnlyLocales()[languageOnlyLocale] || null
-}
-
-function getSupportedTranslatedLocales (): Set<string> {
-  return new Set(Object.keys(translatedMessages)).add('en')
-}
+export const locale: string = initIntl()
 
 /**
- * @return map langOnlyLocale => locale
- */
-function getSupportedTranslatedLanguageOnlyLocales (): {[string]: string} {
-  return Array.from(getSupportedTranslatedLocales())
-    .reduce((sum, locale) => Object.assign(sum, { [getLocaleLanguage(locale)]: locale }), {})
-}
-
-function getLocaleLanguage (locale: string): string {
-  return locale.split(/[-_]/)[0]
-}
-
-/**
- * For React Intl purposes
+ * For react-intl's `IntlProvider` component
  */
 export function getSelectedMessages (): { [MessageIdType]: string } {
   return Object.assign({}, defaultMessages, translatedMessages[locale])
@@ -115,7 +53,7 @@ function getMessageForLocale (id: MessageIdType, locale: string): ?string {
 
 const messageFormatCache: {[MessageIdType]: IntlMessageFormat} = {}
 
-export function formatMessage (id: MessageIdType, values: ?Object): string {
+function formatMessage (id: MessageIdType, values: ?Object): string {
   let messageFormat = messageFormatCache[id]
   if (!messageFormat) {
     messageFormat = new IntlMessageFormat(getMessage(id), locale)
@@ -137,22 +75,6 @@ function removeMessageDescription (messages: { [MessageIdType]: MessageType }): 
 }
 
 const defaultMessages: { [MessageIdType]: string } = removeMessageDescription(messages)
-
-function createIdsMap (messages: { [MessageIdType]: MessageType }): { [MessageIdType]: MessageIdType } {
-  return Object.keys(messages)
-    .reduce((sum, key) => Object.assign(sum, { [key]: key }), {})
-}
-
-/**
- * Identifies from {@link messages}
- *
- * To be used with react-intl <code>formatMessage</code>
- * and <code><FormattedMessage></code> component.
- *
- * @see https://github.com/yahoo/react-intl/wiki/API#formatmessage
- * @see https://github.com/yahoo/react-intl/wiki/Components#formattedmessage
- */
-export const msgId: {[MessageIdType]: MessageIdType} = createIdsMap(messages)
 
 function createFormattingFunctionsMap (messages: { [MessageIdType]: MessageType }): {[MessageIdType]: ((?Object) => string)} {
   return Object.keys(messages)
@@ -178,31 +100,3 @@ export function enumMsg (enumId: string, enumItem: string): string {
   console.warn(`No translation for enum item "${enumId}.${enumItem}" found.`)
   return enumItem
 }
-
-/**
- * Exported for tests purposes only
- */
-export const localeDataMap = {
-  'cs': csLocalData,
-  'de': deLocalData,
-  'en': enLocalData,
-  'es': esLocalData,
-  'fr': frLocalData,
-  'it': itLocalData,
-  'ja': jaLocalData,
-  'ko': koLocalData,
-  'pt-BR': ptLocalData,
-  'zh-CN': zhLocalData,
-}
-
-function initializeReactIntl () {
-  const selectedLocalData = localeDataMap[locale]
-  if (!selectedLocalData) {
-    console.warn(`No locale data found to initialize 'react-intl' library for locale '${locale}'.`)
-    addLocaleData(...localeDataMap['en'])
-    return
-  }
-  addLocaleData(...selectedLocalData)
-}
-
-initializeReactIntl()
