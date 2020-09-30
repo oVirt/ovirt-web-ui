@@ -1,25 +1,30 @@
-import React from 'react'
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import TableConfirmButtonsRow from 'patternfly-react/dist/js/components/Table/TableConfirmButtonsRow'
-
-const TableInlineEditRow = props => {
-  const buttonsPosition = (window, rowDimensions) => {
+class TableInlineEditRow extends Component {
+  constructor (props) {
+    super(props)
+    this.buttonsPosition = this.buttonsPosition.bind(this)
+    this.rowHeight = undefined
+  }
+  buttonsPosition (window, rowDimensions) {
     const position = {}
+    const modalDomElement = document.querySelectorAll('div.fade.in.modal')
+    const scrolledInPx = modalDomElement.length === 1 ? modalDomElement[0].scrollTop : 0
 
-    if (props.last) {
-      position.bottom = window.height - rowDimensions.top - 1
-    } else {
-      position.top = rowDimensions.bottom
+    if (!this.rowHeight || Math.abs(this.rowHeight - rowDimensions.height) < 10) {
+      this.rowHeight = rowDimensions.height
     }
+
+    position.top = rowDimensions.y + this.rowHeight + scrolledInPx
     position.right = 75 // window.width - rowDimensions.right + 10
 
     console.info('button position', position)
     return position
   }
-
-  const buttonsClassName = props.last ? 'top' : 'bottom'
-
-  return <TableConfirmButtonsRow {...props} buttonsPosition={buttonsPosition} buttonsClassName={buttonsClassName} />
+  render () {
+    return <TableConfirmButtonsRow {...this.props} buttonsPosition={this.buttonsPosition} buttonsClassName={'bottom'} />
+  }
 }
 
 TableInlineEditRow.shouldComponentUpdate = true
