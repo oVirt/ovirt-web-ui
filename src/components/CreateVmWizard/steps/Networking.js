@@ -376,7 +376,7 @@ class Networking extends React.Component {
     const editedRow = this.state.editing[rowData.id]
 
     let editingErrors = false
-    for (const errorKey of this.state.editingErrors) {
+    for (const errorKey in this.state.editingErrors) {
       editingErrors = editingErrors || this.state.editingErrors[errorKey]
     }
 
