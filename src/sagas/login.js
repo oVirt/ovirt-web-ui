@@ -55,9 +55,12 @@ import { fetchRoles } from './roles'
 import { fetchServerConfiguredValues } from './server-configs'
 import { fetchDataCentersAndStorageDomains, fetchIsoFiles } from './storageDomains'
 import { loadIconsFromLocalStorage } from './osIcons'
-import { transformAndPermitVm } from './index'
+import {
+  transformAndPermitVm,
+} from './index'
 
 import { loadFromLocalStorage } from '_/storage'
+import { loadUserOptions } from './options'
 
 /**
  * Perform login checks, and if they pass, perform initial data loading
@@ -204,6 +207,7 @@ function* initialLoad () {
     call(fetchAllOS, getAllOperatingSystems()),
     call(fetchAllHosts, getAllHosts()),
     call(loadFilters),
+    call(loadUserOptions),
   ])
   console.log('\u2714 data loads with no prerequisites are complete')
   console.groupEnd('no data prerequisites')

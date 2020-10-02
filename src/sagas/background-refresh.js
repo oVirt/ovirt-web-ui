@@ -1,4 +1,8 @@
 import {
+  loadUserOptions,
+} from './options'
+
+import {
   all,
   call,
   put,
@@ -64,6 +68,7 @@ const pagesRefreshers = {
   [C.DETAIL_PAGE_TYPE]: refreshDetailPage,
   [C.CREATE_PAGE_TYPE]: refreshCreatePage,
   [C.CONSOLE_PAGE_TYPE]: refreshConsolePage,
+  [C.SETTINGS_PAGE_TYPE]: loadUserOptions,
 }
 
 function* getIdsByType (type) {

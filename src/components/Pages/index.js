@@ -9,12 +9,17 @@ import VmsList from '../VmsList'
 import VmDetails from '../VmDetails'
 import VmConsole from '../VmConsole'
 import Handler404 from '_/Handler404'
+import { GlobalSettings } from '../UserSettings'
 
 /**
  * Route component (for PageRouter) to view the list of VMs and Pools
  */
 const VmsListPage = () => {
   return <VmsList />
+}
+
+const GlobalSettingsPage = () => {
+  return <GlobalSettings />
 }
 
 /**
@@ -105,4 +110,5 @@ export {
   VmConsolePageConnected as VmConsolePage,
   VmDetailsPageConnected as VmDetailsPage,
   VmsListPage,
+  GlobalSettingsPage,
 }

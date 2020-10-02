@@ -1,6 +1,5 @@
 {
   "cs": {
-    "SSHKey": "SSH Klíč",
     "about": "O aplikaci",
     "actionFailed": "{action} se nezdařilo",
     "actualStateVmIsIn": "Skutečný stav virtuálního stroje.",
@@ -155,7 +154,6 @@
     "yes": "Ano"
   },
   "de": {
-    "SSHKey": "SSH-Schlüssel",
     "about": "Über",
     "aboutDialogDocumentationLink": "Weiter Informationen finden Sie unter {link}",
     "aboutDialogDocumentationText": "Dokumentation",
@@ -607,7 +605,6 @@
     "youHaveNoAllowedVnicProfiles": "Sie können NICs nicht erstellen oder bearbeiten, da Sie nicht die Berechtigung haben, vNIC-Profile im Data-Center der VM zu verwenden."
   },
   "es": {
-    "SSHKey": "Clave SSH",
     "about": "Acerca de",
     "aboutDialogDocumentationLink": "Para más información, consulte {link}.",
     "aboutDialogDocumentationText": "Documentación",
@@ -1059,7 +1056,6 @@
     "youHaveNoAllowedVnicProfiles": "No puede crear o editar las NIC porque no tiene permiso para usar ningún perfil vNIC en el centro de datos de la MV."
   },
   "fr": {
-    "SSHKey": "Clé SSH",
     "about": "À propos de",
     "aboutDialogDocumentationLink": "pour plus d'informations voir {link}",
     "aboutDialogDocumentationText": "Documentation",
@@ -1598,7 +1594,6 @@
     "yes": "Si"
   },
   "ja": {
-    "SSHKey": "ユーザーの公開鍵",
     "about": "バージョン情報",
     "aboutDialogDocumentationLink": "詳細は {link} を参照してください",
     "aboutDialogDocumentationText": "ドキュメント",
@@ -2050,7 +2045,6 @@
     "youHaveNoAllowedVnicProfiles": "仮想マシンのデータセンターで vNIC プロファイルを使用するパーミッションがないので、NIC を作成または編集することはできません。"
   },
   "ko": {
-    "SSHKey": "SSH 키 ",
     "about": "정보 ",
     "aboutDialogDocumentationLink": "자세한 내용은 {link}를 참조하십시오",
     "aboutDialogDocumentationText": "문서",
@@ -2502,7 +2496,6 @@
     "youHaveNoAllowedVnicProfiles": "가상 머신 데이터 센터에서 vNIC 프로파일을 사용할 수있는 권한이 없으므로 NIC를 만들거나 편집할 수 없습니다."
   },
   "pt-BR": {
-    "SSHKey": "Chave SSH",
     "about": "Sobre",
     "aboutDialogDocumentationLink": "Para mais informações, consulte {link}",
     "aboutDialogDocumentationText": "Documentação",
@@ -2954,7 +2947,6 @@
     "youHaveNoAllowedVnicProfiles": "Não é possível criar ou editar NICs porque você não tem permissão para usar perfis de vNIC no data center da MV."
   },
   "zh-CN": {
-    "SSHKey": "SSH 密钥",
     "about": "关于",
     "aboutDialogDocumentationLink": "更多信息 {link}",
     "aboutDialogDocumentationText": "文档",
