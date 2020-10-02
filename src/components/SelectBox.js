@@ -96,9 +96,9 @@ class SelectBox extends React.Component {
 
 SelectBox.propTypes = {
   /* eslint-disable react/no-unused-prop-types */
-  selected: PropTypes.string, // id of a selected item, false-ish for the first item
+  selected: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), // id of a selected item, false-ish for the first item
   items: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.string,
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     value: PropTypes.string,
   })).isRequired, // Array<{ id: string, value: string }>, order matters if sort is false-ish
   sort: PropTypes.bool, // sorted alphabetically by current locale with { numeric: true } if true
