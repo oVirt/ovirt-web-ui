@@ -487,7 +487,7 @@ export const messages: { [messageId: string]: MessageType } = {
   },
   notEditableForPoolsOrPoolVms: 'Not editable for Pools or pool VMs.',
   notifications: 'Notifications',
-  notificationSettingsAffectAllNotifications: 'Notification settings applied here affect all notifications (including VMs and Pools notifications).',
+  notificationSettingsAffectAllNotifications: 'Notification settings applied here affect all notifications (including all VMs and Pools notifications) and are not persisted (a page reload will clear them).',
   noVmAvailable: 'No VM available.',
   noVmAvailableForLoggedUser: 'No VM is available for the logged user.',
   off: 'Off',
@@ -557,7 +557,6 @@ export const messages: { [messageId: string]: MessageType } = {
     message: 'Your session is about to timeout due to inactivity.',
     description: 'Primary message for SessionTimeout modal component',
   },
-  sessionDuration: 'session duration',
   shutdown: 'Shutdown',
   shutdownStatelessPoolVm: 'This virtual machine belongs to {poolName} and is stateless so any data that is currently attached to the virtual machine will be lost if it is shutdown. The virtual machine will be returned to {poolName} if shutdown.',
   shutdownVm: 'Shutdown the VM',
@@ -636,6 +635,10 @@ export const messages: { [messageId: string]: MessageType } = {
   unsavedChangesTitle: {
     message: 'Dialog contains unsaved changes',
     description: 'Title of modal dialog opened when a user tried to navigate off an editor page after changes have been made.',
+  },
+  untilNextPageReload: {
+    message: 'until next page reload',
+    description: 'Phrase used to describe a time period. Will be used in a dropdown (labeled "Do not disturb for") as one of the possible durations (together with typical durations like 1 hour or 1 day).',
   },
   updateCloudInit: 'Do you want update Cloud-init hostname on new VM name?',
   updateVm: 'Update VM',

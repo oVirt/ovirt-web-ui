@@ -95,7 +95,16 @@ function* saveGlobalOptions ({ payload: { sshKey, showNotifications, notificatio
   }
 
   if (showNotifications !== undefined || notificationSnoozeDuration !== undefined) {
-
+    yield call(
+      updateNotifications,
+      {
+        current: yield select((state) => state.options.getIn(['global', 'showNotifications'])),
+        next: showNotifications,
+      },
+      {
+        current: yield select((state) => state.options.getIn(['global', 'notificationSnoozeDuration'])),
+        next: notificationSnoozeDuration,
+      })
   }
 
   yield put(
@@ -103,6 +112,34 @@ function* saveGlobalOptions ({ payload: { sshKey, showNotifications, notificatio
       { key: ['lastTransactions', 'global'], value: { transactionId } },
     ),
   )
+}
+
+function* updateNotifications (show: {current: boolean, next?: boolean}, snooze: {current: number, next?: number}): any {
+  const snoozeDuration = snooze.next || snooze.current
+  const showNotifications = show.next === undefined ? show.current : show.next
+  const snoozeUntilPageReload = snoozeDuration === Number.MAX_SAFE_INTEGER
+
+  yield put(A.setOption({ key: ['global', 'showNotifications'], value: showNotifications }))
+  yield put(A.setOption({ key: ['global', 'notificationSnoozeDuration'], value: snoozeDuration }))
+  yield put(A.setAutoAcknowledge(!showNotifications))
+  if (showNotifications || snoozeUntilPageReload) {
+    yield put(A.stopSchedulerForResumingNotifications())
+  } else {
+    // minutes -> seconds
+    yield put(A.startSchedulerForResumingNotifications(snoozeDuration * 60))
+  }
+}
+
+export function* resumeNotifications (): any {
+  yield call(
+    updateNotifications,
+    {
+      current: yield select((state) => state.options.getIn(['global', 'showNotifications'])),
+      next: true,
+    },
+    {
+      current: yield select((state) => state.options.getIn(['global', 'notificationSnoozeDuration'])),
+    })
 }
 
 export function* loadUserOptions (): any {

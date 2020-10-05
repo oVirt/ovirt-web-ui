@@ -21,7 +21,9 @@ import {
   SET_WEBSOCKET,
   SHOW_TOKEN_EXPIRED_MSG,
   START_SCHEDULER_FIXED_DELAY,
+  START_SCHEDULER_FOR_RESUMING_NOTIFICATIONS,
   STOP_SCHEDULER_FIXED_DELAY,
+  STOP_SCHEDULER_FOR_RESUMING_NOTIFICATIONS,
   UPDATE_PAGING_DATA,
 } from '_/constants'
 
@@ -67,6 +69,19 @@ export function startSchedulerFixedDelay ({
 
 export function stopSchedulerFixedDelay () {
   return { type: STOP_SCHEDULER_FIXED_DELAY }
+}
+
+export function startSchedulerForResumingNotifications (delayInSeconds) {
+  return {
+    type: START_SCHEDULER_FOR_RESUMING_NOTIFICATIONS,
+    payload: {
+      delayInSeconds,
+    },
+  }
+}
+
+export function stopSchedulerForResumingNotifications () {
+  return { type: STOP_SCHEDULER_FOR_RESUMING_NOTIFICATIONS }
 }
 
 export function setUserFilterPermission (filter) {

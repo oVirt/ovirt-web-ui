@@ -28,7 +28,7 @@ class GlobalSettings extends Component {
     },
     {
       id: Number.MAX_SAFE_INTEGER,
-      value: msg.sessionDuration(),
+      value: msg.untilNextPageReload(),
     },
   ]
 
