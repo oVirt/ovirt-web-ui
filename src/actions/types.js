@@ -12,7 +12,7 @@ export type LoadUserOptionsActionType = {
 export type SaveGlobalOptionsActionType = {
   type: C.SAVE_GLOBAL_OPTIONS,
   payload: {|
-    updateRate?: number,
+    refreshInterval?: number,
     language?: string,
     showNotifications?: boolean,
     notificationSnoozeDuration?: number,

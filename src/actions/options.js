@@ -84,7 +84,7 @@ export function loadingUserOptionsFinished (): Object {
   }
 }
 
-export function saveGlobalOptions ({ values: { sshKey, language, showNotifications, notificationSnoozeDuration, updateRate } = {} }: Object, { transactionId }: Object): SaveGlobalOptionsActionType {
+export function saveGlobalOptions ({ values: { sshKey, language, showNotifications, notificationSnoozeDuration, refreshInterval } = {} }: Object, { transactionId }: Object): SaveGlobalOptionsActionType {
   return {
     type: C.SAVE_GLOBAL_OPTIONS,
     payload: {
@@ -92,7 +92,7 @@ export function saveGlobalOptions ({ values: { sshKey, language, showNotificatio
       language,
       showNotifications,
       notificationSnoozeDuration,
-      updateRate,
+      refreshInterval,
     },
     meta: {
       transactionId,

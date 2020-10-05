@@ -980,10 +980,14 @@ const RemoteUserOptions = {
     vmPortalOptions.forEach(([name, option]) => { fromEntries[name] = option })
 
     // pick only options supported by this version of the UI
-    const { locale } = fromEntries
+    const {
+      locale,
+      refreshInterval,
+    } = fromEntries
 
     return {
       locale,
+      refreshInterval,
     }
   },
 }

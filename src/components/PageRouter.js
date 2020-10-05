@@ -7,7 +7,8 @@ import { push } from 'connected-react-router'
 
 import { RouterPropTypeShapes } from '../propTypeShapes'
 import Breadcrumb from './Breadcrumb'
-import { changePage } from '../actions'
+import { changePage, startSchedulerFixedDelay } from '../actions'
+import AppConfiguration from '_/config'
 
 const findExactOrOnlyMatch = (branches) => {
   return branches.length === 1 ? branches[0] : branches.find(branch => branch.match.isExact) || null
@@ -19,6 +20,7 @@ class PageRouter extends React.Component {
     this.state = {
       previousPath: '/',
       currentPath: null,
+      refreshInterval: props.refreshInterval,
 
       branches: [],
       branch: null,
@@ -42,7 +44,10 @@ class PageRouter extends React.Component {
     document.removeEventListener('keyup', this.handleKeyUp)
   }
 
-  static getDerivedStateFromProps ({ location, route, onChangePage }, { currentPath, previousPath }) {
+  static getDerivedStateFromProps (
+    { location, route, onChangePage, refreshInterval, onRefreshIntervalChange },
+    { currentPath, previousPath, refreshInterval: currentRefreshInterval, currentPage }
+  ) {
     const newPath = location.pathname
     const updates = {}
 
@@ -56,6 +61,12 @@ class PageRouter extends React.Component {
         updates.previousPath = currentPath
       }
       onChangePage(updates.branch.route.type, updates.branch.match.params.id)
+    }
+
+    if (currentRefreshInterval !== refreshInterval) {
+      console.log(`Detected refreshInterval change: prev=${currentRefreshInterval}, new=${refreshInterval}`)
+      updates.refreshInterval = refreshInterval
+      onRefreshIntervalChange(refreshInterval, currentPage)
     }
 
     return Object.keys(updates).length > 0 ? updates : null
@@ -86,9 +97,12 @@ PageRouter.propTypes = {
   location: RouterPropTypeShapes.location.isRequired,
   history: RouterPropTypeShapes.history.isRequired,
   route: PropTypes.object.isRequired,
+  refreshInterval: PropTypes.number.isRequired,
 
   navigationHandler: PropTypes.func.isRequired,
   onChangePage: PropTypes.func.isRequired,
+  onRefreshIntervalChange: PropTypes.func.isRequired,
+
 }
 
 /*
@@ -96,11 +110,14 @@ PageRouter.propTypes = {
  */
 export default withRouter(
   connect(
-    state => ({
+    ({ options, config }) => ({
+      refreshInterval: options.getIn(['remoteOptions', 'refreshInterval', 'content'], AppConfiguration.schedulerFixedDelayInSeconds),
+      currentPage: config.get('currentPage'),
     }),
     dispatch => ({
       navigationHandler: (newPath) => dispatch(push(newPath)),
       onChangePage: (type, id) => dispatch(changePage({ type, id })),
+      onRefreshIntervalChange: (refreshInterval, currentPage) => dispatch(startSchedulerFixedDelay({ delayInSeconds: refreshInterval, targetPage: currentPage })),
     })
   )(PageRouter)
 )
