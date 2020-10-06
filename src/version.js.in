@@ -5,7 +5,7 @@ const Product = {
 
   ovirtApiVersionRequired: {
     major: 4,
-    minor: 2,
+    minor: 4,
   },
 }
 
