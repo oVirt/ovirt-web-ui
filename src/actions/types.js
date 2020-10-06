@@ -1,11 +1,11 @@
 // @flow
 import * as C from '_/constants'
-import type { UserOptionsType } from '_/ovirtapi/types'
+import type { RemoteUserOptionsType } from '_/ovirtapi/types'
 
 export type LoadUserOptionsActionType = {
   type: C.LOAD_USER_OPTIONS,
   payload: {
-    userOptions: UserOptionsType
+    userOptions: RemoteUserOptionsType
   }
 }
 

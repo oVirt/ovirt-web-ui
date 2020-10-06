@@ -6,6 +6,7 @@ import { push } from 'connected-react-router'
 import { saveGlobalOptions } from '_/actions'
 import { FormControl, Switch } from 'patternfly-react'
 import { msg } from '_/intl'
+import localeWithFullName from '_/intl/localeWithFullName'
 import style from './style.css'
 
 import { Settings, SettingsBase } from '../Settings'
@@ -144,6 +145,23 @@ class GlobalSettings extends Component {
             body: <span>{config.userName}</span>,
           },
           {
+            title: msg.email(),
+            body: <span>{config.email}</span>,
+          },
+          {
+            title: translatedLabels.language,
+            body: (
+              <div className={style['half-width']}>
+                <SelectBox
+                  id={`${idPrefix}-language`}
+                  items={Object.entries(localeWithFullName).map(([id, value]) => ({ id, value }))}
+                  selected={draftValues.language}
+                  onChange={onChange('language')}
+                />
+              </div>
+            ),
+          },
+          {
             title: translatedLabels.sshKey,
             tooltip: msg.sshKeyTooltip(),
             body: (
@@ -236,10 +254,10 @@ export default connect(
     },
     currentValues: {
       sshKey: options.getIn(['ssh', 'key']),
-      language: options.getIn(['global', 'language']),
-      showNotifications: options.getIn(['global', 'showNotifications']),
-      notificationSnoozeDuration: options.getIn(['global', 'notificationSnoozeDuration']),
-      updateRate: options.getIn(['global', 'updateRate']),
+      language: options.getIn(['remoteOptions', 'locale', 'content']),
+      showNotifications: options.getIn(['localOptions', 'showNotifications']),
+      notificationSnoozeDuration: options.getIn(['localOptions', 'notificationSnoozeDuration']),
+      updateRate: options.getIn(['remoteOptions', 'updateRate', 'content']),
     },
     lastTransactionId: options.getIn(['lastTransactions', 'global', 'transactionId'], ''),
   }),

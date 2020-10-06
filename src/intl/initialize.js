@@ -14,6 +14,8 @@ import 'moment-duration-format'
 
 import { BASE_LOCALE_SET, DEFAULT_LOCALE, DUMMY_LOCALE } from './index'
 import { timeDurations } from './time-durations'
+import { loadFromLocalStorage } from '_/storage'
+import type { RemoteUserOptionsType } from '_/ovirtapi/types'
 
 export function initIntl (forceLocale: ?string): string {
   const locale: string = forceLocale || discoverUserLocale()
@@ -25,10 +27,15 @@ export function initIntl (forceLocale: ?string): string {
 }
 
 function discoverUserLocale (): string {
-  return getLocaleFromUrl() || getBrowserLocale() || DEFAULT_LOCALE
+  return getLocaleFromUrl() || loadLocaleFromLocalStorage() || getBrowserLocale() || DEFAULT_LOCALE
 }
 
-function getLocaleFromUrl (): ?string {
+function loadLocaleFromLocalStorage (): ?string {
+  const { remoteOptions: { locale: { content } = {} } = {} } : {remoteOptions: RemoteUserOptionsType} = JSON.parse(loadFromLocalStorage('options')) || {}
+  return content
+}
+
+export function getLocaleFromUrl (): ?string {
   const localeMatch = /locale=(\w{2}([-_]\w{2})?)/.exec(window.location.search)
   if (localeMatch === null) {
     return null

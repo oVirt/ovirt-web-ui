@@ -19,6 +19,7 @@ import AppConfiguration, { readConfiguration } from '_/config'
 import { login } from '_/actions'
 
 import App from './App'
+import LocaleReloader from './intl/LocaleReloader'
 import GlobalErrorBoundary from './GlobalErrorBoundary'
 
 // Patternfly dependencies
@@ -34,7 +35,9 @@ function renderApp (store: Object, errorBridge: Object) {
   ReactDOM.render(
     <GlobalErrorBoundary errorBridge={errorBridge} store={store}>
       <Provider store={store}>
-        <App history={store.history} />
+        <LocaleReloader>
+          <App history={store.history} />
+        </LocaleReloader>
       </Provider>
     </GlobalErrorBoundary>,
 

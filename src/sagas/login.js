@@ -27,6 +27,7 @@ import {
   getAllVnicProfiles,
   getRoles,
   getUserGroups,
+  getUser,
 
   downloadConsole,
   getSingleVm,
@@ -57,6 +58,7 @@ import { fetchDataCentersAndStorageDomains, fetchIsoFiles } from './storageDomai
 import { loadIconsFromLocalStorage } from './osIcons'
 import {
   transformAndPermitVm,
+  fetchCurrentUser,
 } from './index'
 
 import { loadFromLocalStorage } from '_/storage'
@@ -203,6 +205,7 @@ function* initialLoad () {
   yield all([
     call(loadIconsFromLocalStorage),
     call(fetchRoles, getRoles()),
+    call(fetchCurrentUser, getUser()),
     call(fetchUserGroups, getUserGroups()),
     call(fetchAllOS, getAllOperatingSystems()),
     call(fetchAllHosts, getAllHosts()),

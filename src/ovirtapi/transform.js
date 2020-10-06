@@ -25,6 +25,9 @@ import type {
   ApiPermissionType, PermissionType,
   ApiEventType, EventType,
   ApiRoleType, RoleType,
+  ApiUserType, UserType,
+  UserOptionType,
+  RemoteUserOptionsType,
 } from './types'
 
 import { isWindows } from '_/helpers'
@@ -964,6 +967,47 @@ const Event = {
   toApi: undefined,
 }
 
+const RemoteUserOptions = {
+  toInternal: (options: Array<UserOptionType<string> & {name: string}> = []): RemoteUserOptionsType => {
+    const { locale } = Object.fromEntries(options.map(option => RemoteUserOption.toInternal(option)))
+
+    return {
+      locale,
+    }
+  },
+}
+
+const RemoteUserOption = {
+  toInternal: ({ name, content, id }: UserOptionType<string> & {name: string} = {}): [string, UserOptionType<any>] => {
+    return [
+      name,
+      {
+        id,
+        content: JSON.parse(content),
+      }]
+  },
+  toApi: (name: string, option: UserOptionType<Object>): UserOptionType<string> & {name: string} => {
+    return ({
+      name,
+      // double encoding - value is transferred as a string
+      content: JSON.stringify(option.content),
+    })
+  },
+}
+
+const User = {
+  toInternal ({ user: { user_name: userName, last_name: lastName, email, principal } = {} }: { user: ApiUserType }): UserType {
+    return {
+      userName,
+      lastName,
+      email,
+      principal,
+    }
+  },
+
+  toApi: undefined,
+}
+
 //
 // Export each transforms individually so they can be consumed individually
 //
@@ -992,4 +1036,7 @@ export {
   Permissions,
   Event,
   Role,
+  User,
+  RemoteUserOptions,
+  RemoteUserOption,
 }

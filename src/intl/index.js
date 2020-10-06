@@ -1,7 +1,7 @@
 // @flow
 
 import IntlMessageFormat from 'intl-messageformat'
-import { initIntl } from './initialize'
+import { initIntl, getLocaleFromUrl } from './initialize'
 
 import { messages, type MessageIdType, type MessageType } from './messages'
 import translatedMessages from './translated-messages.json'
@@ -16,6 +16,7 @@ export const BASE_LOCALE_SET: Set<string> = new Set(Object.keys(localeWithFullNa
  * Currently selected locale
  */
 export const locale: string = initIntl()
+export const localeFromUrl: ?string = getLocaleFromUrl()
 
 function getMessage (id: MessageIdType): string {
   const message = getMessageForLocale(id, locale)
