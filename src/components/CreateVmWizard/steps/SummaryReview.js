@@ -13,6 +13,7 @@ import { optimizedForMap } from './BasicSettings'
 import { NicNameWithLabels } from './Networking'
 import { DiskNameWithLabels } from './Storage'
 import style from './style.css'
+import { EMPTY_VNIC_PROFILE_ID } from '_/constants'
 
 const Item = ({ id, label, children }) =>
   <div className={style['review-item']}>
@@ -79,7 +80,9 @@ const ReviewNetworking = ({ id, vnicProfiles, network }) => {
   const vnicNames = vnicProfiles.reduce((map, vnic) => {
     map[vnic.get('id')] = `${vnic.getIn(['network', 'name'])}/${vnic.get('name')}`
     return map
-  }, {})
+  }, {
+    [EMPTY_VNIC_PROFILE_ID]: msg.nicNoVnicAssigned(),
+  })
 
   return <Item id={`${id}-networking`} label={msg.createVmWizardStepTitleNetwork()}>
     { network.length === 0 && <div>{msg.createVmNetEmptyInfo()}</div> }

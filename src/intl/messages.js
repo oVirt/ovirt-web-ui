@@ -121,7 +121,6 @@ export const messages: { [messageId: string]: MessageType } = {
   createVmNetEmptyInfo: 'No NICs have been defined for this VM.',
   createVmNetEmptyTitle: 'No NICs Defined',
   createVmNetNoEditHelpMessage: 'This NIC is defined by your selected template and cannot be edited or deleted at creation.',
-  createVmNetSelectVnicProfile: 'Select vNic Profile',
   createVmNetTableHeaderNicName: 'NIC Name',
   createVmNetTableHeaderType: 'Device Type',
   createVmNetTableHeaderVnicProfile: 'vNic Profile',

@@ -31,6 +31,7 @@ import SelectBox from '_/components/SelectBox'
 
 import style from './style.css'
 import OverlayTooltip from '_/components/OverlayTooltip'
+import { EMPTY_VNIC_PROFILE_ID } from '_/constants'
 
 const NIC_INTERFACES = createNicInterfacesList()
 const NIC_INTERFACE_DEFAULT = 'virtio'
@@ -191,10 +192,6 @@ class Networking extends React.Component {
           const vnicList = createVNicProfileList(vnicProfiles, { dataCenterId, cluster })
           const row = this.state.editing[rowData.id]
 
-          if (vnicList.length > 1 || row.vnicProfileId === '_') {
-            vnicList.unshift({ id: '_', value: `-- ${msg.createVmNetSelectVnicProfile()} --` })
-          }
-
           return (
             <SelectBox
               id={`${idPrefix}-${value}-vnic-profile-edit`}
@@ -306,16 +303,6 @@ class Networking extends React.Component {
     const newId = generateUnique('NEW_')
     const nextNicName = suggestNicName(this.props.nics)
 
-    // If only 1 vnic profile is available, select it automatically
-    const {
-      dataCenterId,
-      cluster,
-      vnicProfiles,
-    } = this.props
-    const vnicList = createVNicProfileList(vnicProfiles, { dataCenterId, cluster })
-    const vnicProfileId =
-      vnicList.length === 1 ? vnicList[0].id : '_'
-
     // Setup a new nic in the editing object
     this.setState(state => ({
       creating: newId,
@@ -325,7 +312,7 @@ class Networking extends React.Component {
           id: newId,
           name: nextNicName,
           deviceType: NIC_INTERFACE_DEFAULT,
-          vnicProfileId,
+          vnicProfileId: EMPTY_VNIC_PROFILE_ID,
         },
       },
     }))
