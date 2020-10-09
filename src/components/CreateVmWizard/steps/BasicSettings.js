@@ -17,7 +17,13 @@ import {
   isVmNameValid,
 } from '_/components/utils'
 
-import { ExpandCollapse, Form, FormControl, Checkbox } from 'patternfly-react'
+import {
+  ExpandCollapse,
+  FieldLevelHelp,
+  Form,
+  FormControl,
+  Checkbox,
+} from 'patternfly-react'
 import { Grid, Row, Col } from '_/components/Grid'
 import SelectBox from '_/components/SelectBox'
 
@@ -38,6 +44,7 @@ const FieldRow = ({
   labelCols = 3,
   fieldCols = 7,
   children,
+  tooltip,
 }) => (
   <Row className={`
       form-group
@@ -61,6 +68,12 @@ const FieldRow = ({
       <React.Fragment>
         <Col cols={labelCols} className={`control-label ${style['col-label']}`}>
           {label}
+          { tooltip &&
+            <FieldLevelHelp
+              content={tooltip}
+              inline
+            />
+          }
         </Col>
         <Col cols={fieldCols} className={style['col-data']} id={id}>{children}</Col>
       </React.Fragment>
@@ -77,6 +90,7 @@ FieldRow.propTypes = {
   labelCols: PropTypes.number,
   fieldCols: PropTypes.number,
   children: PropTypes.node.isRequired,
+  tooltip: PropTypes.string,
 }
 
 const SubHeading = ({ children }) => (
@@ -395,6 +409,12 @@ class BasicSettings extends React.Component {
       maxNumberOfCores: maxNumOfCores,
       maxNumberOfThreads: maxNumOfThreads,
     })
+    // for Threads per Core tooltip
+    const clusterId = data.clusterId || '_'
+    const cluster = clusters && clusters.get(clusterId)
+    const threadsTooltip = cluster && cluster.get('architecture') === 'ppc64'
+      ? msg.recomendedPower8ValuesForThreads({ threads: maxNumOfThreads })
+      : msg.recomendedValuesForThreads({ threads: maxNumOfThreads })
 
     // ----- RENDER -----
     return <Form horizontal id={idPrefix}>
@@ -616,6 +636,7 @@ class BasicSettings extends React.Component {
             fieldCols={3}
             label={msg.threadsPerCores()}
             id={`${idPrefix}-topology-threads`}
+            tooltip={threadsTooltip}
           >
             <SelectBox
               id={`${idPrefix}-topology-threads-edit`}
