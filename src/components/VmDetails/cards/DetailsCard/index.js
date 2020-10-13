@@ -940,7 +940,7 @@ class DetailsCard extends React.Component {
                         tooltip={
                           isClusterPower8
                             ? msg.recomendedPower8ValuesForThreads({ threads: maxNumberOfThreads })
-                            : msg.recomendedValuesForThreads({ threads: maxNumberOfThreads })
+                            : msg.recomendedValuesForThreads()
                         }>
                         <SelectBox
                           id={`${idPrefix}-vcpu-topology-threads-edit`}

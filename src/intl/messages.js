@@ -502,7 +502,7 @@ export const messages: { [messageId: string]: MessageType } = {
   rebootVm: 'Reboot the VM',
   rebootVmQuestion: 'Are you sure you want to Restart the VM?',
   recomendedPower8ValuesForThreads: 'Your cluster architecture is POWER, we recommend using 1 through {threads} values ({threads} for high load VMs).',
-  recomendedValuesForThreads: 'Please check your host architecture to make sure it is properly set up before changing the value. If you are not sure, we recommend keeping threads-per-core set to 1. Other recommended values include: x86- 1, Power8- 1 through {threads} ({threads} for high load VMs).',
+  recomendedValuesForThreads: 'Please check your host architecture to make sure it is properly set up before changing the value. If you are not sure, we recommend keeping threads-per-core set to 1.',
   refresh: {
     message: 'Refresh',
     description: 'Reload data from server',
