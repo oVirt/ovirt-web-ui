@@ -276,24 +276,15 @@ class BasicSettings extends React.Component {
     let changes = {}
     switch (field) {
       case 'clusterId':
-        if (value === undefined) {
-          changes.dataCenterId = undefined
-          changes.clusterId = undefined
-          changes.provisionSource = 'template'
-          changes.isoImage = undefined
-          changes.templateId = undefined
-        } else {
-          const templateList = createTemplateList(this.props.templates, value)
-
-          changes.dataCenterId = this.props.clusters.getIn([value, 'dataCenterId'])
-          changes.clusterId = value
-          changes.provisionSource =
+        const templateList = value ? createTemplateList(this.props.templates, value) : []
+        changes.dataCenterId = value ? this.props.clusters.getIn([value, 'dataCenterId']) : undefined
+        changes.clusterId = value
+        changes.provisionSource =
             (templateList.length === 1 && templateList[0].id === this.props.blankTemplateId)
               ? 'iso'
               : 'template'
-          changes.isoImage = undefined
-          changes.templateId = templateList.length === 1 ? this.props.blankTemplateId : undefined
-        }
+        changes.templateId = templateList.length === 1 ? this.props.blankTemplateId : undefined
+        changes.isoImage = undefined
         break
 
       case 'provisionSource':
