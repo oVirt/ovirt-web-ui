@@ -141,6 +141,7 @@ class BasicSettings extends React.Component {
     this.validateForm = this.validateForm.bind(this)
     this.validateVmName = this.validateVmName.bind(this)
     this.mapVCpuTopologyItems = this.mapVCpuTopologyItems.bind(this)
+    this.handleProvisionSourceChange = this.handleProvisionSourceChange.bind(this)
 
     this.fields = {
       select: [
@@ -238,6 +239,29 @@ class BasicSettings extends React.Component {
     })
   }
 
+  handleProvisionSourceChange (provisionSource) {
+    const changes = {}
+    const { defaultValues } = this.props
+
+    changes.provisionSource = provisionSource
+    changes.isoImage = undefined
+    changes.templateId = undefined
+    changes.operatingSystemId = defaultValues.operatingSystemId
+    changes.memory = defaultValues.memory
+    changes.cpus = defaultValues.cpus
+    changes.topology = defaultValues.topology
+    changes.optimizedFor = defaultValues.optimizedFor
+    changes.cloudInitEnabled = defaultValues.initEnabled
+
+    // when changing Provision type to ISO, set the default time zone according to the OS
+    if (changes.provisionSource === 'iso') {
+      changes.timeZone = this.checkTimeZone(changes.operatingSystemId, changes.templateId)
+      changes.initTimezone = '' // reset the sysprep timezone value, we don't support cloud-init TZ yet
+    }
+
+    return changes
+  }
+
   handleChange (field, value, extra) {
     // normalize the value for drop downs with a "-- Select --" option
     if (this.fields.select.includes(field) && value === '_') {
@@ -249,7 +273,7 @@ class BasicSettings extends React.Component {
       value = !!value || value === 'on'
     }
 
-    const changes = {}
+    let changes = {}
     switch (field) {
       case 'clusterId':
         if (value === undefined) {
@@ -273,20 +297,7 @@ class BasicSettings extends React.Component {
         break
 
       case 'provisionSource':
-        changes.provisionSource = value
-        changes.isoImage = undefined
-        changes.templateId = undefined
-        changes.operatingSystemId = this.props.defaultValues.operatingSystemId
-        changes.memory = this.props.defaultValues.memory
-        changes.cpus = this.props.defaultValues.cpus
-        changes.topology = this.props.defaultValues.topology
-        changes.optimizedFor = this.props.defaultValues.optimizedFor
-        changes.cloudInitEnabled = this.props.defaultValues.initEnabled
-
-        // when changing Provision type to ISO, set the default time zone according to the OS
-        if (changes.provisionSource === 'iso') {
-          changes.timeZone = this.checkTimeZone(changes.operatingSystemId, changes.templateId)
-        }
+        changes = this.handleProvisionSourceChange(value)
         break
 
       case 'templateId':
