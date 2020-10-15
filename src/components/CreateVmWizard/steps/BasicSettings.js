@@ -284,7 +284,7 @@ class BasicSettings extends React.Component {
               ? 'iso'
               : 'template'
         changes.templateId = templateList.length === 1 ? this.props.blankTemplateId : undefined
-        changes.isoImage = undefined
+        changes = { ...changes, ...this.handleProvisionSourceChange(changes.provisionSource) }
         break
 
       case 'provisionSource':
