@@ -84,3 +84,12 @@
 .text-align-left {
   text-align: left;
 }
+/*
+ * SelectBox validationState classes
+ * compatible with PF3 FormControl component
+ */
+
+.selectBox-has-error,.selectBox-has-error:hover,.selectBox-has-error:focus {
+    /*pf-red-100*/
+    border-color: #cc0000;
+}
