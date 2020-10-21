@@ -17,7 +17,7 @@ Source0:        https://github.com/oVirt/ovirt-web-ui/archive/%{source_basename}
 BuildArch: noarch
 
 # nodejs-modules embeds yarn and requires nodejs
-BuildRequires: ovirt-engine-nodejs-modules >= 2.0.33-1
+BuildRequires: ovirt-engine-nodejs-modules >= 2.0.36-1
 
 %description
 This package provides the VM Portal for %{product}.
@@ -48,6 +48,32 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Wed Oct 21 2020 Sharon Gratch <sgratchk@redhat.com> - 1.6.5-1
+ - create VM Wizard - support tab through fields in Storage and Networking steps
+ - create VM Wizard - VM time zone format is now compatible with VM OS and also displayed on the review step
+ - create VM Wizard - prevent the unsaved data confirmation dialog from being displayed in last step after VM creation
+ - create VM Wizard - add Timezone field for sysprep options
+ - create VM Wizard - sort alphabetically the list of Disks and NICs on the review step
+ - create VM Wizard - fix setting the disk size by using arrows to work properly
+ - create VM Wizard - Validate add/edit NIC name field on row save action
+ - create VM Wizard - support creation of a new NIC with an empty (n/a) profile
+ - create VM Wizard - support advanced CPU topology setting on "Basic Settings" step
+ - create VM Wizard - add indication of which field is invalid/missing on "Basic Settings" step for enablng the next step
+ - the CPU Utilization chart details are fixed to be displayed properly, based on the number of vCPUs
+ - set enable-usb-autoshare in console.vv file according to SpiceUsbAutoShare engine config value
+ - refactor DetailsCard component to use explicit config values
+ - increase spacing between Boot Order and VCPU Topology sections in VM Details card
+ - use pf3 ExpandCollapse react component in the VM Details card
+ - rephrase the "Threads per Core" tooltip text
+ - update dependencies of handlebars and bootstrap-select
+ - update minimum ovirt version to 4.4
+ - translations update 2020-Sep-2
+ - translate the About modal missing strings
+ - refactor i18n normalize script by adding an explicit key sorting function
+ - translate the Duration formatting for VM uptime and refactor intl scripts
+ - refactor intl initialization and remove react-intl package
+ - update Zanata tools to use the maven plugin
+
 * Wed Aug 19 2020 Sharon Gratch <sgratchk@redhat.com> - 1.6.4-1
  - create VM Wizard - prevent the dialog from being closed without a confirmation
  - create VM Wizard - add a tooltip message to Disk size field on edit mode
