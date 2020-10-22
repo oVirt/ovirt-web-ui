@@ -30,15 +30,6 @@ import SelectBox from '_/components/SelectBox'
 import style from './style.css'
 import { Tooltip, InfoTooltip } from '_/components/tooltips'
 
-function getDefaultDiskType (vmOptimizedFor) {
-  const diskType =
-    vmOptimizedFor === 'highperformance' ? 'pre'
-      : vmOptimizedFor === 'server' ? 'pre'
-        : 'thin'
-
-  return diskType
-}
-
 const TooltipLabel = ({ id, className, bsStyle = 'default', children }) =>
   <Label
     id={id}
@@ -478,7 +469,6 @@ class Storage extends React.Component {
       dataCenterId,
       vmName,
       disks,
-      optimizedFor,
     } = this.props
 
     // If only 1 storage domain is available, select it automatically
@@ -500,7 +490,7 @@ class Storage extends React.Component {
           bootable: false,
           iface: 'virtio_scsi',
           type: 'image',
-          diskType: getDefaultDiskType(optimizedFor),
+          diskType: 'thin',
 
           size: (diskInitialSizeInGib * 1024 ** 3),
         },
