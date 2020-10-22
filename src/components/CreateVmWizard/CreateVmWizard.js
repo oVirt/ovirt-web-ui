@@ -348,26 +348,39 @@ class CreateVmWizard extends React.Component {
         }
 
         if (resetDisks) {
+          const { storageDomains } = this.props
           draft.steps.storage = {
             updated: (draft.steps.storage.updated + 1),
             disks: !template
               ? []
               : template.get('disks', List())
-                .map(disk => ({
-                  id: disk.get('attachmentId'),
-                  name: disk.get('name'),
+                .map(disk => {
+                  const canUserUseStorageDomain =
+                    storageDomains.getIn([ disk.get('storageDomainId'), 'canUserUseDomain' ], false)
 
-                  diskId: disk.get('id'),
-                  storageDomainId: disk.get('storageDomainId'),
-                  canUserUseStorageDomain: this.props.storageDomains.getIn([ disk.get('storageDomainId'), 'canUserUseDomain' ], false),
+                  const diskType = // constrain to values from createDiskTypeList()
+                    template.get('type') === 'desktop' // optimizedFor
+                      ? canUserUseStorageDomain
+                        ? disk.get('sparse') ? 'thin' : 'pre'
+                        : 'pre'
+                      : 'pre'
 
-                  bootable: disk.get('bootable'),
-                  iface: disk.get('iface'),
-                  type: disk.get('type'), // [ image | lun | cinder ]
-                  diskType: disk.get('sparse') ? 'thin' : 'pre', // constrain to values from createDiskTypeList()
-                  size: disk.get('provisionedSize'), // bytes
-                  isFromTemplate: true,
-                }))
+                  return {
+                    id: disk.get('attachmentId'),
+                    name: disk.get('name'),
+
+                    diskId: disk.get('id'),
+                    storageDomainId: disk.get('storageDomainId'),
+                    canUserUseStorageDomain,
+
+                    bootable: disk.get('bootable'),
+                    iface: disk.get('iface'),
+                    type: disk.get('type'), // [ image | lun | cinder ]
+                    diskType,
+                    size: disk.get('provisionedSize'), // bytes
+                    isFromTemplate: true,
+                  }
+                })
                 .toJS(),
           }
         }
