@@ -2,7 +2,7 @@ import { getOsHumanName } from '../components/utils'
 import { enumMsg } from '_/intl'
 
 const compareMap = {
-  name: (item, filter) => !!filter.find(n => item.get('name').includes(n)),
+  name: (item, filter) => !!filter.find(n => item.get('name').toUpperCase().includes(n.toUpperCase())),
   os: (item, filter) => getOsHumanName(item.getIn(['os', 'type'])) === filter,
   status: (item, filter) => enumMsg('VmStatus', item.get('status')) === filter,
 }
