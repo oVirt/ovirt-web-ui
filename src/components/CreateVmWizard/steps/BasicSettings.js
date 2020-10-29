@@ -441,6 +441,7 @@ class BasicSettings extends React.Component {
         <FieldRow label={msg.name()} id={`${idPrefix}-name`} required validationState={indicators.name}>
           <FormControl
             id={`${idPrefix}-name-edit`}
+            autoFocus
             autoComplete='off'
             type='text'
             defaultValue={data.name}
