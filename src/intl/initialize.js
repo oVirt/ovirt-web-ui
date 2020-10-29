@@ -69,7 +69,7 @@ function coerceToSupportedLocale (locale: string): ?string {
     return 'en'
   }
 
-  if (BASE_LOCALE_SET.has(locale)) {
+  if (BASE_LOCALE_SET.has(locale) || DUMMY_LOCALE === locale) {
     return locale
   }
 
