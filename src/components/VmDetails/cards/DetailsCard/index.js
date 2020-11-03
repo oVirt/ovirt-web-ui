@@ -113,7 +113,7 @@ class DetailsCard extends React.Component {
       promptNextRunChanges: false,
 
       isoList: createIsoList(props.storageDomains, vmDataCenterId),
-      clusterList: createClusterList(props.clusters),
+      clusterList: createClusterList(props.clusters, vmDataCenterId),
       osList: createOsList(vmClusterId, props.clusters, props.operatingSystems),
     }
     this.trackUpdates = {}
@@ -170,13 +170,14 @@ class DetailsCard extends React.Component {
     //       __storageDomains__, and __operatingSystems__ don't need to be kept in state for
     //       change comparison
     const vmClusterId = this.props.vm.getIn(['cluster', 'id'])
+    const vmDataCenterId = this.props.clusters.getIn([vmClusterId, 'dataCenterId'])
 
     if (prevProps.clusters !== this.props.clusters) {
-      this.setState({ clusterList: createClusterList(this.props.clusters) }) // eslint-disable-line react/no-did-update-set-state
+      const { clusters } = this.props
+      this.setState({ clusterList: createClusterList(clusters, vmDataCenterId) }) // eslint-disable-line react/no-did-update-set-state
     }
 
     if (prevProps.storageDomains !== this.props.storageDomains) {
-      const vmDataCenterId = this.props.clusters.getIn([vmClusterId, 'dataCenterId'])
       this.setState({ isoList: createIsoList(this.props.storageDomains, vmDataCenterId) }) // eslint-disable-line react/no-did-update-set-state
     }
 
@@ -734,7 +735,7 @@ class DetailsCard extends React.Component {
                       { isFullEdit && canChangeCluster &&
                         <SelectBox
                           id={`${idPrefix}-cluster-edit`}
-                          items={clusterList.filter(cluster => cluster.datacenter === dataCenterId)}
+                          items={clusterList}
                           selected={clusterId}
                           onChange={(selectedId) => { this.handleChange('cluster', selectedId) }}
                         />
