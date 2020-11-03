@@ -658,6 +658,7 @@ const Cluster = {
       name: cluster.name,
       dataCenterId: cluster.data_center && cluster.data_center.id,
       architecture: cluster.cpu && cluster.cpu.architecture,
+      cpuType: cluster.cpu && cluster.cpu.type,
 
       memoryPolicy: {
         overCommitPercent:
