@@ -356,7 +356,7 @@ class CreateVmWizard extends React.Component {
               : template.get('disks', List())
                 .map(disk => {
                   const canUserUseStorageDomain =
-                    storageDomains.getIn([ disk.get('storageDomainId'), 'canUserUseDomain' ], false)
+                    !!filteredStorageDomainList.find(sd => sd.id === disk.get('storageDomainId'))
 
                   const diskType = // constrain to values from createDiskTypeList()
                     template.get('type') === 'desktop' // optimizedFor

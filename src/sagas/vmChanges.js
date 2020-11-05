@@ -146,7 +146,6 @@ function* composeAndCreateVm ({ payload: { basic, nics, disks }, meta: { correla
 }
 
 function* composeProvisionSourceIso ({ vm, basic }) {
-  // TODO: Verify that we absolutely need to create VM then change CD.
   const cdrom = {
     fileId: basic.isoImage,
   }
@@ -202,6 +201,7 @@ function* composeProvisionSourceTemplate ({ vm, basic, disks }) {
       // did the storage domain change?
       if (disk.storageDomainId !== templateDisk.get('storageDomainId')) {
         changesToTemplateDisk.sparse = false
+        changesToTemplateDisk.format = 'raw'
         changesToTemplateDisk.storage_domains = {
           storage_domain: [{ id: disk.storageDomainId }],
         }
@@ -212,7 +212,7 @@ function* composeProvisionSourceTemplate ({ vm, basic, disks }) {
         changesToTemplateDisk.sparse = disk.diskType === 'thin'
       }
 
-      if (Object.keys(changesToTemplateDisk) > 1) {
+      if (Object.keys(changesToTemplateDisk).length > 1) {
         vmRequiresClone = true
         merge(vmUpdates, {
           disk_attachments: {
