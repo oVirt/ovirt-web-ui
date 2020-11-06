@@ -24,7 +24,8 @@ module.exports = {
 
   plugins: [
     'flowtype',
-    'import'
+    'import',
+    'react-hooks',
   ],
 
   parserOptions: {
@@ -58,6 +59,8 @@ module.exports = {
     'comma-dangle': [2, 'always-multiline'],
     'object-curly-spacing': [2, 'always'],
     'import/no-duplicates': 2,
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn',
     'flowtype/boolean-style': [
       2,
       'boolean'
