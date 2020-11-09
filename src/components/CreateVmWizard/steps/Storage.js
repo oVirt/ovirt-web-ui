@@ -579,9 +579,11 @@ class Storage extends React.Component {
       id: idPrefix = 'create-vm-wizard-disks',
       storageDomains,
       disks,
+      dataCenterId,
     } = this.props
 
     const storageDomainList = createStorageDomainList(storageDomains)
+    const dataCenterStorageDomainsList = createStorageDomainList(storageDomains, dataCenterId)
     const enableCreate = storageDomainList.length > 0 && !this.isEditingMode()
 
     const diskList = sortNicsDisks([...disks])
@@ -589,7 +591,10 @@ class Storage extends React.Component {
       .map(disk => {
         disk = this.state.editing[disk.id] || disk
         const sd = storageDomainList.find(sd => sd.id === disk.storageDomainId)
-        const isSdOk = sd && disk.canUserUseStorageDomain
+        const isSdOk = !!sd && (
+          disk.canUserUseStorageDomain ||
+          dataCenterStorageDomainsList.find(sd => sd.id === disk.storageDomainId)
+        )
 
         return {
           ...disk,

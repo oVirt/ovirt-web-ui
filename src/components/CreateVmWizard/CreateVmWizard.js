@@ -348,7 +348,10 @@ class CreateVmWizard extends React.Component {
         }
 
         if (resetDisks) {
-          const { storageDomains } = this.props
+          const dataCenterStorageDomainsList = createStorageDomainList(
+            this.props.storageDomains,
+            this.state.steps.basic.dataCenterId)
+
           draft.steps.storage = {
             updated: (draft.steps.storage.updated + 1),
             disks: !template
@@ -356,7 +359,7 @@ class CreateVmWizard extends React.Component {
               : template.get('disks', List())
                 .map(disk => {
                   const canUserUseStorageDomain =
-                    !!filteredStorageDomainList.find(sd => sd.id === disk.get('storageDomainId'))
+                    !!dataCenterStorageDomainsList.find(sd => sd.id === disk.get('storageDomainId'))
 
                   const diskType = // constrain to values from createDiskTypeList()
                     template.get('type') === 'desktop' // optimizedFor
