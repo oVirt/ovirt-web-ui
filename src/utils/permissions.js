@@ -2,8 +2,17 @@
 import Selectors from '_/selectors'
 import type { ClusterType, PermissionType, VnicProfileType } from '_/ovirtapi/types'
 
-function checkUserPermit (permit: string, permits: Set<string>): boolean {
-  return permits.has(permit)
+function checkUserPermit (permit: string | Array<string>, permits: Set<string>): boolean {
+  if (Array.isArray(permit)) {
+    for (const p of permit) {
+      if (!permits.has(p)) {
+        return false
+      }
+    }
+    return true
+  } else {
+    return permits.has(permit)
+  }
 }
 
 export function canUserChangeCd (permits: Set<string>): boolean {
@@ -31,7 +40,7 @@ export function canUserManipulateSnapshots (permits: Set<string>): boolean {
 }
 
 export function canUserUseStorageDomain (permits: Set<string>): boolean {
-  return checkUserPermit('create_disk', permits)
+  return checkUserPermit([ 'create_disk', 'attach_disk_profile' ], permits)
 }
 
 export function canUserEditVmStorage (permits: Set<string>): boolean {
@@ -64,15 +73,16 @@ export function getUserPermits (permissions: Array<PermissionType>): Set<string>
   const userFilter = Selectors.getFilter()
   const userGroups = Selectors.getUserGroups()
   const userId = Selectors.getUserId()
-  let permits = []
+
+  const permits = new Set()
   permissions.forEach((role) => {
     if (userFilter ||
       (
         (role.groupId && userGroups.includes(role.groupId)) ||
         (role.userId && role.userId === userId)
       )) {
-      role.permits.map((permit) => permit.name).forEach((permit) => permits.push(permit))
+      role.permits.map((permit) => permit.name).forEach((permit) => permits.add(permit))
     }
   })
-  return new Set(permits)
+  return permits
 }
