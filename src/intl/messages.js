@@ -578,6 +578,7 @@ export const messages: { [messageId: string]: MessageType } = {
   },
   sysPrepCustomScript: 'Custom Script',
   sysPrepTimezone: 'Timezone',
+  sysPrepTimezoneConfigure: 'Configure Timezone',
   sysPrepOptions: 'SysPrep Options',
   takeVm: 'Take a Virtual Machine',
   template: 'Template',
