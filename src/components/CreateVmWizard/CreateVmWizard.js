@@ -28,6 +28,11 @@ const DEFAULT_STATE = {
       startOnCreation: false,
       initEnabled: false,
       optimizedFor: 'desktop',
+      topology: {
+        sockets: 1,
+        cores: 1,
+        threads: 1,
+      },
     },
     network: {
       nics: [],
