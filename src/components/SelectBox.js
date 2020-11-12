@@ -66,7 +66,7 @@ class SelectBox extends React.Component {
       <div style={{ width: '100%' }} id={id}>
         <div className='dropdown'>
           <Tooltip id={`${id}-selectbox-tooltip`} placement={'bottom'} tooltip={selectedItem ? selectedItem.value : ''}>
-            <button 
+            <button
               className={`btn btn-default dropdown-toggle ${style['dropdown-button']} ${validationClass}`}
               type='button'
               data-toggle='dropdown'
