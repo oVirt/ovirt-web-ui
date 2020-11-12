@@ -234,6 +234,10 @@ textarea {
   resize: vertical;
 }
 
+.pficon-delete {
+  color: #C9190B;
+}
+
 /*
  * For Advanced Options/ExpandCollapse pf3 component
  */

@@ -6,7 +6,7 @@ import FieldRow from '../FieldRow'
 import CloudInitForm from './CloudInitForm'
 import SysprepForm from './SysprepForm'
 
-const CloudInit = ({ idPrefix, vm, isWindows, onChange }) => {
+const CloudInit = ({ idPrefix, vm, isWindows, onChange, lastInitTimezone }) => {
   const cloudInitEnabled = vm.getIn(['cloudInit', 'enabled'])
   return (
     <React.Fragment>
@@ -22,7 +22,7 @@ const CloudInit = ({ idPrefix, vm, isWindows, onChange }) => {
       { cloudInitEnabled && <div style={{ marginTop: '15px' }}>
         {
           isWindows
-            ? <SysprepForm idPrefix={idPrefix} vm={vm} onChange={onChange} />
+            ? <SysprepForm idPrefix={idPrefix} vm={vm} onChange={onChange} lastInitTimezone={lastInitTimezone} />
             : <CloudInitForm idPrefix={idPrefix} vm={vm} onChange={onChange} />
         }
       </div> }
@@ -35,6 +35,7 @@ CloudInit.propTypes = {
   vm: PropTypes.object.isRequired,
   isWindows: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
+  lastInitTimezone: PropTypes.string.isRequired,
 }
 
 export default CloudInit

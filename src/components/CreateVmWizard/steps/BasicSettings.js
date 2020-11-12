@@ -309,11 +309,28 @@ class BasicSettings extends React.Component {
         changes.initSshKeys = template.getIn(['cloudInit', 'sshAuthorizedKeys'])
         changes.initTimezone = template.getIn(['cloudInit', 'timezone'])
         changes.initCustomScript = template.getIn(['cloudInit', 'customScript'])
+
+        if (changes.initTimezone && isOsWindows(changes.operatingSystemId, this.props.operatingSystems)) {
+          // Configure Timezone checkbox should be checked if template's timezone set
+          changes.enableInitTimezone = true
+          changes.lastInitTimezone = changes.initTimezone // select template's timezone in the Timezone drop down
+        } else {
+          changes.enableInitTimezone = false
+          changes.initTimezone = ''
+          // select the same default GMT sysprep timezone as in Admin Portal
+          changes.lastInitTimezone = timezones.find(timezone => timezone.value.startsWith('(GMT) Greenwich')).id
+        }
+
         break
 
       case 'operatingSystemId':
         changes[field] = value
         changes.timeZone = this.checkTimeZone(value, this.props.data.templateId)
+
+        // only when changing the OS from one Windows to other Windows
+        changes.initTimezone = this.props.data.cloudInitEnabled && this.props.data.enableInitTimezone && isOsWindows(value, this.props.operatingSystems)
+          ? this.props.data.lastInitTimezone // set the sysprep timezone as the last selected sysprep timezone
+          : ''
         break
 
       case 'memory':
@@ -332,6 +349,24 @@ class BasicSettings extends React.Component {
 
       case 'topology': // number of sockets, cores or threads changed by the user in Advanced Options section
         changes[field] = this.getTopologySettings(this.props.data.cpus, { [extra.vcpu]: +value })
+        break
+
+      case 'enableInitTimezone': // Configure Timezone checkbox change
+        changes[field] = value
+        // if the Configure Timezone checkbox checked, set the sysprep timezone
+        changes.initTimezone = value ? this.props.data.initTimezone || this.props.data.lastInitTimezone : ''
+        break
+
+      case 'initTimezone': // sysprep timezone change
+        changes[field] = value
+        changes.lastInitTimezone = value // save the actual selected sysprep timezone
+        break
+
+      case 'cloudInitEnabled': // Cloud-init/Sysprep checkbox change
+        changes[field] = value
+        changes.initTimezone = value && this.props.data.enableInitTimezone && isOsWindows(this.props.data.operatingSystemId, this.props.operatingSystems)
+          ? this.props.data.lastInitTimezone
+          : ''
         break
 
       default:
@@ -355,7 +390,7 @@ class BasicSettings extends React.Component {
 
   render () {
     const idPrefix = this.props.id || 'create-vm-wizard-basic'
-    const { data, clusters, maxNumOfSockets, maxNumOfCores, maxNumOfThreads } = this.props
+    const { data, clusters, maxNumOfSockets, maxNumOfCores, maxNumOfThreads, operatingSystems } = this.props
     const indicators = {
       name: this.validateVmName(),
     }
@@ -387,7 +422,7 @@ class BasicSettings extends React.Component {
 
     const enableOsSelect = isValidUid(data.clusterId) && [ 'iso', 'template' ].includes(data.provisionSource)
     const operatingSystemList = enableOsSelect
-      ? createOsList(data.clusterId, clusters, this.props.operatingSystems)
+      ? createOsList(data.clusterId, clusters, operatingSystems)
       : [ { id: '_', value: `-- ${msg.createVmWizardSelectClusterBeforeOS()} --` } ]
 
     const enableIsoSelect = data.provisionSource === 'iso' && isValidUid(data.dataCenterId)
@@ -417,8 +452,8 @@ class BasicSettings extends React.Component {
       delete indicators.template
     }
 
-    const enableCloudInit = data.cloudInitEnabled && isOsLinux(data.operatingSystemId, this.props.operatingSystems)
-    const enableSysPrep = data.cloudInitEnabled && isOsWindows(data.operatingSystemId, this.props.operatingSystems)
+    const enableCloudInit = data.cloudInitEnabled && isOsLinux(data.operatingSystemId, operatingSystems)
+    const enableSysPrep = data.cloudInitEnabled && isOsWindows(data.operatingSystemId, operatingSystems)
 
     // for Advanced CPU Topology Options expand/collapse section
     const vCpuTopologyDividers = getTopologyPossibleValues({
@@ -441,6 +476,7 @@ class BasicSettings extends React.Component {
         <FieldRow label={msg.name()} id={`${idPrefix}-name`} required validationState={indicators.name}>
           <FormControl
             id={`${idPrefix}-name-edit`}
+            autoFocus
             autoComplete='off'
             type='text'
             defaultValue={data.name}
@@ -603,12 +639,24 @@ class BasicSettings extends React.Component {
               />
             </FieldRow>
 
+            {/*  Configure Timezone checkbox */}
+            <FieldRow id={`${idPrefix}-sysPrepTimezone-configure`} vertical>
+              <Checkbox
+                id={`${idPrefix}-sysprep-timezone-config`}
+                checked={data.enableInitTimezone}
+                onChange={e => this.handleChange('enableInitTimezone', e.target.checked)}
+              >
+                {msg.sysPrepTimezoneConfigure()}
+              </Checkbox>
+            </FieldRow>
+
             <FieldRow label={msg.sysPrepTimezone()} id={`${idPrefix}-sysPrepTimezone`} vertical>
               <SelectBox
                 id={`${idPrefix}-sysprep-timezone-select`}
                 items={timezones}
-                selected={data.initTimezone}
+                selected={data.lastInitTimezone}
                 onChange={selectedId => this.handleChange('initTimezone', selectedId)}
+                disabled={!data.enableInitTimezone}
               />
             </FieldRow>
 

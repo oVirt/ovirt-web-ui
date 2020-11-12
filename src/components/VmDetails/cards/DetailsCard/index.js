@@ -88,6 +88,7 @@ NotAvailable.propTypes = {
 }
 
 const DEFAULT_BOOT_DEVICES = List(['hd', null])
+const DEFAULT_GMT_TIMEZONE = timezones.find(timezone => timezone.value.startsWith('(GMT) Greenwich')).id
 
 /*
  * Specific information and details of the VM (status/up-time, data center, cluster,
@@ -114,6 +115,9 @@ class DetailsCard extends React.Component {
       isoList: createIsoList(props.storageDomains, vmDataCenterId),
       clusterList: createClusterList(props.clusters),
       osList: createOsList(vmClusterId, props.clusters, props.operatingSystems),
+
+      enableInitTimezone: !!props.vm.getIn(['cloudInit', 'timezone']), // true if sysprep timezone set or Configure Timezone checkbox checked
+      lastInitTimezone: props.vm.getIn(['cloudInit', 'timezone']) || DEFAULT_GMT_TIMEZONE,
     }
     this.trackUpdates = {}
     this.hotPlugUpdates = {}
@@ -232,6 +236,10 @@ class DetailsCard extends React.Component {
     }
 
     let updates = this.state.vm
+
+    const { enableInitTimezone, lastInitTimezone } = this.state
+    let initTimezoneUpdates = { enableInitTimezone, lastInitTimezone }
+
     const changeQueue = [{ fieldName, value }]
     const { maxNumberOfSockets, maxNumberOfCores, maxNumberOfThreads } = this.props
 
@@ -297,6 +305,8 @@ class DetailsCard extends React.Component {
 
         case 'cloudInitEnabled':
           updates = updates.setIn(['cloudInit', 'enabled'], value)
+          // when sysprep enabled and Configure Timezone checkbox checked, set the sysprep timezone to the last selected one
+          updates = updates.setIn(['cloudInit', 'timezone'], value && enableInitTimezone ? lastInitTimezone : '')
           fieldUpdated = 'cloudInit'
           break
 
@@ -312,6 +322,7 @@ class DetailsCard extends React.Component {
 
         case 'cloudInitTimezone':
           updates = updates.setIn(['cloudInit', 'timezone'], value)
+          initTimezoneUpdates.lastInitTimezone = value // remember the actual change of the sysprep timezone
           fieldUpdated = 'cloudInit'
           break
 
@@ -322,6 +333,12 @@ class DetailsCard extends React.Component {
 
         case 'cloudInitPassword':
           updates = updates.setIn(['cloudInit', 'password'], value)
+          fieldUpdated = 'cloudInit'
+          break
+
+        case 'enableInitTimezone': // Configure Timezone checkbox change
+          updates = updates.setIn(['cloudInit', 'timezone'], value ? lastInitTimezone : '')
+          initTimezoneUpdates.enableInitTimezone = value
           fieldUpdated = 'cloudInit'
           break
 
@@ -421,13 +438,21 @@ class DetailsCard extends React.Component {
 
       if (updates !== this.state.vm) {
         this.trackUpdates[fieldUpdated] = true
-        this.setState({ vm: updates, isDirty: true })
+        this.setState({ vm: updates, isDirty: true, ...initTimezoneUpdates })
       }
     } // for
   }
 
   handleCardOnCancel () {
-    this.setState({ isEditing: false, isDirty: false, correlationId: null, correlatedMessages: null })
+    const cloudInitTimezone = this.props.vm.getIn(['cloudInit', 'timezone'])
+    this.setState({
+      isEditing: false,
+      isDirty: false,
+      correlationId: null,
+      correlatedMessages: null,
+      lastInitTimezone: cloudInitTimezone || DEFAULT_GMT_TIMEZONE,
+      enableInitTimezone: !!cloudInitTimezone,
+    })
     this.props.onEditChange(false)
   }
 
@@ -486,6 +511,10 @@ class DetailsCard extends React.Component {
 
     if (this.trackUpdates['cloudInit']) {
       vmUpdates['cloudInit'] = stateVm.get('cloudInit').toJS()
+      this.setState({
+        enableInitTimezone: vmUpdates['cloudInit'].enabled,
+        lastInitTimezone: vmUpdates['cloudInit'].timezone || DEFAULT_GMT_TIMEZONE,
+      })
     }
 
     if (this.trackUpdates['timeZone']) {
@@ -857,7 +886,7 @@ class DetailsCard extends React.Component {
                           onChange={(e, state) => { this.handleChange('bootMenuEnabled', state) }}
                         />
                       </FieldRow>
-                      <CloudInit idPrefix={idPrefix} vm={vm} onChange={this.handleChange} isWindows={isOsWindows} />
+                      <CloudInit idPrefix={idPrefix} vm={vm} onChange={this.handleChange} isWindows={isOsWindows} lastInitTimezone={this.state.lastInitTimezone} />
                     </Grid>
                   </Col>
                   {/* Second column */}
