@@ -132,26 +132,12 @@ class VmActions extends React.Component {
     const status = vm.get('status')
     const onStart = (isPool ? onStartPool : onStartVm)
 
-    // TODO: On the card list page, the VM's consoles would not have been fetched yet,
-    // TODO: so the tooltip on the console button will be blank.
-    let consoleProtocol = ''
-    if (!vm.get('consoles').isEmpty()) {
-      const vConsole = vm.get('consoles').find(c => c.get('protocol') === 'spice') || vm.getIn(['consoles', 0])
-      const protocol = vConsole.get('protocol').toUpperCase()
-      consoleProtocol = msg.openProtocolConsole({ protocol })
-    }
-
-    if (vm.get('consoleInUse')) {
-      consoleProtocol = 'Console in use'
-    }
-
     const vncConsole = vm.get('consoles').find(c => c.get('protocol') === 'vnc')
     const hasRdp = isWindows(vm.getIn(['os', 'type']))
     const consoles = vm.get('consoles').map((c) => ({
       priority: 0,
       shortTitle: msg[c.get('protocol') + 'Console'](),
       icon: <Icon name='external-link' />,
-      tooltip: msg[c.get('protocol') + 'ConsoleOpen'](),
       id: `${idPrefix}-button-console-${c.get('protocol')}`,
       confirmation: (
         <ConsoleConfirmationModal consoleId={c.get('id')} vm={vm} />
@@ -165,7 +151,6 @@ class VmActions extends React.Component {
         priority: 0,
         shortTitle: msg.rdpConsole(),
         icon: <Icon name='external-link' />,
-        tooltip: msg.rdpConsoleOpen(),
         id: `${idPrefix}-button-console-rdp`,
         onClick: (e) => { e.preventDefault(); onRDP({ domain, username }) },
       })
@@ -175,7 +160,6 @@ class VmActions extends React.Component {
       consoles.push({
         priority: 0,
         shortTitle: msg.vncConsoleBrowser(),
-        tooltip: msg.vncConsoleBrowserOpen(),
         actionDisabled: config.get('websocket') === null,
         id: `${idPrefix}-button-console-browser`,
         confirmation: (
@@ -189,7 +173,6 @@ class VmActions extends React.Component {
         priority: 0,
         actionDisabled: (!isPool && !canStart(status)) || vm.getIn(['actionInProgress', 'start']) || (isPool && pool.get('maxUserVms') <= pool.get('vmsCount')),
         shortTitle: isPool ? msg.takeVm() : msg.run(),
-        tooltip: msg.startVm(),
         className: 'btn btn-success',
         id: `${idPrefix}-button-start`,
         onClick: onStart,
@@ -198,7 +181,6 @@ class VmActions extends React.Component {
         priority: 0,
         actionDisabled: isPool || isPoolVm || !canSuspend(status) || vm.getIn(['actionInProgress', 'suspend']),
         shortTitle: msg.suspend(),
-        tooltip: msg.suspendVm(),
         className: 'btn btn-default',
         id: `${idPrefix}-button-suspend`,
         confirmation: (
@@ -213,7 +195,6 @@ class VmActions extends React.Component {
         priority: 0,
         actionDisabled: isPool || !canShutdown(status) || vm.getIn(['actionInProgress', 'shutdown']),
         shortTitle: msg.shutdown(),
-        tooltip: msg.shutdownVm(),
         className: 'btn btn-default',
         id: `${idPrefix}-button-shutdown`,
         confirmation: (
@@ -230,7 +211,6 @@ class VmActions extends React.Component {
         priority: 0,
         actionDisabled: isPool || !canRestart(status) || vm.getIn(['actionInProgress', 'restart']),
         shortTitle: msg.reboot(),
-        tooltip: msg.rebootVm(),
         className: 'btn btn-default',
         id: `${idPrefix}-button-reboot`,
         confirmation: (
@@ -245,7 +225,6 @@ class VmActions extends React.Component {
         priority: 1,
         actionDisabled: isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole']) || vm.get('consoles').isEmpty(),
         shortTitle: msg.console(),
-        tooltip: consoleProtocol,
         className: 'btn btn-default',
         bsStyle: 'default',
         id: `${idPrefix}-button-console`,
@@ -268,7 +247,6 @@ class VmActions extends React.Component {
           priority: 0,
           actionDisabled: isPool || !canExternalService(status, fqdn),
           shortTitle: serviceName,
-          tooltip: msg.serviceTip({ serviceName }),
           className: 'btn btn-default',
           id: `${idPrefix}-button-svc-${idx++}`,
           onClick: () => window.open(`${protocol}://${fqdn}:${port}`),
@@ -352,7 +330,6 @@ class VmActions extends React.Component {
           confirmation={removeConfirmation}
           actionDisabled={isPool || !canRemove(status) || vm.getIn(['actionInProgress', 'remove'])}
           shortTitle={msg.remove()}
-          tooltip={msg.removeVm()}
           className='btn btn-danger'
           id={`${idPrefix}-button-remove`}
         />

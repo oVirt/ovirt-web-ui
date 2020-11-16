@@ -6,7 +6,6 @@ import {
   Col,
   ControlLabel,
   ExpandCollapse,
-  FieldLevelHelp,
   Form,
   FormControl,
   FormGroup,
@@ -20,6 +19,7 @@ import { msg } from '_/intl'
 import style from './style.css'
 import { createNicInterfacesList, createVNicProfileList } from '_/components/utils'
 import { EMPTY_VNIC_PROFILE_ID } from '_/constants'
+import { InfoTooltip } from '_/components/tooltips'
 
 const NIC_INTERFACES = createNicInterfacesList()
 const NIC_INTERFACE_DEFAULT = 'virtio'
@@ -208,10 +208,9 @@ class NicEditor extends Component {
                 <LabelCol sm={3}>
                   { msg.nicEditorInterfaceLabel() }
                   { !canChangeInterface &&
-                    <FieldLevelHelp
-                      inline
-                      content={msg.nicEditorInterfaceCantEditHelp()}
-                      buttonClass={style['field-help']}
+                    <InfoTooltip
+                      id={`${modalId}-interface-edit-tooltip`}
+                      tooltip={msg.nicEditorInterfaceCantEditHelp()}
                     />
                   }
                 </LabelCol>

@@ -53,12 +53,12 @@ const CpuCharts = ({ cpuStats, isRunning, id, vcpus }) => {
               {
                 x: msg.utilizationCardLegendUsedP(),
                 y: cpuUsed,
-                label: `${msg.utilizationCardLegendUsed()} - ${cpuUsed}%`,
+                label: `${msg.utilizationCardLegendUsed()}: ${cpuUsed}%`,
               },
               {
                 x: msg.utilizationCardLegendAvailableP(),
                 y: cpuAvailable,
-                label: `${msg.utilizationCardAvailable()} - ${cpuAvailable}%`,
+                label: `${msg.utilizationCardAvailable()}: ${cpuAvailable}%`,
               },
             ]}
             subTitle={msg.utilizationCardLegendUsedP()}

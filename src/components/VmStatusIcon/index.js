@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 
 import { Icon } from 'patternfly-react'
 import style from './style.css'
+import { Tooltip } from '_/components/tooltips'
 
 /* eslint-disable key-spacing, no-multi-spaces */
 const VM_STATUS_TO_ICON = {
@@ -29,7 +30,7 @@ const VM_STATUS_TO_ICON = {
 /**
  * Status-dependent icon for a VM
  */
-const VmStatusIcon = ({ status, className = undefined }) => {
+const VmStatusIcon = ({ id, status, className = undefined }) => {
   const iconData = VM_STATUS_TO_ICON[status] || VM_STATUS_TO_ICON.__default__
   const classNames =
     iconData.className && className ? `${iconData.className} ${className}`
@@ -37,9 +38,12 @@ const VmStatusIcon = ({ status, className = undefined }) => {
         : !iconData.className && className ? `${className}`
           : undefined
 
-  return <Icon type={iconData.type} name={iconData.name} className={classNames} title={iconData.tooltip} />
+  return <Tooltip id={id} tooltip={iconData.tooltip} placement={'bottom'}>
+    <Icon type={iconData.type} name={iconData.name} className={classNames} />
+  </Tooltip>
 }
 VmStatusIcon.propTypes = {
+  id: PropTypes.string.isRequired,
   status: PropTypes.string.isRequired,
   className: PropTypes.string,
 }

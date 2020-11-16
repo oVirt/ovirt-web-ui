@@ -93,12 +93,12 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
                   {
                     x: msg.utilizationCardAllocated(),
                     y: actualSize,
-                    label: `${msg.utilizationCardLegendUsed()} - ${usedFormated.rounded} ${usedFormated.suffix}`,
+                    label: `${msg.utilizationCardLegendUsed()}: ${usedFormated.rounded} ${usedFormated.suffix}`,
                   },
                   {
                     x: msg.utilizationCardUnallocated(),
                     y: provisionedSize - actualSize,
-                    label: `${msg.utilizationCardLegendAvailable()} - ${availableFormated.rounded} ${availableFormated.suffix}`,
+                    label: `${msg.utilizationCardLegendAvailable()}: ${availableFormated.rounded} ${availableFormated.suffix}`,
                   },
                 ]}
                 subTitle={msg.utilizationCardUnitAllocated({ storageUnit: usedFormated.suffix })}

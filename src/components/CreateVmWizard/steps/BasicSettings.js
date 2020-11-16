@@ -19,7 +19,6 @@ import {
 
 import {
   ExpandCollapse,
-  FieldLevelHelp,
   Form,
   FormControl,
   Checkbox,
@@ -30,6 +29,7 @@ import SelectBox from '_/components/SelectBox'
 import timezones from '_/components/utils/timezones.json'
 
 import style from './style.css'
+import { InfoTooltip } from '_/components/tooltips'
 
 /*
  * Render a label plus children as a single grid row with 2 columns.
@@ -69,9 +69,9 @@ const FieldRow = ({
         <Col cols={labelCols} className={`control-label ${style['col-label']}`}>
           {label}
           { tooltip &&
-            <FieldLevelHelp
-              content={tooltip}
-              inline
+            <InfoTooltip
+              tooltip={tooltip}
+              id={`${id}-tooltip`}
             />
           }
         </Col>

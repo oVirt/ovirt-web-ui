@@ -75,12 +75,12 @@ const MemoryCharts = ({ memoryStats, isRunning, id }) => {
               {
                 x: msg.utilizationCardLegendUsed(),
                 y: used,
-                label: `${msg.utilizationCardLegendUsed()} - ${usedFormated.rounded} ${usedFormated.suffix}`,
+                label: `${msg.utilizationCardLegendUsed()}: ${usedFormated.rounded} ${usedFormated.suffix}`,
               },
               {
                 x: msg.utilizationCardLegendAvailable(),
                 y: available,
-                label: `${msg.utilizationCardLegendAvailable()} - ${availableFormated.rounded} ${availableFormated.suffix}`,
+                label: `${msg.utilizationCardLegendAvailable()}: ${availableFormated.rounded} ${availableFormated.suffix}`,
               },
             ]}
             subTitle={msg.utilizationCardUnitUsed({ storageUnit: usedFormated.suffix })}

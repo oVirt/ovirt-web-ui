@@ -98,6 +98,9 @@
   width: 100%;
   margin-top: 5px;
 }
+.bootable-info-tooltip {
+  padding-top: 3px;
+}
 
 .disk-table :global(.inline-edit-buttons) {
   z-index: 900;
@@ -151,6 +154,10 @@ table tbody tr td.kebab-menu-cell {
   margin-bottom: 0;
 }
 
+.kebab-menu-wrapper {
+  display: inline-block;
+}
+
 /*
  * Summary Review
  */
@@ -161,6 +168,11 @@ table tbody tr td.kebab-menu-cell {
 
 .form-group-edit{
   margin-bottom: 0;
+}
+
+.cpu-tooltip-list {
+  list-style: disc;
+  padding-left: 30px;
 }
 
 .review-progress {

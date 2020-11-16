@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import {
   Icon,
   OverlayTrigger,
-  Tooltip,
+  Tooltip as PFTooltip,
   noop,
 } from 'patternfly-react'
 
@@ -19,7 +19,7 @@ import SnapshotDetail from './SnapshotDetail'
 import { deleteVmSnapshot } from './actions'
 import { formatDateFromNow } from '_/helpers'
 import { getMinimizedString, escapeHtml } from '../../../utils'
-import OverlayTooltip from '_/components/OverlayTooltip'
+import { Tooltip, InfoTooltip } from '_/components/tooltips'
 const MAX_DESCRIPTION_SIZE = 50
 
 const SnapshotAction = ({ children, className, disabled, id, onClick }) => {
@@ -42,7 +42,7 @@ SnapshotAction.propTypes = {
 }
 
 const StatusTooltip = ({ icon, text, id, placement }) => {
-  return <OverlayTrigger overlay={<Tooltip id={id}>{text}</Tooltip>} placement={placement} trigger={['hover', 'focus']}>
+  return <OverlayTrigger overlay={<PFTooltip id={id}>{text}</PFTooltip>} placement={placement} trigger={['hover', 'focus']}>
     <a>{icon}</a>
   </OverlayTrigger>
 }
@@ -121,9 +121,10 @@ class SnapshotItem extends React.Component {
           key='info'
         >
           <a id={`${this.props.id}-info`}>
-            <OverlayTooltip placement={this.state.isMobile ? 'right' : 'left'} id={`${this.props.id}-info-tt`} tooltip={msg.details()}>
-              <Icon type='pf' name='info' />
-            </OverlayTooltip>
+            <InfoTooltip
+              id={`${this.props.id}-info-tt`}
+              tooltip={msg.details()}
+            />
           </a>
         </OverlayTrigger>
       )
@@ -138,9 +139,9 @@ class SnapshotItem extends React.Component {
             vmId={this.props.vmId}
             trigger={({ onClick }) => (
               <SnapshotAction key='restore' id={`${this.props.id}-restore`} onClick={onClick} disabled={isRestoreDisabled}>
-                <OverlayTooltip placement={this.state.isMobile ? 'right' : 'left'} id={`${this.props.id}-restore-tt`} tooltip={msg.snapshotRestore()}>
+                <Tooltip id={`${this.props.id}-restore-tt`} tooltip={msg.snapshotRestore()}>
                   <Icon type='fa' name='play-circle' />
-                </OverlayTooltip>
+                </Tooltip>
               </SnapshotAction>
             )}
           />
@@ -154,9 +155,9 @@ class SnapshotItem extends React.Component {
             onDelete={this.props.onSnapshotDelete}
             trigger={({ onClick }) => (
               <SnapshotAction key='delete' id={`${this.props.id}-delete`} disabled={isActionsDisabled} onClick={onClick}>
-                <OverlayTooltip placement={this.state.isMobile ? 'right' : 'left'} id={`${this.props.id}-delete-tt`} tooltip={msg.snapshotDelete()}>
+                <Tooltip id={`${this.props.id}-delete-tt`} tooltip={msg.snapshotDelete()}>
                   <Icon type='pf' name='delete' />
-                </OverlayTooltip>
+                </Tooltip>
               </SnapshotAction>
             )}
           >
@@ -174,16 +175,17 @@ class SnapshotItem extends React.Component {
 
       // Status tooltip
       const tooltipId = `${this.props.id}-status-icon-${this.props.snapshot.get('status')}`
-      var tooltipPlacement = this.state.isMobile ? 'right' : 'left'
+      const tooltipPlacement = 'top'
+      const status = `${msg.status()}:`
       switch (this.props.snapshot.get('status')) {
         case 'locked':
-          statusIcon = <StatusTooltip icon={<Icon type='pf' name='locked' />} text={msg.locked()} id={tooltipId} placement={tooltipPlacement} />
+          statusIcon = <StatusTooltip icon={<Icon type='pf' name='locked' />} text={`${status} ${msg.locked()}`} id={tooltipId} placement={tooltipPlacement} />
           break
         case 'in_preview':
-          statusIcon = <StatusTooltip icon={<Icon type='fa' name='eye' />} text={msg.inPreview()} id={tooltipId} placement={tooltipPlacement} />
+          statusIcon = <StatusTooltip icon={<Icon type='fa' name='eye' />} text={`${status} ${msg.inPreview()}`} id={tooltipId} placement={tooltipPlacement} />
           break
         case 'ok':
-          statusIcon = <StatusTooltip icon={<Icon type='pf' name='ok' />} text={msg.ok()} id={tooltipId} placement={tooltipPlacement} />
+          statusIcon = <StatusTooltip icon={<Icon type='pf' name='ok' />} text={`${status} ${msg.ok()}`} id={tooltipId} placement={tooltipPlacement} />
           break
       }
     }

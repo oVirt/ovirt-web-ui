@@ -214,7 +214,8 @@ class OverviewCard extends React.Component {
       <BaseCard
         editMode={isEditing}
         editable={isEditable}
-        editTooltip={`Edit ${vm.get('name')}`}
+        editTooltip={msg.edit()}
+        editTooltipPlacement={'bottom'}
         disableTooltip={isPoolVm && isPoolAutomatic ? msg.automaticPoolsNotEditable({ poolName: pool.get('name') }) : undefined}
         idPrefix={idPrefix}
         disableSaveButton={nameError}
@@ -270,7 +271,7 @@ class OverviewCard extends React.Component {
                   </div>
 
                   <div className={style['vm-status']} id={`${idPrefix}-status`}>
-                    <VmStatusIcon className={style['vm-status-icon']} status={vm.get('status')} />
+                    <VmStatusIcon id={`${idPrefix}-status-icon`} className={style['vm-status-icon']} status={vm.get('status')} />
                     <span className={style['vm-status-text']} id={`${idPrefix}-status-value`}>{enumMsg('VmStatus', vm.get('status'))}</span>
 
                     { uptime &&

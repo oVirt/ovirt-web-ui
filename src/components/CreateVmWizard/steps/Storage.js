@@ -18,7 +18,6 @@ import {
   Checkbox,
   DropdownKebab,
   EmptyState,
-  FieldLevelHelp,
   FormGroup,
   FormControl,
   MenuItem,
@@ -29,7 +28,7 @@ import _TableInlineEditRow from './_TableInlineEditRow'
 import SelectBox from '_/components/SelectBox'
 
 import style from './style.css'
-import OverlayTooltip from '_/components/OverlayTooltip'
+import { Tooltip, InfoTooltip } from '_/components/tooltips'
 
 function getDefaultDiskType (vmOptimizedFor) {
   const diskType =
@@ -61,11 +60,11 @@ export const DiskNameWithLabels = ({ id, disk }) => {
   return <React.Fragment>
     <span id={`${idPrefix}-name`}>{ disk.name }</span>
     { disk.isFromTemplate &&
-      <OverlayTooltip id={`${idPrefix}-template-defined-badge`} tooltip={msg.templateDefined()} placement='top'>
+      <Tooltip id={`${idPrefix}-template-defined-badge`} tooltip={msg.templateDefined()}>
         <Label id={`${idPrefix}-from-template`} className={`${style['disk-label']}`}>
           T
         </Label>
-      </OverlayTooltip>
+      </Tooltip>
     }
     { disk.bootable &&
       <Label id={`${idPrefix}-bootable`} className={style['disk-label']} bsStyle='info'>
@@ -210,11 +209,12 @@ class Storage extends React.Component {
                 title='Bootable flag'
               />
             }
-            <FieldLevelHelp
-              content={this.bootableInfo(rowData.bootable)}
-              inline
-              className={style['disk-size-edit-label']}
-            />
+            <div className={style['bootable-info-tooltip']}>
+              <InfoTooltip
+                id={`${idPrefix}-bootable-tooltip`}
+                tooltip={this.bootableInfo(rowData.bootable)}
+              />
+            </div>
           </div>
         },
       },
@@ -260,10 +260,9 @@ class Storage extends React.Component {
               />
             </FormGroup>
             <span className={style['disk-size-edit-label']}>GiB</span>
-            <FieldLevelHelp
-              inline
-              content={msg.diskEditorSizeCreateHelp()}
-            />
+            <div>
+              <InfoTooltip id={`${idPrefix}-${value}-size-edit-info-tooltip`} tooltip={msg.diskEditorSizeCreateInfoTooltip()} />
+            </div>
           </div>
         },
       },
@@ -380,33 +379,36 @@ class Storage extends React.Component {
 
                 { templateDefined &&
                   <Table.Cell className={style['disk-from-template']}>
-                    <FieldLevelHelp content={msg.createVmStorageNoEditHelpMessage()} inline />
+                    <InfoTooltip id={`${kebabId}-info-tooltip`} tooltip={msg.createVmStorageNoEditHelpMessage()} />
                   </Table.Cell>
                 }
 
                 { !hideKebab && !templateDefined &&
                   <Table.Cell className={style['kebab-menu-cell']}>
-                    <DropdownKebab
-                      id={kebabId}
-                      className={style['action-kebab']}
-                      title={msg.createVmStorageEditActions()}
-                      pullRight
-                    >
-                      <MenuItem
-                        id={`${kebabId}-edit`}
-                        onSelect={() => { this.inlineEditController.onActivate({ rowIndex, rowData }) }}
-                        disabled={actionsDisabled}
-                      >
-                        {msg.edit()}
-                      </MenuItem>
-                      <MenuItem
-                        id={`${kebabId}-delete`}
-                        onSelect={() => { this.onDeleteRow(rowData) }}
-                        disabled={actionsDisabled}
-                      >
-                        {msg.delete()}
-                      </MenuItem>
-                    </DropdownKebab>
+                    <Tooltip id={`tooltip-${kebabId}`} tooltip={msg.createVmStorageEditActions()} placement={'bottom'}>
+                      <div className={style['kebab-menu-wrapper']}>
+                        <DropdownKebab
+                          id={kebabId}
+                          className={style['action-kebab']}
+                          pullRight
+                        >
+                          <MenuItem
+                            id={`${kebabId}-edit`}
+                            onSelect={() => { this.inlineEditController.onActivate({ rowIndex, rowData }) }}
+                            disabled={actionsDisabled}
+                          >
+                            {msg.edit()}
+                          </MenuItem>
+                          <MenuItem
+                            id={`${kebabId}-delete`}
+                            onSelect={() => { this.onDeleteRow(rowData) }}
+                            disabled={actionsDisabled}
+                          >
+                            {msg.delete()}
+                          </MenuItem>
+                        </DropdownKebab>
+                      </div>
+                    </Tooltip>
                   </Table.Cell>
                 }
               </React.Fragment>

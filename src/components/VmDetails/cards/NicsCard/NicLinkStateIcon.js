@@ -5,20 +5,20 @@ import { Icon } from 'patternfly-react'
 
 import { msg } from '_/intl'
 import style from './style.css'
-import OverlayTooltip from '_/components/OverlayTooltip'
+import { Tooltip } from '_/components/tooltips'
 
 const nicLinkInfoSettings = {
   true: {
     type: 'fa',
     name: 'arrow-circle-o-up',
     className: style['link-icon-up'],
-    tooltip: msg.nicLinkUpTooltip(),
+    tooltip: msg.nicLinkStatusUp(),
   },
   false: {
     type: 'fa',
     name: 'arrow-circle-o-down',
     className: style['link-icon-down'],
-    tooltip: msg.nicLinkDownTooltip(),
+    tooltip: msg.nicLinkStatusDown(),
   },
 }
 
@@ -33,9 +33,9 @@ const NicLinkStateIcon = ({ linkState = false, showTooltip = true, idSuffix }) =
     />
 
   if (showTooltip) {
-    return <OverlayTooltip id={`nic-link-icon-tooltip-${idSuffix || linkState}`} tooltip={linkInfo.tooltip}>
+    return <Tooltip id={`nic-link-icon-tooltip-${idSuffix || linkState}`} tooltip={linkInfo.tooltip}>
       {theIcon}
-    </OverlayTooltip>
+    </Tooltip>
   }
 
   return theIcon

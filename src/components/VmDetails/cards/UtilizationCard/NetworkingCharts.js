@@ -60,12 +60,12 @@ const NetworkingCharts = ({ netStats, isRunning, id }) => {
               {
                 x: msg.utilizationCardLegendUsedP(),
                 y: used,
-                label: `${msg.utilizationCardLegendUsed()} - ${used}%`,
+                label: `${msg.utilizationCardLegendUsed()}: ${used}%`,
               },
               {
                 x: msg.utilizationCardLegendAvailableP(),
                 y: available,
-                label: `${msg.utilizationCardAvailable()} - ${available}%`,
+                label: `${msg.utilizationCardAvailable()}: ${available}%`,
               },
             ]}
             subTitle={msg.utilizationCardLegendUsedP()}

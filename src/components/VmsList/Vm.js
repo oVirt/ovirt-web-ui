@@ -35,9 +35,12 @@ const Vm = ({ vm, icons, os, vms, onStart }) => {
         {isPoolVm && pool && <span className={style['pool-vm-label']} style={{ backgroundColor: pool.get('color') }}>{ pool.get('name') }</span>}
       </BaseCard.Header>
       <BaseCard.Icon url={`/vm/${vm.get('id')}`} icon={icon} />
-      <BaseCard.Title url={`/vm/${vm.get('id')}`} name={vm.get('name')} />
+      <BaseCard.Title
+        url={`/vm/${vm.get('id')}`}
+        name={vm.get('name')}
+      />
       <BaseCard.Status>
-        <VmStatusIcon status={status} />&nbsp;{statusValue}
+        <VmStatusIcon id={`${idPrefix}-status-icon`} status={status} />&nbsp;{statusValue}
       </BaseCard.Status>
       <VmActions isOnCard vm={vm} pool={pool} onStart={onStart} idPrefix={idPrefix} />
     </BaseCard>

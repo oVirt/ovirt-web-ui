@@ -5,26 +5,26 @@ import { Icon } from 'patternfly-react'
 
 import { msg } from '../../../../intl'
 import style from './style.css'
-import OverlayTooltip from '_/components/OverlayTooltip'
+import { Tooltip } from '_/components/tooltips'
 
 const diskStateSettings = {
   'active': {
     type: 'fa',
     name: 'arrow-circle-o-up',
     className: style['state-icon-active'],
-    tooltip: msg.diskStateActiveTooltip(),
+    tooltip: msg.diskTooltipStatusMessage({ statusInfo: msg.diskStateActiveTooltip() }),
   },
   'inactive': {
     type: 'fa',
     name: 'arrow-circle-o-down',
     className: style['state-icon-inactive'],
-    tooltip: msg.diskStateInactiveTooltip(),
+    tooltip: msg.diskTooltipStatusMessage({ statusInfo: msg.diskStateInactiveTooltip() }),
   },
   'locked': {
     type: 'pf',
     name: 'locked',
     className: style['state-icon-locked'],
-    tooltip: msg.diskStateLockedTooltip(),
+    tooltip: msg.diskTooltipStatusMessage({ statusInfo: msg.diskStateLockedTooltip() }),
   },
 
 }
@@ -40,9 +40,9 @@ const DiskStateIcon = ({ idPrefix, diskState, showTooltip = true }) => {
     />
 
   if (showTooltip) {
-    return <OverlayTooltip id={`${idPrefix}-state-icon-tooltip`} tooltip={diskInfo.tooltip}>
+    return <Tooltip id={`${idPrefix}-state-icon-tooltip`} tooltip={diskInfo.tooltip}>
       {theIcon}
-    </OverlayTooltip>
+    </Tooltip>
   }
   return theIcon
 }

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { sortedBy } from '_/helpers'
 
 import style from './sharedStyle.css'
+import { Tooltip } from '_/components/tooltips'
 
 const NOBREAK_SPACE = '\u00A0'
 
@@ -64,18 +65,20 @@ class SelectBox extends React.Component {
     return (
       <div style={{ width: '100%' }} id={id}>
         <div className='dropdown'>
-          <button
-            className={`btn btn-default dropdown-toggle ${style['dropdown-button']} ${validationClass}`}
-            type='button'
-            data-toggle='dropdown'
-            id={`${id}-button-toggle`}
-            disabled={disabled}
-          >
-            <span className={style['dropdown-button-text']} id={`${id}-button-text`} title={selectedItem && selectedItem.value}>
-              {selectedItem ? selectedItem.value : NOBREAK_SPACE}
-            </span>
-            <span className='caret' id={`${id}-button-caret`} />
-          </button>
+          <Tooltip id={`${id}-selectbox-tooltip`} placement={'bottom'} tooltip={selectedItem ? selectedItem.value : ''}>
+            <button
+              className={`btn btn-default dropdown-toggle ${style['dropdown-button']} ${validationClass}`}
+              type='button'
+              data-toggle='dropdown'
+              id={`${id}-button-toggle`}
+              disabled={disabled}
+            >
+              <span className={style['dropdown-button-text']} id={`${id}-button-text`} >
+                {selectedItem ? selectedItem.value : NOBREAK_SPACE}
+              </span>
+              <span className='caret' id={`${id}-button-caret`} />
+            </button>
+          </Tooltip>
           <ul className={`dropdown-menu ${style['dropdown']}`} role='menu'>
             {this.state.items.map(item => (
               <li role='presentation' className={item.id === this.state.selected ? 'selected' : ''} key={item.id}>
@@ -86,7 +89,8 @@ class SelectBox extends React.Component {
             ))}
           </ul>
         </div>
-      </div>)
+      </div>
+    )
   }
 }
 
