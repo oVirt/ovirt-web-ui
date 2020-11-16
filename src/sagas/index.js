@@ -44,6 +44,7 @@ import {
   removeActiveRequest,
   getVmCdRom,
   setVmsFilters,
+  setVmConsoles,
 } from '_/actions'
 
 import {
@@ -87,6 +88,7 @@ import {
   SELECT_POOL_DETAIL,
   SELECT_VM_DETAIL,
   NAVIGATE_TO_VM_DETAILS,
+  FETCH_CONSOLES,
 } from '_/constants'
 
 import {
@@ -97,6 +99,7 @@ import {
   canUserManipulateSnapshots,
 } from '_/utils'
 import AppConfiguration from '_/config'
+import { VmConsoles } from '_/ovirtapi/transform'
 
 const VM_FETCH_ADDITIONAL_DEEP = [
   'cdroms',
@@ -109,9 +112,7 @@ const VM_FETCH_ADDITIONAL_DEEP = [
   'statistics',
 ]
 
-const VM_FETCH_ADDITIONAL_SHALLOW = [
-  'graphics_consoles',
-]
+const VM_FETCH_ADDITIONAL_SHALLOW = []
 
 export const EVERYONE_GROUP_ID = 'eee00000-0000-0000-0000-123456789eee'
 
@@ -181,6 +182,15 @@ export function* fetchByPage () {
     poolsPage: poolsExpectMorePages ? poolsPage + 1 : undefined,
     poolsExpectMorePages: pools.length >= count,
   }))
+}
+
+function* fetchConsoles ({ payload: { vmId } }) {
+  const apiConsoles = yield callExternalAction('consoles', Api.consoles, { payload: { vmId } })
+  if (apiConsoles.graphics_console) {
+    const internalConsoles = VmConsoles.toInternal({ consoles: apiConsoles })
+    yield put(setVmConsoles({ vmId, consolesList: internalConsoles }))
+    return internalConsoles
+  }
 }
 
 export function* fetchVms ({ payload: { count, page, shallowFetch = true } }) {
@@ -570,6 +580,7 @@ export function* rootSaga () {
     takeEvery(OPEN_CONSOLE_MODAL, openConsoleModal),
     takeEvery(DOWNLOAD_CONSOLE_VM, downloadVmConsole),
     takeEvery(GET_RDP_VM, getRDPVm),
+    takeEvery(FETCH_CONSOLES, fetchConsoles),
 
     takeEvery(SAVE_FILTERS, saveFilters),
 

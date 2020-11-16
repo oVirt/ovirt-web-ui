@@ -8,6 +8,7 @@ import {
   CLOSE_CONSOLE_MODAL,
   SET_IN_USE_CONSOLE_MODAL_STATE,
   SET_LOGON_CONSOLE_MODAL_STATE,
+  FETCH_CONSOLES,
 } from '../constants'
 
 export function openConsoleModal ({ vmId, usbAutoshare, usbFilter, userId, consoleId, hasGuestAgent, openInPage, isNoVNC, modalId }) {
@@ -50,6 +51,15 @@ export function downloadConsole ({ vmId, consoleId, usbAutoshare, usbFilter, has
       openInPage,
       isNoVNC,
       modalId,
+    },
+  }
+}
+
+export function downloadVmConsoles ({ vmId }) {
+  return {
+    type: FETCH_CONSOLES,
+    payload: {
+      vmId,
     },
   }
 }
