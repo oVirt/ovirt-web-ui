@@ -69,10 +69,10 @@ class CardEditButton extends React.Component {
   }
 }
 CardEditButton.propTypes = {
-  tooltip: PropTypes.oneOfType(Tooltip.propTypes.tooltip),
+  tooltip: Tooltip.propTypes.tooltip,
   editEnabled: PropTypes.bool,
   editable: PropTypes.bool,
-  disableTooltip: PropTypes.oneOfType(Tooltip.propTypes.tooltip),
+  disableTooltip: PropTypes.oneOfType([ Tooltip.propTypes.tooltip ]),
   id: PropTypes.string.isRequired,
   onClick: PropTypes.func,
   placement: Tooltip.propTypes.placement,
