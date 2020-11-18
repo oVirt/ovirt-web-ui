@@ -130,7 +130,8 @@
     "intl:pull": "scripts/intl/intl-zanata-pull.sh",
     "intl:apply": "scripts/intl/intl-apply.sh",
     "intl:report": "babel-node scripts/intl/report.js --presets env,flow",
-    "intl:sync": "babel-node scripts/intl/sync-messages.js --presets env,flow"
+    "intl:sync": "babel-node scripts/intl/sync-messages.js --presets env,flow",
+    "intl:check-use": "scripts/intl/check-message-use.sh"
   },
   "jest": {
     "moduleFileExtensions": [
