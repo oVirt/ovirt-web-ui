@@ -71,7 +71,7 @@ const VmCardList = ({ vms, alwaysShowPoolCard, fetchMoreVmsAndPools }) => {
     if (sentinelStillInView) {
       fetchMoreVmsAndPools()
     }
-  }, [ vms ])
+  }, [ vms, scrollerRef, sentinelRef ])
 
   return (
     <div className={style['scroll-container-wrapper']}>
