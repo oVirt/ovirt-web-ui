@@ -6,6 +6,7 @@ import {
   GET_BY_PAGE,
   GET_OPTION,
   GET_USER_GROUPS,
+  MANUAL_REFRESH,
   SET_ADMINISTRATOR,
   SET_CPU_TOPOLOGY_OPTIONS,
   SET_CURRENT_PAGE,
@@ -45,10 +46,20 @@ export function appConfigured () {
   return { type: APP_CONFIGURED }
 }
 
-export function startSchedulerFixedDelay (delayInSeconds = AppConfiguration.schedulerFixedDelayInSeconds) {
+export function manualRefresh () {
+  return { type: MANUAL_REFRESH }
+}
+
+export function startSchedulerFixedDelay ({
+  delayInSeconds = AppConfiguration.schedulerFixedDelayInSeconds,
+  startDelayInSeconds = AppConfiguration.schedulerFixedDelayInSeconds,
+  targetPage,
+  pageRouterRefresh = false,
+  manualRefresh = false,
+}) {
   return {
     type: START_SCHEDULER_FIXED_DELAY,
-    payload: { delayInSeconds },
+    payload: { delayInSeconds, startDelayInSeconds, targetPage, pageRouterRefresh, manualRefresh },
   }
 }
 

@@ -34,28 +34,27 @@ import { fetchIsoFiles } from './storageDomains'
  * This should be done at the time of navigation to the page, typically by the page router.
  */
 function* changePage (action) {
-  yield put(Actions.stopSchedulerFixedDelay())
   yield put(Actions.setCurrentPage(action.payload))
-  yield put(Actions.refresh({
-    onNavigation: true,
-    shallowFetch: true,
-  }))
-  yield put(Actions.startSchedulerFixedDelay())
+  yield put(Actions.startSchedulerFixedDelay({ pageRouterRefresh: true, targetPage: action.payload, startDelayInSeconds: 0 }))
+}
+
+function* refreshManually () {
+  const currentPage = yield select(state => state.config.get('currentPage'))
+  yield put(Actions.startSchedulerFixedDelay({ manualRefresh: true, targetPage: currentPage, startDelayInSeconds: 0 }))
 }
 
 /**
  * Invoke the correct refresh function based on the app's current page type.
  */
-function* refreshData (action) {
-  const currentPage = yield select(state => state.config.get('currentPage'))
+function* refreshData ({ payload: { targetPage, ...otherPayload } }) {
   const refreshType =
-    currentPage.type === C.NO_REFRESH_TYPE ? null
-      : currentPage.type === undefined ? C.LIST_PAGE_TYPE
-        : currentPage.type
+    targetPage.type === C.NO_REFRESH_TYPE ? null
+      : targetPage.type === undefined ? C.LIST_PAGE_TYPE
+        : targetPage.type
 
-  console.info('refreshData() 🡒', 'refreshType:', refreshType, 'currentPage:', currentPage, 'payload:', action.payload)
+  console.info('refreshData() 🡒', 'refreshType:', refreshType, 'currentPage:', targetPage, 'payload:', otherPayload)
   if (refreshType) {
-    yield pagesRefreshers[refreshType](Object.assign({ id: currentPage.id }, action.payload))
+    yield pagesRefreshers[refreshType](Object.assign({ id: targetPage.id }, otherPayload))
   }
   console.info('refreshData() 🡒 finished')
 }
@@ -72,7 +71,7 @@ function* getIdsByType (type) {
   return ids
 }
 
-function* refreshListPage ({ shallowFetch, onNavigation, onSchedule }) {
+function* refreshListPage ({ shallowFetch }) {
   const [ vmsPage, poolsPage ] = yield select(st => [ st.vms.get('vmsPage'), st.vms.get('poolsPage') ])
 
   // Special case for the very first `refreshListPage` of the App .. use fetchByPage()!
@@ -143,28 +142,28 @@ function* refreshListPage ({ shallowFetch, onNavigation, onSchedule }) {
   yield put(Actions.updateVmsPoolsCount())
 }
 
-function* refreshDetailPage ({ id, onNavigation, onSchedule }) {
+function* refreshDetailPage ({ id, manualRefresh }) {
   yield selectVmDetail(Actions.selectVmDetail({ vmId: id }))
   yield getConsoleOptions(Actions.getConsoleOptions({ vmId: id }))
 
   // Load ISO images on manual refresh click only
-  if (!onNavigation && !onSchedule) {
+  if (manualRefresh) {
     yield fetchIsoFiles(Actions.getIsoFiles())
   }
 }
 
-function* refreshCreatePage ({ id, onNavigation, onSchedule }) {
+function* refreshCreatePage ({ id, manualRefresh }) {
   if (id) {
     yield selectVmDetail(Actions.selectVmDetail({ vmId: id }))
   }
 
   // Load ISO images on manual refresh click only
-  if (!onNavigation && !onSchedule) {
+  if (manualRefresh) {
     yield fetchIsoFiles(Actions.getIsoFiles())
   }
 }
 
-function* refreshConsolePage ({ id, onNavigation, onSchedule }) {
+function* refreshConsolePage ({ id }) {
   if (id) {
     yield selectVmDetail(Actions.selectVmDetail({ vmId: id }))
   }
@@ -175,30 +174,52 @@ function* startSchedulerWithFixedDelay (action) {
   yield put(Actions.stopSchedulerFixedDelay())
 
   // run a new scheduler
-  yield schedulerWithFixedDelay(action.payload.delayInSeconds)
+  yield schedulerWithFixedDelay(action.payload)
+}
+
+/**
+ * Starts a cancellable timer.
+ * Timer can be cancelled by dispatching configurable action.
+ */
+function* schedulerWaitFor (timeInSeconds, cancelActionType = C.STOP_SCHEDULER_FIXED_DELAY) {
+  if (!timeInSeconds) {
+    return {}
+  }
+  const { stopped } = yield race({
+    stopped: take(cancelActionType),
+    fixedDelay: delay(timeInSeconds * 1000),
+  })
+  return { stopped: !!stopped }
 }
 
 let _SchedulerCount = 0
 
-function* schedulerWithFixedDelay (delayInSeconds = AppConfiguration.schedulerFixedDelayInSeconds) {
-  if (!isNumber(delayInSeconds) || delayInSeconds <= 0) {
+function* schedulerWithFixedDelay ({
+  delayInSeconds = AppConfiguration.schedulerFixedDelayInSeconds,
+  startDelayInSeconds = AppConfiguration.schedulerFixedDelayInSeconds,
+  targetPage,
+  pageRouterRefresh = false,
+  manualRefresh = false,
+}) {
+  if (!isNumber(delayInSeconds) || delayInSeconds <= 0 ||
+  !isNumber(startDelayInSeconds) || startDelayInSeconds < 0) {
+    console.error(`⏰ schedulerWithFixedDelay 🡒 invalid arguments: delayInSeconds=${delayInSeconds} startDelayInSeconds=${startDelayInSeconds}`)
     return
   }
+  let firstRun = true
+  const myId = ++_SchedulerCount
+  console.log(`⏰ schedulerWithFixedDelay[${myId}] 🡒 starting fixed delay scheduler with start delay ${startDelayInSeconds}`)
 
-  const myId = _SchedulerCount++
-  console.log(`⏰ schedulerWithFixedDelay[${myId}] 🡒 starting fixed delay scheduler`)
+  const { stopped: stoppedBeforeStarted } = yield call(schedulerWaitFor, startDelayInSeconds)
+  if (stoppedBeforeStarted) {
+    console.log(`⏰ schedulerWithFixedDelay[${myId}] 🡒 scheduler has been stopped during start delay`)
+  }
 
-  let enabled = true
+  let enabled = !stoppedBeforeStarted
   while (enabled) {
-    console.log(`⏰ schedulerWithFixedDelay[${myId}] 🡒 stoppable delay for: ${delayInSeconds}`)
-    const { stopped } = yield race({
-      stopped: take(C.STOP_SCHEDULER_FIXED_DELAY), // TODO: stop the scheduler if an error page or logged out page is displayed
-      fixedDelay: call(delay, (delayInSeconds * 1000)),
-    })
-
-    if (stopped) {
+    if (myId !== _SchedulerCount) {
       enabled = false
-      console.log(`⏰ schedulerWithFixedDelay[${myId}] 🡒 scheduler has been stopped`)
+      console.log(`⏰ schedulerWithFixedDelay[${myId}] 🡒 scheduler has been stopped due to newer scheduler detected [${_SchedulerCount}]`)
       continue
     }
 
@@ -215,14 +236,28 @@ function* schedulerWithFixedDelay (delayInSeconds = AppConfiguration.schedulerFi
       continue
     }
 
-    console.log(`⏰ schedulerWithFixedDelay[${myId}] 🡒 running after delay of: ${delayInSeconds}`)
     yield put(Actions.refresh({
-      onSchedule: true,
-      shallowFetch: true,
+      pageRouterRefresh: pageRouterRefresh && firstRun,
+      manualRefresh: manualRefresh && firstRun,
+      targetPage,
+      schedulerRefresh: true,
+      // false for first refresh triggered manually
+      shallowFetch: firstRun ? !manualRefresh : true,
     }))
+    firstRun = false
+
+    console.log(`⏰ schedulerWithFixedDelay[${myId}] 🡒 stoppable delay for: ${delayInSeconds}`)
+    const { stopped } = yield call(schedulerWaitFor, delayInSeconds)
+
+    if (stopped) {
+      enabled = false
+      console.log(`⏰ schedulerWithFixedDelay[${myId}] 🡒 scheduler has been stopped`)
+      continue
+    }
+
+    console.log(`⏰ schedulerWithFixedDelay[${myId}] 🡒 running after delay of: ${delayInSeconds}`)
   }
 }
-
 /**
  * When ovirt-web-ui is installed to ovirt-engine, a logout should push the user to the
  * base ovirt welcome page.  But when running in dev mode or via container, the logout
@@ -236,6 +271,7 @@ function* logoutAndCancelScheduler () {
 
 export default [
   takeEvery(C.START_SCHEDULER_FIXED_DELAY, startSchedulerWithFixedDelay),
+  throttle(5000, C.MANUAL_REFRESH, refreshManually),
   throttle(5000, C.REFRESH_DATA, refreshData),
   takeLatest(C.CHANGE_PAGE, changePage),
   takeEvery(C.LOGOUT, logoutAndCancelScheduler),

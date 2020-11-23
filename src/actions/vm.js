@@ -15,6 +15,7 @@ import {
   LOGIN,
   LOGOUT,
   NAVIGATE_TO_VM_DETAILS,
+  NO_REFRESH_TYPE,
   REFRESH_DATA,
   REMOVE_MISSING_VMS,
   REMOVE_VM,
@@ -55,13 +56,20 @@ export function login ({ username, domain, token, userId }) {
 /**
  * I.e. the Refresh button is clicked or scheduler event occurred (polling)
  */
-export function refresh ({ shallowFetch = false, onNavigation = false, onSchedule = false }) {
+export function refresh ({
+  shallowFetch = false,
+  pageRouterRefresh = false,
+  schedulerRefresh = false,
+  manualRefresh = false,
+  targetPage = { type: NO_REFRESH_TYPE } }) {
   return {
     type: REFRESH_DATA,
     payload: {
       shallowFetch,
-      onNavigation,
-      onSchedule,
+      pageRouterRefresh,
+      schedulerRefresh,
+      manualRefresh,
+      targetPage,
     },
   }
 }

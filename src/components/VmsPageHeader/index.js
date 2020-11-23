@@ -9,7 +9,7 @@ import UserMenu from './UserMenu'
 import Header from '../Header'
 import { hrefWithoutHistory } from '_/helpers'
 
-import { refresh } from '_/actions'
+import { manualRefresh } from '_/actions'
 import { msg } from '_/intl'
 import { Tooltip } from '../tooltips'
 
@@ -44,8 +44,8 @@ VmsPageHeader.propTypes = {
 }
 
 export default connect(
-  (state) => ({ }),
+  null,
   (dispatch) => ({
-    onRefresh: (page) => dispatch(refresh({ shallowFetch: false })),
+    onRefresh: () => dispatch(manualRefresh()),
   })
 )(VmsPageHeader)
