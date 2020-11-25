@@ -481,12 +481,20 @@ const OvirtApi = {
   saveSSHKey ({ key, userId, sshId }: { key: string, userId: string, sshId: ?string }): Promise<Object> {
     assertLogin({ methodName: 'saveSSHKey' })
     const input = JSON.stringify({ content: key })
-    if (sshId !== undefined && sshId !== null) {
+    if (sshId && key) {
+      // update existing key
       return httpPut({
         url: `${AppConfiguration.applicationContext}/api/users/${userId}/sshpublickeys/${sshId}`,
         input,
       })
+    } else if (sshId && !key) {
+      // delete existing key
+      return httpDelete({
+        url: `${AppConfiguration.applicationContext}/api/users/${userId}/sshpublickeys/${sshId}`,
+        input: '',
+      })
     } else {
+      // create new key
       return httpPost({
         url: `${AppConfiguration.applicationContext}/api/users/${userId}/sshpublickeys`,
         input,
