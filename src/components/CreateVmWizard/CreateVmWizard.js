@@ -8,7 +8,7 @@ import { List } from 'immutable'
 import * as Actions from '_/actions'
 import { generateUnique } from '_/helpers'
 import { msg } from '_/intl'
-import { createTemplateList } from '_/components/utils'
+import { handleClusterIdChange } from './helpers'
 
 import NavigationConfirmationModal from '../NavigationConfirmationModal'
 import BasicSettings from './steps/BasicSettings'
@@ -28,6 +28,11 @@ const DEFAULT_STATE = {
       startOnCreation: false,
       initEnabled: false,
       optimizedFor: 'desktop',
+      topology: {
+        sockets: 1,
+        cores: 1,
+        threads: 1,
+      },
     },
     network: {
       nics: [],
@@ -68,22 +73,19 @@ const DEFAULT_STATE = {
  * Given the set of clusters and VM templates available to the user, build the initial
  * new VM state for the create wizard.
  */
-function getInitialState (clusters, templates, blankTemplateId, operatingSystems) {
+function getInitialState ({ clusters, templates, blankTemplateId, operatingSystems, storageDomains, defaultGeneralTimezone, defaultWindowsTimezone }) {
   // 1 cluster available? select it by default
-  let clusterId
+  let changes = {}
   if (clusters.size === 1) {
-    clusterId = clusters.first().get('id')
+    changes.clusterId = clusters.first().get('id')
   }
 
   // 1 template available (Blank only) on the default cluster? set the source to 'iso'
-  let provisionSource = 'template'
-  let templateId
-  if (clusterId) {
-    const templateList = createTemplateList(templates, clusterId)
-    if (templateList.length === 1 && templateList[0].id === blankTemplateId) {
-      provisionSource = 'iso'
-    } else {
-      templateId = blankTemplateId
+  changes.provisionSource = 'template'
+  if (changes.clusterId) {
+    changes = {
+      ...changes,
+      ...handleClusterIdChange(changes.clusterId, { blankTemplateId, defaultValues: DEFAULT_STATE.steps.basic, clusters, templates, operatingSystems, storageDomains, defaultGeneralTimezone, defaultWindowsTimezone }),
     }
   }
   const blankTemplate = templates.get(blankTemplateId)
@@ -116,9 +118,7 @@ function getInitialState (clusters, templates, blankTemplateId, operatingSystems
     draft.steps.basic = {
       ...draft.steps.basic,
       ...blankTemplateValues,
-      clusterId,
-      provisionSource,
-      templateId,
+      ...changes,
     }
   })
 
@@ -153,7 +153,7 @@ class CreateVmWizard extends React.Component {
   constructor (props) {
     super(props)
 
-    this.state = getInitialState(props.clusters, props.templates, props.blankTemplateId, props.operatingSystems)
+    this.state = getInitialState(props)
     this.hideAndResetState = this.hideAndResetState.bind(this)
     this.hideAndNavigate = this.hideAndNavigate.bind(this)
     this.handleBasicOnUpdate = this.handleBasicOnUpdate.bind(this)
@@ -288,9 +288,8 @@ class CreateVmWizard extends React.Component {
   }
 
   hideAndResetState () {
-    const { onHide, clusters, templates, blankTemplateId, operatingSystems } = this.props
-    this.setState(getInitialState(clusters, templates, blankTemplateId, operatingSystems))
-    onHide()
+    this.setState(getInitialState(this.props))
+    this.props.onHide()
   }
 
   hideAndNavigate () {
@@ -512,16 +511,24 @@ CreateVmWizard.propTypes = {
   show: PropTypes.bool,
   onHide: PropTypes.func,
 
+  // todo remove the "eslint-disable-next-line"s below when updating the eslint to newer version
+  // eslint-disable-next-line react/no-unused-prop-types
   clusters: PropTypes.object.isRequired,
   storageDomains: PropTypes.object.isRequired,
   templates: PropTypes.object.isRequired,
+  // eslint-disable-next-line react/no-unused-prop-types
   blankTemplateId: PropTypes.string.isRequired,
   userMessages: PropTypes.object.isRequired,
   actionResults: PropTypes.object.isRequired,
+  // eslint-disable-next-line react/no-unused-prop-types
   operatingSystems: PropTypes.object.isRequired,
 
   onCreate: PropTypes.func,
   navigateToVm: PropTypes.func,
+  // eslint-disable-next-line react/no-unused-prop-types
+  defaultGeneralTimezone: PropTypes.string.isRequired,
+  // eslint-disable-next-line react/no-unused-prop-types
+  defaultWindowsTimezone: PropTypes.string.isRequired,
 }
 
 export default connect(
@@ -533,6 +540,8 @@ export default connect(
     userMessages: state.userMessages,
     actionResults: state.vms.get('correlationResult'),
     operatingSystems: state.operatingSystems,
+    defaultGeneralTimezone: state.config.get('defaultGeneralTimezone'),
+    defaultWindowsTimezone: state.config.get('defaultWindowsTimezone'),
   }),
   (dispatch) => ({
     onCreate: (basic, nics, disks, correlationId) => dispatch(
