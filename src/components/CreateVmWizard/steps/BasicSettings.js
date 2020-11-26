@@ -313,7 +313,7 @@ class BasicSettings extends React.Component {
           value: `${cluster.value} (${this.props.dataCenters.find(dc => dc.id === cluster.datacenter).name})`,
         }))
     if (!isValidUid(data.clusterId)) {
-      clusterList.unshift({ id: '_', value: `-- ${msg.createVmWizardSelectCluster()} --` })
+      clusterList.unshift({ id: '_', value: clusterList.length === 0 ? `-- ${msg.noClustersAvailable()} --` : `-- ${msg.createVmWizardSelectCluster()} --` })
       indicators.cluster = !indicators.name && 'error'
     } else {
       delete indicators.cluster
@@ -346,7 +346,7 @@ class BasicSettings extends React.Component {
         .sort((a, b) => localeCompare(a.value, b.value))
       : [ { id: '_', value: `-- ${msg.createVmWizardSelectClusterBeforeISO()} --` } ]
     if (enableIsoSelect && !isValidUid(data.isoImage)) {
-      isoList.unshift({ id: '_', value: `-- ${msg.createVmWizardSelectISO()} --` })
+      isoList.unshift({ id: '_', value: isoList.length === 0 ? `-- ${msg.noCdsAvailable()} --` : `-- ${msg.createVmWizardSelectISO()} --` })
       indicators.isoList = !indicators.provisionSource && !indicators.name && 'error'
     } else {
       delete indicators.isoList

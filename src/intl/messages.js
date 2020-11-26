@@ -442,6 +442,8 @@ export const messages: { [messageId: string]: MessageType } = {
   nicNoVnicAssigned: 'N/A',
   nicsTooltip: 'Connected VM network interfaces.',
   noActiveStorageDomainInDataCenter: 'There is no active data storage domain in data center "{dataCenterName}"',
+  noCdsAvailable: 'No CDs available',
+  noClustersAvailable: 'No Clusters available',
   noDisks: 'no disks',
   noError: 'No error',
   noMessages: 'There are no notifications to display.',

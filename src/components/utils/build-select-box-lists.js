@@ -17,6 +17,9 @@ function createClusterList (clusters, dataCenterId = null) {
       .toList()
       .filter(cluster =>
         cluster.get('canUserUseCluster') &&
+        !!cluster.get('architecture') &&
+        cluster.get('architecture') !== 'undefined' &&
+        !!cluster.get('cpuType') &&
         (dataCenterId === null
           ? true
           : cluster.get('dataCenterId') === dataCenterId)
