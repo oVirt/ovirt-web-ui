@@ -326,12 +326,12 @@ const VmStatistics = {
         stat.values &&
         stat.values.value &&
         (stat.name === 'disks.usage'
-          ? stat.values.value[0].detail || null
+          ? stat.values.value[0] && stat.values.value[0].detail
           : stat.values.value.length === 1
             ? stat.values.value[0].datum
             : stat.values.value.map(value => value.datum))
 
-      if (stat.name === 'disks.usage' && datum !== null) {
+      if (stat.name === 'disks.usage' && !!datum) {
         datum = JSON.parse(datum)
         datum = datum.map(data => {
           data.total = convertInt(data.total)
