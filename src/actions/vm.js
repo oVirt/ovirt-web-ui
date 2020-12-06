@@ -101,6 +101,7 @@ export function getVmsByCount ({ count, shallowFetch = true }) {
     type: GET_VMS,
     payload: {
       shallowFetch,
+      page: 1,
       count,
     },
   }
