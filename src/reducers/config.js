@@ -18,6 +18,8 @@ import {
   SET_USER_SESSION_TIMEOUT_INTERVAL,
   SET_WEBSOCKET,
   SHOW_TOKEN_EXPIRED_MSG,
+  SET_GLOBAL_DEFAULT_CONSOLE,
+  SET_GLOBAL_VNC_MODE,
 } from '_/constants'
 
 const initialState = Immutable.fromJS({
@@ -34,6 +36,8 @@ const initialState = Immutable.fromJS({
     minor: undefined,
     passed: undefined,
   },
+  defaultConsole: 'vnc',
+  defaultVncMode: 'Native',
   filter: true,
   isFilterChecked: false,
   administrator: false,
@@ -98,6 +102,12 @@ const config = actionReducer(initialState, {
   },
   [SET_USER] (state, { payload: { user } }) {
     return state.mergeDeep({ user })
+  },
+  [SET_GLOBAL_DEFAULT_CONSOLE] (state, { payload: { defaultConsole } }) {
+    return state.set('defaultConsole', defaultConsole)
+  },
+  [SET_GLOBAL_VNC_MODE] (state, { payload: { defaultVncMode } }) {
+    return state.set('defaultVncMode', defaultVncMode)
   },
   [SET_USER_GROUPS] (state, { payload: { groups } }) {
     return state.set('userGroups', groups)

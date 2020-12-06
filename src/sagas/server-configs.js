@@ -9,6 +9,8 @@ import {
   setUSBFilter,
   setUserSessionTimeoutInternal,
   setWebsocket,
+  setDefaultConsole,
+  setDefaultVncMode,
 } from '_/actions'
 
 import { callExternalAction } from './utils'
@@ -25,6 +27,8 @@ export function* fetchServerConfiguredValues () {
     userSessionTimeout,
     defaultGeneralTimezone, defaultWindowsTimezone,
     websocketProxy,
+    consoleDefault,
+    defaultVncMode,
   ] = yield all([
     callGetOption('MaxNumOfVmSockets', optionVersion, 16),
     callGetOption('MaxNumOfCpuPerSocket', optionVersion, 16),
@@ -40,6 +44,8 @@ export function* fetchServerConfiguredValues () {
     callGetOption('DefaultWindowsTimeZone', 'general', 'GMT Standard Time'),
 
     callGetOption('WebSocketProxy', 'general', ''),
+    callGetOption('ClientModeConsoleDefault', 'general', ''),
+    callGetOption('ClientModeVncDefault', 'general', ''),
   ])
 
   yield put(setCpuTopologyOptions({
@@ -67,6 +73,12 @@ export function* fetchServerConfiguredValues () {
   if (websocketProxy) {
     const [ host = '', port = '' ] = websocketProxy.split(':')
     yield put(setWebsocket({ host, port }))
+  }
+  if (consoleDefault) {
+    yield put(setDefaultConsole(consoleDefault))
+  }
+  if (defaultVncMode) {
+    yield put(setDefaultVncMode(defaultVncMode))
   }
 }
 
