@@ -112,13 +112,22 @@ function* login (action) {
   yield initialLoad()
   console.groupEnd('Login Data Fetch')
 
-  // The first page of VMs and Pools are loaded by the background-refresh sagas when the
-  // `react-router-config` loads the route '/'.  Loading of additional pages is handled by
-  // user interaction (scrolling) on the `Vms` card view component.
-
   yield put(appConfigured())
   yield autoConnectCheck()
   yield put(getAllEvents())
+
+  // Note: The initial data needed to render the App's initial route will be loaded by
+  // the background-refresh sagas.  `PageRouter` uses the `changePage` action to set the
+  // "page" based on the route on the initial and all subsequent route changes.
+  //
+  // put(appConfigured)
+  //   -> renderRoutes(...)
+  //     -> PageRouter
+  //       -> getDerivedStateFromProps() -> currentPath != newPath -> onChangePage(...)
+  //         -> dispatch(changePage(...))
+  //           -> put(startSchedulerFixedDelay({ startDelayInSeconds: 0, ...}))
+  //             -> refreshData()
+  //
 }
 
 /**
