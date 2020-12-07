@@ -1,6 +1,7 @@
 import Immutable from 'immutable'
 import {
   ADD_USER_MESSAGE,
+  AUTO_ACKNOWLEDGE,
   DISMISS_USER_MSG,
   FAILED_EXTERNAL_ACTION,
   LOGIN_FAILED,
@@ -23,13 +24,14 @@ function addLogEntry ({ state, message, type = 'ERROR', failedAction }) {
       type,
       failedAction,
       time: Date.now(),
-      notified: false,
+      notified: state.get('autoAcknowledge'),
       source: 'local',
     })))
 }
 
 const initialState = Immutable.fromJS({
   records: [],
+  autoAcknowledge: false,
 })
 
 const userMessages = actionReducer(initialState, {
@@ -75,6 +77,11 @@ const userMessages = actionReducer(initialState, {
   [DISMISS_USER_MSG] (state, { payload: { eventId } }) {
     return state.update('records', records => records.delete(state.get('records').findIndex(r => r.get('id') === eventId)))
   },
+
+  [AUTO_ACKNOWLEDGE] (state, { payload: { autoAcknowledge = false } }) {
+    return state.set('autoAcknowledge', autoAcknowledge)
+  },
+
 })
 
 export default userMessages

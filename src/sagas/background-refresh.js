@@ -1,4 +1,9 @@
 import {
+  resumeNotifications,
+  loadUserOptions,
+} from './options'
+
+import {
   all,
   call,
   put,
@@ -64,6 +69,7 @@ const pagesRefreshers = {
   [C.DETAIL_PAGE_TYPE]: refreshDetailPage,
   [C.CREATE_PAGE_TYPE]: refreshCreatePage,
   [C.CONSOLE_PAGE_TYPE]: refreshConsolePage,
+  [C.SETTINGS_PAGE_TYPE]: loadUserOptions,
 }
 
 function* getIdsByType (type) {
@@ -258,6 +264,20 @@ function* schedulerWithFixedDelay ({
     console.log(`⏰ schedulerWithFixedDelay[${myId}] 🡒 running after delay of: ${delayInSeconds}`)
   }
 }
+let _SchedulerForNotificationsCount = 0
+function* scheduleResumingNotifications ({ payload: { delayInSeconds } }) {
+  yield put(Actions.stopSchedulerForResumingNotifications())
+  const myId = _SchedulerForNotificationsCount++
+  console.log(`notification timer [${myId}] - delay [${delayInSeconds}] sec`)
+  const { stopped } = yield call(schedulerWaitFor, delayInSeconds, C.STOP_SCHEDULER_FOR_RESUMING_NOTIFICATIONS)
+  if (stopped) {
+    console.log(`notification timer [${myId}] - stopped`)
+  } else {
+    console.log(`notification timer [${myId}] - resume notifications`)
+    yield call(resumeNotifications)
+  }
+}
+
 /**
  * When ovirt-web-ui is installed to ovirt-engine, a logout should push the user to the
  * base ovirt welcome page.  But when running in dev mode or via container, the logout
@@ -275,4 +295,5 @@ export default [
   throttle(5000, C.REFRESH_DATA, refreshData),
   takeLatest(C.CHANGE_PAGE, changePage),
   takeEvery(C.LOGOUT, logoutAndCancelScheduler),
+  takeEvery(C.START_SCHEDULER_FOR_RESUMING_NOTIFICATIONS, scheduleResumingNotifications),
 ]

@@ -71,7 +71,10 @@ const OvirtApi = {
     assertLogin({ methodName: 'icon' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/icons/${id}` })
   },
-
+  user ({ userId }: { userId: string }): Promise<Object> {
+    assertLogin({ methodName: 'user' })
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/users/${userId}` })
+  },
   groups ({ userId }: { userId: string }): Promise<Object> {
     assertLogin({ methodName: 'groups' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/users/${userId}/groups` })
@@ -482,28 +485,53 @@ const OvirtApi = {
     assertLogin({ methodName: 'saveSSHKey' })
     const input = JSON.stringify({ content: key })
     if (sshId && key) {
-      // update existing key
+      /**
+       * Update existing key.
+       * Expected result: { user: <> , content: <>, id: <>, href: <> }
+       */
       return httpPut({
         url: `${AppConfiguration.applicationContext}/api/users/${userId}/sshpublickeys/${sshId}`,
         input,
       })
     } else if (sshId && !key) {
-      // delete existing key
+      /**
+       * Delete existing key.
+       * Expected result: { status: 'complete'}
+      */
       return httpDelete({
         url: `${AppConfiguration.applicationContext}/api/users/${userId}/sshpublickeys/${sshId}`,
         input: '',
       })
     } else {
-      // create new key
+      /**
+       * Create new key.
+       * Expected result from POST: { status: 'complete'}
+       *
+       * Since POST method does not return the newly created key/key_id we need to
+       * fetch it imemdiately after (successful) creation.
+       */
       return httpPost({
         url: `${AppConfiguration.applicationContext}/api/users/${userId}/sshpublickeys`,
         input,
-      })
+      }).then(() => OvirtApi.getSSHKey({ userId }))
     }
   },
+
   getSSHKey ({ userId }: { userId: string }): Promise<Object> {
     assertLogin({ methodName: 'getSSHKey' })
+    // Expected result from GET: { ssh_public_key : [ { user: <> , content: <>, id: <>, href: <> }]}
+    // return empty key if there are no keys
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/users/${userId}/sshpublickeys` })
+      .then(({ ssh_public_key: [firstKey = {}] = [] }) => firstKey)
+  },
+
+  persistUserOptions ({ options, userId }: Object): Promise<Object> {
+    assertLogin({ methodName: 'persistUserOptions' })
+    const input = JSON.stringify(options)
+    return httpPut({
+      url: `${AppConfiguration.applicationContext}/api/users/${userId}`,
+      input,
+    })
   },
 
   /**

@@ -2,7 +2,6 @@
 //
 // Types used in the API and the types used internal to the App.
 //
-
 export type ApiVmType = Object
 export type VmType = Object
 
@@ -149,13 +148,42 @@ export type ApiIconType = Object
 export type IconType = Object
 
 export type ApiSshKeyType = Object
-export type SshKeyType = Object
+export type SshKeyType = {
+  key: string,
+  id: string
+}
 
 export type ApiVmConsolesType = Object
 export type VmConsolesType = Object
 
 export type ApiVmSessionsType = Object
 export type VmSessionsType = Object
+
+export type ApiUserType = Object
+
+export type GlobalUserSettingsType = {|
+  // merging logic assumes thee is no nested object
+  updateRate: number,
+  language: string,
+  showNotifications?: boolean,
+  notificationSnoozeDuration?: number
+|}
+
+export type UserOptionsType = {|
+  global: GlobalUserSettingsType,
+  ssh?: SshKeyType,
+  lastTransactions: { global?: { transactionId: string } },
+  consoleOptions: {[vmId: string]: { autoconnect?: boolean}},
+  loadingFinished: boolean
+|}
+
+export type UserType = {
+  userName: string,
+  lastName: string,
+  email: string,
+  principal: string,
+  receivedOptions?: Object
+}
 
 export type ApiPermissionType = {
   role: {

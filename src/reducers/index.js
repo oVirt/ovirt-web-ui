@@ -17,7 +17,6 @@ import consoles from './consoles'
 import pendingTasks from './pendingTasks'
 import roles from './roles'
 
-import { reducer as OptionsDialog } from '../components/OptionsDialog/reducer'
 import NewDiskDialog from '../components/NewDiskDialog/reducers'
 
 export default combineReducers({
@@ -38,6 +37,5 @@ export default combineReducers({
   pendingTasks,
   roles,
 
-  OptionsDialog,
   NewDiskDialog,
 })

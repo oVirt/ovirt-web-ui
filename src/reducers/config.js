@@ -12,6 +12,7 @@ import {
   SET_OVIRT_API_VERSION,
   SET_USB_AUTOSHARE,
   SET_USB_FILTER,
+  SET_USER,
   SET_USER_FILTER_PERMISSION,
   SET_USER_GROUPS,
   SET_USER_SESSION_TIMEOUT_INTERVAL,
@@ -94,6 +95,9 @@ const config = actionReducer(initialState, {
   },
   [SET_WEBSOCKET] (state, { payload: { websocket } }) {
     return state.set('websocket', Immutable.fromJS(websocket))
+  },
+  [SET_USER] (state, { payload: { user } }) {
+    return state.mergeDeep({ user })
   },
   [SET_USER_GROUPS] (state, { payload: { groups } }) {
     return state.set('userGroups', groups)

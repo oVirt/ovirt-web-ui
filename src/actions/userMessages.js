@@ -1,5 +1,6 @@
 import {
   ADD_USER_MESSAGE,
+  AUTO_ACKNOWLEDGE,
   CLEAR_USER_MSGS,
   DISMISS_EVENT,
   DISMISS_USER_MSG,
@@ -21,6 +22,15 @@ export function addUserMessage ({ message, shortMessage, type = '' }) {
 
 export function clearUserMessages () {
   return { type: CLEAR_USER_MSGS }
+}
+
+export function setAutoAcknowledge (autoAcknowledge) {
+  return {
+    type: AUTO_ACKNOWLEDGE,
+    payload: {
+      autoAcknowledge,
+    },
+  }
 }
 
 export function setNotificationNotified ({ eventId }) {

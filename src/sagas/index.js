@@ -12,10 +12,10 @@ import { push } from 'connected-react-router'
 import Api, { Transforms } from '_/ovirtapi'
 import { saveToLocalStorage } from '_/storage'
 
+import sagasOptions from './options'
 import sagasRefresh from './background-refresh'
 import sagasDisks from './disks'
 import sagasLogin from './login'
-import sagasOptionsDialog from '_/components/OptionsDialog/sagas'
 import sagasRoles from './roles'
 import sagasStorageDomains from './storageDomains'
 import sagasVmChanges from './vmChanges'
@@ -575,9 +575,9 @@ export function* rootSaga () {
 
     // Sagas from Components
     ...sagasDisks,
-    ...sagasOptionsDialog,
     ...sagasRoles,
     ...sagasStorageDomains,
+    ...sagasOptions,
     ...sagasVmChanges,
     ...sagasVmSnapshots,
   ])

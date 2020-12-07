@@ -5,16 +5,13 @@ import { initIntl } from './initialize'
 
 import { messages, type MessageIdType, type MessageType } from './messages'
 import translatedMessages from './translated-messages.json'
+import localeWithFullName from './localeWithFullName.json'
 
 export const DEFAULT_LOCALE: string = 'en'
 
 export const DUMMY_LOCALE: string = 'aa' // NOTE: Used for development and testing
 
-export const BASE_LOCALE_SET: Set<string> = new Set([
-  DEFAULT_LOCALE,
-  'cs', 'de', 'es', 'fr', 'it', 'ja', 'ko', 'pt-BR', 'zh-CN',
-])
-
+export const BASE_LOCALE_SET: Set<string> = new Set(Object.keys(localeWithFullName))
 /**
  * Currently selected locale
  */

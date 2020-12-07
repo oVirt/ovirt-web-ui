@@ -1,12 +1,29 @@
 import React from 'react'
 
-import { DETAIL_PAGE_TYPE, LIST_PAGE_TYPE, CONSOLE_PAGE_TYPE, NO_REFRESH_TYPE } from '_/constants'
-import { msg } from '_/intl'
-
 import PageRouter from './components/PageRouter'
+
 import Handler404 from './Handler404'
-import { VmDetailToolbar, VmConsoleToolbar, VmsListToolbar } from './components/Toolbar'
-import { VmDetailsPage, VmsListPage, VmConsolePage } from './components/Pages'
+import {
+  VmDetailToolbar,
+  VmConsoleToolbar,
+  VmsListToolbar,
+  SettingsToolbar,
+} from './components/Toolbar'
+import {
+  VmDetailsPage,
+  VmsListPage,
+  GlobalSettingsPage,
+  VmConsolePage,
+} from './components/Pages'
+
+import { msg } from '_/intl'
+import {
+  DETAIL_PAGE_TYPE,
+  LIST_PAGE_TYPE,
+  CONSOLE_PAGE_TYPE,
+  NO_REFRESH_TYPE,
+  SETTINGS_PAGE_TYPE,
+} from '_/constants'
 
 /**
  * Function get vms object, and return routes object
@@ -50,6 +67,16 @@ export default function getRoutes (vms) {
             type: CONSOLE_PAGE_TYPE,
           },
         ],
+      },
+
+      {
+        path: '/settings',
+        exact: true,
+        title: msg.accountSettings(),
+        component: GlobalSettingsPage,
+        toolbars: SettingsToolbar,
+        isToolbarFullWidth: true,
+        type: SETTINGS_PAGE_TYPE,
       },
 
       {

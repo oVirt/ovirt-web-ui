@@ -39,30 +39,35 @@ class CounterAlert extends React.Component {
       this.timer = null
     }
     this.setState({ showAlert: false })
+    this.props.onDismiss()
   }
 
   render () {
-    const { title, type } = this.props
+    const { title, type, children } = this.props
     return this.state.showAlert &&
       <Alert type={type} onDismiss={this.handleDismiss} className={style['text-align-left']}>
         {title}
+        {children}
       </Alert>
   }
 }
 
 CounterAlert.propTypes = {
-  title: PropTypes.string.isRequired,
-
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
+  children: PropTypes.node,
   /**
    * A timeout of <= 0 will force a manual dismiss of the alert.
    */
   timeout: PropTypes.number,
 
   type: PropTypes.string,
+
+  onDismiss: PropTypes.func,
 }
 
 CounterAlert.defaultProps = {
   type: 'success',
+  onDismiss: () => {},
 }
 
 export default CounterAlert
