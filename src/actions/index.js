@@ -26,7 +26,9 @@ import {
   STOP_SCHEDULER_FOR_RESUMING_NOTIFICATIONS,
   UPDATE_PAGING_DATA,
   SET_GLOBAL_DEFAULT_CONSOLE,
-  SET_GLOBAL_VNC_MODE,
+  SET_GLOBAL_DEFAULT_VNC_MODE
+
+  ,
 } from '_/constants'
 
 export * from './error'
@@ -123,7 +125,7 @@ export function setDefaultConsole (defaultConsole) {
 }
 export function setDefaultVncMode (defaultVncMode) {
   return {
-    type: SET_GLOBAL_VNC_MODE,
+    type: SET_GLOBAL_DEFAULT_VNC_MODE,
     payload: {
       defaultVncMode,
     },

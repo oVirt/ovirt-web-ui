@@ -19,7 +19,7 @@ import {
   SET_WEBSOCKET,
   SHOW_TOKEN_EXPIRED_MSG,
   SET_GLOBAL_DEFAULT_CONSOLE,
-  SET_GLOBAL_VNC_MODE,
+  SET_GLOBAL_DEFAULT_VNC_MODE,
 } from '_/constants'
 
 const initialState = Immutable.fromJS({
@@ -106,7 +106,7 @@ const config = actionReducer(initialState, {
   [SET_GLOBAL_DEFAULT_CONSOLE] (state, { payload: { defaultConsole } }) {
     return state.set('defaultConsole', defaultConsole)
   },
-  [SET_GLOBAL_VNC_MODE] (state, { payload: { defaultVncMode } }) {
+  [SET_GLOBAL_DEFAULT_VNC_MODE] (state, { payload: { defaultVncMode } }) {
     return state.set('defaultVncMode', defaultVncMode)
   },
   [SET_USER_GROUPS] (state, { payload: { groups } }) {

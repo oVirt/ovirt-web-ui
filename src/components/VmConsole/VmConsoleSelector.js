@@ -41,7 +41,7 @@ const VmConsoleSelector = ({ vmId, vms, consoles, config, consoleId, isConsolePa
       key={RDP_ID}
       onClick={(e) => { e.preventDefault(); onRDP({ domain, username, vms }) }}
     >
-      {msg.rdpConsole()} <Icon name='external-link' />
+      {msg.remoteDesktop()} <Icon name='external-link' />
     </MenuItem>)
   }
 
@@ -58,7 +58,7 @@ const VmConsoleSelector = ({ vmId, vms, consoles, config, consoleId, isConsolePa
   }
 
   const activeConsole = consoleId === RDP_ID
-    ? msg.rdpConsole()
+    ? msg.remoteDesktop()
     : consoles.getIn(['vms', vmId, 'consoleStatus']) === DOWNLOAD_CONSOLE
       ? msg[actions.find((a) => a.get('id') === consoleId).get('protocol') + 'Console']()
       : msg.vncConsoleBrowser()

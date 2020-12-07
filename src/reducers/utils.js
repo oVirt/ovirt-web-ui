@@ -1,9 +1,5 @@
 import { Map } from 'immutable'
 import { UPDATE_ICONS, REMOVE_ACTIVE_REQUEST, DELAYED_REMOVE_ACTIVE_REQUEST, ADD_ACTIVE_REQUEST } from '_/constants'
-import {
-  EMPTY_CONSOLES_LIST,
-  NO_DEFAULT_CONSOLE,
-} from '_/constants/consoleAutoSelect'
 
 /**
  * Takes initial state of the reducer and a map of action handlers and returns a redux-compatible reducer.
@@ -69,15 +65,4 @@ export function removeMissingItems ({ state, subStateName, idsToPreserve }) {
     }, Map().asMutable())
     .asImmutable()
   return state.set(subStateName, newItems)
-}
-export function selectDefaultConsoleProtocol (defaultProtocol, consoles = []) {
-  if (consoles.length > 0) {
-    if (consoles.length === 1) {
-      return consoles[0].protocol
-    } else {
-      const selectedProtocol = consoles.find(c => c.protocol === defaultProtocol)
-      return selectedProtocol ? selectedProtocol.protocol : NO_DEFAULT_CONSOLE
-    }
-  }
-  return EMPTY_CONSOLES_LIST
 }

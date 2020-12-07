@@ -55,11 +55,11 @@ export function downloadConsole ({ vmId, consoleId, usbAutoshare, usbFilter, has
   }
 }
 
-export function downloadVmConsoles ({ vmId }) {
+export function downloadVmConsoles ({ vm }) {
   return {
     type: FETCH_CONSOLES,
     payload: {
-      vmId,
+      vm,
     },
   }
 }
