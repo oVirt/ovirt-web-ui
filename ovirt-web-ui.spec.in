@@ -48,6 +48,23 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Wed Dec 9 2020 Sharon Gratch <sgratchk@redhat.com> - 1.6.6-1
+ - create VM Wizard - handle buttons "Save", "Cancel" position to be fixed for avoiding movements when clicking on them repeatedly
+ - create VM Wizard - auto focus on the 'VM Name' field on 'Basic Settings' step
+ - create VM Wizard - display proper sysprep timezone default value
+ - create VM Wizard - automatically set fields values when possible on 'Basic Settings' step
+ - for both create VM Wizard and VM details view card - filter out the clusters with no architecture and cpu-type attached
+ - change the VM's filters to be case insensitive
+ - support user settings first phase - setting SSH key and impersistent blocking toast notifications
+ - fix the virt-viewer console file for SPICE to be downloaded as a console.vv file name instead of a temp long file name and without the .vv extension
+ - tooltip refactoring - use one type of tooltip for consistency in VM portal
+ - change all delete icons to red in the VM details view for helping to distinguish between edit and delete icons easily
+ - prevent duplicate refresh on page change
+ - display only Pool VMs that the user is supposed to see after manual refresh
+ - add linting rules for React hooks
+ - add 'yarn intl:check-use' for automated translations script
+ - update parsing of VM statistics (fetched with VM details)
+
 * Wed Oct 21 2020 Sharon Gratch <sgratchk@redhat.com> - 1.6.5-1
  - create VM Wizard - support tab through fields in Storage and Networking steps
  - create VM Wizard - VM time zone format is now compatible with VM OS and also displayed on the review step
