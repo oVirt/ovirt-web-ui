@@ -181,7 +181,7 @@ function* composeProvisionSourceTemplate ({ vm, basic, disks }) {
 
   /*
    * If a template defined disk needs to be created in a storage domain different than
-   * the one defined in the template, of if the disk's sparse value is changed, the
+   * the one defined in the template, or if the disk's sparse value is changed, the
    * changes need to passed along in the VM create call.
    *
    * See: http://ovirt.github.io/ovirt-engine-api-model/master/#services/vms/methods/add
@@ -200,7 +200,6 @@ function* composeProvisionSourceTemplate ({ vm, basic, disks }) {
 
       // did the storage domain change?
       if (disk.storageDomainId !== templateDisk.get('storageDomainId')) {
-        changesToTemplateDisk.sparse = false
         changesToTemplateDisk.format = 'raw'
         changesToTemplateDisk.storage_domains = {
           storage_domain: [{ id: disk.storageDomainId }],
@@ -208,19 +207,25 @@ function* composeProvisionSourceTemplate ({ vm, basic, disks }) {
       }
 
       // did the diskType (disk's sparse ) change?  'thin' === sparse, 'pre' === !sparse
-      if ((disk.diskType === 'thin') !== templateDisk.get('sparse')) {
+      const templateDiskType = templateDisk.get('sparse') ? 'thin' : 'pre'
+      if (disk.diskType !== templateDiskType) {
         changesToTemplateDisk.sparse = disk.diskType === 'thin'
       }
 
       if (Object.keys(changesToTemplateDisk).length > 1) {
         vmRequiresClone = true
-        merge(vmUpdates, {
-          disk_attachments: {
+
+        if (vmUpdates.disk_attachments) {
+          // add another disk to clone
+          vmUpdates.disk_attachments.disk_attachment.push({ disk: changesToTemplateDisk })
+        } else {
+          // initial setup a disk to clone
+          vmUpdates.disk_attachments = {
             disk_attachment: [{
               disk: changesToTemplateDisk,
             }],
-          },
-        })
+          }
+        }
       }
     })
 

@@ -362,10 +362,8 @@ class CreateVmWizard extends React.Component {
                     !!dataCenterStorageDomainsList.find(sd => sd.id === disk.get('storageDomainId'))
 
                   const diskType = // constrain to values from createDiskTypeList()
-                    template.get('type') === 'desktop' // optimizedFor
-                      ? canUserUseStorageDomain
-                        ? disk.get('sparse') ? 'thin' : 'pre'
-                        : 'pre'
+                    this.state.steps.basic.optimizedFor === 'desktop'
+                      ? disk.get('sparse') ? 'thin' : 'pre'
                       : 'pre'
 
                   return {
