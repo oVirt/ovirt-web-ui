@@ -424,12 +424,12 @@ class Storage extends React.Component {
     return Object.keys(this.state.editing).length > 0
   }
 
-  // return true if there's any disk set as bootable and if it's a template disk
+  // return true if the VM has any template disks that are set bootable
   isBootableDiskTemplate () {
-    const bootableDisk = this.props.disks.find(disk => disk.bootable)
-    const templateDisk = this.props.disks.find(disk => disk.isFromTemplate)
+    const bootableTemplateDisks = this.props.disks
+      .filter(disk => disk.isFromTemplate && disk.bootable)
 
-    return bootableDisk && templateDisk && bootableDisk === templateDisk
+    return bootableTemplateDisks.length > 0
   }
 
   // set appropriate tooltip message regarding setting bootable flag
