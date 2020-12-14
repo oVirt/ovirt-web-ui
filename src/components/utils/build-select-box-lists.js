@@ -1,5 +1,6 @@
 import {
   filterOsByArchitecture,
+  getClusterArchitecture,
   localeCompare,
   templateNameRenderer,
 } from '_/helpers'
@@ -79,10 +80,8 @@ function createOsList (clusterId, clusters, operatingSystems) {
     return []
   }
 
-  const cluster = clusters && clusters.get(clusterId)
-  const architecture = cluster && cluster.get('architecture')
   const osList =
-    filterOsByArchitecture(operatingSystems, architecture)
+    filterOsByArchitecture(operatingSystems, getClusterArchitecture(clusterId, clusters))
       .toList()
       .map(os => ({
         id: os.get('id'),

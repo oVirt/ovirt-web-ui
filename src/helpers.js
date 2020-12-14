@@ -246,7 +246,6 @@ export function formatDateFromNow (d) {
 export function filterOsByArchitecture (operatingSystems, architecture) {
   return operatingSystems.filter(os => os.get('architecture') === architecture)
 }
-
 export function getClusterArchitecture (clusterId, clusters) {
   const cluster = clusters && clusters.get(clusterId)
   return cluster && cluster.get('architecture')
