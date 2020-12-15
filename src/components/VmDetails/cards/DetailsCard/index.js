@@ -5,7 +5,15 @@ import { List } from 'immutable'
 
 import * as Actions from '_/actions'
 import { MAX_VM_MEMORY_FACTOR } from '_/constants'
-import { generateUnique, isWindows, templateNameRenderer, userFormatOfBytes } from '_/helpers'
+import {
+  filterOsByArchitecture,
+  generateUnique,
+  getClusterArchitecture,
+  getDefaultOSByArchitecture,
+  isWindows,
+  templateNameRenderer,
+  userFormatOfBytes,
+} from '_/helpers'
 import { msg, enumMsg } from '_/intl'
 
 import {
@@ -242,7 +250,15 @@ class DetailsCard extends React.Component {
     let initTimezoneUpdates = { enableInitTimezone, lastInitTimezone }
 
     const changeQueue = [{ fieldName, value }]
-    const { maxNumberOfSockets, maxNumberOfCores, maxNumberOfThreads } = this.props
+    const {
+      maxNumberOfSockets,
+      maxNumberOfCores,
+      maxNumberOfThreads,
+      operatingSystems,
+      blankTemplateId,
+      clusters,
+      templates,
+    } = this.props
 
     for (let change = changeQueue.shift(); change; change = changeQueue.shift()) {
       console.log('processing change', change)
@@ -251,28 +267,32 @@ class DetailsCard extends React.Component {
       let fieldUpdated
       switch (fieldName) {
         case 'cluster':
-          updates = updates.set('cluster', this.props.clusters.get(value))
+          updates = updates.set('cluster', clusters.get(value))
           fieldUpdated = 'cluster'
 
           // Change the template to 'Blank' if the VM's template isn't in the new cluster
           {
-            const template = this.props.templates.get(updates.getIn(['template', 'id']))
+            const template = templates.get(updates.getIn(['template', 'id']))
             if (template && template.get('clusterId') && template.get('clusterId') !== value) {
-              changeQueue.push({ fieldName: 'template', value: this.props.blankTemplateId })
+              changeQueue.push({ fieldName: 'template', value: blankTemplateId })
             }
           }
           break
 
         case 'template':
-          updates = updates.set('template', this.props.templates.get(value))
+          updates = updates.set('template', templates.get(value))
           fieldUpdated = 'template'
 
           // Apply settings from the template to the VM (memory, CPUs, OS, cloudInit, bootMenuEnabled)
           {
-            const template = this.props.templates.get(value)
+            const template = templates.get(value)
             if (template) {
-              const templateOsType = template.getIn(['os', 'type'], 'other')
-              const templateOs = this.props.operatingSystems.find(os => os.get('type') === templateOsType)
+              const clusterId = updates.getIn(['cluster', 'id'])
+              const clusterArchitecture = getClusterArchitecture(clusterId, clusters)
+              const templateOsName = template.getIn(['os', 'type'], 'other')
+              const templateOs = filterOsByArchitecture(operatingSystems, clusterArchitecture)
+                .find(os => os.get('name') === templateOsName) ||
+                getDefaultOSByArchitecture(operatingSystems, clusterArchitecture)
 
               // fields that are editable on the card
               changeQueue.push(
@@ -345,7 +365,6 @@ class DetailsCard extends React.Component {
 
         case 'os':
           fieldUpdated = 'os'
-          const operatingSystems = this.props.operatingSystems
           const os = operatingSystems.find(os => os.get('id') === value)
           updates = this.updateOs(updates, os)
 
