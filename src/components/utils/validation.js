@@ -1,12 +1,7 @@
 // @flow
 
 export function isHostNameValid (nameCandidate: string): boolean {
-  if (nameCandidate.length > 64) {
-    return false
-  }
-  const regexpString = '^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$'
-  const regexp = new RegExp(regexpString)
-  return regexp.test(nameCandidate)
+  return /^[a-zA-Z0-9_\-\\.]{1,255}$/.test(nameCandidate)
 }
 
 const UNICODE_NON_ASCII_LETTERS =
