@@ -1,5 +1,6 @@
 import { locale as appLocale, msg } from '_/intl'
 import AppConfiguration from '_/config'
+import { defaultOperatingSystemIds } from '_/constants/operatingSystems'
 
 // "payload":{"message":"Not Found","shortMessage":"LOGIN failed","type":404,"action":{"type":"LOGIN","payload":{"credentials":{"username":"admin@internal","password":"admi"}}}}}
 export function hidePassword ({ action, param }) {
@@ -244,6 +245,16 @@ export function formatDateFromNow (d) {
 
 export function filterOsByArchitecture (operatingSystems, architecture) {
   return operatingSystems.filter(os => os.get('architecture') === architecture)
+}
+
+export function getClusterArchitecture (clusterId, clusters) {
+  const cluster = clusters && clusters.get(clusterId)
+  return cluster && cluster.get('architecture')
+}
+
+export function getDefaultOSByArchitecture (operatingSystems, architecture) {
+  const clustersOs = filterOsByArchitecture(operatingSystems, architecture)
+  return clustersOs.find(os => defaultOperatingSystemIds.includes(os.get('id')))
 }
 
 export function findOsByName (operatingSystems, name) {
