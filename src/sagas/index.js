@@ -369,7 +369,6 @@ export function* startProgress ({ vmId, poolId, name }) {
 }
 
 export function* stopProgress ({ vmId, poolId, name, result }) {
-  const actionInProgress = vmId ? vmActionInProgress : poolActionInProgress
   if (result && result.status === 'complete') {
     vmId = vmId || result.vm.id
     // do not call 'end of in progress' if successful,
@@ -381,6 +380,7 @@ export function* stopProgress ({ vmId, poolId, name, result }) {
     yield getSingleInstance({ vmId, poolId })
   }
 
+  const actionInProgress = vmId ? vmActionInProgress : poolActionInProgress
   yield put(actionInProgress(Object.assign(vmId ? { vmId } : { poolId }, { name, started: false })))
 }
 
