@@ -29,6 +29,7 @@ import {
   ExpandCollapse,
   Form,
   FormControl,
+  HelpBlock,
   Checkbox,
 } from 'patternfly-react'
 import { Grid, Row, Col } from '_/components/Grid'
@@ -53,6 +54,7 @@ const FieldRow = ({
   fieldCols = 7,
   children,
   tooltip,
+  errorMessage,
 }) => (
   <Row className={`
       form-group
@@ -69,6 +71,9 @@ const FieldRow = ({
             {label}
           </div>
           <div>{children}</div>
+          {(validationState && errorMessage) &&
+            <HelpBlock>{errorMessage}</HelpBlock>
+          }
         </Col>
       </React.Fragment>
     }
@@ -83,7 +88,12 @@ const FieldRow = ({
             />
           }
         </Col>
-        <Col cols={fieldCols} className={style['col-data']} id={id}>{children}</Col>
+        <Col cols={fieldCols} className={style['col-data']} id={id}>
+          {children}
+          {(validationState && errorMessage) &&
+            <HelpBlock>{errorMessage}</HelpBlock>
+          }
+        </Col>
       </React.Fragment>
     }
   </Row>
@@ -99,6 +109,7 @@ FieldRow.propTypes = {
   fieldCols: PropTypes.number,
   children: PropTypes.node.isRequired,
   tooltip: PropTypes.string,
+  errorMessage: PropTypes.string,
 }
 
 const SubHeading = ({ children }) => (
@@ -302,6 +313,7 @@ class BasicSettings extends React.Component {
     const { data, clusters, maxNumOfSockets, maxNumOfCores, maxNumOfThreads, operatingSystems } = this.props
     const indicators = {
       name: this.validateVmName(),
+      hostName: !isHostNameValid(data.initHostname || ''),
     }
 
     const clusterList =
@@ -382,7 +394,7 @@ class BasicSettings extends React.Component {
     return <Form horizontal id={idPrefix}>
       <Grid className={style['settings-container']}>
         {/* -- VM name and where it will live -- */}
-        <FieldRow label={msg.name()} id={`${idPrefix}-name`} required validationState={indicators.name}>
+        <FieldRow label={msg.name()} id={`${idPrefix}-name`} required validationState={indicators.name} errorMessage={data.name ? msg.pleaseEnterValidVmName() : ''}>
           <FormControl
             id={`${idPrefix}-name-edit`}
             autoFocus
@@ -512,8 +524,13 @@ class BasicSettings extends React.Component {
           <React.Fragment>
             <SubHeading>{msg.cloudInitOptions()}</SubHeading>
 
-            {/* TODO: cloud-init/linux hostname field level validation? */}
-            <FieldRow label={msg.hostName()} id={`${idPrefix}-cloudInitHostname`} vertical>
+            <FieldRow
+              label={msg.hostName()}
+              id={`${idPrefix}-cloudInitHostname`}
+              vertical
+              validationState={data.initHostname && indicators.hostName ? 'error' : undefined}
+              errorMessage={msg.pleaseEnterValidHostName()}
+            >
               <FormControl
                 id={`${idPrefix}-cloudInitHostname-edit`}
                 type='text'
@@ -538,8 +555,13 @@ class BasicSettings extends React.Component {
           <React.Fragment>
             <SubHeading>{msg.sysPrepOptions()}</SubHeading>
 
-            {/* TODO: sysprep/windows hostname field level validation? */}
-            <FieldRow label={msg.hostName()} id={`${idPrefix}-sysPrepHostname`} vertical>
+            <FieldRow
+              label={msg.hostName()}
+              id={`${idPrefix}-sysPrepHostname`}
+              vertical
+              validationState={data.initHostname && indicators.hostName ? 'error' : undefined}
+              errorMessage={msg.pleaseEnterValidHostName()}
+            >
               <FormControl
                 id={`${idPrefix}-sysPrepHostname-edit`}
                 type='text'

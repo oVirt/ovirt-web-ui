@@ -6,15 +6,17 @@ describe('check host names', function () {
     expect(isHostNameValid('a')).toEqual(true)
     expect(isHostNameValid('a1')).toEqual(true)
     expect(isHostNameValid('abcd-1')).toEqual(true)
+    expect(isHostNameValid('abc_.d-1')).toEqual(true)
+    expect(isHostNameValid('AC.DC')).toEqual(true)
+    expect(isHostNameValid('veryveryveryveryveryveryveryveryveryveryveryveryveryveryverylongname')).toEqual(true)
   })
 
   it('invalid host names', function () {
-    expect(isHostNameValid('..0_0..')).toEqual(false)
-    expect(isHostNameValid('A_b')).toEqual(false)
-    expect(isHostNameValid('AC.DC')).toEqual(false)
-    expect(isHostNameValid('-abc')).toEqual(false)
+    expect(isHostNameValid('..0_ 0..')).toEqual(false)
+    expect(isHostNameValid('!A_b')).toEqual(false)
+    expect(isHostNameValid('#-abc')).toEqual(false)
     expect(isHostNameValid('Кирилиця')).toEqual(false)
-    expect(isHostNameValid('veryveryveryveryveryveryveryveryveryveryveryveryveryveryverylongname')).toEqual(false)
+    expect(isHostNameValid('veryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryverylongname')).toEqual(false)
   })
 })
 

@@ -505,7 +505,8 @@ export const messages: { [messageId: string]: MessageType } = {
   permissionsNoEditThisVm: 'You do not have permissions to edit VM {name} / {vmId}',
   pendingChanges: 'Pending Changes',
   pleaseEnterValidDiskName: 'Please enter a valid disk name. Only lower-case and upper-case letters, numbers, and \'_\',\'-\',\'.\' are allowed.',
-  pleaseEnterValidVmName: 'Please enter a valid virtual machine name. Only lower-case and upper-case letters, numbers, and \'_\',\'-\',\'.\' are allowed.',
+  pleaseEnterValidHostName: "Please enter a valid host name. Only lower-case and upper-case letters, numbers, and '_','-','.' are allowed.",
+  pleaseEnterValidVmName: "Please enter a valid virtual machine name. Only lower-case and upper-case letters, numbers, and '_','-','.' are allowed.",
   preserveDisks: 'Preserve disks',
   pressF11ExitFullScreen: 'Press F11 to exit full screen mode',
   provisionSource: {
