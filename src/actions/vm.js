@@ -58,7 +58,6 @@ export function login ({ username, domain, token, userId }) {
  * I.e. the Refresh button is clicked or scheduler event occurred (polling)
  */
 export function refresh ({
-  shallowFetch = false,
   pageRouterRefresh = false,
   schedulerRefresh = false,
   manualRefresh = false,
@@ -66,7 +65,6 @@ export function refresh ({
   return {
     type: REFRESH_DATA,
     payload: {
-      shallowFetch,
       pageRouterRefresh,
       schedulerRefresh,
       manualRefresh,
