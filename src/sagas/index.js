@@ -188,7 +188,8 @@ function* fetchConsoles ({ payload: { vmId } }) {
   const apiConsoles = yield callExternalAction('consoles', Api.consoles, { payload: { vmId } })
   if (apiConsoles.graphics_console) {
     const internalConsoles = VmConsoles.toInternal({ consoles: apiConsoles })
-    yield put(setVmConsoles({ vmId, consolesList: internalConsoles }))
+    const defaultConsoleProtocol = yield select(state => state.config.get('defaultConsole'))
+    yield put(setVmConsoles({ vmId, consolesList: internalConsoles, defaultConsoleProtocol }))
     return internalConsoles
   }
 }

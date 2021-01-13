@@ -25,7 +25,7 @@ import {
   VM_ACTION_IN_PROGRESS,
   SET_VM_CONSOLES,
 } from '_/constants'
-import { actionReducer, removeMissingItems } from './utils'
+import { actionReducer, removeMissingItems, selectDefaultConsoleProtocol } from './utils'
 import { sortFields } from '_/utils'
 
 const initialState = Immutable.fromJS({
@@ -157,11 +157,13 @@ const vms = actionReducer(initialState, {
     return state
   },
 
-  [SET_VM_CONSOLES] (state, { payload: { vmId, consoles } }) {
+  [SET_VM_CONSOLES] (state, { payload: { vmId, consoles, defaultConsoleProtocol } }) {
     if (state.getIn(['vms', vmId])) {
+      const selectedProtocol = selectDefaultConsoleProtocol(defaultConsoleProtocol, consoles)
+      state = state.setIn(['vms', vmId, 'defaultConsole'], selectedProtocol)
       return state.setIn(['vms', vmId, 'consoles'], Immutable.fromJS(consoles)) // deep immutable
     } else { // fail, if VM not found
-      console.error(`vms.setConsoles() reducer: vmId ${vmId} not found`)
+      console.error(`vms.setVmConsoles() reducer: vmId ${vmId} not found`)
     }
     return state
   },
