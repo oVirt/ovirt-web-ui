@@ -2,7 +2,7 @@ var path = require('path')
 var autoprefixer = require('autoprefixer')
 var webpack = require('webpack')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
-var ExtractTextPlugin = require('extract-text-webpack-plugin')
+var MiniCssExtractPlugin = require('mini-css-extract-plugin')
 var CopyWebpackPlugin = require('copy-webpack-plugin')
 var url = require('url')
 var paths = require('./paths')
@@ -54,17 +54,12 @@ module.exports = {
     publicPath: publicPath,
   },
   resolve: {
-    // This allows you to set a fallback for where Webpack should look for modules.
-    // We read `NODE_PATH` environment variable in `paths.js` and pass paths here.
-    // We use `fallback` instead of `root` because we want `node_modules` to "win"
-    // if there any conflicts. This matches Node resolution mechanism.
-    // https://github.com/facebookincubator/create-react-app/issues/253
-    fallback: paths.nodePaths,
     // These are the reasonable defaults supported by the Node ecosystem.
     // We also include JSX as a common component filename extension to support
     // some tools, although we do not recommend using it, see:
     // https://github.com/facebookincubator/create-react-app/issues/290
-    extensions: ['.js', '.json', '.jsx', ''],
+    // Note: resolve.extensions option no longer requires passing an empty string
+    extensions: ['.js', '.json', '.jsx'],
     alias: {
       // Support React Native Web
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
@@ -72,32 +67,28 @@ module.exports = {
       ...webpackConfigCommons.commonAliases()
     },
   },
-  // Resolve loaders (webpack plugins for CSS, images, transpilation) from the
-  // directory of `react-scripts` itself rather than the project directory.
-  // You can remove this after ejecting.
-  resolveLoader: {
-    root: paths.ownNodeModules,
-    moduleTemplates: ['*-loader'],
-  },
   module: {
-    // First, run the linter.
-    // It's important to do this before Babel processes the JS.
-    preLoaders: [
+    // For webpack >= 2, module.loaders changed to module.rules
+    rules: [
       {
+        // module.preLoaders were removed
+        // First, run the linter.
+        // It's important to do this before Babel processes the JS.
         test: /\.(js|jsx)$/,
-        loader: 'eslint',
+        loader: 'eslint-loader',
         include: paths.appSrc,
         options: {
+          configFile: path.join(__dirname, 'eslint.js'),
+          useEslintrc: false,
           failOnError: true,
-        }
+        },
+        enforce: 'pre'
       },
-    ],
-    loaders: [
       // Process JS with Babel.
       {
         test: /\.(js|jsx)$/,
         include: [paths.appSrc, paths.novnc, paths.spiceHtml5],
-        loader: 'babel',
+        loader: 'babel-loader',
         query: require('./babel.prod'),
       },
       // The notation here is somewhat confusing.
@@ -123,26 +114,41 @@ module.exports = {
         // Webpack 1.x uses Uglify plugin as a signal to minify *all* the assets
         // including CSS. This is confusing and will be removed in Webpack 2:
         // https://github.com/webpack/webpack/issues/283
-        loader: ExtractTextPlugin.extract('style', 'css?-autoprefixer!postcss'),
         // Note: this won't work without `new ExtractTextPlugin()` in `plugins`.
+
+        // Note: ExtractTextPlugin is deprecated for webpack > 2, MiniCssExtractPlugin used instead
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader
+          },
+          'css-loader?-autoprefixer!postcss-loader'
+        ]
       },
       {
         test: /\.css$/,
         exclude: /(node_modules)|(-nomodules\.css$)/,
-        loader: 'style!css?modules!postcss',
+        use: [
+          {
+            loader: 'style-loader'
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              modules: true
+            }
+          },
+          {
+            loader: 'postcss-loader'
+          }
+        ]
       },
-      // JSON is not enabled by default in Webpack but both Node and Browserify
-      // allow it implicitly so we also enable it.
-      {
-        test: /\.json$/,
-        loader: 'json',
-      },
+
       // "file" loader makes sure those assets end up in the `build` folder.
       // When you `import` an asset, you get its filename.
       {
         test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)(\?.*)?$/,
         exclude: /\/favicon.ico$/,
-        loader: 'file',
+        loader: 'file-loader',
         query: {
           name: 'static/media/[name].[hash:8].[ext]',
         },
@@ -151,7 +157,7 @@ module.exports = {
       {
         test: /\/favicon.ico$/,
         include: [paths.appSrc],
-        loader: 'file',
+        loader: 'file-loader',
         query: {
           name: 'favicon.ico?[hash:8]',
         },
@@ -160,7 +166,7 @@ module.exports = {
       // assets smaller than specified size as data URLs to avoid requests.
       {
         test: /\.(mp4|webm|wav|mp3|m4a|aac|oga)(\?.*)?$/,
-        loader: 'url',
+        loader: 'url-loader',
         query: {
           limit: 10000,
           name: 'static/media/[name].[hash:8].[ext]',
@@ -170,34 +176,12 @@ module.exports = {
       // resources linked with <link href="./relative/path"> HTML tags.
       {
         test: /\.html$/,
-        loader: 'html',
+        loader: 'html-loader',
         query: {
           attrs: ['link:href'],
         },
       },
     ],
-  },
-  // Point ESLint to our predefined config.
-  eslint: {
-    // TODO: consider separate config for production,
-    // e.g. to enable no-console and no-debugger only in production.
-    configFile: path.join(__dirname, 'eslint.js'),
-    useEslintrc: false,
-    failOnError: true,
-  },
-  // We use PostCSS for autoprefixing only.
-  postcss: function () {
-    return [
-      autoprefixer({
-        browsers: [
-          '>1%',
-          'last 4 versions',
-          'Firefox ESR',
-          'not ie > 0', // VM Portal don't support IE at all
-        ],
-        grid: false,
-      }),
-    ]
   },
   plugins: [
     new CopyWebpackPlugin([{
@@ -212,7 +196,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       filename: 'index.jsp',
       inject: true,
-      template: `!!handlebars!${paths.appHtml}`,
+      template: `!!handlebars-loader!${paths.appHtml}`,
       publicPath,
       jspSSO: true,
       minify: {
@@ -235,11 +219,11 @@ module.exports = {
     // Otherwise React will be compiled in the very slow development mode.
     new webpack.DefinePlugin(env),
 
-    // This helps ensure the builds are consistent if source hasn't changed:
-    new webpack.optimize.OccurrenceOrderPlugin(),
+    // webpack.optimize.OccurrenceOrderPlugin,
+    // which helps ensure the builds are consistent if source hasn't changed,
+    // is enabled by default
 
-    // Try to dedupe duplicated modules, if any:
-    new webpack.optimize.DedupePlugin(),
+    // webpack.optimize.DedupePlugin isn't needed anymore
 
     // Minify the code.
     new webpack.optimize.UglifyJsPlugin({
@@ -254,10 +238,32 @@ module.exports = {
         comments: false,
         screw_ie8: true,
       },
+      sourceMap: true
     }),
 
-    // Note: this won't work without ExtractTextPlugin.extract(..) in `loaders`.
-    new ExtractTextPlugin('static/css/[name].[contenthash:8].css'),
+    // To keep compatibility with old loaders, loaders can be switched to minimize mode via plugin:
+    new webpack.LoaderOptionsPlugin({
+      options: {
+        // We use PostCSS for autoprefixing only.
+        postcssLoader: function () {
+          return [
+            autoprefixer({
+              browsers: [
+                '>1%',
+                'last 4 versions',
+                'Firefox ESR',
+                'not ie > 0', // VM Portal don't support IE at all
+              ],
+              grid: false,
+            }),
+          ]
+        },
+      }
+    }),
+
+    new MiniCssExtractPlugin({
+      filename: 'static/css/[name].[contenthash:8].css'
+    })
   ],
   // Some libraries import Node modules but don't use them in the browser.
   // Tell Webpack to provide empty mocks for them so importing them works.
