@@ -24,7 +24,8 @@ export type ApiVmStatisticType = {
 }
 
 export type StatisticValueType = {
-  datum: number | Array<number>,
+  firstDatum: number | string | Object | void,
+  datum: Array<number | string | Object>,
   unit: ApiStatisticUnitType,
   description: string
 }
