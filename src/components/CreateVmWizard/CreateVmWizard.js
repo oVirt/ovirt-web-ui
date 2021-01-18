@@ -16,6 +16,7 @@ import Networking from './steps/Networking'
 import Storage from './steps/Storage'
 import SummaryReview from './steps/SummaryReview'
 import { EMPTY_VNIC_PROFILE_ID } from '_/constants'
+import { createClusterList } from '_/components/utils'
 
 const DEFAULT_STATE = {
   activeStepIndex: 0,
@@ -76,8 +77,9 @@ const DEFAULT_STATE = {
 function getInitialState ({ clusters, templates, blankTemplateId, operatingSystems, storageDomains, defaultGeneralTimezone, defaultWindowsTimezone }) {
   // 1 cluster available? select it by default
   let changes = {}
-  if (clusters.size === 1) {
-    changes.clusterId = clusters.first().get('id')
+  const clustersList = createClusterList(clusters)
+  if (clustersList.length === 1) {
+    changes.clusterId = clustersList[0].id
   }
 
   // 1 template available (Blank only) on the default cluster? set the source to 'iso'
