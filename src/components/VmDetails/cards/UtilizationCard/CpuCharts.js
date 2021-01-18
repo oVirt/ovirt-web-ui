@@ -26,7 +26,7 @@ import NoLiveData from './NoLiveData'
  * right.
  */
 const CpuCharts = ({ cpuStats, isRunning, id, vcpus }) => {
-  const cpuUsed = cpuStats['current.total'].datum / vcpus // the average value considering the number of VM CPUs, same as in Admin Portal
+  const cpuUsed = cpuStats['current.total'].firstDatum / vcpus // the average value considering the number of VM CPUs, same as in Admin Portal
   const cpuAvailable = 100 - cpuUsed
 
   // NOTE: CPU history comes sorted from newest to oldest

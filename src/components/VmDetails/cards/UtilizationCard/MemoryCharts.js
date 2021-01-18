@@ -31,12 +31,12 @@ import NoLiveData from './NoLiveData'
  *       currently used data should work for VMs with and without the guest agent.
  */
 const MemoryCharts = ({ memoryStats, isRunning, id }) => {
-  const available = isRunning ? memoryStats.free.datum : memoryStats.installed.datum
-  const used = !isRunning ? 0 : memoryStats.installed.datum - memoryStats.free.datum
+  const available = isRunning ? memoryStats.free.firstDatum : memoryStats.installed.firstDatum
+  const used = !isRunning ? 0 : memoryStats.installed.firstDatum - memoryStats.free.firstDatum
 
   const usedFormated = userFormatOfBytes(used, null, 1)
   const availableFormated = userFormatOfBytes(available, null, 1)
-  const totalFormated = userFormatOfBytes(memoryStats.installed.datum, null, 1)
+  const totalFormated = userFormatOfBytes(memoryStats.installed.firstDatum, null, 1)
 
   // NOTE: Memory history comes sorted from newest to oldest
   const history = ((memoryStats['usage.history'] && memoryStats['usage.history'].datum) || []).reverse()
