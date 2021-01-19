@@ -106,8 +106,10 @@ const DEFAULT_GMT_TIMEZONE = timezones.find(timezone => timezone.value.startsWit
 class DetailsCard extends React.Component {
   constructor (props) {
     super(props)
-    const vmClusterId = props.vm.getIn(['cluster', 'id'])
-    const vmDataCenterId = props.clusters.getIn([vmClusterId, 'dataCenterId'])
+    const { vm, clusters } = props
+    const vmClusterId = vm.getIn(['cluster', 'id'])
+    const vmDataCenterId = clusters.getIn([vmClusterId, 'dataCenterId'])
+    const clusterArchitecture = getClusterArchitecture(vmClusterId, clusters)
 
     this.state = {
       vm: props.vm, // ImmutableJS Map
@@ -121,7 +123,7 @@ class DetailsCard extends React.Component {
       promptNextRunChanges: false,
 
       isoList: createIsoList(props.storageDomains, vmDataCenterId),
-      clusterList: createClusterList(props.clusters, vmDataCenterId),
+      clusterList: createClusterList(props.clusters, vmDataCenterId, clusterArchitecture),
       osList: createOsList(vmClusterId, props.clusters, props.operatingSystems),
 
       enableInitTimezone: !!props.vm.getIn(['cloudInit', 'timezone']), // true if sysprep timezone set or Configure Timezone checkbox checked
@@ -180,12 +182,14 @@ class DetailsCard extends React.Component {
     // NOTE: Doing the following here instead of getDerivedStateFromProps so __clusters__,
     //       __storageDomains__, and __operatingSystems__ don't need to be kept in state for
     //       change comparison
-    const vmClusterId = this.props.vm.getIn(['cluster', 'id'])
-    const vmDataCenterId = this.props.clusters.getIn([vmClusterId, 'dataCenterId'])
+    const { clusters, vm } = this.props
+    const vmClusterId = vm.getIn(['cluster', 'id'])
+    const vmDataCenterId = clusters.getIn([vmClusterId, 'dataCenterId'])
+    const clusterArchitecture = getClusterArchitecture(vmClusterId, clusters)
 
     if (prevProps.clusters !== this.props.clusters) {
       const { clusters } = this.props
-      this.setState({ clusterList: createClusterList(clusters, vmDataCenterId) }) // eslint-disable-line react/no-did-update-set-state
+      this.setState({ clusterList: createClusterList(clusters, vmDataCenterId, clusterArchitecture) }) // eslint-disable-line react/no-did-update-set-state
     }
 
     if (prevProps.storageDomains !== this.props.storageDomains) {

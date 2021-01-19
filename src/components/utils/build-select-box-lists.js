@@ -11,7 +11,7 @@ import { EMPTY_VNIC_PROFILE_ID } from '_/constants'
  * Return a normalized and sorted list of clusters ready for use in a __SelectBox__ from
  * the Map of provided clusters, optionally limiting to clusters in a given data center.
  */
-function createClusterList (clusters, dataCenterId = null) {
+function createClusterList (clusters, dataCenterId = null, architecture = null) {
   const clusterList =
     clusters
       .toList()
@@ -20,9 +20,8 @@ function createClusterList (clusters, dataCenterId = null) {
         !!cluster.get('architecture') &&
         cluster.get('architecture') !== 'undefined' &&
         !!cluster.get('cpuType') &&
-        (dataCenterId === null
-          ? true
-          : cluster.get('dataCenterId') === dataCenterId)
+        (architecture === null || cluster.get('architecture') === architecture) &&
+        (dataCenterId === null || cluster.get('dataCenterId') === dataCenterId)
       )
       .map(cluster => ({
         id: cluster.get('id'),
