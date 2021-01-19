@@ -255,7 +255,6 @@ class DetailsCard extends React.Component {
       maxNumberOfCores,
       maxNumberOfThreads,
       operatingSystems,
-      blankTemplateId,
       clusters,
       templates,
     } = this.props
@@ -269,14 +268,6 @@ class DetailsCard extends React.Component {
         case 'cluster':
           updates = updates.set('cluster', clusters.get(value))
           fieldUpdated = 'cluster'
-
-          // Change the template to 'Blank' if the VM's template isn't in the new cluster
-          {
-            const template = templates.get(updates.getIn(['template', 'id']))
-            if (template && template.get('clusterId') && template.get('clusterId') !== value) {
-              changeQueue.push({ fieldName: 'template', value: blankTemplateId })
-            }
-          }
           break
 
         case 'template':
@@ -1018,7 +1009,6 @@ DetailsCard.propTypes = {
   vms: PropTypes.object.isRequired,
   onEditChange: PropTypes.func,
 
-  blankTemplateId: PropTypes.string.isRequired,
   hosts: PropTypes.object.isRequired,
   clusters: PropTypes.object.isRequired,
   dataCenters: PropTypes.object.isRequired,
@@ -1039,7 +1029,6 @@ DetailsCard.propTypes = {
 
 const DetailsCardConnected = connect(
   (state) => ({
-    blankTemplateId: state.config.get('blankTemplateId'),
     vms: state.vms,
     hosts: state.hosts,
     clusters: state.clusters,
