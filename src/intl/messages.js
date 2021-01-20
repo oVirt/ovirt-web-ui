@@ -210,7 +210,7 @@ export const messages: { [messageId: string]: MessageType } = {
   },
   diskEditorResizeLabel: 'Increase Size By (GiB)',
   diskEditorSizeCantChangeHelp: 'Disk size cannot be extended for this type of disk.',
-  diskEditorSizeCreateInfoTooltip: 'After creating a disk, you can only extends its size. It is not possible to decrease disk size.',
+  diskEditorSizeCreateInfoTooltip: 'After creating a disk, you can only extend its size. It is not possible to decrease disk size.',
   diskEditorSizeLabel: 'Size (GiB)',
   diskEditorSizeEditLabel: 'Current Size (GiB)',
   diskEditorResizeNote: `After resizing the disk, you must also increase the size of the guest's filesystem`,

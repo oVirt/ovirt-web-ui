@@ -18,7 +18,6 @@ import {
   Checkbox,
   DropdownKebab,
   EmptyState,
-  FormGroup,
   FormControl,
   MenuItem,
   Table,
@@ -220,24 +219,18 @@ class Storage extends React.Component {
         editView: (value, { rowData }) => {
           const row = this.state.editing[rowData.id]
           const sizeGiB = row.size / (1024 ** 3)
-          const { invalidSizeValue } = row
 
           return <div className={style['disk-size-edit']}>
-            <FormGroup
-              validationState={invalidSizeValue && 'error'}
-              className={style['form-group-edit']}
-            >
+            <div>
               <FormControl
                 id={`${idPrefix}-${value}-size-edit`}
                 type='number'
-                min={this.props.minDiskSizeInGiB}
-                max={this.props.maxDiskSizeInGiB}
                 step={1}
                 value={sizeGiB}
                 className={style['disk-size-form-control-edit']}
                 onChange={e => this.handleCellChange(rowData, 'size', e.target.value)}
               />
-            </FormGroup>
+            </div>
             <span className={style['disk-size-edit-label']}>GiB</span>
             <div>
               <InfoTooltip id={`${idPrefix}-${value}-size-edit-info-tooltip`} tooltip={msg.diskEditorSizeCreateInfoTooltip()} />
@@ -531,14 +524,9 @@ class Storage extends React.Component {
   handleCellChange (rowData, field, value) {
     const editingRow = this.state.editing[rowData.id]
     if (field === 'size') {
-      if (!isNumber(value)) return
-
       const { minDiskSizeInGiB, maxDiskSizeInGiB } = this.props
-      if (value >= minDiskSizeInGiB && value <= maxDiskSizeInGiB) {
-        delete editingRow.invalidSizeValue
-      } else {
-        editingRow.invalidSizeValue = true
-      }
+      if (!isNumber(value) || value < minDiskSizeInGiB || value > maxDiskSizeInGiB) return
+
       value = +value * (1024 ** 3) // GiB to B
     }
 
@@ -566,7 +554,7 @@ class Storage extends React.Component {
     const actionCreate = !!this.state.creating && this.state.creating === rowData.id
     const editedRow = this.state.editing[rowData.id]
 
-    if (editedRow.invalidSizeValue || editedRow.storageDomainId === '_') return
+    if (editedRow.storageDomainId === '_') return
 
     // if the edited disk is set bootable, make sure to remove bootable from the other disks
     if (editedRow.bootable) {
