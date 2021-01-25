@@ -134,7 +134,7 @@ function isValidUid (toTest) {
 export const optimizedForMap = {
   'desktop': { id: 'desktop', value: msg.vmType_desktop() },
   'server': { id: 'server', value: msg.vmType_server() },
-  // 'high_performance': { id: 'high_performance', value: msg.vmType_highPerformance() },
+  'high_performance': { id: 'high_performance', value: msg.vmType_highPerformance() },
 }
 
 /**
@@ -149,6 +149,7 @@ class BasicSettings extends React.Component {
     this.validateForm = this.validateForm.bind(this)
     this.validateVmName = this.validateVmName.bind(this)
     this.mapVCpuTopologyItems = this.mapVCpuTopologyItems.bind(this)
+    this.buildOptimizedForList = this.buildOptimizedForList.bind(this)
 
     this.fields = {
       select: [
@@ -186,7 +187,7 @@ class BasicSettings extends React.Component {
     const okOperatingSystem = dataSet.operatingSystemId && operatingSystems.find(os => os.get('id') === dataSet.operatingSystemId) !== undefined
     const okMemory = isNumberInRange(dataSet.memory, 0, maxMemorySizeInMiB)
     const okCpu = isNumberInRange(dataSet.cpus, 0, maxNumOfVmCpus)
-    const okOptimizedFor = dataSet.optimizedFor && optimizedForMap[dataSet.optimizedFor] !== undefined
+    const okOptimizedFor = dataSet.optimizedFor && this.buildOptimizedForList(dataSet)[dataSet.optimizedFor] !== undefined
 
     const checkInit = dataSet.cloudInitEnabled
     const okInitHostname = dataSet.initHostname ? isHostNameValid(dataSet.initHostname) : true
@@ -196,6 +197,25 @@ class BasicSettings extends React.Component {
       okProvision && (okProvisionIso || okProvisionTemplate) &&
       okOperatingSystem && okMemory && okCpu && okOptimizedFor &&
       (checkInit ? okInitHostname : true)
+  }
+
+  /**
+   * supports in showing high performance option only for HP template based vm.
+   * TODO remove when REST API will fully support creating of a High Performance VM type, not based on a template
+   **/
+  buildOptimizedForList (dataSet) {
+    const optimizedForList = { ...optimizedForMap }
+
+    const template = this.props.templates.find(template => template.get('id') === dataSet.templateId)
+    const templateOrigOptimizedFor = template && template.get('type')
+    if (dataSet.provisionSource !== 'template' || templateOrigOptimizedFor !== 'high_performance') {
+      delete optimizedForList.high_performance
+    } else {
+      delete optimizedForList.desktop
+      delete optimizedForList.server
+    }
+
+    return optimizedForList
   }
 
   validateVmName () {
@@ -309,8 +329,13 @@ class BasicSettings extends React.Component {
   }
 
   render () {
-    const idPrefix = this.props.id || 'create-vm-wizard-basic'
-    const { data, clusters, maxNumOfSockets, maxNumOfCores, maxNumOfThreads, operatingSystems } = this.props
+    const {
+      data, clusters, maxNumOfSockets, maxNumOfCores,
+      maxNumOfThreads, operatingSystems, id, dataCenters,
+      storageDomains, templates,
+    } = this.props
+    const idPrefix = id || 'create-vm-wizard-basic'
+
     const indicators = {
       name: this.validateVmName(),
       hostName: !isHostNameValid(data.initHostname || ''),
@@ -320,7 +345,7 @@ class BasicSettings extends React.Component {
       createClusterList(clusters)
         .map(cluster => ({
           id: cluster.id,
-          value: `${cluster.value} (${this.props.dataCenters.find(dc => dc.id === cluster.datacenter).name})`,
+          value: `${cluster.value} (${dataCenters.find(dc => dc.id === cluster.datacenter).name})`,
         }))
     if (!isValidUid(data.clusterId)) {
       clusterList.unshift({ id: '_', value: clusterList.length === 0 ? `-- ${msg.noClustersAvailable()} --` : `-- ${msg.createVmWizardSelectCluster()} --` })
@@ -348,7 +373,7 @@ class BasicSettings extends React.Component {
 
     const enableIsoSelect = data.provisionSource === 'iso' && isValidUid(data.dataCenterId)
     const isoList = enableIsoSelect
-      ? createIsoList(this.props.storageDomains, data.dataCenterId)
+      ? createIsoList(storageDomains, data.dataCenterId)
         .map(iso => ({
           id: iso.file.id,
           value: iso.file.name,
@@ -364,7 +389,7 @@ class BasicSettings extends React.Component {
 
     const enableTemplateSelect = data.provisionSource === 'template'
     const templateList = enableTemplateSelect && isValidUid(data.clusterId)
-      ? createTemplateList(this.props.templates, data.clusterId)
+      ? createTemplateList(templates, data.clusterId)
       : [ { id: '_', value: `-- ${msg.createVmWizardSelectClusterBeforeTemplate()} --` } ]
     if (enableTemplateSelect && isValidUid(data.clusterId) && !isValidUid(data.templateId)) {
       templateList.unshift({ id: '_', value: `-- ${msg.createVmWizardSelectTemplate()} --` })
@@ -493,7 +518,7 @@ class BasicSettings extends React.Component {
         <FieldRow label={msg.optimizedFor()} id={`${idPrefix}-optimizedFor`} required>
           <SelectBox
             id={`${idPrefix}-optimizedFor-edit`}
-            items={Object.values(optimizedForMap)}
+            items={Object.values(this.buildOptimizedForList(data))}
             selected={data.optimizedFor || '_'}
             onChange={selectedId => this.handleChange('optimizedFor', selectedId)}
           />

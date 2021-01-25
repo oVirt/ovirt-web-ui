@@ -61,7 +61,7 @@ function rephraseVmType (vmType) {
   const types = {
     'desktop': msg.vmType_desktop(),
     'server': msg.vmType_server(),
-    'highperformance': msg.vmType_highPerformance(),
+    'high_performance': msg.vmType_highPerformance(),
   }
 
   const type = vmType.toLowerCase()
