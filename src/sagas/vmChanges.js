@@ -60,53 +60,38 @@ function* composeAndCreateVm ({ payload: { basic, nics, disks }, meta: { correla
       }
       : {},
   }
+  let vmRequiresClone = false
 
   // Provision = ISO (setup boot to CD and "insert" the CD after the VM is created)
   let cdrom
   if (basic.provisionSource === 'iso') {
-    // TODO: Verify that we absolutely need to create VM then change CD.
-    cdrom = {
-      fileId: basic.isoImage,
-    }
+    const [ vmUpdates, cdrom_ ] = yield composeProvisionSourceIso({ vm, basic })
 
-    merge(vm, {
-      template: { id: yield select(state => state.config.get('blankTemplateId')) },
-
-      os: {
-        boot: {
-          devices: {
-            device: [ 'cdrom' ],
-          },
-        },
-      },
-    })
+    cdrom = cdrom_
+    merge(vm, vmUpdates)
   }
 
   // Provision = TEMPLATE
   if (basic.provisionSource === 'template') {
-    const template = yield select(state => state.templates.get(basic.templateId))
-    merge(vm, {
-      template: { id: template.get('id') },
+    const [ vmUpdates, vmRequiresClone_ ] = yield composeProvisionSourceTemplate({ vm, basic, disks })
 
-      cpu: {
-        topology: (basic.cpus === template.getIn(['cpu', 'vCPUs']))
-          ? template.getIn(['cpu', 'topology']).toJS()
-          : vm.cpu.topology,
-      },
-    })
+    vmRequiresClone = vmRequiresClone_
+    merge(vm, vmUpdates)
   }
 
   // TODO: TimeZone handling (https://github.com/oVirt/ovirt-web-ui/pull/1118)
+
+  const clone = (
+    (basic.provisionSource === 'template' && basic.optimizedFor !== 'desktop') ||
+    vmRequiresClone
+  )
+  const clonePermissions = basic.provisionSource === 'template'
 
   /*
    * NOTE: The VM create REST service does not handle adding NICs or Disks. Until
    *       the create service supports this, we will add Nics and Disks individually
    *       after the VM has been created and is no longer image locked.
    */
-
-  const clone = false // TODO: Clone from template based on criteria
-  const clonePermissions = basic.provisionSource === 'template'
-
   const newVmId = yield createVm(
     A.createVm({ vm, cdrom, clone, clonePermissions, transformInput: false }, { correlationId })
   )
@@ -116,7 +101,7 @@ function* composeAndCreateVm ({ payload: { basic, nics, disks }, meta: { correla
   }
 
   // Wait for the VM image to be unlocked before adding NICs and Disks
-  yield waitForVmToBeUnlocked(newVmId)
+  yield waitForVmToBeUnlocked(newVmId, clone)
 
   // Assuming NICs cannot be added along with the VM create request, add them now
   yield all(nics.filter(nic => !nic.isFromTemplate).map(nic =>
@@ -131,6 +116,7 @@ function* composeAndCreateVm ({ payload: { basic, nics, disks }, meta: { correla
       },
     }))
   ))
+  // TODO? If cloning, toast notify that NICs have been added.
 
   // Assuming Disks cannot be added along with the VM create request, add them now
   yield all(disks.filter(disk => !disk.isFromTemplate).map(disk =>
@@ -151,11 +137,99 @@ function* composeAndCreateVm ({ payload: { basic, nics, disks }, meta: { correla
       },
     }))
   ))
+  // TODO? If cloning, toast notify that Disks have been added.
 
   // start on create, but after everything else is done...
   if (newVmId !== -1 && basic.startOnCreation) {
     yield put(A.startVm({ vmId: newVmId }))
   }
+}
+
+function* composeProvisionSourceIso ({ vm, basic }) {
+  const cdrom = {
+    fileId: basic.isoImage,
+  }
+
+  const vmUpdates = {
+    template: { id: yield select(state => state.config.get('blankTemplateId')) },
+
+    os: {
+      boot: {
+        devices: {
+          device: [ 'cdrom' ],
+        },
+      },
+    },
+  }
+
+  return [ vmUpdates, cdrom ]
+}
+
+function* composeProvisionSourceTemplate ({ vm, basic, disks }) {
+  const template = yield select(state => state.templates.get(basic.templateId))
+  let vmRequiresClone = false
+
+  const vmUpdates = {
+    template: { id: template.get('id') },
+
+    cpu: {
+      topology: (basic.cpus === template.getIn(['cpu', 'vCPUs']))
+        ? template.getIn(['cpu', 'topology']).toJS()
+        : vm.cpu.topology,
+    },
+  }
+
+  /*
+   * If a template defined disk needs to be created in a storage domain different than
+   * the one defined in the template, or if the disk's sparse value is changed, the
+   * changes need to passed along in the VM create call.
+   *
+   * See: http://ovirt.github.io/ovirt-engine-api-model/master/#services/vms/methods/add
+   */
+  disks
+    .filter(disk => disk.isFromTemplate)
+    .forEach(disk => {
+      const templateDisk = template.get('disks').find(tdisk => tdisk.get('id') === disk.id)
+      if (!templateDisk) {
+        return
+      }
+
+      const changesToTemplateDisk = {
+        id: disk.id,
+      }
+
+      // did the storage domain change?
+      if (disk.storageDomainId !== templateDisk.get('storageDomainId')) {
+        changesToTemplateDisk.format = 'raw'
+        changesToTemplateDisk.storage_domains = {
+          storage_domain: [{ id: disk.storageDomainId }],
+        }
+      }
+
+      // did the diskType (disk's sparse ) change?  'thin' === sparse, 'pre' === !sparse
+      const templateDiskType = templateDisk.get('sparse') ? 'thin' : 'pre'
+      if (disk.diskType !== templateDiskType) {
+        changesToTemplateDisk.sparse = disk.diskType === 'thin'
+      }
+
+      if (Object.keys(changesToTemplateDisk).length > 1) {
+        vmRequiresClone = true
+
+        if (vmUpdates.disk_attachments) {
+          // add another disk to clone
+          vmUpdates.disk_attachments.disk_attachment.push({ disk: changesToTemplateDisk })
+        } else {
+          // initial setup a disk to clone
+          vmUpdates.disk_attachments = {
+            disk_attachment: [{
+              disk: changesToTemplateDisk,
+            }],
+          }
+        }
+      }
+    })
+
+  return [ vmUpdates, vmRequiresClone ]
 }
 
 /*
@@ -205,10 +279,16 @@ function* createVm (action) {
   return -1
 }
 
-function* waitForVmToBeUnlocked (vmId) {
+/*
+ * Poll at intervals and return when either the number of polling steps has completed,
+ * or when the VM's image is no longer locked.  If the VM is being cloned, use 200 steps.
+ * If not, use 20 steps.  Cloning requires a full copy of the Template disks, so the
+ * process may take a long time.
+ */
+function* waitForVmToBeUnlocked (vmId, isCloning = false) {
   const vm = yield select(state => state.vms.getIn(['vms', vmId]))
   if (vm.get('status') === 'image_locked') {
-    for (let delayMs of delayInMsSteps()) {
+    for (let delayMs of delayInMsSteps(isCloning ? 20 : 200)) {
       yield delay(delayMs)
 
       const check = yield callExternalAction('getVm', Api.getVm, { payload: { vmId } }, true)

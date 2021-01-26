@@ -30,31 +30,6 @@ import SelectBox from '_/components/SelectBox'
 import style from './style.css'
 import { Tooltip, InfoTooltip } from '_/components/tooltips'
 
-function getDefaultDiskType (vmOptimizedFor) {
-  const diskType =
-    vmOptimizedFor === 'highperformance' ? 'pre'
-      : vmOptimizedFor === 'server' ? 'pre'
-        : 'thin'
-
-  return diskType
-}
-
-const TooltipLabel = ({ id, className, bsStyle = 'default', children }) =>
-  <Label
-    id={id}
-    className={`${style['disk-label']} ${className}`}
-    bsStyle={bsStyle}
-  >
-    {children}
-  </Label>
-
-TooltipLabel.propTypes = {
-  id: PropTypes.string,
-  className: PropTypes.string,
-  bsStyle: Label.propTypes.bsStyle,
-  children: PropTypes.node.isRequired,
-}
-
 export const DiskNameWithLabels = ({ id, disk }) => {
   const idPrefix = `${id}-disk-${disk.id}`
   return <React.Fragment>
@@ -94,15 +69,19 @@ class Storage extends React.Component {
   constructor (props) {
     super(props)
     this.handleCellChange = this.handleCellChange.bind(this)
+    this.handleTemplateDiskStorageDomainChange = this.handleTemplateDiskStorageDomainChange.bind(this)
     this.handleRowCancelChange = this.handleRowCancelChange.bind(this)
     this.handleRowConfirmChange = this.handleRowConfirmChange.bind(this)
+    this.removeEditState = this.removeEditState.bind(this)
     this.onCreateDisk = this.onCreateDisk.bind(this)
-    this.onDeleteRow = this.onDeleteRow.bind(this)
+    this.onDeleteDisk = this.onDeleteDisk.bind(this)
     this.onEditDisk = this.onEditDisk.bind(this)
     this.rowRenderProps = this.rowRenderProps.bind(this)
     this.bootableInfo = this.bootableInfo.bind(this)
     this.isBootableDiskTemplate = this.isBootableDiskTemplate.bind(this)
     this.isEditingMode = this.isEditingMode.bind(this)
+
+    props.onUpdate({ valid: this.validateTemplateDiskStorageDomains() })
 
     this.state = {
       editing: {},
@@ -285,11 +264,37 @@ class Storage extends React.Component {
           const {
             storageDomainId: id,
             storageDomain: sd,
+            canUserUseStorageDomain,
+            isFromTemplate,
           } = rowData
 
-          // TODO: if the disk's storage domain is not available to the user, highlight it
-          // TODO: like a validation error and force editing the SD before allowing the user to move
-          // TODO: forward to the next wizard step
+          if (isFromTemplate && !canUserUseStorageDomain) {
+            const { storageDomains, dataCenterId } = props
+            const storageDomainList = createStorageDomainList(storageDomains, dataCenterId, true)
+
+            if (storageDomainList.length === 0) {
+              return <React.Fragment>
+                {msg.createVmStorageNoStorageDomainAvailable()}
+                <InfoTooltip
+                  id={`${idPrefix}-${rowData.id}-storage-domain-na-tooltip`}
+                  tooltip={msg.createVmStorageNoStorageDomainAvailableTooltip()}
+                />
+              </React.Fragment>
+            } else {
+              if (!sd.isOk) {
+                storageDomainList.unshift({ id: '_', value: `-- ${msg.createVmStorageSelectStorageDomain()} --` })
+              }
+
+              return <SelectBox
+                id={`${idPrefix}-${rowData.id}-storage-domain-edit`}
+                items={storageDomainList}
+                selected={sd.isOk ? rowData.storageDomainId : '_'}
+                validationState={!sd.isOk && 'error'}
+                onChange={value => this.handleTemplateDiskStorageDomainChange(rowData, value)}
+              />
+            }
+          }
+
           return <React.Fragment>
             { id === '_'
               ? `-- ${msg.createVmStorageSelectStorageDomain()} --`
@@ -304,7 +309,7 @@ class Storage extends React.Component {
           const storageDomainList = createStorageDomainList(storageDomains, dataCenterId, true)
           const row = this.state.editing[rowData.id]
 
-          if (storageDomainList.length > 1 || row.storageDomain === '_') {
+          if (storageDomainList.length > 1 || row.storageDomainId === '_') {
             storageDomainList.unshift({ id: '_', value: `-- ${msg.createVmStorageSelectStorageDomain()} --` })
           }
 
@@ -314,6 +319,7 @@ class Storage extends React.Component {
               items={storageDomainList}
               selected={row.storageDomainId}
               onChange={value => this.handleCellChange(rowData, 'storageDomainId', value)}
+              validationState={row.storageDomainId === '_' && 'error'}
             />
           )
         },
@@ -401,7 +407,7 @@ class Storage extends React.Component {
                           </MenuItem>
                           <MenuItem
                             id={`${kebabId}-delete`}
-                            onSelect={() => { this.onDeleteRow(rowData) }}
+                            onSelect={() => { this.onDeleteDisk(rowData) }}
                             disabled={actionsDisabled}
                           >
                             {msg.delete()}
@@ -448,6 +454,25 @@ class Storage extends React.Component {
     return msg.createVmStorageBootableMessage()
   }
 
+  validateTemplateDiskStorageDomains ({ update, ignoreId } = {}) {
+    const { disks, storageDomains } = this.props
+    let disksAreValid = true
+
+    const templateDisks = disks.filter(disk => disk.isFromTemplate)
+    for (let i = 0; disksAreValid && i < templateDisks.length; i++) {
+      let disk = templateDisks[i]
+      if (disk.id === ignoreId) {
+        continue
+      }
+      if (update && update.id === disk.id) {
+        disk = { ...disk, ...update }
+      }
+      disksAreValid = disksAreValid && storageDomains.getIn([ disk.storageDomainId, 'canUserUseDomain' ], false)
+    }
+
+    return disksAreValid
+  }
+
   onCreateDisk () {
     const newId = generateUnique('NEW_')
     const {
@@ -456,7 +481,6 @@ class Storage extends React.Component {
       dataCenterId,
       vmName,
       disks,
-      optimizedFor,
     } = this.props
 
     // If only 1 storage domain is available, select it automatically
@@ -478,13 +502,13 @@ class Storage extends React.Component {
           bootable: false,
           iface: 'virtio_scsi',
           type: 'image',
-          diskType: getDefaultDiskType(optimizedFor),
+          diskType: 'thin',
 
           size: (diskInitialSizeInGib * 1024 ** 3),
         },
       },
     }))
-    this.props.onUpdate({ valid: false })
+    this.props.onUpdate({ valid: false }) // the step isn't valid until Create is done
   }
 
   onEditDisk (rowData) {
@@ -494,11 +518,14 @@ class Storage extends React.Component {
         [rowData.id]: rowData,
       },
     }))
-    this.props.onUpdate({ valid: false })
+    this.props.onUpdate({ valid: false }) // the step isn't valid until Edit is done
   }
 
-  onDeleteRow (rowData) {
-    this.props.onUpdate({ remove: rowData.id })
+  onDeleteDisk (rowData) {
+    this.props.onUpdate({
+      valid: this.validateTemplateDiskStorageDomains({ ignoreId: rowData.id }),
+      remove: rowData.id,
+    })
   }
 
   handleCellChange (rowData, field, value) {
@@ -526,12 +553,20 @@ class Storage extends React.Component {
     }
   }
 
-  // Push the new or editing row up via __onUpdate__
+  handleTemplateDiskStorageDomainChange (rowData, storageDomainId) {
+    const update = { id: rowData.id, storageDomainId }
+    this.props.onUpdate({
+      valid: this.validateTemplateDiskStorageDomains({ update }),
+      update,
+    })
+  }
+
+  // Verify changes, and if valid, push the new or editing row up via __onUpdate__
   handleRowConfirmChange (rowData) {
     const actionCreate = !!this.state.creating && this.state.creating === rowData.id
     const editedRow = this.state.editing[rowData.id]
 
-    if (editedRow.invalidSizeValue) return
+    if (editedRow.invalidSizeValue || editedRow.storageDomainId === '_') return
 
     // if the edited disk is set bootable, make sure to remove bootable from the other disks
     if (editedRow.bootable) {
@@ -543,24 +578,30 @@ class Storage extends React.Component {
       }
     }
 
-    // TODO: Add field level validation for the edit or create fields
-
-    this.props.onUpdate({ [actionCreate ? 'create' : 'update']: editedRow })
-    this.handleRowCancelChange(rowData)
+    this.props.onUpdate({
+      [actionCreate ? 'create' : 'update']: editedRow,
+      valid: this.validateTemplateDiskStorageDomains(), // don't need to update changes on non-template disks
+    })
+    this.removeEditState(rowData.id)
   }
 
   // Cancel the creation or editing of a row by throwing out edit state
   handleRowCancelChange (rowData) {
-    this.components = undefined
+    this.props.onUpdate({ valid: this.validateTemplateDiskStorageDomains() })
+    this.removeEditState(rowData.id)
+  }
+
+  // Drop table edit state
+  removeEditState (rowId) {
+    this.components = undefined // forces the table to reload
     this.setState(state => {
       const editing = state.editing
-      delete editing[rowData.id]
+      delete editing[rowId]
       return {
         creating: false,
         editing,
       }
     })
-    this.props.onUpdate({ valid: true })
   }
 
   // Create props for each row that will be passed to the row component (TableInlineEditRow)
@@ -588,15 +629,18 @@ class Storage extends React.Component {
     } = this.props
 
     const storageDomainList = createStorageDomainList(storageDomains)
-    const filteredStorageDomainList = createStorageDomainList(storageDomains, dataCenterId)
+    const dataCenterStorageDomainsList = createStorageDomainList(storageDomains, dataCenterId)
     const enableCreate = storageDomainList.length > 0 && !this.isEditingMode()
 
     const diskList = sortNicsDisks([...disks])
       .concat(this.state.creating ? [ this.state.editing[this.state.creating] ] : [])
       .map(disk => {
-        disk = this.state.editing[disk.id] ? this.state.editing[disk.id] : disk // update editing changes from state after sorting
+        disk = this.state.editing[disk.id] || disk
         const sd = storageDomainList.find(sd => sd.id === disk.storageDomainId)
-        const isSdOk = sd && filteredStorageDomainList.find(filtered => filtered.id === sd.id) !== undefined
+        const isSdOk = !!sd && (
+          disk.canUserUseStorageDomain ||
+          dataCenterStorageDomainsList.find(sd => sd.id === disk.storageDomainId)
+        )
 
         return {
           ...disk,
@@ -612,12 +656,14 @@ class Storage extends React.Component {
               : disk.diskType,
         }
       })
-    const components = {
+
+    // reuse _TableInlineEditRow to allow for normal form behavior (keyboard navigation
+    // and using onChange field handlers)
+    this.components = this.components || {
       body: {
-        row: _TableInlineEditRow, // Table.InlineEditRow,
+        row: _TableInlineEditRow,
       },
     }
-    this.components = this.components || components // if the table should (re)render the value of this.components should be undefined
 
     return <div className={style['settings-container']} id={idPrefix}>
       { diskList.length === 0 && <React.Fragment>
@@ -679,7 +725,7 @@ Storage.propTypes = {
 }
 
 export default connect(
-  (state, { dataCenterId, clusterId }) => ({
+  (state, { clusterId }) => ({
     cluster: state.clusters.get(clusterId),
     storageDomains: state.storageDomains,
     maxDiskSizeInGiB: 4096, // TODO: 4TiB, no config option pulled as of 2019-Mar-22

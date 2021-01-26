@@ -134,6 +134,8 @@ export const messages: { [messageId: string]: MessageType } = {
   createVmStorageEmptyTitle: 'No Disks Defined',
   createVmStorageNoEditBootableMessage: 'Disk "{diskName}", defined by the selected template, is set as bootable. This can only be changed after the VM has been created.',
   createVmStorageNoEditHelpMessage: 'This Disk is defined by your selected template and cannot be edited or deleted at creation.',
+  createVmStorageNoStorageDomainAvailable: 'No Storage Domain is available',
+  createVmStorageNoStorageDomainAvailableTooltip: 'This Disk is defined by the selected template, is not currently available to you, and there are no target storage domains available. Please contact your administrator to resolve this problem.',
   createVmStorageSelectDiskType: 'Select a Disk Type',
   createVmStorageSelectStorageDomain: 'Select a Storage Domain',
   createVmStorageTableHeaderBootable: 'Bootable',

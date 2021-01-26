@@ -9,6 +9,7 @@ import * as Actions from '_/actions'
 import { generateUnique } from '_/helpers'
 import { msg } from '_/intl'
 import { handleClusterIdChange } from './helpers'
+import { createStorageDomainList } from '_/components/utils'
 
 import NavigationConfirmationModal from '../NavigationConfirmationModal'
 import BasicSettings from './steps/BasicSettings'
@@ -349,26 +350,40 @@ class CreateVmWizard extends React.Component {
         }
 
         if (resetDisks) {
+          const dataCenterStorageDomainsList = createStorageDomainList(
+            this.props.storageDomains,
+            this.state.steps.basic.dataCenterId)
+
           draft.steps.storage = {
             updated: (draft.steps.storage.updated + 1),
             disks: !template
               ? []
               : template.get('disks', List())
-                .map(disk => ({
-                  id: disk.get('attachmentId'),
-                  name: disk.get('name'),
+                .map(disk => {
+                  const canUserUseStorageDomain =
+                    !!dataCenterStorageDomainsList.find(sd => sd.id === disk.get('storageDomainId'))
 
-                  diskId: disk.get('id'),
-                  storageDomainId: disk.get('storageDomainId'),
-                  canUserUseStorageDomain: this.props.storageDomains.getIn([ disk.get('storageDomainId'), 'canUserUseDomain' ], false),
+                  const diskType = // constrain to values from createDiskTypeList()
+                    this.state.steps.basic.optimizedFor === 'desktop'
+                      ? disk.get('sparse') ? 'thin' : 'pre'
+                      : 'pre'
 
-                  bootable: disk.get('bootable'),
-                  iface: disk.get('iface'),
-                  type: disk.get('type'), // [ image | lun | cinder ]
-                  diskType: disk.get('sparse') ? 'thin' : 'pre', // constrain to values from createDiskTypeList()
-                  size: disk.get('provisionedSize'), // bytes
-                  isFromTemplate: true,
-                }))
+                  return {
+                    id: disk.get('attachmentId'),
+                    name: disk.get('name'),
+
+                    diskId: disk.get('id'),
+                    storageDomainId: disk.get('storageDomainId'),
+                    canUserUseStorageDomain,
+
+                    bootable: disk.get('bootable'),
+                    iface: disk.get('iface'),
+                    type: disk.get('type'), // [ image | lun | cinder ]
+                    diskType,
+                    size: disk.get('provisionedSize'), // bytes
+                    isFromTemplate: true,
+                  }
+                })
                 .toJS(),
           }
         }
