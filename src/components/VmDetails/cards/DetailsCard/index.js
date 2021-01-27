@@ -5,7 +5,15 @@ import { List } from 'immutable'
 
 import * as Actions from '_/actions'
 import { MAX_VM_MEMORY_FACTOR } from '_/constants'
-import { generateUnique, isWindows, templateNameRenderer, userFormatOfBytes } from '_/helpers'
+import {
+  filterOsByArchitecture,
+  generateUnique,
+  getClusterArchitecture,
+  getDefaultOSByArchitecture,
+  isWindows,
+  templateNameRenderer,
+  userFormatOfBytes,
+} from '_/helpers'
 import { msg, enumMsg } from '_/intl'
 
 import {
@@ -98,8 +106,10 @@ const DEFAULT_GMT_TIMEZONE = timezones.find(timezone => timezone.value.startsWit
 class DetailsCard extends React.Component {
   constructor (props) {
     super(props)
-    const vmClusterId = props.vm.getIn(['cluster', 'id'])
-    const vmDataCenterId = props.clusters.getIn([vmClusterId, 'dataCenterId'])
+    const { vm, clusters } = props
+    const vmClusterId = vm.getIn(['cluster', 'id'])
+    const vmDataCenterId = clusters.getIn([vmClusterId, 'dataCenterId'])
+    const clusterArchitecture = getClusterArchitecture(vmClusterId, clusters)
 
     this.state = {
       vm: props.vm, // ImmutableJS Map
@@ -113,7 +123,7 @@ class DetailsCard extends React.Component {
       promptNextRunChanges: false,
 
       isoList: createIsoList(props.storageDomains, vmDataCenterId),
-      clusterList: createClusterList(props.clusters, vmDataCenterId),
+      clusterList: createClusterList(props.clusters, vmDataCenterId, clusterArchitecture),
       osList: createOsList(vmClusterId, props.clusters, props.operatingSystems),
 
       enableInitTimezone: !!props.vm.getIn(['cloudInit', 'timezone']), // true if sysprep timezone set or Configure Timezone checkbox checked
@@ -172,12 +182,14 @@ class DetailsCard extends React.Component {
     // NOTE: Doing the following here instead of getDerivedStateFromProps so __clusters__,
     //       __storageDomains__, and __operatingSystems__ don't need to be kept in state for
     //       change comparison
-    const vmClusterId = this.props.vm.getIn(['cluster', 'id'])
-    const vmDataCenterId = this.props.clusters.getIn([vmClusterId, 'dataCenterId'])
+    const { clusters, vm } = this.props
+    const vmClusterId = vm.getIn(['cluster', 'id'])
+    const vmDataCenterId = clusters.getIn([vmClusterId, 'dataCenterId'])
+    const clusterArchitecture = getClusterArchitecture(vmClusterId, clusters)
 
     if (prevProps.clusters !== this.props.clusters) {
       const { clusters } = this.props
-      this.setState({ clusterList: createClusterList(clusters, vmDataCenterId) }) // eslint-disable-line react/no-did-update-set-state
+      this.setState({ clusterList: createClusterList(clusters, vmDataCenterId, clusterArchitecture) }) // eslint-disable-line react/no-did-update-set-state
     }
 
     if (prevProps.storageDomains !== this.props.storageDomains) {
@@ -242,7 +254,14 @@ class DetailsCard extends React.Component {
     let initTimezoneUpdates = { enableInitTimezone, lastInitTimezone }
 
     const changeQueue = [{ fieldName, value }]
-    const { maxNumberOfSockets, maxNumberOfCores, maxNumberOfThreads } = this.props
+    const {
+      maxNumberOfSockets,
+      maxNumberOfCores,
+      maxNumberOfThreads,
+      operatingSystems,
+      clusters,
+      templates,
+    } = this.props
 
     for (let change = changeQueue.shift(); change; change = changeQueue.shift()) {
       console.log('processing change', change)
@@ -251,28 +270,24 @@ class DetailsCard extends React.Component {
       let fieldUpdated
       switch (fieldName) {
         case 'cluster':
-          updates = updates.set('cluster', this.props.clusters.get(value))
+          updates = updates.set('cluster', clusters.get(value))
           fieldUpdated = 'cluster'
-
-          // Change the template to 'Blank' if the VM's template isn't in the new cluster
-          {
-            const template = this.props.templates.get(updates.getIn(['template', 'id']))
-            if (template && template.get('clusterId') && template.get('clusterId') !== value) {
-              changeQueue.push({ fieldName: 'template', value: this.props.blankTemplateId })
-            }
-          }
           break
 
         case 'template':
-          updates = updates.set('template', this.props.templates.get(value))
+          updates = updates.set('template', templates.get(value))
           fieldUpdated = 'template'
 
           // Apply settings from the template to the VM (memory, CPUs, OS, cloudInit, bootMenuEnabled)
           {
-            const template = this.props.templates.get(value)
+            const template = templates.get(value)
             if (template) {
-              const templateOsType = template.getIn(['os', 'type'], 'other')
-              const templateOs = this.props.operatingSystems.find(os => os.get('type') === templateOsType)
+              const clusterId = updates.getIn(['cluster', 'id'])
+              const clusterArchitecture = getClusterArchitecture(clusterId, clusters)
+              const templateOsName = template.getIn(['os', 'type'], 'other')
+              const templateOs = filterOsByArchitecture(operatingSystems, clusterArchitecture)
+                .find(os => os.get('name') === templateOsName) ||
+                getDefaultOSByArchitecture(operatingSystems, clusterArchitecture)
 
               // fields that are editable on the card
               changeQueue.push(
@@ -345,7 +360,6 @@ class DetailsCard extends React.Component {
 
         case 'os':
           fieldUpdated = 'os'
-          const operatingSystems = this.props.operatingSystems
           const os = operatingSystems.find(os => os.get('id') === value)
           updates = this.updateOs(updates, os)
 
@@ -999,7 +1013,6 @@ DetailsCard.propTypes = {
   vms: PropTypes.object.isRequired,
   onEditChange: PropTypes.func,
 
-  blankTemplateId: PropTypes.string.isRequired,
   hosts: PropTypes.object.isRequired,
   clusters: PropTypes.object.isRequired,
   dataCenters: PropTypes.object.isRequired,
@@ -1020,7 +1033,6 @@ DetailsCard.propTypes = {
 
 const DetailsCardConnected = connect(
   (state) => ({
-    blankTemplateId: state.config.get('blankTemplateId'),
     vms: state.vms,
     hosts: state.hosts,
     clusters: state.clusters,
