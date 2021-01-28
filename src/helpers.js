@@ -256,16 +256,6 @@ export function getDefaultOSByArchitecture (operatingSystems, architecture) {
   return clustersOs.find(os => defaultOperatingSystemIds.includes(os.get('id')))
 }
 
-export function getClusterArchitecture (clusterId, clusters) {
-  const cluster = clusters && clusters.get(clusterId)
-  return cluster && cluster.get('architecture')
-}
-
-export function getDefaultOSByArchitecture (operatingSystems, architecture) {
-  const clustersOs = filterOsByArchitecture(operatingSystems, architecture)
-  return clustersOs.find(os => defaultOperatingSystemIds.includes(os.get('id')))
-}
-
 export function findOsByName (operatingSystems, name) {
   return operatingSystems.toList().find(os =>
     os.get('name') === name)
