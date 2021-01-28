@@ -6,18 +6,17 @@ import produce from 'immer'
 import { List } from 'immutable'
 
 import * as Actions from '_/actions'
+import { EMPTY_VNIC_PROFILE_ID } from '_/constants'
 import { generateUnique } from '_/helpers'
 import { msg } from '_/intl'
 import { handleClusterIdChange } from './helpers'
-import { createStorageDomainList } from '_/components/utils'
+import { createStorageDomainList, createClusterList } from '_/components/utils'
 
 import NavigationConfirmationModal from '../NavigationConfirmationModal'
 import BasicSettings from './steps/BasicSettings'
 import Networking from './steps/Networking'
 import Storage from './steps/Storage'
 import SummaryReview from './steps/SummaryReview'
-import { EMPTY_VNIC_PROFILE_ID } from '_/constants'
-import { createClusterList } from '_/components/utils'
 
 const DEFAULT_STATE = {
   activeStepIndex: 0,
