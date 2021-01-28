@@ -246,6 +246,15 @@ export function formatDateFromNow (d) {
 export function filterOsByArchitecture (operatingSystems, architecture) {
   return operatingSystems.filter(os => os.get('architecture') === architecture)
 }
+export function getClusterArchitecture (clusterId, clusters) {
+  const cluster = clusters && clusters.get(clusterId)
+  return cluster && cluster.get('architecture')
+}
+
+export function getDefaultOSByArchitecture (operatingSystems, architecture) {
+  const clustersOs = filterOsByArchitecture(operatingSystems, architecture)
+  return clustersOs.find(os => defaultOperatingSystemIds.includes(os.get('id')))
+}
 
 export function getClusterArchitecture (clusterId, clusters) {
   const cluster = clusters && clusters.get(clusterId)

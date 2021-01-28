@@ -1,6 +1,11 @@
 import { createIsoList, createTemplateList } from '_/components/utils'
 import timezones from '_/components/utils/timezones.json'
-import { isWindows } from '_/helpers'
+import {
+  filterOsByArchitecture,
+  getClusterArchitecture,
+  getDefaultOSByArchitecture,
+  isWindows,
+} from '_/helpers'
 
 const handleClusterIdChange = (clusterId, { blankTemplateId, defaultValues, clusters, templates, operatingSystems, storageDomains, defaultGeneralTimezone, defaultWindowsTimezone }) => {
   let changes = {}
@@ -9,7 +14,7 @@ const handleClusterIdChange = (clusterId, { blankTemplateId, defaultValues, clus
   changes.clusterId = clusterId
 
   if (clusterId === undefined) {
-    changes = { ...changes, ...handleProvisionSourceChange('template', { defaultValues, defaultGeneralTimezone, defaultWindowsTimezone, templates, operatingSystems }) }
+    changes = { ...changes, ...handleProvisionSourceChange('template', { defaultValues, defaultGeneralTimezone, defaultWindowsTimezone, templates, operatingSystems, clusters, data: { clusterId } }) }
     return changes
   }
 
@@ -17,14 +22,14 @@ const handleClusterIdChange = (clusterId, { blankTemplateId, defaultValues, clus
     // cluster includes more than one non blank template
     changes = {
       ...changes,
-      ...handleProvisionSourceChange('template', { defaultValues, defaultGeneralTimezone, defaultWindowsTimezone, templates, operatingSystems }),
+      ...handleProvisionSourceChange('template', { defaultValues, defaultGeneralTimezone, defaultWindowsTimezone, templates, operatingSystems, clusters, data: { clusterId } }),
     }
     if (templateList.length === 2) {
       // cluster includes only one non blank template
       const selectedTemplate = templateList.find(t => t.id !== blankTemplateId)
       changes = {
         ...changes,
-        ...(selectedTemplate ? handleTemplateIdChange(selectedTemplate.id, defaultValues.optimizedFor, { templates, operatingSystems, defaultGeneralTimezone, defaultWindowsTimezone }) : {}),
+        ...(selectedTemplate ? handleTemplateIdChange(selectedTemplate.id, defaultValues.optimizedFor, { templates, operatingSystems, defaultGeneralTimezone, defaultWindowsTimezone, clusters, data: { clusterId } }) : {}),
       }
     }
     return changes
@@ -37,7 +42,7 @@ const handleClusterIdChange = (clusterId, { blankTemplateId, defaultValues, clus
       // cluster includes at least one iso cd
       changes = {
         ...changes,
-        ...handleProvisionSourceChange('iso', { defaultValues, defaultGeneralTimezone, defaultWindowsTimezone, templates, operatingSystems }),
+        ...handleProvisionSourceChange('iso', { defaultValues, defaultGeneralTimezone, defaultWindowsTimezone, templates, operatingSystems, clusters, data: { clusterId } }),
       }
       if (isoList.length === 1) {
         // cluster includes only one iso cd
@@ -47,8 +52,8 @@ const handleClusterIdChange = (clusterId, { blankTemplateId, defaultValues, clus
       // cluster does not include any non blank template or iso cd
       changes = {
         ...changes,
-        ...handleProvisionSourceChange('template', { defaultValues, defaultGeneralTimezone, defaultWindowsTimezone, templates, operatingSystems }),
-        ...handleTemplateIdChange(blankTemplateId, defaultValues.optimizedFor, { templates, operatingSystems, defaultGeneralTimezone, defaultWindowsTimezone }),
+        ...handleProvisionSourceChange('template', { defaultValues, defaultGeneralTimezone, defaultWindowsTimezone, templates, operatingSystems, clusters, data: { clusterId } }),
+        ...handleTemplateIdChange(blankTemplateId, defaultValues.optimizedFor, { templates, operatingSystems, defaultGeneralTimezone, defaultWindowsTimezone, clusters, data: { clusterId } }),
       }
     }
     return changes
@@ -61,12 +66,12 @@ const handleClusterIdChange = (clusterId, { blankTemplateId, defaultValues, clus
   return changes
 }
 
-const handleProvisionSourceChange = (provisionSource, { defaultValues, defaultGeneralTimezone, defaultWindowsTimezone, templates, operatingSystems }) => {
+const handleProvisionSourceChange = (provisionSource, { defaultValues, defaultGeneralTimezone, defaultWindowsTimezone, templates, operatingSystems, clusters, data: { clusterId } }) => {
   const changes = {}
   changes.provisionSource = provisionSource
   changes.isoImage = undefined
   changes.templateId = undefined
-  changes.operatingSystemId = defaultValues.operatingSystemId
+  changes.operatingSystemId = verifyOsIdToCluster(defaultValues.operatingSystemId, clusterId, { clusters, operatingSystems })
   changes.memory = defaultValues.memory
   changes.cpus = defaultValues.cpus
   changes.topology = defaultValues.topology
@@ -81,7 +86,7 @@ const handleProvisionSourceChange = (provisionSource, { defaultValues, defaultGe
   return changes
 }
 
-const handleTemplateIdChange = (templateId, defaultOptimizedFor, { templates, operatingSystems, defaultGeneralTimezone, defaultWindowsTimezone }) => {
+const handleTemplateIdChange = (templateId, defaultOptimizedFor, { templates, operatingSystems, defaultGeneralTimezone, defaultWindowsTimezone, clusters, data: { clusterId } }) => {
   const changes = {}
   const template = templates.find(t => t.get('id') === templateId)
   changes.templateId = template.get('id')
@@ -90,10 +95,10 @@ const handleTemplateIdChange = (templateId, defaultOptimizedFor, { templates, op
   changes.cpus = template.getIn([ 'cpu', 'vCPUs' ])
   changes.topology = template.getIn([ 'cpu', 'topology' ]).toJS()
   changes.optimizedFor = template.get('type', defaultOptimizedFor)
-  changes.operatingSystemId = operatingSystems
+  const suggestedOs = operatingSystems
     .find(os => os.get('name') === template.getIn([ 'os', 'type' ]))
     .get('id')
-
+  changes.operatingSystemId = verifyOsIdToCluster(suggestedOs, clusterId, { clusters, operatingSystems })
   // Check template's timezone compatibility with the template's OS, set the timezone corresponding to the template's OS
   changes.timeZone = checkTimeZone(changes.operatingSystemId, changes.templateId, { defaultGeneralTimezone, defaultWindowsTimezone, templates, operatingSystems })
   changes.cloudInitEnabled = template.getIn(['cloudInit', 'enabled'])
@@ -151,6 +156,13 @@ const isOsLinux = (operatingSystemId, operatingSystems) => {
   return os && !os.get('isWindows')
 }
 
+const verifyOsIdToCluster = (selectedOsId, clusterId, { clusters, operatingSystems }) => {
+  const architecture = getClusterArchitecture(clusterId, clusters)
+  const clusterOsList = filterOsByArchitecture(operatingSystems, architecture)
+  const selectedOs = clusterOsList.find(os => os.get('id') === selectedOsId) || getDefaultOSByArchitecture(operatingSystems, architecture)
+  return selectedOs ? selectedOs.get('id') : '0'
+}
+
 module.exports = {
   handleClusterIdChange,
   handleProvisionSourceChange,
@@ -158,4 +170,5 @@ module.exports = {
   checkTimeZone,
   isOsWindows,
   isOsLinux,
+  verifyOsIdToCluster,
 }
