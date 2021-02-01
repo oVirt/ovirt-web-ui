@@ -1,9 +1,13 @@
 // @flow
 
-export function isHostNameValid (nameCandidate: string): boolean {
-  return /^[a-zA-Z0-9_\-\\.]{1,255}$/.test(nameCandidate)
-}
+const charactersRegExpTest = (nameCandidate: string) => /^[a-zA-Z0-9_\-\\.]*$/.test(nameCandidate)
 
+export function isHostNameValid (nameCandidate: string): boolean {
+  if (nameCandidate.length === 0 || nameCandidate.length > 255) {
+    return false
+  }
+  return charactersRegExpTest(nameCandidate)
+}
 const UNICODE_NON_ASCII_LETTERS =
   '\u00AA\u00B5\u00BA\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02C1\u02C6-\u02D1' +
   '\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376\u0377\u037A-\u037D\u0386' +
@@ -76,22 +80,28 @@ const VM_NAME_REGEX = new RegExp(
  * See https://github.com/oVirt/ovirt-engine/blob/89449b50aff6d137c28a4249f2c374f42b003a6d/frontend/webadmin/modules/uicommonweb/src/main/java/org/ovirt/engine/ui/uicommonweb/validation/I18NNameValidation.java#L23
  */
 export function isVmNameValid (nameCandidate: string): boolean {
-  if (nameCandidate.length > 64) {
+  if (nameCandidate.length === 0 || nameCandidate.length > 64) {
     return false
   }
   return VM_NAME_REGEX.test(nameCandidate)
 }
 
 export function isDiskNameValid (nameCandidate: string): boolean {
-  return isVmNameValid(nameCandidate)
+  if (nameCandidate.length === 0 || nameCandidate.length > 255) {
+    return false
+  }
+  return VM_NAME_REGEX.test(nameCandidate)
 }
 
 /**
  * check if the name's length between 1 to 50 characters
  * and contains only uppercase, lowercase, hyphens and underscores
  */
-export function isNicNameValid (name: string): boolean {
-  return /^[a-zA-Z0-9_\-\\.]{1,50}$/.test(name)
+export function isNicNameValid (nameCandidate: string): boolean {
+  if (nameCandidate.length === 0 || nameCandidate.length > 50) {
+    return false
+  }
+  return charactersRegExpTest(nameCandidate)
 }
 
 /**

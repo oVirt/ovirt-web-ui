@@ -204,7 +204,7 @@ class DiskImageEditor extends Component {
     switch (field) {
       case 'alias':
         if (!isDiskNameValid(this.state.values.alias)) {
-          errors['alias'] = msg.pleaseEnterValidDiskName()
+          errors['alias'] = msg.diskNameValidationRules()
           isErrorOnField = true
         } else {
           delete errors['alias']

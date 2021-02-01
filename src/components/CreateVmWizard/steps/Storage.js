@@ -11,6 +11,7 @@ import {
   createStorageDomainList,
   sortNicsDisks,
   suggestDiskName,
+  isDiskNameValid,
 } from '_/components/utils'
 
 import {
@@ -18,7 +19,9 @@ import {
   Checkbox,
   DropdownKebab,
   EmptyState,
+  FormGroup,
   FormControl,
+  HelpBlock,
   MenuItem,
   Table,
   Label,
@@ -79,10 +82,14 @@ class Storage extends React.Component {
     this.bootableInfo = this.bootableInfo.bind(this)
     this.isBootableDiskTemplate = this.isBootableDiskTemplate.bind(this)
     this.isEditingMode = this.isEditingMode.bind(this)
+    this.isValidDiskSize = this.isValidDiskSize.bind(this)
 
     props.onUpdate({ valid: this.validateTemplateDiskStorageDomains() })
 
     this.state = {
+      editingErrors: {
+        diskInvalidName: false,
+      },
       editing: {},
       creating: false,
     }
@@ -146,16 +153,25 @@ class Storage extends React.Component {
         },
         editView: (value, { rowData }) => {
           const row = this.state.editing[rowData.id]
+          const { diskInvalidName } = this.state.editingErrors
 
           return row.isFromTemplate
             ? this.columns[0].valueView(value, { rowData })
             : (
-              <FormControl
-                id={`${idPrefix}-${value}-name-edit`}
-                type='text'
-                defaultValue={row.name}
-                onBlur={e => this.handleCellChange(rowData, 'name', e.target.value)}
-              />
+              <FormGroup
+                validationState={diskInvalidName ? 'error' : null}
+                className={style['form-group-edit']}
+              >
+                <FormControl
+                  id={`${idPrefix}-${value}-name-edit`}
+                  type='text'
+                  defaultValue={row.name}
+                  onChange={e => this.handleCellChange(rowData, 'name', e.target.value)}
+                />
+                {diskInvalidName &&
+                  <HelpBlock>{msg.diskNameValidationRules()}</HelpBlock>
+                }
+              </FormGroup>
             )
         },
       },
@@ -521,18 +537,31 @@ class Storage extends React.Component {
     })
   }
 
+  isValidDiskSize (size) {
+    const { minDiskSizeInGiB, maxDiskSizeInGiB } = this.props
+    return isNumber(size) && size >= minDiskSizeInGiB && size <= maxDiskSizeInGiB
+  }
+
   handleCellChange (rowData, field, value) {
     const editingRow = this.state.editing[rowData.id]
-    if (field === 'size') {
-      const { minDiskSizeInGiB, maxDiskSizeInGiB } = this.props
-      if (!isNumber(value) || value < minDiskSizeInGiB || value > maxDiskSizeInGiB) return
-
-      value = +value * (1024 ** 3) // GiB to B
+    const editingErrors = {}
+    switch (field) {
+      case 'size':
+        if (!this.isValidDiskSize(value)) return
+        value = +value * (1024 ** 3) // GiB to B
+        break
+      case 'name':
+        editingErrors.diskInvalidName = !isDiskNameValid(value)
+        break
     }
 
     if (editingRow) {
       editingRow[field] = value
       this.setState(state => ({
+        editingErrors: {
+          ...state.editingErrors,
+          ...editingErrors,
+        },
         editing: {
           ...state.editing,
           [rowData.id]: editingRow,
@@ -551,10 +580,11 @@ class Storage extends React.Component {
 
   // Verify changes, and if valid, push the new or editing row up via __onUpdate__
   handleRowConfirmChange (rowData) {
-    const actionCreate = !!this.state.creating && this.state.creating === rowData.id
-    const editedRow = this.state.editing[rowData.id]
+    const { creating, editing, editingErrors } = this.state
+    const actionCreate = !!creating && creating === rowData.id
+    const editedRow = editing[rowData.id]
 
-    if (editedRow.storageDomainId === '_') return
+    if (Object.values(editingErrors).find(val => val) || editedRow.storageDomainId === '_') return
 
     // if the edited disk is set bootable, make sure to remove bootable from the other disks
     if (editedRow.bootable) {
@@ -586,6 +616,9 @@ class Storage extends React.Component {
       const editing = state.editing
       delete editing[rowId]
       return {
+        editingErrors: {
+          diskInvalidName: false,
+        },
         creating: false,
         editing,
       }

@@ -1,5 +1,11 @@
 /* eslint-env jest */
-import { isHostNameValid, isVmNameValid, isNicNameValid, isNicNameUnique } from './validation'
+import {
+  isHostNameValid,
+  isVmNameValid,
+  isNicNameValid,
+  isNicNameUnique,
+  isDiskNameValid,
+} from './validation'
 
 describe('check host names', function () {
   it('valid host names', function () {
@@ -8,7 +14,7 @@ describe('check host names', function () {
     expect(isHostNameValid('abcd-1')).toEqual(true)
     expect(isHostNameValid('abc_.d-1')).toEqual(true)
     expect(isHostNameValid('AC.DC')).toEqual(true)
-    expect(isHostNameValid('veryveryveryveryveryveryveryveryveryveryveryveryveryveryverylongname')).toEqual(true)
+    expect(isHostNameValid('a'.repeat(255))).toEqual(true) // 255 characters
   })
 
   it('invalid host names', function () {
@@ -16,7 +22,29 @@ describe('check host names', function () {
     expect(isHostNameValid('!A_b')).toEqual(false)
     expect(isHostNameValid('#-abc')).toEqual(false)
     expect(isHostNameValid('Кирилиця')).toEqual(false)
-    expect(isHostNameValid('veryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryveryverylongname')).toEqual(false)
+    expect(isHostNameValid('a'.repeat(255) + '1')).toEqual(false) // 256 characters
+  })
+})
+
+describe('check disk names', function () {
+  it('valid disk names', function () {
+    expect(isDiskNameValid('a'.repeat(255))).toEqual(true)
+    expect(isDiskNameValid('a')).toEqual(true)
+    expect(isDiskNameValid('a1')).toEqual(true)
+    expect(isDiskNameValid('abcd-1')).toEqual(true)
+    expect(isDiskNameValid('..0_0..')).toEqual(true)
+    expect(isDiskNameValid('A_b')).toEqual(true)
+    expect(isDiskNameValid('AC.DC')).toEqual(true)
+    expect(isDiskNameValid('-abc')).toEqual(true)
+    expect(isDiskNameValid('Кирилиця')).toEqual(true)
+  })
+
+  it('invalid disk names', function () {
+    expect(isDiskNameValid('')).toEqual(false)
+    expect(isDiskNameValid('a b')).toEqual(false)
+    expect(isDiskNameValid('a!@$b298')).toEqual(false)
+    expect(isDiskNameValid('a_name()')).toEqual(false)
+    expect(isDiskNameValid('a'.repeat(255) + '1')).toEqual(false) // 256 characters
   })
 })
 
@@ -29,13 +57,14 @@ describe('check VM names', function () {
     expect(isVmNameValid('--Foo--')).toEqual(true)
     expect(isVmNameValid('__baR__')).toEqual(true)
     expect(isVmNameValid('Кирилиця')).toEqual(true)
+    expect(isVmNameValid('a'.repeat(64))).toEqual(true) // 64 characters
   })
 
   it('invalid VM names', function () {
     expect(isVmNameValid('A+b')).toEqual(false)
     expect(isVmNameValid('AC/DC')).toEqual(false)
     expect(isVmNameValid('  abc  ')).toEqual(false)
-    expect(isVmNameValid('veryveryveryveryveryveryveryveryveryveryveryveryveryveryverylongname')).toEqual(false)
+    expect(isVmNameValid('a'.repeat(64) + '1')).toEqual(false) // 65 characters
   })
 })
 
@@ -46,6 +75,7 @@ describe('check NIC names', function () {
     expect(isNicNameValid('A_c')).toEqual(true)
     expect(isNicNameValid('c1-b')).toEqual(true)
     expect(isNicNameValid('A10-_.b')).toEqual(true)
+    expect(isNicNameValid('a'.repeat(50))).toEqual(true) // 50 characters
   })
   it('invalid NIC names ', function () {
     expect(isNicNameValid('SomeBadName?')).toEqual(false)
@@ -53,6 +83,7 @@ describe('check NIC names', function () {
     expect(isNicNameValid('')).toEqual(false)
     expect(isNicNameValid('N@me$)')).toEqual(false)
     expect(isNicNameValid('A1 b1')).toEqual(false)
+    expect(isNicNameValid('a'.repeat(50) + '1')).toEqual(false) // 51 characters
   })
 })
 describe('check NIC name uniqueness', function () {
