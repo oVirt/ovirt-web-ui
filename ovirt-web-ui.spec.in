@@ -17,7 +17,7 @@ Source0:        https://github.com/oVirt/ovirt-web-ui/archive/%{source_basename}
 BuildArch: noarch
 
 # nodejs-modules embeds yarn and requires nodejs
-BuildRequires: ovirt-engine-nodejs-modules >= 2.0.36-1
+BuildRequires: ovirt-engine-nodejs-modules >= 2.0.40-1
 
 %description
 This package provides the VM Portal for %{product}.
@@ -48,7 +48,22 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
-* Wed Dec 9 2020 Sharon Gratch <sgratchk@redhat.com> - 1.6.6-1
+* Wed Feb 10 2021 Sharon Gratch <sgratch@redhat.com> - 1.6.7-1
+ - create VM Wizard - display a validation text message next to the VM Name and Cloud-init/Sysprep's host name fields on basic settings step
+ - create VM Wizard - add a validation to disk name field on the storage step
+ - create VM Wizard - force template disk's storage domain selection and change default disk type for Template and ISO provisioned VMs
+ - create VM Wizard - validate the disk's storage domain for the current user based on user permissions
+ - create VM Wizard - fix the create VM from template's bootable disk flag option
+ - create VM Wizard - select The correct "Other OS" option in OS field of basic settings step, based on cluster's cpu architecture
+ - create VM Wizard - fix the basic settings step behaviour when only one cluster exists and no hosts are assigned to the cluster
+ - create VM Wizard - remove disk size inconsistent tooltip in storage step
+ - create VM Wizard - fix eslint import errors
+ - fix an exception occurs when a VM is taken from a pool while a refresh is done with a filter
+ - fix an error occurs after changing a cluster for an existed VM via the details card component
+ - update dependencies of immer and datatables.net
+ - remove Fedora 30 from STDCI since it's EOL
+
+* Wed Dec 9 2020 Sharon Gratch <sgratch@redhat.com> - 1.6.6-1
  - create VM Wizard - handle buttons "Save", "Cancel" position to be fixed for avoiding movements when clicking on them repeatedly
  - create VM Wizard - auto focus on the 'VM Name' field on 'Basic Settings' step
  - create VM Wizard - display proper sysprep timezone default value
@@ -65,7 +80,7 @@ make install DESTDIR=%{buildroot}
  - add 'yarn intl:check-use' for automated translations script
  - update parsing of VM statistics (fetched with VM details)
 
-* Wed Oct 21 2020 Sharon Gratch <sgratchk@redhat.com> - 1.6.5-1
+* Wed Oct 21 2020 Sharon Gratch <sgratch@redhat.com> - 1.6.5-1
  - create VM Wizard - support tab through fields in Storage and Networking steps
  - create VM Wizard - VM time zone format is now compatible with VM OS and also displayed on the review step
  - create VM Wizard - prevent the unsaved data confirmation dialog from being displayed in last step after VM creation
@@ -91,7 +106,7 @@ make install DESTDIR=%{buildroot}
  - refactor intl initialization and remove react-intl package
  - update Zanata tools to use the maven plugin
 
-* Wed Aug 19 2020 Sharon Gratch <sgratchk@redhat.com> - 1.6.4-1
+* Wed Aug 19 2020 Sharon Gratch <sgratch@redhat.com> - 1.6.4-1
  - create VM Wizard - prevent the dialog from being closed without a confirmation
  - create VM Wizard - add a tooltip message to Disk size field on edit mode
  - create VM Wizard - allow valid only calls to onUpdate functions
@@ -107,7 +122,7 @@ make install DESTDIR=%{buildroot}
  - update dependencies of jquery and lodash
  - translations update 2020-July-02
 
-* Mon Jul 6 2020 Sharon Gratch <sgratchk@redhat.com> - 1.6.3-1
+* Mon Jul 6 2020 Sharon Gratch <sgratch@redhat.com> - 1.6.3-1
  - create VM Wizard - fixed a bug so that nics and disks data resetting happens only when it is supposed to
  - create VM Wizard - enable resetting of basic settings to baseline defaults when changing the provision source
  - create VM Wizard - add a tooltip to the "T" badge for Templates disks and nics
@@ -123,7 +138,7 @@ make install DESTDIR=%{buildroot}
  - refactor Makefile to prevent unexpected symlinks
  - translations update
 
-* Tue May 12 2020 Sharon Gratch <sgratchk@redhat.com> - 1.6.2-1
+* Tue May 12 2020 Sharon Gratch <sgratch@redhat.com> - 1.6.2-1
  - fix a bug in which VM Portal fails to initialize if the environment contains an Export storage domain
  - fix a bug in which opening a VM console of type SPICE or VNC is always failing
  - fix VMs filter results to include all VMs with entered string exists anywhere inside the Vm name and not just the prefix
@@ -132,7 +147,7 @@ make install DESTDIR=%{buildroot}
  - yarn dependencies update
  - translations update
 
-* Mon Apr 6 2020 Sharon Gratch <sgratchk@redhat.com> - 1.6.1-1
+* Mon Apr 6 2020 Sharon Gratch <sgratch@redhat.com> - 1.6.1-1
  - fixed saving NIC with empty VNIC Profile
  - make the vm poratl more responsive for browser resizing, set minimum card widths and fixed alignments.
  - add kebob actions menu and changed Shutdown button type to default in VM's dashboard
