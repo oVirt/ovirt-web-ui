@@ -327,15 +327,15 @@ function getUserInfo (protocol, port) {
    * be disabled and hidden.
    * @type {String}
    */
-  var username = readlineSync.question(`oVirt user (${DEFAULT_USER}): `, {
+  var username = process.env.ENGINE_USER || readlineSync.question(`oVirt user (${DEFAULT_USER}): `, {
     defaultInput: DEFAULT_USER
   });
 
-  var password = readlineSync.question('oVirt password: ', {
+  var password = process.env.ENGINE_PASSWORD || readlineSync.question('oVirt password: ', {
     noEchoBack: true
   });
 
-  var domain = readlineSync.question(`oVirt domain (${DEFAULT_DOMAIN}): `, {
+  var domain = process.env.ENGINE_DOMAIN || readlineSync.question(`oVirt domain (${DEFAULT_DOMAIN}): `, {
     defaultInput: DEFAULT_DOMAIN
   });
 

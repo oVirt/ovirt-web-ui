@@ -56,8 +56,15 @@ to accomplish this. To start the server:
 
     ENGINE_URL=https://my.ovirt.instance/ovirt-engine/ yarn start
 
-When asked, provide a valid user name (in the form of `user@domain`) and password so
+When asked, provide a valid user name (in the form of `user@profile`) and password so
 the application can start in the context of a logged in user.
+
+#### Credentials
+User name and password can also be provided via shell variables:
+
+    ENGINE_USER=user@profile
+    ENGINE_PASSWORD=password
+    ENGINE_DOMAIN=domain
 
 #### Auto-Open browser
 When the dev server is started, it will attempt to open a new browser window/tab on
