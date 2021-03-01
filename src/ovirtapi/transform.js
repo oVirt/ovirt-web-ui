@@ -986,6 +986,7 @@ export {
   Icon,
   VmConsoles,
   VmSessions,
+  VmStatistics,
   CloudInit,
   Permissions,
   Event,
