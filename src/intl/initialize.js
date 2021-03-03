@@ -27,7 +27,7 @@ export function initIntl (forceLocale: ?string): string {
 }
 
 function discoverUserLocale (): string {
-  return getLocaleFromUrl() || loadLocaleFromLocalStorage() || getBrowserLocale() || DEFAULT_LOCALE
+  return loadLocaleFromLocalStorage() || getLocaleFromUrl() || getBrowserLocale() || DEFAULT_LOCALE
 }
 
 function loadLocaleFromLocalStorage (): ?string {
