@@ -969,7 +969,14 @@ const Event = {
 
 const RemoteUserOptions = {
   toInternal: (options: Array<UserOptionType<string> & {name: string}> = []): RemoteUserOptionsType => {
-    const { locale } = Object.fromEntries(options.map(option => RemoteUserOption.toInternal(option)))
+    const vmPortalOptions: Array<[string, UserOptionType<any>]> = options
+      .map(option => RemoteUserOption.toInternal(option))
+      // non-vmPortal props were reduced to undefined
+      // filter them out
+      .filter(Boolean)
+
+    // pick only options supported by this version of the UI
+    const { locale } = Object.fromEntries(vmPortalOptions)
 
     return {
       locale,
@@ -977,10 +984,16 @@ const RemoteUserOptions = {
   },
 }
 
+const VM_PORTAL_PREFIX = 'vmPortal.'
+
 const RemoteUserOption = {
-  toInternal: ({ name, content, id }: UserOptionType<string> & {name: string} = {}): [string, UserOptionType<any>] => {
+  canTransformToInternal: (name: string): boolean => !!name && name.startsWith(VM_PORTAL_PREFIX),
+  toInternal: ({ name, content, id }: UserOptionType<string> & {name: string} = {}): ?[string, UserOptionType<any>] => {
+    if (!RemoteUserOption.canTransformToInternal(name)) {
+      return undefined
+    }
     return [
-      name,
+      name.replace(VM_PORTAL_PREFIX, ''),
       {
         id,
         content: JSON.parse(content),
@@ -988,7 +1001,7 @@ const RemoteUserOption = {
   },
   toApi: (name: string, option: UserOptionType<Object>): UserOptionType<string> & {name: string} => {
     return ({
-      name,
+      name: `${VM_PORTAL_PREFIX}${name}`,
       // double encoding - value is transferred as a string
       content: JSON.stringify(option.content),
     })

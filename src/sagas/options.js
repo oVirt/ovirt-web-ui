@@ -9,6 +9,7 @@ import { callExternalAction } from './utils'
 import * as C from '_/constants'
 
 import type { SaveGlobalOptionsActionType } from '_/actions/types'
+import type { UserOptionType } from '_/ovirtapi/types'
 
 /**
  * Internal type to formalize result returned from
@@ -114,7 +115,22 @@ function* saveRemoteOption ([ name, value ]: any): any | ResultType {
     true,
   ))
 
-  return toResult({ ...result, change: name })
+  if (result.error) {
+    return toResult({ ...result, change: name })
+  }
+
+  const parsedResult : ?[string, UserOptionType<any>] = Transforms.RemoteUserOption.toInternal(result)
+  if (!parsedResult) {
+    console.error('Failed to parse the response', result)
+    return toResult({ ...result, error: true, change: name })
+  }
+
+  const [parsedName, parsedValue] = parsedResult
+  return toResult({
+    ...result,
+    name: parsedName,
+    value: parsedValue,
+    change: name })
 }
 
 /**
@@ -140,7 +156,7 @@ function* saveGlobalOptions ({ payload: { sshKey, showNotifications, notificatio
   })
 
   if (!locale.error && locale.change && !locale.sameAsCurrent) {
-    const [name, value] = Transforms.RemoteUserOption.toInternal(locale.data)
+    const { name, value } = locale.data
     yield put(A.setOption({ key: [ 'remoteOptions', name ], value }))
   }
 
