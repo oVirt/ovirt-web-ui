@@ -9,7 +9,9 @@ import { callExternalAction } from './utils'
 import * as C from '_/constants'
 
 import type { SaveGlobalOptionsActionType } from '_/actions/types'
-import type { UserOptionType } from '_/ovirtapi/types'
+import type { UserOptionType, RemoteUserOptionsType } from '_/ovirtapi/types'
+import { DEFAULT_LOCALE, locale as inferredLocale } from '_/intl'
+import { generateUnique } from '_/helpers'
 
 /**
  * Internal type to formalize result returned from
@@ -81,7 +83,19 @@ function* fetchUserOptions (action: Object): any {
     return
   }
 
-  yield put(A.loadUserOptions(Transforms.RemoteUserOptions.toInternal(result)))
+  const remoteOptions: RemoteUserOptionsType = Transforms.RemoteUserOptions.toInternal(result)
+
+  yield put(A.loadUserOptions(remoteOptions))
+
+  if (!remoteOptions.locale) {
+    yield call(exportInferredLocale)
+  }
+}
+
+function* exportInferredLocale (): any {
+  if (inferredLocale !== DEFAULT_LOCALE) {
+    yield put(A.saveGlobalOptions({ values: { language: inferredLocale } }, { transactionId: generateUnique('exportInferredLocale_') }))
+  }
 }
 
 /**
@@ -103,7 +117,8 @@ function* saveRemoteOption ([ name, value ]: any): any | ResultType {
     options.getIn(['remoteOptions', name, 'id']),
   ])
 
-  if (value === currentValue) {
+  // missing option ID indicates that the option does not exist on the server
+  if (value === currentValue && optionId) {
     return toResult({ change: name, sameAsCurrent: true })
   }
 
