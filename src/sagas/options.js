@@ -1,6 +1,7 @@
 // @flow
 
 import Api, { Transforms } from '_/ovirtapi'
+import { delay } from 'redux-saga'
 import { all, put, select, takeLatest, call } from 'redux-saga/effects'
 
 import * as A from '_/actions'
@@ -159,6 +160,7 @@ function withLoadingUserOptions (delegateGenerator: (any) => Generator<any, any,
     try {
       yield call(delegateGenerator, action)
     } finally {
+      yield delay(1000)
       yield put(A.loadingUserOptionsFinished())
     }
   }
