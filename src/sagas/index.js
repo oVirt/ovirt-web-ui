@@ -44,6 +44,7 @@ import {
   removeActiveRequest,
   getVmCdRom,
   setVmsFilters,
+  setVmConsoles,
 } from '_/actions'
 
 import {
@@ -87,6 +88,9 @@ import {
   SELECT_POOL_DETAIL,
   SELECT_VM_DETAIL,
   NAVIGATE_TO_VM_DETAILS,
+  FETCH_CONSOLES,
+  NO_DEFAULT_CONSOLE,
+  EMPTY_CONSOLES_LIST,
 } from '_/constants'
 
 import {
@@ -109,9 +113,7 @@ const VM_FETCH_ADDITIONAL_DEEP = [
   'statistics',
 ]
 
-const VM_FETCH_ADDITIONAL_SHALLOW = [
-  'graphics_consoles',
-]
+const VM_FETCH_ADDITIONAL_SHALLOW = []
 
 export const EVERYONE_GROUP_ID = 'eee00000-0000-0000-0000-123456789eee'
 
@@ -181,6 +183,28 @@ export function* fetchByPage () {
     poolsPage: poolsExpectMorePages ? poolsPage + 1 : undefined,
     poolsExpectMorePages: pools.length >= count,
   }))
+}
+
+function* fetchConsoles ({ payload: { vm } }) {
+  const vmId = vm.get('id')
+  const apiConsoles = yield callExternalAction('consoles', Api.consoles, { payload: { vmId } })
+
+  // headless VM (no graphics_consoles defined) - API response is `{}`
+  if (Object.values(apiConsoles).length === 0) {
+    yield put(setVmConsoles({ vmId, consolesList: [], selectedConsole: EMPTY_CONSOLES_LIST }))
+  }
+
+  if (apiConsoles && apiConsoles.graphics_console) {
+    const defaultConsoleProtocol = yield select(state => state.config.get('defaultConsole'))
+    const consoles = Transforms.VmConsoles.toInternal({ consoles: apiConsoles })
+    // select the console to use based on availability and app/user configs
+    const selectedConsole =
+      consoles.length === 0 ? EMPTY_CONSOLES_LIST
+        : consoles.length === 1 ? consoles[0]
+          : consoles.find(c => c.protocol === defaultConsoleProtocol) || NO_DEFAULT_CONSOLE
+
+    yield put(setVmConsoles({ vmId, consolesList: consoles, selectedConsole }))
+  }
 }
 
 export function* fetchVms ({ payload: { count, page, shallowFetch = true } }) {
@@ -570,6 +594,7 @@ export function* rootSaga () {
     takeEvery(OPEN_CONSOLE_MODAL, openConsoleModal),
     takeEvery(DOWNLOAD_CONSOLE_VM, downloadVmConsole),
     takeEvery(GET_RDP_VM, getRDPVm),
+    takeEvery(FETCH_CONSOLES, fetchConsoles),
 
     takeEvery(SAVE_FILTERS, saveFilters),
 

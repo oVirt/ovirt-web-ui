@@ -39,6 +39,7 @@ import {
   UPDATE_VM_SNAPSHOT,
   UPDATE_VMS,
   VM_ACTION_IN_PROGRESS,
+  SET_VM_CONSOLES,
 } from '_/constants'
 
 export function login ({ username, domain, token, userId }) {
@@ -57,7 +58,6 @@ export function login ({ username, domain, token, userId }) {
  * I.e. the Refresh button is clicked or scheduler event occurred (polling)
  */
 export function refresh ({
-  shallowFetch = false,
   pageRouterRefresh = false,
   schedulerRefresh = false,
   manualRefresh = false,
@@ -65,7 +65,6 @@ export function refresh ({
   return {
     type: REFRESH_DATA,
     payload: {
-      shallowFetch,
       pageRouterRefresh,
       schedulerRefresh,
       manualRefresh,
@@ -303,6 +302,17 @@ export function updateIcons ({ icons }) {
     type: UPDATE_ICONS,
     payload: {
       icons,
+    },
+  }
+}
+
+export function setVmConsoles ({ vmId, consolesList, selectedConsole }) {
+  return {
+    type: SET_VM_CONSOLES,
+    payload: {
+      vmId,
+      consoles: consolesList,
+      selectedConsole,
     },
   }
 }

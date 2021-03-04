@@ -25,6 +25,10 @@ import {
   STOP_SCHEDULER_FIXED_DELAY,
   STOP_SCHEDULER_FOR_RESUMING_NOTIFICATIONS,
   UPDATE_PAGING_DATA,
+  SET_GLOBAL_DEFAULT_CONSOLE,
+  SET_GLOBAL_DEFAULT_VNC_MODE
+
+  ,
 } from '_/constants'
 
 export * from './error'
@@ -107,6 +111,23 @@ export function setWebsocket (websocket) {
     type: SET_WEBSOCKET,
     payload: {
       websocket,
+    },
+  }
+}
+
+export function setDefaultConsole (defaultConsole) {
+  return {
+    type: SET_GLOBAL_DEFAULT_CONSOLE,
+    payload: {
+      defaultConsole,
+    },
+  }
+}
+export function setDefaultVncMode (defaultVncMode) {
+  return {
+    type: SET_GLOBAL_DEFAULT_VNC_MODE,
+    payload: {
+      defaultVncMode,
     },
   }
 }

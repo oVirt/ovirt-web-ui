@@ -23,6 +23,7 @@ import {
   UPDATE_VM_DISK,
   UPDATE_VMS,
   VM_ACTION_IN_PROGRESS,
+  SET_VM_CONSOLES,
 } from '_/constants'
 import { actionReducer, removeMissingItems } from './utils'
 import { sortFields } from '_/utils'
@@ -152,6 +153,16 @@ const vms = actionReducer(initialState, {
       return state.setIn(['vms', vmId, 'nics'], Immutable.fromJS(nics)) // deep immutable
     } else { // fail, if VM not found
       console.error(`vms.setVmNics() reducer: vmId ${vmId} not found`)
+    }
+    return state
+  },
+
+  [SET_VM_CONSOLES] (state, { payload: { vmId, consoles, selectedConsole } }) {
+    if (state.getIn(['vms', vmId])) {
+      state = state.setIn(['vms', vmId, 'defaultConsole'], selectedConsole)
+      return state.setIn(['vms', vmId, 'consoles'], Immutable.fromJS(consoles)) // deep immutable
+    } else { // fail, if VM not found
+      console.error(`vms.setVmConsoles() reducer: vmId ${vmId} not found`)
     }
     return state
   },

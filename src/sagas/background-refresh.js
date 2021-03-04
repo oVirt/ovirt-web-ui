@@ -77,7 +77,7 @@ function* getIdsByType (type) {
   return ids
 }
 
-function* refreshListPage ({ shallowFetch }) {
+function* refreshListPage () {
   const [ vmsPage, poolsPage ] = yield select(st => [ st.vms.get('vmsPage'), st.vms.get('poolsPage') ])
 
   // Special case for the very first `refreshListPage` of the App .. use fetchByPage()!
@@ -92,7 +92,6 @@ function* refreshListPage ({ shallowFetch }) {
       if (vmsPage > 0) {
         const fetchedVmIds = yield fetchVms(Actions.getVmsByCount({
           count: vmsPage * AppConfiguration.pageLimit,
-          shallowFetch,
         }))
 
         const vmsIds = yield getIdsByType('vms')
@@ -100,7 +99,7 @@ function* refreshListPage ({ shallowFetch }) {
           (yield all(
             vmsIds
               .filter(vmId => !fetchedVmIds.includes(vmId))
-              .map(vmId => call(fetchSingleVm, Actions.getSingleVm({ vmId, shallowFetch })))
+              .map(vmId => call(fetchSingleVm, Actions.getSingleVm({ vmId, shallowFetch: true })))
           ))
             .reduce((vmIds, vm) => { if (vm) vmIds.push(vm.id); return vmIds }, [])
 
@@ -247,8 +246,6 @@ function* schedulerWithFixedDelay ({
       manualRefresh: manualRefresh && firstRun,
       targetPage,
       schedulerRefresh: true,
-      // false for first refresh triggered manually
-      shallowFetch: firstRun ? !manualRefresh : true,
     }))
     firstRun = false
 

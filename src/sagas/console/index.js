@@ -15,6 +15,7 @@ import {
   setLogonConsoleModalState,
   closeConsoleModal,
   setNewConsoleModal,
+  addUserMessage,
 } from '_/actions'
 
 import { callExternalAction } from '../utils'
@@ -26,6 +27,7 @@ import RDPBuilder from './rdpBuilder'
 import { push } from 'connected-react-router'
 import { setActiveConsole } from '../../actions'
 import { INIT_CONSOLE, DOWNLOAD_CONSOLE } from '_/constants'
+import { msg } from '_/intl'
 
 // ----- Connection files
 /**
@@ -37,7 +39,18 @@ export function* downloadVmConsole (action) {
   if (hasGuestAgent && !skipSSO) {
     let result = yield callExternalAction('vmLogon', Api.vmLogon, { payload: { vmId } }, true)
     if (!result || result.status !== 'complete') {
+      const {
+        error: {
+          responseJSON: {
+            fault: {
+              detail:
+                message = '',
+            } = {},
+          } = {},
+        } = {},
+      } = result
       yield put(setLogonConsoleModalState({ modalId }))
+      yield put(addUserMessage({ message: msg.cantOpenConsole({ message }), type: 'error' }))
       return
     }
   }
