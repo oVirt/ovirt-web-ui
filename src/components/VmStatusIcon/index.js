@@ -4,26 +4,27 @@ import PropTypes from 'prop-types'
 import { Icon } from 'patternfly-react'
 import style from './style.css'
 import { Tooltip } from '_/components/tooltips'
+import { msg } from '_/intl'
 
 /* eslint-disable key-spacing, no-multi-spaces */
 const VM_STATUS_TO_ICON = {
-  'up'                : { type: 'pf', name: 'on-running',         tooltip: 'The VM is running.', className: style['green'] },
-  'powering_up'       : { type: 'pf', name: 'in-progress',        tooltip: 'The VM is powering up.' },
-  'down'              : { type: 'pf', name: 'off',                tooltip: 'The VM is down.' },
-  'paused'            : { type: 'pf', name: 'paused',             tooltip: 'The VM is paused.' },
-  'suspended'         : { type: 'pf', name: 'asleep',             tooltip: 'The VM is suspended.' },
-  'powering_down'     : { type: 'pf', name: 'in-progress',        tooltip: 'The VM is going down.' },
-  'not_responding'    : { type: 'pf', name: 'warning-triangle-o', tooltip: 'The VM is not responding.' },
-  'unknown'           : { type: 'pf', name: 'unknown',            tooltip: 'The VM status is unknown.' },
-  'unassigned'        : { type: 'pf', name: 'unknown',            tooltip: 'The VM status is unassigned.' },
-  'migrating'         : { type: 'pf', name: 'migration',          tooltip: 'The VM is being migrated.' },
-  'wait_for_launch'   : { type: 'pf', name: 'pending',            tooltip: 'The VM is scheduled for launch.' },
-  'reboot_in_progress': { type: 'pf', name: 'in-progress',        tooltip: 'The VM is being rebooted.' },
-  'saving_state'      : { type: 'pf', name: 'pending',            tooltip: 'The VM is saving its state.' },
-  'restoring_state'   : { type: 'pf', name: 'in-progress',        tooltip: 'The VM is restoring its state.' },
-  'image_locked'      : { type: 'pf', name: 'locked',             tooltip: 'The VM\'s image is locked' },
+  'up'                : { type: 'pf', name: 'on-running',         tooltip: msg.vmStatusIconTooltipUp(), className: style['green'] },
+  'powering_up'       : { type: 'pf', name: 'in-progress',        tooltip: msg.vmStatusIconTooltipPoweringUp() },
+  'down'              : { type: 'pf', name: 'off',                tooltip: msg.vmStatusIconTooltipDown() },
+  'paused'            : { type: 'pf', name: 'paused',             tooltip: msg.vmStatusIconTooltipPaused },
+  'suspended'         : { type: 'pf', name: 'asleep',             tooltip: msg.vmStatusIconTooltipSuspended() },
+  'powering_down'     : { type: 'pf', name: 'in-progress',        tooltip: msg.vmStatusIconTooltipPoweringDown() },
+  'not_responding'    : { type: 'pf', name: 'warning-triangle-o', tooltip: msg.vmStatusIconTooltipNotResponding() },
+  'unknown'           : { type: 'pf', name: 'unknown',            tooltip: msg.vmStatusIconTooltipUnknown() },
+  'unassigned'        : { type: 'pf', name: 'unknown',            tooltip: msg.vmStatusIconTooltipUnassigned() },
+  'migrating'         : { type: 'pf', name: 'migration',          tooltip: msg.vmStatusIconTooltipMigrating() },
+  'wait_for_launch'   : { type: 'pf', name: 'pending',            tooltip: msg.vmStatusIconTooltipWaitForLaunch() },
+  'reboot_in_progress': { type: 'pf', name: 'in-progress',        tooltip: msg.vmStatusIconTooltipRebootInProgress() },
+  'saving_state'      : { type: 'pf', name: 'pending',            tooltip: msg.vmStatusIconTooltipSavingState() },
+  'restoring_state'   : { type: 'pf', name: 'in-progress',        tooltip: msg.vmStatusIconTooltipRestoringState() },
+  'image_locked'      : { type: 'pf', name: 'locked',             tooltip: msg.vmStatusIconTooltipImageLocked() },
 
-  '__default__'       : { type: 'pf', name: 'zone',               tooltip: 'Unknown/unexpected VM state' },
+  '__default__'       : { type: 'pf', name: 'zone',               tooltip: msg.vmStatusIconTooltipDefault() },
 }
 /* eslint-enable key-spacing, no-multi-spaces */
 

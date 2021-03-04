@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Filter, FormControl } from 'patternfly-react'
-import { enumMsg } from '_/intl'
+import { enumMsg, msg } from '_/intl'
 import { saveVmsFilters } from '_/actions'
 import { localeCompare } from '_/helpers'
 
@@ -51,14 +51,14 @@ class VmFilters extends React.Component {
     const filterTypes = [
       {
         id: 'name',
-        title: 'Name',
-        placeholder: 'Filter by Name',
+        title: msg.name(),
+        placeholder: msg.vmFilterTypePlaceholderName(),
         filterType: 'text',
       },
       {
         id: 'status',
-        title: 'Status',
-        placeholder: 'Filter by Status',
+        title: msg.status(),
+        placeholder: msg.vmFilterTypePlaceholderStatus(),
         filterType: 'select',
         filterValues: statuses
           .map((status) => ({ title: enumMsg('VmStatus', status), id: status }))
@@ -66,8 +66,8 @@ class VmFilters extends React.Component {
       },
       {
         id: 'os',
-        title: 'Operating System',
-        placeholder: 'Filter by Operating System',
+        title: msg.operatingSystem(),
+        placeholder: msg.vmFilterTypePlaceholderOS(),
         filterType: 'select',
         filterValues: Array.from(this.props.operatingSystems
           .toList()
