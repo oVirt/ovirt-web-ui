@@ -300,13 +300,14 @@ const VM = {
 //
 //
 const VmStatistics = {
-  toInternal ({ statistics }: { statistics: Array<ApiVmStatisticType> }): VmStatisticsType {
+  toInternal ({ statistics = [] }: { statistics: Array<ApiVmStatisticType> } = {}): VmStatisticsType {
     const base: VmStatisticsType = {
       memory: {},
       cpu: {},
       network: {},
       elapsedUptime: {
-        datum: 0,
+        firstDatum: undefined,
+        datum: [ 0 ],
         unit: 'seconds',
         description: 'Elapsed VM runtime (default to 0)',
       },
@@ -315,22 +316,28 @@ const VmStatistics = {
 
     for (const stat: ApiVmStatisticType of statistics) {
       if (stat.name === 'elapsed.time') {
-        base.elapsedUptime.datum = stat.values.value[0].datum
+        base.elapsedUptime.datum = stat.values.value.map((val: any) => val.datum)
+        base.elapsedUptime.firstDatum = base.elapsedUptime.datum[0]
         base.elapsedUptime.description = stat.description
       }
 
       if (stat.kind !== 'gauge') continue
 
-      // no values -> undefined, 1 value -> value.datum, >1 values -> [...values.datum]
-      // ?disks.usage -> {detail...}
-      let datum: any =
-        stat.values &&
-        stat.values.value &&
-        (stat.name === 'disks.usage'
-          ? stat.values.value[0] && stat.values.value[0].detail
-          : stat.values.value.length === 1
-            ? stat.values.value[0].datum
-            : stat.values.value.map(value => value.datum))
+      // no values -> undefined, >0 value -> [...values.datum]
+      let datum: any
+      if (stat.values && stat.values.value) {
+        if (stat.type === 'decimal' || stat.type === 'integer') {
+          datum = Array.isArray(stat.values.value)
+            ? stat.values.value.map((val: any) => val.datum)
+            : [stat.values.value.datum]
+        }
+
+        if (stat.type === 'string') {
+          datum = Array.isArray(stat.values.value)
+            ? stat.values.value.map((val: any) => val.detail)
+            : [stat.values.value.detail]
+        }
+      }
 
       if (stat.name === 'disks.usage' && !!datum) {
         datum = JSON.parse(datum)
@@ -340,9 +347,16 @@ const VmStatistics = {
           return data
         })
       }
+
+      const firstDatum: any =
+        (datum && datum.length > 0)
+          ? datum[0]
+          : undefined
+
       const nameParts = /^(memory|cpu|network|disks)\.(.*)?$/.exec(stat.name)
       if (nameParts) {
         base[nameParts[1]][nameParts[2]] = {
+          firstDatum,
           datum,
           unit: stat.unit,
           description: stat.description,
@@ -973,6 +987,7 @@ export {
   Icon,
   VmConsoles,
   VmSessions,
+  VmStatistics,
   CloudInit,
   Permissions,
   Event,

@@ -31,7 +31,7 @@ import NoLiveData from './NoLiveData'
 const NetworkingCharts = ({ netStats, isRunning, id }) => {
   const haveNetworkStats = !!netStats['current.total']
 
-  const used = (netStats['current.total'] && netStats['current.total'].datum) || 0
+  const used = (netStats['current.total'] && netStats['current.total'].firstDatum) || 0
   const available = 100 - used
 
   // NOTE: Network history comes sorted from newest to oldest

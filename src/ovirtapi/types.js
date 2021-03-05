@@ -16,15 +16,13 @@ export type ApiVmStatisticType = {
   type: ApiStatisticTypeType,
   unit: ApiStatisticUnitType,
   values: {
-    value: Array<{
-      datum: number,
-      detail?: string
-    }>
+    value: Array<{ datum: number} | { detail: string }>
   }
 }
 
 export type StatisticValueType = {
-  datum: number | Array<number>,
+  firstDatum: number | string | Object | void,
+  datum: Array<number | string | Object>,
   unit: ApiStatisticUnitType,
   description: string
 }
