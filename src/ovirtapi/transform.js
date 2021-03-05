@@ -299,7 +299,7 @@ const VM = {
 //
 //
 const VmStatistics = {
-  toInternal ({ statistics }: { statistics: Array<ApiVmStatisticType> }): VmStatisticsType {
+  toInternal ({ statistics = [] }: { statistics: Array<ApiVmStatisticType> } = {}): VmStatisticsType {
     const base: VmStatisticsType = {
       memory: {},
       cpu: {},
