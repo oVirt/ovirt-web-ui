@@ -1,9 +1,9 @@
 {
-  "BRAND_NAME": "oVirt",
-  "LEGAL_INFO": "Released under",
-  "LEGAL_INFO_LINK_TEXT": "Apache License 2.0",
+  "BRAND_NAME": "aboutDialogOvirtBRAND_NAME",
+  "LEGAL_INFO": "aboutDialogOvirtLEGAL_INFO",
+  "LEGAL_INFO_LINK_TEXT": "aboutDialogOvirtLEGAL_INFO_LINK_TEXT",
   "LEGAL_INFO_LINK_URL": "https://github.com/oVirt/ovirt-web-ui/blob/master/LICENSE",
   "DOCUMENTATION_LINK": "https://ovirt.org/documentation",
   "ISSUES_TRACKER_URL": "https://github.com/oVirt/ovirt-web-ui/issues",
-  "ISSUES_TRACKER_TEXT": "Github Issue Tracker"
+  "ISSUES_TRACKER_TEXT": "aboutDialogOvirtISSUES_TRACKER_TEXT"
 }

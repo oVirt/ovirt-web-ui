@@ -1,6 +1,7 @@
 // @flow
 
 import AppConfiguration from './config'
+import { msg } from '_/intl'
 
 let loaded: ?Promise<void>
 
@@ -25,7 +26,19 @@ export function loadOnce (): Promise<void> {
     loaded = fetch(resourcesUrls.fixedStrings, { credentials: 'include' })
       .then(body => body.json())
       .then(json => {
-        fixedStrings = Object.freeze(json)
+        console.log('___json before', json)
+        const translatedStrings = {
+          ...json,
+          BRAND_NAME: msg[json.BRAND_NAME](),
+          LEGAL_INFO_LINK_TEXT: msg[json.LEGAL_INFO_LINK_TEXT](),
+          ISSUES_TRACKER_TEXT: msg[json.ISSUES_TRACKER_TEXT](),
+        }
+
+        if (json.LEGAL_INFO) {
+          translatedStrings.LEGAL_INFO = msg[json.LEGAL_INFO]()
+        }
+
+        fixedStrings = Object.freeze(translatedStrings)
       })
       .catch(error => console.error(`'${resourcesUrls.fixedStrings}' cannot be loaded.`, error))
   }
