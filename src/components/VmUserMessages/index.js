@@ -52,7 +52,7 @@ const VmUserMessages = ({ userMessages, onClearMessages, onDismissMessage, onClo
 
   return (
     <NotificationDrawer hide={!show} expanded={expanded}>
-      <NotificationDrawer.Title onCloseClick={onClose} onExpandClick={() => setExpanded(!expanded)} />
+      <NotificationDrawer.Title title={msg.notifications()} onCloseClick={onClose} onExpandClick={() => setExpanded(!expanded)} />
       <NotificationDrawer.PanelBody className={style['panel-body']}>
         <div className={style['notifications-list']}>
           {messagesList}
