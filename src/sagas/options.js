@@ -11,7 +11,7 @@ import * as C from '_/constants'
 
 import type { SaveGlobalOptionsActionType } from '_/actions/types'
 import type { UserOptionType, RemoteUserOptionsType } from '_/ovirtapi/types'
-import { DEFAULT_LOCALE, locale as inferredLocale } from '_/intl'
+import { localeFromUrl, locale as inferredLocale } from '_/intl'
 import { generateUnique } from '_/helpers'
 
 /**
@@ -94,9 +94,7 @@ function* fetchUserOptions (action: Object): any {
 }
 
 function* exportInferredLocale (): any {
-  if (inferredLocale !== DEFAULT_LOCALE) {
-    yield put(A.saveGlobalOptions({ values: { language: inferredLocale } }, { transactionId: generateUnique('exportInferredLocale_') }))
-  }
+  yield put(A.saveGlobalOptions({ values: { language: localeFromUrl || inferredLocale } }, { transactionId: generateUnique('exportInferredLocale_') }))
 }
 
 /**
