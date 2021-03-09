@@ -975,8 +975,11 @@ const RemoteUserOptions = {
       // filter them out
       .filter(Boolean)
 
+    const fromEntries = {}
+    vmPortalOptions.forEach(([name, option]) => { fromEntries[name] = option })
+
     // pick only options supported by this version of the UI
-    const { locale } = Object.fromEntries(vmPortalOptions)
+    const { locale } = fromEntries
 
     return {
       locale,
