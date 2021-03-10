@@ -25,6 +25,9 @@ import type {
   ApiPermissionType, PermissionType,
   ApiEventType, EventType,
   ApiRoleType, RoleType,
+  ApiUserType, UserType,
+  UserOptionType,
+  RemoteUserOptionsType,
 } from './types'
 
 import { isWindows } from '_/helpers'
@@ -964,6 +967,63 @@ const Event = {
   toApi: undefined,
 }
 
+const RemoteUserOptions = {
+  toInternal: (options: Array<UserOptionType<string> & {name: string}> = []): RemoteUserOptionsType => {
+    const vmPortalOptions: Array<[string, UserOptionType<any>]> = options
+      .map(option => RemoteUserOption.toInternal(option))
+      // non-vmPortal props were reduced to undefined
+      // filter them out
+      .filter(Boolean)
+
+    const fromEntries = {}
+    vmPortalOptions.forEach(([name, option]) => { fromEntries[name] = option })
+
+    // pick only options supported by this version of the UI
+    const { locale } = fromEntries
+
+    return {
+      locale,
+    }
+  },
+}
+
+const VM_PORTAL_PREFIX = 'vmPortal.'
+
+const RemoteUserOption = {
+  canTransformToInternal: (name: string): boolean => !!name && name.startsWith(VM_PORTAL_PREFIX),
+  toInternal: ({ name, content, id }: UserOptionType<string> & {name: string} = {}): ?[string, UserOptionType<any>] => {
+    if (!RemoteUserOption.canTransformToInternal(name)) {
+      return undefined
+    }
+    return [
+      name.replace(VM_PORTAL_PREFIX, ''),
+      {
+        id,
+        content: JSON.parse(content),
+      }]
+  },
+  toApi: (name: string, option: UserOptionType<Object>): UserOptionType<string> & {name: string} => {
+    return ({
+      name: `${VM_PORTAL_PREFIX}${name}`,
+      // double encoding - value is transferred as a string
+      content: JSON.stringify(option.content),
+    })
+  },
+}
+
+const User = {
+  toInternal ({ user: { user_name: userName, last_name: lastName, email, principal } = {} }: { user: ApiUserType }): UserType {
+    return {
+      userName,
+      lastName,
+      email,
+      principal,
+    }
+  },
+
+  toApi: undefined,
+}
+
 //
 // Export each transforms individually so they can be consumed individually
 //
@@ -992,4 +1052,7 @@ export {
   Permissions,
   Event,
   Role,
+  User,
+  RemoteUserOptions,
+  RemoteUserOption,
 }

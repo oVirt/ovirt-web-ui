@@ -1,26 +1,13 @@
 // @flow
 
-import type { UserOptionsType, SshKeyType } from '_/ovirtapi/types'
+import type { RemoteUserOptionsType, SshKeyType } from '_/ovirtapi/types'
 import type { LoadUserOptionsActionType, SaveGlobalOptionsActionType } from '_/actions/types'
 
-import {
-  GET_CONSOLE_OPTIONS,
-  SAVE_CONSOLE_OPTIONS,
-  SET_CONSOLE_OPTIONS,
-  GET_SSH_KEY,
-  SAVE_GLOBAL_OPTIONS,
-  SAVE_SSH_KEY,
-  SET_SSH_KEY,
-  SET_OPTION,
-  LOAD_USER_OPTIONS,
-  LOAD_USER_OPTIONS_IN_PROGRESS,
-  LOAD_USER_OPTIONS_FINISHED,
-  PERSIST_OPTIONS,
-} from '_/constants'
+import * as C from '_/constants'
 
 export function setConsoleOptions ({ vmId, options }: Object): Object {
   return {
-    type: SET_CONSOLE_OPTIONS,
+    type: C.SET_CONSOLE_OPTIONS,
     payload: {
       vmId,
       options,
@@ -30,7 +17,7 @@ export function setConsoleOptions ({ vmId, options }: Object): Object {
 
 export function getConsoleOptions ({ vmId }: Object): Object {
   return {
-    type: GET_CONSOLE_OPTIONS,
+    type: C.GET_CONSOLE_OPTIONS,
     payload: {
       vmId,
     },
@@ -39,7 +26,7 @@ export function getConsoleOptions ({ vmId }: Object): Object {
 
 export function saveConsoleOptions ({ vmId, options }: Object): Object {
   return {
-    type: SAVE_CONSOLE_OPTIONS,
+    type: C.SAVE_CONSOLE_OPTIONS,
     payload: {
       vmId,
       options,
@@ -49,7 +36,7 @@ export function saveConsoleOptions ({ vmId, options }: Object): Object {
 
 export function getSSHKey ({ userId }: Object): Object {
   return {
-    type: GET_SSH_KEY,
+    type: C.GET_SSH_KEY,
     payload: {
       userId,
     },
@@ -58,7 +45,7 @@ export function getSSHKey ({ userId }: Object): Object {
 
 export function setSSHKey ({ key, id }: SshKeyType): Object {
   return {
-    type: SET_SSH_KEY,
+    type: C.SET_SSH_KEY,
     payload: {
       key,
       id,
@@ -68,7 +55,7 @@ export function setSSHKey ({ key, id }: SshKeyType): Object {
 
 export function setOption ({ key, value }: Object): Object {
   return {
-    type: SET_OPTION,
+    type: C.SET_OPTION,
     payload: {
       key,
       value,
@@ -76,9 +63,9 @@ export function setOption ({ key, value }: Object): Object {
   }
 }
 
-export function loadUserOptions (userOptions: UserOptionsType): LoadUserOptionsActionType {
+export function loadUserOptions (userOptions: RemoteUserOptionsType): LoadUserOptionsActionType {
   return {
-    type: LOAD_USER_OPTIONS,
+    type: C.LOAD_USER_OPTIONS,
     payload: {
       userOptions,
     },
@@ -87,19 +74,19 @@ export function loadUserOptions (userOptions: UserOptionsType): LoadUserOptionsA
 
 export function loadingUserOptionsInProgress (): Object {
   return {
-    type: LOAD_USER_OPTIONS_IN_PROGRESS,
+    type: C.LOAD_USER_OPTIONS_IN_PROGRESS,
   }
 }
 
 export function loadingUserOptionsFinished (): Object {
   return {
-    type: LOAD_USER_OPTIONS_FINISHED,
+    type: C.LOAD_USER_OPTIONS_FINISHED,
   }
 }
 
 export function saveGlobalOptions ({ values: { sshKey, language, showNotifications, notificationSnoozeDuration, updateRate } = {} }: Object, { transactionId }: Object): SaveGlobalOptionsActionType {
   return {
-    type: SAVE_GLOBAL_OPTIONS,
+    type: C.SAVE_GLOBAL_OPTIONS,
     payload: {
       sshKey,
       language,
@@ -115,7 +102,7 @@ export function saveGlobalOptions ({ values: { sshKey, language, showNotificatio
 
 export function saveSSHKey ({ key, userId, sshId }: Object): Object {
   return {
-    type: SAVE_SSH_KEY,
+    type: C.SAVE_SSH_KEY,
     payload: {
       key,
       userId,
@@ -124,11 +111,22 @@ export function saveSSHKey ({ key, userId, sshId }: Object): Object {
   }
 }
 
-export function persistUserOptions ({ options, userId }: Object): Object {
+export function persistUserOption ({ userId, name, content, optionId }: Object): Object {
   return {
-    type: PERSIST_OPTIONS,
+    type: C.PERSIST_OPTION,
     payload: {
-      options,
+      userId,
+      name,
+      content,
+      optionId,
+    },
+  }
+}
+
+export function fetchUserOptions ({ userId }: Object): Object {
+  return {
+    type: C.FETCH_OPTIONS,
+    payload: {
       userId,
     },
   }

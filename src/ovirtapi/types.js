@@ -150,6 +150,10 @@ export type SshKeyType = {
   key: string,
   id: string
 }
+export type UserOptionType<T> = {
+  id?: string,
+  content: T
+}
 
 export type ApiVmConsolesType = Object
 export type VmConsolesType = Object
@@ -160,15 +164,23 @@ export type VmSessionsType = Object
 export type ApiUserType = Object
 
 export type GlobalUserSettingsType = {|
-  // merging logic assumes thee is no nested object
   updateRate: number,
   language: string,
   showNotifications?: boolean,
   notificationSnoozeDuration?: number
 |}
 
+export type RemoteUserOptionsType = {|
+  locale: UserOptionType<string>,
+  updateRate?: UserOptionType<number>
+|}
+
 export type UserOptionsType = {|
-  global: GlobalUserSettingsType,
+  localOptions: {
+    showNotifications?: boolean,
+    notificationSnoozeDuration?: number
+  },
+  remoteOptions: RemoteUserOptionsType,
   ssh?: SshKeyType,
   lastTransactions: { global?: { transactionId: string } },
   consoleOptions: {[vmId: string]: { autoconnect?: boolean}},
@@ -179,8 +191,7 @@ export type UserType = {
   userName: string,
   lastName: string,
   email: string,
-  principal: string,
-  receivedOptions?: Object
+  principal: string
 }
 
 export type ApiPermissionType = {

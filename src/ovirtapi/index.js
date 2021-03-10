@@ -505,15 +505,21 @@ const OvirtApi = {
     } else {
       /**
        * Create new key.
-       * Expected result from POST: { status: 'complete'}
+       * Expected result from POST before 4.4.5 : { status: 'complete'}
+       * Expected result from 4.4.5 : { user: <> , content: <>, id: <>, href: <> }
        *
-       * Since POST method does not return the newly created key/key_id we need to
+       * Since legacy POST method does not return the newly created key/key_id we need to
        * fetch it imemdiately after (successful) creation.
        */
       return httpPost({
         url: `${AppConfiguration.applicationContext}/api/users/${userId}/sshpublickeys`,
         input,
-      }).then(() => OvirtApi.getSSHKey({ userId }))
+      }).then(({ content, id }) => {
+        if (content && id) {
+          return ({ content, id })
+        }
+        return OvirtApi.getSSHKey({ userId })
+      })
     }
   },
 
@@ -525,13 +531,31 @@ const OvirtApi = {
       .then(({ ssh_public_key: [firstKey = {}] = [] }) => firstKey)
   },
 
-  persistUserOptions ({ options, userId }: Object): Promise<Object> {
-    assertLogin({ methodName: 'persistUserOptions' })
-    const input = JSON.stringify(options)
-    return httpPut({
-      url: `${AppConfiguration.applicationContext}/api/users/${userId}`,
+  persistUserOption ({ name, content, optionId, userId }: Object): Promise<Object> {
+    assertLogin({ methodName: 'persistUserOption' })
+    const input = JSON.stringify(Transforms.RemoteUserOption.toApi(name, { content }))
+    console.log('optionId', optionId, 'input', input)
+    if (optionId) {
+      // delete existing property and create a new one with updated content
+      return httpDelete({
+        url: `${AppConfiguration.applicationContext}/api/users/${userId}/options/${optionId}`,
+        input: '',
+      }).then(() => httpPost({
+        url: `${AppConfiguration.applicationContext}/api/users/${userId}/options`,
+        input,
+      }))
+    }
+    return httpPost({
+      url: `${AppConfiguration.applicationContext}/api/users/${userId}/options`,
       input,
     })
+  },
+
+  fetchUserOptions ({ userId }: { userId: string }): Promise<Object> {
+    assertLogin({ methodName: 'fetchUserOptions' })
+    // Expected result from GET: { user_option : [ { user: <> , content: <>, id: <>, name: <> }]}
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/users/${userId}/options` })
+      .then(({ user_option: options = [] }) => options)
   },
 
   /**
