@@ -48,6 +48,14 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Thu Mar 11 2021 Sharon Gratch <sgratch@redhat.com> - 1.6.8-1
+ - create VM Wizard - ass support for creating VMs based on a High Performance optimized for template
+ - enhance graphic consoles data fetching time by fetching consoles info on demand instead of on refresh. This changes the way consoles are opened on dashboard
+ - prevent crash when viewing a suspending/shutting down VM's details card
+ - fixed few translated strings on VMs dashboard
+ - enhance user/account settings by adding support for locale changes and displaying email info
+ - a fix for reading new format of config val MaxNumOfVmCpus
+
 * Wed Feb 10 2021 Sharon Gratch <sgratch@redhat.com> - 1.6.7-1
  - create VM Wizard - display a validation text message next to the VM Name and Cloud-init/Sysprep's host name fields on basic settings step
  - create VM Wizard - add a validation to disk name field on the storage step
