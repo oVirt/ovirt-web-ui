@@ -9,10 +9,11 @@ var paths = require('./paths')
 var env = require('./env')
 var webpackConfigCommons = require('./webpack.config.commons')
 
-// This is the development configuration.
-// It is focused on developer experience and fast rebuilds.
-// The production configuration is different and lives in a separate file.
 module.exports = {
+  // This is the development configuration.
+  // It is focused on developer experience and fast rebuilds.
+  mode: 'development',
+
   // Integrate https://github.com/facebook/create-react-app/pull/924 here.
   // You may want 'eval' instead if you prefer to see the compiled output in DevTools.
   // See the discussion in https://github.com/facebookincubator/create-react-app/issues/343.
@@ -193,7 +194,8 @@ module.exports = {
     ],
   },
   plugins: [
-    new CopyWebpackPlugin([
+    new CopyWebpackPlugin({
+      patterns: [
       {
         from: 'src/ovirt-web-ui.config',
       },
@@ -201,8 +203,8 @@ module.exports = {
         from: paths.appBranding,
         to: 'branding',
         toType: 'dir'
-      }
-    ]),
+      }]
+    }),
 
     // Generates an `index.html` file with the <script> injected.
     new HtmlWebpackPlugin({

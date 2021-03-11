@@ -32,6 +32,7 @@ if (!publicPath.endsWith('/')) {
 // It compiles slowly and is focused on producing a fast and minimal bundle.
 // The development configuration is different and lives in a separate file.
 module.exports = {
+  mode: 'production',
   // Don't attempt to continue if there are any errors.
   bail: true,
   // We generate sourcemaps in production. This is slow but gives good results.
@@ -184,13 +185,17 @@ module.exports = {
     ],
   },
   plugins: [
-    new CopyWebpackPlugin([{
-      from: 'src/ovirt-web-ui.config',
-    }, {
-      from: 'branding',
-      to: 'branding',
-      toType: 'dir'
-    }]),
+    new CopyWebpackPlugin({
+      patterns: [
+      {
+        from: 'src/ovirt-web-ui.config',
+      },
+      {
+        from: 'branding',
+        to: 'branding',
+        toType: 'dir'
+      }]
+    }),
 
     // Generates an `index.html` file with the <script> injected.
     new HtmlWebpackPlugin({
@@ -213,33 +218,11 @@ module.exports = {
       },
     }),
 
-    // Makes some environment variables available to the JS code, for example:
-    // if (process.env.NODE_ENV === 'production') { ... }. See `env.js`.
-    // It is absolutely essential that NODE_ENV was set to production here.
-    // Otherwise React will be compiled in the very slow development mode.
-    new webpack.DefinePlugin(env),
+    // for webpack 4, DefinePlugin and UglifyJsPlugin are default in production mode
 
     // webpack.optimize.OccurrenceOrderPlugin,
     // which helps ensure the builds are consistent if source hasn't changed,
     // is enabled by default
-
-    // webpack.optimize.DedupePlugin isn't needed anymore
-
-    // Minify the code.
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        screw_ie8: true, // React doesn't support IE8
-        warnings: false,
-      },
-      mangle: {
-        screw_ie8: true,
-      },
-      output: {
-        comments: false,
-        screw_ie8: true,
-      },
-      sourceMap: true
-    }),
 
     // To keep compatibility with old loaders, loaders can be switched to minimize mode via plugin:
     new webpack.LoaderOptionsPlugin({
