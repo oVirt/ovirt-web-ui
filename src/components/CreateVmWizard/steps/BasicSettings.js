@@ -713,7 +713,7 @@ export default connect(
     templates: state.templates,
     blankTemplateId: state.config.get('blankTemplateId'),
     storageDomains: state.storageDomains,
-    maxNumOfVmCpus: state.config.get('maxNumOfVmCpus', 384),
+    maxNumOfVmCpus: state.config.get('maxNumOfVmCpus', 512),
     maxMemorySizeInMiB: 4194304, // TODO: 4TiB, no config option pulled as of 2019-Mar-22
     defaultGeneralTimezone: state.config.get('defaultGeneralTimezone'),
     defaultWindowsTimezone: state.config.get('defaultWindowsTimezone'),

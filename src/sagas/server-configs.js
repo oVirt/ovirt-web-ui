@@ -14,6 +14,7 @@ import {
 } from '_/actions'
 
 import { callExternalAction } from './utils'
+import { isNumber } from '_/utils'
 
 export function* fetchServerConfiguredValues () {
   const optionVersion = yield select(state => {
@@ -52,7 +53,8 @@ export function* fetchServerConfiguredValues () {
     maxNumberOfSockets: parseInt(maxNumberOfSockets, 10),
     maxNumberOfCores: parseInt(maxNumberOfCores, 10),
     maxNumberOfThreads: parseInt(maxNumberOfThreads, 10),
-    maxNumOfVmCpus: parseInt(maxNumOfVmCpus, 10),
+    // TODO: need to replace this by the actual map value parsing for maxNumOfVmCpus
+    maxNumOfVmCpus: isNumber(parseInt(maxNumOfVmCpus, 10)) ? parseInt(maxNumOfVmCpus, 10) : 512,
   }))
 
   if (usbAutoShare) {
