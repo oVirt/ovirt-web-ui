@@ -2,25 +2,27 @@ import Immutable from 'immutable'
 import { actionReducer } from './utils'
 import {
   APP_CONFIGURED,
+  DEFAULT_ARCH,
+  DEFAULT_ENGINE_OPTION_VALUE,
   LOGIN_FAILED,
   LOGIN_SUCCESSFUL,
   LOGOUT,
+  REFRESH_DATA,
   SET_ADMINISTRATOR,
-  SET_CURRENT_PAGE,
   SET_CPU_TOPOLOGY_OPTIONS,
+  SET_CURRENT_PAGE,
   SET_DEFAULT_TIMEZONE,
+  SET_GLOBAL_DEFAULT_CONSOLE,
+  SET_GLOBAL_DEFAULT_VNC_MODE,
   SET_OVIRT_API_VERSION,
   SET_USB_AUTOSHARE,
   SET_USB_FILTER,
-  SET_USER,
   SET_USER_FILTER_PERMISSION,
   SET_USER_GROUPS,
   SET_USER_SESSION_TIMEOUT_INTERVAL,
+  SET_USER,
   SET_WEBSOCKET,
   SHOW_TOKEN_EXPIRED_MSG,
-  REFRESH_DATA,
-  SET_GLOBAL_DEFAULT_CONSOLE,
-  SET_GLOBAL_DEFAULT_VNC_MODE,
 } from '_/constants'
 
 const initialState = Immutable.fromJS({
@@ -47,10 +49,12 @@ const initialState = Immutable.fromJS({
   usbFilter: null,
   userGroups: [],
   currentPage: {},
-  maxNumberOfSockets: 16,
-  maxNumberOfCores: 254,
-  maxNumberOfThreads: 8,
-  maxNumOfVmCpus: 1,
+  cpuOptions: {
+    maxNumOfSockets: new Map([[ DEFAULT_ENGINE_OPTION_VALUE, 16 ]]),
+    maxNumOfCores: new Map([[ DEFAULT_ENGINE_OPTION_VALUE, 254 ]]),
+    maxNumOfThreads: new Map([[ DEFAULT_ENGINE_OPTION_VALUE, 8 ]]),
+    maxNumOfVmCpusPerArch: new Map([[ DEFAULT_ENGINE_OPTION_VALUE, { ppc64: 1, x86_64: 1, s390x: 1, [DEFAULT_ARCH]: 512 } ]]),
+  },
   defaultGeneralTimezone: 'Etc/GMT',
   defaultWindowsTimezone: 'GMT Standard Time',
   websocket: null,
@@ -118,17 +122,17 @@ const config = actionReducer(initialState, {
     return state.set('currentPage', Object.assign({}, payload))
   },
   [SET_CPU_TOPOLOGY_OPTIONS] (state, { payload: {
-    maxNumberOfSockets,
-    maxNumberOfCores,
-    maxNumberOfThreads,
-    maxNumOfVmCpus,
+    maxNumOfSockets,
+    maxNumOfCores,
+    maxNumOfThreads,
+    maxNumOfVmCpusPerArch,
   } }) {
-    return state.merge({
-      maxNumberOfSockets,
-      maxNumberOfCores,
-      maxNumberOfThreads,
-      maxNumOfVmCpus,
-    })
+    return state.set('cpuOptions', Immutable.fromJS({
+      maxNumOfSockets,
+      maxNumOfCores,
+      maxNumOfThreads,
+      maxNumOfVmCpusPerArch,
+    }))
   },
   [SET_DEFAULT_TIMEZONE] (state, { payload: {
     defaultGeneralTimezone,

@@ -18,6 +18,8 @@ import {
 } from '_/actions'
 
 import {
+  DEFAULT_ARCH,
+  DEFAULT_ENGINE_OPTION_VALUE,
   GET_ALL_CLUSTERS,
   GET_ALL_HOSTS,
   GET_ALL_OS,
@@ -28,6 +30,29 @@ import {
 
 import { EVERYONE_GROUP_ID } from './index'
 import { fetchUnknownIcons } from './osIcons'
+
+/**
+ * Map an entity's cpuOptions config values from engine options. The mappings are based
+ * on the (custom)? compatibility version and CPU architecture.
+ */
+function* mapCpuOptions (version, architecture) {
+  const [ maxNumSockets, maxNumOfCores, maxNumOfThreads, maxNumOfVmCpusPerArch ] =
+    yield select(({ config }) => [
+      config.getIn(['cpuOptions', 'maxNumOfSockets']),
+      config.getIn(['cpuOptions', 'maxNumOfCores']),
+      config.getIn(['cpuOptions', 'maxNumOfThreads']),
+      config.getIn(['cpuOptions', 'maxNumOfVmCpusPerArch']),
+    ])
+
+  const maxNumOfVmCpusPerArch_ = maxNumOfVmCpusPerArch.get(version) || maxNumOfVmCpusPerArch.get(DEFAULT_ENGINE_OPTION_VALUE)
+
+  return {
+    maxNumOfSockets: maxNumSockets.get(version) || maxNumSockets.get(DEFAULT_ENGINE_OPTION_VALUE),
+    maxNumOfCores: maxNumOfCores.get(version) || maxNumOfCores.get(DEFAULT_ENGINE_OPTION_VALUE),
+    maxNumOfThreads: maxNumOfThreads.get(version) || maxNumOfThreads.get(DEFAULT_ENGINE_OPTION_VALUE),
+    maxNumOfVmCpus: maxNumOfVmCpusPerArch_[architecture] || maxNumOfVmCpusPerArch_[DEFAULT_ARCH],
+  }
+}
 
 export function* fetchAllClusters (action) {
   const clusters = yield callExternalAction('getAllClusters', Api.getAllClusters, action)
@@ -41,6 +66,11 @@ export function* fetchAllClusters (action) {
     for (const cluster of clustersInternal) {
       cluster.userPermits = yield entityPermissionsToUserPermits(cluster)
       cluster.canUserUseCluster = canUserUseCluster(cluster.userPermits)
+    }
+
+    // Map cluster attribute derived config values to the clusters
+    for (const cluster of clustersInternal) {
+      cluster.cpuOptions = yield mapCpuOptions(cluster.version, cluster.architecture)
     }
 
     yield put(setClusters(clustersInternal))
@@ -84,6 +114,14 @@ export function* fetchAllTemplates (action) {
     for (const template of templatesInternal) {
       template.userPermits = yield entityPermissionsToUserPermits(template)
       template.canUserUseTemplate = canUserUseTemplate(template.userPermits)
+    }
+
+    // Map template attribute derived config values to the templates
+    for (const template of templatesInternal) {
+      const customCompatVer = template.customCompatibilityVersion
+      if (customCompatVer) {
+        template.cpuOptions = yield mapCpuOptions(customCompatVer, template.cpu.arch)
+      }
     }
 
     yield put(setTemplates(templatesInternal))

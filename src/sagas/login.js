@@ -17,7 +17,6 @@ import {
   setUserFilterPermission,
   setAdministrator,
   getAllEvents,
-  getOption,
 
   getAllClusters,
   getAllHosts,
@@ -53,7 +52,7 @@ import {
 } from './base-data'
 import { downloadVmConsole } from './console'
 import { fetchRoles } from './roles'
-import { fetchServerConfiguredValues } from './server-configs'
+import { fetchServerConfiguredValues, fetchGeneralEngineOption } from './server-configs'
 import { fetchDataCentersAndStorageDomains, fetchIsoFiles } from './storageDomains'
 import { loadIconsFromLocalStorage } from './osIcons'
 import {
@@ -149,7 +148,14 @@ function* checkOvirtApiVersion (oVirtMeta) {
   const required = Product.ovirtApiVersionRequired
   const passed = compareVersion(actual, required)
 
-  yield put(setOvirtApiVersion({ passed, ...actual }))
+  yield put(setOvirtApiVersion({
+    passed,
+    major: parseInt(oVirtMeta.product_info.version.major, 10),
+    minor: parseInt(oVirtMeta.product_info.version.minor, 10),
+    build: parseInt(oVirtMeta.product_info.version.build, 10),
+    revision: parseInt(oVirtMeta.product_info.version.revision, 10),
+    full_version: oVirtMeta.product_info.version.full_version,
+  }))
   return passed
 }
 
@@ -185,11 +191,7 @@ function* checkUserFilterPermissions () {
     return
   }
 
-  const alwaysFilterOption = yield callExternalAction(
-    'getOption',
-    Api.getOption,
-    getOption('AlwaysFilterResultsForWebUi', 'general', 'false'))
-
+  const alwaysFilterOption = yield fetchGeneralEngineOption('AlwaysFilterResultsForWebUi', 'false')
   const isAlwaysFilterOption = alwaysFilterOption === 'true'
   yield put.resolve(setUserFilterPermission(isAlwaysFilterOption))
 }

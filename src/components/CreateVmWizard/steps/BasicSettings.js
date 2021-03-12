@@ -150,6 +150,7 @@ class BasicSettings extends React.Component {
     this.validateVmName = this.validateVmName.bind(this)
     this.mapVCpuTopologyItems = this.mapVCpuTopologyItems.bind(this)
     this.buildOptimizedForList = this.buildOptimizedForList.bind(this)
+    this.grabCpuOptions = this.grabCpuOptions.bind(this)
 
     this.fields = {
       select: [
@@ -163,9 +164,11 @@ class BasicSettings extends React.Component {
 
   validateForm (dataSet) {
     const {
+      msg,
       dataCenters, clusters, storageDomains, templates, operatingSystems,
-      maxMemorySizeInMiB, maxNumOfVmCpus, msg,
+      maxMemorySizeInMiB,
     } = this.props
+    const { maxNumOfVmCpus } = this.grabCpuOptions()
 
     const okName = dataSet.name && isVmNameValid(dataSet.name)
 
@@ -184,9 +187,10 @@ class BasicSettings extends React.Component {
     const okProvisionTemplate = dataSet.provisionSource === 'template' &&
         [ null, dataSet.clusterId ].includes(templates.getIn([ dataSet.templateId, 'clusterId' ]))
 
+    const okCpu = isNumberInRange(dataSet.cpus, 0, maxNumOfVmCpus)
+
     const okOperatingSystem = dataSet.operatingSystemId && operatingSystems.find(os => os.get('id') === dataSet.operatingSystemId) !== undefined
     const okMemory = isNumberInRange(dataSet.memory, 0, maxMemorySizeInMiB)
-    const okCpu = isNumberInRange(dataSet.cpus, 0, maxNumOfVmCpus)
     const okOptimizedFor = dataSet.optimizedFor && this.buildOptimizedForList(dataSet, msg)[dataSet.optimizedFor] !== undefined
 
     const checkInit = dataSet.cloudInitEnabled
@@ -226,15 +230,44 @@ class BasicSettings extends React.Component {
   // Calculate the proper number of virtual sockets, cores per virtual socket, threads per core according to the number of virtual CPUs
   // any change of the number of vCpus in the Basic settings requires recalculation of the numer of cores, sockets, threads
   getTopologySettings (vcpus, force = {}) {
+    const { maxNumOfSockets, maxNumOfCores, maxNumOfThreads } = this.grabCpuOptions()
     return getTopology({
       value: vcpus,
       max: {
-        sockets: this.props.maxNumOfSockets,
-        cores: this.props.maxNumOfCores,
-        threads: this.props.maxNumOfThreads,
+        sockets: maxNumOfSockets,
+        cores: maxNumOfCores,
+        threads: maxNumOfThreads,
       },
       force: force,
     })
+  }
+
+  grabCpuOptions () {
+    const { data, clusters, templates } = this.props
+
+    // No cluster has been selected yet.........
+    if (!isValidUid(data.clusterId)) {
+      return {
+        maxNumOfSockets: 1,
+        maxNumOfCores: 1,
+        maxNumOfThreads: 1,
+        maxNumOfVmCpus: 1,
+      }
+    }
+
+    // CPU options come from the selected Template (if defined there) or Cluster
+    const cluster = clusters.get(data.clusterId)
+    const clusterOptions = cluster.get('cpuOptions')
+
+    const template = templates.get(data.templateId)
+    const templateOptions = template ? template.get('cpuOptions') : new Map()
+
+    return {
+      maxNumOfSockets: templateOptions.get('maxNumOfSockets') || clusterOptions.get('maxNumOfSockets'),
+      maxNumOfCores: templateOptions.get('maxNumOfCores') || clusterOptions.get('maxNumOfCores'),
+      maxNumOfThreads: templateOptions.get('maxNumOfThreads') || clusterOptions.get('maxNumOfThreads'),
+      maxNumOfVmCpus: templateOptions.get('maxNumOfVmCpus') || clusterOptions.get('maxNumOfVmCpus'),
+    }
   }
 
   handleChange (field, value, extra) {
@@ -280,7 +313,8 @@ class BasicSettings extends React.Component {
         break
 
       case 'cpus':
-        if (isNumberInRange(value, 0, this.props.maxNumOfVmCpus)) {
+        const { maxNumOfVmCpus } = this.grabCpuOptions()
+        if (isNumberInRange(value, 0, maxNumOfVmCpus)) {
           changes.cpus = +value
         }
 
@@ -330,10 +364,11 @@ class BasicSettings extends React.Component {
 
   render () {
     const {
-      data, clusters, maxNumOfSockets, maxNumOfCores,
-      maxNumOfThreads, operatingSystems, id, dataCenters,
+      data, clusters,
+      operatingSystems, id, dataCenters,
       storageDomains, templates, msg, locale,
     } = this.props
+
     const idPrefix = id || 'create-vm-wizard-basic'
 
     const indicators = {
@@ -402,11 +437,12 @@ class BasicSettings extends React.Component {
     const enableSysPrep = data.cloudInitEnabled && isOsWindows(data.operatingSystemId, operatingSystems)
 
     // for Advanced CPU Topology Options expand/collapse section
+    const { maxNumOfSockets, maxNumOfCores, maxNumOfThreads } = this.grabCpuOptions()
     const vCpuTopologyDividers = getTopologyPossibleValues({
       value: data.cpus,
-      maxNumberOfSockets: maxNumOfSockets,
-      maxNumberOfCores: maxNumOfCores,
-      maxNumberOfThreads: maxNumOfThreads,
+      maxNumOfSockets,
+      maxNumOfCores,
+      maxNumOfThreads,
     })
     // for Threads per Core tooltip
     const clusterId = data.clusterId || '_'
@@ -679,6 +715,7 @@ class BasicSettings extends React.Component {
 BasicSettings.propTypes = {
   id: PropTypes.string,
   data: PropTypes.shape(BASIC_DATA_SHAPE),
+
   // todo remove the 'eslint-disable-next-line' below when updating the eslint to newer version
   // eslint-disable-next-line react/no-unused-prop-types
   defaultValues: PropTypes.shape(BASIC_DATA_SHAPE),
@@ -690,21 +727,16 @@ BasicSettings.propTypes = {
   // eslint-disable-next-line react/no-unused-prop-types
   blankTemplateId: PropTypes.string.isRequired,
   storageDomains: PropTypes.object.isRequired,
-  maxNumOfVmCpus: PropTypes.number.isRequired,
   maxMemorySizeInMiB: PropTypes.number.isRequired,
-
-  maxNumOfSockets: PropTypes.number.isRequired,
-  maxNumOfCores: PropTypes.number.isRequired,
-  maxNumOfThreads: PropTypes.number.isRequired,
-
-  onUpdate: PropTypes.func.isRequired,
-
   // eslint-disable-next-line react/no-unused-prop-types
   defaultGeneralTimezone: PropTypes.string.isRequired,
   // eslint-disable-next-line react/no-unused-prop-types
   defaultWindowsTimezone: PropTypes.string.isRequired,
+
   msg: PropTypes.object.isRequired,
   locale: PropTypes.string.isRequired,
+
+  onUpdate: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -715,12 +747,8 @@ export default connect(
     templates: state.templates,
     blankTemplateId: state.config.get('blankTemplateId'),
     storageDomains: state.storageDomains,
-    maxNumOfVmCpus: state.config.get('maxNumOfVmCpus', 512),
     maxMemorySizeInMiB: 4194304, // TODO: 4TiB, no config option pulled as of 2019-Mar-22
     defaultGeneralTimezone: state.config.get('defaultGeneralTimezone'),
     defaultWindowsTimezone: state.config.get('defaultWindowsTimezone'),
-    maxNumOfSockets: state.config.get('maxNumberOfSockets'),
-    maxNumOfCores: state.config.get('maxNumberOfCores'),
-    maxNumOfThreads: state.config.get('maxNumberOfThreads'),
   })
 )(withMsg(BasicSettings))

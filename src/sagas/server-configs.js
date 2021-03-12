@@ -1,8 +1,8 @@
-import { put, call, all, select } from 'redux-saga/effects'
+import { put, call, all } from 'redux-saga/effects'
 
-import Api from '_/ovirtapi'
+import Api, { Transforms } from '_/ovirtapi'
 import {
-  getOption,
+  getEngineOption,
   setCpuTopologyOptions,
   setDefaultTimezone,
   setSpiceUsbAutoShare,
@@ -14,16 +14,11 @@ import {
 } from '_/actions'
 
 import { callExternalAction } from './utils'
-import { isNumber } from '_/utils'
+import { DEFAULT_ARCH, DEFAULT_ENGINE_OPTION_VALUE } from '_/constants'
 
 export function* fetchServerConfiguredValues () {
-  const optionVersion = yield select(state => {
-    const ver = state.config.get('oVirtApiVersion')
-    return `${ver.get('major')}.${ver.get('minor')}`
-  })
-
   const [
-    maxNumberOfSockets, maxNumberOfCores, maxNumberOfThreads, maxNumOfVmCpus,
+    maxNumOfSockets, maxNumOfCores, maxNumOfThreads, maxNumOfVmCpusPerArch,
     usbAutoShare, usbFilter,
     userSessionTimeout,
     defaultGeneralTimezone, defaultWindowsTimezone,
@@ -31,30 +26,30 @@ export function* fetchServerConfiguredValues () {
     consoleDefault,
     defaultVncMode,
   ] = yield all([
-    callGetOption('MaxNumOfVmSockets', optionVersion, 16),
-    callGetOption('MaxNumOfCpuPerSocket', optionVersion, 16),
-    callGetOption('MaxNumOfThreadsPerCpu', optionVersion, 16),
-    callGetOption('MaxNumOfVmCpus', optionVersion, 1),
+    call(fetchEngineOption, 'MaxNumOfVmSockets', 16),
+    call(fetchEngineOption, 'MaxNumOfCpuPerSocket', 254),
+    call(fetchEngineOption, 'MaxNumOfThreadsPerCpu', 8),
+    call(fetchEngineOption, 'MaxNumOfVmCpus', `{${DEFAULT_ARCH}=1}`),
 
-    callGetOption('SpiceUsbAutoShare', 'general', 1),
+    call(fetchGeneralEngineOption, 'SpiceUsbAutoShare', 1),
     callExternalAction('getUSBFilter', Api.getUSBFilter, {}),
 
-    callGetOption('UserSessionTimeOutInterval', 'general', 30),
+    call(fetchGeneralEngineOption, 'UserSessionTimeOutInterval', 30),
 
-    callGetOption('DefaultGeneralTimeZone', 'general', 'Etc/GMT'),
-    callGetOption('DefaultWindowsTimeZone', 'general', 'GMT Standard Time'),
+    call(fetchGeneralEngineOption, 'DefaultGeneralTimeZone', 'Etc/GMT'),
+    call(fetchGeneralEngineOption, 'DefaultWindowsTimeZone', 'GMT Standard Time'),
 
-    callGetOption('WebSocketProxy', 'general', ''),
-    callGetOption('ClientModeConsoleDefault', 'general', ''),
-    callGetOption('ClientModeVncDefault', 'general', ''),
+    call(fetchGeneralEngineOption, 'WebSocketProxy', ''),
+    call(fetchGeneralEngineOption, 'ClientModeConsoleDefault', ''),
+    call(fetchGeneralEngineOption, 'ClientModeVncDefault', ''),
   ])
 
+  // Per version is "compatibility version" of the VM, or if not set in VM, the Cluster
   yield put(setCpuTopologyOptions({
-    maxNumberOfSockets: parseInt(maxNumberOfSockets, 10),
-    maxNumberOfCores: parseInt(maxNumberOfCores, 10),
-    maxNumberOfThreads: parseInt(maxNumberOfThreads, 10),
-    // TODO: need to replace this by the actual map value parsing for maxNumOfVmCpus
-    maxNumOfVmCpus: isNumber(parseInt(maxNumOfVmCpus, 10)) ? parseInt(maxNumOfVmCpus, 10) : 512,
+    maxNumOfSockets: Transforms.EngineOptionNumberPerVersion.toInternal(maxNumOfSockets),
+    maxNumOfCores: Transforms.EngineOptionNumberPerVersion.toInternal(maxNumOfCores),
+    maxNumOfThreads: Transforms.EngineOptionNumberPerVersion.toInternal(maxNumOfThreads),
+    maxNumOfVmCpusPerArch: Transforms.EngineOptionMaxNumOfVmCpus.toInternal(maxNumOfVmCpusPerArch),
   }))
 
   if (usbAutoShare) {
@@ -84,11 +79,28 @@ export function* fetchServerConfiguredValues () {
   }
 }
 
-function callGetOption (name, version, defaultValue) {
-  return call(
-    callExternalAction,
-    'getOption',
-    Api.getOption,
-    getOption(name, version, defaultValue)
+export function* fetchEngineOption (name, defaultValue) {
+  const option = yield callExternalAction(
+    'getEngineOption',
+    Api.getEngineOption,
+    getEngineOption(name),
+    true
   )
+
+  let internalOption
+  if (option && option.values) {
+    internalOption = Transforms.EngineOption.toInternal(option)
+  } else {
+    internalOption = new Map()
+  }
+
+  if (defaultValue) {
+    internalOption.set(DEFAULT_ENGINE_OPTION_VALUE, defaultValue)
+  }
+  return internalOption
+}
+
+export function* fetchGeneralEngineOption (name, defaultValue) {
+  const option = yield fetchEngineOption(name)
+  return option.has('general') ? option.get('general') : defaultValue
 }

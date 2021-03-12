@@ -1,5 +1,5 @@
 // Keep alphabetically sorted
-// TODO: remove all constants except those used within sagas
+
 export const ADD_ACTIVE_REQUEST = 'ADD_ACTIVE_REQUEST'
 export const ADD_DISK_REMOVAL_PENDING_TASK = 'ADD_DISK_REMOVAL_PENDING_TASK'
 export const ADD_NETWORKS_TO_VNIC_PROFILES = 'ADD_NETWORKS_TO_VNIC_PROFILES'
@@ -18,6 +18,8 @@ export const CLEAR_USER_MSGS = 'CLEAR_USER_MSGS'
 export const COMPOSE_CREATE_VM = 'COMPOSE_CREATE_VM'
 export const CREATE_DISK_FOR_VM = 'CREATE_DISK_FOR_VM'
 export const CREATE_VM = 'CREATE_VM'
+export const DEFAULT_ENGINE_OPTION_VALUE = '_'
+export const DEFAULT_ARCH = '_'
 export const DELAYED_REMOVE_ACTIVE_REQUEST = 'DELAYED_REMOVE_ACTIVE_REQUEST'
 export const DELETE_VM_NIC = 'DELETE_VM_NIC'
 export const DISMISS_USER_MSG = 'DISMISS_USER_MSG'
