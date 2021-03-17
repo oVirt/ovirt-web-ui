@@ -59,6 +59,15 @@ to accomplish this. To start the server:
 When asked, provide a valid user name (in the form of `user@profile`) and password so
 the application can start in the context of a logged in user.
 
+#### .env.* files
+
+You can group environment variables using `.env.envname` files. For example, for environment `foo`
+create a file `.env.foo` in the root of the project cotaining all related variables.
+The file should follow [dotenv](https://github.com/motdotla/dotenv) convention.
+Then start the server with:
+
+    ENGINE_ENV=foo yarn start
+
 #### Credentials
 User name and password can also be provided via shell variables:
 

@@ -19,6 +19,17 @@ var env = require('../config/env')
 var rimraf = require('rimraf')
 var formatMessage = require('./utils/utils').formatMessage
 var isLikelyASyntaxError = require('./utils/utils').isLikelyASyntaxError
+const fs = require('fs');
+const dotenv = require('dotenv')
+
+if (process.env.ENGINE_ENV){
+  const envFilePath = `.env.${process.env.ENGINE_ENV}`
+  const envConfig = dotenv.parse(fs.readFileSync(envFilePath))
+  console.log(chalk`{green Loaded configuration from:${envFilePath}}`);
+  for (const k in envConfig) {
+    process.env[k] = envConfig[k]
+  }
+}
 
 // Tools like Cloud9 rely on this.
 var DEFAULT_PORT = process.env.PORT || 3000;
@@ -339,6 +350,7 @@ function getUserInfo (protocol, port) {
     defaultInput: DEFAULT_DOMAIN
   });
 
+  console.log('Connecting using provided credentials...')
 
   return new Promise((resolve, reject) => {
     request(`${engineUrl}/sso/oauth/token?` +

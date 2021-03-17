@@ -14,6 +14,7 @@ build
 npm-debug.log
 .idea
 .vscode/
+.env*
 
 # automake.sh / automake / autoconfig generated files
 Makefile
