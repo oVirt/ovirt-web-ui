@@ -28,6 +28,7 @@ import type {
   ApiUserType, UserType,
   UserOptionType,
   RemoteUserOptionsType,
+  VersionType,
 } from './types'
 
 import { isWindows } from '_/helpers'
@@ -1024,6 +1025,16 @@ const User = {
   toApi: undefined,
 }
 
+const Version = {
+  toInternal ({ major = 0, minor = 0, build = 0 }: any): VersionType {
+    return {
+      major: Number(major),
+      minor: Number(minor),
+      build: Number(build),
+    }
+  },
+}
+
 //
 // Export each transforms individually so they can be consumed individually
 //
@@ -1055,4 +1066,5 @@ export {
   User,
   RemoteUserOptions,
   RemoteUserOption,
+  Version,
 }

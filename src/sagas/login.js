@@ -2,7 +2,7 @@ import { all, call, put, takeEvery, select } from 'redux-saga/effects'
 import pick from 'lodash/pick'
 
 import Product from '_/version'
-import Api from '_/ovirtapi'
+import Api, { Transforms } from '_/ovirtapi'
 import AppConfiguration from '_/config'
 import OptionsManager from '_/optionsManager'
 
@@ -139,17 +139,13 @@ function* logout () {
  * is compatible with our expected API version.
  */
 function* checkOvirtApiVersion (oVirtMeta) {
-  if (!(oVirtMeta &&
-        oVirtMeta['product_info'] &&
-        oVirtMeta['product_info']['version'] &&
-        oVirtMeta['product_info']['version']['major'] &&
-        oVirtMeta['product_info']['version']['minor'])) {
+  if (!isValidOvirtMeta(oVirtMeta)) {
     console.error('Incompatible oVirt API version: ', oVirtMeta)
     yield put(setOvirtApiVersion({ passed: false, ...oVirtMeta }))
     return false
   }
 
-  const actual = oVirtMeta['product_info']['version']
+  const actual = Transforms.Version.toInternal(oVirtMeta['product_info']['version'])
   const required = Product.ovirtApiVersionRequired
   const passed = compareVersion(actual, required)
 
@@ -157,14 +153,19 @@ function* checkOvirtApiVersion (oVirtMeta) {
   return passed
 }
 
-function composeIncompatibleOVirtApiVersionMessage (oVirtMeta) {
-  const requested = `${Product.ovirtApiVersionRequired.major}.${Product.ovirtApiVersionRequired.minor}`
-  let found
-  if (!(oVirtMeta &&
+function isValidOvirtMeta (oVirtMeta) {
+  return oVirtMeta &&
         oVirtMeta['product_info'] &&
         oVirtMeta['product_info']['version'] &&
         oVirtMeta['product_info']['version']['major'] &&
-        oVirtMeta['product_info']['version']['minor'])) {
+        oVirtMeta['product_info']['version']['minor'] &&
+        oVirtMeta['product_info']['version']['build']
+}
+
+function composeIncompatibleOVirtApiVersionMessage (oVirtMeta) {
+  const requested = `${Product.ovirtApiVersionRequired.major}.${Product.ovirtApiVersionRequired.minor}`
+  let found
+  if (!isValidOvirtMeta(oVirtMeta)) {
     found = JSON.stringify(oVirtMeta)
   } else {
     const version = oVirtMeta['product_info']['version']
