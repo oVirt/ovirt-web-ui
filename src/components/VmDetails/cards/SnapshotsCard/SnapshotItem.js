@@ -12,7 +12,7 @@ import {
 
 import style from './style.css'
 
-import { msg } from '_/intl'
+import { withMsg } from '_/intl'
 import RestoreConfirmationModal from './RestoreConfirmationModal'
 import DeleteConfirmationModal from '../../../VmModals/DeleteConfirmationModal'
 import SnapshotDetail from './SnapshotDetail'
@@ -96,6 +96,7 @@ class SnapshotItem extends React.Component {
   }
 
   render () {
+    const { msg } = this.props
     let statusIcon = null
     let buttons = []
 
@@ -212,6 +213,7 @@ SnapshotItem.propTypes = {
   isVmDown: PropTypes.bool,
   isPoolVm: PropTypes.bool,
   onSnapshotDelete: PropTypes.func.isRequired,
+  msg: PropTypes.object.isRequired,
 }
 
 export default connect(
@@ -221,4 +223,4 @@ export default connect(
   (dispatch, { vmId, snapshot }) => ({
     onSnapshotDelete: () => dispatch(deleteVmSnapshot({ vmId, snapshotId: snapshot.get('id') })),
   })
-)(SnapshotItem)
+)(withMsg(SnapshotItem))

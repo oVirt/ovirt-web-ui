@@ -5,7 +5,7 @@ import $ from 'jquery'
 
 import { Popover, OverlayTrigger } from 'react-bootstrap'
 
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 import style from './style.css'
 
 /**
@@ -43,6 +43,7 @@ class FieldHelp extends React.Component {
     this.setState({ style: popoverStyle, placement })
   }
   render () {
+    const { msg } = this.context
     const tooltip = this.props.tooltip || msg.clickForHelp()
 
     const popover = (
@@ -61,6 +62,8 @@ class FieldHelp extends React.Component {
     )
   }
 }
+
+FieldHelp.contextType = MsgContext
 
 FieldHelp.propTypes = {
   title: PropTypes.string, // popover title

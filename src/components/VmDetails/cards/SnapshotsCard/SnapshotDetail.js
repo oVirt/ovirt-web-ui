@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 
 import {
@@ -12,7 +12,7 @@ import Immutable from 'immutable'
 
 import style from './style.css'
 
-import { msg } from '_/intl'
+import { msg, MsgContext } from '_/intl'
 
 import Selectors from '_/selectors'
 import { templateNameRenderer, getFormatedDateTime, userFormatOfBytes, localeCompare } from '_/helpers'
@@ -47,6 +47,7 @@ const statusMap = {
 }
 
 const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, id, isPoolVm, ...otherProps }) => {
+  const { msg } = useContext(MsgContext)
   const template = Selectors.getTemplateById(snapshot.getIn(['vm', 'template', 'id']))
   const time = getFormatedDateTime(snapshot.get('date'))
 

@@ -29,6 +29,7 @@ const LocaleReloader = ({ children, localeFromStore, loadingFinished }) => {
       window.location.reload()
     }
   }, [localeFromStore, loadingFinished])
+
   return ([ children ])
 }
 

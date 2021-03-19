@@ -8,7 +8,7 @@ import { List } from 'immutable'
 import * as Actions from '_/actions'
 import { EMPTY_VNIC_PROFILE_ID } from '_/constants'
 import { generateUnique } from '_/helpers'
-import { msg } from '_/intl'
+import { withMsg } from '_/intl'
 import { handleClusterIdChange } from './helpers'
 import { createStorageDomainList, createClusterList } from '_/components/utils'
 
@@ -167,6 +167,7 @@ class CreateVmWizard extends React.Component {
     this.wizardClickNext = this.wizardClickNext.bind(this)
     this.hideCloseWizardDialog = this.hideCloseWizardDialog.bind(this)
     this.showCloseWizardDialog = this.showCloseWizardDialog.bind(this)
+    const { msg } = this.props
 
     this.wizardSteps = [
       {
@@ -453,6 +454,7 @@ class CreateVmWizard extends React.Component {
   }
 
   render () {
+    const { msg } = this.props
     const { activeStepIndex, stepNavigation, correlationId } = this.state
     const activeStep = this.wizardSteps[activeStepIndex]
     const vmCreateWorking = correlationId !== null && !this.props.actionResults.has(correlationId)
@@ -523,6 +525,7 @@ class CreateVmWizard extends React.Component {
     </React.Fragment>
   }
 }
+
 CreateVmWizard.propTypes = {
   show: PropTypes.bool,
   onHide: PropTypes.func,
@@ -545,6 +548,7 @@ CreateVmWizard.propTypes = {
   defaultGeneralTimezone: PropTypes.string.isRequired,
   // eslint-disable-next-line react/no-unused-prop-types
   defaultWindowsTimezone: PropTypes.string.isRequired,
+  msg: PropTypes.object.isRequired,
 }
 
 export default connect(
@@ -565,4 +569,4 @@ export default connect(
     ),
     navigateToVm: (vmId) => dispatch(Actions.navigateToVmDetails(vmId)),
   })
-)(CreateVmWizard)
+)(withMsg(CreateVmWizard))

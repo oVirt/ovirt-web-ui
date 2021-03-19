@@ -6,6 +6,7 @@ import { initIntl, getLocaleFromUrl } from './initialize'
 import { messages, type MessageIdType, type MessageType } from './messages'
 import translatedMessages from './translated-messages.json'
 import localeWithFullName from './localeWithFullName.json'
+export { withMsg, default as MsgContext } from './MsgContext'
 
 export const DEFAULT_LOCALE: string = 'en'
 
@@ -78,6 +79,8 @@ function createFormattingFunctionsMap (messages: { [MessageIdType]: MessageType 
  * Keys corresponds to {@link messages}
  */
 export const msg: {[MessageIdType]: ((?Object) => string)} = createFormattingFunctionsMap(messages)
+
+export const msgObj = { msg }
 
 /**
  * Utility function to translate enums

@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 import { getByPage } from '_/actions'
 import { filterVms, sortFunction } from '_/utils'
 
@@ -16,6 +16,7 @@ import style from './style.css'
  * available to the current user.
  */
 const VmCardList = ({ vms, alwaysShowPoolCard, fetchMoreVmsAndPools }) => {
+  const { msg } = useContext(MsgContext)
   const sort = vms.get('sort').toJS()
   const filters = vms.get('filters').toJS()
 

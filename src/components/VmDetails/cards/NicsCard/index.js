@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Icon } from 'patternfly-react'
 
-import { msg } from '_/intl'
+import { withMsg } from '_/intl'
 import { addVmNic, deleteVmNic, editVmNic } from '_/actions'
 
 import { Grid, Row, Col } from '_/components/Grid'
@@ -88,7 +88,7 @@ class NicsCard extends React.Component {
   }
 
   render () {
-    const { vm, vnicProfiles, onEditChange } = this.props
+    const { vm, vnicProfiles, onEditChange, msg } = this.props
 
     const idPrefix = 'vmdetail-nics'
     const canEditTheCard =
@@ -183,6 +183,7 @@ class NicsCard extends React.Component {
     )
   }
 }
+
 NicsCard.propTypes = {
   vm: PropTypes.object.isRequired,
   onEditChange: PropTypes.func.isRequired,
@@ -193,6 +194,7 @@ NicsCard.propTypes = {
   addNic: PropTypes.func.isRequired, // eslint-disable-line react/no-unused-prop-types
   editNic: PropTypes.func.isRequired, // eslint-disable-line react/no-unused-prop-types
   deleteNic: PropTypes.func.isRequired, // eslint-disable-line react/no-unused-prop-types
+  msg: PropTypes.object.isRequired,
 }
 
 export default connect(
@@ -205,4 +207,4 @@ export default connect(
     editNic: ({ nic }) => dispatch(editVmNic({ vmId: vm.get('id'), nic })),
     deleteNic: ({ nicId }) => dispatch(deleteVmNic({ vmId: vm.get('id'), nicId })),
   })
-)(NicsCard)
+)(withMsg(NicsCard))

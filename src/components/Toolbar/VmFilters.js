@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Filter, FormControl } from 'patternfly-react'
-import { enumMsg, msg } from '_/intl'
+import { enumMsg, withMsg } from '_/intl'
 import { saveVmsFilters } from '_/actions'
 import { localeCompare } from '_/helpers'
 
@@ -31,6 +31,7 @@ class VmFilters extends React.Component {
   }
 
   composeFilterTypes () {
+    const { msg } = this.props
     const statuses = [
       'up',
       'powering_up',
@@ -201,6 +202,7 @@ VmFilters.propTypes = {
   operatingSystems: PropTypes.object.isRequired,
   vms: PropTypes.object.isRequired,
   onFilterUpdate: PropTypes.func.isRequired,
+  msg: PropTypes.object.isRequired,
 }
 
 export default connect(
@@ -211,4 +213,4 @@ export default connect(
   (dispatch) => ({
     onFilterUpdate: (filters) => dispatch(saveVmsFilters({ filters })),
   })
-)(VmFilters)
+)(withMsg(VmFilters))

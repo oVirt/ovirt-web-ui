@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import ConfirmationModal from './ConfirmationModal'
 
 import { downloadConsole, openConsoleModal, closeConsoleModal } from '_/actions'
-import { msg } from '_/intl'
+import { withMsg } from '_/intl'
 import { doesVmSessionExistForUserId } from '_/utils'
 import { generateUnique } from '_/helpers'
 
@@ -65,6 +65,7 @@ class ConsoleConfirmationModal extends React.Component {
     const {
       consoles,
       show,
+      msg,
     } = this.props
 
     if (consoles.getIn(['modals', this.modalId, 'state'])) {
@@ -107,6 +108,7 @@ ConsoleConfirmationModal.propTypes = {
   onConsoleSessionConfirmaClose: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
   onOpen: PropTypes.func.isRequired,
+  msg: PropTypes.object.isRequired,
 }
 
 export default connect(
@@ -145,4 +147,4 @@ export default connect(
       }))
     },
   })
-)(ConsoleConfirmationModal)
+)(withMsg(ConsoleConfirmationModal))

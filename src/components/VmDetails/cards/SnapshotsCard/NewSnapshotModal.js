@@ -16,7 +16,7 @@ import {
   Modal,
   noop,
 } from 'patternfly-react'
-import { msg } from '_/intl'
+import { withMsg } from '_/intl'
 import style from './style.css'
 
 class NewSnapshotModal extends Component {
@@ -55,7 +55,7 @@ class NewSnapshotModal extends Component {
   }
 
   render () {
-    const { idPrefix } = this.props
+    const { idPrefix, msg } = this.props
 
     let modalId = `${idPrefix}-modal`
 
@@ -131,6 +131,7 @@ NewSnapshotModal.propTypes = {
   idPrefix: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   onAdd: PropTypes.func.isRequired,
+  msg: PropTypes.object.isRequired,
 }
 
 export default connect(
@@ -138,4 +139,4 @@ export default connect(
   (dispatch, { vmId }) => ({
     onAdd: ({ snapshot }) => dispatch(addVmSnapshot({ vmId, snapshot })),
   })
-)(NewSnapshotModal)
+)(withMsg(NewSnapshotModal))

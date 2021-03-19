@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 import FieldHelp from '../FieldHelp/index'
 
 import style from './style.css'
@@ -15,6 +15,7 @@ class IconUpload extends React.Component {
   }
 
   handleIconChange (e) {
+    const { msg } = this.context
     const that = this
     const files = e.target.files
 
@@ -49,6 +50,7 @@ class IconUpload extends React.Component {
   }
 
   render () {
+    const { msg } = this.context
     const error = this.props.error
 
     const iconError = this.props.error
@@ -85,6 +87,8 @@ class IconUpload extends React.Component {
     )
   }
 }
+
+IconUpload.contextType = MsgContext
 
 IconUpload.propTypes = {
   /* eslint-disable-next-line react/no-unused-prop-types */

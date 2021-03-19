@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
@@ -6,7 +6,7 @@ import { withRouter } from 'react-router-dom'
 
 import { EmptyState } from 'patternfly-react'
 import VmCardList from './VmCardList'
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 
 /**
  * Component displayed when VMs or Pools exist but the data is still loading.
@@ -19,6 +19,7 @@ const VmLoading = () => {
  * Component displayed when no VMs or Pools could be loaded for the current user.
  */
 const NoVmAvailable = () => {
+  const { msg } = useContext(MsgContext)
   const idPrefix = 'no-vm'
   return (
     <EmptyState>

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 
@@ -7,13 +7,14 @@ import { DropdownButton, MenuItem, Icon } from 'patternfly-react'
 import ConsoleConfirmationModal from '../VmActions/ConsoleConfirmationModal'
 import { MenuItemAction } from '../VmActions/Action'
 import { DOWNLOAD_CONSOLE, RDP_ID } from '_/constants'
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 import { getRDP } from '_/actions'
 
 import { isWindows } from '_/helpers'
 import style from './style.css'
 
 const VmConsoleSelector = ({ vmId, vms, consoles, config, consoleId, isConsolePage, onRDP }) => {
+  const { msg } = useContext(MsgContext)
   let actions = vms.getIn(['vms', vmId, 'consoles'])
   if (actions.size === 0) {
     return <div />

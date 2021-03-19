@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 
 import { createDiskForVm, editDiskOnVm, removeDisk } from '_/actions'
 
-import { msg } from '_/intl'
+import { withMsg } from '_/intl'
 import { maskForElementId, suggestDiskName, sortDisksForDisplay } from '_/components/utils'
 
 import { Icon } from 'patternfly-react'
@@ -112,7 +112,7 @@ class DisksCard extends React.Component {
   }
 
   render () {
-    const { vm, onEditChange } = this.props
+    const { vm, onEditChange, msg } = this.props
     const { suggestedDiskName, suggestedStorageDomain, filteredStorageDomainList } = this.state
 
     const idPrefix = 'vmdetail-disks'
@@ -193,6 +193,7 @@ class DisksCard extends React.Component {
     )
   }
 }
+
 DisksCard.propTypes = {
   vm: PropTypes.object.isRequired,
   onEditChange: PropTypes.func.isRequired,
@@ -203,6 +204,7 @@ DisksCard.propTypes = {
   addDisk: PropTypes.func.isRequired,
   editDisk: PropTypes.func.isRequired,
   deleteDisk: PropTypes.func.isRequired,
+  msg: PropTypes.object.isRequired,
 }
 
 export default connect(
@@ -215,4 +217,4 @@ export default connect(
     editDisk: ({ vmId, disk }) => dispatch(editDiskOnVm({ vmId, disk })),
     deleteDisk: ({ vmId, diskId }) => dispatch(removeDisk({ diskId, vmToRefreshId: vmId })),
   })
-)(DisksCard)
+)(withMsg(DisksCard))

@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import Immutable from 'immutable'
 
 import { Icon, MessageDialog } from 'patternfly-react'
-import { msg } from '_/intl'
+import { withMsg } from '_/intl'
 import { getMinimizedString, escapeHtml } from '_/components/utils'
 import { restoreVmSnapshot } from './actions'
 
@@ -33,7 +33,7 @@ class RestoreConfirmationModal extends React.Component {
   }
 
   render () {
-    const { snapshot, trigger, snapshots, id } = this.props
+    const { snapshot, trigger, snapshots, id, msg } = this.props
 
     const icon = <Icon type='pf' name='warning-triangle-o' />
     const snapshotsThatWillBeDeleted = snapshots.filter((s) => s.get('date') > snapshot.get('date'))
@@ -81,6 +81,7 @@ RestoreConfirmationModal.propTypes = {
 
   snapshots: PropsTypes.object.isRequired,
   onRestore: PropsTypes.func.isRequired,
+  msg: PropsTypes.object.isRequired,
 }
 
 export default connect(
@@ -90,4 +91,4 @@ export default connect(
   (dispatch, { vmId, snapshot }) => ({
     onRestore: () => dispatch(restoreVmSnapshot({ vmId, snapshotId: snapshot.get('id') })),
   })
-)(RestoreConfirmationModal)
+)(withMsg(RestoreConfirmationModal))

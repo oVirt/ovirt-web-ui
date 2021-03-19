@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import {
   CardTitle,
@@ -13,7 +13,7 @@ import {
 import DonutChart from './UtilizationCharts/DonutChart'
 import AreaChart from './UtilizationCharts/AreaChart'
 
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 
 import style from './style.css'
 
@@ -26,6 +26,7 @@ import NoLiveData from './NoLiveData'
  * right.
  */
 const CpuCharts = ({ cpuStats, isRunning, id, vcpus }) => {
+  const { msg } = useContext(MsgContext)
   const cpuUsed = cpuStats['current.total'].firstDatum / vcpus // the average value considering the number of VM CPUs, same as in Admin Portal
   const cpuAvailable = 100 - cpuUsed
 

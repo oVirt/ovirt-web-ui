@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { addUserMessage, downloadVmConsoles } from '_/actions'
@@ -7,7 +7,7 @@ import {
   EMPTY_CONSOLES_LIST,
   NO_DEFAULT_CONSOLE,
 } from '_/constants'
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 
 const DEFAULT_CONSOLE_PROTOCOL_ERRORS_LIST = [
   NO_DEFAULT_CONSOLE,
@@ -24,6 +24,7 @@ const AutoSelectConsole = ({
   defaultConsole,
   setUserMessage,
 }) => {
+  const { msg } = useContext(MsgContext)
   useEffect(() => {
     if (show && defaultConsole === 'undefined') {
       fetchConsoles(vm)
@@ -43,7 +44,7 @@ const AutoSelectConsole = ({
       }
       onClose()
     }
-  }, [defaultConsole, show])
+  }, [defaultConsole, show, msg])
 
   const isProtocolSelected = (defaultConsole) => defaultConsole !== 'undefined' && !DEFAULT_CONSOLE_PROTOCOL_ERRORS_LIST.includes(defaultConsole)
 

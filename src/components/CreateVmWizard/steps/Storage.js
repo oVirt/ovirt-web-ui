@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { msg } from '_/intl'
+import { MsgContext, withMsg } from '_/intl'
 import { generateUnique } from '_/helpers'
 import { isNumber, convertValue } from '_/utils'
 import { BASIC_DATA_SHAPE, STORAGE_SHAPE } from '../dataPropTypes'
@@ -33,6 +33,7 @@ import style from './style.css'
 import { Tooltip, InfoTooltip } from '_/components/tooltips'
 
 export const DiskNameWithLabels = ({ id, disk }) => {
+  const { msg } = useContext(MsgContext)
   const idPrefix = `${id}-disk-${disk.id}`
   return <React.Fragment>
     <span id={`${idPrefix}-name`}>{ disk.name }</span>
@@ -85,6 +86,8 @@ class Storage extends React.Component {
     this.isValidDiskSize = this.isValidDiskSize.bind(this)
 
     props.onUpdate({ valid: this.validateTemplateDiskStorageDomains() })
+
+    const { msg } = this.props
 
     this.state = {
       editingErrors: {
@@ -449,6 +452,7 @@ class Storage extends React.Component {
 
   // set appropriate tooltip message regarding setting bootable flag
   bootableInfo (isActualDiskBootable) {
+    const { msg } = this.props
     const bootableDisk = this.props.disks.find(disk => disk.bootable)
 
     if (this.isBootableDiskTemplate()) {
@@ -647,6 +651,7 @@ class Storage extends React.Component {
       storageDomains,
       disks,
       dataCenterId,
+      msg,
     } = this.props
 
     const storageDomainList = createStorageDomainList(storageDomains)
@@ -743,6 +748,7 @@ Storage.propTypes = {
   maxDiskSizeInGiB: PropTypes.number.isRequired,
   minDiskSizeInGiB: PropTypes.number.isRequired,
   onUpdate: PropTypes.func.isRequired,
+  msg: PropTypes.object.isRequired,
 }
 
 export default connect(
@@ -752,4 +758,4 @@ export default connect(
     maxDiskSizeInGiB: 4096, // TODO: 4TiB, no config option pulled as of 2019-Mar-22
     minDiskSizeInGiB: 1,
   })
-)(Storage)
+)(withMsg(Storage))

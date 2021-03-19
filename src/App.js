@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
@@ -13,33 +13,36 @@ import ToastNotifications from './components/ToastNotifications'
 
 import getRoutes from './routes'
 import { fixedStrings } from './branding'
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 import NoLogin from '_/components/NoLogin'
 
 function isLoginMissing (config) {
   return !config.get('loginToken') || config.get('isTokenExpired')
 }
 
-const UnsupportedBrowser = () => (
-  <div className='unsupported-browser-container'>
-    <div className='unsupported-browser-box'>
-      <h2>
-        {msg.ieNotSupported()}
-        <br />
-        {msg.useBrowserBelow()}
-      </h2>
-      <div className='browser-suggestions'>
-        <h4>{msg.freeBrowsers()}</h4>
-        <ul>
-          <li><a href='https://www.mozilla.org/firefox/new/'>Mozilla Firefox</a></li>
-          <li><a href='https://www.microsoft.com/en-us/windows/microsoft-edge'>Microsoft Edge</a></li>
-          <li><a href='https://www.google.com/chrome/'>Google Chrome</a></li>
-          <li><a href='https://www.apple.com/safari/'>Apple Safari</a></li>
-        </ul>
+const UnsupportedBrowser = () => {
+  const { msg } = useContext(MsgContext)
+  return (
+    <div className='unsupported-browser-container'>
+      <div className='unsupported-browser-box'>
+        <h2>
+          {msg.ieNotSupported()}
+          <br />
+          {msg.useBrowserBelow()}
+        </h2>
+        <div className='browser-suggestions'>
+          <h4>{msg.freeBrowsers()}</h4>
+          <ul>
+            <li><a href='https://www.mozilla.org/firefox/new/'>Mozilla Firefox</a></li>
+            <li><a href='https://www.microsoft.com/en-us/windows/microsoft-edge'>Microsoft Edge</a></li>
+            <li><a href='https://www.google.com/chrome/'>Google Chrome</a></li>
+            <li><a href='https://www.apple.com/safari/'>Apple Safari</a></li>
+          </ul>
+        </div>
       </div>
     </div>
-  </div>
-)
+  )
+}
 
 function isBrowserUnsupported () {
   return (navigator.userAgent.indexOf('MSIE') !== -1) || (!!document.documentMode === true)
@@ -50,6 +53,7 @@ function isBrowserUnsupported () {
  * the various dialogs and error messages that may be needed.
  */
 const App = ({ history, config, appReady, activateSessionTracker }) => {
+  const { msg } = useContext(MsgContext)
   if (isBrowserUnsupported()) {
     return <UnsupportedBrowser />
   }

@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { msg } from '_/intl'
+import { withMsg } from '_/intl'
 
 import { Spinner } from 'patternfly-react'
 
@@ -71,6 +71,7 @@ class LoadingData extends React.Component {
   }
 
   render () {
+    const { msg } = this.props
     if (!this.state.shouldDisplay) {
       return null
     }
@@ -87,9 +88,11 @@ class LoadingData extends React.Component {
     )
   }
 }
+
 LoadingData.propTypes = {
   requestActive: PropTypes.bool.isRequired,
   inline: PropTypes.bool,
+  msg: PropTypes.object,
 }
 LoadingData.defaultProps = {
   inline: false,
@@ -99,4 +102,4 @@ export default connect(
   (state) => ({
     requestActive: !state.activeRequests.isEmpty(),
   })
-)(LoadingData)
+)(withMsg(LoadingData))

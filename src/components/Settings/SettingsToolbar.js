@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import { Toolbar } from 'patternfly-react'
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 
 import style from './style.css'
 
 const SettingsToolbar = ({ onSave, onCancel, enableSave }) => {
+  const { msg } = useContext(MsgContext)
   const [container] = useState(document.createElement('div'))
   useEffect(() => {
     const root = document.getElementById('settings-toolbar')

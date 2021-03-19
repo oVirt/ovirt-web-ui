@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
@@ -8,9 +8,10 @@ import style from './style.css'
 
 import { clearUserMessages, dismissEvent } from '_/actions'
 import { getFormatedDateTime } from '_/helpers'
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 
 const UserMessage = ({ record, id, onDismissMessage }) => {
+  const { msg } = useContext(MsgContext)
   const time = getFormatedDateTime(record.get('time'))
   return (<Notification seen>
     <NotificationDrawer.Dropdown id={id}>
@@ -34,6 +35,7 @@ UserMessage.propTypes = {
 }
 
 const VmUserMessages = ({ userMessages, onClearMessages, onDismissMessage, onClose, show }) => {
+  const { msg } = useContext(MsgContext)
   const [expanded, setExpanded] = useState(false)
 
   const idPrefix = `usermsgs`

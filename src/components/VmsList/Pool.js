@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
 import { startPool } from '_/actions'
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 import { getOsHumanName } from '_/components/utils'
 
 import BaseCard from './BaseCard'
@@ -18,6 +18,7 @@ import { InfoTooltip } from '_/components/tooltips'
  * Single icon-card in the list for a Pool
  */
 const Pool = ({ pool, icons, onStart }) => {
+  const { msg } = useContext(MsgContext)
   const idPrefix = `pool-${pool.get('name')}`
   const osName = getOsHumanName(pool.getIn(['vm', 'os', 'type']))
   const iconId = pool.getIn(['vm', 'icons', 'large', 'id'])

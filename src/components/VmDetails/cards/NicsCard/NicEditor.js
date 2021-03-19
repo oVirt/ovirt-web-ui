@@ -15,7 +15,7 @@ import {
 import SelectBox from '../../../SelectBox'
 import NicLinkStateIcon from './NicLinkStateIcon'
 
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 import style from './style.css'
 import { createNicInterfacesList, createVNicProfileList } from '_/components/utils'
 import { EMPTY_VNIC_PROFILE_ID } from '_/constants'
@@ -143,6 +143,7 @@ class NicEditor extends Component {
   }
 
   render () {
+    const { msg } = this.context
     const { idPrefix, trigger, vmStatus, vnicProfileList } = this.props
     const modalId = idPrefix + '-modal'
 
@@ -278,6 +279,9 @@ class NicEditor extends Component {
     </React.Fragment>
   }
 }
+
+NicEditor.contextType = MsgContext
+
 NicEditor.propTypes = {
   idPrefix: PropTypes.string.isRequired,
   nic: PropTypes.object,

@@ -19,6 +19,8 @@ import AppConfiguration, { readConfiguration } from '_/config'
 import { login } from '_/actions'
 
 import App from './App'
+import { msgObj } from './intl'
+import MsgContext from './intl/MsgContext'
 import LocaleReloader from './intl/LocaleReloader'
 import GlobalErrorBoundary from './GlobalErrorBoundary'
 
@@ -34,11 +36,13 @@ window.combobox = require('patternfly-bootstrap-combobox/js/bootstrap-combobox.j
 function renderApp (store: Object, errorBridge: Object) {
   ReactDOM.render(
     <GlobalErrorBoundary errorBridge={errorBridge} store={store}>
-      <Provider store={store}>
-        <LocaleReloader>
-          <App history={store.history} />
-        </LocaleReloader>
-      </Provider>
+      <MsgContext.Provider value={msgObj}>
+        <Provider store={store}>
+          <LocaleReloader>
+            <App history={store.history} />
+          </LocaleReloader>
+        </Provider>
+      </MsgContext.Provider>
     </GlobalErrorBoundary>,
 
     (document.getElementById('root'): any)

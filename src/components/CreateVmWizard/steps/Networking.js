@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { msg, enumMsg } from '_/intl'
+import { MsgContext, enumMsg, withMsg } from '_/intl'
 import { generateUnique } from '_/helpers'
 import { NIC_SHAPE } from '../dataPropTypes'
 
@@ -36,6 +36,7 @@ const NIC_INTERFACES = createNicInterfacesList()
 const NIC_INTERFACE_DEFAULT = 'virtio'
 
 export const NicNameWithLabels = ({ id, nic }) => {
+  const { msg } = useContext(MsgContext)
   const idPrefix = `${id}-nic-${nic.id}`
   return <React.Fragment>
     <span id={`${idPrefix}-name`}>{ nic.name }</span>
@@ -78,6 +79,8 @@ class Networking extends React.Component {
     this.onEditNic = this.onEditNic.bind(this)
     this.rowRenderProps = this.rowRenderProps.bind(this)
     this.isVnicNameUniqueAndValid = this.isVnicNameUniqueAndValid.bind(this)
+
+    const { msg } = this.props
 
     this.state = {
       editingErrors: {
@@ -416,6 +419,7 @@ class Networking extends React.Component {
       cluster,
       nics,
       vnicProfiles,
+      msg,
     } = this.props
 
     const vnicList = createVNicProfileList(vnicProfiles, { dataCenterId, cluster })
@@ -491,6 +495,8 @@ Networking.propTypes = {
   vnicProfiles: PropTypes.object.isRequired,
 
   onUpdate: PropTypes.func.isRequired,
+
+  msg: PropTypes.object.isRequired,
 }
 
 export default connect(
@@ -498,4 +504,4 @@ export default connect(
     cluster: state.clusters.get(clusterId),
     vnicProfiles: state.vnicProfiles,
   })
-)(Networking)
+)(withMsg(Networking))

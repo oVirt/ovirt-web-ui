@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { List } from 'immutable'
@@ -14,7 +14,7 @@ import {
   templateNameRenderer,
   userFormatOfBytes,
 } from '_/helpers'
-import { msg, enumMsg } from '_/intl'
+import { msg, enumMsg, MsgContext, withMsg } from '_/intl'
 
 import {
   isNumber,
@@ -76,20 +76,23 @@ function rephraseVmType (vmType) {
  * Render "N/A" with an optional tooltip for any field that won't have a value
  * based on the state of the VM.
  */
-const NotAvailable = ({ tooltip, id }) => (
-  <div>
-    { tooltip
-      ? (
-        <Tooltip id={id} tooltip={tooltip}>
-          <span>{msg.notAvailable()}</span>
-        </Tooltip>
-      )
-      : (
-        <span id={id}>{msg.notAvailable()}</span>
-      )
-    }
-  </div>
-)
+const NotAvailable = ({ tooltip, id }) => {
+  const { msg } = useContext(MsgContext)
+  return (
+    <div>
+      { tooltip
+        ? (
+          <Tooltip id={id} tooltip={tooltip}>
+            <span>{msg.notAvailable()}</span>
+          </Tooltip>
+        )
+        : (
+          <span id={id}>{msg.notAvailable()}</span>
+        )
+      }
+    </div>
+  )
+}
 NotAvailable.propTypes = {
   tooltip: PropTypes.string,
   id: PropTypes.string.isRequired,
@@ -616,7 +619,7 @@ class DetailsCard extends React.Component {
   }
 
   render () {
-    const { hosts, clusters, dataCenters, templates, operatingSystems, vms, isAdmin } = this.props
+    const { hosts, clusters, dataCenters, templates, operatingSystems, vms, isAdmin, msg } = this.props
     const { vm, isEditing, correlatedMessages, clusterList, isoList } = this.state
 
     const idPrefix = 'vmdetail-details'
@@ -1008,6 +1011,7 @@ class DetailsCard extends React.Component {
     </React.Fragment>
   }
 }
+
 DetailsCard.propTypes = {
   vm: PropTypes.object.isRequired,
   vms: PropTypes.object.isRequired,
@@ -1029,6 +1033,8 @@ DetailsCard.propTypes = {
   maxNumOfVmCpus: PropTypes.number.isRequired,
 
   saveChanges: PropTypes.func.isRequired,
+
+  msg: PropTypes.object.isRequired,
 }
 
 const DetailsCardConnected = connect(
@@ -1056,6 +1062,6 @@ const DetailsCardConnected = connect(
         { correlationId }
       )),
   })
-)(DetailsCard)
+)(withMsg(DetailsCard))
 
 export default DetailsCardConnected

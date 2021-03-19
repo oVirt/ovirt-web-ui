@@ -6,7 +6,7 @@ import { Sort } from 'patternfly-react'
 import { setVmSort } from '_/actions'
 import { sortFields } from '_/utils'
 import { Tooltip } from '_/components/tooltips'
-import { msg } from '_/intl'
+import { withMsg } from '_/intl'
 
 class VmSort extends React.Component {
   constructor (props) {
@@ -26,6 +26,7 @@ class VmSort extends React.Component {
   }
 
   getSortTooltipMessage () {
+    const { msg } = this.props
     const { sort: { id, isAsc } } = this.props
     return id === 'os' || id === 'name'
       ? (isAsc ? msg.sortAToZ() : msg.sortZToA())
@@ -66,6 +67,7 @@ VmSort.propTypes = {
     isAsc: PropTypes.bool,
   }).isRequired,
   onSortChange: PropTypes.func.isRequired,
+  msg: PropTypes.object.isRequired,
 }
 
 export default connect(
@@ -75,4 +77,4 @@ export default connect(
   (dispatch) => ({
     onSortChange: (sort) => dispatch(setVmSort({ sort })),
   })
-)(VmSort)
+)(withMsg(VmSort))

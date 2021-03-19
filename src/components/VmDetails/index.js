@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Alert, Card, CardBody } from 'patternfly-react'
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 
 import styles from './style.css'
 
@@ -48,6 +48,7 @@ class VmDetailsContainer extends React.Component {
   }
 
   render () {
+    const { msg } = this.context
     const { vm } = this.props
 
     return (
@@ -86,6 +87,9 @@ class VmDetailsContainer extends React.Component {
     )
   }
 }
+
+VmDetailsContainer.contextType = MsgContext
+
 VmDetailsContainer.propTypes = {
   vm: PropTypes.object,
 }

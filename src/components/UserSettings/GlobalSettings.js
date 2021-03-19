@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 import { saveGlobalOptions } from '_/actions'
 import { FormControl, Switch } from 'patternfly-react'
-import { msg } from '_/intl'
+import { msg, withMsg } from '_/intl'
 import localeWithFullName from '_/intl/localeWithFullName'
 import style from './style.css'
 
@@ -134,7 +134,7 @@ class GlobalSettings extends Component {
 
   buildSections (onChange) {
     const { draftValues, translatedLabels } = this.state
-    const { config } = this.props
+    const { config, msg } = this.props
     const idPrefix = 'global-user-settings'
     return {
       general: {
@@ -238,12 +238,14 @@ class GlobalSettings extends Component {
     )
   }
 }
+
 GlobalSettings.propTypes = {
   currentValues: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
   lastTransactionId: PropTypes.string,
   saveOptions: PropTypes.func.isRequired,
   goToMainPage: PropTypes.func.isRequired,
+  msg: PropTypes.object.isRequired,
 }
 
 export default connect(
@@ -266,4 +268,4 @@ export default connect(
     saveOptions: (values, transactionId) => dispatch(saveGlobalOptions({ values }, { transactionId })),
     goToMainPage: () => dispatch(push('/')),
   })
-)(GlobalSettings)
+)(withMsg(GlobalSettings))

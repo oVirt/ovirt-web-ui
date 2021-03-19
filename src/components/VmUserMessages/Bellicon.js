@@ -1,12 +1,13 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import { hrefWithoutHistory } from '_/helpers'
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 import { Tooltip } from '../tooltips'
 
 const Bellicon = ({ userMessages, handleclick }) => {
+  const { msg } = useContext(MsgContext)
   const messagesCount = userMessages.get('records').size
   const idPrefix = `usermsgs`
   const badgeElement = messagesCount === 0

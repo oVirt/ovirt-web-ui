@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import { msg } from '_/intl'
 import { isNumber } from '_/utils'
 import { createDiskTypeList, createStorageDomainList, isDiskNameValid } from '_/components/utils'
 
@@ -198,6 +197,7 @@ class DiskImageEditor extends Component {
   }
 
   validateField (field = '') {
+    const { msg } = this.context
     const errors = this.state.errors
     let isErrorOnField = false
 
@@ -277,6 +277,7 @@ class DiskImageEditor extends Component {
   }
 
   render () {
+    const { msg } = this.context
     const { idPrefix, disk, trigger, vm } = this.props
 
     const createMode = !disk

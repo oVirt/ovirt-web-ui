@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { localeCompare } from '_/helpers'
-import { msg } from '_/intl'
+import { withMsg, msg } from '_/intl'
 import { isNumberInRange } from '_/utils'
 import { BASIC_DATA_SHAPE } from '../dataPropTypes'
 import {
@@ -332,7 +332,7 @@ class BasicSettings extends React.Component {
     const {
       data, clusters, maxNumOfSockets, maxNumOfCores,
       maxNumOfThreads, operatingSystems, id, dataCenters,
-      storageDomains, templates,
+      storageDomains, templates, msg,
     } = this.props
     const idPrefix = id || 'create-vm-wizard-basic'
 
@@ -703,6 +703,7 @@ BasicSettings.propTypes = {
   defaultGeneralTimezone: PropTypes.string.isRequired,
   // eslint-disable-next-line react/no-unused-prop-types
   defaultWindowsTimezone: PropTypes.string.isRequired,
+  msg: PropTypes.object.isRequired,
 }
 
 export default connect(
@@ -721,4 +722,4 @@ export default connect(
     maxNumOfCores: state.config.get('maxNumberOfCores'),
     maxNumOfThreads: state.config.get('maxNumberOfThreads'),
   })
-)(BasicSettings)
+)(withMsg(BasicSettings))

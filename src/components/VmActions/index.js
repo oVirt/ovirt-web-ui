@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
 import style from './style.css'
-import { msg } from '_/intl'
+import { withMsg } from '_/intl'
 import { RouterPropTypeShapes } from '_/propTypeShapes'
 
 import {
@@ -128,6 +128,7 @@ class VmActions extends React.Component {
       onSuspend,
       onRDP,
       isOnCard,
+      msg,
     } = this.props
     const isPoolVm = !!vm.getIn(['pool', 'id'], false)
     const isPool = !!pool && !isPoolVm
@@ -279,6 +280,7 @@ class VmActions extends React.Component {
       isOnCard = false,
       idPrefix = `vmaction-${vm.get('name')}`,
       onRemove,
+      msg,
     } = this.props
 
     const isPool = !!pool
@@ -372,6 +374,7 @@ VmActions.propTypes = {
   onStartPool: PropTypes.func.isRequired,
   onStartVm: PropTypes.func.isRequired,
   onRDP: PropTypes.func.isRequired,
+  msg: PropTypes.object.isRequired,
 }
 
 export default withRouter(
@@ -390,5 +393,5 @@ export default withRouter(
       onStartVm: () => dispatch(startVm({ vmId: vm.get('id') })),
       onRDP: ({ domain, username }) => dispatch(getRDP({ name: vm.get('name'), fqdn: vm.get('fqdn'), domain, username })),
     })
-  )(VmActions)
+  )(withMsg(VmActions))
 )

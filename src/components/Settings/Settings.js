@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import PropTypes from 'prop-types'
 
 import SettingsToolbar from './SettingsToolbar'
@@ -6,7 +6,7 @@ import NavigationPrompt from 'react-router-navigation-prompt'
 import NavigationConfirmationModal from '../NavigationConfirmationModal'
 import CounterAlert from '_/components/CounterAlert'
 import { generateUnique } from '_/helpers'
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 import style from './style.css'
 
 const changedInTheMeantime = ({ currentValues = {}, baseValues = {}, draftValues = {}, sentValues = {} }) => {
@@ -39,6 +39,7 @@ const stillPending = ({ currentValues = {}, sentValues = {} }) => {
 const Settings = ({ draftValues, onSave, lastTransactionId, onCancel,
   translatedLabels, baseValues, sentValues, currentValues,
   resetBaseValues, children }) => {
+  const { msg } = useContext(MsgContext)
   const [transactionId, setTransactionId] = useState(null)
 
   const handleSave = () => {
