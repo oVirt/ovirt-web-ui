@@ -21,12 +21,12 @@ function* addVmSnapshot (action) {
 
   if (snapshot && snapshot.id) {
     yield fetchVmSnapshots({ vmId: action.payload.vmId })
-    for (let delaySec of delayInMsSteps()) {
+    for (let delayMilliSec of delayInMsSteps()) {
       const apiSnapshot = yield callExternalAction('snapshot', Api.snapshot, { payload: { snapshotId: snapshot.id, vmId: action.payload.vmId } }, true)
       if (apiSnapshot.snapshot_status !== 'locked') {
         break
       }
-      yield delay(delaySec * 1000)
+      yield delay(delayMilliSec)
     }
     yield fetchVmSnapshots({ vmId: action.payload.vmId })
   }
