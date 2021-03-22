@@ -19,6 +19,18 @@ var env = require('../config/env')
 var rimraf = require('rimraf')
 var formatMessage = require('./utils/utils').formatMessage
 var isLikelyASyntaxError = require('./utils/utils').isLikelyASyntaxError
+const fs = require('fs');
+const dotenv = require('dotenv')
+
+if (process.env.ENGINE_ENV){
+  const envFilePath = `.env.${process.env.ENGINE_ENV}`
+  const envConfig = dotenv.parse(fs.readFileSync(envFilePath))
+  console.log(chalk`{green Loaded configuration from:${envFilePath}}`);
+  for (const k in envConfig) {
+    // give higher priority to existing variables
+    process.env[k] = process.env[k] || envConfig[k]
+  }
+}
 
 // Tools like Cloud9 rely on this.
 var DEFAULT_PORT = process.env.PORT || 3000;
@@ -327,18 +339,19 @@ function getUserInfo (protocol, port) {
    * be disabled and hidden.
    * @type {String}
    */
-  var username = readlineSync.question(`oVirt user (${DEFAULT_USER}): `, {
+  var username = process.env.ENGINE_USER || readlineSync.question(`oVirt user (${DEFAULT_USER}): `, {
     defaultInput: DEFAULT_USER
   });
 
-  var password = readlineSync.question('oVirt password: ', {
+  var password = process.env.ENGINE_PASSWORD || readlineSync.question('oVirt password: ', {
     noEchoBack: true
   });
 
-  var domain = readlineSync.question(`oVirt domain (${DEFAULT_DOMAIN}): `, {
+  var domain = process.env.ENGINE_DOMAIN || readlineSync.question(`oVirt domain (${DEFAULT_DOMAIN}): `, {
     defaultInput: DEFAULT_DOMAIN
   });
 
+  console.log('Connecting using provided credentials...')
 
   return new Promise((resolve, reject) => {
     request(`${engineUrl}/sso/oauth/token?` +
