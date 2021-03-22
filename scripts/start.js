@@ -27,7 +27,8 @@ if (process.env.ENGINE_ENV){
   const envConfig = dotenv.parse(fs.readFileSync(envFilePath))
   console.log(chalk`{green Loaded configuration from:${envFilePath}}`);
   for (const k in envConfig) {
-    process.env[k] = envConfig[k]
+    // give higher priority to existing variables
+    process.env[k] = process.env[k] || envConfig[k]
   }
 }
 
