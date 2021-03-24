@@ -1,7 +1,6 @@
 // @flow
 
 import Api, { Transforms } from '_/ovirtapi'
-import { delay } from 'redux-saga'
 import { all, put, select, takeLatest, call } from 'redux-saga/effects'
 
 import * as A from '_/actions'
@@ -147,23 +146,6 @@ function* saveRemoteOption ([ name, value ]: any): any | ResultType {
     change: name })
 }
 
-/**
- * Required to delay destructive side effects of user option changes.
- * Effect should wait until 'finish' event was dispatched.
- * Primary use case is page reload after locale change.
- */
-function withLoadingUserOptions (delegateGenerator: (any) => Generator<any, any, any>): any {
-  return function* (action: any): any {
-    yield put(A.loadingUserOptionsInProgress())
-    try {
-      yield call(delegateGenerator, action)
-    } finally {
-      yield delay(1000)
-      yield put(A.loadingUserOptionsFinished())
-    }
-  }
-}
-
 function* saveGlobalOptions ({ payload: { sshKey, showNotifications, notificationSnoozeDuration, language, updateRate }, meta: { transactionId } }: SaveGlobalOptionsActionType): Generator<any, any, any> {
   const { ssh, locale } = yield all({
     ssh: call(saveSSHKey, ...Object.entries({ sshKey })),
@@ -231,12 +213,11 @@ export function* loadUserOptions (): any {
   const userId = yield select(state => state.config.getIn(['user', 'id']))
   yield put(A.getSSHKey({ userId }))
   yield put(A.fetchUserOptions({ userId }))
-  yield put(A.loadingUserOptionsFinished())
 }
 
 export default [
   takeLatest(C.SAVE_SSH_KEY, saveSSHKey),
-  takeLatest(C.SAVE_GLOBAL_OPTIONS, withLoadingUserOptions(saveGlobalOptions)),
+  takeLatest(C.SAVE_GLOBAL_OPTIONS, saveGlobalOptions),
   takeLatest(C.GET_SSH_KEY, fetchSSHKey),
   takeLatest(C.FETCH_OPTIONS, fetchUserOptions),
 ]

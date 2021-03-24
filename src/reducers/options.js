@@ -28,7 +28,6 @@ const defaultOptions: UserOptionsType = {
   ssh: undefined,
   lastTransactions: {},
   consoleOptions: {},
-  loadingFinished: false,
 }
 
 const initialState = fromJS({ ...defaultOptions })
@@ -36,12 +35,6 @@ const initialState = fromJS({ ...defaultOptions })
 const options = actionReducer(initialState, {
   [C.SET_CONSOLE_OPTIONS] (clientState: any, { payload: { vmId, options } }: any): any {
     return clientState.setIn(['consoleOptions', vmId], options)
-  },
-  [C.LOAD_USER_OPTIONS_IN_PROGRESS]: (clientState: any, action: any) => {
-    return clientState.setIn(['loadingFinished'], false)
-  },
-  [C.LOAD_USER_OPTIONS_FINISHED]: (clientState: any, action: any) => {
-    return clientState.setIn(['loadingFinished'], true)
   },
   [C.LOAD_USER_OPTIONS]: (clientState: any, action: LoadUserOptionsActionType) => {
     const serverState = fromJS(action.payload.userOptions || {})

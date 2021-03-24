@@ -72,18 +72,6 @@ export function loadUserOptions (userOptions: RemoteUserOptionsType): LoadUserOp
   }
 }
 
-export function loadingUserOptionsInProgress (): Object {
-  return {
-    type: C.LOAD_USER_OPTIONS_IN_PROGRESS,
-  }
-}
-
-export function loadingUserOptionsFinished (): Object {
-  return {
-    type: C.LOAD_USER_OPTIONS_FINISHED,
-  }
-}
-
 export function saveGlobalOptions ({ values: { sshKey, language, showNotifications, notificationSnoozeDuration, updateRate } = {} }: Object, { transactionId }: Object): SaveGlobalOptionsActionType {
   return {
     type: C.SAVE_GLOBAL_OPTIONS,

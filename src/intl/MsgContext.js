@@ -1,13 +1,14 @@
 import React from 'react'
-import { msgObj } from './index'
+import { msg } from './index'
 
-const MsgContext = React.createContext(msgObj)
+const defaultMsg = { msg }
+const MsgContext = React.createContext(defaultMsg)
 console.warn('Created MsgContext:', MsgContext)
 
 export const withMsg = (WrappedComponent) => {
   return ({ ...otherProps }) => (
-    <MsgContext.Consumer>{({ msg }) => (
-      <WrappedComponent msg={msg} {...otherProps} />)
+    <MsgContext.Consumer>{({ ...msgProps }) => (
+      <WrappedComponent {...otherProps} {...msgProps} />)
     }
     </MsgContext.Consumer>
   )

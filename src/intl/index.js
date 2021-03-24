@@ -19,12 +19,12 @@ export const BASE_LOCALE_SET: Set<string> = new Set(Object.keys(localeWithFullNa
 export const locale: string = initIntl()
 export const localeFromUrl: ?string = getLocaleFromUrl()
 
-function getMessage (id: MessageIdType): string {
-  const message = getMessageForLocale(id, locale)
+function getMessage (id: MessageIdType, targetLocale: string): string {
+  const message = getMessageForLocale(id, targetLocale)
   if (message) {
     return message
   }
-  if (locale !== DEFAULT_LOCALE) {
+  if (targetLocale !== DEFAULT_LOCALE) {
     const enMessage = getMessageForLocale(id, DEFAULT_LOCALE)
     if (enMessage) {
       return enMessage
@@ -33,22 +33,22 @@ function getMessage (id: MessageIdType): string {
   return id
 }
 
-function getMessageForLocale (id: MessageIdType, locale: string): ?string {
-  const messages = locale === DEFAULT_LOCALE ? defaultMessages : translatedMessages[locale]
+function getMessageForLocale (id: MessageIdType, targetLocale: string): ?string {
+  const messages = targetLocale === DEFAULT_LOCALE ? defaultMessages : translatedMessages[targetLocale]
   const message = messages[id]
   if (message) {
     return message
   }
-  console.warn(`Message for id '${id}' and locale '${locale}' not found.`)
+  console.warn(`Message for id '${id}' and locale '${targetLocale}' not found.`)
   return null
 }
 
 const messageFormatCache: {[MessageIdType]: IntlMessageFormat} = {}
 
-function formatMessage (id: MessageIdType, values: ?Object): string {
+function formatMessage (id: MessageIdType, values: ?Object, targetLocale: string): string {
   let messageFormat = messageFormatCache[id]
   if (!messageFormat) {
-    messageFormat = new IntlMessageFormat(getMessage(id), locale)
+    messageFormat = new IntlMessageFormat(getMessage(id, targetLocale), targetLocale)
     messageFormatCache[id] = messageFormat
   }
   return messageFormat.format(values)
@@ -68,9 +68,16 @@ function removeMessageDescription (messages: { [MessageIdType]: MessageType }): 
 
 const defaultMessages: { [MessageIdType]: string } = removeMessageDescription(messages)
 
-function createFormattingFunctionsMap (messages: { [MessageIdType]: MessageType }): {[MessageIdType]: ((?Object) => string)} {
+function createFormattingFunctionsMap (targetLocale: string, messages: { [MessageIdType]: MessageType }): {[MessageIdType]: ((?Object) => string)} {
   return Object.keys(messages)
-    .reduce((sum, key) => Object.assign(sum, { [key]: (values) => formatMessage(key, values) }), {})
+    .reduce((sum, key) => Object.assign(sum, { [key]: (values) => formatMessage(key, values, targetLocale) }), {})
+}
+
+export function createMessages (targetLocale: string): {[MessageIdType]: ((?Object) => string)} {
+  for (const key in messageFormatCache) {
+    delete messageFormatCache[key]
+  }
+  return createFormattingFunctionsMap(targetLocale, messages)
 }
 
 /**
@@ -78,9 +85,7 @@ function createFormattingFunctionsMap (messages: { [MessageIdType]: MessageType 
  *
  * Keys corresponds to {@link messages}
  */
-export const msg: {[MessageIdType]: ((?Object) => string)} = createFormattingFunctionsMap(messages)
-
-export const msgObj = { msg }
+export const msg: {[MessageIdType]: ((?Object) => string)} = createMessages(locale)
 
 /**
  * Utility function to translate enums

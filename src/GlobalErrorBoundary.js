@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { msg } from '_/intl'
+import { msg, MsgContext, createMessages, locale } from './intl'
 import { logout } from '_/actions'
 import AppConfiguration from '_/config'
 import ErrorContent from '_/components/ErrorContent'
@@ -9,7 +9,24 @@ import * as branding from '_/branding'
 class GlobalErrorBoundary extends React.Component {
   constructor (props) {
     super(props)
-    this.state = { hasError: false }
+
+    this.reloadMsg = (locale) => {
+      this.setState(({ msgContextState }) => ({ msgContextState: {
+        msg: createMessages(locale),
+        locale,
+        reloadMsg: msgContextState.reloadMsg,
+      },
+      }))
+    }
+
+    this.state = {
+      hasError: false,
+      msgContextState: {
+        msg,
+        reloadMsg: this.reloadMsg,
+        locale,
+      },
+    }
 
     this.props.errorBridge.setErrorHandler((error) => {
       this.setState({ hasError: true })
@@ -39,13 +56,14 @@ class GlobalErrorBoundary extends React.Component {
   }
 
   render () {
+    const { hasError, msgContextState: { msg } } = this.state
     const trackText = branding.fixedStrings.ISSUES_TRACKER_TEXT || 'Github Issue Tracker'
     const trackUrl = branding.fixedStrings.ISSUES_TRACKER_URL || 'https://github.com/oVirt/ovirt-web-ui/issues'
     const descr = msg.globalErrorBoundaryDescription({
       bugUrl: `<a href='${trackUrl}'>${trackText}</a>`,
     })
 
-    if (this.state.hasError) {
+    if (hasError) {
       return (
         <div>
           <nav className='navbar navbar-pf-vertical obrand_masthead'>
@@ -71,7 +89,7 @@ class GlobalErrorBoundary extends React.Component {
         </div>
       )
     }
-    return this.props.children
+    return (<MsgContext.Provider value={this.state.msgContextState}>{this.props.children}</MsgContext.Provider>)
   }
 }
 
