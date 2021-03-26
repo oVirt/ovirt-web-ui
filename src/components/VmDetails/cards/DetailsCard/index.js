@@ -14,7 +14,7 @@ import {
   templateNameRenderer,
   userFormatOfBytes,
 } from '_/helpers'
-import { msg, enumMsg, MsgContext, withMsg } from '_/intl'
+import { enumMsg, MsgContext, withMsg } from '_/intl'
 
 import {
   isNumber,
@@ -57,7 +57,7 @@ import { Tooltip, InfoTooltip } from '_/components/tooltips'
 
 import timezones from '_/components/utils/timezones.json'
 
-function rephraseVmType (vmType) {
+function rephraseVmType (vmType, msg) {
   const types = {
     'desktop': msg.vmType_desktop(),
     'server': msg.vmType_server(),
@@ -673,7 +673,7 @@ class DetailsCard extends React.Component {
     const bootMenuEnabled = vm.get('bootMenuEnabled')
 
     // Optimized for
-    const optimizedFor = rephraseVmType(vm.get('type'))
+    const optimizedFor = rephraseVmType(vm.get('type'), msg)
 
     // VCPU
     const SOCKETS_VCPU = 'sockets'
