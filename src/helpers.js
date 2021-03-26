@@ -1,4 +1,4 @@
-import { locale as appLocale, msg } from '_/intl'
+import { locale as appLocale } from '_/intl'
 import AppConfiguration from '_/config'
 import { defaultOperatingSystemIds } from '_/constants/operatingSystems'
 
@@ -222,25 +222,6 @@ export function getFormatedDateTime (timestamp) {
     time: `${formatTwoDigits(t.getHours())}:${formatTwoDigits(t.getMinutes())}:${formatTwoDigits(t.getSeconds())}`,
     date: `${t.getDate()}/${t.getMonth()}/${t.getFullYear()}`,
   }
-}
-
-export function formatDateFromNow (d) {
-  const now = Date.now()
-  const date = new Date(d)
-
-  const suffixes = [ msg.secondsShort(), msg.minutesShort(), msg.hoursShort(), msg.daysShort(), msg.monthsShort(), msg.yearsShort() ]
-  const divitions = [ 1000, 60, 60, 24, 30, 12 ]
-  let elapsed = (now - date.getTime())
-  let suffix = ''
-
-  let currentIndex = 0
-  do {
-    suffix = suffixes[currentIndex]
-    elapsed = Math.floor(elapsed / divitions[currentIndex])
-    currentIndex++
-  } while (divitions[currentIndex] <= elapsed && currentIndex < suffixes.length)
-
-  return msg.timeAgo({ time: `${elapsed}${suffix}` })
 }
 
 export function filterOsByArchitecture (operatingSystems, architecture) {

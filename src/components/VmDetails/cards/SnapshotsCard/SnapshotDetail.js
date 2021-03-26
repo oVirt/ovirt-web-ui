@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 
 import {
@@ -12,7 +12,7 @@ import Immutable from 'immutable'
 
 import style from './style.css'
 
-import { msg, MsgContext } from '_/intl'
+import { withMsg } from '_/intl'
 
 import Selectors from '_/selectors'
 import { templateNameRenderer, getFormatedDateTime, userFormatOfBytes, localeCompare } from '_/helpers'
@@ -20,10 +20,15 @@ import { getOsHumanName, sortDisksForDisplay } from '_/components/utils'
 
 import RestoreConfirmationModal from './RestoreConfirmationModal'
 
-function getStatus (status) {
+const Status = ({ status, msg }) => {
   return status
     ? <span className={style['status-icon']}><Icon type='pf' name='on-running' className={style['green']} />{msg.on()}</span>
     : <span className={style['status-icon']}><Icon type='pf' name='off' />{msg.off()}</span>
+}
+
+Status.propTypes = {
+  status: PropTypes.bool.isRequired,
+  msg: PropTypes.object.isRequired,
 }
 
 const diskRender = (idPrefix, disk, index) => {
@@ -40,14 +45,13 @@ const nicRender = (idPrefix, nic) => {
   </div>
 }
 
-const statusMap = {
+const statusMap = (msg) => ({
   'in_preview': msg.inPreview(),
   'locked': msg.locked(),
   'ok': msg.ok(),
-}
+})
 
-const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, id, isPoolVm, ...otherProps }) => {
-  const { msg } = useContext(MsgContext)
+const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, id, isPoolVm, msg, ...otherProps }) => {
   const template = Selectors.getTemplateById(snapshot.getIn(['vm', 'template', 'id']))
   const time = getFormatedDateTime(snapshot.get('date'))
 
@@ -112,7 +116,7 @@ const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, id, isPoolVm, ...othe
           {msg.status()}
         </dt>
         <dd id={`${id}-status`}>
-          {statusMap[snapshot.get('status')]}
+          {statusMap(msg)[snapshot.get('status')]}
         </dd>
       </dl>
       <dl className={style['snapshot-properties']}>
@@ -161,7 +165,7 @@ const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, id, isPoolVm, ...othe
           {msg.bootMenu()}
         </dt>
         <dd id={`${id}-boot-menu`}>
-          {getStatus(snapshot.getIn(['vm', 'bootMenuEnabled']))}
+          <Status msg={msg} status={snapshot.getIn(['vm', 'bootMenuEnabled'])} />
         </dd>
         <dt>
           {msg.disks()}
@@ -199,6 +203,7 @@ const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, id, isPoolVm, ...othe
         id={`${id}-restore-modal`}
         snapshot={snapshot}
         vmId={vmId}
+        msg={msg}
         trigger={({ onClick }) =>
           isPoolVm ? (
             <OverlayTrigger placement='top' overlay={<Tooltip id={`${id}-restore-tt`}>{ msg.vmPoolSnapshotRestoreUnavailable() }</Tooltip>}>
@@ -223,6 +228,7 @@ SnapshotDetail.propTypes = {
   vmId: PropTypes.string.isRequired,
   restoreDisabled: PropTypes.bool,
   isPoolVm: PropTypes.bool,
+  msg: PropTypes.object.isRequired,
 }
 
-export default SnapshotDetail
+export default withMsg(SnapshotDetail)
