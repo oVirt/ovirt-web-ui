@@ -15,6 +15,7 @@ import baseStyle from '../../style.css'
 import style from './style.css'
 import NicEditor from './NicEditor'
 import NicListItem from './NicListItem'
+import { localeCompare } from '_/helpers'
 
 /*
  * Filter the set of vNIC profiles to display to the user such that:
@@ -88,7 +89,13 @@ class NicsCard extends React.Component {
   }
 
   render () {
-    const { vm, vnicProfiles, onEditChange, msg } = this.props
+    const {
+      vm,
+      vnicProfiles,
+      onEditChange,
+      msg,
+      locale,
+    } = this.props
 
     const idPrefix = 'vmdetail-nics'
     const canEditTheCard =
@@ -100,7 +107,7 @@ class NicsCard extends React.Component {
 
     const showNicIPs = vm.get('status') === 'up'
     const nicList = vm.get('nics')
-      .sort((a, b) => a.get('name').localeCompare(b.get('name')))
+      .sort((a, b) => localeCompare(a.get('name'), b.get('name'), locale))
       .map(nic => ({
         id: nic.get('id'),
         name: nic.get('name'),
@@ -195,6 +202,7 @@ NicsCard.propTypes = {
   editNic: PropTypes.func.isRequired, // eslint-disable-line react/no-unused-prop-types
   deleteNic: PropTypes.func.isRequired, // eslint-disable-line react/no-unused-prop-types
   msg: PropTypes.object.isRequired,
+  locale: PropTypes.string.isRequired,
 }
 
 export default connect(

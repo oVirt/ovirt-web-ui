@@ -143,13 +143,13 @@ class NicEditor extends Component {
   }
 
   render () {
-    const { msg } = this.context
+    const { msg, locale } = this.context
     const { idPrefix, trigger, vmStatus, vnicProfileList } = this.props
     const modalId = idPrefix + '-modal'
 
     const createMode = !this.props.nic
 
-    const vnicList = createVNicProfileList(vnicProfileList)
+    const vnicList = createVNicProfileList(vnicProfileList, locale)
     const nicInterface = NIC_INTERFACES.find(ni => ni.id === this.state.values.interface)
     const canChangeInterface =
       createMode ||

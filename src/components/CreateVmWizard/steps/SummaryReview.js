@@ -239,11 +239,11 @@ const SummaryReview = ({
   vnicProfiles,
   storageDomains,
 }) => {
-  const { msg } = useContext(MsgContext)
+  const { msg, locale } = useContext(MsgContext)
   const id = propsId ? `${propsId}-review` : 'create-vm-wizard-review'
 
-  const disksList = sortNicsDisks([...storage]) // Sort the template based ones first, then by name
-  const nicsList = sortNicsDisks([...network])
+  const disksList = sortNicsDisks([...storage], locale) // Sort the template based ones first, then by name
+  const nicsList = sortNicsDisks([...network], locale)
 
   return (<div className={style['review-content']}>
     { (!progress.inProgress && !progress.result) &&

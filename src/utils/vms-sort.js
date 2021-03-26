@@ -1,5 +1,6 @@
 import { getOsHumanName } from '../components/utils'
 import { enumMsg } from '_/intl'
+import { localeCompare } from '_/helpers'
 
 const getFieldValueMap = {
   name: (item) => item.get('name'),
@@ -25,13 +26,13 @@ export const SortFields = {
   },
 }
 
-export const sortFunction = (sortType) =>
+export const sortFunction = (sortType, locale) =>
   (vmA, vmB) => {
     const vmAValue = getFieldValueMap[sortType.id](vmA)
     const vmBValue = getFieldValueMap[sortType.id](vmB)
     if (!vmAValue) {
       return sortType.isAsc ? -1 : 1
     }
-    const compareValue = vmAValue.localeCompare(vmBValue)
+    const compareValue = localeCompare(vmAValue, vmBValue, locale)
     return sortType.isAsc ? compareValue : -compareValue
   }

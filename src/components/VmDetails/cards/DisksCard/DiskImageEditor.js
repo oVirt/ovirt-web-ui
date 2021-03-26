@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 
 import { isNumber } from '_/utils'
 import { createDiskTypeList, createStorageDomainList, isDiskNameValid } from '_/components/utils'
+import { withMsg } from '_/intl'
 
 import {
   Button,
@@ -76,9 +77,10 @@ LabelCol.propTypes = {
 class DiskImageEditor extends Component {
   constructor (props) {
     super(props)
+    const { storageDomainList, dataCenterId, locale } = this.props
     this.state = {
       showModal: false,
-      storageDomainSelectList: createStorageDomainList(props.storageDomainList, props.dataCenterId, true),
+      storageDomainSelectList: createStorageDomainList({ storageDomains: storageDomainList, dataCenterId, includeUsage: true, locale }),
 
       id: undefined,
       values: {
@@ -108,7 +110,7 @@ class DiskImageEditor extends Component {
 
   open (e) {
     e.preventDefault()
-    const { disk, suggestedName, suggestedStorageDomain } = this.props
+    const { disk, suggestedName, suggestedStorageDomain, storageDomainList, dataCenterId, locale } = this.props
     const { storageDomainSelectList } = this.state
     const diskInfo = disk
       ? { // edit
@@ -143,7 +145,7 @@ class DiskImageEditor extends Component {
 
     this.setState({
       showModal: true,
-      storageDomainSelectList: createStorageDomainList(this.props.storageDomainList, this.props.dataCenterId, true),
+      storageDomainSelectList: createStorageDomainList({ storageDomains: storageDomainList, dataCenterId, includeUsage: true, locale }),
       ...diskInfo,
     })
     this.changesMade = false
@@ -197,7 +199,7 @@ class DiskImageEditor extends Component {
   }
 
   validateField (field = '') {
-    const { msg } = this.context
+    const { msg } = this.props
     const errors = this.state.errors
     let isErrorOnField = false
 
@@ -277,8 +279,7 @@ class DiskImageEditor extends Component {
   }
 
   render () {
-    const { msg } = this.context
-    const { idPrefix, disk, trigger, vm } = this.props
+    const { idPrefix, disk, trigger, vm, msg } = this.props
 
     const createMode = !disk
     const isImage = disk && disk.get('type') === 'image'
@@ -507,6 +508,7 @@ class DiskImageEditor extends Component {
     </React.Fragment>
   }
 }
+
 DiskImageEditor.propTypes = {
   idPrefix: PropTypes.string.isRequired,
   vm: PropTypes.object.isRequired,
@@ -521,6 +523,9 @@ DiskImageEditor.propTypes = {
 
   storageDomains: PropTypes.object.isRequired,
   dataCenterId: PropTypes.string.isRequired,
+
+  locale: PropTypes.string.isRequired,
+  msg: PropTypes.object.isRequired,
 }
 
 export default connect(
@@ -528,4 +533,4 @@ export default connect(
     storageDomains: state.storageDomains,
     dataCenterId: state.clusters.getIn([ vm.getIn([ 'cluster', 'id' ]), 'dataCenterId' ]),
   })
-)(DiskImageEditor)
+)(withMsg(DiskImageEditor))

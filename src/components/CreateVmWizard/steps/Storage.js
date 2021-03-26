@@ -281,8 +281,8 @@ class Storage extends React.Component {
           } = rowData
 
           if (isFromTemplate && !canUserUseStorageDomain) {
-            const { storageDomains, dataCenterId } = props
-            const storageDomainList = createStorageDomainList(storageDomains, dataCenterId, true)
+            const { storageDomains, dataCenterId, locale } = props
+            const storageDomainList = createStorageDomainList({ storageDomains, dataCenterId, includeUsage: true, locale })
 
             if (storageDomainList.length === 0) {
               return <React.Fragment>
@@ -317,8 +317,8 @@ class Storage extends React.Component {
           </React.Fragment>
         },
         editView: (value, { rowData }) => {
-          const { storageDomains, dataCenterId } = props
-          const storageDomainList = createStorageDomainList(storageDomains, dataCenterId, true)
+          const { storageDomains, dataCenterId, locale } = props
+          const storageDomainList = createStorageDomainList({ storageDomains, dataCenterId, includeUsage: true, locale })
           const row = this.state.editing[rowData.id]
 
           if (storageDomainList.length > 1 || row.storageDomainId === '_') {
@@ -494,10 +494,11 @@ class Storage extends React.Component {
       dataCenterId,
       vmName,
       disks,
+      locale,
     } = this.props
 
     // If only 1 storage domain is available, select it automatically
-    const storageDomainList = createStorageDomainList(storageDomains, dataCenterId)
+    const storageDomainList = createStorageDomainList({ storageDomains, dataCenterId, locale })
     const storageDomainId = storageDomainList.length === 1 ? storageDomainList[0].id : '_'
 
     // Setup a new disk in the editing hash
@@ -652,13 +653,14 @@ class Storage extends React.Component {
       disks,
       dataCenterId,
       msg,
+      locale,
     } = this.props
 
-    const storageDomainList = createStorageDomainList(storageDomains)
-    const dataCenterStorageDomainsList = createStorageDomainList(storageDomains, dataCenterId)
+    const storageDomainList = createStorageDomainList({ storageDomains, locale })
+    const dataCenterStorageDomainsList = createStorageDomainList({ storageDomains, dataCenterId, locale })
     const enableCreate = storageDomainList.length > 0 && !this.isEditingMode()
 
-    const diskList = sortNicsDisks([...disks])
+    const diskList = sortNicsDisks([...disks], locale)
       .concat(this.state.creating ? [ this.state.editing[this.state.creating] ] : [])
       .map(disk => {
         disk = this.state.editing[disk.id] || disk
@@ -749,6 +751,7 @@ Storage.propTypes = {
   minDiskSizeInGiB: PropTypes.number.isRequired,
   onUpdate: PropTypes.func.isRequired,
   msg: PropTypes.object.isRequired,
+  locale: PropTypes.string.isRequired,
 }
 
 export default connect(

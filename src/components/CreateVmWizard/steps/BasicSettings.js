@@ -332,7 +332,7 @@ class BasicSettings extends React.Component {
     const {
       data, clusters, maxNumOfSockets, maxNumOfCores,
       maxNumOfThreads, operatingSystems, id, dataCenters,
-      storageDomains, templates, msg,
+      storageDomains, templates, msg, locale,
     } = this.props
     const idPrefix = id || 'create-vm-wizard-basic'
 
@@ -342,7 +342,7 @@ class BasicSettings extends React.Component {
     }
 
     const clusterList =
-      createClusterList(clusters)
+      createClusterList({ clusters, locale })
         .map(cluster => ({
           id: cluster.id,
           value: `${cluster.value} (${dataCenters.find(dc => dc.id === cluster.datacenter).name})`,
@@ -368,7 +368,7 @@ class BasicSettings extends React.Component {
 
     const enableOsSelect = isValidUid(data.clusterId) && [ 'iso', 'template' ].includes(data.provisionSource)
     const operatingSystemList = enableOsSelect
-      ? createOsList(data.clusterId, clusters, operatingSystems)
+      ? createOsList({ clusterId: data.clusterId, clusters, operatingSystems, locale })
       : [ { id: '_', value: `-- ${msg.createVmWizardSelectClusterBeforeOS()} --` } ]
 
     const enableIsoSelect = data.provisionSource === 'iso' && isValidUid(data.dataCenterId)
@@ -378,7 +378,7 @@ class BasicSettings extends React.Component {
           id: iso.file.id,
           value: iso.file.name,
         }))
-        .sort((a, b) => localeCompare(a.value, b.value))
+        .sort((a, b) => localeCompare(a.value, b.value, locale))
       : [ { id: '_', value: `-- ${msg.createVmWizardSelectClusterBeforeISO()} --` } ]
     if (enableIsoSelect && !isValidUid(data.isoImage)) {
       isoList.unshift({ id: '_', value: isoList.length === 0 ? `-- ${msg.noCdsAvailable()} --` : `-- ${msg.createVmWizardSelectISO()} --` })
@@ -389,7 +389,7 @@ class BasicSettings extends React.Component {
 
     const enableTemplateSelect = data.provisionSource === 'template'
     const templateList = enableTemplateSelect && isValidUid(data.clusterId)
-      ? createTemplateList(templates, data.clusterId)
+      ? createTemplateList({ templates, clusterId: data.clusterId, locale })
       : [ { id: '_', value: `-- ${msg.createVmWizardSelectClusterBeforeTemplate()} --` } ]
     if (enableTemplateSelect && isValidUid(data.clusterId) && !isValidUid(data.templateId)) {
       templateList.unshift({ id: '_', value: `-- ${msg.createVmWizardSelectTemplate()} --` })
@@ -704,6 +704,7 @@ BasicSettings.propTypes = {
   // eslint-disable-next-line react/no-unused-prop-types
   defaultWindowsTimezone: PropTypes.string.isRequired,
   msg: PropTypes.object.isRequired,
+  locale: PropTypes.string.isRequired,
 }
 
 export default connect(

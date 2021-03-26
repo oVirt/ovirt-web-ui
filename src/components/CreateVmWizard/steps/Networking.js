@@ -80,7 +80,7 @@ class Networking extends React.Component {
     this.rowRenderProps = this.rowRenderProps.bind(this)
     this.isVnicNameUniqueAndValid = this.isVnicNameUniqueAndValid.bind(this)
 
-    const { msg } = this.props
+    const { msg, locale } = this.props
 
     this.state = {
       editingErrors: {
@@ -191,7 +191,7 @@ class Networking extends React.Component {
             cluster,
             vnicProfiles,
           } = props
-          const vnicList = createVNicProfileList(vnicProfiles, { dataCenterId, cluster })
+          const vnicList = createVNicProfileList(vnicProfiles, locale, { dataCenterId, cluster })
           const row = this.state.editing[rowData.id]
 
           return (
@@ -420,12 +420,13 @@ class Networking extends React.Component {
       nics,
       vnicProfiles,
       msg,
+      locale,
     } = this.props
 
-    const vnicList = createVNicProfileList(vnicProfiles, { dataCenterId, cluster })
+    const vnicList = createVNicProfileList(vnicProfiles, locale, { dataCenterId, cluster })
     const enableCreate = vnicList.length > 0 && Object.keys(this.state.editing).length === 0
 
-    const nicList = sortNicsDisks([...nics])
+    const nicList = sortNicsDisks([...nics], locale)
       .concat(this.state.creating ? [ this.state.editing[this.state.creating] ] : [])
       .map(nic => ({
         ...(this.state.editing[nic.id] ? this.state.editing[nic.id] : nic),
@@ -497,6 +498,7 @@ Networking.propTypes = {
   onUpdate: PropTypes.func.isRequired,
 
   msg: PropTypes.object.isRequired,
+  locale: PropTypes.string.isRequired,
 }
 
 export default connect(

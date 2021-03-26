@@ -96,7 +96,7 @@ class SnapshotItem extends React.Component {
   }
 
   render () {
-    const { msg } = this.props
+    const { msg, locale } = this.props
     let statusIcon = null
     let buttons = []
 
@@ -115,6 +115,7 @@ class SnapshotItem extends React.Component {
               restoreDisabled={isRestoreDisabled}
               isPoolVm={this.props.isPoolVm}
               msg={msg}
+              locale={locale}
             />
           }
           placement={this.state.isMobile || this.state.isTablet ? 'top' : 'left'}
@@ -215,6 +216,7 @@ SnapshotItem.propTypes = {
   isPoolVm: PropTypes.bool,
   onSnapshotDelete: PropTypes.func.isRequired,
   msg: PropTypes.object.isRequired,
+  locale: PropTypes.string.isRequired,
 }
 
 export default connect(

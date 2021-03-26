@@ -1,4 +1,3 @@
-import { locale as appLocale } from '_/intl'
 import AppConfiguration from '_/config'
 import { defaultOperatingSystemIds } from '_/constants/operatingSystems'
 
@@ -194,11 +193,16 @@ export function userFormatOfBytes (number, suffix = 'B', precision = 0) {
   return buildRetVal(number, suffix)
 }
 
-export function localeCompare (a, b, locale = appLocale) {
+export function localeCompare (a, b, locale) {
+  if (!locale) {
+    console.trace('Non-localized compare detected!')
+  }
+  // natural sort order thanks to "numeric" option
+  // ["b", "a10", "a2", "1"] -> [ "1", "a2", "a10", "b" ]
   return a.localeCompare(b, locale, { numeric: true })
 }
 
-export function sortedBy (array, sortBy, locale = appLocale) {
+export function sortedBy (array, sortBy, locale) {
   return array.sort((a, b) => localeCompare(a[sortBy], b[sortBy], locale))
 }
 

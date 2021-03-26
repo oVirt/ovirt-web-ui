@@ -51,18 +51,18 @@ const statusMap = (msg) => ({
   'ok': msg.ok(),
 })
 
-const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, id, isPoolVm, msg, ...otherProps }) => {
+const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, id, isPoolVm, msg, locale, ...otherProps }) => {
   const template = Selectors.getTemplateById(snapshot.getIn(['vm', 'template', 'id']))
   const time = getFormatedDateTime(snapshot.get('date'))
 
   const snapshotMemoryState = snapshot.get('persistMemoryState') && msg.memoryIncluded()
 
-  const disksToRender = sortDisksForDisplay(snapshot.get('disks', Immutable.fromJS([])))
+  const disksToRender = sortDisksForDisplay(snapshot.get('disks', Immutable.fromJS([])), locale)
   const showMoreDisks = disksToRender.size > 2
   const diskToShow = disksToRender.slice(0, 2)
   const additionalDisk = disksToRender.slice(2)
 
-  const nicsToRender = snapshot.get('nics', Immutable.fromJS([])).sort((a, b) => localeCompare(a.get('name'), b.get('name')))
+  const nicsToRender = snapshot.get('nics', Immutable.fromJS([])).sort((a, b) => localeCompare(a.get('name'), b.get('name'), locale))
   const showMoreNics = nicsToRender.size > 2
   const nicsToShow = nicsToRender.slice(0, 2)
   const additionalNics = nicsToRender.slice(2)
@@ -229,6 +229,7 @@ SnapshotDetail.propTypes = {
   restoreDisabled: PropTypes.bool,
   isPoolVm: PropTypes.bool,
   msg: PropTypes.object.isRequired,
+  locale: PropTypes.string.isRequired,
 }
 
 export default withMsg(SnapshotDetail)

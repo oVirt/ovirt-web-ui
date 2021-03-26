@@ -109,13 +109,13 @@ const DEFAULT_GMT_TIMEZONE = timezones.find(timezone => timezone.value.startsWit
 class DetailsCard extends React.Component {
   constructor (props) {
     super(props)
-    const { vm, clusters } = props
+    const { vm, clusters, operatingSystems, locale } = props
     const vmClusterId = vm.getIn(['cluster', 'id'])
     const vmDataCenterId = clusters.getIn([vmClusterId, 'dataCenterId'])
     const clusterArchitecture = getClusterArchitecture(vmClusterId, clusters)
 
     this.state = {
-      vm: props.vm, // ImmutableJS Map
+      vm, // ImmutableJS Map
 
       isEditing: false,
       isDirty: false,
@@ -124,13 +124,12 @@ class DetailsCard extends React.Component {
 
       promptHotPlugChanges: false,
       promptNextRunChanges: false,
-
       isoList: createIsoList(props.storageDomains, vmDataCenterId),
-      clusterList: createClusterList(props.clusters, vmDataCenterId, clusterArchitecture),
-      osList: createOsList(vmClusterId, props.clusters, props.operatingSystems),
+      clusterList: createClusterList({ clusters, dataCenterId: vmDataCenterId, architecture: clusterArchitecture, locale }),
+      osList: createOsList({ clusterId: vmClusterId, clusters, operatingSystems, locale }),
 
-      enableInitTimezone: !!props.vm.getIn(['cloudInit', 'timezone']), // true if sysprep timezone set or Configure Timezone checkbox checked
-      lastInitTimezone: props.vm.getIn(['cloudInit', 'timezone']) || DEFAULT_GMT_TIMEZONE,
+      enableInitTimezone: !!vm.getIn(['cloudInit', 'timezone']), // true if sysprep timezone set or Configure Timezone checkbox checked
+      lastInitTimezone: vm.getIn(['cloudInit', 'timezone']) || DEFAULT_GMT_TIMEZONE,
     }
     this.trackUpdates = {}
     this.hotPlugUpdates = {}
@@ -185,14 +184,14 @@ class DetailsCard extends React.Component {
     // NOTE: Doing the following here instead of getDerivedStateFromProps so __clusters__,
     //       __storageDomains__, and __operatingSystems__ don't need to be kept in state for
     //       change comparison
-    const { clusters, vm } = this.props
+    const { clusters, vm, operatingSystems, locale } = this.props
     const vmClusterId = vm.getIn(['cluster', 'id'])
     const vmDataCenterId = clusters.getIn([vmClusterId, 'dataCenterId'])
     const clusterArchitecture = getClusterArchitecture(vmClusterId, clusters)
 
     if (prevProps.clusters !== this.props.clusters) {
       const { clusters } = this.props
-      this.setState({ clusterList: createClusterList(clusters, vmDataCenterId, clusterArchitecture) }) // eslint-disable-line react/no-did-update-set-state
+      this.setState({ clusterList: createClusterList({ clusters, dataCenterId: vmDataCenterId, architecture: clusterArchitecture, locale }) }) // eslint-disable-line react/no-did-update-set-state
     }
 
     if (prevProps.storageDomains !== this.props.storageDomains) {
@@ -203,7 +202,7 @@ class DetailsCard extends React.Component {
       prevProps.clusters !== this.props.clusters ||
       prevProps.vm.getIn(['cluster', 'id']) !== vmClusterId
     ) {
-      this.setState({ osList: createOsList(vmClusterId, this.props.clusters, this.props.operatingSystems) }) // eslint-disable-line react/no-did-update-set-state
+      this.setState({ osList: createOsList({ clusterId: vmClusterId, clusters, operatingSystems, locale }) }) // eslint-disable-line react/no-did-update-set-state
     }
   }
 
@@ -1035,6 +1034,7 @@ DetailsCard.propTypes = {
   saveChanges: PropTypes.func.isRequired,
 
   msg: PropTypes.object.isRequired,
+  locale: PropTypes.string.isRequired,
 }
 
 const DetailsCardConnected = connect(

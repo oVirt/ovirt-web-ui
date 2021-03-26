@@ -31,7 +31,7 @@ class VmFilters extends React.Component {
   }
 
   composeFilterTypes () {
-    const { msg } = this.props
+    const { msg, locale } = this.props
     const statuses = [
       'up',
       'powering_up',
@@ -63,7 +63,7 @@ class VmFilters extends React.Component {
         filterType: 'select',
         filterValues: statuses
           .map((status) => ({ title: enumMsg('VmStatus', status), id: status }))
-          .sort((a, b) => localeCompare(a.title, b.title)),
+          .sort((a, b) => localeCompare(a.title, b.title, locale)),
       },
       {
         id: 'os',
@@ -76,7 +76,7 @@ class VmFilters extends React.Component {
             acc.add(item.get('description'))
           ), new Set()))
           .map(item => ({ title: item, id: item }))
-          .sort((a, b) => localeCompare(a.title, b.title)),
+          .sort((a, b) => localeCompare(a.title, b.title, locale)),
       },
     ]
     return filterTypes
@@ -203,6 +203,7 @@ VmFilters.propTypes = {
   vms: PropTypes.object.isRequired,
   onFilterUpdate: PropTypes.func.isRequired,
   msg: PropTypes.object.isRequired,
+  locale: PropTypes.string.isRequired,
 }
 
 export default connect(

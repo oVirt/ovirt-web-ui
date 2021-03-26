@@ -7,9 +7,9 @@ import {
   isWindows,
 } from '_/helpers'
 
-const handleClusterIdChange = (clusterId, { blankTemplateId, defaultValues, clusters, templates, operatingSystems, storageDomains, defaultGeneralTimezone, defaultWindowsTimezone }) => {
+const handleClusterIdChange = (clusterId, { blankTemplateId, defaultValues, clusters, templates, operatingSystems, storageDomains, defaultGeneralTimezone, defaultWindowsTimezone, locale }) => {
   let changes = {}
-  const templateList = clusterId ? createTemplateList(templates, clusterId) : []
+  const templateList = clusterId ? createTemplateList({ templates, clusterId, locale }) : []
   changes.dataCenterId = clusterId ? clusters.getIn([clusterId, 'dataCenterId']) : undefined
   changes.clusterId = clusterId
 

@@ -16,7 +16,7 @@ import style from './style.css'
  * available to the current user.
  */
 const VmCardList = ({ vms, alwaysShowPoolCard, fetchMoreVmsAndPools }) => {
-  const { msg } = useContext(MsgContext)
+  const { msg, locale } = useContext(MsgContext)
   const sort = vms.get('sort').toJS()
   const filters = vms.get('filters').toJS()
 
@@ -36,7 +36,7 @@ const VmCardList = ({ vms, alwaysShowPoolCard, fetchMoreVmsAndPools }) => {
     .toList()
 
   // Display the VMs and Pools together, sorted nicely
-  const vmsAndPools = [ ...filteredVms, ...filteredPools ].sort(sortFunction(sort))
+  const vmsAndPools = [ ...filteredVms, ...filteredPools ].sort(sortFunction(sort, locale))
 
   // Handle the infinite scroll and pagination
   const hasMore = vms.get('vmsExpectMorePages') || vms.get('poolsExpectMorePages')

@@ -4,6 +4,7 @@ import { sortedBy } from '_/helpers'
 
 import style from './sharedStyle.css'
 import { Tooltip } from '_/components/tooltips'
+import { withMsg } from '_/intl'
 
 const NOBREAK_SPACE = '\u00A0'
 
@@ -11,8 +12,8 @@ function getSelectedId (props) {
   return props.selected == null ? (props.items.length > 0 ? props.items[0].id : null) : props.selected
 }
 
-function getItems (props) {
-  return props.sort ? sortedBy(props.items, 'value') : props.items
+function getItems ({ sort, items, locale }) {
+  return sort ? sortedBy(items, 'value', locale) : items
 }
 
 /*
@@ -23,16 +24,18 @@ function getItems (props) {
 class SelectBox extends React.Component {
   constructor (props) {
     super(props)
+    const { sort, items, locale } = this.props
     this.state = {
       selected: getSelectedId(props),
-      items: getItems(props),
+      items: getItems({ sort, items, locale }),
     }
     this.handleChange = this.handleChange.bind(this)
     this.getValidationClass = this.getValidationClass.bind(this)
   }
 
   componentWillReceiveProps (nextProps) {
-    const nextState = { items: getItems(nextProps) }
+    const { sort, items, locale } = nextProps
+    const nextState = { items: getItems({ sort, items, locale }) }
     if (this.props.selected !== nextProps.selected) {
       nextState.selected = getSelectedId(nextProps)
     }
@@ -107,6 +110,7 @@ SelectBox.propTypes = {
   id: PropTypes.string,
   validationState: PropTypes.oneOf([ false, 'default', 'error' ]),
   disabled: PropTypes.bool,
+  locale: PropTypes.string.isRequired,
 }
 
-export default SelectBox
+export default withMsg(SelectBox)
