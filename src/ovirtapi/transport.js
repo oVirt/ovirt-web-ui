@@ -1,7 +1,7 @@
 // @flow
 
 import $ from 'jquery'
-import AppConfiguration from '../config'
+import { DEFAULT_LOCALE } from '_/intl'
 import { Exception } from '../exceptions'
 import Selectors from '../selectors'
 
@@ -39,6 +39,11 @@ function addHttpListener (listener: ListenerType) {
   listeners.add(listener)
 }
 
+var currentLocale = DEFAULT_LOCALE
+function updateLocale (locale: string) {
+  currentLocale = locale
+}
+
 function notifyStart (method: MethodType, url: string): Object {
   const requestId = { method, url }
   listeners.forEach(listener => listener(requestId, 'START'))
@@ -65,7 +70,7 @@ function httpGet ({ url, custHeaders = {} }: GetRequestType): Promise<Object> {
   const headers = {
     'Accept': 'application/json',
     'Authorization': `Bearer ${_getLoginToken()}`,
-    'Accept-Language': AppConfiguration.queryParams.locale, // can be: undefined, empty or string
+    'Accept-Language': currentLocale,
     'Filter': Selectors.getFilter(),
     ...custHeaders,
   }
@@ -94,7 +99,7 @@ function httpPost ({ url, input, contentType = 'application/json' }: InputReques
     headers: {
       'Accept': 'application/json',
       'Authorization': `Bearer ${_getLoginToken()}`,
-      'Accept-Language': AppConfiguration.queryParams.locale,
+      'Accept-Language': currentLocale,
       'Filter': Selectors.getFilter(),
       'Content-Type': contentType,
     },
@@ -118,7 +123,7 @@ function httpPut ({ url, input, contentType = 'application/json' }: InputRequest
     headers: {
       'Accept': 'application/json',
       'Authorization': `Bearer ${_getLoginToken()}`,
-      'Accept-Language': AppConfiguration.queryParams.locale,
+      'Accept-Language': currentLocale,
       'Filter': Selectors.getFilter(),
       'Content-Type': contentType,
     },
@@ -165,6 +170,7 @@ export type {
 }
 export {
   addHttpListener,
+  updateLocale,
   assertLogin,
   httpGet,
   httpPost,

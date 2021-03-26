@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import { withMsg } from '_/intl'
+import OvirtApi from '_/ovirtapi'
 
 const LocaleReloader = ({ children, localeFromStore, locale, reloadMsg }) => {
   /* Basic flow:
@@ -23,6 +24,10 @@ const LocaleReloader = ({ children, localeFromStore, locale, reloadMsg }) => {
       reloadMsg(localeFromStore)
     }
   }, [localeFromStore, locale, reloadMsg])
+
+  useEffect(() => {
+    OvirtApi.updateLocale(locale)
+  }, [locale])
 
   return ([ children ])
 }
