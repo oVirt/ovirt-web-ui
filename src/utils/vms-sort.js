@@ -1,5 +1,5 @@
 import { getOsHumanName } from '../components/utils'
-import { enumMsg, msg } from '_/intl'
+import { enumMsg } from '_/intl'
 
 const getFieldValueMap = {
   name: (item) => item.get('name'),
@@ -7,23 +7,23 @@ const getFieldValueMap = {
   status: (item) => enumMsg('VmStatus', item.get('status')),
 }
 
-export const sortFields = [
-  {
+export const SortFields = {
+  NAME: {
     id: 'name',
-    title: msg.name(),
     isNumeric: false,
+    toLabel: (msg) => msg.name(),
   },
-  {
+  OS: {
     id: 'os',
-    title: msg.operatingSystem(),
     isNumeric: false,
+    toLabel: (msg) => msg.operatingSystem(),
   },
-  {
+  STATUS: {
     id: 'status',
-    title: msg.status(),
     isNumeric: false,
+    toLabel: (msg) => msg.status(),
   },
-]
+}
 
 export const sortFunction = (sortType) =>
   (vmA, vmB) => {

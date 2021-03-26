@@ -26,13 +26,13 @@ import {
   SET_VM_CONSOLES,
 } from '_/constants'
 import { actionReducer, removeMissingItems } from './utils'
-import { sortFields } from '_/utils'
+import { SortFields } from '_/utils'
 
 const initialState = Immutable.fromJS({
   vms: {},
   pools: {},
   filters: {},
-  sort: { ...sortFields[0], isAsc: true },
+  sort: { ...SortFields.NAME, isAsc: true },
 
   missedVms: Immutable.Set(),
 

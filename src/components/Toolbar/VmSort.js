@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { Sort } from 'patternfly-react'
 
 import { setVmSort } from '_/actions'
-import { sortFields } from '_/utils'
+import { SortFields } from '_/utils'
 import { Tooltip } from '_/components/tooltips'
 import { withMsg } from '_/intl'
 
@@ -34,13 +34,13 @@ class VmSort extends React.Component {
   }
 
   render () {
-    const { sort } = this.props
+    const { sort, msg } = this.props
 
     return (
       <Sort>
         <Sort.TypeSelector
-          sortTypes={sortFields}
-          currentSortType={sort}
+          sortTypes={Object.values(SortFields).map(type => ({ ...type, title: type.toLabel(msg) }))}
+          currentSortType={sort && { ...sort, title: sort.toLabel(msg) }}
           onSortTypeSelected={this.updateCurrentSortType}
         />
         <Tooltip
@@ -62,7 +62,7 @@ class VmSort extends React.Component {
 VmSort.propTypes = {
   sort: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
+    toLabel: PropTypes.func.isRequired,
     isNumeric: PropTypes.bool,
     isAsc: PropTypes.bool,
   }).isRequired,
