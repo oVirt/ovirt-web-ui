@@ -1,22 +1,38 @@
 // @flow
 
 import IntlMessageFormat from 'intl-messageformat'
-import { initIntl, getLocaleFromUrl } from './initialize'
+import { discoverUserLocale, getLocaleFromUrl, coerceToSupportedLocale, initMomentTranslations } from './initialize'
 
 import { messages, type MessageIdType, type MessageType } from './messages'
 import translatedMessages from './translated-messages.json'
-import localeWithFullName from './localeWithFullName.json'
+import baseLocaleWithFullName from './localeWithFullName.json'
+import moment from 'moment'
+
 export { withMsg, default as MsgContext } from './MsgContext'
 
 export const DEFAULT_LOCALE: string = 'en'
 
-export const DUMMY_LOCALE: string = 'aa' // NOTE: Used for development and testing
+const DUMMY_LOCALE: string = 'aa' // NOTE: Used for development and testing
 
+function buildBaseLocale (): {[string]: string} {
+  if (!translatedMessages[DUMMY_LOCALE]) {
+    return baseLocaleWithFullName
+  }
+  console.warn(`Enable test locale: ${DUMMY_LOCALE}`)
+  moment.defineLocale(DUMMY_LOCALE, {})
+  return {
+    ...baseLocaleWithFullName,
+    [DUMMY_LOCALE]: DUMMY_LOCALE,
+  }
+}
+
+export const localeWithFullName = buildBaseLocale()
 export const BASE_LOCALE_SET: Set<string> = new Set(Object.keys(localeWithFullName))
+
 /**
  * Currently selected locale
  */
-export const locale: string = initIntl()
+export const locale: string = discoverUserLocale()
 export const localeFromUrl: ?string = getLocaleFromUrl()
 
 function getMessage (id: MessageIdType, targetLocale: string): string {
@@ -74,10 +90,16 @@ function createFormattingFunctionsMap (targetLocale: string, messages: { [Messag
 }
 
 export function createMessages (targetLocale: string): {[MessageIdType]: ((?Object) => string)} {
+  const safeLocale = coerceToSupportedLocale(targetLocale) || DEFAULT_LOCALE
+  console.log(`Create messages for locale ${safeLocale}`)
+  if (targetLocale !== safeLocale) {
+    console.warn(`Locale ${targetLocale} is not supported and was replaced with ${safeLocale}`)
+  }
   for (const key in messageFormatCache) {
     delete messageFormatCache[key]
   }
-  return createFormattingFunctionsMap(targetLocale, messages)
+  initMomentTranslations(safeLocale, DEFAULT_LOCALE)
+  return createFormattingFunctionsMap(safeLocale, messages)
 }
 
 /**

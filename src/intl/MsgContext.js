@@ -1,10 +1,8 @@
 import React from 'react'
-import { msg } from './index'
 
-const defaultMsg = { msg }
-const MsgContext = React.createContext(defaultMsg)
-console.warn('Created MsgContext:', MsgContext)
-
+// do not provide default value
+// the real value will be provided by the root of the component tree
+const MsgContext = React.createContext()
 export const withMsg = (WrappedComponent) => {
   return ({ ...otherProps }) => (
     <MsgContext.Consumer>{({ ...msgProps }) => (
