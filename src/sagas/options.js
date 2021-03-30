@@ -12,6 +12,7 @@ import type { SaveGlobalOptionsActionType } from '_/actions/types'
 import type { UserOptionType, RemoteUserOptionsType } from '_/ovirtapi/types'
 import { localeFromUrl, locale as inferredLocale } from '_/intl'
 import { generateUnique } from '_/helpers'
+import { saveLocaleToLocalStorage } from '_/storage'
 
 /**
  * Internal type to formalize result returned from
@@ -155,6 +156,7 @@ function* saveGlobalOptions ({ payload: { sshKey, showNotifications, notificatio
   if (!locale.error && locale.change && !locale.sameAsCurrent) {
     const { name, value } = locale.data
     yield put(A.setOption({ key: [ 'remoteOptions', name ], value }))
+    saveLocaleToLocalStorage(value)
   }
 
   if (!ssh.error && ssh.change && !ssh.sameAsCurrent) {

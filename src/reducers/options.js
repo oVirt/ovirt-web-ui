@@ -5,7 +5,7 @@ import { fromJS } from 'immutable'
 import * as C from '_/constants'
 import { actionReducer } from './utils'
 import { locale } from '_/intl'
-import { saveToLocalStorage } from '_/storage'
+import { saveLocaleToLocalStorage } from '_/storage'
 import AppConfiguration from '_/config'
 import type { UserOptionsType } from '_/ovirtapi/types'
 import type { LoadUserOptionsActionType } from '_/actions/types'
@@ -45,12 +45,7 @@ const options = actionReducer(initialState, {
 
     const merged = clientState.setIn(['remoteOptions'], mergedRemote)
 
-    // use the same structure in Redux store and in local storage
-    saveToLocalStorage('options', JSON.stringify({
-      remoteOptions: {
-        locale: merged.getIn(['remoteOptions', 'locale']).toJS(),
-      },
-    }))
+    saveLocaleToLocalStorage(merged.getIn(['remoteOptions', 'locale']).toJS())
     return merged
   },
   [C.SET_OPTION] (state: any, { payload: { key, value } }: any): any {

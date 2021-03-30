@@ -22,3 +22,12 @@ export function saveToSessionStorage (key, value) {
 export function loadFromSessionStorage (key) {
   return window.sessionStorage.getItem(key)
 }
+
+export function saveLocaleToLocalStorage (value) {
+  // use the same structure in Redux store and in local storage
+  saveToLocalStorage('options', JSON.stringify({
+    remoteOptions: {
+      locale: value,
+    },
+  }))
+}
