@@ -21,7 +21,6 @@ import { createNicInterfacesList, createVNicProfileList } from '_/components/uti
 import { EMPTY_VNIC_PROFILE_ID } from '_/constants'
 import { InfoTooltip } from '_/components/tooltips'
 
-const NIC_INTERFACES = createNicInterfacesList()
 const NIC_INTERFACE_DEFAULT = 'virtio'
 const NIC_INTERFACE_CANT_CHANGE = [ 'pci_passthrough' ]
 
@@ -144,6 +143,7 @@ class NicEditor extends Component {
 
   render () {
     const { msg, locale } = this.context
+    const NIC_INTERFACES = createNicInterfacesList(msg)
     const { idPrefix, trigger, vmStatus, vnicProfileList } = this.props
     const modalId = idPrefix + '-modal'
 

@@ -116,7 +116,7 @@ const ReviewNetworking = ({ id, vnicProfiles, network }) => {
               { vnicNames[nic.vnicProfileId] ? vnicNames[nic.vnicProfileId] : msg.createVmNetUnknownVnicProfile() }
             </div>
             <div className={style['review-entity-info']}>
-              { enumMsg('NicInterface', nic.deviceType) }
+              { enumMsg('NicInterface', nic.deviceType, msg) }
             </div>
           </div>
         )}

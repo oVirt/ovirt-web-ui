@@ -22,7 +22,7 @@ const VmCardList = ({ vms, alwaysShowPoolCard, fetchMoreVmsAndPools }) => {
 
   // Filter the VMs (1. apply the filter bar criteria, 2. only show Pool VMs if the Pool exists)
   const filteredVms = vms.get('vms')
-    .filter(vm => filterVms(vm, filters))
+    .filter(vm => filterVms(vm, filters, msg))
     .filter(vm => vm.getIn(['pool', 'id'], false) ? !!vms.getIn(['pools', vm.getIn(['pool', 'id'])], false) : true)
     .toList()
     .map(vm => vm.set('isVm', true))
@@ -31,12 +31,12 @@ const VmCardList = ({ vms, alwaysShowPoolCard, fetchMoreVmsAndPools }) => {
   const filteredPools = vms.get('pools')
     .filter(pool =>
       (alwaysShowPoolCard || (pool.get('vmsCount') < pool.get('maxUserVms') && pool.get('size') > 0)) &&
-      filterVms(pool, filters)
+      filterVms(pool, filters, msg)
     )
     .toList()
 
   // Display the VMs and Pools together, sorted nicely
-  const vmsAndPools = [ ...filteredVms, ...filteredPools ].sort(sortFunction(sort, locale))
+  const vmsAndPools = [ ...filteredVms, ...filteredPools ].sort(sortFunction(sort, locale, msg))
 
   // Handle the infinite scroll and pagination
   const hasMore = vms.get('vmsExpectMorePages') || vms.get('poolsExpectMorePages')

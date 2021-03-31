@@ -62,7 +62,7 @@ class VmFilters extends React.Component {
         placeholder: msg.vmFilterTypePlaceholderStatus(),
         filterType: 'select',
         filterValues: statuses
-          .map((status) => ({ title: enumMsg('VmStatus', status), id: status }))
+          .map((status) => ({ title: enumMsg('VmStatus', status, msg), id: status }))
           .sort((a, b) => localeCompare(a.title, b.title, locale)),
       },
       {

@@ -7,6 +7,7 @@ import { setVmSort } from '_/actions'
 import { SortFields } from '_/utils'
 import { Tooltip } from '_/components/tooltips'
 import { withMsg } from '_/intl'
+import { translate } from '_/helpers'
 
 class VmSort extends React.Component {
   constructor (props) {
@@ -39,8 +40,8 @@ class VmSort extends React.Component {
     return (
       <Sort>
         <Sort.TypeSelector
-          sortTypes={Object.values(SortFields).map(type => ({ ...type, title: type.toLabel(msg) }))}
-          currentSortType={sort && { ...sort, title: sort.toLabel(msg) }}
+          sortTypes={Object.values(SortFields).map(type => ({ ...type, title: translate({ ...type.messageDescriptor, msg }) }))}
+          currentSortType={sort && { ...sort, title: translate({ ...sort.messageDescriptor, msg }) }}
           onSortTypeSelected={this.updateCurrentSortType}
         />
         <Tooltip
@@ -62,7 +63,7 @@ class VmSort extends React.Component {
 VmSort.propTypes = {
   sort: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    toLabel: PropTypes.func.isRequired,
+    messageDescriptor: PropTypes.object.isRequired,
     isNumeric: PropTypes.bool,
     isAsc: PropTypes.bool,
   }).isRequired,

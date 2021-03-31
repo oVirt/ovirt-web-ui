@@ -205,19 +205,19 @@ function createDiskTypeList (msg) {
  *
  *    http://ovirt.github.io/ovirt-engine-api-model/master/#types/disk_interface
  */
-function createDiskInterfacesList () {
+function createDiskInterfacesList (msg) {
   return [
     {
       id: 'ide',
-      value: enumMsg('DiskInterface', 'ide'),
+      value: enumMsg('DiskInterface', 'ide', msg),
     },
     {
       id: 'virtio_scsi',
-      value: enumMsg('DiskInterface', 'virtio_scsi'),
+      value: enumMsg('DiskInterface', 'virtio_scsi', msg),
     },
     {
       id: 'virtio',
-      value: enumMsg('DiskInterface', 'virtio'),
+      value: enumMsg('DiskInterface', 'virtio', msg),
     },
   ]
 }
@@ -228,19 +228,19 @@ function createDiskInterfacesList () {
  *
  *    http://ovirt.github.io/ovirt-engine-api-model/master/#types/nic_interface
  */
-function createNicInterfacesList () {
+function createNicInterfacesList (msg) {
   return [
     {
       id: 'virtio',
-      value: enumMsg('NicInterface', 'virtio'),
+      value: enumMsg('NicInterface', 'virtio', msg),
     },
     {
       id: 'rtl8139',
-      value: enumMsg('NicInterface', 'rtl8139'),
+      value: enumMsg('NicInterface', 'rtl8139', msg),
     },
     {
       id: 'e1000',
-      value: enumMsg('NicInterface', 'e1000'),
+      value: enumMsg('NicInterface', 'e1000', msg),
     },
   ]
 }

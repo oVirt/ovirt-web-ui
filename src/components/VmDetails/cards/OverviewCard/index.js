@@ -272,7 +272,7 @@ class OverviewCard extends React.Component {
 
                   <div className={style['vm-status']} id={`${idPrefix}-status`}>
                     <VmStatusIcon id={`${idPrefix}-status-icon`} className={style['vm-status-icon']} status={vm.get('status')} />
-                    <span className={style['vm-status-text']} id={`${idPrefix}-status-value`}>{enumMsg('VmStatus', vm.get('status'))}</span>
+                    <span className={style['vm-status-text']} id={`${idPrefix}-status-value`}>{enumMsg('VmStatus', vm.get('status'), msg)}</span>
 
                     { uptime &&
                       <div className={style['vm-uptime']} id={`${idPrefix}-uptime`}>{msg.uptimeDuration({ uptime })}</div>

@@ -1,11 +1,11 @@
 /* eslint-env jest */
-import { enumMsg, BASE_LOCALE_SET, DEFAULT_LOCALE } from './index'
+import { enumMsg, BASE_LOCALE_SET, DEFAULT_LOCALE, msg } from './index'
 import localeWithFullName from './localeWithFullName.json'
 
 describe('intl', () => {
   it('enumMsg should survive unknown enum item', () => {
     const unknownEnumItem = 'unknownEnumItem'
-    expect(enumMsg('UnknownEnum', unknownEnumItem)).toEqual(unknownEnumItem)
+    expect(enumMsg('UnknownEnum', unknownEnumItem, msg)).toEqual(unknownEnumItem)
   })
 
   it('default locale exists in supported locales', () => {

@@ -821,13 +821,13 @@ class DetailsCard extends React.Component {
                     <FieldRow label={isOsWindows ? msg.sysprep() : msg.cloudInit()} id={`${idPrefix}-cloud-init`}>
                       <div className={style['cloud-init-field']}>
                         {cloudInitEnabled ? <Icon type='pf' name='on' /> : <Icon type='pf' name='off' />}
-                        {enumMsg('Switch', cloudInitEnabled ? 'on' : 'off')}
+                        {enumMsg('Switch', cloudInitEnabled ? 'on' : 'off', msg)}
                       </div>
                     </FieldRow>
                     <FieldRow label={msg.bootMenu()} id={`${idPrefix}-boot-menu-readonly`}>
                       <div className={style['boot-menu-field']}>
                         {bootMenuEnabled ? <Icon type='pf' name='on' /> : <Icon type='pf' name='off' />}
-                        {enumMsg('Switch', bootMenuEnabled ? 'on' : 'off')}
+                        {enumMsg('Switch', bootMenuEnabled ? 'on' : 'off', msg)}
                       </div>
                     </FieldRow>
 

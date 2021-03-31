@@ -2,34 +2,34 @@ import { getOsHumanName } from '../components/utils'
 import { enumMsg } from '_/intl'
 import { localeCompare } from '_/helpers'
 
-const getFieldValueMap = {
+const getFieldValueMap = (msg) => ({
   name: (item) => item.get('name'),
   os: (item) => getOsHumanName(item.getIn(['os', 'type'])),
-  status: (item) => enumMsg('VmStatus', item.get('status')),
-}
+  status: (item) => enumMsg('VmStatus', item.get('status'), msg),
+})
 
 export const SortFields = {
   NAME: {
     id: 'name',
     isNumeric: false,
-    toLabel: (msg) => msg.name(),
+    messageDescriptor: { id: 'name' },
   },
   OS: {
     id: 'os',
     isNumeric: false,
-    toLabel: (msg) => msg.operatingSystem(),
+    messageDescriptor: { id: 'operatingSystem' },
   },
   STATUS: {
     id: 'status',
     isNumeric: false,
-    toLabel: (msg) => msg.status(),
+    messageDescriptor: { id: 'status' },
   },
 }
 
-export const sortFunction = (sortType, locale) =>
+export const sortFunction = (sortType, locale, msg) =>
   (vmA, vmB) => {
-    const vmAValue = getFieldValueMap[sortType.id](vmA)
-    const vmBValue = getFieldValueMap[sortType.id](vmB)
+    const vmAValue = getFieldValueMap(msg)[sortType.id](vmA)
+    const vmBValue = getFieldValueMap(msg)[sortType.id](vmB)
     if (!vmAValue) {
       return sortType.isAsc ? -1 : 1
     }

@@ -1,12 +1,15 @@
 import AppConfiguration from '_/config'
 import { defaultOperatingSystemIds } from '_/constants/operatingSystems'
 
-function translate ({ id, params, msg }) {
+export function translate ({ id, params, msg }) {
   if (!msg) {
     console.trace('Translation object not provided.')
   }
+  if (msg && !msg[id]) {
+    console.warn(`Unknown translation key: ${id}`)
+  }
   // display just the id as string if there is no translation
-  return msg[id] ? msg[id](params) : id
+  return msg && msg[id] ? msg[id](params) : id
 }
 
 export function buildMessageFromRecord ({ messageDescriptor: { id, params } = {}, message }, msg) {

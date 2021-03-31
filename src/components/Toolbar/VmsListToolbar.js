@@ -60,8 +60,8 @@ const VmsListToolbar = ({ match, vms, onRemoveFilter, onClearFilters }) => {
 
   const total = vms.get('vms').size + vms.get('pools').size
   const available = vms.get('filters').size &&
-    vms.get('vms').filter(vm => filterVms(vm, filters)).size +
-    vms.get('pools').filter(vm => filterVms(vm, filters)).size
+    vms.get('vms').filter(vm => filterVms(vm, filters, msg)).size +
+    vms.get('pools').filter(vm => filterVms(vm, filters, msg)).size
 
   return (
     <Toolbar className={style['full-width']}>

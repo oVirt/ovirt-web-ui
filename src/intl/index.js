@@ -112,9 +112,9 @@ export const msg: {[MessageIdType]: ((?Object) => string)} = createMessages(loca
 /**
  * Utility function to translate enums
  */
-export function enumMsg (enumId: string, enumItem: string): string {
+export function enumMsg (enumId: string, enumItem: string, msg: {[MessageIdType]: ((?Object) => string)}): string {
   const messageKey: MessageIdType = (`enum_${enumId}_${enumItem}`: any)
-  const messageFormattingFunction = msg[messageKey]
+  const messageFormattingFunction = msg && msg[messageKey]
   if (messageFormattingFunction) {
     return messageFormattingFunction()
   }

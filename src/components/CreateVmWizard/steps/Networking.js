@@ -32,7 +32,6 @@ import style from './style.css'
 import { Tooltip, InfoTooltip } from '_/components/tooltips'
 import { EMPTY_VNIC_PROFILE_ID } from '_/constants'
 
-const NIC_INTERFACES = createNicInterfacesList()
 const NIC_INTERFACE_DEFAULT = 'virtio'
 
 export const NicNameWithLabels = ({ id, nic }) => {
@@ -81,6 +80,7 @@ class Networking extends React.Component {
     this.isVnicNameUniqueAndValid = this.isVnicNameUniqueAndValid.bind(this)
 
     const { msg, locale } = this.props
+    const NIC_INTERFACES = createNicInterfacesList(msg)
 
     this.state = {
       editingErrors: {
@@ -433,7 +433,7 @@ class Networking extends React.Component {
         vnic: vnicList.find(vnic => vnic.id === nic.vnicProfileId)
           ? vnicList.find(vnic => vnic.id === nic.vnicProfileId).value
           : msg.createVmNetUnknownVnicProfile(),
-        device: enumMsg('NicInterface', nic.deviceType),
+        device: enumMsg('NicInterface', nic.deviceType, msg),
       }))
     const components = {
       body: {
