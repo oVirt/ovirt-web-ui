@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { localeCompare } from '_/helpers'
-import { withMsg, msg } from '_/intl'
+import { withMsg } from '_/intl'
 import { isNumberInRange } from '_/utils'
 import { BASIC_DATA_SHAPE } from '../dataPropTypes'
 import {
@@ -131,11 +131,11 @@ function isValidUid (toTest) {
   return toTest && toTest !== '_'
 }
 
-export const optimizedForMap = {
+export const optimizedForMap = (msg) => ({
   'desktop': { id: 'desktop', value: msg.vmType_desktop() },
   'server': { id: 'server', value: msg.vmType_server() },
   'high_performance': { id: 'high_performance', value: msg.vmType_highPerformance() },
-}
+})
 
 /**
  * Basic Setting Wizard Step #1
@@ -164,7 +164,7 @@ class BasicSettings extends React.Component {
   validateForm (dataSet) {
     const {
       dataCenters, clusters, storageDomains, templates, operatingSystems,
-      maxMemorySizeInMiB, maxNumOfVmCpus,
+      maxMemorySizeInMiB, maxNumOfVmCpus, msg,
     } = this.props
 
     const okName = dataSet.name && isVmNameValid(dataSet.name)
@@ -187,7 +187,7 @@ class BasicSettings extends React.Component {
     const okOperatingSystem = dataSet.operatingSystemId && operatingSystems.find(os => os.get('id') === dataSet.operatingSystemId) !== undefined
     const okMemory = isNumberInRange(dataSet.memory, 0, maxMemorySizeInMiB)
     const okCpu = isNumberInRange(dataSet.cpus, 0, maxNumOfVmCpus)
-    const okOptimizedFor = dataSet.optimizedFor && this.buildOptimizedForList(dataSet)[dataSet.optimizedFor] !== undefined
+    const okOptimizedFor = dataSet.optimizedFor && this.buildOptimizedForList(dataSet, msg)[dataSet.optimizedFor] !== undefined
 
     const checkInit = dataSet.cloudInitEnabled
     const okInitHostname = dataSet.initHostname ? isHostNameValid(dataSet.initHostname) : true
@@ -203,8 +203,8 @@ class BasicSettings extends React.Component {
    * supports in showing high performance option only for HP template based vm.
    * TODO remove when REST API will fully support creating of a High Performance VM type, not based on a template
    **/
-  buildOptimizedForList (dataSet) {
-    const optimizedForList = { ...optimizedForMap }
+  buildOptimizedForList (dataSet, msg) {
+    const optimizedForList = { ...optimizedForMap(msg) }
 
     const template = this.props.templates.find(template => template.get('id') === dataSet.templateId)
     const templateOrigOptimizedFor = template && template.get('type')
@@ -518,7 +518,7 @@ class BasicSettings extends React.Component {
         <FieldRow label={msg.optimizedFor()} id={`${idPrefix}-optimizedFor`} required>
           <SelectBox
             id={`${idPrefix}-optimizedFor-edit`}
-            items={Object.values(this.buildOptimizedForList(data))}
+            items={Object.values(this.buildOptimizedForList(data, msg))}
             selected={data.optimizedFor || '_'}
             onChange={selectedId => this.handleChange('optimizedFor', selectedId)}
           />

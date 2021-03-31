@@ -80,7 +80,7 @@ const ReviewBasic = ({ id, dataCenters, clusters, isos, templates, operatingSyst
       >
         <InfoCircleIcon className={style['info-circle-icon']} />
       </Tooltip>    </Item>
-    <Item id={`${id}-optimizedFor`} label={msg.optimizedFor()}>{optimizedForMap[basic.optimizedFor].value}</Item>
+    <Item id={`${id}-optimizedFor`} label={msg.optimizedFor()}>{optimizedForMap(msg)[basic.optimizedFor].value}</Item>
   </React.Fragment>
 }
 ReviewBasic.propTypes = {
