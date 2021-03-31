@@ -4,7 +4,7 @@ import {
   localeCompare,
   templateNameRenderer,
 } from '_/helpers'
-import { enumMsg, msg } from '_/intl'
+import { enumMsg } from '_/intl'
 import { convertValue } from '_/utils'
 import { EMPTY_VNIC_PROFILE_ID } from '_/constants'
 
@@ -97,7 +97,7 @@ function createOsList ({ clusterId, clusters, operatingSystems, locale }) {
  * from the List of provided storage domains, optionally filtered to be active in the
  * provided data center.
  */
-function createStorageDomainList ({ storageDomains, dataCenterId = null, includeUsage = false, locale }) {
+function createStorageDomainList ({ storageDomains, dataCenterId = null, includeUsage = false, locale, msg }) {
   const storageDomainList =
     storageDomains
       .toList()
@@ -155,7 +155,7 @@ function createTemplateList ({ templates, clusterId = null, locale }) {
  *   - each vNIC is in the same data center as the VM
  *   - each vNIC's network is available on the same cluster as the VM
  */
-function createVNicProfileList (vnicProfiles, locale, { dataCenterId = null, cluster = null } = {}) {
+function createVNicProfileList (vnicProfiles, { locale, msg }, { dataCenterId = null, cluster = null } = {}) {
   const clusterNetworks = cluster === null ? [] : cluster.get('networks')
 
   const vnicList =
@@ -186,7 +186,7 @@ function createVNicProfileList (vnicProfiles, locale, { dataCenterId = null, clu
  *     - sparse (boolean)
  *     - format (http://ovirt.github.io/ovirt-engine-api-model/master/#types/disk_format)
  */
-function createDiskTypeList () {
+function createDiskTypeList (msg) {
   return [
     {
       id: 'pre',

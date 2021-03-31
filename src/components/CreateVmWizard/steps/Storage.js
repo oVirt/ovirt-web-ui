@@ -282,7 +282,7 @@ class Storage extends React.Component {
 
           if (isFromTemplate && !canUserUseStorageDomain) {
             const { storageDomains, dataCenterId, locale } = props
-            const storageDomainList = createStorageDomainList({ storageDomains, dataCenterId, includeUsage: true, locale })
+            const storageDomainList = createStorageDomainList({ storageDomains, dataCenterId, includeUsage: true, locale, msg })
 
             if (storageDomainList.length === 0) {
               return <React.Fragment>
@@ -318,7 +318,7 @@ class Storage extends React.Component {
         },
         editView: (value, { rowData }) => {
           const { storageDomains, dataCenterId, locale } = props
-          const storageDomainList = createStorageDomainList({ storageDomains, dataCenterId, includeUsage: true, locale })
+          const storageDomainList = createStorageDomainList({ storageDomains, dataCenterId, includeUsage: true, locale, msg })
           const row = this.state.editing[rowData.id]
 
           if (storageDomainList.length > 1 || row.storageDomainId === '_') {
@@ -355,7 +355,7 @@ class Storage extends React.Component {
         editView: (value, { rowData }) => {
           const row = this.state.editing[rowData.id]
 
-          const typeList = createDiskTypeList()
+          const typeList = createDiskTypeList(msg)
           if (!row.diskType || row.diskType === '_') {
             typeList.unshift({ id: '_', value: `-- ${msg.createVmStorageSelectDiskType()} --` })
           }
@@ -495,10 +495,11 @@ class Storage extends React.Component {
       vmName,
       disks,
       locale,
+      msg,
     } = this.props
 
     // If only 1 storage domain is available, select it automatically
-    const storageDomainList = createStorageDomainList({ storageDomains, dataCenterId, locale })
+    const storageDomainList = createStorageDomainList({ storageDomains, dataCenterId, locale, msg })
     const storageDomainId = storageDomainList.length === 1 ? storageDomainList[0].id : '_'
 
     // Setup a new disk in the editing hash
@@ -656,8 +657,8 @@ class Storage extends React.Component {
       locale,
     } = this.props
 
-    const storageDomainList = createStorageDomainList({ storageDomains, locale })
-    const dataCenterStorageDomainsList = createStorageDomainList({ storageDomains, dataCenterId, locale })
+    const storageDomainList = createStorageDomainList({ storageDomains, locale, msg })
+    const dataCenterStorageDomainsList = createStorageDomainList({ storageDomains, dataCenterId, locale, msg })
     const enableCreate = storageDomainList.length > 0 && !this.isEditingMode()
 
     const diskList = sortNicsDisks([...disks], locale)

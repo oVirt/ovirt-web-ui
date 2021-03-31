@@ -369,12 +369,13 @@ class CreateVmWizard extends React.Component {
         }
 
         if (resetDisks) {
-          const { storageDomains, locale } = this.props
+          const { storageDomains, locale, msg } = this.props
           const { dataCenterId } = this.state.steps.basic
           const dataCenterStorageDomainsList = createStorageDomainList({
             storageDomains,
             dataCenterId,
             locale,
+            msg,
           })
 
           draft.steps.storage = {

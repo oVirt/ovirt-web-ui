@@ -191,7 +191,7 @@ class Networking extends React.Component {
             cluster,
             vnicProfiles,
           } = props
-          const vnicList = createVNicProfileList(vnicProfiles, locale, { dataCenterId, cluster })
+          const vnicList = createVNicProfileList(vnicProfiles, { locale, msg }, { dataCenterId, cluster })
           const row = this.state.editing[rowData.id]
 
           return (
@@ -423,7 +423,7 @@ class Networking extends React.Component {
       locale,
     } = this.props
 
-    const vnicList = createVNicProfileList(vnicProfiles, locale, { dataCenterId, cluster })
+    const vnicList = createVNicProfileList(vnicProfiles, { locale, msg }, { dataCenterId, cluster })
     const enableCreate = vnicList.length > 0 && Object.keys(this.state.editing).length === 0
 
     const nicList = sortNicsDisks([...nics], locale)

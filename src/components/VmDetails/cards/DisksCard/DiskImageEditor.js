@@ -36,8 +36,6 @@ const DISK_DEFAULTS = {
   provisionedSize: 1 * 1024 ** 3,
 }
 
-const DISK_TYPES = createDiskTypeList()
-
 const LabelCol = ({ children, ...props }) => {
   return <Col componentClass={ControlLabel} {...props}>
     { children }
@@ -77,10 +75,10 @@ LabelCol.propTypes = {
 class DiskImageEditor extends Component {
   constructor (props) {
     super(props)
-    const { storageDomainList, dataCenterId, locale } = this.props
+    const { storageDomainList, dataCenterId, locale, msg } = this.props
     this.state = {
       showModal: false,
-      storageDomainSelectList: createStorageDomainList({ storageDomains: storageDomainList, dataCenterId, includeUsage: true, locale }),
+      storageDomainSelectList: createStorageDomainList({ storageDomains: storageDomainList, dataCenterId, includeUsage: true, locale, msg }),
 
       id: undefined,
       values: {
@@ -110,7 +108,7 @@ class DiskImageEditor extends Component {
 
   open (e) {
     e.preventDefault()
-    const { disk, suggestedName, suggestedStorageDomain, storageDomainList, dataCenterId, locale } = this.props
+    const { disk, suggestedName, suggestedStorageDomain, storageDomainList, dataCenterId, locale, msg } = this.props
     const { storageDomainSelectList } = this.state
     const diskInfo = disk
       ? { // edit
@@ -145,7 +143,7 @@ class DiskImageEditor extends Component {
 
     this.setState({
       showModal: true,
-      storageDomainSelectList: createStorageDomainList({ storageDomains: storageDomainList, dataCenterId, includeUsage: true, locale }),
+      storageDomainSelectList: createStorageDomainList({ storageDomains: storageDomainList, dataCenterId, includeUsage: true, locale, msg }),
       ...diskInfo,
     })
     this.changesMade = false
@@ -280,6 +278,7 @@ class DiskImageEditor extends Component {
 
   render () {
     const { idPrefix, disk, trigger, vm, msg } = this.props
+    const DISK_TYPES = createDiskTypeList(msg)
 
     const createMode = !disk
     const isImage = disk && disk.get('type') === 'image'
