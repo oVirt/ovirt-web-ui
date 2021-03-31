@@ -7,7 +7,7 @@ import { List } from 'immutable'
 
 import * as Actions from '_/actions'
 import { EMPTY_VNIC_PROFILE_ID } from '_/constants'
-import { generateUnique } from '_/helpers'
+import { generateUnique, buildMessageFromRecord } from '_/helpers'
 import { withMsg } from '_/intl'
 import { handleClusterIdChange } from './helpers'
 import { createStorageDomainList, createClusterList } from '_/components/utils'
@@ -274,7 +274,7 @@ class CreateVmWizard extends React.Component {
               .filter(
                 record => record.getIn([ 'failedAction', 'meta', 'correlationId' ]) === correlationId
               )
-              .map(record => record.get('message'))
+              .map(record => buildMessageFromRecord(record.toJS(), msg))
               .toJS()
 
           return <SummaryReview

@@ -13,6 +13,7 @@ import {
   isWindows,
   templateNameRenderer,
   userFormatOfBytes,
+  buildMessageFromRecord,
 } from '_/helpers'
 import { enumMsg, MsgContext, withMsg } from '_/intl'
 
@@ -1001,7 +1002,7 @@ class DetailsCard extends React.Component {
 
             { correlatedMessages && correlatedMessages.size > 0 &&
               correlatedMessages.map((message, key) =>
-                <Alert key={`user-message-${key}`} type='error' style={{ margin: '5px 0 0 0' }}>{message.get('message')}</Alert>
+                <Alert key={`user-message-${key}`} type='error' style={{ margin: '5px 0 0 0' }}>{buildMessageFromRecord(message.toJS(), msg)}</Alert>
               )
             }
           </React.Fragment>

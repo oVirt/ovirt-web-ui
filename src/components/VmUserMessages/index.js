@@ -7,7 +7,7 @@ import { Notification, NotificationDrawer, MenuItem, Icon, Button } from 'patter
 import style from './style.css'
 
 import { clearUserMessages, dismissEvent } from '_/actions'
-import { getFormatedDateTime } from '_/helpers'
+import { getFormatedDateTime, buildMessageFromRecord } from '_/helpers'
 import { MsgContext } from '_/intl'
 
 const UserMessage = ({ record, id, onDismissMessage }) => {
@@ -22,7 +22,7 @@ const UserMessage = ({ record, id, onDismissMessage }) => {
     <Icon className='pull-left' type='pf' name='warning-triangle-o' />
     <Notification.Content>
       <Notification.Message>
-        {record.get('message')}
+        { buildMessageFromRecord(record.toJS(), msg) }
       </Notification.Message>
       <Notification.Info leftText={time.date} rightText={time.time} />
     </Notification.Content>

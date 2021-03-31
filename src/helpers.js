@@ -1,7 +1,26 @@
 import AppConfiguration from '_/config'
 import { defaultOperatingSystemIds } from '_/constants/operatingSystems'
 
-// "payload":{"message":"Not Found","shortMessage":"LOGIN failed","type":404,"action":{"type":"LOGIN","payload":{"credentials":{"username":"admin@internal","password":"admi"}}}}}
+function translate ({ id, params, msg }) {
+  if (!msg) {
+    console.trace('Translation object not provided.')
+  }
+  // display just the id as string if there is no translation
+  return msg[id] ? msg[id](params) : id
+}
+
+export function buildMessageFromRecord ({ messageDescriptor: { id, params } = {}, message }, msg) {
+  if (!id) {
+    return message
+  }
+  if (id && !message) {
+    return translate({ id, params, msg })
+  }
+  // format previously used by failedExternalAction
+  return `${translate({ id, params, msg })}\n${message}`
+}
+
+// "payload":{"message":"Not Found","messageDescriptor":{"id": "loginFailed"},"type":404,"action":{"type":"LOGIN","payload":{"credentials":{"username":"admin@internal","password":"admi"}}}}}
 export function hidePassword ({ action, param }) {
   if (action) {
     const hidden = JSON.parse(JSON.stringify(action))

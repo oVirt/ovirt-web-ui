@@ -9,12 +9,12 @@ import {
   GET_ALL_EVENTS,
 } from '_/constants'
 
-export function addUserMessage ({ message, shortMessage, type = '' }) {
+export function addUserMessage ({ message, messageDescriptor, type = '' }) {
   return {
     type: ADD_USER_MESSAGE,
     payload: {
       message,
-      shortMessage,
+      messageDescriptor,
       type,
     },
   }

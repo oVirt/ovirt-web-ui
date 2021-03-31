@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import sharedStyle from '../../../sharedStyle.css'
 import { getOsHumanName, getVmIcon, isVmNameValid, isHostNameValid } from '_/components/utils'
 import { enumMsg, withMsg } from '_/intl'
-import { generateUnique } from '_/helpers'
+import { generateUnique, buildMessageFromRecord } from '_/helpers'
 import { formatUptimeDuration } from '_/utils'
 import { editVm } from '_/actions'
 
@@ -299,7 +299,7 @@ class OverviewCard extends React.Component {
               { correlatedMessages && correlatedMessages.size > 0 &&
                 correlatedMessages.map((message, key) =>
                   <Alert key={`user-message-${key}`} type='error' style={{ margin: '5px 0 0 0' }} id={`${idPrefix}-alert`}>
-                    {message.get('message')}
+                    {buildMessageFromRecord(message.toJS(), msg)}
                   </Alert>
                 )
               }

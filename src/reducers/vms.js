@@ -232,14 +232,14 @@ const vms = actionReducer(initialState, {
     return state
   },
 
-  [FAILED_EXTERNAL_ACTION] (state, { payload: { message, shortMessage, type, failedAction } }) {
+  [FAILED_EXTERNAL_ACTION] (state, { payload: { message, messageDescriptor, type, failedAction } }) {
     if (message && failedAction && failedAction.payload && failedAction.payload.vmId) {
       const vmId = failedAction.payload.vmId
       if (state.getIn(['vms', vmId])) {
-        return state.setIn(['vms', vmId, 'lastMessage'], shortMessage || message)
+        return state.setIn(['vms', vmId, 'lastMessage'], messageDescriptor || message)
       } else {
         console.error(`API reports an error associated to nonexistent VM ${vmId}, error`,
-          { message, shortMessage, type, failedAction })
+          { message, messageDescriptor, type, failedAction })
       }
     }
 

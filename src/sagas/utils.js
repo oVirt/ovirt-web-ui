@@ -6,7 +6,6 @@ import {
 
 import AppConfiguration from '_/config'
 import { hidePassword } from '_/helpers'
-import { msg } from '_/intl'
 import Api from '_/ovirtapi'
 import { getUserPermits } from '_/utils'
 
@@ -54,15 +53,15 @@ export function* callExternalAction (methodName, method, action = {}, canBeMissi
         yield put(checkTokenExpired())
       }
 
-      let shortMessage = shortErrorMessage({ action })
+      let messageDescriptor = shortErrorMessage({ action })
       if (e.status === 0 && e.statusText === 'error') { // special case, mixing https and http
-        shortMessage = 'oVirt API connection failed'
+        messageDescriptor = { id: 'apiConnectionFailed' }
         e.statusText = 'Unable to connect to oVirt REST API. Please check URL and protocol (https).'
       }
 
       yield put(failedExternalAction({
         exception: e,
-        shortMessage,
+        messageDescriptor,
         failedAction: action,
       }))
     }
@@ -113,27 +112,30 @@ export function* waitTillEqual (leftArg, rightArg, limit) {
 }
 
 const shortMessages = {
-  'START_VM': msg.failedToStartVm(),
-  'RESTART_VM': msg.failedToRestartVm(),
-  'SHUTDOWN_VM': msg.failedToShutdownVm(),
-  'DOWNLOAD_CONSOLE_VM': msg.failedToGetVmConsole(),
-  'SUSPEND_VM': msg.failedToSuspendVm(),
-  'REMOVE_VM': msg.failedToRemoveVm(),
+  'START_VM': 'failedToStartVm',
+  'RESTART_VM': 'failedToRestartVm',
+  'SHUTDOWN_VM': 'failedToShutdownVm',
+  'DOWNLOAD_CONSOLE_VM': 'failedToGetVmConsole',
+  'SUSPEND_VM': 'failedToSuspendVm',
+  'REMOVE_VM': 'failedToRemoveVm',
 
-  'GET_ICON': msg.failedToRetrieveVmIcon(),
-  'INTERNAL_CONSOLE': msg.failedToRetrieveVmConsoleDetails(),
-  'INTERNAL_CONSOLES': msg.failedToRetrieveListOfVmConsoles(),
-  'GET_DISK_DETAILS': msg.failedToRetrieveDiskDetails(),
-  'GET_DISK_ATTACHMENTS': msg.failedToRetrieveVmDisks(),
-  'GET_ISO_FILES': msg.failedToRetrieveIsoStorages(),
+  'GET_ICON': 'failedToRetrieveVmIcon',
+  'INTERNAL_CONSOLE': 'failedToRetrieveVmConsoleDetails',
+  'INTERNAL_CONSOLES': 'failedToRetrieveListOfVmConsoles',
+  'GET_DISK_DETAILS': 'failedToRetrieveDiskDetails',
+  'GET_DISK_ATTACHMENTS': 'failedToRetrieveVmDisks',
+  'GET_ISO_FILES': 'failedToRetrieveIsoStorages',
 
-  'GET_VM': msg.failedToRetrieveVmDetails(),
-  'CHANGE_VM_ICON': msg.failedToChangeVmIcon(),
-  'CHANGE_VM_ICON_BY_ID': msg.failedToChangeVmIconToDefault(),
+  'GET_VM': 'failedToRetrieveVmDetails',
+  'CHANGE_VM_ICON': 'failedToChangeVmIcon',
+  'CHANGE_VM_ICON_BY_ID': 'failedToChangeVmIconToDefault',
 }
 
-export function shortErrorMessage ({ action }) {
-  return shortMessages[action.type] ? shortMessages[action.type] : msg.actionFailed({ action: action.type })
+function shortErrorMessage ({ action: { type = 'NONE' } }) {
+  if (shortMessages[type]) {
+    return { id: shortMessages[type] }
+  }
+  return { id: 'actionFailed', params: { action: type } }
 }
 
 export function* foreach (array, fn, context) {
