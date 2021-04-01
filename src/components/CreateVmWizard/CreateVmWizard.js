@@ -365,10 +365,20 @@ class CreateVmWizard extends React.Component {
                   const canUserUseStorageDomain =
                     !!dataCenterStorageDomainsList.find(sd => sd.id === disk.get('storageDomainId'))
 
+                  /*
+                   * To be consistent with webadmin create VM from a template, diskType needs
+                   * to match webadmin's default diskType. Webadmin derives the default disk
+                   * type for the template's default storage allocation value, which is derived
+                   * from the optimizedFor type.
+                   *
+                   * Optimized for -> Storage Allocation -> format / diskType:
+                   *   - desktop -> Thin -> cow / 'thin'
+                   *   - server or high performance -> Clone -> raw / as defined in the template
+                   */
                   const diskType = // constrain to values from createDiskTypeList()
-                    this.state.steps.basic.optimizedFor === 'desktop'
-                      ? disk.get('sparse') ? 'thin' : 'pre'
-                      : 'pre'
+                    template.get('type') === 'desktop' ? 'thin'
+                      : this.state.steps.basic.optimizedFor === 'desktop' ? 'thin'
+                        : disk.get('sparse') ? 'thin' : 'pre'
 
                   return {
                     id: disk.get('attachmentId'),
