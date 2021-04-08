@@ -899,7 +899,7 @@ const VmSessions = {
 //
 //
 const Permissions = {
-  toInternal ({ permissions }: { permissions: Array<ApiPermissionType> }): Array<PermissionType> {
+  toInternal ({ permissions = [] }: { permissions: Array<ApiPermissionType> }): Array<PermissionType> {
     return permissions.map(permission => ({
       name: permission.role.name,
       userId: permission.user && permission.user.id,

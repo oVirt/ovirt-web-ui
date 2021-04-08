@@ -162,7 +162,10 @@ export function* delayInMsSteps (count = 20, msMultiplier = 2000) {
 
 export function* fetchPermits ({ entityType, id }) {
   const permissions = yield callExternalAction(`get${entityType}Permissions`, Api[`get${entityType}Permissions`], { payload: { id } })
-  return getUserPermits(Api.permissionsToInternal({ permissions: permissions.permission }))
+  if (permissions && Array.isArray(permissions.permission)) {
+    return getUserPermits(Api.permissionsToInternal({ permissions: permissions.permission }))
+  }
+  return []
 }
 
 export const PermissionsType = {
