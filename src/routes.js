@@ -2,6 +2,8 @@ import React from 'react'
 
 import PageRouter from './components/PageRouter'
 
+import { HomeIcon } from '@patternfly/react-icons'
+
 import Handler404 from './Handler404'
 import {
   VmDetailToolbar,
@@ -43,40 +45,42 @@ export default function getRoutes (vms) {
     routes: [
       {
         path: '/',
-        exact: true,
+        title: () => (<HomeIcon style={{ fontSize: '1rem' }} />),
         component: VmsListPage,
         toolbars: (match) => (<VmsListToolbar match={match} vms={vms} key='addbutton' />),
         type: LIST_PAGE_TYPE,
         isToolbarFullWidth: true,
-      },
-
-      {
-        path: '/vm/:id',
-        title: (match, vms) => vms.getIn(['vms', match.params.id, 'name']) || match.params.id,
-        component: VmDetailsPage,
-        toolbars: (match) => (<VmDetailToolbar match={match} key='vmaction' />),
-        type: DETAIL_PAGE_TYPE,
         routes: [
           {
-            path: '/vm/:id/console/:console',
-            title: (match) => msg.console(),
-            component: VmConsolePage,
-            closeable: true,
-            toolbars: (match) => (<VmConsoleToolbar match={match} key='vmconsole' />),
-            isToolbarFullWidth: true,
-            type: CONSOLE_PAGE_TYPE,
+            path: '/vm/:id',
+            title: (match, vms) => vms.getIn(['vms', match.params.id, 'name']) || match.params.id,
+            component: VmDetailsPage,
+            toolbars: (match) => (<VmDetailToolbar match={match} key='vmaction' />),
+            type: DETAIL_PAGE_TYPE,
+            routes: [
+              {
+                path: '/vm/:id/console/:console',
+                title: (match) => msg.console(),
+                component: VmConsolePage,
+                closeable: true,
+                toolbars: (match) => (<VmConsoleToolbar match={match} key='vmconsole' />),
+                isToolbarFullWidth: true,
+                type: CONSOLE_PAGE_TYPE,
+              },
+            ],
           },
-        ],
-      },
 
-      {
-        path: '/settings',
-        exact: true,
-        title: msg.accountSettings(),
-        component: GlobalSettingsPage,
-        toolbars: SettingsToolbar,
-        isToolbarFullWidth: true,
-        type: SETTINGS_PAGE_TYPE,
+          {
+            path: '/settings',
+            exact: true,
+            title: msg.accountSettings(),
+            component: GlobalSettingsPage,
+            toolbars: SettingsToolbar,
+            isToolbarFullWidth: true,
+            type: SETTINGS_PAGE_TYPE,
+          },
+
+        ],
       },
 
       {
