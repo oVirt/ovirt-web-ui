@@ -114,6 +114,26 @@ export type ApiClusterType = Object
 export type ClusterType = Object
 
 export type ApiNicType = Object
+
+type IpType = {
+  address: string,
+  version: 'v4' | 'v6'
+}
+
+export type ReportedDevicesType = {
+  description: string,
+  href: string,
+  id: string,
+  ips?: { ip: Array<IpType> },
+  mac: { address: string },
+  name: string,
+  type: string,
+  vm: {
+    href: string,
+    id: string
+  }
+}
+
 export type NicType = {
   id: string,
   name: string,

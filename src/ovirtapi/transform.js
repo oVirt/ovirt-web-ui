@@ -715,10 +715,11 @@ const Cluster = {
 //
 const Nic = {
   toInternal ({ nic }: { nic: ApiNicType }): NicType {
+    const { mac: { address: nicMacAddress = '' } = {} } = nic
     const ips =
       nic.reported_devices && nic.reported_devices.reported_device
         ? nic.reported_devices.reported_device
-          .filter(device => !!device.ips && !!device.ips.ip)
+          .filter(device => !!device.ips && !!device.ips.ip && device.mac && device.mac.address === nicMacAddress)
           .map(device => device.ips.ip)
           .reduce((ips, ipArray) => [...ipArray, ...ips], [])
         : []

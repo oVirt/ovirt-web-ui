@@ -173,6 +173,7 @@ class NicsCard extends React.Component {
               <Row key={nic.id} id={`${idPrefix}-${nic.name}`}>
                 <Col style={{ display: 'block' }}>
                   <NicListItem
+                    showNicIPs={showNicIPs}
                     idPrefix={`${idPrefix}-${nic.name}`}
                     nic={nic}
                     vmStatus={vmStatus}

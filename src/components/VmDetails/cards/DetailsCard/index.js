@@ -624,6 +624,7 @@ class DetailsCard extends React.Component {
 
     const idPrefix = 'vmdetail-details'
 
+    const showIPs = vm.get('status') === 'up'
     const isPoolVm = vm.getIn(['pool', 'id']) !== undefined
     const canEditDetails = vm.get('canUserEditVm') && !isPoolVm
     let pool = null
@@ -637,8 +638,13 @@ class DetailsCard extends React.Component {
     const hostName = hosts && hosts.getIn([vm.get('hostId'), 'name'])
 
     // IP Addresses
-    const ip4Addresses = !vm.has('nics') ? [] : vm.get('nics').reduce((ipSet, nic) => [...ipSet, ...nic.get('ipv4')], [])
-    const ip6Addresses = !vm.has('nics') ? [] : vm.get('nics').reduce((ipSet, nic) => [...ipSet, ...nic.get('ipv6')], [])
+    const ip4Addresses = [...(new Set(!vm.has('nics') || !showIPs
+      ? []
+      : vm.get('nics').reduce((ipSet, nic) => [...ipSet, ...nic.get('ipv4')], [])))]
+    const ip6Addresses = [...(new Set(
+      !vm.has('nics') || !showIPs
+        ? []
+        : vm.get('nics').reduce((ipSet, nic) => [...ipSet, ...nic.get('ipv6')], [])))]
 
     // FQDN
     const fqdn = vm.get('fqdn')
