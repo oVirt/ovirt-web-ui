@@ -11,7 +11,7 @@ const VM_STATUS_TO_ICON = {
   'up'                : { type: 'pf', name: 'on-running',         tooltip: msg.vmStatusIconTooltipUp(), className: style['green'] },
   'powering_up'       : { type: 'pf', name: 'in-progress',        tooltip: msg.vmStatusIconTooltipPoweringUp() },
   'down'              : { type: 'pf', name: 'off',                tooltip: msg.vmStatusIconTooltipDown() },
-  'paused'            : { type: 'pf', name: 'paused',             tooltip: msg.vmStatusIconTooltipPaused },
+  'paused'            : { type: 'pf', name: 'paused',             tooltip: msg.vmStatusIconTooltipPaused() },
   'suspended'         : { type: 'pf', name: 'asleep',             tooltip: msg.vmStatusIconTooltipSuspended() },
   'powering_down'     : { type: 'pf', name: 'in-progress',        tooltip: msg.vmStatusIconTooltipPoweringDown() },
   'not_responding'    : { type: 'pf', name: 'warning-triangle-o', tooltip: msg.vmStatusIconTooltipNotResponding() },
