@@ -120,7 +120,13 @@ const Settings = ({ draftValues, onSave, lastTransactionId, onCancel,
         />
       }
     </div>
-    <SettingsToolbar onSave={handleSave} onCancel={onCancel} enableSave={!!pendingChanges.length} />
+    <SettingsToolbar
+      onSave={handleSave}
+      onCancel={onCancel}
+      enableSave={!!pendingChanges.length}
+      changes={pendingChanges}
+      translatedLabels={translatedLabels}
+    />
     {children}
   </React.Fragment>
 }

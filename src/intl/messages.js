@@ -554,6 +554,8 @@ export const messages: { [messageId: string]: MessageType } = {
   },
   run: 'Run',
   save: 'Save',
+  saveChanges: 'Save Changes',
+  saveSettingsChangesConfirmation: 'Are you sure you want to make changes to the following settings?',
   secondDevice: 'Second Device',
   secondDeviceTooltip: 'Second device in order.',
   secondsShort: 's',
