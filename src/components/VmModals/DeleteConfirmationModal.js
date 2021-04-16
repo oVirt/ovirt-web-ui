@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { MessageDialog, Icon } from 'patternfly-react'
-import { MsgContext } from '_/intl'
+import { withMsg } from '_/intl'
 
 class DeleteConfirmationModal extends React.Component {
   constructor (props) {
@@ -28,8 +28,13 @@ class DeleteConfirmationModal extends React.Component {
   }
 
   render () {
-    const { msg } = this.context
-    const { children, trigger, id, severity = 'normal' } = this.props
+    const {
+      children,
+      trigger,
+      id,
+      severity = 'normal',
+      msg,
+    } = this.props
 
     const primary = Array.isArray(children) ? children[0] : children
     const secondary = Array.isArray(children) ? children.slice(1) : undefined
@@ -61,8 +66,6 @@ class DeleteConfirmationModal extends React.Component {
   }
 }
 
-DeleteConfirmationModal.contextType = MsgContext
-
 DeleteConfirmationModal.propTypes = {
   id: PropTypes.string.isRequired,
   trigger: PropTypes.func.isRequired,
@@ -70,6 +73,7 @@ DeleteConfirmationModal.propTypes = {
   onDelete: PropTypes.func.isRequired,
   onClose: PropTypes.func,
   severity: PropTypes.oneOf([ 'normal', 'danger' ]),
+  msg: PropTypes.object.isRequired,
 }
 
-export default DeleteConfirmationModal
+export default withMsg(DeleteConfirmationModal)

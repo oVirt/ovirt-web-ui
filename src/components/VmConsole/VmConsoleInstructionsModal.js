@@ -1,7 +1,7 @@
 import React from 'react'
 import { Icon, Modal, Button } from 'patternfly-react'
 import style from './style.css'
-import { MsgContext } from '../../intl'
+import { withMsg } from '../../intl'
 import PropTypes from 'prop-types'
 
 class VmConsoleInstructionsModal extends React.Component {
@@ -21,8 +21,7 @@ class VmConsoleInstructionsModal extends React.Component {
   }
 
   render () {
-    const { msg } = this.context
-    const { disabled } = this.props
+    const { disabled, msg } = this.props
     return <div className={style['console-modal-box']}>
       <Button bsStyle='link' onClick={this.open} className={style['color-blue']} disabled={disabled}>
         { msg.consoleInstructions() }
@@ -61,10 +60,9 @@ class VmConsoleInstructionsModal extends React.Component {
   }
 }
 
-VmConsoleInstructionsModal.contextType = MsgContext
-
 VmConsoleInstructionsModal.propTypes = {
   disabled: PropTypes.bool,
+  msg: PropTypes.object.isRequired,
 }
 
-export default VmConsoleInstructionsModal
+export default withMsg(VmConsoleInstructionsModal)
