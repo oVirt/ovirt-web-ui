@@ -250,6 +250,25 @@ export function getFormatedDateTime (timestamp) {
   }
 }
 
+export function formatDateFromNow (d, msg) {
+  const now = Date.now()
+  const date = new Date(d)
+
+  const suffixes = [ msg.secondsShort(), msg.minutesShort(), msg.hoursShort(), msg.daysShort(), msg.monthsShort(), msg.yearsShort() ]
+  const divitions = [ 1000, 60, 60, 24, 30, 12 ]
+  let elapsed = (now - date.getTime())
+  let suffix = ''
+
+  let currentIndex = 0
+  do {
+    suffix = suffixes[currentIndex]
+    elapsed = Math.floor(elapsed / divitions[currentIndex])
+    currentIndex++
+  } while (divitions[currentIndex] <= elapsed && currentIndex < suffixes.length)
+
+  return msg.timeAgo({ time: `${elapsed}${suffix}` })
+}
+
 export function filterOsByArchitecture (operatingSystems, architecture) {
   return operatingSystems.filter(os => os.get('architecture') === architecture)
 }
