@@ -248,3 +248,9 @@ export type EventType = {
   description: string,
   severity: string
 }
+
+export type VersionType = {|
+  major: number,
+  minor: number,
+  build: number
+|}

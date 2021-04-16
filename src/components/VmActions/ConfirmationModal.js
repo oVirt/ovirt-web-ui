@@ -31,7 +31,9 @@ const ConfirmationModal = ({ show, title, confirm, body, subContent, onClose, ex
                   { body }
                 </p>
                 {
-                  subContent && <p>{ subContent }</p>
+                  subContent && typeof subContent === 'string'
+                    ? <p>{ subContent }</p>
+                    : subContent
                 }
               </div>
             </React.Fragment>
@@ -60,7 +62,7 @@ ConfirmationModal.propTypes = {
   }),
   extra: btnPropType,
   body: PropsTypes.oneOfType([PropsTypes.node, PropsTypes.string]).isRequired,
-  subContent: PropsTypes.string,
+  subContent: PropsTypes.oneOfType([PropsTypes.node, PropsTypes.string]),
 }
 
 export default ConfirmationModal

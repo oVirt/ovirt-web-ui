@@ -61,3 +61,7 @@
 :global(#settings-toolbar) {
     margin-left: -20px;
 }
+.changes-list{
+    list-style-type: disc;
+    list-style: inside;
+}

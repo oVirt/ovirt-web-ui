@@ -8,6 +8,8 @@ import AppConfiguration from '_/config'
 import { hidePassword } from '_/helpers'
 import Api from '_/ovirtapi'
 import { getUserPermits } from '_/utils'
+import semverGte from 'semver/functions/gte'
+import semverValid from 'semver/functions/valid'
 
 import {
   checkTokenExpired,
@@ -21,23 +23,16 @@ import {
 export const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 /**
- * Compare the actual { major, minor } version to the required { major, minor } and
+ * Compare the actual { major, minor, build} version to the required { major, minor} and
  * return if the **actual** is greater then or equal to **required**.
  *
  * Backward compatibility of the API is assumed.
  */
 export function compareVersion (actual, required) {
-  console.log(`compareVersion(), actual=${JSON.stringify(actual)}, required=${JSON.stringify(required)}`)
-
-  if (actual.major >= required.major) {
-    if (actual.major === required.major) {
-      if (actual.minor < required.minor) {
-        return false
-      }
-    }
-    return true
-  }
-  return false
+  const fullActual = `${actual.major}.${actual.minor}.${actual.build}`
+  const fullRequired = `${required.major}.${required.minor}.0`
+  console.log(`compareVersion(), actual=${fullActual}, required=${fullRequired}`)
+  return !!semverValid(fullActual) && semverGte(fullActual, fullRequired)
 }
 
 export function* callExternalAction (methodName, method, action = {}, canBeMissing = false) {
@@ -164,7 +159,10 @@ export function* delayInMsSteps (count = 20, msMultiplier = 2000) {
 
 export function* fetchPermits ({ entityType, id }) {
   const permissions = yield callExternalAction(`get${entityType}Permissions`, Api[`get${entityType}Permissions`], { payload: { id } })
-  return getUserPermits(Api.permissionsToInternal({ permissions: permissions.permission }))
+  if (permissions && Array.isArray(permissions.permission)) {
+    return getUserPermits(Api.permissionsToInternal({ permissions: permissions.permission }))
+  }
+  return []
 }
 
 export const PermissionsType = {
