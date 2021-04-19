@@ -157,9 +157,8 @@ const vms = actionReducer(initialState, {
     return state
   },
 
-  [SET_VM_CONSOLES] (state, { payload: { vmId, consoles, selectedConsole } }) {
+  [SET_VM_CONSOLES] (state, { payload: { vmId, consoles } }) {
     if (state.getIn(['vms', vmId])) {
-      state = state.setIn(['vms', vmId, 'defaultConsole'], selectedConsole)
       return state.setIn(['vms', vmId, 'consoles'], Immutable.fromJS(consoles)) // deep immutable
     } else { // fail, if VM not found
       console.error(`vms.setVmConsoles() reducer: vmId ${vmId} not found`)

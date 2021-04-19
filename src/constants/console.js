@@ -14,3 +14,7 @@ export const CONSOLE_IN_USE = 'IN_USE'
 export const CONSOLE_LOGON = 'LOGON'
 
 export const RDP_ID = 'rdp'
+export const VNC = 'vnc'
+export const NO_VNC = 'noVNC'
+export const SPICE = 'spice'
+export const RDP = 'rdp'

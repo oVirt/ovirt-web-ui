@@ -133,6 +133,7 @@ const OvirtApi = {
     let url = `${AppConfiguration.applicationContext}/api/vms/${vmId}`
     if (additional && additional.length > 0) {
       url += `?follow=${additional.join(',')}`
+      url += '&current' // performance optimization - retrieve graphic consoles from vm_dynamic
     }
     return httpGet({ url })
   },
@@ -141,6 +142,8 @@ const OvirtApi = {
     const max = count ? `;max=${count}` : ''
     const params =
       [
+        'detail=current_graphics_consoles',
+        'current', // for backward compatibility only (before 4.4.7)
         page ? 'search=' + encodeURIComponent(`SORTBY NAME ASC page ${page}`) : '',
         additional && additional.length > 0 ? 'follow=' + encodeURIComponent(`${additional.join(',')}`) : '',
       ]

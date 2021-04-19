@@ -9,7 +9,7 @@ import { MenuItemAction } from '../VmActions/Action'
 import { DOWNLOAD_CONSOLE, RDP_ID } from '_/constants'
 import { MsgContext } from '_/intl'
 import { getRDP } from '_/actions'
-
+import { VNC } from '_/constants/console'
 import { isWindows } from '_/helpers'
 import style from './style.css'
 
@@ -20,7 +20,7 @@ const VmConsoleSelector = ({ vmId, vms, consoles, config, consoleId, isConsolePa
     return <div />
   }
 
-  const vnc = actions.find((a) => a.get('protocol') === 'vnc')
+  const vnc = actions.find((a) => a.get('protocol') === VNC)
 
   const consoleItems = actions.map(action =>
     <MenuItemAction

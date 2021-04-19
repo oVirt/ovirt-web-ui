@@ -144,4 +144,3 @@ export const VM_ACTION_IN_PROGRESS = 'VM_ACTION_IN_PROGRESS'
 
 export * from './pages'
 export * from './console'
-export * from './consoleAutoSelect'

@@ -34,7 +34,7 @@ import { SplitButton, Icon, Checkbox, DropdownKebab } from 'patternfly-react'
 import ConfirmationModal from './ConfirmationModal'
 import ConsoleConfirmationModal from './ConsoleConfirmationModal'
 import Action, { ActionButtonWraper, MenuItemAction, ActionMenuItemWrapper } from './Action'
-import AutoSelectConsole from './AutoSelectConsole'
+import { VNC, NO_VNC, RDP } from '_/constants/console'
 
 const EmptyAction = ({ state, isOnCard }) => {
   if (!canConsole(state) && !canShutdown(state) && !canRestart(state) && !canStart(state)) {
@@ -127,7 +127,6 @@ class VmActions extends React.Component {
       onForceShutdown,
       onSuspend,
       onRDP,
-      isOnCard,
       msg,
     } = this.props
     const isPoolVm = !!vm.getIn(['pool', 'id'], false)
@@ -135,41 +134,33 @@ class VmActions extends React.Component {
     const status = vm.get('status')
     const onStart = (isPool ? onStartPool : onStartVm)
 
-    const vncConsole = vm.get('consoles').find(c => c.get('protocol') === 'vnc')
+    const vncConsole = vm.get('consoles').find(c => c.get('protocol') === VNC)
     const hasRdp = isWindows(vm.getIn(['os', 'type']))
+    const defaultConsole = vm.get('defaultConsole')
     let consoles = []
-    if (isOnCard) {
-      consoles.push({
-        priority: 1,
-        actionDisabled: isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole']),
-        shortTitle: msg.console(),
-        onClick: (e) => { e.preventDefault() },
-        className: 'btn btn-success',
-        id: `${idPrefix}-button-Consoles`,
-        confirmation: (<AutoSelectConsole vm={vm} id={`${vm.get('id')}-console-selector`} />),
-      })
-    } else {
-      consoles = vm.get('consoles').map((c) => ({
-        priority: 0,
-        shortTitle: msg[c.get('protocol') + 'Console'](),
-        icon: <Icon name='external-link' />,
-        id: `${idPrefix}-button-console-${c.get('protocol')}`,
-        confirmation: (
-          <ConsoleConfirmationModal consoleId={c.get('id')} vm={vm} />
-        ),
-      })).toJS()
 
-      if (vncConsole) {
-        consoles.push({
-          priority: 0,
-          shortTitle: msg.vncConsoleBrowser(),
-          actionDisabled: config.get('websocket') === null,
-          id: `${idPrefix}-button-console-browser`,
-          confirmation: (
-            <ConsoleConfirmationModal isNoVNC consoleId={vncConsole.get('id')} vm={vm} />
-          ),
-        })
-      }
+    consoles = vm.get('consoles').map((c) => ({
+      priority: 0,
+      protocol: c.get('protocol'),
+      shortTitle: msg[c.get('protocol') + 'Console'](),
+      icon: <Icon name='external-link' />,
+      id: `${idPrefix}-button-console-${c.get('protocol')}`,
+      confirmation: (
+        <ConsoleConfirmationModal consoleId={c.get('id')} vm={vm} />
+      ),
+    })).toJS()
+
+    if (vncConsole) {
+      consoles.push({
+        priority: 0,
+        protocol: NO_VNC,
+        shortTitle: msg.vncConsoleBrowser(),
+        actionDisabled: config.get('websocket') === null,
+        id: `${idPrefix}-button-console-browser`,
+        confirmation: (
+          <ConsoleConfirmationModal isNoVNC consoleId={vncConsole.get('id')} vm={vm} />
+        ),
+      })
     }
 
     if (hasRdp) {
@@ -177,12 +168,17 @@ class VmActions extends React.Component {
       const username = config.getIn([ 'user', 'name' ])
       consoles.push({
         priority: 0,
+        protocol: RDP,
         shortTitle: msg.remoteDesktop(),
         icon: <Icon name='external-link' />,
         id: `${idPrefix}-button-console-rdp`,
         onClick: (e) => { e.preventDefault(); onRDP({ domain, username }) },
       })
     }
+
+    consoles = consoles
+      .map(({ protocol, ...props }) => ({ ...props, protocol, priority: protocol === defaultConsole ? 1 : 0 }))
+      .sort((a, b) => b.priority - a.priority)
 
     const actions = [
       {
@@ -239,7 +235,7 @@ class VmActions extends React.Component {
       },
       {
         priority: 1,
-        actionDisabled: isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole']) || (!isOnCard && vm.get('consoles').isEmpty()),
+        actionDisabled: isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole']) || vm.get('consoles').isEmpty(),
         shortTitle: msg.console(),
         className: 'btn btn-default',
         bsStyle: 'default',

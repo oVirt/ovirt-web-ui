@@ -163,7 +163,7 @@ const VM = {
       },
       disks: [],
       consoles: [],
-      defaultConsole: 'undefined',
+      defaultConsole: undefined,
       snapshots: [],
       pool: {
         id: vm['vm_pool'] ? vm.vm_pool['id'] : undefined,
@@ -874,8 +874,8 @@ const SSHKey = {
 //
 //
 const VmConsoles = {
-  toInternal ({ consoles }: { consoles: ApiVmConsolesType }): Array<VmConsolesType> {
-    return consoles['graphics_console'].map((c: Object): Object => {
+  toInternal ({ consoles: { graphics_console: graphicConsoles = [] } = {} }: { consoles: ApiVmConsolesType }): Array<VmConsolesType> {
+    return graphicConsoles.map((c: Object): Object => {
       return {
         id: c.id,
         protocol: c.protocol,

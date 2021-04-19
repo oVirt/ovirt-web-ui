@@ -23,6 +23,8 @@ import {
   SET_GLOBAL_DEFAULT_VNC_MODE,
 } from '_/constants'
 
+import { VNC } from '_/constants/console'
+
 const initialState = Immutable.fromJS({
   appConfigured: false,
   loginToken: undefined,
@@ -37,7 +39,7 @@ const initialState = Immutable.fromJS({
     minor: undefined,
     passed: undefined,
   },
-  defaultConsole: 'vnc',
+  defaultConsole: VNC,
   defaultVncMode: 'Native',
   filter: true,
   isFilterChecked: false,

@@ -91,8 +91,6 @@ import {
   SELECT_VM_DETAIL,
   NAVIGATE_TO_VM_DETAILS,
   FETCH_CONSOLES,
-  NO_DEFAULT_CONSOLE,
-  EMPTY_CONSOLES_LIST,
 } from '_/constants'
 
 import {
@@ -115,12 +113,15 @@ const VM_FETCH_ADDITIONAL_DEEP = [
   'statistics',
 ]
 
-const VM_FETCH_ADDITIONAL_SHALLOW = []
+const VM_FETCH_ADDITIONAL_SHALLOW = [
+  'graphics_consoles', // for backward compatibility only (before 4.4.7)
+]
 
 export const EVERYONE_GROUP_ID = 'eee00000-0000-0000-0000-123456789eee'
 
-export function* transformAndPermitVm (vm) {
+export function* transformAndPermitVm (vm, defaultConsole) {
   const internalVm = Transforms.VM.toInternal({ vm })
+  internalVm.defaultConsole = defaultConsole
   internalVm.userPermits = yield entityPermissionsToUserPermits(internalVm)
 
   internalVm.canUserChangeCd = canUserChangeCd(internalVm.userPermits)
@@ -191,22 +192,9 @@ function* fetchConsoles ({ payload: { vm } }) {
   const vmId = vm.get('id')
   const apiConsoles = yield callExternalAction('consoles', Api.consoles, { payload: { vmId } })
 
-  // headless VM (no graphics_consoles defined) - API response is `{}`
-  if (Object.values(apiConsoles).length === 0) {
-    yield put(setVmConsoles({ vmId, consolesList: [], selectedConsole: EMPTY_CONSOLES_LIST }))
-  }
-
-  if (apiConsoles && apiConsoles.graphics_console) {
-    const defaultConsoleProtocol = yield select(state => state.config.get('defaultConsole'))
-    const consoles = Transforms.VmConsoles.toInternal({ consoles: apiConsoles })
-    // select the console to use based on availability and app/user configs
-    const selectedConsole =
-      consoles.length === 0 ? EMPTY_CONSOLES_LIST
-        : consoles.length === 1 ? consoles[0]
-          : consoles.find(c => c.protocol === defaultConsoleProtocol) || NO_DEFAULT_CONSOLE
-
-    yield put(setVmConsoles({ vmId, consolesList: consoles, selectedConsole }))
-  }
+  // for headless VM (no graphics_consoles defined) - API response is `{}`
+  const consoles = Transforms.VmConsoles.toInternal({ consoles: apiConsoles })
+  yield put(setVmConsoles({ vmId, consolesList: consoles }))
 }
 
 export function* fetchVms ({ payload: { count, page, shallowFetch = true } }) {
@@ -214,10 +202,11 @@ export function* fetchVms ({ payload: { count, page, shallowFetch = true } }) {
 
   const additional = shallowFetch ? VM_FETCH_ADDITIONAL_SHALLOW : VM_FETCH_ADDITIONAL_DEEP
   const apiVms = yield callExternalAction('getVms', Api.getVms, { payload: { count, page, additional } })
+  const defaultConsoleProtocol = yield select(state => state.config.get('defaultConsole'))
   if (apiVms && apiVms['vm']) {
     const internalVms = []
     for (const apiVm of apiVms.vm) {
-      const internalVm = yield transformAndPermitVm(apiVm)
+      const internalVm = yield transformAndPermitVm(apiVm, defaultConsoleProtocol)
       fetchedVmIds.push(internalVm.id)
       internalVms.push(internalVm)
     }
@@ -241,10 +230,11 @@ export function* fetchSingleVm (action) {
 
   action.payload.additional = shallowFetch ? VM_FETCH_ADDITIONAL_SHALLOW : VM_FETCH_ADDITIONAL_DEEP
 
+  const defaultConsoleProtocol = yield select(state => state.config.get('defaultConsole'))
   const vm = yield callExternalAction('getVm', Api.getVm, action, true)
   let internalVm = null
   if (vm && vm.id) {
-    internalVm = yield transformAndPermitVm(vm)
+    internalVm = yield transformAndPermitVm(vm, defaultConsoleProtocol)
 
     // If the VM is running, we want to display the current=true cdrom info. Due
     // to an API restriction, current=true cdrom info cannot currently (Aug-2018)

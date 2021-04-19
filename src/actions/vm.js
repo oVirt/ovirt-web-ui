@@ -306,13 +306,12 @@ export function updateIcons ({ icons }) {
   }
 }
 
-export function setVmConsoles ({ vmId, consolesList, selectedConsole }) {
+export function setVmConsoles ({ vmId, consolesList }) {
   return {
     type: SET_VM_CONSOLES,
     payload: {
       vmId,
       consoles: consolesList,
-      selectedConsole,
     },
   }
 }
