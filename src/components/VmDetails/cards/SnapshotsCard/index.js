@@ -11,6 +11,7 @@ import SnapshotItem from './SnapshotItem'
 import { PendingTaskTypes } from '_/reducers/pendingTasks'
 
 const DOWN_STATUS = 'down'
+const RUNNING_STATUS = 'up'
 
 const Snapshots = ({
   snapshots,
@@ -21,6 +22,7 @@ const Snapshots = ({
   beingRestored,
   isVmDown,
   canUserManipulateSnapshot,
+  isVmRunning,
 }) => {
   const isVmInPreview = !!snapshots.find(snapshot => snapshot.get('status') === 'in_preview')
   const isVmLocked = !!snapshots.find(snapshot => snapshot.get('status') === 'locked')
@@ -28,7 +30,7 @@ const Snapshots = ({
   return (
     <React.Fragment>
       { canUserManipulateSnapshot && <div className={style['snapshot-create']}>
-        <NewSnapshotModal vmId={vmId} disabled={isActionDisabled} idPrefix={`${idPrefix}-new-snapshot`} />
+        <NewSnapshotModal vmId={vmId} disabled={isActionDisabled} idPrefix={`${idPrefix}-new-snapshot`} isVmRunning={isVmRunning} />
       </div> }
       {
         snapshots.sort((a, b) => b.get('date') - a.get('date')).map((snapshot) => (
@@ -54,6 +56,7 @@ Snapshots.propTypes = {
   beingRestored: PropTypes.bool,
   beingDeleted: PropTypes.bool,
   isVmDown: PropTypes.bool,
+  isVmRunning: PropTypes.bool,
   canUserManipulateSnapshot: PropTypes.bool,
 }
 
@@ -87,6 +90,7 @@ const SnapshotsCard = ({ vm }) => {
         canUserManipulateSnapshot={vm.get('canUserManipulateSnapshots')}
         idPrefix={idPrefix}
         isVmDown={vm.get('status') === DOWN_STATUS}
+        isVmRunning={vm.get('status') === RUNNING_STATUS}
       />
     </BaseCard>
   )

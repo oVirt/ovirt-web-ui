@@ -4,8 +4,11 @@ import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { MsgContext } from '_/intl'
 
+const NONE_VM_ROUTES = [ '/settings' ]
+
 const buildPath = ({ vms, branches, msg }) => {
   const res = []
+  const isVmPath = !branches.find(branch => NONE_VM_ROUTES.includes(branch.match.path))
 
   for (const branch of branches) {
     if (typeof branch.route.title === 'function') {
@@ -19,19 +22,20 @@ const buildPath = ({ vms, branches, msg }) => {
         url: branch.match.url,
       })
     }
+    const { match: { path = '' } = {} } = branch
+    if (isVmPath && ['/'].includes(path)) {
+      res.push({
+        title: msg.virtualMachines(),
+        url: '/',
+      })
+    }
   }
-
   return res
 }
 
-const root = (msg) => ({
-  title: msg.virtualMachines(),
-  url: '/',
-})
-
 const Breadcrumb = ({ vms, branches }) => {
   const { msg } = useContext(MsgContext)
-  const crumbs = [ root(msg), ...buildPath({ vms, branches, msg }) ]
+  const crumbs = buildPath({ vms, branches, msg })
   const idPrefix = `breadcrumb`
 
   return (

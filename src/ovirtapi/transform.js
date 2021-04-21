@@ -29,6 +29,7 @@ import type {
   UserOptionType,
   RemoteUserOptionsType,
   VersionType,
+  ApiBooleanType,
 } from './types'
 
 import { isWindows } from '_/helpers'
@@ -50,6 +51,10 @@ function convertEpoch (epoch: number, defaultValue: ?Date = undefined): ?Date {
 
 function convertBool (val: ?string): boolean {
   return val ? val.toLowerCase() === 'true' : false
+}
+
+function toApiBoolean (value: any): ApiBooleanType {
+  return value ? 'true' : 'false'
 }
 
 function convertInt (val: ?(number | string), defaultValue: number = Number.NaN): number {
@@ -479,7 +484,7 @@ const Snapshot = {
       type: snapshot.snapshot_type || '',
       date: snapshot.date || Date.now(),
       status: snapshot.snapshot_status || '',
-      persistMemoryState: snapshot.persist_memorystate === 'true',
+      persistMemoryState: convertBool(snapshot.persist_memorystate),
       isActive: snapshot.snapshot_type === 'active',
     }
   },
@@ -487,6 +492,7 @@ const Snapshot = {
   toApi ({ snapshot }: { snapshot: SnapshotType }): ApiSnapshotType {
     return {
       description: snapshot.description,
+      persist_memorystate: toApiBoolean(snapshot.persistMemoryState),
     }
   },
 }

@@ -5,6 +5,8 @@
 export type ApiVmType = Object
 export type VmType = Object
 
+export type ApiBooleanType = "true" | "false"
+
 export type ApiStatisticKindType = "counter" | "gauge"
 export type ApiStatisticTypeType = "decimal" | "integer" | "string"
 export type ApiStatisticUnitType = "bytes" | "bits_per_second" | "bytes_per_second" | "count_per_second" | "seconds" | "percent" | "none"
@@ -47,7 +49,7 @@ export type ApiSnapshotType = {
   snapshot_type?: string,
   date?: number,
   snapshot_status?: string,
-  persist_memorystate?: string
+  persist_memorystate?: ApiBooleanType
 }
 export type SnapshotType = {
   id: string,
