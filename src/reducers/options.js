@@ -20,7 +20,7 @@ const defaultOptions: UserOptionsType = {
       id: undefined,
       content: locale,
     },
-    updateRate: {
+    refreshInterval: {
       id: undefined,
       content: AppConfiguration.schedulerFixedDelayInSeconds,
     },

@@ -40,12 +40,14 @@ import { fetchIsoFiles } from './storageDomains'
  */
 function* changePage (action) {
   yield put(Actions.setCurrentPage(action.payload))
-  yield put(Actions.startSchedulerFixedDelay({ pageRouterRefresh: true, targetPage: action.payload, startDelayInSeconds: 0 }))
+  const delayInSeconds = yield select(state => state.options.getIn(['remoteOptions', 'refreshInterval', 'content'], AppConfiguration.schedulerFixedDelayInSeconds))
+  yield put(Actions.startSchedulerFixedDelay({ pageRouterRefresh: true, targetPage: action.payload, startDelayInSeconds: 0, delayInSeconds }))
 }
 
 function* refreshManually () {
   const currentPage = yield select(state => state.config.get('currentPage'))
-  yield put(Actions.startSchedulerFixedDelay({ manualRefresh: true, targetPage: currentPage, startDelayInSeconds: 0 }))
+  const delayInSeconds = yield select(state => state.options.getIn(['remoteOptions', 'refreshInterval', 'content'], AppConfiguration.schedulerFixedDelayInSeconds))
+  yield put(Actions.startSchedulerFixedDelay({ manualRefresh: true, targetPage: currentPage, startDelayInSeconds: 0, delayInSeconds }))
 }
 
 /**
@@ -174,12 +176,37 @@ function* refreshConsolePage ({ id }) {
   }
 }
 
-function* startSchedulerWithFixedDelay (action) {
+function* startSchedulerWithFixedDelay ({ payload: { delayInSeconds, startDelayInSeconds, ...rest } }) {
   // if a scheduler is already running, stop it
   yield put(Actions.stopSchedulerFixedDelay())
 
+  const lastRefresh = yield select(state => state.config.get('lastRefresh', 0))
+
   // run a new scheduler
-  yield schedulerWithFixedDelay(action.payload)
+  yield schedulerWithFixedDelay({
+    delayInSeconds,
+    startDelayInSeconds: calculateStartDelayIfMissing({ delayInSeconds, startDelayInSeconds, lastRefresh }),
+    ...rest,
+  })
+}
+
+/* Continue previous wait period (unless immediate refresh is forced).
+  Restarting the wait period could lead to irregular, long intervals without refresh
+  or prevent the refresh (as long as user will keep changing the interval)
+  Example:
+  1. previous refresh period is 2 min (1m 30sec already elapsed)
+  2. user changes it to 5min
+  3. already elapsed time will be taken into consideration and refresh will be
+     triggered after 3 m 30sec.
+  Result: Wait intervals will be 2min -> 2min -> 5min -> 5min.
+  With restarting timers: 2min -> 2min -> 6min 30 sec -> 5min.
+*/
+function calculateStartDelayIfMissing ({ delayInSeconds, startDelayInSeconds, lastRefresh }) {
+  if (startDelayInSeconds !== undefined) {
+    return startDelayInSeconds
+  }
+  const timeFromLastRefresh = ((Date.now() - lastRefresh) / 1000).toFixed(0)
+  return timeFromLastRefresh > delayInSeconds ? 0 : delayInSeconds - timeFromLastRefresh
 }
 
 /**
@@ -261,6 +288,7 @@ function* schedulerWithFixedDelay ({
     console.log(`⏰ schedulerWithFixedDelay[${myId}] 🡒 running after delay of: ${delayInSeconds}`)
   }
 }
+
 let _SchedulerForNotificationsCount = 0
 function* scheduleResumingNotifications ({ payload: { delayInSeconds } }) {
   yield put(Actions.stopSchedulerForResumingNotifications())

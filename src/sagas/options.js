@@ -147,11 +147,17 @@ function* saveRemoteOption ([ name, value ]: any): any | ResultType {
     change: name })
 }
 
-function* saveGlobalOptions ({ payload: { sshKey, showNotifications, notificationSnoozeDuration, language, updateRate }, meta: { transactionId } }: SaveGlobalOptionsActionType): Generator<any, any, any> {
-  const { ssh, locale } = yield all({
+function* saveGlobalOptions ({ payload: { sshKey, showNotifications, notificationSnoozeDuration, language, refreshInterval }, meta: { transactionId } }: SaveGlobalOptionsActionType): Generator<any, any, any> {
+  const { ssh, locale, refresh } = yield all({
     ssh: call(saveSSHKey, ...Object.entries({ sshKey })),
     locale: call(saveRemoteOption, ...Object.entries({ locale: language })),
+    refresh: call(saveRemoteOption, ...Object.entries({ refreshInterval })),
   })
+
+  if (!refresh.error && refresh.change && !refresh.sameAsCurrent) {
+    const { name, value } = refresh.data
+    yield put(A.setOption({ key: [ 'remoteOptions', name ], value }))
+  }
 
   if (!locale.error && locale.change && !locale.sameAsCurrent) {
     const { name, value } = locale.data

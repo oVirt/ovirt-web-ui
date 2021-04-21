@@ -60,7 +60,7 @@ export function manualRefresh () {
 
 export function startSchedulerFixedDelay ({
   delayInSeconds = AppConfiguration.schedulerFixedDelayInSeconds,
-  startDelayInSeconds = AppConfiguration.schedulerFixedDelayInSeconds,
+  startDelayInSeconds,
   targetPage,
   pageRouterRefresh = false,
   manualRefresh = false,

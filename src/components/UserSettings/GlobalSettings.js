@@ -33,7 +33,7 @@ class GlobalSettings extends Component {
       },
     ]
   }
-  updateRateList (msg) {
+  refreshIntervalList (msg) {
     return [
       {
         id: 30,
@@ -171,6 +171,25 @@ class GlobalSettings extends Component {
           },
         ],
       },
+      refreshInterval: {
+        title: msg.refreshInterval(),
+        tooltip: msg.refreshIntervalTooltip(),
+        fields: [
+          {
+            title: translatedLabels.refreshInterval,
+            body: (
+              <div className={style['half-width']}>
+                <SelectBox
+                  id={`${idPrefix}-update-rate`}
+                  items={this.refreshIntervalList(msg)}
+                  selected={draftValues.refreshInterval}
+                  onChange={onChange('refreshInterval')}
+                />
+              </div>
+            ),
+          },
+        ],
+      },
       notifications: {
         title: msg.notifications(),
         tooltip: msg.notificationSettingsAffectAllNotifications(),
@@ -218,7 +237,7 @@ class GlobalSettings extends Component {
       language: msg.language(),
       showNotifications: msg.dontDisturb(),
       notificationSnoozeDuration: msg.dontDisturbFor(),
-      updateRate: msg.uiRefresh(),
+      refreshInterval: msg.uiRefresh(),
     }
 
     return (
@@ -261,7 +280,7 @@ export default connect(
       language: options.getIn(['remoteOptions', 'locale', 'content']),
       showNotifications: options.getIn(['localOptions', 'showNotifications']),
       notificationSnoozeDuration: options.getIn(['localOptions', 'notificationSnoozeDuration']),
-      updateRate: options.getIn(['remoteOptions', 'updateRate', 'content']),
+      refreshInterval: options.getIn(['remoteOptions', 'refreshInterval', 'content']),
     },
     lastTransactionId: options.getIn(['lastTransactions', 'global', 'transactionId'], ''),
   }),
