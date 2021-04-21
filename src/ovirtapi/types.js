@@ -166,7 +166,7 @@ export type VmSessionsType = Object
 export type ApiUserType = Object
 
 export type GlobalUserSettingsType = {|
-  updateRate: number,
+  refreshInterval: number,
   language: string,
   showNotifications?: boolean,
   notificationSnoozeDuration?: number
@@ -174,7 +174,7 @@ export type GlobalUserSettingsType = {|
 
 export type RemoteUserOptionsType = {|
   locale: UserOptionType<string>,
-  updateRate?: UserOptionType<number>
+  refreshInterval?: UserOptionType<number>
 |}
 
 export type UserOptionsType = {|
