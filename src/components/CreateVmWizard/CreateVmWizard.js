@@ -49,20 +49,20 @@ const DEFAULT_STATE = {
   showCloseWizardDialog: false,
   stepNavigation: {
     basic: {
+      valid: false,
       preventEnter: false,
-      preventExit: true,
     },
     network: {
+      valid: true,
       preventEnter: false,
-      preventExit: false,
     },
     storage: {
+      valid: false,
       preventEnter: false,
-      preventExit: false,
     },
     review: {
+      valid: true,
       preventEnter: false,
-      preventExit: false,
     },
   },
 
@@ -162,6 +162,9 @@ class CreateVmWizard extends React.Component {
     this.handleBasicOnExit = this.handleBasicOnExit.bind(this)
     this.handleListOnUpdate = this.handleListOnUpdate.bind(this)
     this.handleCreateVm = this.handleCreateVm.bind(this)
+    this.wizardAllowGoToStepFromActiveStep = this.wizardAllowGoToStepFromActiveStep.bind(this)
+    this.wizardAllowClickBack = this.wizardAllowClickBack.bind(this)
+    this.wizardAllowClickNext = this.wizardAllowClickNext.bind(this)
     this.wizardGoToStep = this.wizardGoToStep.bind(this)
     this.wizardClickBack = this.wizardClickBack.bind(this)
     this.wizardClickNext = this.wizardClickNext.bind(this)
@@ -173,7 +176,7 @@ class CreateVmWizard extends React.Component {
         id: 'basic',
         title: msg.createVmWizardStepTitleBasic(),
 
-        render: () => (
+        render: (activeStepIndex, title) => (
           <BasicSettings
             id='create-vm-wizard-basic'
             data={this.state.steps.basic}
@@ -182,7 +185,7 @@ class CreateVmWizard extends React.Component {
             onUpdate={({ valid = false, partialUpdate = {} }) => {
               this.handleBasicOnUpdate(partialUpdate)
               this.setState(produce(draft => {
-                draft.stepNavigation.basic.preventExit = !valid
+                draft.stepNavigation.basic.valid = valid
               }))
             }}
           />
@@ -204,7 +207,7 @@ class CreateVmWizard extends React.Component {
             onUpdate={({ valid = true, ...updatePayload }) => {
               this.handleListOnUpdate('network', 'nics', updatePayload)
               this.setState(produce(draft => {
-                draft.stepNavigation.network.preventExit = !valid
+                draft.stepNavigation.network.valid = valid
               }))
             }}
           />
@@ -227,7 +230,7 @@ class CreateVmWizard extends React.Component {
             onUpdate={({ valid = true, ...updatePayload }) => {
               this.handleListOnUpdate('storage', 'disks', updatePayload)
               this.setState(produce(draft => {
-                draft.stepNavigation.storage.preventExit = !valid
+                draft.stepNavigation.storage.valid = valid
               }))
             }}
           />
@@ -428,13 +431,44 @@ class CreateVmWizard extends React.Component {
     this.props.onCreate(basic, nics, disks, correlationId)
   }
 
-  wizardGoToStep (newStepIndex) {
+  wizardAllowGoToStepFromActiveStep (newStepIndex) {
+    if (newStepIndex < 0 || newStepIndex >= this.wizardSteps.length) {
+      return false
+    }
+
     const { activeStepIndex, stepNavigation } = this.state
-    const activeStep = this.wizardSteps[activeStepIndex]
     const newStep = this.wizardSteps[newStepIndex]
 
+    // Direction >0 is forward, <0 is backward
+    //   Forward ok if ... can enter the new step and each step between active and new is valid
+    //   Backward ok if ... can enter the new step
+    const direction = newStepIndex - activeStepIndex
+    if (direction > 0) {
+      return !stepNavigation[newStep.id].preventEnter &&
+        this.wizardSteps.slice(activeStepIndex, newStepIndex).every(step => stepNavigation[step.id].valid)
+    } else if (direction < 0) {
+      return !stepNavigation[newStep.id].preventEnter
+    }
+
+    return false
+  }
+
+  wizardAllowClickBack () {
+    return this.wizardAllowGoToStepFromActiveStep(Math.max(this.state.activeStepIndex - 1, 0))
+  }
+
+  wizardAllowClickNext () {
+    return this.wizardAllowGoToStepFromActiveStep(Math.min(this.state.activeStepIndex + 1, this.wizardSteps.length - 1))
+  }
+
+  wizardGoToStep (newStepIndex) {
+    const { activeStepIndex } = this.state
+    const activeStep = this.wizardSteps[activeStepIndex]
+
     // make sure we can leave the current step and enter the new step
-    if (stepNavigation[activeStep.id].preventExit || stepNavigation[newStep.id].preventEnter) return
+    if (!this.wizardAllowGoToStepFromActiveStep(newStepIndex)) {
+      return
+    }
 
     // run and the current step's `onExit()`
     if (activeStep.onExit) {
@@ -453,8 +487,7 @@ class CreateVmWizard extends React.Component {
   }
 
   render () {
-    const { activeStepIndex, stepNavigation, correlationId } = this.state
-    const activeStep = this.wizardSteps[activeStepIndex]
+    const { activeStepIndex, correlationId, showCloseWizardDialog } = this.state
     const vmCreateWorking = correlationId !== null && !this.props.actionResults.has(correlationId)
     const vmCreateStarted = correlationId !== null && !!this.props.actionResults.get(correlationId)
 
@@ -462,7 +495,9 @@ class CreateVmWizard extends React.Component {
     const isPrimaryNext = !isReviewStep
     const isPrimaryCreate = isReviewStep && !vmCreateStarted
     const isPrimaryClose = isReviewStep && vmCreateStarted
-    const { showCloseWizardDialog } = this.state
+
+    const enableGoBack = activeStepIndex > 0 && !isPrimaryClose && this.wizardAllowClickBack()
+    const enableGoForward = (isReviewStep && !vmCreateWorking) || this.wizardAllowClickNext()
 
     return <React.Fragment>
       {!showCloseWizardDialog && <Wizard
@@ -485,7 +520,7 @@ class CreateVmWizard extends React.Component {
           <Button
             bsStyle='default'
             onClick={this.wizardClickBack}
-            disabled={activeStepIndex === 0 || isPrimaryClose || stepNavigation[activeStep.id].preventExit}
+            disabled={!enableGoBack}
           >
             <Icon type='fa' name='angle-left' />
             { msg.createVmWizardButtonBack() }
@@ -502,7 +537,7 @@ class CreateVmWizard extends React.Component {
                 : isPrimaryCreate ? this.handleCreateVm
                   : this.hideAndNavigate
             }
-            disabled={stepNavigation[activeStep.id].preventExit || vmCreateWorking}
+            disabled={!enableGoForward}
           >
             { isPrimaryNext && msg.createVmWizardButtonNext() }
             { isPrimaryCreate && msg.createVmWizardButtonCreate() }

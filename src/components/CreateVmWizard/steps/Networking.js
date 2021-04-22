@@ -79,6 +79,8 @@ class Networking extends React.Component {
     this.rowRenderProps = this.rowRenderProps.bind(this)
     this.isVnicNameUniqueAndValid = this.isVnicNameUniqueAndValid.bind(this)
 
+    props.onUpdate({ valid: true })
+
     this.state = {
       editingErrors: {
         nicInvalidName: false,
