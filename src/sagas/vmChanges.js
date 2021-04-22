@@ -205,7 +205,6 @@ function* composeProvisionSourceTemplate ({ vm, basic, disks }) {
       // did the storage domain change?
       if (disk.storageDomainId !== templateDisk.get('storageDomainId')) {
         diskRequiresClone = true
-        changesToTemplateDisk.format = 'raw'
         changesToTemplateDisk.storage_domains = {
           storage_domain: [{ id: disk.storageDomainId }],
         }
