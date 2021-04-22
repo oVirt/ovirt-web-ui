@@ -179,18 +179,15 @@ export function* entityPermissionsToUserPermits (entity) {
     ? Array.isArray(entity.permissions) ? entity.permissions : [entity.permissions]
     : []
 
-  const userFilter = yield select(state => state.config.get('filter'))
   const userGroups = yield select(state => state.config.get('userGroups'))
   const userId = yield select(state => state.config.getIn(['user', 'id']))
   const roles = yield select(state => state.roles)
 
   const permitNames = []
   for (const permission of permissions) {
-    if (userFilter ||
-      (
-        (permission.groupId && userGroups.includes(permission.groupId)) ||
-        (permission.userId && permission.userId === userId)
-      )
+    if (
+      (permission.groupId && userGroups.includes(permission.groupId)) ||
+      (permission.userId && permission.userId === userId)
     ) {
       const role = roles.get(permission.roleId)
       if (!role) {
