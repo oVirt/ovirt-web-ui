@@ -88,7 +88,7 @@
     "immutable": "3.8.2",
     "intl-messageformat": "2.2.0",
     "jquery": "3.5.1",
-    "lodash": "4.17.19",
+    "lodash": "4.17.21",
     "moment": "2.27.0",
     "moment-duration-format": "2.3.2",
     "patternfly": "3.59.3",
