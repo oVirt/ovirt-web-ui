@@ -1,12 +1,13 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import Switch from '_/components/Switch'
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 import FieldRow from '../FieldRow'
 import CloudInitForm from './CloudInitForm'
 import SysprepForm from './SysprepForm'
 
 const CloudInit = ({ idPrefix, vm, isWindows, onChange, lastInitTimezone }) => {
+  const { msg } = useContext(MsgContext)
   const cloudInitEnabled = vm.getIn(['cloudInit', 'enabled'])
   return (
     <React.Fragment>

@@ -1,37 +1,38 @@
 import { getOsHumanName } from '../components/utils'
-import { enumMsg, msg } from '_/intl'
+import { enumMsg } from '_/intl'
+import { localeCompare } from '_/helpers'
 
-const getFieldValueMap = {
+const getFieldValueMap = (msg) => ({
   name: (item) => item.get('name'),
   os: (item) => getOsHumanName(item.getIn(['os', 'type'])),
-  status: (item) => enumMsg('VmStatus', item.get('status')),
+  status: (item) => enumMsg('VmStatus', item.get('status'), msg),
+})
+
+export const SortFields = {
+  NAME: {
+    id: 'name',
+    isNumeric: false,
+    messageDescriptor: { id: 'name' },
+  },
+  OS: {
+    id: 'os',
+    isNumeric: false,
+    messageDescriptor: { id: 'operatingSystem' },
+  },
+  STATUS: {
+    id: 'status',
+    isNumeric: false,
+    messageDescriptor: { id: 'status' },
+  },
 }
 
-export const sortFields = [
-  {
-    id: 'name',
-    title: msg.name(),
-    isNumeric: false,
-  },
-  {
-    id: 'os',
-    title: msg.operatingSystem(),
-    isNumeric: false,
-  },
-  {
-    id: 'status',
-    title: msg.status(),
-    isNumeric: false,
-  },
-]
-
-export const sortFunction = (sortType) =>
+export const sortFunction = (sortType, locale, msg) =>
   (vmA, vmB) => {
-    const vmAValue = getFieldValueMap[sortType.id](vmA)
-    const vmBValue = getFieldValueMap[sortType.id](vmB)
+    const vmAValue = getFieldValueMap(msg)[sortType.id](vmA)
+    const vmBValue = getFieldValueMap(msg)[sortType.id](vmB)
     if (!vmAValue) {
       return sortType.isAsc ? -1 : 1
     }
-    const compareValue = vmAValue.localeCompare(vmBValue)
+    const compareValue = localeCompare(vmAValue, vmBValue, locale)
     return sortType.isAsc ? compareValue : -compareValue
   }

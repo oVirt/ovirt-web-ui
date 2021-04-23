@@ -4,6 +4,8 @@ import { connect } from 'react-redux'
 
 import { TimedToastNotification, ToastNotificationList } from 'patternfly-react'
 import { setNotificationNotified } from '_/actions'
+import { withMsg } from '_/intl'
+import { buildMessageFromRecord } from '_/helpers'
 
 import style from './sharedStyle.css'
 
@@ -13,7 +15,7 @@ function normalizeType (theType) {
   return isExpected ? theType : 'warning'
 }
 
-const ToastNotifications = ({ userMessages, onDismissNotification }) => {
+const ToastNotifications = ({ userMessages, onDismissNotification, msg }) => {
   return <ToastNotificationList>
     { userMessages.get('records').filter(r => !r.get('notified')).map(r =>
       <TimedToastNotification
@@ -23,7 +25,7 @@ const ToastNotifications = ({ userMessages, onDismissNotification }) => {
         key={r.get('time')}
       >
         <span>
-          {r.get('message')}
+          {buildMessageFromRecord(r.toJS(), msg)}
         </span>
       </TimedToastNotification>
     )}
@@ -33,6 +35,7 @@ const ToastNotifications = ({ userMessages, onDismissNotification }) => {
 ToastNotifications.propTypes = {
   userMessages: PropTypes.object.isRequired,
   onDismissNotification: PropTypes.func.isRequired,
+  msg: PropTypes.object.isRequired,
 }
 
 export default connect(
@@ -42,4 +45,4 @@ export default connect(
   (dispatch) => ({
     onDismissNotification: (eventId) => dispatch(setNotificationNotified({ eventId })),
   })
-)(ToastNotifications)
+)(withMsg(ToastNotifications))

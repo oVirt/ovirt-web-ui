@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
 import { startVm } from '_/actions'
-import { enumMsg } from '_/intl'
+import { enumMsg, withMsg } from '_/intl'
 import { getOsHumanName, getVmIcon } from '_/components/utils'
 
 import BaseCard from './BaseCard'
@@ -17,12 +17,12 @@ import style from './style.css'
 /**
  * Single icon-card in the list for a VM
  */
-const Vm = ({ vm, icons, os, vms, onStart }) => {
+const Vm = ({ vm, icons, os, vms, onStart, msg }) => {
   const idPrefix = `vm-${vm.get('name')}`
   const osName = getOsHumanName(vm.getIn(['os', 'type']))
   const icon = getVmIcon(icons, os, vm)
   const status = vm.get('status')
-  const statusValue = enumMsg('VmStatus', status)
+  const statusValue = enumMsg('VmStatus', status, msg)
 
   const poolId = vm.getIn(['pool', 'id'])
   const isPoolVm = !!poolId
@@ -52,6 +52,7 @@ Vm.propTypes = {
   vms: PropTypes.object.isRequired,
   os: PropTypes.object.isRequired,
   onStart: PropTypes.func.isRequired,
+  msg: PropTypes.object.isRequired,
 }
 
 export default withRouter(connect(
@@ -63,4 +64,4 @@ export default withRouter(connect(
   (dispatch, { vm }) => ({
     onStart: () => dispatch(startVm({ vmId: vm.get('id') })),
   })
-)(Vm))
+)(withMsg(Vm)))

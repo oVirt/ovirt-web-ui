@@ -12,22 +12,13 @@ import 'moment/locale/pt-br'
 import 'moment/locale/zh-cn'
 import 'moment-duration-format'
 
-import { BASE_LOCALE_SET, DEFAULT_LOCALE, DUMMY_LOCALE } from './index'
+import { BASE_LOCALE_SET, DEFAULT_LOCALE } from './index'
 import { timeDurations } from './time-durations'
 import { loadFromLocalStorage } from '_/storage'
 import type { RemoteUserOptionsType } from '_/ovirtapi/types'
 
-export function initIntl (forceLocale: ?string): string {
-  const locale: string = forceLocale || discoverUserLocale()
-
-  console.log(`User locale: ${locale}`)
-  initMomentTranslations(locale, DEFAULT_LOCALE)
-
-  return locale
-}
-
-function discoverUserLocale (): string {
-  return loadLocaleFromLocalStorage() || getLocaleFromUrl() || getBrowserLocale() || DEFAULT_LOCALE
+export function discoverUserLocale (): string {
+  return coerceToSupportedLocale(loadLocaleFromLocalStorage() || getLocaleFromUrl() || getBrowserLocale()) || DEFAULT_LOCALE
 }
 
 function loadLocaleFromLocalStorage (): ?string {
@@ -71,12 +62,16 @@ function getBrowserLocale (): ?string {
  *    'fr-CA' -> 'fr'
  *    'pt-PT' -> null  (since we support pt-BR and don't have a base pt translation)
  */
-function coerceToSupportedLocale (locale: string): ?string {
+export function coerceToSupportedLocale (locale: ?string): ?string {
+  if (!locale) {
+    return null
+  }
+
   if (/^en/.test(locale)) {
     return 'en'
   }
 
-  if (BASE_LOCALE_SET.has(locale) || DUMMY_LOCALE === locale) {
+  if (BASE_LOCALE_SET.has(locale)) {
     return locale
   }
 
@@ -87,11 +82,7 @@ function coerceToSupportedLocale (locale: string): ?string {
 //
 // moment and moment-duration-format setup
 //
-function initMomentTranslations (locale: string, defaultLocale: string) {
-  if (locale === DUMMY_LOCALE) {
-    moment.defineLocale(DUMMY_LOCALE, {})
-  }
-
+export function initMomentTranslations (locale: string, defaultLocale: string) {
   const chosen = moment.locale([ locale, defaultLocale ])
   console.log(`Locale being used by moment: ${chosen}`)
 

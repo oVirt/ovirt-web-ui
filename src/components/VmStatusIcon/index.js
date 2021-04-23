@@ -1,13 +1,13 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 
 import { Icon } from 'patternfly-react'
 import style from './style.css'
 import { Tooltip } from '_/components/tooltips'
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 
 /* eslint-disable key-spacing, no-multi-spaces */
-const VM_STATUS_TO_ICON = {
+const VM_STATUS_TO_ICON = (msg) => ({
   'up'                : { type: 'pf', name: 'on-running',         tooltip: msg.vmStatusIconTooltipUp(), className: style['green'] },
   'powering_up'       : { type: 'pf', name: 'in-progress',        tooltip: msg.vmStatusIconTooltipPoweringUp() },
   'down'              : { type: 'pf', name: 'off',                tooltip: msg.vmStatusIconTooltipDown() },
@@ -25,14 +25,15 @@ const VM_STATUS_TO_ICON = {
   'image_locked'      : { type: 'pf', name: 'locked',             tooltip: msg.vmStatusIconTooltipImageLocked() },
 
   '__default__'       : { type: 'pf', name: 'zone',               tooltip: msg.vmStatusIconTooltipDefault() },
-}
+})
 /* eslint-enable key-spacing, no-multi-spaces */
 
 /**
  * Status-dependent icon for a VM
  */
 const VmStatusIcon = ({ id, status, className = undefined }) => {
-  const iconData = VM_STATUS_TO_ICON[status] || VM_STATUS_TO_ICON.__default__
+  const { msg } = useContext(MsgContext)
+  const iconData = VM_STATUS_TO_ICON(msg)[status] || VM_STATUS_TO_ICON(msg).__default__
   const classNames =
     iconData.className && className ? `${iconData.className} ${className}`
       : iconData.className && !className ? `${iconData.className}`

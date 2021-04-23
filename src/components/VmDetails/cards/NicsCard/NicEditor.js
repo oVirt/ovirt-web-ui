@@ -15,13 +15,12 @@ import {
 import SelectBox from '../../../SelectBox'
 import NicLinkStateIcon from './NicLinkStateIcon'
 
-import { msg } from '_/intl'
+import { withMsg } from '_/intl'
 import style from './style.css'
 import { createNicInterfacesList, createVNicProfileList } from '_/components/utils'
 import { EMPTY_VNIC_PROFILE_ID } from '_/constants'
 import { InfoTooltip } from '_/components/tooltips'
 
-const NIC_INTERFACES = createNicInterfacesList()
 const NIC_INTERFACE_DEFAULT = 'virtio'
 const NIC_INTERFACE_CANT_CHANGE = [ 'pci_passthrough' ]
 
@@ -143,12 +142,20 @@ class NicEditor extends Component {
   }
 
   render () {
-    const { idPrefix, trigger, vmStatus, vnicProfileList } = this.props
+    const {
+      idPrefix,
+      trigger,
+      vmStatus,
+      vnicProfileList,
+      msg,
+      locale,
+    } = this.props
+    const NIC_INTERFACES = createNicInterfacesList(msg)
     const modalId = idPrefix + '-modal'
 
     const createMode = !this.props.nic
 
-    const vnicList = createVNicProfileList(vnicProfileList)
+    const vnicList = createVNicProfileList(vnicProfileList, { locale, msg })
     const nicInterface = NIC_INTERFACES.find(ni => ni.id === this.state.values.interface)
     const canChangeInterface =
       createMode ||
@@ -278,6 +285,7 @@ class NicEditor extends Component {
     </React.Fragment>
   }
 }
+
 NicEditor.propTypes = {
   idPrefix: PropTypes.string.isRequired,
   nic: PropTypes.object,
@@ -287,6 +295,8 @@ NicEditor.propTypes = {
   vnicProfileList: PropTypes.object.isRequired,
   trigger: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
+  msg: PropTypes.object.isRequired,
+  locale: PropTypes.string.isRequired,
 }
 
-export default NicEditor
+export default withMsg(NicEditor)

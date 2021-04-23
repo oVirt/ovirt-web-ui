@@ -10,7 +10,7 @@ import ConsoleConfirmationModal from '../VmActions/ConsoleConfirmationModal'
 import { INIT_CONSOLE, DOWNLOAD_CONSOLE, DISCONNECTED_CONSOLE } from '_/constants'
 import { Button } from 'patternfly-react'
 import { VncConsole } from '@patternfly/react-console'
-import { msg } from '_/intl'
+import { withMsg } from '_/intl'
 import CounterAlert from '_/components/CounterAlert'
 
 import Loader, { SIZES } from '../Loader'
@@ -100,7 +100,7 @@ class VmConsole extends React.Component {
   }
 
   render () {
-    const { vmId, config, consoleId, vms, onDisconnected } = this.props
+    const { vmId, config, consoleId, vms, onDisconnected, msg } = this.props
     const { isFullScreen } = this.state
     const websocket = config.get('websocket')
     const vmConsole = this.props.consoles.getIn(['vms', vmId])
@@ -196,6 +196,7 @@ VmConsole.propTypes = {
   onDisconnected: PropTypes.func.isRequired,
   onShutdown: PropTypes.func.isRequired,
   onRDP: PropTypes.func.isRequired,
+  msg: PropTypes.object.isRequired,
 }
 
 export default connect(
@@ -209,4 +210,4 @@ export default connect(
     onShutdown: () => dispatch(push(`/vm/${vmId}`)),
     onRDP: ({ domain, username, vms }) => dispatch(getRDP({ name: vms.getIn(['vms', vmId, 'name']), fqdn: vms.getIn(['vms', vmId, 'fqdn']), domain, username })),
   })
-)(VmConsole)
+)(withMsg(VmConsole))

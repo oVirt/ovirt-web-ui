@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import {
   CardBody,
@@ -12,7 +12,7 @@ import {
 } from 'patternfly-react'
 import DonutChart from './UtilizationCharts/DonutChart'
 import AreaChart from './UtilizationCharts/AreaChart'
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 import { round, floor } from '_/utils'
 import { userFormatOfBytes } from '_/helpers'
 
@@ -31,6 +31,7 @@ import NoLiveData from './NoLiveData'
  *       currently used data should work for VMs with and without the guest agent.
  */
 const MemoryCharts = ({ memoryStats, isRunning, id }) => {
+  const { msg } = useContext(MsgContext)
   const available = isRunning ? memoryStats.free.firstDatum : memoryStats.installed.firstDatum
   const used = !isRunning ? 0 : memoryStats.installed.firstDatum - memoryStats.free.firstDatum
 

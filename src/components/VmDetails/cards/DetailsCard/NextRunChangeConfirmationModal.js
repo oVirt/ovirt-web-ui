@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropsTypes from 'prop-types'
 import {
   MessageDialog,
@@ -6,9 +6,10 @@ import {
   Icon,
   noop,
 } from 'patternfly-react'
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 
 const NextRunChangeConfirmationModal = ({ show, onCancel, onSave, onSaveAndRestart }) => {
+  const { msg } = useContext(MsgContext)
   return <MessageDialog
     show={show}
     onHide={onCancel}

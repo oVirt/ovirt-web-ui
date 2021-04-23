@@ -4,8 +4,8 @@ import { connect } from 'react-redux'
 
 import sharedStyle from '../../../sharedStyle.css'
 import { getOsHumanName, getVmIcon, isVmNameValid, isHostNameValid } from '_/components/utils'
-import { enumMsg, msg } from '_/intl'
-import { generateUnique } from '_/helpers'
+import { enumMsg, withMsg } from '_/intl'
+import { generateUnique, buildMessageFromRecord } from '_/helpers'
 import { formatUptimeDuration } from '_/utils'
 import { editVm } from '_/actions'
 
@@ -189,7 +189,7 @@ class OverviewCard extends React.Component {
   }
 
   render () {
-    const { vm, icons, vms, operatingSystems, isEditable } = this.props
+    const { vm, icons, vms, operatingSystems, isEditable, msg } = this.props
     const { isEditing, correlatedMessages, nameError, updateCloudInit, disableHostnameToggle } = this.state
 
     const elapsedUptime = vm.getIn(['statistics', 'elapsedUptime', 'datum'], 0)
@@ -272,7 +272,7 @@ class OverviewCard extends React.Component {
 
                   <div className={style['vm-status']} id={`${idPrefix}-status`}>
                     <VmStatusIcon id={`${idPrefix}-status-icon`} className={style['vm-status-icon']} status={vm.get('status')} />
-                    <span className={style['vm-status-text']} id={`${idPrefix}-status-value`}>{enumMsg('VmStatus', vm.get('status'))}</span>
+                    <span className={style['vm-status-text']} id={`${idPrefix}-status-value`}>{enumMsg('VmStatus', vm.get('status'), msg)}</span>
 
                     { uptime &&
                       <div className={style['vm-uptime']} id={`${idPrefix}-uptime`}>{msg.uptimeDuration({ uptime })}</div>
@@ -299,7 +299,7 @@ class OverviewCard extends React.Component {
               { correlatedMessages && correlatedMessages.size > 0 &&
                 correlatedMessages.map((message, key) =>
                   <Alert key={`user-message-${key}`} type='error' style={{ margin: '5px 0 0 0' }} id={`${idPrefix}-alert`}>
-                    {message.get('message')}
+                    {buildMessageFromRecord(message.toJS(), msg)}
                   </Alert>
                 )
               }
@@ -310,6 +310,7 @@ class OverviewCard extends React.Component {
     )
   }
 }
+
 OverviewCard.propTypes = {
   vm: PropTypes.object,
   onEditChange: PropTypes.func,
@@ -322,6 +323,8 @@ OverviewCard.propTypes = {
   templates: PropTypes.object.isRequired,
 
   saveChanges: PropTypes.func.isRequired,
+
+  msg: PropTypes.object.isRequired,
 }
 
 export default connect(
@@ -336,4 +339,4 @@ export default connect(
   (dispatch) => ({
     saveChanges: (minimalVmChanges, correlationId) => dispatch(editVm({ vm: minimalVmChanges }, { correlationId })),
   })
-)(OverviewCard)
+)(withMsg(OverviewCard))

@@ -1,13 +1,13 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 
 import { Icon } from 'patternfly-react'
 
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 import style from './style.css'
 import { Tooltip } from '_/components/tooltips'
 
-const nicLinkInfoSettings = {
+const nicLinkInfoSettings = (msg) => ({
   true: {
     type: 'fa',
     name: 'arrow-circle-o-up',
@@ -20,10 +20,11 @@ const nicLinkInfoSettings = {
     className: style['link-icon-down'],
     tooltip: msg.nicLinkStatusDown(),
   },
-}
+})
 
 const NicLinkStateIcon = ({ linkState = false, showTooltip = true, idSuffix }) => {
-  const linkInfo = nicLinkInfoSettings[linkState]
+  const { msg } = useContext(MsgContext)
+  const linkInfo = nicLinkInfoSettings(msg)[linkState]
   const theIcon =
     <Icon
       id={`nic-link-icon-${idSuffix || linkState}`}

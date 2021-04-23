@@ -6,7 +6,6 @@ import Api from '_/ovirtapi'
 import * as A from '_/actions'
 import * as C from '_/constants'
 import { arrayMatch } from '_/utils'
-import { msg } from '_/intl'
 
 import { callExternalAction, delay, delayInMsSteps } from './utils'
 import { startProgress, stopProgress, addVmNic, fetchSingleVm } from './index'
@@ -373,7 +372,7 @@ function* shutdownVm (action) {
   const result = yield callExternalAction('shutdown', Api.shutdown, action)
   const vmName = yield select(state => state.vms.getIn([ 'vms', action.payload.vmId, 'name' ]))
   if (result.status === 'complete') {
-    yield put(A.addUserMessage({ message: msg.actionFeedbackShutdownVm({ VmName: vmName }), type: 'success' }))
+    yield put(A.addUserMessage({ messageDescriptor: { id: 'actionFeedbackShutdownVm', params: { VmName: vmName } }, type: 'success' }))
   }
   yield stopProgress({ vmId: action.payload.vmId, name: 'shutdown', result })
 }
@@ -383,7 +382,7 @@ function* restartVm (action) {
   const result = yield callExternalAction('restart', Api.restart, action)
   const vmName = yield select(state => state.vms.getIn([ 'vms', action.payload.vmId, 'name' ]))
   if (result.status === 'complete') {
-    yield put(A.addUserMessage({ message: msg.actionFeedbackRestartVm({ VmName: vmName }), type: 'success' }))
+    yield put(A.addUserMessage({ messageDescriptor: { id: 'actionFeedbackRestartVm', 'params': { VmName: vmName } }, type: 'success' }))
   }
   yield stopProgress({ vmId: action.payload.vmId, name: 'restart', result })
 }
@@ -393,7 +392,7 @@ function* suspendVm (action) {
   const result = yield callExternalAction('suspend', Api.suspend, action)
   const vmName = yield select(state => state.vms.getIn([ 'vms', action.payload.vmId, 'name' ]))
   if (result.status === 'pending') {
-    yield put(A.addUserMessage({ message: msg.actionFeedbackSuspendVm({ VmName: vmName }), type: 'success' }))
+    yield put(A.addUserMessage({ messageDescriptor: { id: 'actionFeedbackSuspendVm', params: { VmName: vmName } }, type: 'success' }))
   }
   yield stopProgress({ vmId: action.payload.vmId, name: 'suspend', result })
 }
@@ -404,7 +403,7 @@ function* startVm (action) {
   const vmName = yield select(state => state.vms.getIn([ 'vms', action.payload.vmId, 'name' ]))
   // TODO: check status at refresh --> conditional refresh wait_for_launch
   if (result.status === 'complete') {
-    yield put(A.addUserMessage({ message: msg.actionFeedbackStartVm({ VmName: vmName }), type: 'success' }))
+    yield put(A.addUserMessage({ messageDescriptor: { id: 'actionFeedbackStartVm', params: { VmName: vmName } }, type: 'success' }))
   }
   yield stopProgress({ vmId: action.payload.vmId, name: 'start', result })
 }
@@ -414,7 +413,7 @@ function* startPool (action) {
   const result = yield callExternalAction('startPool', Api.startPool, action)
   const poolName = yield select(state => state.vms.getIn([ 'pools', action.payload.poolId, 'name' ]))
   if (result.status === 'complete') {
-    yield put(A.addUserMessage({ message: msg.actionFeedbackAllocateVm({ poolname: poolName }), type: 'success' }))
+    yield put(A.addUserMessage({ messageDescriptor: { id: 'actionFeedbackAllocateVm', params: { poolname: poolName } }, type: 'success' }))
   }
   yield stopProgress({ poolId: action.payload.poolId, name: 'start', result })
 }

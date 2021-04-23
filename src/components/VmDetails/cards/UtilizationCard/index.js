@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 
 import { Grid, Row, Col } from '_/components/Grid'
 import BaseCard from '../../BaseCard'
@@ -16,6 +16,7 @@ import NoLiveData from './NoLiveData'
  * VM dashboard style Utilization charts (CPU, Memory, Network, Disk)
  */
 const UtilizationCard = ({ vm }) => {
+  const { msg } = useContext(MsgContext)
   const stats = vm.has('statistics') ? vm.get('statistics').toJS() : undefined
   const isRunning = [ 'up' ].includes(vm.get('status'))
 

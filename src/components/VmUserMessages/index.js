@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
@@ -7,10 +7,11 @@ import { Notification, NotificationDrawer, MenuItem, Icon, Button } from 'patter
 import style from './style.css'
 
 import { clearUserMessages, dismissEvent } from '_/actions'
-import { getFormatedDateTime } from '_/helpers'
-import { msg } from '_/intl'
+import { getFormatedDateTime, buildMessageFromRecord } from '_/helpers'
+import { MsgContext } from '_/intl'
 
 const UserMessage = ({ record, id, onDismissMessage }) => {
+  const { msg } = useContext(MsgContext)
   const time = getFormatedDateTime(record.get('time'))
   return (<Notification seen>
     <NotificationDrawer.Dropdown id={id}>
@@ -21,7 +22,7 @@ const UserMessage = ({ record, id, onDismissMessage }) => {
     <Icon className='pull-left' type='pf' name='warning-triangle-o' />
     <Notification.Content>
       <Notification.Message>
-        {record.get('message')}
+        { buildMessageFromRecord(record.toJS(), msg) }
       </Notification.Message>
       <Notification.Info leftText={time.date} rightText={time.time} />
     </Notification.Content>
@@ -34,6 +35,7 @@ UserMessage.propTypes = {
 }
 
 const VmUserMessages = ({ userMessages, onClearMessages, onDismissMessage, onClose, show }) => {
+  const { msg } = useContext(MsgContext)
   const [expanded, setExpanded] = useState(false)
 
   const idPrefix = `usermsgs`

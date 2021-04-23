@@ -1,19 +1,19 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 
 const NONE_VM_ROUTES = [ '/settings' ]
 
-const buildPath = (vms, branches) => {
+const buildPath = ({ vms, branches, msg }) => {
   const res = []
   const isVmPath = !branches.find(branch => NONE_VM_ROUTES.includes(branch.match.path))
 
   for (const branch of branches) {
     if (typeof branch.route.title === 'function') {
       res.push({
-        title: branch.route.title(branch.match, vms),
+        title: branch.route.title({ match: branch.match, vms, msg }),
         url: branch.match.url,
       })
     } else if (typeof branch.route.title === 'string') {
@@ -30,12 +30,12 @@ const buildPath = (vms, branches) => {
       })
     }
   }
-
   return res
 }
 
 const Breadcrumb = ({ vms, branches }) => {
-  const crumbs = buildPath(vms, branches)
+  const { msg } = useContext(MsgContext)
+  const crumbs = buildPath({ vms, branches, msg })
   const idPrefix = `breadcrumb`
 
   return (

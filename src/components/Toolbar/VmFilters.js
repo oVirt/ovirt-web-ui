@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Filter, FormControl } from 'patternfly-react'
-import { enumMsg, msg } from '_/intl'
+import { enumMsg, withMsg } from '_/intl'
 import { saveVmsFilters } from '_/actions'
 import { localeCompare } from '_/helpers'
 
@@ -31,6 +31,7 @@ class VmFilters extends React.Component {
   }
 
   composeFilterTypes () {
+    const { msg, locale } = this.props
     const statuses = [
       'up',
       'powering_up',
@@ -61,8 +62,8 @@ class VmFilters extends React.Component {
         placeholder: msg.vmFilterTypePlaceholderStatus(),
         filterType: 'select',
         filterValues: statuses
-          .map((status) => ({ title: enumMsg('VmStatus', status), id: status }))
-          .sort((a, b) => localeCompare(a.title, b.title)),
+          .map((status) => ({ title: enumMsg('VmStatus', status, msg), id: status }))
+          .sort((a, b) => localeCompare(a.title, b.title, locale)),
       },
       {
         id: 'os',
@@ -75,7 +76,7 @@ class VmFilters extends React.Component {
             acc.add(item.get('description'))
           ), new Set()))
           .map(item => ({ title: item, id: item }))
-          .sort((a, b) => localeCompare(a.title, b.title)),
+          .sort((a, b) => localeCompare(a.title, b.title, locale)),
       },
     ]
     return filterTypes
@@ -201,6 +202,8 @@ VmFilters.propTypes = {
   operatingSystems: PropTypes.object.isRequired,
   vms: PropTypes.object.isRequired,
   onFilterUpdate: PropTypes.func.isRequired,
+  msg: PropTypes.object.isRequired,
+  locale: PropTypes.string.isRequired,
 }
 
 export default connect(
@@ -211,4 +214,4 @@ export default connect(
   (dispatch) => ({
     onFilterUpdate: (filters) => dispatch(saveVmsFilters({ filters })),
   })
-)(VmFilters)
+)(withMsg(VmFilters))

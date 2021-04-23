@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { List } from 'immutable'
@@ -13,8 +13,9 @@ import {
   isWindows,
   templateNameRenderer,
   userFormatOfBytes,
+  buildMessageFromRecord,
 } from '_/helpers'
-import { msg, enumMsg } from '_/intl'
+import { enumMsg, MsgContext, withMsg } from '_/intl'
 
 import {
   isNumber,
@@ -57,7 +58,7 @@ import { Tooltip, InfoTooltip } from '_/components/tooltips'
 
 import timezones from '_/components/utils/timezones.json'
 
-function rephraseVmType (vmType) {
+function rephraseVmType (vmType, msg) {
   const types = {
     'desktop': msg.vmType_desktop(),
     'server': msg.vmType_server(),
@@ -76,20 +77,23 @@ function rephraseVmType (vmType) {
  * Render "N/A" with an optional tooltip for any field that won't have a value
  * based on the state of the VM.
  */
-const NotAvailable = ({ tooltip, id }) => (
-  <div>
-    { tooltip
-      ? (
-        <Tooltip id={id} tooltip={tooltip}>
-          <span>{msg.notAvailable()}</span>
-        </Tooltip>
-      )
-      : (
-        <span id={id}>{msg.notAvailable()}</span>
-      )
-    }
-  </div>
-)
+const NotAvailable = ({ tooltip, id }) => {
+  const { msg } = useContext(MsgContext)
+  return (
+    <div>
+      { tooltip
+        ? (
+          <Tooltip id={id} tooltip={tooltip}>
+            <span>{msg.notAvailable()}</span>
+          </Tooltip>
+        )
+        : (
+          <span id={id}>{msg.notAvailable()}</span>
+        )
+      }
+    </div>
+  )
+}
 NotAvailable.propTypes = {
   tooltip: PropTypes.string,
   id: PropTypes.string.isRequired,
@@ -106,13 +110,13 @@ const DEFAULT_GMT_TIMEZONE = timezones.find(timezone => timezone.value.startsWit
 class DetailsCard extends React.Component {
   constructor (props) {
     super(props)
-    const { vm, clusters } = props
+    const { vm, clusters, operatingSystems, locale } = props
     const vmClusterId = vm.getIn(['cluster', 'id'])
     const vmDataCenterId = clusters.getIn([vmClusterId, 'dataCenterId'])
     const clusterArchitecture = getClusterArchitecture(vmClusterId, clusters)
 
     this.state = {
-      vm: props.vm, // ImmutableJS Map
+      vm, // ImmutableJS Map
 
       isEditing: false,
       isDirty: false,
@@ -121,13 +125,12 @@ class DetailsCard extends React.Component {
 
       promptHotPlugChanges: false,
       promptNextRunChanges: false,
-
       isoList: createIsoList(props.storageDomains, vmDataCenterId),
-      clusterList: createClusterList(props.clusters, vmDataCenterId, clusterArchitecture),
-      osList: createOsList(vmClusterId, props.clusters, props.operatingSystems),
+      clusterList: createClusterList({ clusters, dataCenterId: vmDataCenterId, architecture: clusterArchitecture, locale }),
+      osList: createOsList({ clusterId: vmClusterId, clusters, operatingSystems, locale }),
 
-      enableInitTimezone: !!props.vm.getIn(['cloudInit', 'timezone']), // true if sysprep timezone set or Configure Timezone checkbox checked
-      lastInitTimezone: props.vm.getIn(['cloudInit', 'timezone']) || DEFAULT_GMT_TIMEZONE,
+      enableInitTimezone: !!vm.getIn(['cloudInit', 'timezone']), // true if sysprep timezone set or Configure Timezone checkbox checked
+      lastInitTimezone: vm.getIn(['cloudInit', 'timezone']) || DEFAULT_GMT_TIMEZONE,
     }
     this.trackUpdates = {}
     this.hotPlugUpdates = {}
@@ -182,14 +185,14 @@ class DetailsCard extends React.Component {
     // NOTE: Doing the following here instead of getDerivedStateFromProps so __clusters__,
     //       __storageDomains__, and __operatingSystems__ don't need to be kept in state for
     //       change comparison
-    const { clusters, vm } = this.props
+    const { clusters, vm, operatingSystems, locale } = this.props
     const vmClusterId = vm.getIn(['cluster', 'id'])
     const vmDataCenterId = clusters.getIn([vmClusterId, 'dataCenterId'])
     const clusterArchitecture = getClusterArchitecture(vmClusterId, clusters)
 
     if (prevProps.clusters !== this.props.clusters) {
       const { clusters } = this.props
-      this.setState({ clusterList: createClusterList(clusters, vmDataCenterId, clusterArchitecture) }) // eslint-disable-line react/no-did-update-set-state
+      this.setState({ clusterList: createClusterList({ clusters, dataCenterId: vmDataCenterId, architecture: clusterArchitecture, locale }) }) // eslint-disable-line react/no-did-update-set-state
     }
 
     if (prevProps.storageDomains !== this.props.storageDomains) {
@@ -200,7 +203,7 @@ class DetailsCard extends React.Component {
       prevProps.clusters !== this.props.clusters ||
       prevProps.vm.getIn(['cluster', 'id']) !== vmClusterId
     ) {
-      this.setState({ osList: createOsList(vmClusterId, this.props.clusters, this.props.operatingSystems) }) // eslint-disable-line react/no-did-update-set-state
+      this.setState({ osList: createOsList({ clusterId: vmClusterId, clusters, operatingSystems, locale }) }) // eslint-disable-line react/no-did-update-set-state
     }
   }
 
@@ -616,7 +619,7 @@ class DetailsCard extends React.Component {
   }
 
   render () {
-    const { hosts, clusters, dataCenters, templates, operatingSystems, vms, isAdmin } = this.props
+    const { hosts, clusters, dataCenters, templates, operatingSystems, vms, isAdmin, msg } = this.props
     const { vm, isEditing, correlatedMessages, clusterList, isoList } = this.state
 
     const idPrefix = 'vmdetail-details'
@@ -670,7 +673,7 @@ class DetailsCard extends React.Component {
     const bootMenuEnabled = vm.get('bootMenuEnabled')
 
     // Optimized for
-    const optimizedFor = rephraseVmType(vm.get('type'))
+    const optimizedFor = rephraseVmType(vm.get('type'), msg)
 
     // VCPU
     const SOCKETS_VCPU = 'sockets'
@@ -818,13 +821,13 @@ class DetailsCard extends React.Component {
                     <FieldRow label={isOsWindows ? msg.sysprep() : msg.cloudInit()} id={`${idPrefix}-cloud-init`}>
                       <div className={style['cloud-init-field']}>
                         {cloudInitEnabled ? <Icon type='pf' name='on' /> : <Icon type='pf' name='off' />}
-                        {enumMsg('Switch', cloudInitEnabled ? 'on' : 'off')}
+                        {enumMsg('Switch', cloudInitEnabled ? 'on' : 'off', msg)}
                       </div>
                     </FieldRow>
                     <FieldRow label={msg.bootMenu()} id={`${idPrefix}-boot-menu-readonly`}>
                       <div className={style['boot-menu-field']}>
                         {bootMenuEnabled ? <Icon type='pf' name='on' /> : <Icon type='pf' name='off' />}
-                        {enumMsg('Switch', bootMenuEnabled ? 'on' : 'off')}
+                        {enumMsg('Switch', bootMenuEnabled ? 'on' : 'off', msg)}
                       </div>
                     </FieldRow>
 
@@ -999,7 +1002,7 @@ class DetailsCard extends React.Component {
 
             { correlatedMessages && correlatedMessages.size > 0 &&
               correlatedMessages.map((message, key) =>
-                <Alert key={`user-message-${key}`} type='error' style={{ margin: '5px 0 0 0' }}>{message.get('message')}</Alert>
+                <Alert key={`user-message-${key}`} type='error' style={{ margin: '5px 0 0 0' }}>{buildMessageFromRecord(message.toJS(), msg)}</Alert>
               )
             }
           </React.Fragment>
@@ -1008,6 +1011,7 @@ class DetailsCard extends React.Component {
     </React.Fragment>
   }
 }
+
 DetailsCard.propTypes = {
   vm: PropTypes.object.isRequired,
   vms: PropTypes.object.isRequired,
@@ -1029,6 +1033,9 @@ DetailsCard.propTypes = {
   maxNumOfVmCpus: PropTypes.number.isRequired,
 
   saveChanges: PropTypes.func.isRequired,
+
+  msg: PropTypes.object.isRequired,
+  locale: PropTypes.string.isRequired,
 }
 
 const DetailsCardConnected = connect(
@@ -1056,6 +1063,6 @@ const DetailsCardConnected = connect(
         { correlationId }
       )),
   })
-)(DetailsCard)
+)(withMsg(DetailsCard))
 
 export default DetailsCardConnected

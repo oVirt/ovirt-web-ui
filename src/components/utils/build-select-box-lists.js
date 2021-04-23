@@ -4,7 +4,7 @@ import {
   localeCompare,
   templateNameRenderer,
 } from '_/helpers'
-import { enumMsg, msg } from '_/intl'
+import { enumMsg } from '_/intl'
 import { convertValue } from '_/utils'
 import { EMPTY_VNIC_PROFILE_ID } from '_/constants'
 
@@ -12,7 +12,7 @@ import { EMPTY_VNIC_PROFILE_ID } from '_/constants'
  * Return a normalized and sorted list of clusters ready for use in a __SelectBox__ from
  * the Map of provided clusters, optionally limiting to clusters in a given data center.
  */
-function createClusterList (clusters, dataCenterId = null, architecture = null) {
+function createClusterList ({ clusters, dataCenterId = null, architecture = null, locale }) {
   const clusterList =
     clusters
       .toList()
@@ -29,7 +29,7 @@ function createClusterList (clusters, dataCenterId = null, architecture = null) 
         value: cluster.get('name'),
         datacenter: cluster.get('dataCenterId'),
       }))
-      .sort((a, b) => localeCompare(a.value, b.value))
+      .sort((a, b) => localeCompare(a.value, b.value, locale))
       .toJS()
 
   return clusterList
@@ -74,7 +74,7 @@ function createIsoList (storageDomains, dataCenterId = null) {
  * the Map of provided operating systems cross referenced to the given Cluster's
  * architecture.
  */
-function createOsList (clusterId, clusters, operatingSystems) {
+function createOsList ({ clusterId, clusters, operatingSystems, locale }) {
   if (!clusterId && !clusters && !clusters.has(clusterId)) {
     return []
   }
@@ -86,7 +86,7 @@ function createOsList (clusterId, clusters, operatingSystems) {
         id: os.get('id'),
         value: os.get('description'),
       }))
-      .sort((a, b) => localeCompare(a.value, b.value))
+      .sort((a, b) => localeCompare(a.value, b.value, locale))
       .toJS()
 
   return osList
@@ -97,7 +97,7 @@ function createOsList (clusterId, clusters, operatingSystems) {
  * from the List of provided storage domains, optionally filtered to be active in the
  * provided data center.
  */
-function createStorageDomainList (storageDomains, dataCenterId = null, includeUsage = false) {
+function createStorageDomainList ({ storageDomains, dataCenterId = null, includeUsage = false, locale, msg }) {
   const storageDomainList =
     storageDomains
       .toList()
@@ -117,7 +117,7 @@ function createStorageDomainList (storageDomains, dataCenterId = null, includeUs
             (includeUsage ? ' ' + msg.storageDomainFreeSpace({ size: avail.value, unit: avail.unit }) : ''),
         }
       })
-      .sort((a, b) => localeCompare(a.value, b.value))
+      .sort((a, b) => localeCompare(a.value, b.value, locale))
       .toJS()
 
   return storageDomainList
@@ -127,7 +127,7 @@ function createStorageDomainList (storageDomains, dataCenterId = null, includeUs
  * Return a normalized and sorted list of Templates ready for use in a __SelectBox__ from
  * the Map of provided templates cross referenced to the given cluster.
  */
-function createTemplateList (templates, clusterId = null) {
+function createTemplateList ({ templates, clusterId = null, locale }) {
   function testCluster (template) {
     const templateCluster = template.get('clusterId')
     return templateCluster === null || (clusterId && templateCluster === clusterId)
@@ -144,7 +144,7 @@ function createTemplateList (templates, clusterId = null) {
         id: template.get('id'),
         value: templateNameRenderer(template),
       }))
-      .sort((a, b) => localeCompare(a.value, b.value))
+      .sort((a, b) => localeCompare(a.value, b.value, locale))
       .toJS()
 
   return templateList
@@ -155,7 +155,7 @@ function createTemplateList (templates, clusterId = null) {
  *   - each vNIC is in the same data center as the VM
  *   - each vNIC's network is available on the same cluster as the VM
  */
-function createVNicProfileList (vnicProfiles, { dataCenterId = null, cluster = null } = {}) {
+function createVNicProfileList (vnicProfiles, { locale, msg }, { dataCenterId = null, cluster = null } = {}) {
   const clusterNetworks = cluster === null ? [] : cluster.get('networks')
 
   const vnicList =
@@ -170,7 +170,7 @@ function createVNicProfileList (vnicProfiles, { dataCenterId = null, cluster = n
         id: vnic.get('id'),
         value: `${vnic.getIn(['network', 'name'])}/${vnic.get('name')}`,
       }))
-      .sort((a, b) => localeCompare(a.value, b.value))
+      .sort((a, b) => localeCompare(a.value, b.value, locale))
       .toJS()
   vnicList.unshift({ id: EMPTY_VNIC_PROFILE_ID, value: msg.vnicProfileEmpty() }) // always add an empty/unassigned option to the list, unassigned is always a valid value for a Nic's vnicProfile
 
@@ -186,7 +186,7 @@ function createVNicProfileList (vnicProfiles, { dataCenterId = null, cluster = n
  *     - sparse (boolean)
  *     - format (http://ovirt.github.io/ovirt-engine-api-model/master/#types/disk_format)
  */
-function createDiskTypeList () {
+function createDiskTypeList (msg) {
   return [
     {
       id: 'pre',
@@ -205,19 +205,19 @@ function createDiskTypeList () {
  *
  *    http://ovirt.github.io/ovirt-engine-api-model/master/#types/disk_interface
  */
-function createDiskInterfacesList () {
+function createDiskInterfacesList (msg) {
   return [
     {
       id: 'ide',
-      value: enumMsg('DiskInterface', 'ide'),
+      value: enumMsg('DiskInterface', 'ide', msg),
     },
     {
       id: 'virtio_scsi',
-      value: enumMsg('DiskInterface', 'virtio_scsi'),
+      value: enumMsg('DiskInterface', 'virtio_scsi', msg),
     },
     {
       id: 'virtio',
-      value: enumMsg('DiskInterface', 'virtio'),
+      value: enumMsg('DiskInterface', 'virtio', msg),
     },
   ]
 }
@@ -228,19 +228,19 @@ function createDiskInterfacesList () {
  *
  *    http://ovirt.github.io/ovirt-engine-api-model/master/#types/nic_interface
  */
-function createNicInterfacesList () {
+function createNicInterfacesList (msg) {
   return [
     {
       id: 'virtio',
-      value: enumMsg('NicInterface', 'virtio'),
+      value: enumMsg('NicInterface', 'virtio', msg),
     },
     {
       id: 'rtl8139',
-      value: enumMsg('NicInterface', 'rtl8139'),
+      value: enumMsg('NicInterface', 'rtl8139', msg),
     },
     {
       id: 'e1000',
-      value: enumMsg('NicInterface', 'e1000'),
+      value: enumMsg('NicInterface', 'e1000', msg),
     },
   ]
 }

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { addUserMessage, downloadVmConsoles } from '_/actions'
@@ -7,7 +7,7 @@ import {
   EMPTY_CONSOLES_LIST,
   NO_DEFAULT_CONSOLE,
 } from '_/constants'
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 
 const DEFAULT_CONSOLE_PROTOCOL_ERRORS_LIST = [
   NO_DEFAULT_CONSOLE,
@@ -24,6 +24,7 @@ const AutoSelectConsole = ({
   defaultConsole,
   setUserMessage,
 }) => {
+  const { msg } = useContext(MsgContext)
   useEffect(() => {
     if (show && defaultConsole === 'undefined') {
       fetchConsoles(vm)
@@ -34,16 +35,16 @@ const AutoSelectConsole = ({
     if (show && DEFAULT_CONSOLE_PROTOCOL_ERRORS_LIST.includes(defaultConsole)) {
       const vmName = vm.get('name', '')
       const message = defaultConsole === EMPTY_CONSOLES_LIST
-        ? msg.consoleNotAvailableHeadless({ vmName })
+        ? { id: 'consoleNotAvailableHeadless', params: { vmName } }
         : defaultConsole === NO_DEFAULT_CONSOLE
-          ? msg.consoleDefaultNotAvailable({ vmName, defaultConsole })
+          ? { id: 'consoleDefaultNotAvailable', params: { vmName, defaultConsole } }
           : false
       if (message) {
         setUserMessage(message)
       }
       onClose()
     }
-  }, [defaultConsole, show])
+  }, [defaultConsole, show, msg])
 
   const isProtocolSelected = (defaultConsole) => defaultConsole !== 'undefined' && !DEFAULT_CONSOLE_PROTOCOL_ERRORS_LIST.includes(defaultConsole)
 
@@ -84,6 +85,6 @@ export default connect(
   }),
   (dispatch, { vm }) => ({
     fetchConsoles: () => dispatch(downloadVmConsoles({ vm })),
-    setUserMessage: (message) => dispatch(addUserMessage({ type: 'error', message })),
+    setUserMessage: (message) => dispatch(addUserMessage({ type: 'error', messageDescriptor: message })),
   })
 )(AutoSelectConsole)

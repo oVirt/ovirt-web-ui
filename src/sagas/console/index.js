@@ -27,7 +27,6 @@ import RDPBuilder from './rdpBuilder'
 import { push } from 'connected-react-router'
 import { setActiveConsole } from '../../actions'
 import { INIT_CONSOLE, DOWNLOAD_CONSOLE } from '_/constants'
-import { msg } from '_/intl'
 
 // ----- Connection files
 /**
@@ -50,7 +49,7 @@ export function* downloadVmConsole (action) {
         } = {},
       } = result
       yield put(setLogonConsoleModalState({ modalId }))
-      yield put(addUserMessage({ message: msg.cantOpenConsole({ message }), type: 'error' }))
+      yield put(addUserMessage({ messageDescriptor: { id: 'cantOpenConsole', params: { message } }, type: 'error' }))
       return
     }
   }

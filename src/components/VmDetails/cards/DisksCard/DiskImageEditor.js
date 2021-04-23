@@ -2,9 +2,9 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import { msg } from '_/intl'
 import { isNumber } from '_/utils'
 import { createDiskTypeList, createStorageDomainList, isDiskNameValid } from '_/components/utils'
+import { withMsg } from '_/intl'
 
 import {
   Button,
@@ -35,8 +35,6 @@ const DISK_DEFAULTS = {
 
   provisionedSize: 1 * 1024 ** 3,
 }
-
-const DISK_TYPES = createDiskTypeList()
 
 const LabelCol = ({ children, ...props }) => {
   return <Col componentClass={ControlLabel} {...props}>
@@ -77,9 +75,10 @@ LabelCol.propTypes = {
 class DiskImageEditor extends Component {
   constructor (props) {
     super(props)
+    const { storageDomainList, dataCenterId, locale, msg } = this.props
     this.state = {
       showModal: false,
-      storageDomainSelectList: createStorageDomainList(props.storageDomainList, props.dataCenterId, true),
+      storageDomainSelectList: createStorageDomainList({ storageDomains: storageDomainList, dataCenterId, includeUsage: true, locale, msg }),
 
       id: undefined,
       values: {
@@ -109,7 +108,7 @@ class DiskImageEditor extends Component {
 
   open (e) {
     e.preventDefault()
-    const { disk, suggestedName, suggestedStorageDomain } = this.props
+    const { disk, suggestedName, suggestedStorageDomain, storageDomainList, dataCenterId, locale, msg } = this.props
     const { storageDomainSelectList } = this.state
     const diskInfo = disk
       ? { // edit
@@ -144,7 +143,7 @@ class DiskImageEditor extends Component {
 
     this.setState({
       showModal: true,
-      storageDomainSelectList: createStorageDomainList(this.props.storageDomainList, this.props.dataCenterId, true),
+      storageDomainSelectList: createStorageDomainList({ storageDomains: storageDomainList, dataCenterId, includeUsage: true, locale, msg }),
       ...diskInfo,
     })
     this.changesMade = false
@@ -198,6 +197,7 @@ class DiskImageEditor extends Component {
   }
 
   validateField (field = '') {
+    const { msg } = this.props
     const errors = this.state.errors
     let isErrorOnField = false
 
@@ -277,7 +277,8 @@ class DiskImageEditor extends Component {
   }
 
   render () {
-    const { idPrefix, disk, trigger, vm } = this.props
+    const { idPrefix, disk, trigger, vm, msg } = this.props
+    const DISK_TYPES = createDiskTypeList(msg)
 
     const createMode = !disk
     const isImage = disk && disk.get('type') === 'image'
@@ -506,6 +507,7 @@ class DiskImageEditor extends Component {
     </React.Fragment>
   }
 }
+
 DiskImageEditor.propTypes = {
   idPrefix: PropTypes.string.isRequired,
   vm: PropTypes.object.isRequired,
@@ -520,6 +522,9 @@ DiskImageEditor.propTypes = {
 
   storageDomains: PropTypes.object.isRequired,
   dataCenterId: PropTypes.string.isRequired,
+
+  locale: PropTypes.string.isRequired,
+  msg: PropTypes.object.isRequired,
 }
 
 export default connect(
@@ -527,4 +532,4 @@ export default connect(
     storageDomains: state.storageDomains,
     dataCenterId: state.clusters.getIn([ vm.getIn([ 'cluster', 'id' ]), 'dataCenterId' ]),
   })
-)(DiskImageEditor)
+)(withMsg(DiskImageEditor))

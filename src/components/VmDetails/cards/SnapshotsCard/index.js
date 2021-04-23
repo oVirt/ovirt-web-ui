@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 import BaseCard from '../../BaseCard'
 import style from './style.css'
 
@@ -72,6 +72,7 @@ const ConnectedSnapshots = connect(
  * List of Snapshots taken of a VM
  */
 const SnapshotsCard = ({ vm }) => {
+  const { msg } = useContext(MsgContext)
   const snapshots = vm.get('snapshots', []).filter((s) => !s.get('isActive'))
   const idPrefix = 'vmdetail-snapshots'
 

@@ -5,7 +5,7 @@ import $ from 'jquery'
 
 import { Popover, OverlayTrigger } from 'react-bootstrap'
 
-import { msg } from '_/intl'
+import { withMsg } from '_/intl'
 import style from './style.css'
 
 /**
@@ -43,6 +43,7 @@ class FieldHelp extends React.Component {
     this.setState({ style: popoverStyle, placement })
   }
   render () {
+    const { msg } = this.props
     const tooltip = this.props.tooltip || msg.clickForHelp()
 
     const popover = (
@@ -69,6 +70,7 @@ FieldHelp.propTypes = {
   tooltip: PropTypes.string, // tooltip shown when hovering the text
   children: PropTypes.any,
   container: PropTypes.any,
+  msg: PropTypes.object.isRequired,
 }
 
-export default FieldHelp
+export default withMsg(FieldHelp)

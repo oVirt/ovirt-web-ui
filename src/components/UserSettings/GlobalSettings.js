@@ -5,8 +5,7 @@ import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 import { saveGlobalOptions } from '_/actions'
 import { FormControl, Switch } from 'patternfly-react'
-import { msg } from '_/intl'
-import localeWithFullName from '_/intl/localeWithFullName'
+import { withMsg, localeWithFullName } from '_/intl'
 import style from './style.css'
 
 import { Settings, SettingsBase } from '../Settings'
@@ -14,43 +13,46 @@ import SelectBox from '../SelectBox'
 import moment from 'moment'
 
 class GlobalSettings extends Component {
-  dontDisturbList = [
-    {
-      id: 10,
-      value: moment.duration(10, 'minutes').humanize(),
-    },
-    {
-      id: 60,
-      value: moment.duration(1, 'hours').humanize(),
-    },
-    {
-      id: 60 * 24,
-      value: moment.duration(1, 'days').humanize(),
-    },
-    {
-      id: Number.MAX_SAFE_INTEGER,
-      value: msg.untilNextPageReload(),
-    },
-  ]
-
-  refreshIntervalList = [
-    {
-      id: 30,
-      value: msg.every30Seconds(),
-    },
-    {
-      id: 60,
-      value: msg.everyMinute(),
-    },
-    {
-      id: 120,
-      value: msg.every2Minute(),
-    },
-    {
-      id: 300,
-      value: msg.every5Minute(),
-    },
-  ]
+  dontDisturbList (msg) {
+    return [
+      {
+        id: 10,
+        value: moment.duration(10, 'minutes').humanize(),
+      },
+      {
+        id: 60,
+        value: moment.duration(1, 'hours').humanize(),
+      },
+      {
+        id: 60 * 24,
+        value: moment.duration(1, 'days').humanize(),
+      },
+      {
+        id: Number.MAX_SAFE_INTEGER,
+        value: msg.untilNextPageReload(),
+      },
+    ]
+  }
+  refreshIntervalList (msg) {
+    return [
+      {
+        id: 30,
+        value: msg.every30Seconds(),
+      },
+      {
+        id: 60,
+        value: msg.everyMinute(),
+      },
+      {
+        id: 120,
+        value: msg.every2Minute(),
+      },
+      {
+        id: 300,
+        value: msg.every5Minute(),
+      },
+    ]
+  }
 
   constructor (props) {
     super(props)
@@ -85,15 +87,6 @@ class GlobalSettings extends Component {
       // values submitted using 'save' action
       // inlcude both remote(server and store) or local(store only)
       sentValues: {},
-      // required for error handling: the case of partial success(only some fields saved)
-      // the alert shows the names of the fields that were NOT saved
-      translatedLabels: {
-        sshKey: msg.sshKey(),
-        language: msg.language(),
-        showNotifications: msg.dontDisturb(),
-        notificationSnoozeDuration: msg.dontDisturbFor(),
-        refreshInterval: msg.uiRefresh(),
-      },
     }
     this.handleCancel = this.handleCancel.bind(this)
     this.buildSections = this.buildSections.bind(this)
@@ -132,9 +125,9 @@ class GlobalSettings extends Component {
     }
   }
 
-  buildSections (onChange) {
-    const { draftValues, translatedLabels } = this.state
-    const { config } = this.props
+  buildSections (onChange, translatedLabels) {
+    const { draftValues } = this.state
+    const { config, msg } = this.props
     const idPrefix = 'global-user-settings'
     return {
       general: {
@@ -188,7 +181,7 @@ class GlobalSettings extends Component {
               <div className={style['half-width']}>
                 <SelectBox
                   id={`${idPrefix}-update-rate`}
-                  items={this.refreshIntervalList}
+                  items={this.refreshIntervalList(msg)}
                   selected={draftValues.refreshInterval}
                   onChange={onChange('refreshInterval')}
                 />
@@ -221,7 +214,7 @@ class GlobalSettings extends Component {
               <div className={style['half-width']}>
                 <SelectBox
                   id={`${idPrefix}-dont-disturb-for`}
-                  items={this.dontDisturbList}
+                  items={this.dontDisturbList(msg)}
                   selected={draftValues.notificationSnoozeDuration}
                   onChange={onChange('notificationSnoozeDuration')}
                   disabled={draftValues.showNotifications}
@@ -235,8 +228,17 @@ class GlobalSettings extends Component {
   }
 
   render () {
-    const { lastTransactionId, currentValues } = this.props
-    const { draftValues, baseValues, sentValues, translatedLabels } = this.state
+    const { lastTransactionId, currentValues, msg } = this.props
+    const { draftValues, baseValues, sentValues } = this.state
+    // required also in Settings for error handling: the case of partial success(only some fields saved)
+    // the alert shows the names of the fields that were NOT saved
+    const translatedLabels = {
+      sshKey: msg.sshKey(),
+      language: msg.language(),
+      showNotifications: msg.dontDisturb(),
+      notificationSnoozeDuration: msg.dontDisturbFor(),
+      refreshInterval: msg.uiRefresh(),
+    }
 
     return (
       <div className='container'>
@@ -251,18 +253,20 @@ class GlobalSettings extends Component {
           onSave={this.saveOptions}
           onCancel={this.handleCancel}
         >
-          <SettingsBase sections={this.buildSections(this.onChange)} />
+          <SettingsBase sections={this.buildSections(this.onChange, translatedLabels)} />
         </Settings>
       </div>
     )
   }
 }
+
 GlobalSettings.propTypes = {
   currentValues: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
   lastTransactionId: PropTypes.string,
   saveOptions: PropTypes.func.isRequired,
   goToMainPage: PropTypes.func.isRequired,
+  msg: PropTypes.object.isRequired,
 }
 
 export default connect(
@@ -285,4 +289,4 @@ export default connect(
     saveOptions: (values, transactionId) => dispatch(saveGlobalOptions({ values }, { transactionId })),
     goToMainPage: () => dispatch(push('/')),
   })
-)(GlobalSettings)
+)(withMsg(GlobalSettings))

@@ -12,7 +12,7 @@ import {
 
 import style from './style.css'
 
-import { msg } from '_/intl'
+import { withMsg } from '_/intl'
 import RestoreConfirmationModal from './RestoreConfirmationModal'
 import DeleteConfirmationModal from '../../../VmModals/DeleteConfirmationModal'
 import SnapshotDetail from './SnapshotDetail'
@@ -96,6 +96,7 @@ class SnapshotItem extends React.Component {
   }
 
   render () {
+    const { msg, locale } = this.props
     let statusIcon = null
     let buttons = []
 
@@ -113,6 +114,8 @@ class SnapshotItem extends React.Component {
               vmId={this.props.vmId}
               restoreDisabled={isRestoreDisabled}
               isPoolVm={this.props.isPoolVm}
+              msg={msg}
+              locale={locale}
             />
           }
           placement={this.state.isMobile || this.state.isTablet ? 'top' : 'left'}
@@ -195,7 +198,7 @@ class SnapshotItem extends React.Component {
         <span className={style['snapshot-item-status']} id={`${this.props.id}-status-icon`}>{statusIcon}</span>
         <span className={style['snapshot-item-name']} id={`${this.props.id}-description`}>
           {getMinimizedString(this.props.snapshot.get('description'), MAX_DESCRIPTION_SIZE)}
-          <span className={style['snapshot-item-time']} id={`${this.props.id}-time`}>{`(${formatDateFromNow(this.props.snapshot.get('date'))})`}</span>
+          <span className={style['snapshot-item-time']} id={`${this.props.id}-time`}>{`(${formatDateFromNow(this.props.snapshot.get('date'), msg)})`}</span>
         </span>
         <span className={style['snapshot-item-actions']} id={`${this.props.id}-actions`}>{ buttons }</span>
       </div>
@@ -212,6 +215,8 @@ SnapshotItem.propTypes = {
   isVmDown: PropTypes.bool,
   isPoolVm: PropTypes.bool,
   onSnapshotDelete: PropTypes.func.isRequired,
+  msg: PropTypes.object.isRequired,
+  locale: PropTypes.string.isRequired,
 }
 
 export default connect(
@@ -221,4 +226,4 @@ export default connect(
   (dispatch, { vmId, snapshot }) => ({
     onSnapshotDelete: () => dispatch(deleteVmSnapshot({ vmId, snapshotId: snapshot.get('id') })),
   })
-)(SnapshotItem)
+)(withMsg(SnapshotItem))

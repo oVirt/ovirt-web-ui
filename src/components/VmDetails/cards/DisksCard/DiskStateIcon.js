@@ -1,13 +1,13 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 
 import { Icon } from 'patternfly-react'
 
-import { msg } from '../../../../intl'
+import { MsgContext } from '_/intl'
 import style from './style.css'
 import { Tooltip } from '_/components/tooltips'
 
-const diskStateSettings = {
+const diskStateSettings = (msg) => ({
   'active': {
     type: 'fa',
     name: 'arrow-circle-o-up',
@@ -26,11 +26,11 @@ const diskStateSettings = {
     className: style['state-icon-locked'],
     tooltip: msg.diskTooltipStatusMessage({ statusInfo: msg.diskStateLockedTooltip() }),
   },
-
-}
+})
 
 const DiskStateIcon = ({ idPrefix, diskState, showTooltip = true }) => {
-  const diskInfo = diskStateSettings[diskState]
+  const { msg } = useContext(MsgContext)
+  const diskInfo = diskStateSettings(msg)[diskState]
   const theIcon =
     <Icon
       id={`${idPrefix}-state-icon`}

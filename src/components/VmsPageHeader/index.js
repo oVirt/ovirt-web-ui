@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
@@ -12,13 +12,14 @@ import Header from '../Header'
 import { hrefWithoutHistory } from '_/helpers'
 
 import { manualRefresh } from '_/actions'
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 import { Tooltip } from '../tooltips'
 
 /**
  * Main application header on top of the page
  */
 const VmsPageHeader = ({ onRefresh }) => {
+  const { msg } = useContext(MsgContext)
   const [show, setShow] = useState(false)
   const idPrefix = `pageheader`
 

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import {
   Checkbox,
@@ -6,11 +6,12 @@ import {
   FormControl,
   FormGroup,
 } from 'patternfly-react'
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 import SelectBox from '../../../../SelectBox'
 import timezones from '_/components/utils/timezones.json'
 
 const SysprepForm = ({ idPrefix, vm, onChange, lastInitTimezone }) => {
+  const { msg } = useContext(MsgContext)
   const cloudInitHostName = vm.getIn(['cloudInit', 'hostName'])
   const cloudInitPassword = vm.getIn(['cloudInit', 'password'])
   const cloudInitCustomScript = vm.getIn(['cloudInit', 'customScript'])

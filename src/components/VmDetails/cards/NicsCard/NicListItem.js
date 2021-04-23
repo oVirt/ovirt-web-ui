@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 import { escapeHtml } from '../../../utils'
 import itemStyle from '../../itemListStyle.css'
 import style from './style.css'
@@ -21,6 +21,7 @@ import EllipsisValue from '_/components/EllipsisValue'
  * handler functions.
  */
 const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEdit, onDelete }) => {
+  const { msg } = useContext(MsgContext)
   const canEdit = !!onEdit
   const canDelete = !!onDelete
 

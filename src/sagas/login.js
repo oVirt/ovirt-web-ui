@@ -89,7 +89,7 @@ function* login (action) {
     console.error('oVirt API version check failed')
     yield put(failedExternalAction({
       message: composeIncompatibleOVirtApiVersionMessage(oVirtMeta),
-      shortMessage: 'oVirt API version check failed', // TODO: Localize
+      messageDescriptor: { id: 'apiVersionCheckFailed' },
     }))
     return
   }

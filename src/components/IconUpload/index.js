@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { msg } from '_/intl'
+import { withMsg } from '_/intl'
 import FieldHelp from '../FieldHelp/index'
 
 import style from './style.css'
@@ -15,6 +15,7 @@ class IconUpload extends React.Component {
   }
 
   handleIconChange (e) {
+    const { msg } = this.props
     const that = this
     const files = e.target.files
 
@@ -49,7 +50,7 @@ class IconUpload extends React.Component {
   }
 
   render () {
-    const error = this.props.error
+    const { error, msg } = this.props
 
     const iconError = this.props.error
       ? (<span className={`help-block ${style['error-text']}`}>{this.props.error}</span>)
@@ -91,6 +92,7 @@ IconUpload.propTypes = {
   onErrorChange: PropTypes.func.isRequired,
   onIconChange: PropTypes.func.isRequired,
   error: PropTypes.string,
+  msg: PropTypes.object.isRequired,
 }
 
-export default IconUpload
+export default withMsg(IconUpload)

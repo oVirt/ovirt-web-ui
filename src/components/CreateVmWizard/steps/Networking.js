@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { msg, enumMsg } from '_/intl'
+import { MsgContext, enumMsg, withMsg } from '_/intl'
 import { generateUnique } from '_/helpers'
 import { NIC_SHAPE } from '../dataPropTypes'
 
@@ -32,10 +32,10 @@ import style from './style.css'
 import { Tooltip, InfoTooltip } from '_/components/tooltips'
 import { EMPTY_VNIC_PROFILE_ID } from '_/constants'
 
-const NIC_INTERFACES = createNicInterfacesList()
 const NIC_INTERFACE_DEFAULT = 'virtio'
 
 export const NicNameWithLabels = ({ id, nic }) => {
+  const { msg } = useContext(MsgContext)
   const idPrefix = `${id}-nic-${nic.id}`
   return <React.Fragment>
     <span id={`${idPrefix}-name`}>{ nic.name }</span>
@@ -79,6 +79,8 @@ class Networking extends React.Component {
     this.rowRenderProps = this.rowRenderProps.bind(this)
     this.isVnicNameUniqueAndValid = this.isVnicNameUniqueAndValid.bind(this)
 
+    const { msg, locale } = this.props
+    const NIC_INTERFACES = createNicInterfacesList(msg)
     props.onUpdate({ valid: true })
 
     this.state = {
@@ -190,7 +192,7 @@ class Networking extends React.Component {
             cluster,
             vnicProfiles,
           } = props
-          const vnicList = createVNicProfileList(vnicProfiles, { dataCenterId, cluster })
+          const vnicList = createVNicProfileList(vnicProfiles, { locale, msg }, { dataCenterId, cluster })
           const row = this.state.editing[rowData.id]
 
           return (
@@ -418,19 +420,21 @@ class Networking extends React.Component {
       cluster,
       nics,
       vnicProfiles,
+      msg,
+      locale,
     } = this.props
 
-    const vnicList = createVNicProfileList(vnicProfiles, { dataCenterId, cluster })
+    const vnicList = createVNicProfileList(vnicProfiles, { locale, msg }, { dataCenterId, cluster })
     const enableCreate = vnicList.length > 0 && Object.keys(this.state.editing).length === 0
 
-    const nicList = sortNicsDisks([...nics])
+    const nicList = sortNicsDisks([...nics], locale)
       .concat(this.state.creating ? [ this.state.editing[this.state.creating] ] : [])
       .map(nic => ({
         ...(this.state.editing[nic.id] ? this.state.editing[nic.id] : nic),
         vnic: vnicList.find(vnic => vnic.id === nic.vnicProfileId)
           ? vnicList.find(vnic => vnic.id === nic.vnicProfileId).value
           : msg.createVmNetUnknownVnicProfile(),
-        device: enumMsg('NicInterface', nic.deviceType),
+        device: enumMsg('NicInterface', nic.deviceType, msg),
       }))
     const components = {
       body: {
@@ -493,6 +497,9 @@ Networking.propTypes = {
   vnicProfiles: PropTypes.object.isRequired,
 
   onUpdate: PropTypes.func.isRequired,
+
+  msg: PropTypes.object.isRequired,
+  locale: PropTypes.string.isRequired,
 }
 
 export default connect(
@@ -500,4 +507,4 @@ export default connect(
     cluster: state.clusters.get(clusterId),
     vnicProfiles: state.vnicProfiles,
   })
-)(Networking)
+)(withMsg(Networking))

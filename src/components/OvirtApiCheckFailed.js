@@ -1,13 +1,14 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
 import Product from '../version'
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 import { fixedStrings } from '../branding'
 import ErrorAlert from './ErrorAlert'
 
 const OvirtApiCheckFailed = ({ config }) => {
+  const { msg } = useContext(MsgContext)
   const oVirtApiVersion = config.get('oVirtApiVersion')
 
   const passed = oVirtApiVersion.get('passed')

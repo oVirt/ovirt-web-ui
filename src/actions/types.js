@@ -22,3 +22,26 @@ export type SaveGlobalOptionsActionType = {
     transactionId: string
   |}
 }
+export type MessageDescriptorType = {
+  id: string,
+  params: ?Object
+}
+export type FailedExternalActionInputType = {
+  message: string,
+  messageDescriptor: ?MessageDescriptorType,
+  exception?: Object,
+  failedAction?: Object
+}
+
+export type FailedExternalActionType = {
+  type: 'FAILED_EXTERNAL_ACTION',
+  payload: {
+    message: string,
+    failedAction?: Object
+  } | {
+    message: string,
+    messageDescriptor: ?MessageDescriptorType,
+    type: number | 'ERROR',
+    failedAction: Object
+  }
+}

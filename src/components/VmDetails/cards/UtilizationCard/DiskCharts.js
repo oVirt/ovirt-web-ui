@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import {
   CardBody,
@@ -13,7 +13,7 @@ import {
 import BarChart from './UtilizationCharts/BarChart'
 import DonutChart from './UtilizationCharts/DonutChart'
 
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 import { round, floor, convertValueMap } from '_/utils'
 import { userFormatOfBytes, isWindows } from '_/helpers'
 
@@ -34,6 +34,7 @@ const EmptyBlock = () => (
  *       via REST. Storage allocation is being used instead.
  */
 const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
+  const { msg } = useContext(MsgContext)
   const diskDetails = diskStats && diskStats.usage && diskStats.usage.datum
   const hasDiskDetails = diskDetails && diskDetails.length > 0
 

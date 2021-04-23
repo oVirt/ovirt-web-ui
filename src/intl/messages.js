@@ -46,6 +46,8 @@ export const messages: { [messageId: string]: MessageType } = {
     description: 'In sense of "human friendly name"',
   },
   allocatedVms: 'Allocated VMs',
+  apiConnectionFailed: 'oVirt API connection failed',
+  apiVersionCheckFailed: 'oVirt API version check failed',
   areYouSureYouWantToDeleteDisk: 'Are you sure you want to delete disk {diskName}?',
   areYouSureYouWantToDeleteNic: 'Are you sure you want to delete NIC {nicName}?',
   areYouSureYouWantToDeleteSnapshot: 'Are you sure you want to delete snapshot {snapshotName}?',

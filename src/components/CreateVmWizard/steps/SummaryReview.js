@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Alert, Icon, Spinner, Label } from 'patternfly-react'
 import { InfoCircleIcon } from '@patternfly/react-icons'
 
-import { msg, enumMsg } from '_/intl'
+import { MsgContext, enumMsg } from '_/intl'
 import { templateNameRenderer, userFormatOfBytes } from '_/helpers'
 import { Grid, Row, Col } from '_/components/Grid'
 import { Tooltip } from '_/components/tooltips'
@@ -32,6 +32,7 @@ Item.propTypes = {
 }
 
 const ReviewBasic = ({ id, dataCenters, clusters, isos, templates, operatingSystems, basic }) => {
+  const { msg } = useContext(MsgContext)
   const vmOS = operatingSystems.get(basic.operatingSystemId)
 
   return <React.Fragment>
@@ -79,7 +80,7 @@ const ReviewBasic = ({ id, dataCenters, clusters, isos, templates, operatingSyst
       >
         <InfoCircleIcon className={style['info-circle-icon']} />
       </Tooltip>    </Item>
-    <Item id={`${id}-optimizedFor`} label={msg.optimizedFor()}>{optimizedForMap[basic.optimizedFor].value}</Item>
+    <Item id={`${id}-optimizedFor`} label={msg.optimizedFor()}>{optimizedForMap(msg)[basic.optimizedFor].value}</Item>
   </React.Fragment>
 }
 ReviewBasic.propTypes = {
@@ -93,6 +94,7 @@ ReviewBasic.propTypes = {
 }
 
 const ReviewNetworking = ({ id, vnicProfiles, network }) => {
+  const { msg } = useContext(MsgContext)
   const vnicNames = vnicProfiles.reduce((map, vnic) => {
     map[vnic.get('id')] = `${vnic.getIn(['network', 'name'])}/${vnic.get('name')}`
     return map
@@ -114,7 +116,7 @@ const ReviewNetworking = ({ id, vnicProfiles, network }) => {
               { vnicNames[nic.vnicProfileId] ? vnicNames[nic.vnicProfileId] : msg.createVmNetUnknownVnicProfile() }
             </div>
             <div className={style['review-entity-info']}>
-              { enumMsg('NicInterface', nic.deviceType) }
+              { enumMsg('NicInterface', nic.deviceType, msg) }
             </div>
           </div>
         )}
@@ -129,6 +131,7 @@ ReviewNetworking.propTypes = {
 }
 
 const ReviewStorage = ({ id, storageDomains, storage }) => {
+  const { msg } = useContext(MsgContext)
   return <Item id={`${id}-storage`} label={msg.createVmWizardStepTitleStorage()}>
     { storage.length === 0 && <div>{msg.createVmStorageEmptyInfo()}</div> }
 
@@ -164,6 +167,7 @@ ReviewStorage.propTypes = {
 }
 
 const ReviewAdvanced = ({ id, operatingSystems, basic }) => {
+  const { msg } = useContext(MsgContext)
   const hasAdvanced = basic.startOnCreation || basic.cloudInitEnabled
   const vmOS = operatingSystems.get(basic.operatingSystemId)
 
@@ -221,111 +225,118 @@ ReviewAdvanced.propTypes = {
  * Purely controlled component to show a review of the new VM and to visualize
  * the creation progress.
  */
-class SummaryReview extends React.Component {
-  render () {
-    const id = this.props.id ? `${this.props.id}-review` : 'create-vm-wizard-review'
-    const {
-      network,
-      storage,
-      progress = { inProgress: false },
-    } = this.props
+const SummaryReview = ({
+  id: propsId,
+  network,
+  storage,
+  progress = { inProgress: false },
+  dataCenters,
+  clusters,
+  templates,
+  operatingSystems,
+  isoFiles,
+  basic,
+  vnicProfiles,
+  storageDomains,
+}) => {
+  const { msg, locale } = useContext(MsgContext)
+  const id = propsId ? `${propsId}-review` : 'create-vm-wizard-review'
 
-    const disksList = sortNicsDisks([...storage]) // Sort the template based ones first, then by name
-    const nicsList = sortNicsDisks([...network])
+  const disksList = sortNicsDisks([...storage], locale) // Sort the template based ones first, then by name
+  const nicsList = sortNicsDisks([...network], locale)
 
-    return <div className={style['review-content']}>
-      { (!progress.inProgress && !progress.result) &&
-        <div id={`${id}-progress-review-and-confirm`} className={style['review-progress']}>
-          <div className={style['review-icon-container']}>
-            <Icon className={style['review-icon']} type='pf' name='virtual-machine' />
-          </div>
-          <div className={style['review-text']}>
-            {msg.createVmWizardReviewConfirm()}
-          </div>
-        </div>
-      }
-      { progress.inProgress &&
-        <div id={`${id}-progress-in-progress`} className={style['review-progress']}>
-          <div className={style['review-icon-container']}>
-            <Spinner className={style['review-spinner']} loading size='lg' />
-          </div>
-          <div className={style['review-text']}>
-            {msg.createVmWizardReviewInProgress()}
-          </div>
-        </div>
-      }
-      { progress.result === 'success' &&
-        <div id={`${id}-progress-success`} className={style['review-progress']}>
-          <div className={style['review-icon-container']}>
-            <Icon className={style['review-icon']} type='pf' name='ok' />
-          </div>
-          <div className={style['review-text']}>
-            {msg.createVmWizardReviewSuccess()}
-          </div>
-          { progress.messages && progress.messages.length > 0 &&
-            <Alert type='success' >
-              {progress.messages.map((message, index) =>
-                <div key={`message-${index}`}>
-                  { message }
-                </div>
-              )}
-            </Alert>
-          }
-        </div>
-      }
-      { progress.result === 'error' &&
-        <div id={`${id}-progress-error`} className={style['review-progress']}>
-          <div className={style['review-icon-container']}>
-            <Icon className={style['review-icon']} type='pf' name='error-circle-o' />
-          </div>
-          <div className={style['review-text']}>
-            {msg.createVmWizardReviewError()}
-          </div>
-          { progress.messages && progress.messages.length > 0 &&
-            <Alert type='error' >
-              {progress.messages.map((message, index) =>
-                <div key={`message-${index}`}>
-                  { message }
-                </div>
-              )}
-            </Alert>
-          }
-        </div>
-      }
-
-      <Grid>
-        <Row>
-          <Col>
-            <ReviewBasic
-              id={`${id}-basic`}
-              dataCenters={this.props.dataCenters}
-              clusters={this.props.clusters}
-              templates={this.props.templates}
-              operatingSystems={this.props.operatingSystems}
-              isos={this.props.isoFiles}
-              basic={this.props.basic}
-            />
-            <ReviewNetworking
-              id={`${id}-network`}
-              vnicProfiles={this.props.vnicProfiles}
-              network={nicsList}
-            />
-            <ReviewStorage
-              id={`${id}-storage`}
-              storageDomains={this.props.storageDomains}
-              storage={disksList}
-            />
-            <ReviewAdvanced
-              id={`${id}-advanced`}
-              operatingSystems={this.props.operatingSystems}
-              basic={this.props.basic}
-            />
-          </Col>
-        </Row>
-      </Grid>
-
+  return (<div className={style['review-content']}>
+    { (!progress.inProgress && !progress.result) &&
+    <div id={`${id}-progress-review-and-confirm`} className={style['review-progress']}>
+      <div className={style['review-icon-container']}>
+        <Icon className={style['review-icon']} type='pf' name='virtual-machine' />
+      </div>
+      <div className={style['review-text']}>
+        {msg.createVmWizardReviewConfirm()}
+      </div>
     </div>
-  }
+    }
+    { progress.inProgress &&
+    <div id={`${id}-progress-in-progress`} className={style['review-progress']}>
+      <div className={style['review-icon-container']}>
+        <Spinner className={style['review-spinner']} loading size='lg' />
+      </div>
+      <div className={style['review-text']}>
+        {msg.createVmWizardReviewInProgress()}
+      </div>
+    </div>
+    }
+    { progress.result === 'success' &&
+    <div id={`${id}-progress-success`} className={style['review-progress']}>
+      <div className={style['review-icon-container']}>
+        <Icon className={style['review-icon']} type='pf' name='ok' />
+      </div>
+      <div className={style['review-text']}>
+        {msg.createVmWizardReviewSuccess()}
+      </div>
+      { progress.messages && progress.messages.length > 0 &&
+      <Alert type='success' >
+        {progress.messages.map((message, index) =>
+          <div key={`message-${index}`}>
+            { message }
+          </div>
+        )}
+      </Alert>
+      }
+    </div>
+    }
+    { progress.result === 'error' &&
+    <div id={`${id}-progress-error`} className={style['review-progress']}>
+      <div className={style['review-icon-container']}>
+        <Icon className={style['review-icon']} type='pf' name='error-circle-o' />
+      </div>
+      <div className={style['review-text']}>
+        {msg.createVmWizardReviewError()}
+      </div>
+      { progress.messages && progress.messages.length > 0 &&
+      <Alert type='error' >
+        {progress.messages.map((message, index) =>
+          <div key={`message-${index}`}>
+            { message }
+          </div>
+        )}
+      </Alert>
+      }
+    </div>
+    }
+
+    <Grid>
+      <Row>
+        <Col>
+          <ReviewBasic
+            id={`${id}-basic`}
+            dataCenters={dataCenters}
+            clusters={clusters}
+            templates={templates}
+            operatingSystems={operatingSystems}
+            isos={isoFiles}
+            basic={basic}
+          />
+          <ReviewNetworking
+            id={`${id}-network`}
+            vnicProfiles={vnicProfiles}
+            network={nicsList}
+          />
+          <ReviewStorage
+            id={`${id}-storage`}
+            storageDomains={storageDomains}
+            storage={disksList}
+          />
+          <ReviewAdvanced
+            id={`${id}-advanced`}
+            operatingSystems={operatingSystems}
+            basic={basic}
+          />
+        </Col>
+      </Row>
+    </Grid>
+
+  </div>)
 }
 
 SummaryReview.propTypes = {

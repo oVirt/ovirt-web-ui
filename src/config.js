@@ -1,7 +1,6 @@
 import $ from 'jquery'
 
 import { setLogDebug } from './logger'
-import { localeFromUrl } from '_/intl'
 
 const CONFIG_URL = '/ovirt-engine/web-ui/ovirt-web-ui.config'
 
@@ -16,10 +15,6 @@ const AppConfiguration = {
 
   consoleClientResourcesURL: 'https://www.ovirt.org/documentation/admin-guide/virt/console-client-resources/',
   cockpitPort: '9090',
-
-  queryParams: { // from URL
-    locale: localeFromUrl,
-  },
 }
 
 export function readConfiguration () {

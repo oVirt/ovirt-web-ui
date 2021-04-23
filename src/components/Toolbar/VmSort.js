@@ -4,9 +4,10 @@ import { connect } from 'react-redux'
 import { Sort } from 'patternfly-react'
 
 import { setVmSort } from '_/actions'
-import { sortFields } from '_/utils'
+import { SortFields } from '_/utils'
 import { Tooltip } from '_/components/tooltips'
-import { msg } from '_/intl'
+import { withMsg } from '_/intl'
+import { translate } from '_/helpers'
 
 class VmSort extends React.Component {
   constructor (props) {
@@ -26,6 +27,7 @@ class VmSort extends React.Component {
   }
 
   getSortTooltipMessage () {
+    const { msg } = this.props
     const { sort: { id, isAsc } } = this.props
     return id === 'os' || id === 'name'
       ? (isAsc ? msg.sortAToZ() : msg.sortZToA())
@@ -33,13 +35,13 @@ class VmSort extends React.Component {
   }
 
   render () {
-    const { sort } = this.props
+    const { sort, msg } = this.props
 
     return (
       <Sort>
         <Sort.TypeSelector
-          sortTypes={sortFields}
-          currentSortType={sort}
+          sortTypes={Object.values(SortFields).map(type => ({ ...type, title: translate({ ...type.messageDescriptor, msg }) }))}
+          currentSortType={sort && { ...sort, title: translate({ ...sort.messageDescriptor, msg }) }}
           onSortTypeSelected={this.updateCurrentSortType}
         />
         <Tooltip
@@ -61,11 +63,12 @@ class VmSort extends React.Component {
 VmSort.propTypes = {
   sort: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
+    messageDescriptor: PropTypes.object.isRequired,
     isNumeric: PropTypes.bool,
     isAsc: PropTypes.bool,
   }).isRequired,
   onSortChange: PropTypes.func.isRequired,
+  msg: PropTypes.object.isRequired,
 }
 
 export default connect(
@@ -75,4 +78,4 @@ export default connect(
   (dispatch) => ({
     onSortChange: (sort) => dispatch(setVmSort({ sort })),
   })
-)(VmSort)
+)(withMsg(VmSort))

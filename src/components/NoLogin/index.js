@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 
 import { Button } from '@patternfly/react-core'
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 import AppConfiguration from '_/config'
 import Header from '../Header'
 import signOutIcon from './images/sign-out.svg'
@@ -12,6 +12,7 @@ import style from './style.css'
  * Login (token) to Engine is missing.
  */
 const NoLogin = ({ logoutWasManual = false, isTokenExpired = false }) => {
+  const { msg } = useContext(MsgContext)
   return (
     <div>
       <Header />

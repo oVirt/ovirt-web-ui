@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import { msg } from '../../../../intl'
+import { MsgContext } from '../../../../intl'
 import { convertValue, round } from '../../../../utils'
 import { PendingTaskTypes } from '../../../../reducers/pendingTasks'
 
@@ -34,6 +34,7 @@ const DiskListItem = ({
   isEditing, isDiskBeingDeleted, canDeleteDisks,
   onEdit, onDelete,
 }) => {
+  const { msg } = useContext(MsgContext)
   const size = disk.get('type') === 'lun' ? disk.get('lunSize') : disk.get('provisionedSize')
   const { unit, value } = convertValue('B', size)
   const isLocked = disk.get('status') === 'locked'

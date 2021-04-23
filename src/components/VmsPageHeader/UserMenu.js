@@ -1,14 +1,15 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import { logout } from '_/actions'
 
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 import AboutDialog from '../About'
 import { Tooltip } from '_/components/tooltips'
 
 const UserMenu = ({ config, onLogout }) => {
+  const { msg } = useContext(MsgContext)
   const idPrefix = 'usermenu'
   return (
     <li className='dropdown'>

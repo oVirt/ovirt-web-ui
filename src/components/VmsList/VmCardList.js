@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { msg } from '_/intl'
+import { MsgContext } from '_/intl'
 import { getByPage } from '_/actions'
 import { filterVms, sortFunction } from '_/utils'
 
@@ -16,12 +16,13 @@ import style from './style.css'
  * available to the current user.
  */
 const VmCardList = ({ vms, alwaysShowPoolCard, fetchMoreVmsAndPools }) => {
+  const { msg, locale } = useContext(MsgContext)
   const sort = vms.get('sort').toJS()
   const filters = vms.get('filters').toJS()
 
   // Filter the VMs (1. apply the filter bar criteria, 2. only show Pool VMs if the Pool exists)
   const filteredVms = vms.get('vms')
-    .filter(vm => filterVms(vm, filters))
+    .filter(vm => filterVms(vm, filters, msg))
     .filter(vm => vm.getIn(['pool', 'id'], false) ? !!vms.getIn(['pools', vm.getIn(['pool', 'id'])], false) : true)
     .toList()
     .map(vm => vm.set('isVm', true))
@@ -30,12 +31,12 @@ const VmCardList = ({ vms, alwaysShowPoolCard, fetchMoreVmsAndPools }) => {
   const filteredPools = vms.get('pools')
     .filter(pool =>
       (alwaysShowPoolCard || (pool.get('vmsCount') < pool.get('maxUserVms') && pool.get('size') > 0)) &&
-      filterVms(pool, filters)
+      filterVms(pool, filters, msg)
     )
     .toList()
 
   // Display the VMs and Pools together, sorted nicely
-  const vmsAndPools = [ ...filteredVms, ...filteredPools ].sort(sortFunction(sort))
+  const vmsAndPools = [ ...filteredVms, ...filteredPools ].sort(sortFunction(sort, locale, msg))
 
   // Handle the infinite scroll and pagination
   const hasMore = vms.get('vmsExpectMorePages') || vms.get('poolsExpectMorePages')

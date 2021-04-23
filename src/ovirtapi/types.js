@@ -185,8 +185,7 @@ export type UserOptionsType = {|
   remoteOptions: RemoteUserOptionsType,
   ssh?: SshKeyType,
   lastTransactions: { global?: { transactionId: string } },
-  consoleOptions: {[vmId: string]: { autoconnect?: boolean}},
-  loadingFinished: boolean
+  consoleOptions: {[vmId: string]: { autoconnect?: boolean}}
 |}
 
 export type UserType = {

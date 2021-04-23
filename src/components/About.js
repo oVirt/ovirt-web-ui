@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { msg } from '_/intl'
+import { withMsg } from '_/intl'
 
 import { Modal } from 'patternfly-react'
 import Product from '../version'
@@ -31,7 +31,7 @@ class AboutDialog extends React.Component {
   }
 
   render () {
-    const { oVirtApiVersion } = this.props
+    const { oVirtApiVersion, msg } = this.props
     const idPrefix = `about`
 
     const webUiVersionText = msg.aboutDialogVersion({
@@ -97,12 +97,14 @@ class AboutDialog extends React.Component {
     )
   }
 }
+
 AboutDialog.propTypes = {
   oVirtApiVersion: PropTypes.object,
+  msg: PropTypes.object,
 }
 
 export default connect(
   (state) => ({
     oVirtApiVersion: state.config.get('oVirtApiVersion'),
   })
-)(AboutDialog)
+)(withMsg(AboutDialog))

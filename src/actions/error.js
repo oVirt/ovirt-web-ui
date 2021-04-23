@@ -1,41 +1,22 @@
+// @flow
 import { FAILED_EXTERNAL_ACTION, LOGIN_FAILED } from '_/constants'
+import type { FailedExternalActionInputType, FailedExternalActionType } from './types'
 
-function customizeErrorMessage (message) {
+function customizeErrorMessage (message: string): string {
   const result = message.replace('Vm ', 'VM ')
   return result
 }
 
-export function extractErrorText (exception) {
+export function extractErrorText (exception: Object): string {
   return (exception.responseJSON && (exception.responseJSON.detail || (exception.responseJSON.fault && exception.responseJSON.fault.detail)))
     ? (exception.responseJSON.detail || exception.responseJSON.fault.detail)
     : (exception.statusText || 'UNKNOWN')
 }
 
-/*flow-include
-export type FailedExternalActionInput = {
-  message: string,
-  shortMessage: string,
-  exception?: Object,
-  failedAction?: Object
-}
-
-export type FailedExternalAction = {
-  type: 'FAILED_EXTERNAL_ACTION',
-  payload: {
-    message: string,
-    failedAction?: Object,
-  } | {
-    message: string,
-    shortMessage: string,
-    type: number | 'ERROR',
-    failedAction: Object
-  }
-}
-*/
-export function failedExternalAction ({ message, shortMessage, exception, failedAction } /*: FailedExternalActionInput */) /*: FailedExternalAction */ {
+export function failedExternalAction ({ message, messageDescriptor, exception, failedAction }: FailedExternalActionInputType): FailedExternalActionType {
   if (exception) {
     message = message || extractErrorText(exception)
-    message = shortMessage + '\n' + customizeErrorMessage(message)
+    message = customizeErrorMessage(message)
 
     const type = exception['status'] ? exception['status'] : 'ERROR'
 
@@ -43,7 +24,7 @@ export function failedExternalAction ({ message, shortMessage, exception, failed
       type: FAILED_EXTERNAL_ACTION,
       payload: {
         message,
-        shortMessage,
+        messageDescriptor,
         type,
         failedAction,
       },
@@ -53,13 +34,14 @@ export function failedExternalAction ({ message, shortMessage, exception, failed
   return {
     type: FAILED_EXTERNAL_ACTION,
     payload: {
+      messageDescriptor,
       message,
       failedAction,
     },
   }
 }
 
-export function loginFailed ({ errorCode, message }) {
+export function loginFailed ({ errorCode, message }: Object): Object {
   return {
     type: LOGIN_FAILED,
     payload: {

@@ -12,6 +12,7 @@ import AppConfiguration from '../config'
 
 import {
   addHttpListener as transportAddHttpListener,
+  updateLocale as transportUpdateLocale,
   assertLogin,
   httpGet,
   httpPost,
@@ -28,6 +29,7 @@ const zeroUUID: string = '00000000-0000-0000-0000-000000000000'
 
 const OvirtApi = {
   addHttpListener: transportAddHttpListener,
+  updateLocale: transportUpdateLocale,
 
   //
   //
