@@ -700,11 +700,18 @@ class Storage extends React.Component {
           <EmptyState.Icon />
           <EmptyState.Title>{msg.createVmStorageEmptyTitle()}</EmptyState.Title>
           <EmptyState.Info>{msg.createVmStorageEmptyInfo()}</EmptyState.Info>
-          <EmptyState.Action>
-            <Button bsStyle='primary' bsSize='large' onClick={this.onCreateDisk}>
-              {msg.diskActionCreateNew()}
-            </Button>
-          </EmptyState.Action>
+          { enableCreate &&
+            <EmptyState.Action>
+              <Button bsStyle='primary' bsSize='large' onClick={this.onCreateDisk}>
+                {msg.diskActionCreateNew()}
+              </Button>
+            </EmptyState.Action>
+          }
+          { !enableCreate &&
+            <EmptyState.Help>
+              {msg.diskNoCreate()}
+            </EmptyState.Help>
+          }
         </EmptyState>
       </React.Fragment> }
 

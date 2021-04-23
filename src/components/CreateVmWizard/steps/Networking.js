@@ -81,6 +81,7 @@ class Networking extends React.Component {
 
     const { msg, locale } = this.props
     const NIC_INTERFACES = createNicInterfacesList(msg)
+    props.onUpdate({ valid: true })
 
     this.state = {
       editingErrors: {

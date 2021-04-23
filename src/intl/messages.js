@@ -224,6 +224,7 @@ export const messages: { [messageId: string]: MessageType } = {
   diskEditorStorageDomainCreateHelp: 'Once you have selected a storage domain, you will not be able to change it.',
   diskEditorStorageDomainLabel: 'Storage Domain',
   diskEditorStorageDomainNotAvailable: 'N/A',
+  diskNoCreate: 'No storage domains are available. A new disk cannot be created.',
   diskStateActiveTooltip: 'Active',
   diskStateInactiveTooltip: 'Inactive',
   diskStateLockedTooltip: 'Locked',
