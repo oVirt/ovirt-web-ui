@@ -108,7 +108,7 @@ const VM_FETCH_ADDITIONAL_DEEP = [
   'cdroms',
   'disk_attachments.disk',
   'graphics_consoles',
-  'nics',
+  'nics.reporteddevices',
   'permissions',
   'sessions',
   'snapshots',

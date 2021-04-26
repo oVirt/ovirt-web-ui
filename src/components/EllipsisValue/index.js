@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { xor } from '_/propTypeExtras'
 import style from './style.css'
 import classnames from 'classnames'
+import Tooltip from '_/components/tooltips/Tooltip'
 
 class EllipsisValue extends React.Component {
   constructor (props) {
@@ -46,14 +47,18 @@ class EllipsisValue extends React.Component {
     const { className, id, children, tooltip } = this.props
 
     if (children) {
-      return <span
+      const ellipsisValue = (<span
         className={classnames(style['field-value'], className)}
         id={id}
-        title={this.state.isOverflow ? tooltip : ''}
         ref={this.ref}
       >
         {children}
-      </span>
+      </span>)
+
+      return this.state.isOverflow ? (<Tooltip tooltip={tooltip} id={`ellipsis_tooltip${id}`} >
+        {ellipsisValue}
+      </Tooltip>)
+        : (ellipsisValue)
     }
     return null
   }

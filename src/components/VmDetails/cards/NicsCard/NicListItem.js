@@ -20,7 +20,7 @@ import EllipsisValue from '_/components/EllipsisValue'
  * If _edit_ then render the appropriate action buttons linked to provided
  * handler functions.
  */
-const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEdit, onDelete }) => {
+const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEdit, onDelete, showNicIPs }) => {
   const { msg } = useContext(MsgContext)
   const canEdit = !!onEdit
   const canDelete = !!onDelete
@@ -45,7 +45,7 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEd
       <Grid>
         <Row>
           <Col cols={4} wrapExpand className={style['ip4-container']} id={`${idPrefix}-ipv4`}>
-            { nic.ipv4.length > 0 &&
+            { showNicIPs && nic.ipv4.length > 0 &&
               nic.ipv4.map((ip4, index) =>
                 <EllipsisValue
                   tooltip={ip4}
@@ -57,7 +57,7 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEd
             }
           </Col>
           <Col cols={8} wrapExpand className={style['ip6-container']} id={`${idPrefix}-ipv6`}>
-            { nic.ipv6.length > 0 &&
+            { showNicIPs && nic.ipv6.length > 0 &&
               nic.ipv6.map((ip6, index) =>
                 <EllipsisValue
                   tooltip={ip6}
@@ -143,6 +143,7 @@ NicListItem.propTypes = {
   vmStatus: PropTypes.string.isRequired,
   vnicProfileList: PropTypes.object.isRequired,
   isEditing: PropTypes.bool.isRequired,
+  showNicIPs: PropTypes.bool.isRequired,
 
   onEdit: PropTypes.func,
   onDelete: PropTypes.func,

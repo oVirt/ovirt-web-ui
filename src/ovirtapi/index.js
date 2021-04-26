@@ -584,7 +584,7 @@ const OvirtApi = {
 
   getVmNic ({ vmId }: { vmId: string }): Promise<Object> {
     assertLogin({ methodName: 'getVmNic' })
-    return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/nics` })
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/nics?follow=reporteddevices` })
   },
   getAllNetworks (): Promise<Object> {
     assertLogin({ methodName: 'getNetworks' })
