@@ -182,6 +182,10 @@ export const messages: { [messageId: string]: MessageType } = {
   dataCenterChangesWithCluster: 'The data center cannot be edited from here. Please contact your administrator if you would like to edit the data center.',
   daysShort: 'd',
   defaultButton: 'Default',
+  defaultOption: {
+    message: '(Default)',
+    description: 'Used in dropdowns to mark the default option',
+  },
   definedMemory: 'Defined Memory',
   delete: 'Delete',
   description: 'Description',

@@ -16,6 +16,14 @@ function getItems ({ sort, items, locale }) {
   return sort ? sortedBy(items, 'value', locale) : items
 }
 
+const MarkAsDefault = withMsg(({ msg, value, isDefault }) => {
+  if (!isDefault) {
+    return value
+  }
+  return (<React.Fragment>{value}{NOBREAK_SPACE}<i>{msg.defaultOption()}</i></React.Fragment>
+  )
+})
+
 /*
  * TODO: Update this to use a patternfly-react component. Probably use a width styled
  *       __DropdownButton__ with a set of scrolling __MenuItem__s.
@@ -77,7 +85,7 @@ class SelectBox extends React.Component {
               disabled={disabled}
             >
               <span className={style['dropdown-button-text']} id={`${id}-button-text`} >
-                {selectedItem ? selectedItem.value : NOBREAK_SPACE}
+                {selectedItem ? <MarkAsDefault {...selectedItem} /> : NOBREAK_SPACE}
               </span>
               <span className='caret' id={`${id}-button-caret`} />
             </button>
@@ -86,7 +94,7 @@ class SelectBox extends React.Component {
             {this.state.items.map(item => (
               <li role='presentation' className={item.id === this.state.selected ? 'selected' : ''} key={item.id}>
                 <a role='menuitem' tabIndex='-1' onClick={this.handleChange(item.id)} id={`${id}-item-${item.value}`}>
-                  {item.value}
+                  {<MarkAsDefault {...item} />}
                 </a>
               </li>
             ))}
@@ -103,6 +111,7 @@ SelectBox.propTypes = {
   items: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     value: PropTypes.string,
+    isDefault: PropTypes.bool,
   })).isRequired, // Array<{ id: string, value: string }>, order matters if sort is false-ish
   sort: PropTypes.bool, // sorted alphabetically by current locale with { numeric: true } if true
   /* eslint-enable react/no-unused-prop-types */
