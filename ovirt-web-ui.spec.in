@@ -17,7 +17,7 @@ Source0:        https://github.com/oVirt/ovirt-web-ui/archive/%{source_basename}
 BuildArch: noarch
 
 # nodejs-modules embeds yarn and requires nodejs
-BuildRequires: ovirt-engine-nodejs-modules >= 2.0.42-1
+BuildRequires: ovirt-engine-nodejs-modules >= 2.0.44-1
 
 %description
 This package provides the VM Portal for %{product}.
@@ -48,6 +48,23 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Tue Apr 27 2021 Sharon Gratch <sgratch@redhat.com> - 1.6.9-1
+ - user/account settings - support user locale changes by hot reload
+ - user/account settings - adding a confirmation dialog before saving user settings changes
+ - user/account settings - create a "home" breadcrumbs root to resolve the confusion with "Virtual Machines" Breadcrumbs root
+ - user/account settings - add support for setting the refresh interval
+ - user/account settings - add labels by design for planned translation cycle
+ - create VM Wizard - update create VM steps navigation and disk create checks
+ - create VM Wizard- fix a bug so that disk type of new disks based on a 'server/HP' template should be based on the template's disk allocation policy
+ - when launching in dev mode, support reading user name, password and domain from env variable
+ - add check/validation if permission response is an array, to prevent crashing
+ - fixed a bug of missing VmStatusIcon tooltip for a paused vm
+ - use semver to verify API engine versions
+ - allow users to select/deselect saving the memory while creating a snapshot for a running vm
+ - fix a bug of which user permit calculations included invalid permissions
+ - show VM's IP address if the vm is up and guest agent is running
+ - update the dependency of lodash
+
 * Thu Mar 11 2021 Sharon Gratch <sgratch@redhat.com> - 1.6.8-1
  - create VM Wizard - ass support for creating VMs based on a High Performance optimized for template
  - enhance graphic consoles data fetching time by fetching consoles info on demand instead of on refresh. This changes the way consoles are opened on dashboard
