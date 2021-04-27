@@ -78,12 +78,6 @@ function* composeAndCreateVm ({ payload: { basic, nics, disks }, meta: { correla
     merge(vm, vmUpdates)
   }
 
-  // TODO: TimeZone handling (https://github.com/oVirt/ovirt-web-ui/pull/1118)
-
-  const clone = (
-    (basic.provisionSource === 'template' && basic.optimizedFor !== 'desktop') ||
-    vmRequiresClone
-  )
   const clonePermissions = basic.provisionSource === 'template'
 
   /*
@@ -92,7 +86,7 @@ function* composeAndCreateVm ({ payload: { basic, nics, disks }, meta: { correla
    *       after the VM has been created and is no longer image locked.
    */
   const newVmId = yield createVm(
-    A.createVm({ vm, cdrom, clone, clonePermissions, transformInput: false }, { correlationId })
+    A.createVm({ vm, cdrom, clone: vmRequiresClone, clonePermissions, transformInput: false }, { correlationId })
   )
 
   if (newVmId === -1) {
@@ -100,7 +94,7 @@ function* composeAndCreateVm ({ payload: { basic, nics, disks }, meta: { correla
   }
 
   // Wait for the VM image to be unlocked before adding NICs and Disks
-  yield waitForVmToBeUnlocked(newVmId, clone)
+  yield waitForVmToBeUnlocked(newVmId, vmRequiresClone)
 
   // Assuming NICs cannot be added along with the VM create request, add them now
   yield all(nics.filter(nic => !nic.isFromTemplate).map(nic =>
@@ -166,7 +160,10 @@ function* composeProvisionSourceIso ({ vm, basic }) {
 
 function* composeProvisionSourceTemplate ({ vm, basic, disks }) {
   const template = yield select(state => state.templates.get(basic.templateId))
-  let vmRequiresClone = false
+
+  const vmStorageAllocation = basic.optimizedFor === 'desktop' ? 'thin' : 'clone'
+  const templateStorageAllocation = template.get('type') === 'desktop' ? 'thin' : 'clone'
+  let diskRequiresClone = false
 
   const vmUpdates = {
     template: { id: template.get('id') },
@@ -197,23 +194,22 @@ function* composeProvisionSourceTemplate ({ vm, basic, disks }) {
         id: disk.id,
       }
 
+      // make sure disk format (and therefore sparse) matches the template's storageAllocation
+      if (templateStorageAllocation === 'thin') {
+        changesToTemplateDisk.format = 'cow'
+      } else if (templateStorageAllocation === 'clone') {
+        changesToTemplateDisk.format = vmStorageAllocation === 'thin' ? 'cow' : 'raw'
+      }
+
       // did the storage domain change?
       if (disk.storageDomainId !== templateDisk.get('storageDomainId')) {
-        changesToTemplateDisk.format = 'raw'
+        diskRequiresClone = true
         changesToTemplateDisk.storage_domains = {
           storage_domain: [{ id: disk.storageDomainId }],
         }
       }
 
-      // did the diskType (disk's sparse ) change?  'thin' === sparse, 'pre' === !sparse
-      const templateDiskType = templateDisk.get('sparse') ? 'thin' : 'pre'
-      if (disk.diskType !== templateDiskType) {
-        changesToTemplateDisk.sparse = disk.diskType === 'thin'
-      }
-
       if (Object.keys(changesToTemplateDisk).length > 1) {
-        vmRequiresClone = true
-
         if (vmUpdates.disk_attachments) {
           // add another disk to clone
           vmUpdates.disk_attachments.disk_attachment.push({ disk: changesToTemplateDisk })
@@ -228,7 +224,7 @@ function* composeProvisionSourceTemplate ({ vm, basic, disks }) {
       }
     })
 
-  return [ vmUpdates, vmRequiresClone ]
+  return [ vmUpdates, vmStorageAllocation === 'clone' || diskRequiresClone ]
 }
 
 /*
