@@ -2,7 +2,7 @@
 <config xmlns="http://zanata.org/namespace/config/">
     <url>https://zanata.phx.ovirt.org/</url>
     <project>ovirt-web-ui</project>
-    <project-version>1.6</project-version>
+    <project-version>1.7</project-version>
     <project-type>gettext</project-type>
 
     <src-dir>extra/to-zanata</src-dir>
