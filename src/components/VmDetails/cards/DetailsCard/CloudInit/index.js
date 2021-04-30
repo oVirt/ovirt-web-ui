@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
-import Switch from '_/components/Switch'
+import { Switch } from '@patternfly/react-core'
 import { MsgContext } from '_/intl'
 import FieldRow from '../FieldRow'
 import CloudInitForm from './CloudInitForm'
@@ -14,10 +14,8 @@ const CloudInit = ({ idPrefix, vm, isWindows, onChange, lastInitTimezone }) => {
       <FieldRow label={isWindows ? msg.sysprep() : msg.cloudInit()} id={`${idPrefix}-cloud-init`}>
         <Switch
           id={`${idPrefix}-cloud-init-edit`}
-          bsSize='mini'
-          handleWidth={30}
-          value={cloudInitEnabled}
-          onChange={(e, state) => onChange('cloudInitEnabled', state)}
+          isChecked={cloudInitEnabled}
+          onChange={state => onChange('cloudInitEnabled', state)}
         />
       </FieldRow>
       { cloudInitEnabled && <div style={{ marginTop: '15px' }}>
