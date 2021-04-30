@@ -182,7 +182,6 @@ export const messages: { [messageId: string]: MessageType } = {
   customScript: 'Custom script',
   dataCenter: { message: 'Data Center', description: 'Label for the VM\'s data center' },
   dataCenterChangesWithCluster: 'The data center cannot be edited from here. Please contact your administrator if you would like to edit the data center.',
-  daysShort: 'd',
   defaultButton: 'Default',
   defaultOption: {
     message: '(Default)',
@@ -397,7 +396,6 @@ export const messages: { [messageId: string]: MessageType } = {
   'Applying the changes to CPU and/or Memory can be done right now but it requires ' +
   'doing a hot plug.  You can choose to apply these changes after a restart instead.',
   hotPlugConfirmTitle: 'Apply Changes',
-  hoursShort: 'h',
   htmlPleaseReferToDocumentationForMoreInformation: 'Please refer to <a href="{documentationUrl}" target="_blank">documentation</a> for more information.',
   htmlUnsupportedOvirtVersionFoundButVersionAtLeastRequired: '<strong>Unsupported {version} {productName} version</strong> found, but at least version {requiredVersion} is required.',
   icon: 'Icon',
@@ -432,8 +430,6 @@ export const messages: { [messageId: string]: MessageType } = {
   memory: 'Memory',
   memoryIncluded: '(State included)',
   messages: 'Messages',
-  minutesShort: 'm',
-  monthsShort: 'M',
   more: {
     message: 'more',
     description: 'more/less pair used to control collapsible long listing',
@@ -585,7 +581,6 @@ export const messages: { [messageId: string]: MessageType } = {
   saveSettingsChangesConfirmation: 'Are you sure you want to make changes to the following settings?',
   secondDevice: 'Second Device',
   secondDeviceTooltip: 'Second device in order.',
-  secondsShort: 's',
   selectTheBootableDeviceTooltip: 'Select the bootable devices in the order you would like them to boot.',
   sendShortcutKey: 'Send Key',
   sendCtrlAltDel: 'Ctrl+Alt+Del',
@@ -649,7 +644,6 @@ export const messages: { [messageId: string]: MessageType } = {
   takeVm: 'Take a Virtual Machine',
   template: 'Template',
   templateDefined: 'Template Defined',
-  timeAgo: '{time} ago',
   timezone: 'Timezone',
   thisOperationCantBeUndone: 'This operation cannot be undone.',
   threadsPerCores: 'Threads per Core',
@@ -769,7 +763,6 @@ export const messages: { [messageId: string]: MessageType } = {
   vncOptions: 'VNC Options',
   vnicProfile: 'VNIC Profile',
   vnicProfileEmpty: '<Empty>',
-  yearsShort: 'y',
   yes: 'Yes',
   youHaveNoAllowedVnicProfiles: 'You cannot create or edit NICs because you do not have permission to use any vNIC Profiles in the VM\'s Data Center.',
 }

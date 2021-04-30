@@ -35,3 +35,9 @@ export function formatUptimeDuration (
   )
   return formatted
 }
+
+export function formatHowLongAgo (pastDate: Date, now: Date = new Date()): string {
+  // 'now' parameter allows reliable testing
+  // uses standard moment.relativeTimeThreshold values
+  return moment.duration(moment(pastDate).diff(moment(now))).humanize(true)
+}
