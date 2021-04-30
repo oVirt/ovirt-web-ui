@@ -17,7 +17,7 @@ import RestoreConfirmationModal from './RestoreConfirmationModal'
 import DeleteConfirmationModal from '../../../VmModals/DeleteConfirmationModal'
 import SnapshotDetail from './SnapshotDetail'
 import { deleteVmSnapshot } from './actions'
-import { formatDateFromNow } from '_/helpers'
+import { formatHowLongAgo } from '_/utils/format'
 import { getMinimizedString, escapeHtml } from '../../../utils'
 import { Tooltip, InfoTooltip } from '_/components/tooltips'
 const MAX_DESCRIPTION_SIZE = 50
@@ -198,7 +198,7 @@ class SnapshotItem extends React.Component {
         <span className={style['snapshot-item-status']} id={`${this.props.id}-status-icon`}>{statusIcon}</span>
         <span className={style['snapshot-item-name']} id={`${this.props.id}-description`}>
           {getMinimizedString(this.props.snapshot.get('description'), MAX_DESCRIPTION_SIZE)}
-          <span className={style['snapshot-item-time']} id={`${this.props.id}-time`}>{`(${formatDateFromNow(this.props.snapshot.get('date'), msg)})`}</span>
+          <span className={style['snapshot-item-time']} id={`${this.props.id}-time`}>{`(${formatHowLongAgo(this.props.snapshot.get('date'))})`}</span>
         </span>
         <span className={style['snapshot-item-actions']} id={`${this.props.id}-actions`}>{ buttons }</span>
       </div>
