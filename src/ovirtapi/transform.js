@@ -281,7 +281,7 @@ const VM = {
       bios: vm.hasOwnProperty('bootMenuEnabled')
         ? {
           boot_menu: {
-            enabled: vm.bootMenuEnabled,
+            enabled: toApiBoolean(vm.bootMenuEnabled),
           },
         }
         : undefined,
@@ -541,8 +541,8 @@ const DiskAttachment = {
     const forApi: ApiDiskAttachmentType = {
       // disk_attachment part
       id: disk.attachmentId,
-      active: disk.active,
-      bootable: disk.bootable,
+      active: toApiBoolean(disk.active),
+      bootable: toApiBoolean(disk.bootable),
       interface: disk.iface,
     }
 
@@ -554,7 +554,7 @@ const DiskAttachment = {
 
         storage_type: 'image',
         format: disk.format || (disk.sparse && disk.sparse ? 'cow' : 'raw'),
-        sparse: disk.sparse,
+        sparse: toApiBoolean(disk.sparse),
         provisioned_size: disk.provisionedSize,
 
         storage_domains: disk.storageDomainId && {
@@ -745,8 +745,8 @@ const Nic = {
     const res = {
       id: nic.id,
       name: nic.name,
-      plugged: nic.plugged,
-      linked: nic.linked,
+      plugged: toApiBoolean(nic.plugged),
+      linked: toApiBoolean(nic.linked),
       interface: nic.interface,
       vnic_profile: undefined,
     }
