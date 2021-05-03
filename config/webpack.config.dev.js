@@ -8,6 +8,7 @@ var CopyWebpackPlugin = require('copy-webpack-plugin')
 var paths = require('./paths')
 var env = require('./env')
 var webpackConfigCommons = require('./webpack.config.commons')
+const ESLintPlugin = require('eslint-webpack-plugin')
 
 module.exports = {
   // This is the development configuration.
@@ -78,20 +79,6 @@ module.exports = {
   },
   module: {
     rules: [
-      {
-        // module.preLoaders were removed
-        // First, run the linter.
-        // It's important to do this before Babel processes the JS.
-        test: /\.(js|jsx)$/,
-        loader: 'eslint-loader',
-        include: paths.appSrc,
-        options: {
-          configFile: path.join(__dirname, 'eslint.js'),
-          useEslintrc: false,
-          failOnError: true,
-        },
-        enforce: 'pre'
-      },
       // Process JS with Babel.
       {
         test: /\.(js|jsx)$/,
@@ -252,6 +239,12 @@ module.exports = {
     // makes the discovery automatic so you don't have to restart.
     // See https://github.com/facebookincubator/create-react-app/issues/186
     new WatchMissingNodeModulesPlugin(paths.appNodeModules),
+
+    new ESLintPlugin({
+      overrideConfigFile: path.join(__dirname, 'eslint.js'),
+      useEslintrc: false,
+      failOnError: true,
+    }),
   ],
   // Some libraries import Node modules but don't use them in the browser.
   // Tell Webpack to provide empty mocks for them so importing them works.
