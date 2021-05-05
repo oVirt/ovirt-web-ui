@@ -12,6 +12,7 @@ const AppConfiguration = {
   pageLimit: 20,
   schedulerFixedDelayInSeconds: 60,
   notificationSnoozeDurationInMinutes: 10,
+  showNotificationsDefault: true,
 
   consoleClientResourcesURL: 'https://www.ovirt.org/documentation/admin-guide/virt/console-client-resources/',
   cockpitPort: '9090',
