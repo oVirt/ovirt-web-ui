@@ -255,18 +255,16 @@ class BasicSettings extends React.Component {
       }
     }
 
-    // CPU options come from the selected Template (if defined there) or Cluster
-    const cluster = clusters.get(data.clusterId)
-    const clusterOptions = cluster.get('cpuOptions')
-
+    // CPU options come from the selected Template (if selected and defined there) or Cluster
     const template = templates.get(data.templateId)
-    const templateOptions = template ? template.get('cpuOptions') : new Map()
+    const cluster = clusters.get(data.clusterId)
 
+    const cpuOptions = (template && template.get('cpuOptions')) || cluster.get('cpuOptions')
     return {
-      maxNumOfSockets: templateOptions.get('maxNumOfSockets') || clusterOptions.get('maxNumOfSockets'),
-      maxNumOfCores: templateOptions.get('maxNumOfCores') || clusterOptions.get('maxNumOfCores'),
-      maxNumOfThreads: templateOptions.get('maxNumOfThreads') || clusterOptions.get('maxNumOfThreads'),
-      maxNumOfVmCpus: templateOptions.get('maxNumOfVmCpus') || clusterOptions.get('maxNumOfVmCpus'),
+      maxNumOfSockets: cpuOptions.get('maxNumOfSockets'),
+      maxNumOfCores: cpuOptions.get('maxNumOfCores'),
+      maxNumOfThreads: cpuOptions.get('maxNumOfThreads'),
+      maxNumOfVmCpus: cpuOptions.get('maxNumOfVmCpus'),
     }
   }
 

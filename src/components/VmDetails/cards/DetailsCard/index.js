@@ -253,14 +253,12 @@ class DetailsCard extends React.Component {
     const { vm } = this.state
     const cluster = this.props.clusters.get(vm.getIn(['cluster', 'id']))
 
-    const vmOptions = vm.get('cpuOptions')
-    const clusterOptions = cluster.get('cpuOptions')
-
+    const cpuOptions = vm.get('cpuOptions') || cluster.get('cpuOptions')
     return {
-      maxNumOfSockets: vmOptions.get('maxNumOfSockets') || clusterOptions.get('maxNumOfSockets'),
-      maxNumOfCores: vmOptions.get('maxNumOfCores') || clusterOptions.get('maxNumOfCores'),
-      maxNumOfThreads: vmOptions.get('maxNumOfThreads') || clusterOptions.get('maxNumOfThreads'),
-      maxNumOfVmCpus: vmOptions.get('maxNumOfVmCpus') || clusterOptions.get('maxNumOfVmCpus'),
+      maxNumOfSockets: cpuOptions.get('maxNumOfSockets'),
+      maxNumOfCores: cpuOptions.get('maxNumOfCores'),
+      maxNumOfThreads: cpuOptions.get('maxNumOfThreads'),
+      maxNumOfVmCpus: cpuOptions.get('maxNumOfVmCpus'),
     }
   }
 
@@ -281,7 +279,6 @@ class DetailsCard extends React.Component {
       templates,
     } = this.props
 
-    // TODO: Lookups!
     const {
       maxNumOfSockets,
       maxNumOfCores,
