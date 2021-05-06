@@ -32,7 +32,7 @@ import type {
   ApiBooleanType,
   ApiEngineOptionType, EngineOptionType,
   EngineOptionNumberPerVersionType,
-  EngineOptionMaxNumOfVmCpusType,
+  EngineOptionMaxNumOfVmCpusPerArchType,
 } from './types'
 
 import { isWindows } from '_/helpers'
@@ -1115,7 +1115,7 @@ const EngineOptionNumberPerVersion = {
   },
 }
 
-const EngineOptionMaxNumOfVmCpus = {
+const EngineOptionMaxNumOfVmCpusPerArch = {
   /**
    * Transform a `MaxNumOfVmCpus` config string of the format:
    *     "{ppc=123, x86=456, s390x=789}"
@@ -1129,8 +1129,8 @@ const EngineOptionMaxNumOfVmCpus = {
    * in the api docs:
    *     http://ovirt.github.io/ovirt-engine-api-model/master/#types/architecture
    */
-  toInternal (cpusPerArchPerVersion: EngineOptionType): EngineOptionMaxNumOfVmCpusType {
-    const versionToArchToCount: EngineOptionMaxNumOfVmCpusType = new Map()
+  toInternal (cpusPerArchPerVersion: EngineOptionType): EngineOptionMaxNumOfVmCpusPerArchType {
+    const versionToArchToCount: EngineOptionMaxNumOfVmCpusPerArchType = new Map()
 
     for (const [version, cpusPerArch] of cpusPerArchPerVersion) {
       const archToCount: { [string]: number} = {
@@ -1195,5 +1195,5 @@ export {
   Version,
   EngineOption,
   EngineOptionNumberPerVersion,
-  EngineOptionMaxNumOfVmCpus,
+  EngineOptionMaxNumOfVmCpusPerArch,
 }

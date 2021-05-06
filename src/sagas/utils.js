@@ -13,7 +13,7 @@ import semverValid from 'semver/functions/valid'
 
 import {
   DEFAULT_ARCH,
-  DEFAULT_ENGINE_OPTION_VALUE,
+  DEFAULT_ENGINE_OPTION_VERSION,
 } from '_/constants'
 
 import {
@@ -221,12 +221,12 @@ export function* mapCpuOptions (version, architecture) {
       config.getIn(['cpuOptions', 'maxNumOfVmCpusPerArch']),
     ])
 
-  const maxNumOfVmCpusPerArch_ = maxNumOfVmCpusPerArch.get(version) || maxNumOfVmCpusPerArch.get(DEFAULT_ENGINE_OPTION_VALUE)
+  const maxNumOfVmCpusPerArch_ = maxNumOfVmCpusPerArch.get(version) || maxNumOfVmCpusPerArch.get(DEFAULT_ENGINE_OPTION_VERSION)
 
   return {
-    maxNumOfSockets: maxNumSockets.get(version) || maxNumSockets.get(DEFAULT_ENGINE_OPTION_VALUE),
-    maxNumOfCores: maxNumOfCores.get(version) || maxNumOfCores.get(DEFAULT_ENGINE_OPTION_VALUE),
-    maxNumOfThreads: maxNumOfThreads.get(version) || maxNumOfThreads.get(DEFAULT_ENGINE_OPTION_VALUE),
+    maxNumOfSockets: maxNumSockets.get(version) || maxNumSockets.get(DEFAULT_ENGINE_OPTION_VERSION),
+    maxNumOfCores: maxNumOfCores.get(version) || maxNumOfCores.get(DEFAULT_ENGINE_OPTION_VERSION),
+    maxNumOfThreads: maxNumOfThreads.get(version) || maxNumOfThreads.get(DEFAULT_ENGINE_OPTION_VERSION),
     maxNumOfVmCpus: maxNumOfVmCpusPerArch_[architecture] || maxNumOfVmCpusPerArch_[DEFAULT_ARCH],
   }
 }

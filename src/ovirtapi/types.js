@@ -328,4 +328,4 @@ export type ApiEngineOptionType = {
 }
 export type EngineOptionType = Map<string, string>
 export type EngineOptionNumberPerVersionType = Map<string, number>
-export type EngineOptionMaxNumOfVmCpusType = Map<string, { [string]: number }>
+export type EngineOptionMaxNumOfVmCpusPerArchType = Map<string, { [string]: number }>

@@ -13,7 +13,7 @@ import {
   setDefaultVncMode,
 } from '_/actions'
 import { DefaultEngineOptions } from '_/config'
-import { DEFAULT_ENGINE_OPTION_VALUE } from '_/constants'
+import { DEFAULT_ENGINE_OPTION_VERSION } from '_/constants'
 
 import { callExternalAction } from './utils'
 
@@ -42,7 +42,7 @@ export function* fetchServerConfiguredValues () {
     maxNumOfSockets: Transforms.EngineOptionNumberPerVersion.toInternal(eo.maxNumOfSockets),
     maxNumOfCores: Transforms.EngineOptionNumberPerVersion.toInternal(eo.maxNumOfCores),
     maxNumOfThreads: Transforms.EngineOptionNumberPerVersion.toInternal(eo.maxNumOfThreads),
-    maxNumOfVmCpusPerArch: Transforms.EngineOptionMaxNumOfVmCpus.toInternal(eo.maxNumOfVmCpusPerArch),
+    maxNumOfVmCpusPerArch: Transforms.EngineOptionMaxNumOfVmCpusPerArch.toInternal(eo.maxNumOfVmCpusPerArch),
   }))
 
   if (eo.usbAutoShare) {
@@ -88,7 +88,7 @@ export function* fetchEngineOption (name, defaultValue) {
   }
 
   if (defaultValue) {
-    internalOption.set(DEFAULT_ENGINE_OPTION_VALUE, defaultValue)
+    internalOption.set(DEFAULT_ENGINE_OPTION_VERSION, defaultValue)
   }
   return internalOption
 }

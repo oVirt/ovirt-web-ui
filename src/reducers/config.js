@@ -4,7 +4,7 @@ import { actionReducer } from './utils'
 import { DefaultEngineOptions } from '_/config'
 import {
   APP_CONFIGURED,
-  DEFAULT_ENGINE_OPTION_VALUE,
+  DEFAULT_ENGINE_OPTION_VERSION,
   LOGIN_FAILED,
   LOGIN_SUCCESSFUL,
   LOGOUT,
@@ -51,10 +51,10 @@ const initialState = Immutable.fromJS({
   administrator: false,
 
   cpuOptions: {
-    maxNumOfSockets: new Map([[ DEFAULT_ENGINE_OPTION_VALUE, DefaultEngineOptions.MaxNumOfVmSockets ]]),
-    maxNumOfCores: new Map([[ DEFAULT_ENGINE_OPTION_VALUE, DefaultEngineOptions.MaxNumOfCpuPerSocket ]]),
-    maxNumOfThreads: new Map([[ DEFAULT_ENGINE_OPTION_VALUE, DefaultEngineOptions.MaxNumOfThreadsPerCpu ]]),
-    maxNumOfVmCpusPerArch: new Map([[ DEFAULT_ENGINE_OPTION_VALUE, DefaultEngineOptions.MaxNumOfVmCpusPerArch ]]),
+    maxNumOfSockets: new Map([[ DEFAULT_ENGINE_OPTION_VERSION, DefaultEngineOptions.MaxNumOfVmSockets ]]),
+    maxNumOfCores: new Map([[ DEFAULT_ENGINE_OPTION_VERSION, DefaultEngineOptions.MaxNumOfCpuPerSocket ]]),
+    maxNumOfThreads: new Map([[ DEFAULT_ENGINE_OPTION_VERSION, DefaultEngineOptions.MaxNumOfThreadsPerCpu ]]),
+    maxNumOfVmCpusPerArch: new Map([[ DEFAULT_ENGINE_OPTION_VERSION, DefaultEngineOptions.MaxNumOfVmCpusPerArch ]]),
   },
 
   usbAutoshare: DefaultEngineOptions.SpiceUsbAutoShare,
