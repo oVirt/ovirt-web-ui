@@ -148,14 +148,7 @@ function* checkOvirtApiVersion (oVirtMeta) {
   const required = Product.ovirtApiVersionRequired
   const passed = compareVersion(actual, required)
 
-  yield put(setOvirtApiVersion({
-    passed,
-    major: parseInt(oVirtMeta.product_info.version.major, 10),
-    minor: parseInt(oVirtMeta.product_info.version.minor, 10),
-    build: parseInt(oVirtMeta.product_info.version.build, 10),
-    revision: parseInt(oVirtMeta.product_info.version.revision, 10),
-    full_version: oVirtMeta.product_info.version.full_version,
-  }))
+  yield put(setOvirtApiVersion({ passed, ...actual }))
   return passed
 }
 
