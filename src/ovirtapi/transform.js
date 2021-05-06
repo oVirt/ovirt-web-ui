@@ -36,6 +36,7 @@ import type {
 } from './types'
 
 import { isWindows } from '_/helpers'
+import { DEFAULT_ARCH } from '_/constants'
 
 function vCpusCount ({ cpu }: { cpu: Object }): number {
   if (cpu && cpu.topology) {
@@ -198,14 +199,15 @@ const VM = {
       canUserEditVmStorage: false,
       canUserManipulateSnapshots: false,
 
-      // engine option config values that map to VM custom compatibility version, if
-      // custom compatibility version is not set, values will be undefined.
-      // the mappings are done in sagas
+      // engine option config values that map to the VM's custom compatibility version.
+      // the mapping from engine options are done in sagas. if custom compatibility version
+      // is not set, the fetch saga will set `cpuOptions` to `null`. -1 values here make it
+      // obvious if the fetch saga fails.
       cpuOptions: {
-        maxNumOfSockets: undefined,
-        maxNumOfCores: undefined,
-        maxNumOfThreads: undefined,
-        maxNumOfVmCpus: undefined,
+        maxNumOfSockets: -1,
+        maxNumOfCores: -1,
+        maxNumOfThreads: -1,
+        maxNumOfVmCpus: -1,
       },
     }
 
@@ -456,14 +458,15 @@ const Template = {
       userPermits: new Set(),
       canUserUseTemplate: false,
 
-      // engine option config values that map to Template custom compatibility version, if
-      // custom compatibility version is not set, values will be undefined.
-      // the mappings are done in sagas
+      // engine option config values that map to the Templates's custom compatibility version.
+      // the mapping from engine options are done in sagas. if custom compatibility version
+      // is not set, the fetch saga will set `cpuOptions` to `null`. -1 values here make it
+      // obvious if the fetch saga fails.
       cpuOptions: {
-        maxNumOfSockets: undefined,
-        maxNumOfCores: undefined,
-        maxNumOfThreads: undefined,
-        maxNumOfVmCpus: undefined,
+        maxNumOfSockets: -1,
+        maxNumOfCores: -1,
+        maxNumOfThreads: -1,
+        maxNumOfVmCpus: -1,
       },
     })
   },
@@ -731,7 +734,8 @@ const Cluster = {
       userPermits: new Set(),
       canUserUseCluster: false,
 
-      // engine option config values that map to cluster compatibility version, mappings done in sagas
+      // engine option config values that map to cluster compatibility version. mappings
+      // are done in sagas. -1 values make it obvious if the fetch saga fails
       cpuOptions: {
         maxNumOfSockets: -1,
         maxNumOfCores: -1,
@@ -1137,6 +1141,7 @@ const EngineOptionMaxNumOfVmCpusPerArch = {
         ppc64: 1,
         x86_64: 1,
         s390x: 1,
+        [DEFAULT_ARCH]: 1,
       }
 
       const [, ppc] = cpusPerArch.match(/ppc=(\d+)/) || []
