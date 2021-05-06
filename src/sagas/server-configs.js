@@ -12,70 +12,63 @@ import {
   setDefaultConsole,
   setDefaultVncMode,
 } from '_/actions'
+import { DefaultEngineOptions } from '_/config'
+import { DEFAULT_ENGINE_OPTION_VALUE } from '_/constants'
 
 import { callExternalAction } from './utils'
-import { DEFAULT_ARCH, DEFAULT_ENGINE_OPTION_VALUE } from '_/constants'
 
 export function* fetchServerConfiguredValues () {
-  const [
-    maxNumOfSockets, maxNumOfCores, maxNumOfThreads, maxNumOfVmCpusPerArch,
-    usbAutoShare, usbFilter,
-    userSessionTimeout,
-    defaultGeneralTimezone, defaultWindowsTimezone,
-    websocketProxy,
-    consoleDefault,
-    defaultVncMode,
-  ] = yield all([
-    call(fetchEngineOption, 'MaxNumOfVmSockets', 16),
-    call(fetchEngineOption, 'MaxNumOfCpuPerSocket', 254),
-    call(fetchEngineOption, 'MaxNumOfThreadsPerCpu', 8),
-    call(fetchEngineOption, 'MaxNumOfVmCpus', `{${DEFAULT_ARCH}=1}`),
+  const eo = yield all({
+    maxNumOfSockets: call(fetchEngineOption, 'MaxNumOfVmSockets', DefaultEngineOptions.MaxNumOfVmSockets),
+    maxNumOfCores: call(fetchEngineOption, 'MaxNumOfCpuPerSocket', DefaultEngineOptions.MaxNumOfCpuPerSocket),
+    maxNumOfThreads: call(fetchEngineOption, 'MaxNumOfThreadsPerCpu', DefaultEngineOptions.MaxNumOfThreadsPerCpu),
+    maxNumOfVmCpusPerArch: call(fetchEngineOption, 'MaxNumOfVmCpus', DefaultEngineOptions.MaxNumOfVmCpusPerArch),
 
-    call(fetchGeneralEngineOption, 'SpiceUsbAutoShare', 1),
-    callExternalAction('getUSBFilter', Api.getUSBFilter, {}),
+    usbAutoShare: call(fetchGeneralEngineOption, 'SpiceUsbAutoShare', DefaultEngineOptions.SpiceUsbAutoShare),
+    usbFilter: callExternalAction('getUSBFilter', Api.getUSBFilter, DefaultEngineOptions.getUSBFilter),
 
-    call(fetchGeneralEngineOption, 'UserSessionTimeOutInterval', 30),
+    userSessionTimeout: call(fetchGeneralEngineOption, 'UserSessionTimeOutInterval', DefaultEngineOptions.UserSessionTimeOutInterval),
 
-    call(fetchGeneralEngineOption, 'DefaultGeneralTimeZone', 'Etc/GMT'),
-    call(fetchGeneralEngineOption, 'DefaultWindowsTimeZone', 'GMT Standard Time'),
+    defaultGeneralTimezone: call(fetchGeneralEngineOption, 'DefaultGeneralTimeZone', DefaultEngineOptions.DefaultGeneralTimeZone),
+    defaultWindowsTimezone: call(fetchGeneralEngineOption, 'DefaultWindowsTimeZone', DefaultEngineOptions.DefaultWindowsTimeZone),
 
-    call(fetchGeneralEngineOption, 'WebSocketProxy', ''),
-    call(fetchGeneralEngineOption, 'ClientModeConsoleDefault', ''),
-    call(fetchGeneralEngineOption, 'ClientModeVncDefault', ''),
-  ])
+    websocketProxy: call(fetchGeneralEngineOption, 'WebSocketProxy', DefaultEngineOptions.WebSocketProxy),
+    consoleDefault: call(fetchGeneralEngineOption, 'ClientModeConsoleDefault', DefaultEngineOptions.ClientModeConsoleDefault),
+    defaultVncMode: call(fetchGeneralEngineOption, 'ClientModeVncDefault', DefaultEngineOptions.ClientModeVncDefault),
+  })
 
   // Per version is "compatibility version" of the VM, or if not set in VM, the Cluster
   yield put(setCpuTopologyOptions({
-    maxNumOfSockets: Transforms.EngineOptionNumberPerVersion.toInternal(maxNumOfSockets),
-    maxNumOfCores: Transforms.EngineOptionNumberPerVersion.toInternal(maxNumOfCores),
-    maxNumOfThreads: Transforms.EngineOptionNumberPerVersion.toInternal(maxNumOfThreads),
-    maxNumOfVmCpusPerArch: Transforms.EngineOptionMaxNumOfVmCpus.toInternal(maxNumOfVmCpusPerArch),
+    maxNumOfSockets: Transforms.EngineOptionNumberPerVersion.toInternal(eo.maxNumOfSockets),
+    maxNumOfCores: Transforms.EngineOptionNumberPerVersion.toInternal(eo.maxNumOfCores),
+    maxNumOfThreads: Transforms.EngineOptionNumberPerVersion.toInternal(eo.maxNumOfThreads),
+    maxNumOfVmCpusPerArch: Transforms.EngineOptionMaxNumOfVmCpus.toInternal(eo.maxNumOfVmCpusPerArch),
   }))
 
-  if (usbAutoShare) {
-    yield put(setSpiceUsbAutoShare(usbAutoShare))
+  if (eo.usbAutoShare) {
+    yield put(setSpiceUsbAutoShare(eo.usbAutoShare))
   }
 
-  if (usbFilter) {
-    yield put(setUSBFilter({ usbFilter }))
+  if (eo.usbFilter) {
+    yield put(setUSBFilter({ usbFilter: eo.usbFilter }))
   }
 
-  yield put(setUserSessionTimeoutInternal(parseInt(userSessionTimeout, 10)))
+  yield put(setUserSessionTimeoutInternal(parseInt(eo.userSessionTimeout, 10)))
 
   yield put(setDefaultTimezone({
-    defaultGeneralTimezone,
-    defaultWindowsTimezone,
+    defaultGeneralTimezone: eo.defaultGeneralTimezone,
+    defaultWindowsTimezone: eo.defaultWindowsTimezone,
   }))
 
-  if (websocketProxy) {
-    const [ host = '', port = '' ] = websocketProxy.split(':')
+  if (eo.websocketProxy) {
+    const [ host = '', port = '' ] = eo.websocketProxy.split(':')
     yield put(setWebsocket({ host, port }))
   }
-  if (consoleDefault) {
-    yield put(setDefaultConsole(consoleDefault))
+  if (eo.consoleDefault) {
+    yield put(setDefaultConsole(eo.consoleDefault))
   }
-  if (defaultVncMode) {
-    yield put(setDefaultVncMode(defaultVncMode))
+  if (eo.defaultVncMode) {
+    yield put(setDefaultVncMode(eo.defaultVncMode))
   }
 }
 

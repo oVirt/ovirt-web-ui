@@ -55,6 +55,7 @@ import {
   entityPermissionsToUserPermits,
   foreach,
   fetchPermits,
+  mapCpuOptions,
   PermissionsType,
 } from './utils'
 
@@ -72,8 +73,6 @@ import {
   ADD_VM_NIC,
   CHECK_TOKEN_EXPIRED,
   CLEAR_USER_MSGS,
-  DEFAULT_ARCH,
-  DEFAULT_ENGINE_OPTION_VALUE,
   DELAYED_REMOVE_ACTIVE_REQUEST,
   DELETE_VM_NIC,
   DISMISS_EVENT,
@@ -134,23 +133,9 @@ export function* transformAndPermitVm (vm) {
   // VM's custom compatibility version and CPU architecture.
   const customCompatVer = internalVm.customCompatibilityVersion
   if (customCompatVer) {
-    const [ maxNumSockets, maxNumOfCores, maxNumOfThreads, maxNumOfVmCpusPerArch ] =
-      yield select(({ config }) => [
-        config.getIn(['cpuOptions', 'maxNumOfSockets']),
-        config.getIn(['cpuOptions', 'maxNumOfCores']),
-        config.getIn(['cpuOptions', 'maxNumOfThreads']),
-        config.getIn(['cpuOptions', 'maxNumOfVmCpusPerArch']),
-      ])
-
-    const arch = internalVm.cpu.arch
-    const maxNumOfVmCpusPerArch_ = maxNumOfVmCpusPerArch.get(customCompatVer) || maxNumOfVmCpusPerArch.get(DEFAULT_ENGINE_OPTION_VALUE)
-
-    internalVm.cpuOptions = {
-      maxNumOfSockets: maxNumSockets.get(customCompatVer) || maxNumSockets.get(DEFAULT_ENGINE_OPTION_VALUE),
-      maxNumOfCores: maxNumOfCores.get(customCompatVer) || maxNumOfCores.get(DEFAULT_ENGINE_OPTION_VALUE),
-      maxNumOfThreads: maxNumOfThreads.get(customCompatVer) || maxNumOfThreads.get(DEFAULT_ENGINE_OPTION_VALUE),
-      maxNumOfVmCpus: !arch ? undefined : maxNumOfVmCpusPerArch_[arch] || maxNumOfVmCpusPerArch_[DEFAULT_ARCH],
-    }
+    internalVm.cpuOptions = yield mapCpuOptions(customCompatVer, internalVm.cpu.arch)
+  } else {
+    internalVm.cpuOptions = null
   }
 
   return internalVm

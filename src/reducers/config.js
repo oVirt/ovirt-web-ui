@@ -1,8 +1,9 @@
 import Immutable from 'immutable'
 import { actionReducer } from './utils'
+
+import { DefaultEngineOptions } from '_/config'
 import {
   APP_CONFIGURED,
-  DEFAULT_ARCH,
   DEFAULT_ENGINE_OPTION_VALUE,
   LOGIN_FAILED,
   LOGIN_SUCCESSFUL,
@@ -26,40 +27,47 @@ import {
 } from '_/constants'
 
 const initialState = Immutable.fromJS({
-  appConfigured: false,
-  loginToken: undefined,
-  logoutWasManual: false,
-  isTokenExpired: false,
-  user: {
-    name: undefined,
-    id: undefined,
-  },
+  lastRefresh: 0,
   oVirtApiVersion: {
     major: undefined,
     minor: undefined,
     passed: undefined,
   },
-  defaultConsole: 'vnc',
-  defaultVncMode: 'Native',
+  blankTemplateId: '00000000-0000-0000-0000-000000000000', // "engine/api/" -> special_objects.blank_template.id
+
+  loginToken: undefined,
+  logoutWasManual: false,
+  isTokenExpired: false,
+  appConfigured: false,
+
+  currentPage: {},
+  user: {
+    name: undefined,
+    id: undefined,
+  },
+  userGroups: [],
   filter: true,
   isFilterChecked: false,
   administrator: false,
-  userSessionTimeoutInterval: null,
-  usbAutoshare: null,
-  usbFilter: null,
-  userGroups: [],
-  currentPage: {},
+
   cpuOptions: {
-    maxNumOfSockets: new Map([[ DEFAULT_ENGINE_OPTION_VALUE, 16 ]]),
-    maxNumOfCores: new Map([[ DEFAULT_ENGINE_OPTION_VALUE, 254 ]]),
-    maxNumOfThreads: new Map([[ DEFAULT_ENGINE_OPTION_VALUE, 8 ]]),
-    maxNumOfVmCpusPerArch: new Map([[ DEFAULT_ENGINE_OPTION_VALUE, { ppc64: 1, x86_64: 1, s390x: 1, [DEFAULT_ARCH]: 512 } ]]),
+    maxNumOfSockets: new Map([[ DEFAULT_ENGINE_OPTION_VALUE, DefaultEngineOptions.MaxNumOfVmSockets ]]),
+    maxNumOfCores: new Map([[ DEFAULT_ENGINE_OPTION_VALUE, DefaultEngineOptions.MaxNumOfCpuPerSocket ]]),
+    maxNumOfThreads: new Map([[ DEFAULT_ENGINE_OPTION_VALUE, DefaultEngineOptions.MaxNumOfThreadsPerCpu ]]),
+    maxNumOfVmCpusPerArch: new Map([[ DEFAULT_ENGINE_OPTION_VALUE, DefaultEngineOptions.MaxNumOfVmCpusPerArch ]]),
   },
-  defaultGeneralTimezone: 'Etc/GMT',
-  defaultWindowsTimezone: 'GMT Standard Time',
-  websocket: null,
-  blankTemplateId: '00000000-0000-0000-0000-000000000000', // "engine/api/" -> special_objects.blank_template.id
-  lastRefresh: 0,
+
+  usbAutoshare: DefaultEngineOptions.SpiceUsbAutoShare,
+  usbFilter: DefaultEngineOptions.getUSBFilter,
+
+  userSessionTimeoutInterval: DefaultEngineOptions.UserSessionTimeOutInterval,
+
+  defaultGeneralTimezone: DefaultEngineOptions.DefaultGeneralTimeZone,
+  defaultWindowsTimezone: DefaultEngineOptions.DefaultWindowsTimeZone,
+
+  websocket: DefaultEngineOptions.WebSocketProxy,
+  defaultConsole: DefaultEngineOptions.ClientModeConsoleDefault,
+  defaultVncMode: DefaultEngineOptions.ClientModeVncDefault,
 })
 
 const config = actionReducer(initialState, {
