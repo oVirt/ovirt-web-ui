@@ -62,9 +62,26 @@ export type SnapshotType = {
   isActive: boolean
 }
 
-export type ApiDiskAttachmentType = Object
-export type ApiDiskType = Object
 export type DiskInterfaceType = "ide" | "sata" | "virtio" | "virtio_scsi"
+
+// http://ovirt.github.io/ovirt-engine-api-model/4.4/#types/disk_attachment
+export type ApiDiskAttachmentType = {
+  active: ApiBooleanType,
+  bootable: ApiBooleanType,
+  disk?: Object,
+  href?: string,
+  comment?: string,
+  description?: string,
+  id?: string,
+  logical_name?: string,
+  pass_discard?: ApiBooleanType,
+  read_only?: ApiBooleanType,
+  uses_scsi_reservation?: ApiBooleanType,
+  template?: Object,
+  vm?: Object,
+  interface?: DiskInterfaceType
+}
+export type ApiDiskType = Object
 export type DiskTypeType = "image" | "cinder" | "lun"
 export type DiskType = {
   // attachment part
@@ -113,11 +130,33 @@ export type StorageDomainFileType = Object
 export type ApiClusterType = Object
 export type ClusterType = Object
 
-export type ApiNicType = Object
+type NicInterfaceType = 'e1000' | 'pci_passthrough' | 'rtl8139' | 'rtl8139_virtio' | 'virtio'
 
 type IpType = {
   address: string,
   version: 'v4' | 'v6'
+}
+
+export type ApiNicType = {
+  reported_devices?: {
+    reported_device: Array<{
+      mac: {
+        address: string
+      },
+      ips: {
+        ip: Array<IpType>
+      }
+    }>
+  },
+  id: string,
+  name: string,
+  mac?: Object,
+  plugged: ApiBooleanType,
+  linked: ApiBooleanType,
+  interface: NicInterfaceType,
+  vnic_profile?: {
+    id: string | null | typeof undefined
+  }
 }
 
 export type ReportedDevicesType = {
@@ -137,10 +176,10 @@ export type ReportedDevicesType = {
 export type NicType = {
   id: string,
   name: string,
-  mac: string,
+  mac?: string,
   plugged: boolean,
   linked: boolean,
-  interface: 'e1000' | 'pci_passthrough' | 'rtl8139' | 'rtl8139_virtio' | 'virtio',
+  interface: NicInterfaceType,
   ips: Array<{
     address: string,
     version: 'v4' | 'v6'
@@ -148,7 +187,7 @@ export type NicType = {
   ipv4: Array<string>,
   ipv6: Array<string>,
   vnicProfile: {
-    id: string | null
+    id: string | null | typeof undefined
   }
 }
 
