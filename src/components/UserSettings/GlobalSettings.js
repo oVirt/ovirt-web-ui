@@ -5,12 +5,13 @@ import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 import { saveGlobalOptions } from '_/actions'
 import { FormControl, Switch } from 'patternfly-react'
-import { withMsg, localeWithFullName } from '_/intl'
+import { withMsg, localeWithFullName, DEFAULT_LOCALE } from '_/intl'
 import style from './style.css'
 
 import { Settings, SettingsBase } from '../Settings'
 import SelectBox from '../SelectBox'
 import moment from 'moment'
+import AppConfiguration from '_/config'
 
 class GlobalSettings extends Component {
   dontDisturbList (msg) {
@@ -33,6 +34,7 @@ class GlobalSettings extends Component {
       },
     ]
   }
+
   refreshIntervalList (msg) {
     return [
       {
@@ -147,7 +149,7 @@ class GlobalSettings extends Component {
               <div className={style['half-width']}>
                 <SelectBox
                   id={`${idPrefix}-language`}
-                  items={Object.entries(localeWithFullName).map(([id, value]) => ({ id, value }))}
+                  items={Object.entries(localeWithFullName).map(([id, value]) => ({ id, value, isDefault: id === DEFAULT_LOCALE }))}
                   selected={draftValues.language}
                   onChange={onChange('language')}
                 />
@@ -181,7 +183,8 @@ class GlobalSettings extends Component {
               <div className={style['half-width']}>
                 <SelectBox
                   id={`${idPrefix}-update-rate`}
-                  items={this.refreshIntervalList(msg)}
+                  items={this.refreshIntervalList(msg)
+                    .map(({ id, value }) => ({ id, value, isDefault: id === AppConfiguration.schedulerFixedDelayInSeconds }))}
                   selected={draftValues.refreshInterval}
                   onChange={onChange('refreshInterval')}
                 />
