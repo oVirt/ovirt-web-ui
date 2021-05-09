@@ -1,13 +1,12 @@
 {
-  "cs" : "Česky",
-  "de": "Deutsch - Deutschland",
-  "en":"U.S. English",
+  "cs":"Česky - Česko",
+  "de":"Deutsch - Deutschland",
+  "en":"English - United States",
   "es":"español - España",
   "fr":"français - France",
-  "it":"italiano - Italia",
+  "it":"Italiano - Italia",
   "ja":"日本語 - 日本",
   "ko":"한국어 - 대한민국",
-  "pt-BR":"português do Brasil",
+  "pt-BR":"Português - Brasil",
   "zh-CN":"中文（简体） - 中国"
 }
-
