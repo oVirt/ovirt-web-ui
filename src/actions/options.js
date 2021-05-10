@@ -72,12 +72,13 @@ export function loadUserOptions (userOptions: RemoteUserOptionsType): LoadUserOp
   }
 }
 
-export function saveGlobalOptions ({ values: { sshKey, language, showNotifications, notificationSnoozeDuration, refreshInterval } = {} }: Object, { transactionId }: Object): SaveGlobalOptionsActionType {
+export function saveGlobalOptions ({ values: { sshKey, language, showNotifications, notificationSnoozeDuration, refreshInterval, persistLocale } = {} }: Object, { transactionId }: Object): SaveGlobalOptionsActionType {
   return {
     type: C.SAVE_GLOBAL_OPTIONS,
     payload: {
       sshKey,
       language,
+      persistLocale,
       showNotifications,
       notificationSnoozeDuration,
       refreshInterval,
@@ -95,6 +96,15 @@ export function saveSSHKey ({ key, userId, sshId }: Object): Object {
       key,
       userId,
       sshId,
+    },
+  }
+}
+export function deleteUserOption ({ optionId, userId }: Object): Object {
+  return {
+    type: C.REMOVE_USER_OPTION,
+    payload: {
+      optionId,
+      userId,
     },
   }
 }

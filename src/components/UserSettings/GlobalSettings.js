@@ -145,7 +145,8 @@ class GlobalSettings extends Component {
 
   buildSections (onChange, translatedLabels) {
     const { draftValues } = this.state
-    const { config, msg } = this.props
+    const { config, msg, currentValues: { language } } = this.props
+    const disableLanguage = !draftValues.persistLocale
     const idPrefix = 'global-user-settings'
     return {
       general: {
@@ -165,6 +166,7 @@ class GlobalSettings extends Component {
               <div className={style['half-width']}>
                 <SelectBox
                   id={`${idPrefix}-language`}
+                  disabled={disableLanguage}
                   items={Object.entries(localeWithFullName).map(([id, value]) => ({ id, value, isDefault: id === DEFAULT_LOCALE }))}
                   selected={draftValues.language}
                   onChange={onChange('language')}
@@ -188,6 +190,26 @@ class GlobalSettings extends Component {
             ),
           },
         ],
+      },
+      advancedOptions: {
+        title: msg.advancedOptions(),
+        fields: [
+          {
+            title: msg.persistLanguage(),
+            tooltip: msg.persistLanguageTooltip(),
+            body: (<Switch
+              id={`${idPrefix}-persist-language`}
+              bsSize='normal'
+              title='normal'
+              value={draftValues.persistLocale}
+              onChange={(e, persist) => {
+                onChange('persistLocale')(persist)
+                if (persist === false) {
+                  onChange('language')(language)
+                }
+              }}
+            />),
+          }],
       },
       refreshInterval: {
         title: msg.refreshInterval(),
@@ -257,6 +279,7 @@ class GlobalSettings extends Component {
       showNotifications: msg.dontDisturb(),
       notificationSnoozeDuration: msg.dontDisturbFor(),
       refreshInterval: msg.uiRefresh(),
+      persistLocale: msg.persistLanguage(),
     }
 
     return (
@@ -302,6 +325,7 @@ export default connect(
       showNotifications: options.getIn(['localOptions', 'showNotifications']),
       notificationSnoozeDuration: options.getIn(['localOptions', 'notificationSnoozeDuration']),
       refreshInterval: options.getIn(['remoteOptions', 'refreshInterval', 'content']),
+      persistLocale: options.getIn(['remoteOptions', 'persistLocale', 'content']),
     },
     lastTransactionId: options.getIn(['lastTransactions', 'global', 'transactionId'], ''),
   }),

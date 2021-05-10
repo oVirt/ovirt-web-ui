@@ -4,11 +4,10 @@ import { fromJS } from 'immutable'
 
 import * as C from '_/constants'
 import { actionReducer } from './utils'
-import { locale } from '_/intl'
-import { saveLocaleToLocalStorage } from '_/storage'
 import AppConfiguration from '_/config'
 import type { UserOptionsType } from '_/ovirtapi/types'
 import type { LoadUserOptionsActionType } from '_/actions/types'
+import { locale as inferredLocale } from '_/intl'
 
 const defaultOptions: UserOptionsType = {
   localOptions: {
@@ -18,7 +17,11 @@ const defaultOptions: UserOptionsType = {
   remoteOptions: {
     locale: {
       id: undefined,
-      content: locale,
+      content: inferredLocale,
+    },
+    persistLocale: {
+      id: undefined,
+      content: AppConfiguration.persistLocale,
     },
     refreshInterval: {
       id: undefined,
@@ -40,12 +43,12 @@ const options = actionReducer(initialState, {
     const serverState = fromJS(action.payload.userOptions || {})
 
     const mergedRemote = clientState.get('remoteOptions').mergeWith((client, server, key) => {
-      return server === undefined ? client : server
+      return (key === 'locale' && server === undefined)
+        ? fromJS({ id: undefined, content: inferredLocale })
+        : server === undefined ? client : server
     }, serverState)
 
     const merged = clientState.setIn(['remoteOptions'], mergedRemote)
-
-    saveLocaleToLocalStorage(merged.getIn(['remoteOptions', 'locale']).toJS())
     return merged
   },
   [C.SET_OPTION] (state: any, { payload: { key, value } }: any): any {

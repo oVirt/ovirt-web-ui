@@ -14,6 +14,7 @@ export type SaveGlobalOptionsActionType = {
   payload: {|
     refreshInterval?: number,
     language?: string,
+    persistLocale?: boolean,
     showNotifications?: boolean,
     notificationSnoozeDuration?: number,
     sshKey?: string

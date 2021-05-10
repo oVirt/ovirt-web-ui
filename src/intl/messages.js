@@ -523,6 +523,7 @@ export const messages: { [messageId: string]: MessageType } = {
   permissionsNoEditThisVm: 'You do not have permissions to edit VM {name} / {vmId}',
   pendingChanges: 'Pending Changes',
   persistLanguage: 'Persist language',
+  persistLanguageTooltip: 'If enabled your language settings will be saved on the server',
   pleaseEnterValidHostName: "Please enter a valid host name. Only lower-case and upper-case letters, numbers, and '_','-','.' are allowed.",
   pleaseEnterValidVmName: "Please enter a valid virtual machine name. Only lower-case and upper-case letters, numbers, and '_','-','.' are allowed.",
   preferredConsole: 'Preferred Console',

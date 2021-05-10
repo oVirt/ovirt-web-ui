@@ -560,6 +560,14 @@ const OvirtApi = {
       .then(({ user_option: options = [] }) => options)
   },
 
+  deleteUserOption ({ userId, optionId }: Object): Promise<Object> {
+    assertLogin({ methodName: 'deleteUserOption' })
+    return httpDelete({
+      url: `${AppConfiguration.applicationContext}/api/users/${userId}/options/${optionId}`,
+      input: '',
+    })
+  },
+
   /**
    * @return {Promise.<?string>} promise of option value if options exists, promise of null otherwise.
    *                             If default value is provided, the method never returns rejected promise and the default
