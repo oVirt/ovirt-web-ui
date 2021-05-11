@@ -39,7 +39,6 @@ import {
   UPDATE_VM_SNAPSHOT,
   UPDATE_VMS,
   VM_ACTION_IN_PROGRESS,
-  SET_VM_CONSOLES,
 } from '_/constants'
 
 export function login ({ username, domain, token, userId }) {
@@ -302,16 +301,6 @@ export function updateIcons ({ icons }) {
     type: UPDATE_ICONS,
     payload: {
       icons,
-    },
-  }
-}
-
-export function setVmConsoles ({ vmId, consolesList }) {
-  return {
-    type: SET_VM_CONSOLES,
-    payload: {
-      vmId,
-      consoles: consolesList,
     },
   }
 }

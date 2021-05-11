@@ -45,7 +45,6 @@ import {
   removeActiveRequest,
   getVmCdRom,
   setVmsFilters,
-  setVmConsoles,
 } from '_/actions'
 
 import {
@@ -90,7 +89,6 @@ import {
   SELECT_POOL_DETAIL,
   SELECT_VM_DETAIL,
   NAVIGATE_TO_VM_DETAILS,
-  FETCH_CONSOLES,
 } from '_/constants'
 
 import {
@@ -186,15 +184,6 @@ export function* fetchByPage () {
     poolsPage: poolsExpectMorePages ? poolsPage + 1 : undefined,
     poolsExpectMorePages: pools.length >= count,
   }))
-}
-
-function* fetchConsoles ({ payload: { vm } }) {
-  const vmId = vm.get('id')
-  const apiConsoles = yield callExternalAction('consoles', Api.consoles, { payload: { vmId } })
-
-  // for headless VM (no graphics_consoles defined) - API response is `{}`
-  const consoles = Transforms.VmConsoles.toInternal({ consoles: apiConsoles })
-  yield put(setVmConsoles({ vmId, consolesList: consoles }))
 }
 
 export function* fetchVms ({ payload: { count, page, shallowFetch = true } }) {
@@ -598,7 +587,6 @@ export function* rootSaga () {
     takeEvery(OPEN_CONSOLE_MODAL, openConsoleModal),
     takeEvery(DOWNLOAD_CONSOLE_VM, downloadVmConsole),
     takeEvery(GET_RDP_VM, getRDPVm),
-    takeEvery(FETCH_CONSOLES, fetchConsoles),
 
     takeEvery(SAVE_FILTERS, saveFilters),
 

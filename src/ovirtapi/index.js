@@ -293,10 +293,6 @@ const OvirtApi = {
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/disks/${diskId}` })
   },
 
-  consoles ({ vmId }: VmIdType): Promise<Object> {
-    assertLogin({ methodName: 'consoles' })
-    return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/graphicsconsoles` })
-  },
   console ({ vmId, consoleId }: { vmId: string, consoleId: string }): Promise<Object> {
     assertLogin({ methodName: 'console' })
     return httpGet({
