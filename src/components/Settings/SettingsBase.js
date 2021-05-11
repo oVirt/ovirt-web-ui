@@ -61,23 +61,20 @@ Section.propTypes = {
   section: PropTypes.object.isRequired,
 }
 
-const SettingsBase = ({ sections }) => {
-  const existingSections = Object.entries(sections).filter(([key, section]) => !!section)
+const SettingsBase = ({ name, section }) => {
   return (
     <div className={style['search-content-box']}>
-      { existingSections.map(([key, section]) => (
-        <Card key={key} className={style['main-content']}>
-          <div className={style['main-content-container']}>
-            <Section name={key} section={section} />
-          </div>
-        </Card>
-      ))
-      }
+      <Card key={name} className={style['main-content']}>
+        <div className={style['main-content-container']}>
+          <Section name={name} section={section} />
+        </div>
+      </Card>
     </div>
   )
 }
 SettingsBase.propTypes = {
-  sections: PropTypes.object.isRequired,
+  section: PropTypes.object.isRequired,
+  name: PropTypes.string.isRequired,
 }
 
 export default SettingsBase
