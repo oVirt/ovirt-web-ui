@@ -163,7 +163,7 @@ const verifyOsIdToCluster = (selectedOsId, clusterId, { clusters, operatingSyste
   return selectedOs ? selectedOs.get('id') : '0'
 }
 
-module.exports = {
+export {
   handleClusterIdChange,
   handleProvisionSourceChange,
   handleTemplateIdChange,
