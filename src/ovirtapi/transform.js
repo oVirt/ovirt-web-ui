@@ -1034,12 +1034,24 @@ const RemoteUserOptions = {
       locale,
       refreshInterval,
       persistLocale,
+      preferredConsole,
+      fullScreenVnc,
+      ctrlAltEndVnc,
+      fullScreenSpice,
+      ctrlAltEndSpice,
+      smartcardSpice,
     } = fromEntries
 
     return {
       locale,
       refreshInterval,
       persistLocale,
+      preferredConsole,
+      fullScreenVnc,
+      ctrlAltEndVnc,
+      fullScreenSpice,
+      ctrlAltEndSpice,
+      smartcardSpice,
     }
   },
 }

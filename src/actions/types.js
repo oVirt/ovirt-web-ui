@@ -17,7 +17,13 @@ export type SaveGlobalOptionsActionType = {
     persistLocale?: boolean,
     showNotifications?: boolean,
     notificationSnoozeDuration?: number,
-    sshKey?: string
+    sshKey?: string,
+    preferredConsole?: string,
+    fullScreenVnc?: boolean,
+    ctrlAltEndVnc?: boolean,
+    fullScreenSpice?: boolean,
+    ctrlAltEndSpice?: boolean,
+    smartcardSpice?: boolean
   |},
   meta: {|
     transactionId: string

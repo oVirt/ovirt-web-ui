@@ -62,13 +62,16 @@ Section.propTypes = {
 }
 
 const SettingsBase = ({ name, section }) => {
+  const sections = section.sections ? Object.entries(section.sections) : [[name, section]]
   return (
     <div className={style['search-content-box']}>
-      <Card key={name} className={style['main-content']}>
-        <div className={style['main-content-container']}>
-          <Section name={name} section={section} />
-        </div>
-      </Card>
+      { sections.map(([name, section]) =>
+        <Card key={name} className={style['main-content']}>
+          <div className={style['main-content-container']}>
+            <Section name={name} section={section} />
+          </div>
+        </Card>
+      )}
     </div>
   )
 }
