@@ -5,7 +5,6 @@
   "devDependencies": {
     "@babel/cli": "7.13.16",
     "@babel/core": "7.13.0",
-    "autoprefixer": "8",
     "babel-eslint": "8.2.3",
     "babel-jest": "26.6.3",
     "babel-loader": "8.2.2",
@@ -13,7 +12,7 @@
     "case-sensitive-paths-webpack-plugin": "2.3.0",
     "chalk": "2.4.1",
     "connect-history-api-fallback": "1.5.0",
-    "copy-webpack-plugin": "6",
+    "copy-webpack-plugin": "6.4.1",
     "css-loader": "5.2.4",
     "detect-port": "1.2.3",
     "dotenv": "8.2.0",
@@ -46,7 +45,8 @@
     "mini-css-extract-plugin": "1.3.4",
     "opn": "4.0.2",
     "path-exists": "3.0.0",
-    "postcss-loader": "4",
+    "postcss-loader": "4.2.0",
+    "postcss-preset-env": "6.7.0",
     "readline-sync": "1.4.9",
     "recursive-readdir": "2.2.2",
     "request": "2.87.0",
@@ -111,7 +111,7 @@
   "scripts": {
     "preinstall": "test -e ./autogen.sh && ./autogen.sh --prefix=/usr --datarootdir=/share || :",
     "clean": "make distclean",
-    "dev": "NODE_ENV=development webpack --progress --config config/webpack.config.dev.js",
+    "dev": "NODE_ENV=development V=1 webpack --progress --config config/webpack.config.dev.js",
     "start": "node scripts/start.js",
     "prebuild": "yarn run test",
     "build": "node scripts/build.js",
@@ -158,5 +158,11 @@
   "eslintConfig": {
     "extends": "./config/eslint.js"
   },
-  "productionHomepage": "/ovirt-engine/web-ui/"
+  "productionHomepage": "/ovirt-engine/web-ui/",
+  "browserslist":[
+    ">1%",
+    "last 4 versions",
+    "Firefox ESR",
+    "not ie > 0"
+  ]
 }

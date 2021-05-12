@@ -1,14 +1,16 @@
-var path = require('path')
+const path = require('path')
 const util = require('util')
 const tty = require('tty')
-var autoprefixer = require('autoprefixer')
-var webpack = require('webpack')
-var HtmlWebpackPlugin = require('html-webpack-plugin')
-var CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
-var WatchMissingNodeModulesPlugin = require('../scripts/utils/WatchMissingNodeModulesPlugin')
-var CopyWebpackPlugin = require('copy-webpack-plugin')
-var paths = require('./paths')
-var env = require('./env')
+const webpack = require('webpack')
+
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
+const WatchMissingNodeModulesPlugin = require('../scripts/utils/WatchMissingNodeModulesPlugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+const postcssPresetEnv = require('postcss-preset-env')
+const paths = require('./paths')
+const env = require('./env')
+const appPackageJson = require(paths.appPackageJson)
 
 // Source maps are resource heavy and can cause out of memory issue for large source files.
 const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false'
@@ -31,23 +33,23 @@ module.exports = ((webpackEnv) => {
     // This means they will be the "root" imports that are included in JS bundle.
     // The first two entry points enable "hot" CSS and auto-refreshes for JS.
     entry: [
-      // Include WebpackDevServer client. It connects to WebpackDevServer via
-      // sockets and waits for recompile notifications. When WebpackDevServer
-      // recompiles, it sends a message to the client by socket. If only CSS
-      // was changed, the app reload just the CSS. Otherwise, it will refresh.
-      // The "?/" bit at the end tells the client to look for the socket at
-      // the root path, i.e. /sockjs-node/. Otherwise visiting a client-side
-      // route like /todos/42 would make it wrongly request /todos/42/sockjs-node.
-      // The socket server is a part of WebpackDevServer which we are using.
-      // The /sockjs-node/ path I'm referring to is hardcoded in WebpackDevServer.
+      // Include an alternative client for WebpackDevServer. A client's job is to
+      // connect to WebpackDevServer by a socket and get notified about changes.
+      // When you save a file, the client will either apply hot updates (in case
+      // of CSS changes), or refresh the page (in case of JS changes). When you
+      // make a syntax error, this client will display a syntax error overlay.
+      // Note: instead of the default WebpackDevServer client, we use a custom one
+      // to bring better experience for Create React App users. You can replace
+      // the line below with these two lines if you prefer the stock client:
       require.resolve('webpack-dev-server/client') + '?/',
-      // Include Webpack hot module replacement runtime. Webpack is pretty
-      // low-level so we need to put all the pieces together. The runtime listens
-      // to the events received by the client above, and applies updates (such as
-      // new CSS) to the running application.
       require.resolve('webpack/hot/dev-server'),
+      // When using the experimental react-refresh integration,
+      // the webpack plugin takes care of injecting the dev client for us.
+      // webpackDevClientEntry,
+
       // We ship a few polyfills by default.
       require.resolve('./polyfills'),
+
       // Finally, this is your app's code:
       paths.appIndexJs,
       // We include the app code last so that if there is a runtime error during
@@ -64,8 +66,32 @@ module.exports = ((webpackEnv) => {
       // served by WebpackDevServer in development. This is the JS bundle
       // containing code from all our entry points, and the Webpack runtime.
       filename: 'static/js/bundle.js',
+      chunkFilename: 'static/js/[name].chunk.js',
       // In development, we always serve from the root. This makes config easier.
       publicPath: '/',
+      // Prevents conflicts when multiple webpack runtimes (from different apps)
+      // are used on the same page.
+      jsonpFunction: `webpackJsonp${appPackageJson.name}`,
+      // this defaults to 'window', but by setting it to 'this' then
+      // module chunks which are built will work in web workers as well.
+      globalObject: 'this',
+    },
+
+    optimization: {
+      // Automatically split vendor and commons
+      splitChunks: {
+        cacheGroups: {
+          vendor: {
+            name: 'vendor',
+            chunks: 'initial',
+            test: /[\\/]node_modules[\\/]/
+          }
+        },
+      },
+      // Keep the runtime chunk separated to enable long term caching
+      runtimeChunk: {
+        name: entrypoint => `webpack-manifest-${entrypoint.name}`,
+      },
     },
 
     resolve: {
@@ -107,7 +133,7 @@ module.exports = ((webpackEnv) => {
                   // Utilize 'babel-preset-react-app' to make it easier to keep up with
                   // useful babel config changes from the Create React App project
                   presets: [
-                    [ "react-app", { "flow": true, "typescript": false } ]
+                    [ 'react-app', { 'flow': true, 'typescript': false } ]
                   ],
 
                   // This is a feature of `babel-loader` for webpack (not Babel itself).
@@ -116,9 +142,7 @@ module.exports = ((webpackEnv) => {
                   cacheDirectory: true,
                   cacheCompression: false,
 
-                  //
                   // 'react-refresh/babel' plugin could be added here in future
-                  //
                 },
               },
             },
@@ -211,6 +235,7 @@ module.exports = ((webpackEnv) => {
             // in development "style" loader enables hot editing of CSS.
 
             // css modules for local style sheets without '-nomodules.css' suffix
+            // ALL imported css from app source should be treated as css-modules except '-nomodules.css'
             {
               test: /\.css$/,
               exclude: /(node_modules)|(-nomodules\.css$)/,
@@ -222,20 +247,28 @@ module.exports = ((webpackEnv) => {
                     importLoaders: 1,
                     sourceMap: true,
                     modules: {
-                      // TODO: ALL import app css should be 'modules' except '-nomodules.css'
                       localIdentName: '[path][name]__[local]--[hash:base64:10]',
                     },
                   },
                 },
                 {
-                  loader: 'postcss-loader'
+                  loader: 'postcss-loader',
+                  options: {
+                    sourceMap: true,
+                    postcssOptions: {
+                      ident: 'postcss',
+                      plugins: [
+                        postcssPresetEnv({
+                          autoprefixer: {
+                            flexbox: 'no-2009',
+                          },
+                          stage: 3,
+                        }),
+                      ],
+                    },
+                  },
                 }
               ],
-              // Don't consider CSS imports dead code (for tree shaking) even if the
-              // containing package claims to have no side effects.
-              // Remove this when webpack adds a warning or an error for this.
-              // See https://github.com/webpack/webpack/issues/6571
-              sideEffects: true,
             },
 
             // plain css for style sheets of dependencies and local with '-nomodules.css' suffix
@@ -244,9 +277,36 @@ module.exports = ((webpackEnv) => {
               include: /(node_modules)|(-nomodules\.css$)/,
               use: [
                 'style-loader',
-                'css-loader',
-                'postcss-loader'
-              ]
+                {
+                  loader: 'css-loader',
+                  options: {
+                    importLoaders: 1,
+                    sourceMap: true,
+                  },
+                },
+                {
+                  loader: 'postcss-loader',
+                  options: {
+                    sourceMap: true,
+                    postcssOptions: {
+                      ident: 'postcss',
+                      plugins: [
+                        postcssPresetEnv({
+                          autoprefixer: {
+                            flexbox: 'no-2009',
+                          },
+                          stage: 3,
+                        }),
+                      ],
+                    },
+                  },
+                }
+              ],
+              // Don't consider CSS imports dead code (for tree shaking) even if the
+              // containing package claims to have no side effects.
+              // Remove this when webpack adds a warning or an error for this.
+              // See https://github.com/webpack/webpack/issues/6571
+              sideEffects: true,
             },
 
             // "file" loader makes sure those assets get served by WebpackDevServer.
@@ -275,16 +335,12 @@ module.exports = ((webpackEnv) => {
     },
 
     plugins: [
+      // Copy sources not otherwise handled by webpack
       new CopyWebpackPlugin({
         patterns: [
-        {
-          from: 'src/ovirt-web-ui.config',
-        },
-        {
-          from: paths.appBranding,
-          to: 'branding',
-          toType: 'dir'
-        }]
+          { from: 'src/ovirt-web-ui.config' },
+          { from: paths.appBranding, to: 'branding', toType: 'dir' },
+        ],
       }),
 
       // Generates an `index.html` file with the <script> injected.
@@ -296,56 +352,55 @@ module.exports = ((webpackEnv) => {
         jspSSO: false,
       }),
 
+      // Embed the small webpack runtime script in index.html
+      // TODO: (react-dev-tools) InlineChunkHtmlPlugin ...
+
+      // This gives some necessary context to module not found errors, such as the requesting resource.
+      // TODO: (react-dev-tools) new ModuleNotFoundPlugin(paths.appPath),
+
       // Makes some environment variables available to the JS code, for example:
       // if (process.env.NODE_ENV === 'development') { ... }. See `env.js`.
       new webpack.DefinePlugin(env),
 
-      // webpack >= 2 no longer allows custom properties in configuration
-      new webpack.LoaderOptionsPlugin({
-        options: {
-          // We use PostCSS for autoprefixing only.
-          postcssLoader: function () {
-            return [
-              autoprefixer({
-                browsers: [
-                  '>1%',
-                  'last 4 versions',
-                  'Firefox ESR',
-                  'not ie > 0', // VM Portal don't support IE at all
-                ],
-                grid: false,
-              }),
-            ]
-          },
-        }
-      }),
+      // TODO (maybe in production only): new webpack.HashedModuleIdsPlugin(),
 
-      // This is necessary to emit hot updates (currently CSS only):
+      // This is necessary to emit hot updates (CSS and Fast Refresh):
       new webpack.HotModuleReplacementPlugin(),
+
+      // Could do `ReactRefreshWebpackPlugin` here in future to support react-refresh
 
       // Watcher doesn't work well if you mistype casing in a path so we use
       // a plugin that prints an error when you attempt to do this.
-      // See https://github.com/facebookincubator/create-react-app/issues/240
       new CaseSensitivePathsPlugin(),
 
       // If you require a missing module and then `npm install` it, you still have
       // to restart the development server for Webpack to discover it. This plugin
       // makes the discovery automatic so you don't have to restart.
-      // See https://github.com/facebookincubator/create-react-app/issues/186
       new WatchMissingNodeModulesPlugin(paths.appNodeModules),
 
+      // TODO: ManifestPlugin (webpack-manifest-plugin)?  Not sure what it helps with
+      // TODO: ESLintPlugin (probably a good thing so we see lint errors quickly)
     ],
 
     // Some libraries import Node modules but don't use them in the browser.
-    // Tell Webpack to provide empty mocks for them so importing them works.
+    // Tell webpack to provide empty mocks for them so importing them works.
     node: {
+      module: 'empty',
+      dgram: 'empty',
+      dns: 'mock',
       fs: 'empty',
+      http2: 'empty',
       net: 'empty',
       tls: 'empty',
+      child_process: 'empty',
     },
+
+    // Turn off performance processing because we utilize
+    // our own hints via the FileSizeReporter
+    // performance: false,
   }
 
-  if (!process.env.Q) {
+  if (process.env.V) {
     const colors = tty.isatty(1)
     console.log('development webpack configuration:')
     console.log(util.inspect(theConfig, { compact: false, breakLength: 120, depth: null, colors }))
