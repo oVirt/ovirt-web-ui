@@ -173,6 +173,8 @@ function* saveGlobalOptions ({ payload: { sshKey, showNotifications, notificatio
 
     if (value && value.content === false) {
       yield call(deleteUserOption, { optionName: 'locale' })
+    } else if (value && value.content === true) {
+      yield call(exportInferredLocale)
     }
   }
 
