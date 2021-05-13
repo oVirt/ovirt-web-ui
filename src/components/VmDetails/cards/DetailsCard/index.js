@@ -16,10 +16,7 @@ import {
   buildMessageFromRecord,
 } from '_/helpers'
 import { enumMsg, MsgContext, withMsg } from '_/intl'
-
-import {
-  isNumber,
-} from '_/utils'
+import { isNumber, isNumberInRange } from '_/utils'
 
 import {
   canChangeCluster as vmCanChangeCluster,
@@ -279,16 +276,14 @@ class DetailsCard extends React.Component {
       templates,
     } = this.props
 
-    const {
-      maxNumOfSockets,
-      maxNumOfCores,
-      maxNumOfThreads,
-      maxNumOfVmCpus,
-    } = this.grabCpuOptions()
-
     for (let change = changeQueue.shift(); change; change = changeQueue.shift()) {
       console.log('processing change', change)
       const { fieldName, value } = change
+      const {
+        maxNumOfSockets,
+        maxNumOfCores,
+        maxNumOfThreads,
+      } = this.grabCpuOptions()
 
       let fieldUpdated
       switch (fieldName) {
@@ -412,7 +407,8 @@ class DetailsCard extends React.Component {
           break
 
         case 'cpu':
-          if (isNumber(value) && value > 0 && value <= maxNumOfVmCpus) {
+          // Allow a value that is too large in case the max total changes due to a Cluster change
+          if (isNumber(value) && value > 0) {
             let topology = { sockets: value, cores: 1, threads: 1 }
             if (value > maxNumOfSockets) {
               topology = getTopology({
@@ -500,6 +496,18 @@ class DetailsCard extends React.Component {
 
     if (Object.keys(this.trackUpdates).length === 0) {
       this.handleCardOnCancel()
+      return
+    }
+
+    // Note: The validations may already be done elsewhere, and the save button should
+    //       only be active if the card fields are valid, but repeat them here to be
+    //       sure.
+    // Run field validations. If any input field is not valid, don't allow the save.
+    const { maxNumOfVmCpus } = this.grabCpuOptions()
+    const vCpuCount = this.state.vm.getIn(['cpu', 'vCPUs'])
+    const vCpuCountIsValid = isNumberInRange(vCpuCount, 0, maxNumOfVmCpus)
+
+    if (!vCpuCountIsValid) {
       return
     }
 
@@ -702,21 +710,24 @@ class DetailsCard extends React.Component {
     // Optimized for
     const optimizedFor = rephraseVmType(vm.get('type'), msg)
 
-    // VCPU
+    // vCPU
     const SOCKETS_VCPU = 'sockets'
     const CORES_VCPU = 'cores'
     const THREADS_VCPU = 'threads'
+    const { maxNumOfSockets, maxNumOfCores, maxNumOfThreads, maxNumOfVmCpus } = this.grabCpuOptions()
+
     const vCpuCount = vm.getIn(['cpu', 'vCPUs'])
+    const vCpuCountIsValid = isNumberInRange(vCpuCount, 0, maxNumOfVmCpus)
+
     const vCpuTopology = vm.getIn(['cpu', 'topology'])
-
-    const { maxNumOfSockets, maxNumOfCores, maxNumOfThreads } = this.grabCpuOptions()
-
-    const vCpuTopologyDividers = getTopologyPossibleValues({
-      value: vCpuCount,
-      maxNumOfSockets,
-      maxNumOfCores,
-      maxNumOfThreads,
-    })
+    const vCpuTopologyDividers = vCpuCountIsValid
+      ? getTopologyPossibleValues({
+        value: vCpuCount,
+        maxNumOfSockets,
+        maxNumOfCores,
+        maxNumOfThreads,
+      })
+      : { sockets: [1], cores: [1], threads: [1] }
 
     // Boot devices
     const allowedBootDevices = ['hd', 'network', 'cdrom']
@@ -754,9 +765,10 @@ class DetailsCard extends React.Component {
         editable={canEditDetails || canChangeCd}
         disableTooltip={isPoolVm && isPoolAutomatic ? msg.automaticPoolsNotEditable({ poolName: pool.get('name') }) : undefined}
         editMode={isEditing}
+        editTooltip={msg.edit()}
         editTooltipPlacement={'bottom'}
         idPrefix={idPrefix}
-        editTooltip={msg.edit()}
+        disableSaveButton={!vCpuCountIsValid}
         onStartEdit={this.handleCardOnStartEdit}
         onCancel={this.handleCardOnCancel}
         onSave={this.handleCardOnSave}
@@ -876,7 +888,9 @@ class DetailsCard extends React.Component {
                             <li>{msg.totalThreadsCpuTooltipMessage({ number: vCpuTopology.get('threads') })}</li>
                           </ul>
                         </div>
-                      }>
+                      }
+                      validationState={vCpuCountIsValid ? null : 'error'}
+                    >
                       { !isFullEdit && vCpuCount }
                       { isFullEdit &&
                         <div>
@@ -887,6 +901,11 @@ class DetailsCard extends React.Component {
                             value={vCpuCount}
                             onChange={e => this.handleChange('cpu', e.target.value)}
                           />
+                          { !vCpuCountIsValid &&
+                            <div className={style['cpu-input-error']}>
+                              {msg.maxAllowedCpus({ max: maxNumOfVmCpus })}
+                            </div>
+                          }
                         </div>
                       }
                     </FieldRow>
@@ -909,6 +928,7 @@ class DetailsCard extends React.Component {
                 </Col>
               </Row>
             </Grid>
+
             {/* Advanced options */}
             { isFullEdit && <ExpandCollapse id={`${idPrefix}-advanced-options`} textCollapsed={msg.advancedOptions()} textExpanded={msg.advancedOptions()}>
               <Grid className={style['details-container']}>
@@ -973,7 +993,7 @@ class DetailsCard extends React.Component {
                           onChange={(selectedId) => { this.handleChange('bootDevices', selectedId, { device: SECOND_DEVICE }) }}
                         />
                       </FieldRow>
-                      {/* VCPU Topology */}
+                      {/* vCPU Topology */}
                       <Row className={style['field-row-divide']}>
                         <Col cols={12} className={style['col-label']}>
                           <div>
@@ -988,6 +1008,7 @@ class DetailsCard extends React.Component {
                             id: i.toString(),
                             value: i.toString(),
                           }))}
+                          disabled={!vCpuCountIsValid}
                           selected={vCpuTopology.get('sockets').toString()}
                           onChange={(selectedId) => { this.handleChange('topology', selectedId, { vcpu: SOCKETS_VCPU }) }}
                         />
@@ -999,6 +1020,7 @@ class DetailsCard extends React.Component {
                             id: i.toString(),
                             value: i.toString(),
                           }))}
+                          disabled={!vCpuCountIsValid}
                           selected={vCpuTopology.get('cores').toString()}
                           onChange={(selectedId) => { this.handleChange('topology', selectedId, { vcpu: CORES_VCPU }) }}
                         />
@@ -1017,6 +1039,7 @@ class DetailsCard extends React.Component {
                             id: i.toString(),
                             value: i.toString(),
                           }))}
+                          disabled={!vCpuCountIsValid}
                           selected={vCpuTopology.get('threads').toString()}
                           onChange={(selectedId) => { this.handleChange('topology', selectedId, { vcpu: THREADS_VCPU }) }}
                         />
