@@ -3,10 +3,13 @@ const util = require('util')
 const tty = require('tty')
 const webpack = require('webpack')
 
-const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
-const WatchMissingNodeModulesPlugin = require('../scripts/utils/WatchMissingNodeModulesPlugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const InlineChunkHtmlPlugin = require('react-dev-utils/InlineChunkHtmlPlugin')
+const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin')
+const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin')
+
 const postcssPresetEnv = require('postcss-preset-env')
 const paths = require('./paths')
 const env = require('./env')
@@ -31,7 +34,6 @@ module.exports = ((webpackEnv) => {
 
     // These are the "entry points" to our application.
     // This means they will be the "root" imports that are included in JS bundle.
-    // The first two entry points enable "hot" CSS and auto-refreshes for JS.
     entry: [
       // Include an alternative client for WebpackDevServer. A client's job is to
       // connect to WebpackDevServer by a socket and get notified about changes.
@@ -61,7 +63,7 @@ module.exports = ((webpackEnv) => {
       // Next line is not used in dev but WebpackDevServer crashes without it:
       path: paths.appBuild,
       // Add /* filename */ comments to generated require()s in the output.
-      pathinfo: true,
+      pathinfo: isEnvDevelopment,
       // This does not produce a real file. It's just the virtual path that is
       // served by WebpackDevServer in development. This is the JS bundle
       // containing code from all our entry points, and the Webpack runtime.
@@ -88,9 +90,10 @@ module.exports = ((webpackEnv) => {
           }
         },
       },
+
       // Keep the runtime chunk separated to enable long term caching
       runtimeChunk: {
-        name: entrypoint => `webpack-manifest-${entrypoint.name}`,
+        name: entrypoint => `runtime-${entrypoint.name}`,
       },
     },
 
@@ -245,7 +248,7 @@ module.exports = ((webpackEnv) => {
                   loader: 'css-loader',
                   options: {
                     importLoaders: 1,
-                    sourceMap: true,
+                    sourceMap: shouldUseSourceMap,
                     modules: {
                       localIdentName: '[path][name]__[local]--[hash:base64:10]',
                     },
@@ -254,7 +257,7 @@ module.exports = ((webpackEnv) => {
                 {
                   loader: 'postcss-loader',
                   options: {
-                    sourceMap: true,
+                    sourceMap: shouldUseSourceMap,
                     postcssOptions: {
                       ident: 'postcss',
                       plugins: [
@@ -281,13 +284,13 @@ module.exports = ((webpackEnv) => {
                   loader: 'css-loader',
                   options: {
                     importLoaders: 1,
-                    sourceMap: true,
+                    sourceMap: shouldUseSourceMap,
                   },
                 },
                 {
                   loader: 'postcss-loader',
                   options: {
-                    sourceMap: true,
+                    sourceMap: shouldUseSourceMap,
                     postcssOptions: {
                       ident: 'postcss',
                       plugins: [
@@ -352,35 +355,36 @@ module.exports = ((webpackEnv) => {
         jspSSO: false,
       }),
 
-      // Embed the small webpack runtime script in index.html
-      // TODO: (react-dev-tools) InlineChunkHtmlPlugin ...
-
       // This gives some necessary context to module not found errors, such as the requesting resource.
-      // TODO: (react-dev-tools) new ModuleNotFoundPlugin(paths.appPath),
+      new ModuleNotFoundPlugin(paths.appPath),
 
       // Makes some environment variables available to the JS code, for example:
       // if (process.env.NODE_ENV === 'development') { ... }. See `env.js`.
       new webpack.DefinePlugin(env),
 
-      // TODO (maybe in production only): new webpack.HashedModuleIdsPlugin(),
+      // Embed the small webpack runtime script in index.html
+      isEnvProduction && new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/runtime-.+[.]js/]),
+
+      // Keep the chunk id stable as long as the contents of the chunks stay the same (i.e. no new modules are used)
+      isEnvProduction && new webpack.HashedModuleIdsPlugin(),
 
       // This is necessary to emit hot updates (CSS and Fast Refresh):
-      new webpack.HotModuleReplacementPlugin(),
+      isEnvDevelopment && new webpack.HotModuleReplacementPlugin(),
 
       // Could do `ReactRefreshWebpackPlugin` here in future to support react-refresh
 
       // Watcher doesn't work well if you mistype casing in a path so we use
       // a plugin that prints an error when you attempt to do this.
-      new CaseSensitivePathsPlugin(),
+      isEnvDevelopment && new CaseSensitivePathsPlugin(),
 
       // If you require a missing module and then `npm install` it, you still have
       // to restart the development server for Webpack to discover it. This plugin
       // makes the discovery automatic so you don't have to restart.
-      new WatchMissingNodeModulesPlugin(paths.appNodeModules),
+      isEnvDevelopment && new WatchMissingNodeModulesPlugin(paths.appNodeModules),
 
-      // TODO: ManifestPlugin (webpack-manifest-plugin)?  Not sure what it helps with
-      // TODO: ESLintPlugin (probably a good thing so we see lint errors quickly)
-    ],
+      // Integrate linting to the build and notify of errors but don't fail to run
+      // TODO: Add ESLintPlugin (https://github.com/webpack-contrib/eslint-webpack-plugin)
+    ].filter(Boolean),
 
     // Some libraries import Node modules but don't use them in the browser.
     // Tell webpack to provide empty mocks for them so importing them works.
@@ -402,7 +406,7 @@ module.exports = ((webpackEnv) => {
 
   if (process.env.V) {
     const colors = tty.isatty(1)
-    console.log('development webpack configuration:')
+    console.log(`${webpackEnv} webpack configuration:`)
     console.log(util.inspect(theConfig, { compact: false, breakLength: 120, depth: null, colors }))
   }
   return theConfig

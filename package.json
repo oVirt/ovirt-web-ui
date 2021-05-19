@@ -47,6 +47,7 @@
     "path-exists": "3.0.0",
     "postcss-loader": "4.2.0",
     "postcss-preset-env": "6.7.0",
+    "react-dev-utils": "11.0.4",
     "readline-sync": "1.4.9",
     "recursive-readdir": "2.2.2",
     "request": "2.87.0",
@@ -159,7 +160,7 @@
     "extends": "./config/eslint.js"
   },
   "productionHomepage": "/ovirt-engine/web-ui/",
-  "browserslist":[
+  "browserslist": [
     ">1%",
     "last 4 versions",
     "Firefox ESR",
