@@ -69,6 +69,7 @@ export const messages: { [messageId: string]: MessageType } = {
   cd: 'CD',
   cdCanOnlyChangeWhenVmRunning: 'CD can only be changed when the VM is running.',
   cdromBoot: 'CD-ROM',
+  changesResetSuccessfully: 'Settings have been successfully reset',
   changesSavedSuccesfully: {
     message: 'Changes to settings saved succesfully!',
     description: 'Message displayed when all user settings have been saved successfully',

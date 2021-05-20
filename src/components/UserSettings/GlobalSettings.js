@@ -89,12 +89,19 @@ class GlobalSettings extends Component {
       // values submitted using 'save' action
       // inlcude both remote(server and store) or local(store only)
       sentValues: {},
+      defaultValues: {
+        language: DEFAULT_LOCALE,
+        showNotifications: AppConfiguration.showNotificationsDefault,
+        refreshInterval: AppConfiguration.schedulerFixedDelayInSeconds,
+        notificationSnoozeDuration: AppConfiguration.notificationSnoozeDurationInMinutes,
+      },
     }
     this.handleCancel = this.handleCancel.bind(this)
     this.buildSections = this.buildSections.bind(this)
     this.saveOptions = this.saveOptions.bind(this)
     this.resetBaseValues = this.resetBaseValues.bind(this)
     this.onChange = this.onChange.bind(this)
+    this.onReset = this.onReset.bind(this)
   }
 
   resetBaseValues () {
@@ -125,6 +132,15 @@ class GlobalSettings extends Component {
         },
       }))
     }
+  }
+  onReset (saveFields, id) {
+    this.setState(state => ({
+      draftValues: {
+        ...this.props.currentValues,
+        ...state.defaultValues,
+      },
+    }))
+    this.saveOptions(saveFields, id)
   }
 
   buildSections (onChange, translatedLabels) {
@@ -232,7 +248,7 @@ class GlobalSettings extends Component {
 
   render () {
     const { lastTransactionId, currentValues, msg } = this.props
-    const { draftValues, baseValues, sentValues } = this.state
+    const { draftValues, baseValues, sentValues, defaultValues } = this.state
     // required also in Settings for error handling: the case of partial success(only some fields saved)
     // the alert shows the names of the fields that were NOT saved
     const translatedLabels = {
@@ -255,6 +271,8 @@ class GlobalSettings extends Component {
           resetBaseValues={this.resetBaseValues}
           onSave={this.saveOptions}
           onCancel={this.handleCancel}
+          onReset={this.onReset}
+          defaultValues={defaultValues}
         >
           <SettingsBase sections={this.buildSections(this.onChange, translatedLabels)} />
         </Settings>
