@@ -1,23 +1,28 @@
-var path = require('path')
-var autoprefixer = require('autoprefixer')
-var webpack = require('webpack')
-var HtmlWebpackPlugin = require('html-webpack-plugin')
-var MiniCssExtractPlugin = require('mini-css-extract-plugin')
-var CopyWebpackPlugin = require('copy-webpack-plugin')
-var url = require('url')
-var paths = require('./paths')
-var env = require('./env')
-var webpackConfigCommons = require('./webpack.config.commons')
+const path = require('path')
+const tty = require('tty')
+const url = require('url')
+const util = require('util')
+const webpack = require('webpack')
 
-// Assert this just to be safe.
-// Development builds of React are slow and not intended for production.
-if (env['process.env.NODE_ENV'] !== '"production"') {
-  throw new Error('Production builds must have NODE_ENV=production.')
-}
+const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const InlineChunkHtmlPlugin = require('react-dev-utils/InlineChunkHtmlPlugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin')
+const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin')
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin')
+const safePostCssParser = require('postcss-safe-parser')
 
-// Source maps are resource heavy and can cause out of memory issue for large source files.
-const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
+const postcssPresetEnv = require('postcss-preset-env')
+const paths = require('./paths')
+const env = require('./env')
+const appPackageJson = require(paths.appPackageJson)
 
+const imageInlineSizeLimit = parseInt(process.env.IMAGE_INLINE_SIZE_LIMIT, 10) || 8192
+
+// TODO: Consider `publicUrlOrPath` handling from `react-dev-utils`
 // We use "homepage" field to infer "public path" at which the app is served.
 // Webpack needs to know it to put the right <script> hrefs into HTML even in
 // single-page apps that may serve index.html for nested URLs like /todos/42.
@@ -36,14 +41,17 @@ if (!publicPath.endsWith('/')) {
 module.exports = ((webpackEnv) => {
   const isEnvDevelopment = webpackEnv === 'development'
   const isEnvProduction = webpackEnv === 'production'
+  let fontsToEmbed
 
-  return {
+  const theConfig = {
     mode: 'production',
     bail: true,
-    devtool: shouldUseSourceMap ? 'source-map' : false,
+    devtool: isEnvDevelopment ? 'eval-source-map' : 'source-map',
 
-    // In production, we only want to load the polyfills and the app code.
+    // These are the "entry points" to our application.
+    // This means they will be the "root" imports that are included in JS bundle.
     entry: [
+      // In production, we only want to load the polyfills and the app code.
       require.resolve('./polyfills'),
       paths.appIndexJs,
     ],
@@ -51,13 +59,79 @@ module.exports = ((webpackEnv) => {
     output: {
       // The build folder.
       path: paths.appBuild,
+      // Add /* filename */ comments to generated require()s in the output.
+      pathinfo: isEnvDevelopment,
       // Generated JS file names (with nested folders).
       // There will be one main bundle, and one file per asynchronous chunk.
       // We don't currently advertise code splitting but Webpack supports it.
       filename: 'static/js/[name].[chunkhash:8].js',
       chunkFilename: 'static/js/[name].[chunkhash:8].chunk.js',
-      // We inferred the "public path" (such as / or /my-project) from homepage.
+      // We already inferred the "public path"
       publicPath: publicPath,
+      // Prevents conflicts when multiple webpack runtimes (from different apps)
+      // are used on the same page.
+      jsonpFunction: `webpackJsonp${appPackageJson.name}`,
+      // this defaults to 'window', but by setting it to 'this' then
+      // module chunks which are built will work in web workers as well.
+      globalObject: 'this',
+    },
+
+    optimization: {
+      // Automatically split vendor and commons
+      splitChunks: {
+        cacheGroups: {
+          vendor: {
+            name: 'vendor',
+            chunks: 'initial',
+            test: /[\\/]node_modules[\\/]/
+          }
+        },
+      },
+
+      // Keep the runtime chunk separated to enable long term caching
+      runtimeChunk: {
+        name: entrypoint => `runtime-${entrypoint.name}`,
+      },
+
+      minimize: isEnvProduction,
+      minimizer: [
+        new TerserPlugin({ // minify JS with source maps
+          cache: true,
+          parallel: true,
+          sourceMap: true,
+
+          terserOptions: {
+            parse: {
+              ecma: 8,
+            },
+            compress: {
+              ecma: 5,
+              warnings: false,
+              comparisons: false,
+              inline: 2,
+            },
+            mangle: {
+              safari10: true,
+            },
+
+            // Added for profiling in devtools
+            keep_classnames: true,
+            keep_fnames: true,
+
+            output: {
+              ecma: 5,
+              comments: false,
+              ascii_only: true,
+            },
+          },
+        }),
+        new OptimizeCSSAssetsPlugin({ // minify CSS with source maps
+          cssProcessorOptions: {
+            parser: safePostCssParser,
+            map: { inline: false, annotation: true },
+          }
+        })
+      ],
     },
 
     resolve: {
@@ -71,175 +145,240 @@ module.exports = ((webpackEnv) => {
         // Support React Native Web
         // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
         'react-native': 'react-native-web',
-        ...webpackConfigCommons.commonAliases()
+        '_': `${paths.appSrc}`,
       },
     },
 
     module: {
-      // For webpack >= 2, module.loaders changed to module.rules
+      strictExportPresence: true,
       rules: [
-        // Process application JS with Babel.
+        // Disable require.ensure as it's not a standard language feature.
+        { parser: { requireEnsure: false } },
         {
-          test: /\.(js|jsx)$/,
-          include: [
-            paths.appSrc,
-          ],
-          loader: 'babel-loader',
-          options: {
-            babelrc: false,
-            compact: isEnvProduction,
-
-            //
-            // Utilize 'babel-preset-react-app' to make it easier to keep up with
-            // useful babel config changes from the Create React App project
-            //
-            presets: [
-              [ "react-app", { "flow": true, "typescript": false } ]
-            ],
-
-            // This is a feature of `babel-loader` for webpack (not Babel itself).
-            // It enables caching results in ./node_modules/.cache/babel-loader/
-            // directory for faster rebuilds.
-            cacheDirectory: true,
-            cacheCompression: false,
-          },
-        },
-
-        // Process any JS outside of the app with Babel.
-        {
-          test: /\.(js|mjs)$/,
-          include: [
-            paths.novnc,
-            paths.spiceHtml5
-          ],
-          loader: 'babel-loader',
-          options: {
-            babelrc: false,
-            configFile: false,
-            compact: false,
-
-            presets: [
-              [
-                require.resolve('babel-preset-react-app/dependencies'),
-                { helpers: true },
+          // oneOf lets us have a loader w/o a test as a default instead of applying to everything
+          // https://webpack.js.org/configuration/module/#ruleoneof
+          oneOf: [
+            // Process application JS with Babel.
+            {
+              test: /\.(js|jsx)$/,
+              include: [
+                paths.appSrc,
               ],
-            ],
+              use: {
+                loader: 'babel-loader',
+                options: {
+                  babelrc: false,
+                  configFile: false,
+                  compact: isEnvProduction,
 
-            cacheDirectory: true,
-            cacheCompression: false,
+                  presets: [ './config/babel.app.config.js' ],
 
-            // Babel sourcemaps are needed for debugging into node_modules
-            // code.  Without the options below, debuggers like VSCode
-            // show incorrect code and set breakpoints on the wrong lines.
-            sourceMaps: shouldUseSourceMap,
-            inputSourceMap: shouldUseSourceMap,
-          }
-        },
-
-        // The notation here is somewhat confusing.
-        // "postcss" loader applies autoprefixer to our CSS.
-        // "css" loader resolves paths in CSS and adds assets as dependencies.
-        // "style" loader normally turns CSS into JS modules injecting <style>,
-        // but unlike in development configuration, we do something different.
-        // `ExtractTextPlugin` first applies the "postcss" and "css" loaders
-        // (second argument), then grabs the result CSS and puts it into a
-        // separate file in our build process. This way we actually ship
-        // a single CSS file in production instead of JS code injecting <style>
-        // tags. If you use code splitting, however, any async bundles will still
-        // use the "style" loader inside the async code so CSS from them won't be
-        // in the main CSS file.
-        {
-          test: /\.css$/,
-          include: /(node_modules)|(-nomodules\.css$)/,
-          // "?-autoprefixer" disables autoprefixer in css-loader itself:
-          // https://github.com/webpack/css-loader/issues/281
-          // We already have it thanks to postcss. We only pass this flag in
-          // production because "css" loader only enables autoprefixer-powered
-          // removal of unnecessary prefixes when Uglify plugin is enabled.
-          // Webpack 1.x uses Uglify plugin as a signal to minify *all* the assets
-          // including CSS. This is confusing and will be removed in Webpack 2:
-          // https://github.com/webpack/webpack/issues/283
-          // Note: this won't work without `new ExtractTextPlugin()` in `plugins`.
-
-          // Note: ExtractTextPlugin is deprecated for webpack > 2, MiniCssExtractPlugin used instead
-          use: [
-            {
-              loader: MiniCssExtractPlugin.loader
+                  // This is a feature of `babel-loader` for webpack (not Babel itself).
+                  // It enables caching results in ./node_modules/.cache/babel-loader/
+                  // directory for faster rebuilds.
+                  cacheDirectory: true,
+                  cacheCompression: false,
+                },
+              },
             },
-            'css-loader?-autoprefixer!postcss-loader'
-          ]
-        },
-        {
-          test: /\.css$/,
-          exclude: /(node_modules)|(-nomodules\.css$)/,
-          use: [
+
+            // Process any JS outside of the app with Babel.
             {
-              loader: 'style-loader'
+              test: /\.(js|mjs)$/,
+              include: [
+                // for @patternfly/react-console
+                '@novnc/novnc',
+                '@spice-project/spice-html5',
+              ].map(dependency => path.resolve(paths.appNodeModules, dependency)),
+              use: {
+                loader: 'babel-loader',
+                options: {
+                  babelrc: false,
+                  configFile: false,
+                  compact: false,
+
+                  presets: [ './config/babel.dep.config.js' ],
+
+                  cacheDirectory: true,
+                  cacheCompression: false,
+
+                  // Babel sourcemaps are needed for debugging into node_modules
+                  // code.  Without the options below, debuggers like VSCode
+                  // show incorrect code and set breakpoints on the wrong lines.
+                  sourceMaps: true,
+                  inputSourceMap: true,
+                },
+              },
             },
+
+            // inline base64 URLs for <= 8k images, direct URLs for the rest
             {
-              loader: 'css-loader',
-              options: {
-                modules: true
+              test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
+              use: {
+                loader: 'url-loader',
+                options: {
+                  limit: imageInlineSizeLimit,
+                  name: 'static/media/[name].[hash:8].[ext]',
+                },
+              },
+            },
+
+            // embed the woff2 fonts and any fonts that are used by the PF icons
+            // directly in the CSS (to avoid lag applying fonts), export the rest
+            // to be loaded separately as needed
+            {
+              test: fontsToEmbed = [
+                /\.woff2(\?v=[0-9].[0-9].[0-9])?$/,
+                /PatternFlyIcons-webfont\.ttf/
+              ],
+              use: {
+                loader: 'url-loader',
+                options: {}
               }
             },
             {
-              loader: 'postcss-loader'
-            }
-          ]
-        },
+              test: /\.(ttf|eot|svg|woff(?!2))(\?v=[0-9].[0-9].[0-9])?$/,
+              exclude: fontsToEmbed,
+              use: {
+                loader: 'file-loader',
+                options: {
+                  name: 'static/fonts/[name].[hash:8].[ext]'
+                }
+              }
+            },
 
-        // "file" loader makes sure those assets end up in the `build` folder.
-        // When you `import` an asset, you get its filename.
-        {
-          test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)(\?.*)?$/,
-          exclude: /\/favicon.ico$/,
-          loader: 'file-loader',
-          query: {
-            name: 'static/media/[name].[hash:8].[ext]',
-          },
-        },
-        // A special case for favicon.ico to place it into build root directory.
-        {
-          test: /\/favicon.ico$/,
-          include: [paths.appSrc],
-          loader: 'file-loader',
-          query: {
-            name: 'favicon.ico?[hash:8]',
-          },
-        },
-        // "url" loader works just like "file" loader but it also embeds
-        // assets smaller than specified size as data URLs to avoid requests.
-        {
-          test: /\.(mp4|webm|wav|mp3|m4a|aac|oga)(\?.*)?$/,
-          loader: 'url-loader',
-          query: {
-            limit: 10000,
-            name: 'static/media/[name].[hash:8].[ext]',
-          },
-        },
-        // "html" loader is used to process template page (index.html) to resolve
-        // resources linked with <link href="./relative/path"> HTML tags.
-        {
-          test: /\.html$/,
-          loader: 'html-loader',
-          query: {
-            attrs: ['link:href'],
-          },
+            // A special case for favicon.ico to place it into build root directory.
+            {
+              test: /\/favicon.ico$/,
+              include: [paths.appSrc],
+              use: {
+                loader: 'file-loader',
+                options: {
+                  name: 'favicon.ico?[hash:8]',
+                },
+              },
+            },
+
+            // "postcss-loader" applies autoprefixer to our CSS.
+            // "css-loader" resolves paths in CSS and adds assets as dependencies.
+            // "style-loader" turns CSS into JS modules that inject <style> tags.
+            // MiniCssExtractPlugin extract CSS into separate files.
+            // In production, we use a plugin to extract that CSS to a file, but
+            // in development "style-loader" loader enables hot editing of CSS.
+
+            // css modules for local style sheets without '-nomodules.css' suffix
+            // ALL imported css from app source should be treated as css-modules except '-nomodules.css'
+            {
+              test: /\.css$/,
+              exclude: /(node_modules)|(-nomodules\.css$)/,
+              use: [
+                {
+                  loader: MiniCssExtractPlugin.loader,
+                  // TODO: Consider publicUrlOrPath handling in `getStyleLoaders()` in create react app
+                },
+                {
+                  loader: 'css-loader',
+                  options: {
+                    importLoaders: 1,
+                    sourceMap: true,
+                    modules: {
+                      localIdentName: '[path][name]__[local]--[hash:base64:10]',
+                    },
+                  },
+                },
+                {
+                  loader: 'postcss-loader',
+                  options: {
+                    sourceMap: true,
+                    postcssOptions: {
+                      ident: 'postcss',
+                      plugins: [
+                        postcssPresetEnv({
+                          autoprefixer: {
+                            flexbox: 'no-2009',
+                          },
+                          stage: 3,
+                        }),
+                      ],
+                    },
+                  },
+                }
+              ],
+            },
+
+            // plain css for style sheets of dependencies and local with '-nomodules.css' suffix
+            {
+              test: /\.css$/,
+              include: /(node_modules)|(-nomodules\.css$)/,
+              use: [
+                {
+                  loader: MiniCssExtractPlugin.loader,
+                  // TODO: Consider publicUrlOrPath handling in `getStyleLoaders()` in create react app
+                },
+                {
+                  loader: 'css-loader',
+                  options: {
+                    importLoaders: 1,
+                    sourceMap: true,
+                  },
+                },
+                {
+                  loader: 'postcss-loader',
+                  options: {
+                    sourceMap: true,
+                    postcssOptions: {
+                      ident: 'postcss',
+                      plugins: [
+                        postcssPresetEnv({
+                          autoprefixer: {
+                            flexbox: 'no-2009',
+                          },
+                          stage: 3,
+                        }),
+                      ],
+                    },
+                  },
+                }
+              ],
+              // Don't consider CSS imports dead code (for tree shaking) even if the
+              // containing package claims to have no side effects.
+              // Remove this when webpack adds a warning or an error for this.
+              // See https://github.com/webpack/webpack/issues/6571
+              sideEffects: true,
+            },
+
+            // "file" loader makes sure those assets get served by WebpackDevServer.
+            // When you `import` an asset, you get its (virtual) filename.
+            // In production, they would get copied to the `build` folder.
+            // This loader **doesn't use a "test"** so it will catch all modules
+            // that fall through the other loaders.
+            {
+              // Exclude `js` files to keep "css" loader working as it injects
+              // its runtime that would otherwise be processed through "file" loader.
+              // Also exclude `html` and `json` extensions so they get processed
+              // by webpack's internal loaders.
+              exclude: [/\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
+              use: {
+                loader: 'file-loader',
+                options: {
+                  name: 'static/media/[name].[hash:8].[ext]',
+                },
+              },
+            },
+            // ** STOP ** Are you adding a new loader?
+            // Make sure to add the new loader(s) before the "file" loader.
+          ],
         },
       ],
     },
 
     plugins: [
+      // Copy sources not otherwise handled by webpack
       new CopyWebpackPlugin({
         patterns: [
-        {
-          from: 'src/ovirt-web-ui.config',
-        },
-        {
-          from: 'branding',
-          to: 'branding',
-          toType: 'dir'
-        }]
+          { from: 'src/ovirt-web-ui.config' },
+          { from: paths.appBranding, to: 'branding', toType: 'dir' },
+        ],
       }),
 
       // Generates an `index.html` file with the <script> injected.
@@ -250,55 +389,71 @@ module.exports = ((webpackEnv) => {
         publicPath,
         jspSSO: true,
         minify: {
-          removeComments: true,
           collapseWhitespace: false,
-          removeRedundantAttributes: true,
-          useShortDoctype: true,
-          removeEmptyAttributes: true,
-          removeStyleLinkTypeAttributes: true,
           keepClosingSlash: true,
           minifyJS: true,
-          minifyCSS: true,
-          minifyURLs: true,
+          removeEmptyAttributes: true,
+          removeRedundantAttributes: true,
         },
       }),
 
-      // for webpack 4, DefinePlugin and UglifyJsPlugin are default in production mode
+      // This gives some necessary context to module not found errors, such as the requesting resource.
+      new ModuleNotFoundPlugin(paths.appPath),
 
-      // webpack.optimize.OccurrenceOrderPlugin,
-      // which helps ensure the builds are consistent if source hasn't changed,
-      // is enabled by default
+      // Makes some environment variables available to the JS code, for example:
+      // if (process.env.NODE_ENV === 'development') { ... }. See `env.js`.
+      new webpack.DefinePlugin(env),
 
-      // To keep compatibility with old loaders, loaders can be switched to minimize mode via plugin:
-      new webpack.LoaderOptionsPlugin({
-        options: {
-          // We use PostCSS for autoprefixing only.
-          postcssLoader: function () {
-            return [
-              autoprefixer({
-                browsers: [
-                  '>1%',
-                  'last 4 versions',
-                  'Firefox ESR',
-                  'not ie > 0', // VM Portal don't support IE at all
-                ],
-                grid: false,
-              }),
-            ]
-          },
-        }
+      // Embed the small webpack runtime script in index.html
+      isEnvProduction && new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/runtime-.+[.]js/]),
+
+      // Keep the chunk id stable as long as the contents of the chunks stay the same (i.e. no new modules are used)
+      isEnvProduction && new webpack.HashedModuleIdsPlugin(),
+
+      // Extract CSS to files - style-loader leaves them embedded in the JS bundle
+      isEnvProduction && new MiniCssExtractPlugin({
+        filename: 'static/css/[name].[contenthash:8].css',
+        chunkFilename: 'static/css/[name].[contenthash:8].chunk.css',
       }),
 
-      new MiniCssExtractPlugin({
-        filename: 'static/css/[name].[contenthash:8].css'
-      })
-    ],
+      // This is necessary to emit hot updates (CSS and Fast Refresh):
+      isEnvDevelopment && new webpack.HotModuleReplacementPlugin(),
+
+      // Watcher doesn't work well if you mistype casing in a path so we use
+      // a plugin that prints an error when you attempt to do this.
+      isEnvDevelopment && new CaseSensitivePathsPlugin(),
+
+      // If you require a missing module and then `npm install` it, you still have
+      // to restart the development server for Webpack to discover it. This plugin
+      // makes the discovery automatic so you don't have to restart.
+      isEnvDevelopment && new WatchMissingNodeModulesPlugin(paths.appNodeModules),
+
+      // Fail the build if the app sources have lint errors
+      // TODO: Add ESLintPlugin (https://github.com/webpack-contrib/eslint-webpack-plugin)
+    ].filter(Boolean),
+
     // Some libraries import Node modules but don't use them in the browser.
-    // Tell Webpack to provide empty mocks for them so importing them works.
+    // Tell webpack to provide empty mocks for them so importing them works.
     node: {
+      module: 'empty',
+      dgram: 'empty',
+      dns: 'mock',
       fs: 'empty',
+      http2: 'empty',
       net: 'empty',
       tls: 'empty',
+      child_process: 'empty',
     },
+
+    // Turn off performance processing because we utilize
+    // our own hints via the FileSizeReporter
+    // performance: false,
   }
+
+  if (process.env.V) {
+    const colors = tty.isatty(1)
+    console.log(`${webpackEnv} webpack configuration:`)
+    console.log(util.inspect(theConfig, { compact: false, breakLength: 120, depth: null, colors }))
+  }
+  return theConfig
 })('production')

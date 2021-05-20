@@ -1,8 +1,15 @@
-// NOTE: These polyfills are most likely unnecessary for our supported browsers. If verified,
-//       they may be removed and save the space in the bundle.
+//
+// Add polyfills to support javascript features we want to use but are not supported
+// natively by browsers the app supports and are not handled by babel transform
+//
 
-// fetch() polyfill for making API calls.
-require('whatwg-fetch')
+//
+// TODO: If the current browserslist browsers all natively support fetch, this can be dropped
+// core-js does not polyfill fetch(), so use whatwg-fetch.
+//
+import 'whatwg-fetch'
 
-// Babel-polyfills for using Array.prototype.includes, Object.assign and Promise
-require('babel-polyfill')
+//
+// NOTE: core-js polyfills are injected in sources by @babel/preset-env { useBuiltIns: 'usage' }
+//       as needed based on package.json#browserslist and use detection
+//

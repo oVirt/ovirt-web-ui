@@ -1,6 +1,6 @@
 const path = require('path')
-const util = require('util')
 const tty = require('tty')
+const util = require('util')
 const webpack = require('webpack')
 
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
@@ -15,10 +15,9 @@ const paths = require('./paths')
 const env = require('./env')
 const appPackageJson = require(paths.appPackageJson)
 
-// Source maps are resource heavy and can cause out of memory issue for large source files.
-const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false'
-
 const imageInlineSizeLimit = parseInt(process.env.IMAGE_INLINE_SIZE_LIMIT, 10) || 8192
+
+var publicPath = '/'
 
 // This is the development configuration.
 // It is focused on developer experience and fast rebuilds.
@@ -30,7 +29,7 @@ module.exports = ((webpackEnv) => {
   const theConfig = {
     mode: 'development',
     bail: true,
-    devtool: shouldUseSourceMap ? 'eval-source-map' : false,
+    devtool: isEnvDevelopment ? 'eval-source-map' : 'source-map',
 
     // These are the "entry points" to our application.
     // This means they will be the "root" imports that are included in JS bundle.
@@ -49,14 +48,10 @@ module.exports = ((webpackEnv) => {
       // the webpack plugin takes care of injecting the dev client for us.
       // webpackDevClientEntry,
 
-      // We ship a few polyfills by default.
+      // Polyfill and app code goes last so the dev server can stay running if
+      // polyfill or app code is broken
       require.resolve('./polyfills'),
-
-      // Finally, this is your app's code:
       paths.appIndexJs,
-      // We include the app code last so that if there is a runtime error during
-      // initialization, it doesn't blow up the WebpackDevServer client, and
-      // changing JS code would still trigger a refresh.
     ],
 
     output: {
@@ -70,7 +65,7 @@ module.exports = ((webpackEnv) => {
       filename: 'static/js/bundle.js',
       chunkFilename: 'static/js/[name].chunk.js',
       // In development, we always serve from the root. This makes config easier.
-      publicPath: '/',
+      publicPath: publicPath,
       // Prevents conflicts when multiple webpack runtimes (from different apps)
       // are used on the same page.
       jsonpFunction: `webpackJsonp${appPackageJson.name}`,
@@ -131,13 +126,10 @@ module.exports = ((webpackEnv) => {
                 loader: 'babel-loader',
                 options: {
                   babelrc: false,
+                  configFile: false,
                   compact: isEnvProduction,
 
-                  // Utilize 'babel-preset-react-app' to make it easier to keep up with
-                  // useful babel config changes from the Create React App project
-                  presets: [
-                    [ 'react-app', { 'flow': true, 'typescript': false } ]
-                  ],
+                  presets: [ './config/babel.app.config.js' ],
 
                   // This is a feature of `babel-loader` for webpack (not Babel itself).
                   // It enables caching results in ./node_modules/.cache/babel-loader/
@@ -154,9 +146,10 @@ module.exports = ((webpackEnv) => {
             {
               test: /\.(js|mjs)$/,
               include: [
-                paths.novnc,
-                paths.spiceHtml5
-              ],
+                // for @patternfly/react-console
+                '@novnc/novnc',
+                '@spice-project/spice-html5',
+              ].map(dependency => path.resolve(paths.appNodeModules, dependency)),
               use: {
                 loader: 'babel-loader',
                 options: {
@@ -164,12 +157,7 @@ module.exports = ((webpackEnv) => {
                   configFile: false,
                   compact: false,
 
-                  presets: [
-                    [
-                      require.resolve('babel-preset-react-app/dependencies'),
-                      { helpers: true },
-                    ],
-                  ],
+                  presets: [ './config/babel.dep.config.js' ],
 
                   cacheDirectory: true,
                   cacheCompression: false,
@@ -177,9 +165,9 @@ module.exports = ((webpackEnv) => {
                   // Babel sourcemaps are needed for debugging into node_modules
                   // code.  Without the options below, debuggers like VSCode
                   // show incorrect code and set breakpoints on the wrong lines.
-                  sourceMaps: shouldUseSourceMap,
-                  inputSourceMap: shouldUseSourceMap,
-                }
+                  sourceMaps: true,
+                  inputSourceMap: true,
+                },
               },
             },
 
@@ -214,7 +202,7 @@ module.exports = ((webpackEnv) => {
               use: {
                 loader: 'file-loader',
                 options: {
-                  name: 'fonts/[name].[hash:8].[ext]'
+                  name: 'static/fonts/[name].[hash:8].[ext]'
                 }
               }
             },
@@ -231,11 +219,12 @@ module.exports = ((webpackEnv) => {
               },
             },
 
-            // "postcss" loader applies autoprefixer to our CSS.
-            // "css" loader resolves paths in CSS and adds assets as dependencies.
-            // "style" loader turns CSS into JS modules that inject <style> tags.
+            // "postcss-loader" applies autoprefixer to our CSS.
+            // "css-loader" resolves paths in CSS and adds assets as dependencies.
+            // "style-loader" turns CSS into JS modules that inject <style> tags.
+            // MiniCssExtractPlugin extract CSS into separate files.
             // In production, we use a plugin to extract that CSS to a file, but
-            // in development "style" loader enables hot editing of CSS.
+            // in development "style-loader" loader enables hot editing of CSS.
 
             // css modules for local style sheets without '-nomodules.css' suffix
             // ALL imported css from app source should be treated as css-modules except '-nomodules.css'
@@ -248,7 +237,7 @@ module.exports = ((webpackEnv) => {
                   loader: 'css-loader',
                   options: {
                     importLoaders: 1,
-                    sourceMap: shouldUseSourceMap,
+                    sourceMap: true,
                     modules: {
                       localIdentName: '[path][name]__[local]--[hash:base64:10]',
                     },
@@ -257,7 +246,7 @@ module.exports = ((webpackEnv) => {
                 {
                   loader: 'postcss-loader',
                   options: {
-                    sourceMap: shouldUseSourceMap,
+                    sourceMap: true,
                     postcssOptions: {
                       ident: 'postcss',
                       plugins: [
@@ -284,13 +273,13 @@ module.exports = ((webpackEnv) => {
                   loader: 'css-loader',
                   options: {
                     importLoaders: 1,
-                    sourceMap: shouldUseSourceMap,
+                    sourceMap: true,
                   },
                 },
                 {
                   loader: 'postcss-loader',
                   options: {
-                    sourceMap: shouldUseSourceMap,
+                    sourceMap: true,
                     postcssOptions: {
                       ident: 'postcss',
                       plugins: [
@@ -351,7 +340,7 @@ module.exports = ((webpackEnv) => {
         filename: 'index.html',
         inject: true,
         template: `!!handlebars-loader!${paths.appHtml}`,
-        publicPath: '/',
+        publicPath,
         jspSSO: false,
       }),
 
