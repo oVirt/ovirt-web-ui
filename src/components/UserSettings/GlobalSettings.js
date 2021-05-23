@@ -94,6 +94,7 @@ class GlobalSettings extends Component {
         showNotifications: AppConfiguration.showNotificationsDefault,
         refreshInterval: AppConfiguration.schedulerFixedDelayInSeconds,
         notificationSnoozeDuration: AppConfiguration.notificationSnoozeDurationInMinutes,
+        persistLocale: AppConfiguration.persistLocale,
       },
     }
     this.handleCancel = this.handleCancel.bind(this)
