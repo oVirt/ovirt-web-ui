@@ -1183,6 +1183,7 @@ const EngineOptionMaxNumOfVmCpusPerArch = {
 // Export each transforms individually so they can be consumed individually
 //
 export {
+  convertBool,
   VM,
   Pool,
   CdRom,

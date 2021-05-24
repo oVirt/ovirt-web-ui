@@ -27,7 +27,7 @@ export const DefaultEngineOptions = Object.seal({
   MaxNumOfThreadsPerCpu: 8,
   MaxNumOfVmCpusPerArch: `{${DEFAULT_ARCH}=1}`,
 
-  SpiceUsbAutoShare: 1,
+  SpiceUsbAutoShare: true,
   getUSBFilter: {},
 
   UserSessionTimeOutInterval: 30,

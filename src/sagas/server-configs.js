@@ -46,7 +46,7 @@ export function* fetchServerConfiguredValues () {
   }))
 
   if (eo.usbAutoShare) {
-    yield put(setSpiceUsbAutoShare(eo.usbAutoShare))
+    yield put(setSpiceUsbAutoShare(Transforms.convertBool(eo.usbAutoShare)))
   }
 
   if (eo.usbFilter) {
