@@ -146,8 +146,7 @@ class GlobalSettings extends Component {
 
   buildSections (onChange, translatedLabels) {
     const { draftValues } = this.state
-    const { config, msg, currentValues: { language } } = this.props
-    const disableLanguage = !draftValues.persistLocale
+    const { config, msg } = this.props
     const idPrefix = 'global-user-settings'
     return {
       general: {
@@ -167,7 +166,6 @@ class GlobalSettings extends Component {
               <div className={style['half-width']}>
                 <SelectBox
                   id={`${idPrefix}-language`}
-                  disabled={disableLanguage}
                   items={Object.entries(localeWithFullName).map(([id, value]) => ({ id, value, isDefault: id === DEFAULT_LOCALE }))}
                   selected={draftValues.language}
                   onChange={onChange('language')}
@@ -203,12 +201,8 @@ class GlobalSettings extends Component {
               bsSize='normal'
               title='normal'
               value={draftValues.persistLocale}
-              onChange={(e, persist) => {
-                onChange('persistLocale')(persist)
-                if (persist === false) {
-                  onChange('language')(language)
-                }
-              }}
+              onChange={(e, persist) => onChange('persistLocale')(persist)}
+
             />),
           }],
       },

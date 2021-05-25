@@ -61,7 +61,7 @@ import {
   fetchCurrentUser,
 } from './index'
 
-import { loadFromLocalStorage } from '_/storage'
+import { loadFromLocalStorage, removeFromLocalStorage } from '_/storage'
 import { loadUserOptions } from './options'
 
 /**
@@ -232,6 +232,9 @@ function* initialLoad () {
   yield call(fetchIsoFiles)
   console.log('\u2714 data loads that require storage domains are complete')
   console.groupEnd('needs storage domains')
+
+  // delete options left in local storage by older versions
+  removeFromLocalStorage('options')
 
   // Vms and Pools are loaded as needed / accessed
 }

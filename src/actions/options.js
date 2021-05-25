@@ -101,7 +101,7 @@ export function saveSSHKey ({ key, userId, sshId }: Object): Object {
 }
 export function deleteUserOption ({ optionId, userId }: Object): Object {
   return {
-    type: C.REMOVE_USER_OPTION,
+    type: C.DELETE_USER_OPTION,
     payload: {
       optionId,
       userId,
