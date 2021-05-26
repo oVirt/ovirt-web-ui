@@ -153,14 +153,17 @@ class GlobalSettings extends Component {
         fields: [
           {
             title: msg.username(),
+            name: 'username',
             body: <span>{config.userName}</span>,
           },
           {
             title: msg.email(),
+            name: 'email',
             body: <span>{config.email}</span>,
           },
           {
             title: translatedLabels.language,
+            name: 'language',
             body: (
               <div className={style['half-width']}>
                 <SelectBox
@@ -175,6 +178,7 @@ class GlobalSettings extends Component {
           {
             title: translatedLabels.sshKey,
             tooltip: msg.sshKeyTooltip(),
+            name: 'sshKey',
             body: (
               <div className={style['half-width']}>
                 <FormControl
@@ -195,6 +199,7 @@ class GlobalSettings extends Component {
         fields: [
           {
             title: translatedLabels.refreshInterval,
+            name: 'refreshInterval',
             body: (
               <div className={style['half-width']}>
                 <SelectBox
@@ -215,6 +220,7 @@ class GlobalSettings extends Component {
         fields: [
           {
             title: translatedLabels.showNotifications,
+            name: 'showNotificatons',
             body: (
               <Switch
                 id={`${idPrefix}-dont-disturb`}
@@ -229,6 +235,7 @@ class GlobalSettings extends Component {
           },
           {
             title: translatedLabels.notificationSnoozeDuration,
+            name: 'notificationSnoozeDuration',
             body: (
               <div className={style['half-width']}>
                 <SelectBox
