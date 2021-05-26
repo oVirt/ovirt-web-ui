@@ -43,7 +43,7 @@ const SettingsToolbar = ({ onSave, onReset, onCancel, enableSave, enableReset, t
     <ul className={style['changes-list']}>{
       changes.map(name => {
         const value = translatedLabels[name] || name
-        return (<li key={`${idPrefix}_li_${value}`}>{value}</li>)
+        return (<li key={`${idPrefix}_li_${name}`}>{value}</li>)
       })
     }
     </ul>
