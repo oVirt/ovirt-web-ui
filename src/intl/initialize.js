@@ -87,7 +87,9 @@ export function initMomentTranslations (locale: string, defaultLocale: string) {
   if (translations[locale]) {
     const t:{ [messageId: string]: string } = translations[locale]
 
-    moment.updateLocale(locale, {
+    // for built-in translations moment.js uses lower case identifiers
+    // i.e. pt-br instead of pt-BR
+    moment.updateLocale(locale.toLowerCase(), {
       durationLabelsStandard: {
         S: t.durationLabelStandard_S || timeDurations.durationLabelStandard_S.message,
         SS: t.durationLabelStandard_SS || timeDurations.durationLabelStandard_SS.message,
