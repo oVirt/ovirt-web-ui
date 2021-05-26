@@ -44,8 +44,8 @@ const Section = ({ name, section }) => (
       { section.tooltip && <InfoTooltip id={`${name}-info-tooltip`} tooltip={section.tooltip} /> }
     </h3>
     { section.fields.map((field) => (
-      <FormGroup key={field.title} className={style['settings-field']}>
-        <LabelCol fieldPath={`${name}-${field.title}`} tooltip={field.tooltip} sm={3} className={style['field-label']}>
+      <FormGroup key={field.name} className={style['settings-field']}>
+        <LabelCol fieldPath={`${name}-${field.name}`} tooltip={field.tooltip} sm={3} className={style['field-label']}>
           { field.title }
         </LabelCol>
         <Col sm={9}>
