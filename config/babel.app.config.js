@@ -10,6 +10,7 @@ const util = require('util')
  */
 module.exports = function (api, opts = {}) {
   const env = process.env.BABEL_ENV || process.env.NODE_ENV;
+  const verbose = process.env.V === '1'
   const isEnvDevelopment = env === 'development';
   const isEnvProduction = env === 'production';
   const isEnvTest = env === 'test'; // for jest running tests on nodejs
@@ -26,7 +27,7 @@ module.exports = function (api, opts = {}) {
       (isEnvDevelopment || isEnvProduction) && [
         '@babel/preset-env',
         {
-          debug: isEnvDevelopment || process.env.V,
+          debug: isEnvDevelopment || verbose,
           useBuiltIns: 'usage',
           corejs: '3.13',
           exclude: [ 'transform-typeof-symbol' ],
@@ -80,7 +81,7 @@ module.exports = function (api, opts = {}) {
     ].filter(Boolean),
   }
 
-  if (process.env.V) {
+  if (verbose) {
     const colors = tty.isatty(1)
     console.log(`${env} babel.app configuration:`)
     console.log(util.inspect(babelConfig, { compact: false, breakLength: 120, depth: null, colors }))

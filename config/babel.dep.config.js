@@ -10,6 +10,7 @@ const util = require('util')
  */
 module.exports = function (api, opts = {}) {
   const env = process.env.BABEL_ENV || process.env.NODE_ENV;
+  const verbose = process.env.V === '1'
   const isEnvDevelopment = env === 'development';
   const isEnvProduction = env === 'production';
   const isEnvTest = env === 'test'; // for jest running tests on nodejs
@@ -57,7 +58,7 @@ module.exports = function (api, opts = {}) {
     ].filter(Boolean),
   }
 
-  if (process.env.V) {
+  if (verbose) {
     const colors = tty.isatty(1)
     console.log(`${env} babel.dep configuration:`)
     console.log(util.inspect(babelConfig, { compact: false, breakLength: 120, depth: null, colors }))
