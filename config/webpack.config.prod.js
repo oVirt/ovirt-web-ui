@@ -44,7 +44,7 @@ module.exports = ((webpackEnv) => {
   let fontsToEmbed
 
   const theConfig = {
-    mode: 'production',
+    mode: 'development', //'production',
     bail: true,
     devtool: isEnvDevelopment ? 'eval-source-map' : 'source-map',
 
@@ -447,7 +447,7 @@ module.exports = ((webpackEnv) => {
 
     // Turn off performance processing because we utilize
     // our own hints via the FileSizeReporter
-    // performance: false,
+    performance: false,
   }
 
   if (process.env.V) {
