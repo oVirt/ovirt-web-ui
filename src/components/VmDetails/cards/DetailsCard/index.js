@@ -41,7 +41,9 @@ import {
   FormControl,
   Icon,
 } from 'patternfly-react'
-import Switch from '_/components/Switch'
+
+import { Switch } from '@patternfly/react-core'
+
 import SelectBox from '_/components/SelectBox'
 import BaseCard from '../../BaseCard'
 
@@ -904,10 +906,8 @@ class DetailsCard extends React.Component {
                       <FieldRow label={msg.bootMenu()} id={`${idPrefix}-boot-menu`}>
                         <Switch
                           id={`${idPrefix}-boot-menu-edit`}
-                          handleWidth={30}
-                          bsSize='mini'
-                          value={bootMenuEnabled}
-                          onChange={(e, state) => { this.handleChange('bootMenuEnabled', state) }}
+                          isChecked={bootMenuEnabled}
+                          onChange={state => this.handleChange('bootMenuEnabled', state)}
                         />
                       </FieldRow>
                       <CloudInit idPrefix={idPrefix} vm={vm} onChange={this.handleChange} isWindows={isOsWindows} lastInitTimezone={this.state.lastInitTimezone} />
