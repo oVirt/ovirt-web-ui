@@ -4,8 +4,8 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 import { saveGlobalOptions } from '_/actions'
-import { FormControl, Switch } from 'patternfly-react'
-import { Nav, NavItem, NavList, Split, SplitItem } from '@patternfly/react-core'
+import { FormControl } from 'patternfly-react'
+import { Switch, Nav, NavItem, NavList, Split, SplitItem } from '@patternfly/react-core'
 import { withMsg, localeWithFullName, DEFAULT_LOCALE } from '_/intl'
 import style from './style.css'
 
@@ -228,10 +228,8 @@ class GlobalSettings extends Component {
             body: (
               <Switch
                 id={`${idPrefix}-dont-disturb`}
-                bsSize='normal'
-                title='normal'
-                value={!draftValues.showNotifications}
-                onChange={(e, dontDisturb) => {
+                isChecked={!draftValues.showNotifications}
+                onChange={(dontDisturb) => {
                   onChange('showNotifications')(!dontDisturb)
                 }}
               />
