@@ -195,22 +195,6 @@ class GlobalSettings extends Component {
           },
         ],
       },
-      advancedOptions: {
-        title: msg.advancedOptions(),
-        fields: [
-          {
-            title: msg.persistLanguage(),
-            tooltip: msg.persistLanguageTooltip(),
-            body: (<Switch
-              id={`${idPrefix}-persist-language`}
-              bsSize='normal'
-              title='normal'
-              value={draftValues.persistLocale}
-              onChange={(e, persist) => onChange('persistLocale')(persist)}
-
-            />),
-          }],
-      },
       refreshInterval: {
         title: msg.refreshInterval(),
         tooltip: msg.refreshIntervalTooltip(),
@@ -263,6 +247,21 @@ class GlobalSettings extends Component {
                 />
               </div>
             ),
+          },
+        ],
+      },
+      advancedOptions: {
+        title: msg.advancedOptions(),
+        fields: [
+          {
+            title: msg.persistLanguage(),
+            name: 'persistLanguage',
+            tooltip: msg.persistLanguageTooltip(),
+            body: (<Switch
+              id={`${idPrefix}-persist-language`}
+              isChecked={draftValues.persistLocale}
+              onChange={(persist) => onChange('persistLocale')(persist)}
+            />),
           },
         ],
       },
