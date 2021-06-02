@@ -179,11 +179,6 @@ function* saveGlobalOptions ({ payload: { sshKey, showNotifications, notificatio
     yield put(A.setOption({ key: [ 'remoteOptions', name ], value }))
   }
 
-  if (!locale.error && locale.change && !locale.sameAsCurrent) {
-    const { name, value } = locale.data
-    yield put(A.setOption({ key: [ 'remoteOptions', name ], value }))
-  }
-
   if (!shouldPersistLocale.error && shouldPersistLocale.change && !shouldPersistLocale.sameAsCurrent) {
     const { name, value } = shouldPersistLocale.data
     yield put(A.setOption({ key: [ 'remoteOptions', name ], value }))
@@ -193,6 +188,11 @@ function* saveGlobalOptions ({ payload: { sshKey, showNotifications, notificatio
     } else {
       yield put({ type: C.EXPORT_LOCALE })
     }
+  }
+
+  if (!locale.error && locale.change && !locale.sameAsCurrent) {
+    const { name, value } = locale.data
+    yield put(A.setOption({ key: [ 'remoteOptions', name ], value }))
   }
 
   if (!ssh.error && ssh.change && !ssh.sameAsCurrent) {
