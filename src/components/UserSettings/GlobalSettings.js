@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 import { saveGlobalOptions } from '_/actions'
 import { FormControl } from 'patternfly-react'
-import { Switch } from '@patternfly/react-core'
+import { Switch, Nav, NavItem, NavList, Split, SplitItem } from '@patternfly/react-core'
 import { withMsg, localeWithFullName, DEFAULT_LOCALE } from '_/intl'
 import style from './style.css'
 
@@ -13,6 +13,8 @@ import { Settings, SettingsBase } from '../Settings'
 import SelectBox from '../SelectBox'
 import moment from 'moment'
 import AppConfiguration from '_/config'
+
+const GENERAL_SECTION = 'general'
 
 class GlobalSettings extends Component {
   dontDisturbList (msg) {
@@ -90,6 +92,7 @@ class GlobalSettings extends Component {
       // values submitted using 'save' action
       // inlcude both remote(server and store) or local(store only)
       sentValues: {},
+      activeSectionKey: GENERAL_SECTION,
       defaultValues: {
         language: DEFAULT_LOCALE,
         showNotifications: AppConfiguration.showNotificationsDefault,
@@ -150,7 +153,7 @@ class GlobalSettings extends Component {
     const { config, msg } = this.props
     const idPrefix = 'global-user-settings'
     return {
-      general: {
+      [GENERAL_SECTION]: {
         title: msg.general(),
         fields: [
           {
@@ -270,7 +273,7 @@ class GlobalSettings extends Component {
 
   render () {
     const { lastTransactionId, currentValues, msg } = this.props
-    const { draftValues, baseValues, sentValues, defaultValues } = this.state
+    const { draftValues, baseValues, sentValues, defaultValues, activeSectionKey } = this.state
     // required also in Settings for error handling: the case of partial success(only some fields saved)
     // the alert shows the names of the fields that were NOT saved
     const translatedLabels = {
@@ -282,23 +285,47 @@ class GlobalSettings extends Component {
       persistLocale: msg.persistLanguage(),
     }
 
+    const sections = this.buildSections(this.onChange, translatedLabels)
+    const { [activeSectionKey]: activeSection } = sections
+
+    const onSelect = result => {
+      this.setState({
+        activeSectionKey: result.itemId,
+      })
+    }
+
     return (
       <div className='container'>
-        <Settings
-          draftValues={draftValues}
-          baseValues={baseValues}
-          currentValues={currentValues}
-          sentValues={sentValues}
-          translatedLabels={translatedLabels}
-          lastTransactionId={lastTransactionId}
-          resetBaseValues={this.resetBaseValues}
-          onSave={this.saveOptions}
-          onCancel={this.handleCancel}
-          onReset={this.onReset}
-          defaultValues={defaultValues}
-        >
-          <SettingsBase sections={this.buildSections(this.onChange, translatedLabels)} />
-        </Settings>
+        <Split hasGutter>
+          <SplitItem>
+            <Nav onSelect={onSelect} theme='light'>
+              <NavList className={`card-pf global-settings-nav-list`}>
+                { Object.entries(sections).map(([key, section]) =>
+                  <NavItem className='border' itemId={key} key={key} isActive={activeSectionKey === key}>
+                    {section.title}
+                  </NavItem>)
+                }
+              </NavList>
+            </Nav>
+          </SplitItem>
+          <SplitItem isFilled>
+            <Settings
+              draftValues={draftValues}
+              baseValues={baseValues}
+              currentValues={currentValues}
+              sentValues={sentValues}
+              translatedLabels={translatedLabels}
+              lastTransactionId={lastTransactionId}
+              resetBaseValues={this.resetBaseValues}
+              onSave={this.saveOptions}
+              onCancel={this.handleCancel}
+              onReset={this.onReset}
+              defaultValues={defaultValues}
+            >
+              <SettingsBase section={activeSection} name={activeSectionKey} />
+            </Settings>
+          </SplitItem>
+        </Split>
       </div>
     )
   }
