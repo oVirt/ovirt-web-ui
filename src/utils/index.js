@@ -1,6 +1,7 @@
 // @flow
 import type { VmSessionsType } from '_/ovirtapi/types'
 import { isNumber } from './type-validation'
+import { VNC, NATIVE, SPICE, NO_VNC, NATIVE_VNC, BROWSER_VNC } from '_/constants/console'
 
 export * from './array-utils'
 export * from './format'
@@ -39,4 +40,11 @@ export function dividers (num: number): Array<number> {
     divs.push(num)
   }
   return divs
+}
+
+export const toUiConsole = (vncMode: NO_VNC | NATIVE, protocol: VNC | SPICE) => {
+  if (protocol !== VNC) {
+    return protocol
+  }
+  return vncMode === NATIVE ? NATIVE_VNC : BROWSER_VNC
 }

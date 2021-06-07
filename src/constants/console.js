@@ -13,7 +13,15 @@ export const CONSOLE_IN_USE = 'IN_USE'
 export const CONSOLE_LOGON = 'LOGON'
 
 export const RDP_ID = 'rdp'
+// console protocols
 export const VNC = 'vnc'
-export const NO_VNC = 'noVNC'
 export const SPICE = 'spice'
 export const RDP = 'rdp'
+
+// VNC modes sent from the backend (ClientConsoleMode)
+export const NO_VNC = 'NoVnc'
+export const NATIVE = 'Native'
+
+// UI console types (for spice and rdp protocol name is used directly)
+export const BROWSER_VNC = 'BrowserVnc'
+export const NATIVE_VNC = 'NativeVnc'

@@ -117,9 +117,8 @@ const VM_FETCH_ADDITIONAL_SHALLOW = [
 
 export const EVERYONE_GROUP_ID = 'eee00000-0000-0000-0000-123456789eee'
 
-export function* transformAndPermitVm (vm, defaultConsole) {
+export function* transformAndPermitVm (vm) {
   const internalVm = Transforms.VM.toInternal({ vm })
-  internalVm.defaultConsole = defaultConsole
   internalVm.userPermits = yield entityPermissionsToUserPermits(internalVm)
 
   internalVm.canUserChangeCd = canUserChangeCd(internalVm.userPermits)
@@ -191,11 +190,10 @@ export function* fetchVms ({ payload: { count, page, shallowFetch = true } }) {
 
   const additional = shallowFetch ? VM_FETCH_ADDITIONAL_SHALLOW : VM_FETCH_ADDITIONAL_DEEP
   const apiVms = yield callExternalAction('getVms', Api.getVms, { payload: { count, page, additional } })
-  const defaultConsoleProtocol = yield select(state => state.config.get('defaultConsole'))
   if (apiVms && apiVms['vm']) {
     const internalVms = []
     for (const apiVm of apiVms.vm) {
-      const internalVm = yield transformAndPermitVm(apiVm, defaultConsoleProtocol)
+      const internalVm = yield transformAndPermitVm(apiVm)
       fetchedVmIds.push(internalVm.id)
       internalVms.push(internalVm)
     }
@@ -219,11 +217,10 @@ export function* fetchSingleVm (action) {
 
   action.payload.additional = shallowFetch ? VM_FETCH_ADDITIONAL_SHALLOW : VM_FETCH_ADDITIONAL_DEEP
 
-  const defaultConsoleProtocol = yield select(state => state.config.get('defaultConsole'))
   const vm = yield callExternalAction('getVm', Api.getVm, action, true)
   let internalVm = null
   if (vm && vm.id) {
-    internalVm = yield transformAndPermitVm(vm, defaultConsoleProtocol)
+    internalVm = yield transformAndPermitVm(vm)
 
     // If the VM is running, we want to display the current=true cdrom info. Due
     // to an API restriction, current=true cdrom info cannot currently (Aug-2018)

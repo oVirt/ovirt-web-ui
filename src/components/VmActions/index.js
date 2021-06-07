@@ -34,7 +34,8 @@ import { SplitButton, Icon, Checkbox, DropdownKebab } from 'patternfly-react'
 import ConfirmationModal from './ConfirmationModal'
 import ConsoleConfirmationModal from './ConsoleConfirmationModal'
 import Action, { ActionButtonWraper, MenuItemAction, ActionMenuItemWrapper } from './Action'
-import { VNC, NO_VNC, RDP } from '_/constants/console'
+import { VNC, RDP, BROWSER_VNC, NATIVE } from '_/constants/console'
+import { toUiConsole } from '_/utils'
 
 const EmptyAction = ({ state, isOnCard }) => {
   if (!canConsole(state) && !canShutdown(state) && !canRestart(state) && !canStart(state)) {
@@ -136,12 +137,13 @@ class VmActions extends React.Component {
 
     const vncConsole = vm.get('consoles').find(c => c.get('protocol') === VNC)
     const hasRdp = isWindows(vm.getIn(['os', 'type']))
-    const defaultConsole = vm.get('defaultConsole')
+    const defaultUiConsole = config.get('defaultUiConsole')
     let consoles = []
 
     consoles = vm.get('consoles').map((c) => ({
       priority: 0,
       protocol: c.get('protocol'),
+      uiConsole: toUiConsole(NATIVE, c.get('protocol')),
       shortTitle: msg[c.get('protocol') + 'Console'](),
       icon: <Icon name='external-link' />,
       id: `${idPrefix}-button-console-${c.get('protocol')}`,
@@ -153,7 +155,7 @@ class VmActions extends React.Component {
     if (vncConsole) {
       consoles.push({
         priority: 0,
-        protocol: NO_VNC,
+        uiConsole: BROWSER_VNC,
         shortTitle: msg.vncConsoleBrowser(),
         actionDisabled: config.get('websocket') === null,
         id: `${idPrefix}-button-console-browser`,
@@ -168,7 +170,7 @@ class VmActions extends React.Component {
       const username = config.getIn([ 'user', 'name' ])
       consoles.push({
         priority: 0,
-        protocol: RDP,
+        uiConsole: RDP,
         shortTitle: msg.remoteDesktop(),
         icon: <Icon name='external-link' />,
         id: `${idPrefix}-button-console-rdp`,
@@ -177,7 +179,7 @@ class VmActions extends React.Component {
     }
 
     consoles = consoles
-      .map(({ protocol, ...props }) => ({ ...props, protocol, priority: protocol === defaultConsole ? 1 : 0 }))
+      .map(({ uiConsole, ...props }) => ({ ...props, priority: uiConsole === defaultUiConsole ? 1 : 0 }))
       .sort((a, b) => b.priority - a.priority)
 
     const actions = [

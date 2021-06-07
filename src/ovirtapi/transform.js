@@ -163,7 +163,6 @@ const VM = {
       },
       disks: [],
       consoles: [],
-      defaultConsole: undefined,
       snapshots: [],
       pool: {
         id: vm['vm_pool'] ? vm.vm_pool['id'] : undefined,

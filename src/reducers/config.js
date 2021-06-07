@@ -23,7 +23,8 @@ import {
   SET_GLOBAL_DEFAULT_VNC_MODE,
 } from '_/constants'
 
-import { VNC } from '_/constants/console'
+import { VNC, NATIVE } from '_/constants/console'
+import { toUiConsole } from '_/utils'
 
 const initialState = Immutable.fromJS({
   appConfigured: false,
@@ -39,8 +40,13 @@ const initialState = Immutable.fromJS({
     minor: undefined,
     passed: undefined,
   },
+  // allowed values: vnc, spice
   defaultConsole: VNC,
-  defaultVncMode: 'Native',
+  // allowed values: Native, NoVnc
+  defaultVncMode: NATIVE,
+  // derrived from defaultConsole and defaultVncMode
+  // allowed values: NativeVnc, BrowserVnc, spice, rdp
+  defaultUiConsole: VNC,
   filter: true,
   isFilterChecked: false,
   administrator: false,
@@ -108,10 +114,15 @@ const config = actionReducer(initialState, {
     return state.mergeDeep({ user })
   },
   [SET_GLOBAL_DEFAULT_CONSOLE] (state, { payload: { defaultConsole } }) {
+    const defaultVncMode = state.get('defaultVncMode')
+
     return state.set('defaultConsole', defaultConsole)
+      .set('defaultUiConsole', toUiConsole(defaultVncMode, defaultConsole))
   },
   [SET_GLOBAL_DEFAULT_VNC_MODE] (state, { payload: { defaultVncMode } }) {
+    const defaultConsole = state.get('defaultConsole')
     return state.set('defaultVncMode', defaultVncMode)
+      .set('defaultUiConsole', toUiConsole(defaultVncMode, defaultConsole))
   },
   [SET_USER_GROUPS] (state, { payload: { groups } }) {
     return state.set('userGroups', groups)
