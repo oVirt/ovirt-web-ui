@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { List } from 'immutable'
 
 import * as Actions from '_/actions'
-import { MAX_VM_MEMORY_FACTOR } from '_/constants'
+import { MAX_VM_MEMORY_FACTOR, MAX_VM_VCPU_EDIT } from '_/constants'
 import {
   filterOsByArchitecture,
   generateUnique,
@@ -283,6 +283,7 @@ class DetailsCard extends React.Component {
         maxNumOfSockets,
         maxNumOfCores,
         maxNumOfThreads,
+        maxNumOfVmCpus,
       } = this.grabCpuOptions()
 
       let fieldUpdated
@@ -408,9 +409,9 @@ class DetailsCard extends React.Component {
 
         case 'cpu':
           // Allow a value that is too large in case the max total changes due to a Cluster change
-          if (isNumber(value) && value > 0) {
+          if (isNumber(value) && value > 0 && value <= MAX_VM_VCPU_EDIT) {
             let topology = { sockets: value, cores: 1, threads: 1 }
-            if (value > maxNumOfSockets) {
+            if (value > maxNumOfSockets && value <= maxNumOfVmCpus) {
               topology = getTopology({
                 value,
                 max: {
@@ -898,6 +899,8 @@ class DetailsCard extends React.Component {
                             id={`${idPrefix}-cpus-edit`}
                             className={style['cpu-input']}
                             type='number'
+                            min={1}
+                            max={MAX_VM_VCPU_EDIT}
                             value={vCpuCount}
                             onChange={e => this.handleChange('cpu', e.target.value)}
                           />

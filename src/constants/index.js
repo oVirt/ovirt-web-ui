@@ -59,6 +59,7 @@ export const LOGIN_SUCCESSFUL = 'LOGIN_SUCCESSFUL'
 export const LOGOUT = 'LOGOUT'
 export const MANUAL_REFRESH = 'MANUAL_REFRESH'
 export const MAX_VM_MEMORY_FACTOR = 4 // see Edit VM flow; magic constant to stay aligned with Web Admin
+export const MAX_VM_VCPU_EDIT = 4096
 export const OPEN_CONSOLE_VM = 'OPEN_CONSOLE_VM'
 export const PERSIST_OPTION = 'PERSIST_OPTION'
 export const POOL_ACTION_IN_PROGRESS = 'POOL_ACTION_IN_PROGRESS'
