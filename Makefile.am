@@ -96,7 +96,7 @@ all: ovirt-web-ui
 ovirt-web-ui:
 	node --version
 	$(YARN) --version
-	$(YARN) run build
+	NODE_OPTIONS=--max_old_space_size=4096 $(YARN) run build
 	cp -rpv packaging/* build/
 	mv build/static build/index.jsp build/ovirt-web-ui.config build/ovirt-web-ui.war/
 
