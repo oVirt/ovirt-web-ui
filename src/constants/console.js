@@ -18,7 +18,7 @@ export const VNC = 'vnc'
 export const SPICE = 'spice'
 export const RDP = 'rdp'
 
-// VNC modes sent from the backend (ClientConsoleMode)
+// VNC modes sent from the backend (config property ClientModeVncDefault)
 export const NO_VNC = 'NoVnc'
 export const NATIVE = 'Native'
 
