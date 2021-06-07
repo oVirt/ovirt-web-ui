@@ -185,7 +185,7 @@ function* saveGlobalOptions ({ payload: { sshKey, showNotifications, notificatio
 
     if (!value.content) {
       yield call(deleteUserOption, 'locale')
-    } else {
+    } else if (!language) {
       yield put({ type: C.EXPORT_LOCALE })
     }
   }
@@ -220,18 +220,24 @@ function* saveGlobalOptions ({ payload: { sshKey, showNotifications, notificatio
 }
 
 function* deleteUserOption (optionName: string): any {
-  const { optionId, userId } = yield select(({ options, config }) => ({
+  const { optionId, userId, optionValue } = yield select(({ options, config }) => ({
     optionId: options.getIn(['remoteOptions', optionName, 'id']),
+    optionValue: options.getIn(['remoteOptions', optionName, 'content']),
     userId: config.getIn(['user', 'id']),
   }))
-  if (optionId && userId) {
-    yield call(
-      callExternalAction,
-      'deleteUserOption',
-      Api.deleteUserOption,
-      A.deleteUserOption({ optionId, userId }),
-      true,
-    )
+  if (!optionId || !userId) {
+    return
+  }
+  const { error } = yield call(
+    callExternalAction,
+    'deleteUserOption',
+    Api.deleteUserOption,
+    A.deleteUserOption({ optionId, userId }),
+    true,
+  )
+
+  if (!error) {
+    yield put(A.setOption({ key: [ 'remoteOptions', optionName ], value: { id: undefined, content: optionValue } }))
   }
 }
 
