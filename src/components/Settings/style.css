@@ -61,7 +61,12 @@
 :global(#settings-toolbar) {
     margin-left: -20px;
 }
-.changes-list{
+
+.section-list{
     list-style-type: disc;
-    list-style: inside;
+}
+
+.field-list{
+    list-style-type: circle;
+    margin-inline-start: 1em;
 }

@@ -8,6 +8,7 @@ import CounterAlert from '_/components/CounterAlert'
 import { generateUnique } from '_/helpers'
 import { MsgContext } from '_/intl'
 import style from './style.css'
+import ChangesList from './ChangesList'
 
 const changedInTheMeantime = ({ currentValues = {}, baseValues = {}, draftValues = {}, sentValues = {} }) => {
   return Object.keys(currentValues).filter(name =>
@@ -94,7 +95,7 @@ const Settings = ({ draftValues, onSave, lastTransactionId, onCancel,
   useEffect(() => {
     const partialSaveState = {
       show: partialSuccess,
-      fields: pendingChanges.map(e => <p key={translatedLabels[e]}>{translatedLabels[e]}</p>),
+      fields: pendingChanges,
     }
     if (partialSaveState.show) { setShowPartialSave(partialSaveState) }
     if (completeFailure) { setShowCompleteFailure(completeFailure) }
@@ -128,7 +129,7 @@ const Settings = ({ draftValues, onSave, lastTransactionId, onCancel,
           type='error'
           title={<p>{msg.failedToSaveChangesToFields()}</p>}
           onDismiss={() => resetNotifications(setShowPartialSave, { show: false, fields: [] })} >
-          {partialSave.fields}
+          <ChangesList changes={partialSave.fields} translatedLabels={translatedLabels} />
         </CounterAlert>
       }
       { showCompleteFailure &&
@@ -157,7 +158,7 @@ Settings.propTypes = {
   currentValues: PropTypes.object.isRequired,
   baseValues: PropTypes.object.isRequired,
   sentValues: PropTypes.object.isRequired,
-  translatedLabels: PropTypes.object.isRequired,
+  translatedLabels: PropTypes.array.isRequired,
   lastTransactionId: PropTypes.string,
   onSave: PropTypes.func.isRequired,
   onReset: PropTypes.func.isRequired,
