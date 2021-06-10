@@ -169,6 +169,7 @@ class GlobalSettings extends Component {
           {
             title: translatedLabels.language,
             name: 'language',
+            tooltip: draftValues.persistLocale ? undefined : msg.optionIsNotSavedOnTheServer({ persistenceReEnableHowTo: msg.persistenceReEnableHowTo({ advancedOptions: msg.advancedOptions() }) }),
             body: (
               <div className={style['half-width']}>
                 <SelectBox
@@ -258,10 +259,10 @@ class GlobalSettings extends Component {
         fields: [
           {
             title: msg.persistLanguage(),
-            name: 'persistLanguage',
+            name: 'persistLocale',
             tooltip: msg.persistLanguageTooltip(),
             body: (<Switch
-              id={`${idPrefix}-persist-language`}
+              id={`${idPrefix}-persist-locale`}
               isChecked={draftValues.persistLocale}
               onChange={(persist) => onChange('persistLocale')(persist)}
             />),
