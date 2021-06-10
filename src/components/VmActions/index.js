@@ -34,8 +34,7 @@ import { SplitButton, Icon, Checkbox, DropdownKebab } from 'patternfly-react'
 import ConfirmationModal from './ConfirmationModal'
 import ConsoleConfirmationModal from './ConsoleConfirmationModal'
 import Action, { ActionButtonWraper, MenuItemAction, ActionMenuItemWrapper } from './Action'
-import { VNC, RDP, BROWSER_VNC, NATIVE } from '_/constants/console'
-import { toUiConsole } from '_/utils'
+import { VNC, RDP, BROWSER_VNC, SPICE, NATIVE_VNC, NO_VNC } from '_/constants/console'
 
 const EmptyAction = ({ state, isOnCard }) => {
   if (!canConsole(state) && !canShutdown(state) && !canRestart(state) && !canStart(state)) {
@@ -136,24 +135,24 @@ class VmActions extends React.Component {
     const onStart = (isPool ? onStartPool : onStartVm)
 
     const vncConsole = vm.get('consoles').find(c => c.get('protocol') === VNC)
+    const spiceConsole = vm.get('consoles').find(c => c.get('protocol') === SPICE)
     const hasRdp = isWindows(vm.getIn(['os', 'type']))
     const defaultUiConsole = config.get('defaultUiConsole')
     let consoles = []
 
-    consoles = vm.get('consoles').map((c) => ({
-      priority: 0,
-      protocol: c.get('protocol'),
-      uiConsole: toUiConsole(NATIVE, c.get('protocol')),
-      shortTitle: msg[c.get('protocol') + 'Console'](),
-      icon: <Icon name='external-link' />,
-      id: `${idPrefix}-button-console-${c.get('protocol')}`,
-      confirmation: (
-        <ConsoleConfirmationModal consoleId={c.get('id')} vm={vm} />
-      ),
-    })).toJS()
-
     if (vncConsole) {
-      consoles.push({
+      const vncModes = [ {
+        priority: 0,
+        protocol: VNC,
+        uiConsole: NATIVE_VNC,
+        shortTitle: msg.vncConsole(),
+        icon: <Icon name='external-link' />,
+        id: `${idPrefix}-button-console-vnc`,
+        confirmation: (
+          <ConsoleConfirmationModal consoleId={vncConsole.get('id')} vm={vm} />
+        ),
+      },
+      {
         priority: 0,
         uiConsole: BROWSER_VNC,
         shortTitle: msg.vncConsoleBrowser(),
@@ -161,6 +160,25 @@ class VmActions extends React.Component {
         id: `${idPrefix}-button-console-browser`,
         confirmation: (
           <ConsoleConfirmationModal isNoVNC consoleId={vncConsole.get('id')} vm={vm} />
+        ),
+      }]
+
+      if (config.get('defaultVncMode') === NO_VNC) {
+        vncModes.reverse()
+      }
+      consoles = [...consoles, ...vncModes]
+    }
+
+    if (spiceConsole) {
+      consoles.push({
+        priority: 0,
+        protocol: SPICE,
+        uiConsole: SPICE,
+        shortTitle: msg.spiceConsole(),
+        icon: <Icon name='external-link' />,
+        id: `${idPrefix}-button-console-spice`,
+        confirmation: (
+          <ConsoleConfirmationModal consoleId={spiceConsole.get('id')} vm={vm} />
         ),
       })
     }
