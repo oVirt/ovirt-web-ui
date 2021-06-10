@@ -44,7 +44,7 @@ module.exports = ((webpackEnv) => {
   let fontsToEmbed
 
   const theConfig = {
-    mode: 'development', //'production',
+    mode: 'production',
     bail: true,
     devtool: isEnvDevelopment ? 'eval-source-map' : 'source-map',
 
