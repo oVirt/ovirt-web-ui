@@ -66,7 +66,7 @@ export function* downloadVmConsole (action) {
     if (isSpice || !isNoVNC) {
       const legacyOptions = getLegacyOptions({ vmId })
       const options = isSpice
-        ? yield getSpiceConsoleOptions({ legacyOptions, usbAutoshare, usbFilter })
+        ? yield getSpiceConsoleOptions({ legacyOptions, usbAutoshare, usbFilter, vmId })
         : yield getVncOptions({ legacyOptions })
 
       data = adjustVVFile({ data, options })
@@ -86,6 +86,12 @@ export function* downloadVmConsole (action) {
   }
 }
 
+/**
+ * Legacy options were saved in browser's local storage.
+ * The UI for setting theose options was removed in previous versions.
+ * However there is still a (small) chance that the data is still there.
+ * Note that legacy options are per VM and therefore should overwrite global defaults.
+ */
 function* getLegacyOptions ({ vmId }) {
   const options = yield select(state => state.options.getIn(['options', 'consoleOptions', vmId]))
   if (options) {
@@ -95,18 +101,22 @@ function* getLegacyOptions ({ vmId }) {
   yield getConsoleOptions(getConsoleOptionsAction({ vmId }))
 }
 
-function* getSpiceConsoleOptions ({ legacyOptions, usbAutoshare, usbFilter }) {
-  const newOptions = yield select(({ options }) => ({
+function* getSpiceConsoleOptions ({ legacyOptions, usbAutoshare, usbFilter, vmId }) {
+  const smartcardEnabledOnVm = yield select(({ vms }) => vms.getIn(['vms', vmId, 'display', 'smartcardEnabled']))
+  const newOptions = yield select(({ options, vms }) => ({
     fullscreen: options.getIn(['remoteOptions', 'fullScreenSpice', 'content']),
     ctrlAltDelToEnd: options.getIn(['remoteOptions', 'ctrlAltEndSpice', 'content']),
     smartcardEnabled: options.getIn(['remoteOptions', 'smartcardSpice', 'content']),
   }))
-  return {
+
+  const merged = {
     ...newOptions,
     ...legacyOptions,
     usbFilter,
     usbAutoshare,
   }
+  merged.smartcardEnabled = smartcardEnabledOnVm && merged.smartcardEnabled
+  return merged
 }
 
 function* getVncOptions ({ legacyOptions }) {

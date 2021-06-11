@@ -127,7 +127,7 @@ class GlobalSettings extends Component {
         ctrlAltEndVnc: false,
         ctrlAltEndSpice: false,
         preferredConsole: config.defaultUiConsole,
-        smartcardSpice: false,
+        smartcardSpice: AppConfiguration.smartcardSpice,
       },
     }
     this.handleCancel = this.handleCancel.bind(this)

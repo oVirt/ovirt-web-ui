@@ -45,7 +45,7 @@ const defaultOptions: UserOptionsType = {
     },
     smartcardSpice: {
       id: undefined,
-      content: false,
+      content: AppConfiguration.smartcardSpice,
     },
   },
   ssh: undefined,
