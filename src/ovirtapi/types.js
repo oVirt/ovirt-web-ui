@@ -232,8 +232,9 @@ export type GlobalUserSettingsType = {|
 |}
 
 export type RemoteUserOptionsType = {|
-  locale: UserOptionType<string>,
-  refreshInterval?: UserOptionType<number>
+  locale: Object,
+  refreshInterval?: UserOptionType<number>,
+  persistLocale?: UserOptionType<boolean>
 |}
 
 export type UserOptionsType = {|

@@ -1034,11 +1034,13 @@ const RemoteUserOptions = {
     const {
       locale,
       refreshInterval,
+      persistLocale,
     } = fromEntries
 
     return {
       locale,
       refreshInterval,
+      persistLocale,
     }
   },
 }

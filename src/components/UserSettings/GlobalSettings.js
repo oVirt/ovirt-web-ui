@@ -98,6 +98,7 @@ class GlobalSettings extends Component {
         showNotifications: AppConfiguration.showNotificationsDefault,
         refreshInterval: AppConfiguration.schedulerFixedDelayInSeconds,
         notificationSnoozeDuration: AppConfiguration.notificationSnoozeDurationInMinutes,
+        persistLocale: AppConfiguration.persistLocale,
       },
     }
     this.handleCancel = this.handleCancel.bind(this)
@@ -168,6 +169,7 @@ class GlobalSettings extends Component {
           {
             title: translatedLabels.language,
             name: 'language',
+            tooltip: draftValues.persistLocale ? undefined : msg.optionIsNotSavedOnTheServer({ persistenceReEnableHowTo: msg.persistenceReEnableHowTo({ advancedOptions: msg.advancedOptions() }) }),
             body: (
               <div className={style['half-width']}>
                 <SelectBox
@@ -252,6 +254,21 @@ class GlobalSettings extends Component {
           },
         ],
       },
+      advancedOptions: {
+        title: msg.advancedOptions(),
+        fields: [
+          {
+            title: msg.persistLanguage(),
+            name: 'persistLocale',
+            tooltip: msg.persistLanguageTooltip(),
+            body: (<Switch
+              id={`${idPrefix}-persist-locale`}
+              isChecked={draftValues.persistLocale}
+              onChange={(persist) => onChange('persistLocale')(persist)}
+            />),
+          },
+        ],
+      },
     }
   }
 
@@ -266,6 +283,7 @@ class GlobalSettings extends Component {
       showNotifications: msg.dontDisturb(),
       notificationSnoozeDuration: msg.dontDisturbFor(),
       refreshInterval: msg.uiRefresh(),
+      persistLocale: msg.persistLanguage(),
     }
 
     const sections = this.buildSections(this.onChange, translatedLabels)
@@ -335,6 +353,7 @@ export default connect(
       showNotifications: options.getIn(['localOptions', 'showNotifications']),
       notificationSnoozeDuration: options.getIn(['localOptions', 'notificationSnoozeDuration']),
       refreshInterval: options.getIn(['remoteOptions', 'refreshInterval', 'content']),
+      persistLocale: options.getIn(['remoteOptions', 'persistLocale', 'content']),
     },
     lastTransactionId: options.getIn(['lastTransactions', 'global', 'transactionId'], ''),
   }),

@@ -560,6 +560,14 @@ const OvirtApi = {
       .then(({ user_option: options = [] }) => options)
   },
 
+  deleteUserOption ({ userId, optionId }: Object): Promise<Object> {
+    assertLogin({ methodName: 'deleteUserOption' })
+    return httpDelete({
+      url: `${AppConfiguration.applicationContext}/api/users/${userId}/options/${optionId}`,
+      input: '',
+    })
+  },
+
   getAllVnicProfiles (): Promise<Object> {
     assertLogin({ methodName: 'getVnicProfiles' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vnicprofiles?follow=network,permissions` })

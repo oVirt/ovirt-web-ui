@@ -14,16 +14,9 @@ import 'moment-duration-format'
 
 import { BASE_LOCALE_SET, DEFAULT_LOCALE } from './index'
 import { timeDurations } from './time-durations'
-import { loadFromLocalStorage } from '_/storage'
-import type { RemoteUserOptionsType } from '_/ovirtapi/types'
 
 export function discoverUserLocale (): string {
-  return coerceToSupportedLocale(loadLocaleFromLocalStorage() || getLocaleFromUrl() || getBrowserLocale()) || DEFAULT_LOCALE
-}
-
-function loadLocaleFromLocalStorage (): ?string {
-  const { remoteOptions: { locale: { content } = {} } = {} } : {remoteOptions: RemoteUserOptionsType} = JSON.parse(loadFromLocalStorage('options')) || {}
-  return content
+  return coerceToSupportedLocale(getLocaleFromUrl() || getBrowserLocale()) || DEFAULT_LOCALE
 }
 
 export function getLocaleFromUrl (): ?string {

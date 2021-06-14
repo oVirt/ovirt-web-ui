@@ -13,10 +13,10 @@ const LocaleReloader = ({ children, localeFromStore, locale, reloadMsg }) => {
    * 3. in the hook the change is detected by comparing value from MsgContext with Redux store
    * 4. if detected, the locale are regenerated and served via MsgContext
    * Special cases:
-   * 1. locale provided by URL (<server>/?locale=en_US) and cookie is used only if there is no locale no locales persisted on the server.
+   * 1. locale provided by URL <server>/?locale=en_US (or inferred from browser settings) is used only if there is no locale persisted on the server (or if locale persistence is disabled).
    * 2. no data from the server (yet) - UI will try to gues user locale. When user settings will be fetched
    *    from the server and incorrect locale was guessed then locale will get hot-reloaded.
-   * 3. no property on server exists but UI was launched using non-default locale(i.e. from URL) - save that locale on the server.
+   * 3. no property on server exists but UI was launched using non-default locale(i.e. from URL) - save that locale on the server(unless locale persistence is disabled).
    */
   useEffect(() => {
     if (localeFromStore !== locale) {

@@ -10,9 +10,7 @@ import * as C from '_/constants'
 
 import type { SaveGlobalOptionsActionType } from '_/actions/types'
 import type { UserOptionType, RemoteUserOptionsType } from '_/ovirtapi/types'
-import { localeFromUrl, locale as inferredLocale } from '_/intl'
 import { generateUnique } from '_/helpers'
-import { saveLocaleToLocalStorage } from '_/storage'
 
 /**
  * Internal type to formalize result returned from
@@ -88,13 +86,19 @@ function* fetchUserOptions (action: Object): any {
 
   yield put(A.loadUserOptions(remoteOptions))
 
-  if (!remoteOptions.locale) {
-    yield call(exportInferredLocale)
+  const { locale, persistLocale: { content: persistLocale = true } = {} } = remoteOptions
+
+  if (!locale && persistLocale) {
+    // locale is not saved on the server and locale persistence is enabled
+    yield put({ type: C.EXPORT_LOCALE })
   }
 }
 
 function* exportInferredLocale (): any {
-  yield put(A.saveGlobalOptions({ values: { language: localeFromUrl || inferredLocale } }, { transactionId: generateUnique('exportInferredLocale_') }))
+  // export the current content of Redux store
+  // it should contain locale inferred by intl scripts (or set by the user via Account Settings)
+  const currentLocale = yield select(state => state.options.getIn(['remoteOptions', 'locale', 'content']))
+  yield put(A.saveGlobalOptions({ values: { language: currentLocale } }, { transactionId: generateUnique('exportInferredLocale_') }))
 }
 
 /**
@@ -147,10 +151,26 @@ function* saveRemoteOption ([ name, value ]: any): any | ResultType {
     change: name })
 }
 
-function* saveGlobalOptions ({ payload: { sshKey, showNotifications, notificationSnoozeDuration, language, refreshInterval }, meta: { transactionId } }: SaveGlobalOptionsActionType): Generator<any, any, any> {
-  const { ssh, locale, refresh } = yield all({
+function* saveLocale ([ localePropName, submittedLocale ]: any, persistLocale: boolean): any | ResultType {
+  const currentPersistLocale = yield select(state => state.options.getIn(['remoteOptions', 'persistLocale', 'content']))
+  const enableLocaleChange = persistLocale || (persistLocale === undefined && currentPersistLocale)
+
+  if (enableLocaleChange) {
+    const remoteResult = yield call(saveRemoteOption, [localePropName, submittedLocale])
+    return remoteResult
+  }
+
+  if (submittedLocale) {
+    return { change: true, data: { name: localePropName, value: { content: submittedLocale, id: undefined } } }
+  }
+  return {}
+}
+
+function* saveGlobalOptions ({ payload: { sshKey, showNotifications, notificationSnoozeDuration, language, refreshInterval, persistLocale }, meta: { transactionId } }: SaveGlobalOptionsActionType): Generator<any, any, any> {
+  const { ssh, locale, refresh, shouldPersistLocale } = yield all({
     ssh: call(saveSSHKey, ...Object.entries({ sshKey })),
-    locale: call(saveRemoteOption, ...Object.entries({ locale: language })),
+    locale: call(saveLocale, ...Object.entries({ locale: language }), persistLocale),
+    shouldPersistLocale: call(saveRemoteOption, ...Object.entries({ persistLocale })),
     refresh: call(saveRemoteOption, ...Object.entries({ refreshInterval })),
   })
 
@@ -159,10 +179,20 @@ function* saveGlobalOptions ({ payload: { sshKey, showNotifications, notificatio
     yield put(A.setOption({ key: [ 'remoteOptions', name ], value }))
   }
 
+  if (!shouldPersistLocale.error && shouldPersistLocale.change && !shouldPersistLocale.sameAsCurrent) {
+    const { name, value } = shouldPersistLocale.data
+    yield put(A.setOption({ key: [ 'remoteOptions', name ], value }))
+
+    if (!value.content) {
+      yield call(deleteUserOption, 'locale')
+    } else if (!language) {
+      yield put({ type: C.EXPORT_LOCALE })
+    }
+  }
+
   if (!locale.error && locale.change && !locale.sameAsCurrent) {
     const { name, value } = locale.data
     yield put(A.setOption({ key: [ 'remoteOptions', name ], value }))
-    saveLocaleToLocalStorage(value)
   }
 
   if (!ssh.error && ssh.change && !ssh.sameAsCurrent) {
@@ -187,6 +217,28 @@ function* saveGlobalOptions ({ payload: { sshKey, showNotifications, notificatio
       { key: ['lastTransactions', 'global'], value: { transactionId } },
     ),
   )
+}
+
+function* deleteUserOption (optionName: string): any {
+  const { optionId, userId, optionValue } = yield select(({ options, config }) => ({
+    optionId: options.getIn(['remoteOptions', optionName, 'id']),
+    optionValue: options.getIn(['remoteOptions', optionName, 'content']),
+    userId: config.getIn(['user', 'id']),
+  }))
+  if (!optionId || !userId) {
+    return
+  }
+  const { error } = yield call(
+    callExternalAction,
+    'deleteUserOption',
+    Api.deleteUserOption,
+    A.deleteUserOption({ optionId, userId }),
+    true,
+  )
+
+  if (!error) {
+    yield put(A.setOption({ key: [ 'remoteOptions', optionName ], value: { id: undefined, content: optionValue } }))
+  }
 }
 
 function* updateNotifications (show: {current: boolean, next?: boolean}, snooze: {current: number, next?: number}): any {
@@ -228,4 +280,5 @@ export default [
   takeLatest(C.SAVE_GLOBAL_OPTIONS, saveGlobalOptions),
   takeLatest(C.GET_SSH_KEY, fetchSSHKey),
   takeLatest(C.FETCH_OPTIONS, fetchUserOptions),
+  takeLatest(C.EXPORT_LOCALE, exportInferredLocale),
 ]
