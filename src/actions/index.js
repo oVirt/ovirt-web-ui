@@ -26,9 +26,7 @@ import {
   STOP_SCHEDULER_FOR_RESUMING_NOTIFICATIONS,
   UPDATE_PAGING_DATA,
   SET_GLOBAL_DEFAULT_CONSOLE,
-  SET_GLOBAL_DEFAULT_VNC_MODE
-
-  ,
+  SET_GLOBAL_DEFAULT_VNC_MODE,
 } from '_/constants'
 
 export * from './error'
@@ -203,18 +201,11 @@ export function setSpiceUsbAutoShare (usbAutoshare) {
   }
 }
 
-/**
- * @param {string} optionName
- * @param {OptionVersionType} version option version
- * @param {string=} defaultValue
- */
-export function getOption (optionName, version, defaultValue) {
+export function getEngineOption (optionName) {
   return {
     type: GET_OPTION,
     payload: {
       optionName,
-      version,
-      defaultValue,
     },
   }
 }
@@ -246,18 +237,18 @@ export function getUser () {
 }
 
 export function setCpuTopologyOptions ({
-  maxNumberOfSockets,
-  maxNumberOfCores,
-  maxNumberOfThreads,
-  maxNumOfVmCpus,
+  maxNumOfSockets,
+  maxNumOfCores,
+  maxNumOfThreads,
+  maxNumOfVmCpusPerArch,
 }) {
   return {
     type: SET_CPU_TOPOLOGY_OPTIONS,
     payload: {
-      maxNumberOfSockets,
-      maxNumberOfCores,
-      maxNumberOfThreads,
-      maxNumOfVmCpus,
+      maxNumOfSockets,
+      maxNumOfCores,
+      maxNumOfThreads,
+      maxNumOfVmCpusPerArch,
     },
   }
 }

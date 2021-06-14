@@ -17,7 +17,6 @@ import {
   setUserFilterPermission,
   setAdministrator,
   getAllEvents,
-  getOption,
 
   getAllClusters,
   getAllHosts,
@@ -53,7 +52,7 @@ import {
 } from './base-data'
 import { downloadVmConsole } from './console'
 import { fetchRoles } from './roles'
-import { fetchServerConfiguredValues } from './server-configs'
+import { fetchServerConfiguredValues, fetchGeneralEngineOption } from './server-configs'
 import { fetchDataCentersAndStorageDomains, fetchIsoFiles } from './storageDomains'
 import { loadIconsFromLocalStorage } from './osIcons'
 import {
@@ -185,11 +184,7 @@ function* checkUserFilterPermissions () {
     return
   }
 
-  const alwaysFilterOption = yield callExternalAction(
-    'getOption',
-    Api.getOption,
-    getOption('AlwaysFilterResultsForWebUi', 'general', 'false'))
-
+  const alwaysFilterOption = yield fetchGeneralEngineOption('AlwaysFilterResultsForWebUi', 'false')
   const isAlwaysFilterOption = alwaysFilterOption === 'true'
   yield put.resolve(setUserFilterPermission(isAlwaysFilterOption))
 }

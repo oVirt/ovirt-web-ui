@@ -55,6 +55,7 @@ import {
   entityPermissionsToUserPermits,
   foreach,
   fetchPermits,
+  mapCpuOptions,
   PermissionsType,
 } from './utils'
 
@@ -70,7 +71,6 @@ import {
 
 import {
   ADD_VM_NIC,
-  OPEN_CONSOLE_MODAL,
   CHECK_TOKEN_EXPIRED,
   CLEAR_USER_MSGS,
   DELAYED_REMOVE_ACTIVE_REQUEST,
@@ -78,6 +78,8 @@ import {
   DISMISS_EVENT,
   DOWNLOAD_CONSOLE_VM,
   EDIT_VM_NIC,
+  EMPTY_CONSOLES_LIST,
+  FETCH_CONSOLES,
   GET_ALL_EVENTS,
   GET_BY_PAGE,
   GET_CONSOLE_OPTIONS,
@@ -85,14 +87,13 @@ import {
   GET_RDP_VM,
   GET_USER,
   GET_VMS,
+  NAVIGATE_TO_VM_DETAILS,
+  NO_DEFAULT_CONSOLE,
+  OPEN_CONSOLE_MODAL,
   SAVE_CONSOLE_OPTIONS,
   SAVE_FILTERS,
   SELECT_POOL_DETAIL,
   SELECT_VM_DETAIL,
-  NAVIGATE_TO_VM_DETAILS,
-  FETCH_CONSOLES,
-  NO_DEFAULT_CONSOLE,
-  EMPTY_CONSOLES_LIST,
 } from '_/constants'
 
 import {
@@ -127,6 +128,15 @@ export function* transformAndPermitVm (vm) {
   internalVm.canUserEditVm = canUserEditVm(internalVm.userPermits)
   internalVm.canUserManipulateSnapshots = canUserManipulateSnapshots(internalVm.userPermits)
   internalVm.canUserEditVmStorage = canUserEditVmStorage(internalVm.userPermits)
+
+  // Map VM attribute derived config values to the VM. The mappings are based on the
+  // VM's custom compatibility version and CPU architecture.
+  const customCompatVer = internalVm.customCompatibilityVersion
+  if (customCompatVer) {
+    internalVm.cpuOptions = yield mapCpuOptions(customCompatVer, internalVm.cpu.arch)
+  } else {
+    internalVm.cpuOptions = null
+  }
 
   return internalVm
 }
