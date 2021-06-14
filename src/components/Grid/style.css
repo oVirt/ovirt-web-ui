@@ -36,10 +36,6 @@
   flex: 1 0;
 }
 
-.grid-row:global(.form-group) {
-
-}
-
 .grid-row:global(.form-group) .grid-column:global(.control-label) {
   display: block;
 }

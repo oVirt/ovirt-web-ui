@@ -30,9 +30,13 @@ import type {
   RemoteUserOptionsType,
   VersionType,
   ApiBooleanType,
+  ApiEngineOptionType, EngineOptionType,
+  EngineOptionNumberPerVersionType,
+  EngineOptionMaxNumOfVmCpusPerArchType,
 } from './types'
 
 import { isWindows } from '_/helpers'
+import { DEFAULT_ARCH } from '_/constants'
 
 function vCpusCount ({ cpu }: { cpu: Object }): number {
   if (cpu && cpu.topology) {
@@ -111,6 +115,9 @@ const VM = {
       nextRunExists: convertBool(vm['next_run_configuration_exists']),
       lastMessage: '',
       hostId: vm['host'] ? vm['host'].id : undefined,
+      customCompatibilityVersion: vm.custom_compatibility_version
+        ? `${vm.custom_compatibility_version.major}.${vm.custom_compatibility_version.minor}`
+        : undefined,
 
       startTime: convertEpoch(vm['start_time']),
       stopTime: convertEpoch(vm['stop_time']),
@@ -189,8 +196,19 @@ const VM = {
       userPermits: new Set(),
       canUserChangeCd: true,
       canUserEditVm: false,
-      canUserManipulateSnapshots: false,
       canUserEditVmStorage: false,
+      canUserManipulateSnapshots: false,
+
+      // engine option config values that map to the VM's custom compatibility version.
+      // the mapping from engine options are done in sagas. if custom compatibility version
+      // is not set, the fetch saga will set `cpuOptions` to `null`. -1 values here make it
+      // obvious if the fetch saga fails.
+      cpuOptions: {
+        maxNumOfSockets: -1,
+        maxNumOfCores: -1,
+        maxNumOfThreads: -1,
+        maxNumOfVmCpus: -1,
+      },
     }
 
     if (vm.cdroms && vm.cdroms.cdrom) {
@@ -398,8 +416,12 @@ const Template = {
       clusterId: template.cluster ? template.cluster.id : null,
       memory: template.memory,
       type: template.type,
+      customCompatibilityVersion: template.custom_compatibility_version
+        ? `${template.custom_compatibility_version.major}.${template.custom_compatibility_version.minor}`
+        : undefined,
 
       cpu: {
+        arch: template.cpu ? template.cpu.architecture : undefined,
         vCPUs: vCpusCount({ cpu: template.cpu }),
         topology: {
           cores: convertInt(template.cpu.topology.cores),
@@ -435,6 +457,17 @@ const Template = {
       permissions,
       userPermits: new Set(),
       canUserUseTemplate: false,
+
+      // engine option config values that map to the Templates's custom compatibility version.
+      // the mapping from engine options are done in sagas. if custom compatibility version
+      // is not set, the fetch saga will set `cpuOptions` to `null`. -1 values here make it
+      // obvious if the fetch saga fails.
+      cpuOptions: {
+        maxNumOfSockets: -1,
+        maxNumOfCores: -1,
+        maxNumOfThreads: -1,
+        maxNumOfVmCpus: -1,
+      },
     })
   },
 
@@ -594,6 +627,7 @@ const DataCenter = {
     return {
       id: dataCenter.id,
       name: dataCenter.name,
+      version: `${dataCenter.version.major}.${dataCenter.version.minor}`,
       status: dataCenter.status,
       storageDomains,
       permissions,
@@ -681,6 +715,7 @@ const Cluster = {
     const c: Object = {
       id: cluster.id,
       name: cluster.name,
+      version: `${cluster.version.major}.${cluster.version.minor}`,
       dataCenterId: cluster.data_center && cluster.data_center.id,
       architecture: cluster.cpu && cluster.cpu.architecture,
       cpuType: cluster.cpu && cluster.cpu.type,
@@ -698,6 +733,15 @@ const Cluster = {
       permissions,
       userPermits: new Set(),
       canUserUseCluster: false,
+
+      // engine option config values that map to cluster compatibility version. mappings
+      // are done in sagas. -1 values make it obvious if the fetch saga fails
+      cpuOptions: {
+        maxNumOfSockets: -1,
+        maxNumOfCores: -1,
+        maxNumOfThreads: -1,
+        maxNumOfVmCpus: -1,
+      },
     }
 
     if (cluster.networks && cluster.networks.network && cluster.networks.network.length > 0) {
@@ -1049,6 +1093,82 @@ const Version = {
 }
 
 //
+//
+//
+const EngineOption = {
+  toInternal (option: ApiEngineOptionType): EngineOptionType {
+    const values = option && option.values && option.values.system_option_value
+      ? option.values.system_option_value
+      : []
+
+    const engineOption: EngineOptionType = new Map()
+    for (const value of values) {
+      engineOption.set(value.version, value.value)
+    }
+    return engineOption
+  },
+}
+
+const EngineOptionNumberPerVersion = {
+  toInternal (values: EngineOptionType): EngineOptionNumberPerVersionType {
+    const numberPerVersion: EngineOptionNumberPerVersionType = new Map()
+
+    for (const [version, numberString] of values) {
+      numberPerVersion.set(version, convertInt(numberString))
+    }
+
+    return numberPerVersion
+  },
+}
+
+const EngineOptionMaxNumOfVmCpusPerArch = {
+  /**
+   * Transform a `MaxNumOfVmCpus` config string of the format:
+   *     "{ppc=123, x86=456, s390x=789}"
+   *
+   * to an Object map of the structure:
+   *     [arch type]: maxCount
+   *
+   * Cluster architecture types are slightly different than the config value.  The
+   * names are mapped in the transform from the config value to the real types that
+   * will be seen on the rest api.  Actual cluster architecture types can be seen
+   * in the api docs:
+   *     http://ovirt.github.io/ovirt-engine-api-model/master/#types/architecture
+   */
+  toInternal (cpusPerArchPerVersion: EngineOptionType): EngineOptionMaxNumOfVmCpusPerArchType {
+    const versionToArchToCount: EngineOptionMaxNumOfVmCpusPerArchType = new Map()
+
+    for (const [version, cpusPerArch] of cpusPerArchPerVersion) {
+      const archToCount: { [string]: number} = {
+        ppc64: 1,
+        x86_64: 1,
+        s390x: 1,
+        [DEFAULT_ARCH]: 1,
+      }
+
+      const [, ppc] = cpusPerArch.match(/ppc=(\d+)/) || []
+      if (ppc) {
+        archToCount.ppc64 = parseInt(ppc, 10)
+      }
+
+      const [, x86] = cpusPerArch.match(/x86=(\d+)/) || []
+      if (x86) {
+        archToCount.x86_64 = parseInt(x86, 10)
+      }
+
+      const [, s390x] = cpusPerArch.match(/s390x=(\d+)/) || []
+      if (s390x) {
+        archToCount.s390x = parseInt(s390x, 10)
+      }
+
+      versionToArchToCount.set(version, archToCount)
+    }
+
+    return versionToArchToCount
+  },
+}
+
+//
 // Export each transforms individually so they can be consumed individually
 //
 export {
@@ -1080,4 +1200,7 @@ export {
   RemoteUserOptions,
   RemoteUserOption,
   Version,
+  EngineOption,
+  EngineOptionNumberPerVersion,
+  EngineOptionMaxNumOfVmCpusPerArch,
 }

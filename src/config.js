@@ -1,6 +1,7 @@
 import $ from 'jquery'
 
-import { setLogDebug } from './logger'
+import { setLogDebug } from '_/logger'
+import { DEFAULT_ARCH } from '_/constants'
 
 const CONFIG_URL = '/ovirt-engine/web-ui/ovirt-web-ui.config'
 
@@ -18,6 +19,25 @@ const AppConfiguration = {
   consoleClientResourcesURL: 'https://www.ovirt.org/documentation/admin-guide/virt/console-client-resources/',
   cockpitPort: '9090',
 }
+
+export const DefaultEngineOptions = Object.seal({
+  MaxNumOfVmSockets: 16,
+  MaxNumOfCpuPerSocket: 254,
+  MaxNumOfThreadsPerCpu: 8,
+  MaxNumOfVmCpusPerArch: `{${DEFAULT_ARCH}=1}`,
+
+  SpiceUsbAutoShare: 1,
+  getUSBFilter: {},
+
+  UserSessionTimeOutInterval: 30,
+
+  DefaultGeneralTimeZone: 'Etc/GMT',
+  DefaultWindowsTimeZone: 'GMT Standard Time',
+
+  WebSocketProxy: null,
+  ClientModeConsoleDefault: 'vnc',
+  ClientModeVncDefault: 'Native',
+})
 
 export function readConfiguration () {
   return new Promise((resolve, reject) => {

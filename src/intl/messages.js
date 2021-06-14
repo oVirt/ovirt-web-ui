@@ -426,6 +426,10 @@ export const messages: { [messageId: string]: MessageType } = {
   logoutRedirected: 'You will be redirected to the log in page momentarily.',
   lowOVirtVersion: 'SSH keys can not be managed with recent oVirt <strong>{apiVersion}</strong> version. Please upgrade oVirt to <strong>4.2</strong> or higher.',
   mapCtrlAltDelKeyboardShortcutToCtrlAltEnd: 'Map Ctrl + Alt + Del keyboard shortcut to Ctrl + Alt + End',
+  maxAllowedCpus: {
+    message: 'maximum allowed: {max}',
+    description: 'Message displayed when the total vCPUs exceeded the maximum allowed based on engine options',
+  },
   maxNumberOfVms: 'A maximum of {numberOfVms} VMs from this pool may be allocated for your use.',
   memory: 'Memory',
   memoryIncluded: '(State included)',

@@ -568,23 +568,6 @@ const OvirtApi = {
     })
   },
 
-  /**
-   * @return {Promise.<?string>} promise of option value if options exists, promise of null otherwise.
-   *                             If default value is provided, the method never returns rejected promise and the default
-   *                             value is returned in case of missing option or any error.
-   */
-  getOption ({ optionName, version, defaultValue }: {optionName: string, version: string, defaultValue?: string}): Promise<?string> {
-    const rawPromise = getOptionWithoutDefault(optionName, version)
-
-    if (!defaultValue) {
-      return rawPromise
-    }
-
-    return rawPromise
-      .then(result => result === null ? defaultValue : result)
-      .catch(() => defaultValue)
-  },
-
   getAllVnicProfiles (): Promise<Object> {
     assertLogin({ methodName: 'getVnicProfiles' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vnicprofiles?follow=network,permissions` })
@@ -598,46 +581,18 @@ const OvirtApi = {
     assertLogin({ methodName: 'getNetworks' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/networks` })
   },
-}
 
-/**
- * @param {string} optionName
- * @param {'general' | '4.2' | '4.1' | '4.0'} version
- * @return {Promise.<?string>} promise of option value if options exists, promise of null otherwise.
- */
-function getOptionWithoutDefault (optionName: string, version: string): Promise<?string> {
-  assertLogin({ methodName: 'getOption' })
-  return httpGet({
-    url: `${AppConfiguration.applicationContext}/api/options/${optionName}`,
-    custHeaders: {
-      Accept: 'application/json',
-      Filter: true,
-    },
-  })
-    .then(response => {
-      let result
-      try {
-        result = response.values.system_option_value
-          .filter((valueAndVersion) => valueAndVersion.version === version)
-          .map(valueAndVersion => valueAndVersion.value)[0]
-      } catch (error) {
-        if (error instanceof TypeError) {
-          console.log(`Response to getting option '${optionName}' has unexpected format:`, response)
-        }
-        throw error
-      }
-      if (result === undefined) {
-        console.log(`Config option '${optionName}' was not found for version '${version}'.`)
-        return null
-      }
-      return result
-    }, error => {
-      if (error.status === 404) {
-        console.log(`Config option '${optionName}' doesn't exist in any version.`)
-        return null
-      }
-      throw error
+  getEngineOption ({ optionName }: { optionName: string }): Promise<Object> {
+    assertLogin({ methodName: 'getEngineOption' })
+
+    return httpGet({
+      url: `${AppConfiguration.applicationContext}/api/options/${optionName}`,
+      custHeaders: {
+        Accept: 'application/json',
+        Filter: true,
+      },
     })
+  },
 }
 
 // export default new Proxy(OvirtApi, {

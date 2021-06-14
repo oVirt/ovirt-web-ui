@@ -316,3 +316,17 @@ export type VersionType = {|
   minor: number,
   build: number
 |}
+
+export type ApiEngineOptionType = {
+  name: string,
+  id: string,
+  values: {
+    system_option_value: Array<{
+      version: string,
+      value: string
+    }>
+  }
+}
+export type EngineOptionType = Map<string, string>
+export type EngineOptionNumberPerVersionType = Map<string, number>
+export type EngineOptionMaxNumOfVmCpusPerArchType = Map<string, { [string]: number }>

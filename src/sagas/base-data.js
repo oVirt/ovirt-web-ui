@@ -6,7 +6,11 @@ import {
   canUserUseVnicProfile,
 } from '_/utils'
 
-import { callExternalAction, entityPermissionsToUserPermits } from './utils'
+import {
+  callExternalAction,
+  entityPermissionsToUserPermits,
+  mapCpuOptions,
+} from './utils'
 
 import {
   setClusters,
@@ -41,6 +45,11 @@ export function* fetchAllClusters (action) {
     for (const cluster of clustersInternal) {
       cluster.userPermits = yield entityPermissionsToUserPermits(cluster)
       cluster.canUserUseCluster = canUserUseCluster(cluster.userPermits)
+    }
+
+    // Map cluster attribute derived config values to the clusters
+    for (const cluster of clustersInternal) {
+      cluster.cpuOptions = yield mapCpuOptions(cluster.version, cluster.architecture)
     }
 
     yield put(setClusters(clustersInternal))
@@ -84,6 +93,15 @@ export function* fetchAllTemplates (action) {
     for (const template of templatesInternal) {
       template.userPermits = yield entityPermissionsToUserPermits(template)
       template.canUserUseTemplate = canUserUseTemplate(template.userPermits)
+    }
+
+    // Map template attribute derived config values to the templates
+    for (const template of templatesInternal) {
+      const customCompatVer = template.customCompatibilityVersion
+
+      template.cpuOptions = customCompatVer
+        ? yield mapCpuOptions(customCompatVer, template.cpu.arch)
+        : null
     }
 
     yield put(setTemplates(templatesInternal))

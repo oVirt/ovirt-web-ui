@@ -1,8 +1,8 @@
-import { put, call, all, select } from 'redux-saga/effects'
+import { put, call, all } from 'redux-saga/effects'
 
-import Api from '_/ovirtapi'
+import Api, { Transforms } from '_/ovirtapi'
 import {
-  getOption,
+  getEngineOption,
   setCpuTopologyOptions,
   setDefaultTimezone,
   setSpiceUsbAutoShare,
@@ -12,83 +12,88 @@ import {
   setDefaultConsole,
   setDefaultVncMode,
 } from '_/actions'
+import { DefaultEngineOptions } from '_/config'
+import { DEFAULT_ENGINE_OPTION_VERSION } from '_/constants'
 
 import { callExternalAction } from './utils'
-import { isNumber } from '_/utils'
 
 export function* fetchServerConfiguredValues () {
-  const optionVersion = yield select(state => {
-    const ver = state.config.get('oVirtApiVersion')
-    return `${ver.get('major')}.${ver.get('minor')}`
+  const eo = yield all({
+    maxNumOfSockets: call(fetchEngineOption, 'MaxNumOfVmSockets', DefaultEngineOptions.MaxNumOfVmSockets),
+    maxNumOfCores: call(fetchEngineOption, 'MaxNumOfCpuPerSocket', DefaultEngineOptions.MaxNumOfCpuPerSocket),
+    maxNumOfThreads: call(fetchEngineOption, 'MaxNumOfThreadsPerCpu', DefaultEngineOptions.MaxNumOfThreadsPerCpu),
+    maxNumOfVmCpusPerArch: call(fetchEngineOption, 'MaxNumOfVmCpus', DefaultEngineOptions.MaxNumOfVmCpusPerArch),
+
+    usbAutoShare: call(fetchGeneralEngineOption, 'SpiceUsbAutoShare', DefaultEngineOptions.SpiceUsbAutoShare),
+    usbFilter: callExternalAction('getUSBFilter', Api.getUSBFilter, DefaultEngineOptions.getUSBFilter),
+
+    userSessionTimeout: call(fetchGeneralEngineOption, 'UserSessionTimeOutInterval', DefaultEngineOptions.UserSessionTimeOutInterval),
+
+    defaultGeneralTimezone: call(fetchGeneralEngineOption, 'DefaultGeneralTimeZone', DefaultEngineOptions.DefaultGeneralTimeZone),
+    defaultWindowsTimezone: call(fetchGeneralEngineOption, 'DefaultWindowsTimeZone', DefaultEngineOptions.DefaultWindowsTimeZone),
+
+    websocketProxy: call(fetchGeneralEngineOption, 'WebSocketProxy', DefaultEngineOptions.WebSocketProxy),
+    consoleDefault: call(fetchGeneralEngineOption, 'ClientModeConsoleDefault', DefaultEngineOptions.ClientModeConsoleDefault),
+    defaultVncMode: call(fetchGeneralEngineOption, 'ClientModeVncDefault', DefaultEngineOptions.ClientModeVncDefault),
   })
 
-  const [
-    maxNumberOfSockets, maxNumberOfCores, maxNumberOfThreads, maxNumOfVmCpus,
-    usbAutoShare, usbFilter,
-    userSessionTimeout,
-    defaultGeneralTimezone, defaultWindowsTimezone,
-    websocketProxy,
-    consoleDefault,
-    defaultVncMode,
-  ] = yield all([
-    callGetOption('MaxNumOfVmSockets', optionVersion, 16),
-    callGetOption('MaxNumOfCpuPerSocket', optionVersion, 16),
-    callGetOption('MaxNumOfThreadsPerCpu', optionVersion, 16),
-    callGetOption('MaxNumOfVmCpus', optionVersion, 1),
-
-    callGetOption('SpiceUsbAutoShare', 'general', 1),
-    callExternalAction('getUSBFilter', Api.getUSBFilter, {}),
-
-    callGetOption('UserSessionTimeOutInterval', 'general', 30),
-
-    callGetOption('DefaultGeneralTimeZone', 'general', 'Etc/GMT'),
-    callGetOption('DefaultWindowsTimeZone', 'general', 'GMT Standard Time'),
-
-    callGetOption('WebSocketProxy', 'general', ''),
-    callGetOption('ClientModeConsoleDefault', 'general', ''),
-    callGetOption('ClientModeVncDefault', 'general', ''),
-  ])
-
+  // Per version is "compatibility version" of the VM, or if not set in VM, the Cluster
   yield put(setCpuTopologyOptions({
-    maxNumberOfSockets: parseInt(maxNumberOfSockets, 10),
-    maxNumberOfCores: parseInt(maxNumberOfCores, 10),
-    maxNumberOfThreads: parseInt(maxNumberOfThreads, 10),
-    // TODO: need to replace this by the actual map value parsing for maxNumOfVmCpus
-    maxNumOfVmCpus: isNumber(parseInt(maxNumOfVmCpus, 10)) ? parseInt(maxNumOfVmCpus, 10) : 512,
+    maxNumOfSockets: Transforms.EngineOptionNumberPerVersion.toInternal(eo.maxNumOfSockets),
+    maxNumOfCores: Transforms.EngineOptionNumberPerVersion.toInternal(eo.maxNumOfCores),
+    maxNumOfThreads: Transforms.EngineOptionNumberPerVersion.toInternal(eo.maxNumOfThreads),
+    maxNumOfVmCpusPerArch: Transforms.EngineOptionMaxNumOfVmCpusPerArch.toInternal(eo.maxNumOfVmCpusPerArch),
   }))
 
-  if (usbAutoShare) {
-    yield put(setSpiceUsbAutoShare(usbAutoShare))
+  if (eo.usbAutoShare) {
+    yield put(setSpiceUsbAutoShare(eo.usbAutoShare))
   }
 
-  if (usbFilter) {
-    yield put(setUSBFilter({ usbFilter }))
+  if (eo.usbFilter) {
+    yield put(setUSBFilter({ usbFilter: eo.usbFilter }))
   }
 
-  yield put(setUserSessionTimeoutInternal(parseInt(userSessionTimeout, 10)))
+  yield put(setUserSessionTimeoutInternal(parseInt(eo.userSessionTimeout, 10)))
 
   yield put(setDefaultTimezone({
-    defaultGeneralTimezone,
-    defaultWindowsTimezone,
+    defaultGeneralTimezone: eo.defaultGeneralTimezone,
+    defaultWindowsTimezone: eo.defaultWindowsTimezone,
   }))
 
-  if (websocketProxy) {
-    const [ host = '', port = '' ] = websocketProxy.split(':')
+  if (eo.websocketProxy) {
+    const [ host = '', port = '' ] = eo.websocketProxy.split(':')
     yield put(setWebsocket({ host, port }))
   }
-  if (consoleDefault) {
-    yield put(setDefaultConsole(consoleDefault))
+  if (eo.consoleDefault) {
+    yield put(setDefaultConsole(eo.consoleDefault))
   }
-  if (defaultVncMode) {
-    yield put(setDefaultVncMode(defaultVncMode))
+  if (eo.defaultVncMode) {
+    yield put(setDefaultVncMode(eo.defaultVncMode))
   }
 }
 
-function callGetOption (name, version, defaultValue) {
-  return call(
-    callExternalAction,
-    'getOption',
-    Api.getOption,
-    getOption(name, version, defaultValue)
+export function* fetchEngineOption (name, defaultValue) {
+  const option = yield callExternalAction(
+    'getEngineOption',
+    Api.getEngineOption,
+    getEngineOption(name),
+    true
   )
+
+  let internalOption
+  if (option && option.values) {
+    internalOption = Transforms.EngineOption.toInternal(option)
+  } else {
+    internalOption = new Map()
+  }
+
+  if (defaultValue) {
+    internalOption.set(DEFAULT_ENGINE_OPTION_VERSION, defaultValue)
+  }
+  return internalOption
+}
+
+export function* fetchGeneralEngineOption (name, defaultValue) {
+  const option = yield fetchEngineOption(name)
+  return option.has('general') ? option.get('general') : defaultValue
 }
