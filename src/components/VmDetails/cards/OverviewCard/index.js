@@ -192,7 +192,7 @@ class OverviewCard extends React.Component {
     const { vm, icons, vms, operatingSystems, isEditable, msg } = this.props
     const { isEditing, correlatedMessages, nameError, updateCloudInit, disableHostnameToggle } = this.state
 
-    const elapsedUptime = vm.getIn(['statistics', 'elapsedUptime', 'datum'], 0)
+    const elapsedUptime = vm.getIn(['statistics', 'elapsedUptime', 'firstDatum'], 0)
     const uptime = elapsedUptime <= 0
       ? formatUptimeDuration({ start: vm.get('startTime') })
       : formatUptimeDuration({ interval: elapsedUptime * 1000 })

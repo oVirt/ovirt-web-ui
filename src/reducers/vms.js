@@ -11,7 +11,6 @@ import {
   SET_FILTERS,
   SET_VM_SORT,
   SET_VM_ACTION_RESULT,
-  SET_VM_CDROM,
   SET_VM_DISKS,
   SET_VM_NICS,
   SET_VM_SESSIONS,
@@ -109,15 +108,6 @@ const vms = actionReducer(initialState, {
       if (existing) {
         state = state.mergeDeepIn(['vms', vmId, 'disks', existing[0]], Immutable.fromJS(disk))
       }
-    }
-    return state
-  },
-
-  [SET_VM_CDROM] (state, { payload: { vmId, cdrom } }) {
-    if (state.getIn(['vms', vmId])) {
-      return state.setIn(['vms', vmId, 'cdrom'], Immutable.fromJS(cdrom)) // deep immutable
-    } else { // fail, if VM not found
-      console.error(`vms[${SET_VM_CDROM}] reducer: vmId ${vmId} not found`)
     }
     return state
   },

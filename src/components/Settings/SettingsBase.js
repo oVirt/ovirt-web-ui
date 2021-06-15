@@ -44,8 +44,8 @@ const Section = ({ name, section }) => (
       { section.tooltip && <InfoTooltip id={`${name}-info-tooltip`} tooltip={section.tooltip} /> }
     </h3>
     { section.fields.map((field) => (
-      <FormGroup key={field.title} className={style['settings-field']}>
-        <LabelCol fieldPath={`${name}-${field.title}`} tooltip={field.tooltip} sm={3} className={style['field-label']}>
+      <FormGroup key={field.name} className={style['settings-field']}>
+        <LabelCol fieldPath={`${name}-${field.name}`} tooltip={field.tooltip} sm={3} className={style['field-label']}>
           { field.title }
         </LabelCol>
         <Col sm={9}>
@@ -61,23 +61,20 @@ Section.propTypes = {
   section: PropTypes.object.isRequired,
 }
 
-const SettingsBase = ({ sections }) => {
-  const existingSections = Object.entries(sections).filter(([key, section]) => !!section)
+const SettingsBase = ({ name, section }) => {
   return (
     <div className={style['search-content-box']}>
-      { existingSections.map(([key, section]) => (
-        <Card key={key} className={style['main-content']}>
-          <div className={style['main-content-container']}>
-            <Section name={key} section={section} />
-          </div>
-        </Card>
-      ))
-      }
+      <Card key={name} className={style['main-content']}>
+        <div className={style['main-content-container']}>
+          <Section name={name} section={section} />
+        </div>
+      </Card>
     </div>
   )
 }
 SettingsBase.propTypes = {
-  sections: PropTypes.object.isRequired,
+  section: PropTypes.object.isRequired,
+  name: PropTypes.string.isRequired,
 }
 
 export default SettingsBase

@@ -36,9 +36,13 @@ const stillPending = ({ currentValues = {}, sentValues = {} }) => {
       currentValues[name] !== sentValues[name])
 }
 
+const enableResetToDefaultSetting = ({ defaultValues = {}, currentValues = {} }) => {
+  return !!Object.keys(defaultValues).find(key => defaultValues[key] !== currentValues[key])
+}
+
 const Settings = ({ draftValues, onSave, lastTransactionId, onCancel,
   translatedLabels, baseValues, sentValues, currentValues,
-  resetBaseValues, children }) => {
+  resetBaseValues, children, onReset, defaultValues }) => {
   const { msg } = useContext(MsgContext)
   const [transactionId, setTransactionId] = useState(null)
 
@@ -53,11 +57,20 @@ const Settings = ({ draftValues, onSave, lastTransactionId, onCancel,
   const pendingChanges = pendingUserChanges({ currentValues, draftValues })
   const stillPendingAfterSave = stillPending({ currentValues, sentValues })
   const changedInLastTrans = changedInLastTransaction({ currentValues, sentValues })
+  const enableReset = !pendingChanges.length && enableResetToDefaultSetting({ currentValues, defaultValues })
 
   if (conflictingChanges.length) {
     console.warn(`Store content changed while editing settings for fields: ${JSON.stringify(conflictingChanges)}`)
   }
 
+  const handleReset = () => {
+    const aggregatedValues = { ...currentValues, ...defaultValues }
+    const saveFields = pendingUserChanges({ currentValues, draftValues: aggregatedValues }).reduce((acc, cur) => ({ ...acc, [cur]: aggregatedValues[cur] }), {})
+    const id = generateUnique('Settings-save_')
+    setTransactionId(id)
+    setIsReset(true) // disabling the save button on reset
+    onReset(saveFields, id)
+  }
   const fullSuccess = changedInLastTrans.length !== 0 &&
    stillPendingAfterSave.length === 0 &&
    transactionId === lastTransactionId
@@ -69,8 +82,14 @@ const Settings = ({ draftValues, onSave, lastTransactionId, onCancel,
    transactionId === lastTransactionId
 
   const [showFullSuccess, setShowFullSuccess] = useState(false)
+  const [isReset, setIsReset] = useState(false)
   const [showCompleteFailure, setShowCompleteFailure] = useState(false)
   const [partialSave, setShowPartialSave] = useState({ show: false, fields: [] })
+
+  const resetNotifications = (setter, parameters = false) => {
+    setter(parameters)
+    isReset && setIsReset(false)
+  }
 
   useEffect(() => {
     const partialSaveState = {
@@ -98,9 +117,9 @@ const Settings = ({ draftValues, onSave, lastTransactionId, onCancel,
       { showFullSuccess &&
         <CounterAlert
           timeout={10}
-          title={msg.changesSavedSuccesfully()}
+          title={isReset ? msg.changesResetSuccessfully() : msg.changesSavedSuccesfully()}
           type='success'
-          onDismiss={() => setShowFullSuccess(false)}
+          onDismiss={() => resetNotifications(setShowFullSuccess, false)}
         />
       }
       { partialSave.show &&
@@ -108,7 +127,7 @@ const Settings = ({ draftValues, onSave, lastTransactionId, onCancel,
           timeout={10}
           type='error'
           title={<p>{msg.failedToSaveChangesToFields()}</p>}
-          onDismiss={() => setShowPartialSave({ show: false, fields: [] })} >
+          onDismiss={() => resetNotifications(setShowPartialSave, { show: false, fields: [] })} >
           {partialSave.fields}
         </CounterAlert>
       }
@@ -117,14 +136,16 @@ const Settings = ({ draftValues, onSave, lastTransactionId, onCancel,
           timeout={10}
           type='error'
           title={msg.failedToSaveChanges()}
-          onDismiss={() => setShowCompleteFailure(false)}
+          onDismiss={() => resetNotifications(setShowCompleteFailure, false)}
         />
       }
     </div>
     <SettingsToolbar
       onSave={handleSave}
+      onReset={handleReset}
+      enableReset={enableReset}
       onCancel={onCancel}
-      enableSave={!!pendingChanges.length}
+      enableSave={!!pendingChanges.length && !isReset}
       changes={pendingChanges}
       translatedLabels={translatedLabels}
     />
@@ -139,9 +160,11 @@ Settings.propTypes = {
   translatedLabels: PropTypes.object.isRequired,
   lastTransactionId: PropTypes.string,
   onSave: PropTypes.func.isRequired,
+  onReset: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
   children: PropTypes.node,
   resetBaseValues: PropTypes.func.isRequired,
+  defaultValues: PropTypes.object,
 }
 
 export default Settings

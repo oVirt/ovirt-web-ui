@@ -1,5 +1,5 @@
 // Keep alphabetically sorted
-// TODO: remove all constants except those used within sagas
+
 export const ADD_ACTIVE_REQUEST = 'ADD_ACTIVE_REQUEST'
 export const ADD_DISK_REMOVAL_PENDING_TASK = 'ADD_DISK_REMOVAL_PENDING_TASK'
 export const ADD_NETWORKS_TO_VNIC_PROFILES = 'ADD_NETWORKS_TO_VNIC_PROFILES'
@@ -18,7 +18,10 @@ export const CLEAR_USER_MSGS = 'CLEAR_USER_MSGS'
 export const COMPOSE_CREATE_VM = 'COMPOSE_CREATE_VM'
 export const CREATE_DISK_FOR_VM = 'CREATE_DISK_FOR_VM'
 export const CREATE_VM = 'CREATE_VM'
+export const DEFAULT_ENGINE_OPTION_VERSION = '_'
+export const DEFAULT_ARCH = '_'
 export const DELAYED_REMOVE_ACTIVE_REQUEST = 'DELAYED_REMOVE_ACTIVE_REQUEST'
+export const DELETE_USER_OPTION = 'DELETE_USER_OPTION'
 export const DELETE_VM_NIC = 'DELETE_VM_NIC'
 export const DISMISS_USER_MSG = 'DISMISS_USER_MSG'
 export const DISMISS_EVENT = 'DISMISS_EVENT'
@@ -27,6 +30,7 @@ export const DOWNLOAD_CONSOLE_VM = 'DOWNLOAD_CONSOLE_VM'
 export const EDIT_VM = 'EDIT_VM'
 export const EDIT_VM_DISK = 'EDIT_VM_DISK'
 export const EDIT_VM_NIC = 'EDIT_VM_NIC'
+export const EXPORT_LOCALE = 'EXPORT_LOCALE'
 export const FAILED_EXTERNAL_ACTION = 'FAILED_EXTERNAL_ACTION'
 export const FETCH_OPTIONS = 'FETCH_OPTIONS'
 export const GET_ALL_CLUSTERS = 'GET_ALL_CLUSTERS'
@@ -57,6 +61,7 @@ export const LOGIN_SUCCESSFUL = 'LOGIN_SUCCESSFUL'
 export const LOGOUT = 'LOGOUT'
 export const MANUAL_REFRESH = 'MANUAL_REFRESH'
 export const MAX_VM_MEMORY_FACTOR = 4 // see Edit VM flow; magic constant to stay aligned with Web Admin
+export const MAX_VM_VCPU_EDIT = 4096
 export const OPEN_CONSOLE_VM = 'OPEN_CONSOLE_VM'
 export const PERSIST_OPTION = 'PERSIST_OPTION'
 export const POOL_ACTION_IN_PROGRESS = 'POOL_ACTION_IN_PROGRESS'

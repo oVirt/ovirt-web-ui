@@ -7,10 +7,11 @@ import { MsgContext } from '_/intl'
 import style from './style.css'
 import ConfirmationModal from '_/components/VmActions/ConfirmationModal'
 
-const SettingsToolbar = ({ onSave, onCancel, enableSave, translatedLabels, changes = [] }) => {
+const SettingsToolbar = ({ onSave, onReset, onCancel, enableSave, enableReset, translatedLabels, changes = [] }) => {
   const { msg } = useContext(MsgContext)
   const [container] = useState(document.createElement('div'))
-  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [showSaveConfirmModal, setShowSaveConfirmModal] = useState(false)
+  const [showResetConfirmModal, setShowResetConfirmModal] = useState(false)
   const idPrefix = 'settings_toolbar'
 
   useEffect(() => {
@@ -20,21 +21,29 @@ const SettingsToolbar = ({ onSave, onCancel, enableSave, translatedLabels, chang
     }
     return () => root && root.removeChild(container)
   })
+  const onResetConfirm = () => {
+    onResetClose()
+    onReset()
+  }
 
-  const onConfirm = () => {
-    onClose()
+  const onSaveConfirm = () => {
+    onSaveClose()
     onSave()
   }
 
-  const onClose = () => {
-    setShowConfirmModal(false)
+  const onSaveClose = () => {
+    setShowSaveConfirmModal(false)
+  }
+
+  const onResetClose = () => {
+    setShowResetConfirmModal(false)
   }
 
   const buildConfirmationModalSubContent = () => (
     <ul className={style['changes-list']}>{
       changes.map(name => {
         const value = translatedLabels[name] || name
-        return (<li key={`${idPrefix}_li_${value}`}>{value}</li>)
+        return (<li key={`${idPrefix}_li_${name}`}>{value}</li>)
       })
     }
     </ul>
@@ -43,16 +52,37 @@ const SettingsToolbar = ({ onSave, onCancel, enableSave, translatedLabels, chang
   return ReactDOM.createPortal(
     <Toolbar className={style['toolbar']}>
       <ConfirmationModal
-        show={showConfirmModal}
+        show={showSaveConfirmModal}
         title={msg.saveChanges()}
         body={msg.saveSettingsChangesConfirmation()}
         subContent={buildConfirmationModalSubContent()}
-        onClose={onClose}
+        onClose={onSaveClose}
         confirm={{
           title: msg.yes(),
-          onClick: onConfirm,
+          onClick: onSaveConfirm,
         }}
       />
+      <ConfirmationModal
+        show={showResetConfirmModal}
+        title={msg.resetSettings()}
+        body={msg.resetSettingsQuestion()}
+        subContent={msg.resetSettingsWarning()}
+        onClose={onResetClose}
+        confirm={{
+          title: msg.reset(),
+          onClick: onResetConfirm,
+        }}
+      />
+      <button
+        className='btn btn-default'
+        disabled={!enableReset}
+        onClick={(e) => {
+          e.preventDefault()
+          setShowResetConfirmModal(true)
+        }}
+      >
+        {msg.resetSettings()}
+      </button>
       <Toolbar.RightContent>
         <button
           onClick={e => {
@@ -67,7 +97,7 @@ const SettingsToolbar = ({ onSave, onCancel, enableSave, translatedLabels, chang
           disabled={!enableSave}
           onClick={e => {
             e.preventDefault()
-            setShowConfirmModal(true)
+            setShowSaveConfirmModal(true)
           }}
           className='btn btn-primary'
         >
@@ -81,6 +111,7 @@ const SettingsToolbar = ({ onSave, onCancel, enableSave, translatedLabels, chang
 
 SettingsToolbar.propTypes = {
   onSave: PropTypes.func.isRequired,
+  onReset: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
   translatedLabels: PropTypes.object.isRequired,
   enableSave: PropTypes.bool,

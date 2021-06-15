@@ -253,7 +253,6 @@ function* createVm (action) {
       vmId: createVmResult.id,
       cdrom: action.payload.cdrom,
       current: false,
-      updateVm: false, // don't auto-refresh the VM since it hasn't been loaded yet
     }, {
       correlationId,
     }))
@@ -344,13 +343,6 @@ function* editVm (action) {
 
 function* changeVmCdRom (action) {
   const result = yield callExternalAction('changeCdRom', Api.changeCdRom, action)
-
-  if (!result.error && action.payload.updateVm) {
-    yield put(A.setVmCdRom({
-      vmId: action.payload.vmId,
-      cdrom: Api.cdRomToInternal(result),
-    }))
-  }
 
   if (action.meta && action.meta.correlationId) {
     yield put(A.setVmActionResult({

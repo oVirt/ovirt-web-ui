@@ -387,13 +387,12 @@ export function getVmCdRom ({ vmId, current = true }) {
   }
 }
 
-export function changeVmCdRom ({ cdrom, vmId, updateVm = true, current = true }, { correlationId, ...additionalMeta } = {}) {
+export function changeVmCdRom ({ cdrom, vmId, current = true }, { correlationId, ...additionalMeta } = {}) {
   const action = {
     type: CHANGE_VM_CDROM,
     payload: {
       cdrom,
       vmId,
-      updateVm,
       current,
     },
   }

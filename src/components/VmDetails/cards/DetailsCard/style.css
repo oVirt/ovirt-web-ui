@@ -17,6 +17,10 @@
   margin-top: 5px;
 }
 
+.field-row:global(.form-group) {
+  margin-bottom: 0;
+}
+
 .field-row-divide {
   margin-top: 20px;
   margin-bottom: 5px;
@@ -26,16 +30,30 @@
   font-weight: bold;
   padding-left: 15px; /* 20px + -15px + this = px from edge */
   padding-right: 5px;
+
   flex-direction: row;
+  align-items: center;
 }
 
 .col-label span {
   vertical-align: top;
 }
 
+.col-label :global(.control-label) {
+  margin-bottom: 0;
+  vertical-align: top;
+}
+
+.col-label .tooltip {
+  flex-grow: 0;
+}
+
 .col-data {
   padding-left: 5px;
   padding-right: 15px;
+
+  flex-direction: row;
+  align-items: center;
 }
 
 /*
@@ -50,15 +68,17 @@
  * For CPU and Memory input fields
  */
 .cpu-input {
-  margin-bottom: 3px;
-  margin-right: 5px;
   width: 40%;
 }
 
+.cpu-input-error {
+  color: #cc0000;
+  margin-top: 3px;
+}
+
 .memory-input {
-  margin-bottom: 3px;
-  margin-right: 5px;
   width: 40%;
+  margin-right: 5px;
   display: inline-block;
 }
 

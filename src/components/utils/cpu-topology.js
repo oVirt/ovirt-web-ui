@@ -37,18 +37,18 @@ export function getTopology ({
 
 export function getTopologyPossibleValues ({
   value,
-  maxNumberOfSockets,
-  maxNumberOfCores,
-  maxNumberOfThreads,
+  maxNumOfSockets,
+  maxNumOfCores,
+  maxNumOfThreads,
 }: {
   value: number,
-  maxNumberOfSockets: number,
-  maxNumberOfCores: number,
-  maxNumberOfThreads: number
+  maxNumOfSockets: number,
+  maxNumOfCores: number,
+  maxNumOfThreads: number
 }): { sockets: Array<number>, cores: Array<number>, threads: Array<number> } {
-  let sockets = dividers(value).filter(x => x <= maxNumberOfSockets)
-  let cores = dividers(value).filter(x => x <= maxNumberOfCores)
-  let threads = dividers(value).filter(x => x <= maxNumberOfThreads)
+  let sockets = dividers(value).filter(x => x <= maxNumOfSockets)
+  let cores = dividers(value).filter(x => x <= maxNumOfCores)
+  let threads = dividers(value).filter(x => x <= maxNumOfThreads)
 
   return { sockets, cores, threads }
 }

@@ -4,7 +4,8 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 import { saveGlobalOptions } from '_/actions'
-import { FormControl, Switch } from 'patternfly-react'
+import { FormControl } from 'patternfly-react'
+import { Switch, Nav, NavItem, NavList, Split, SplitItem } from '@patternfly/react-core'
 import { withMsg, localeWithFullName, DEFAULT_LOCALE } from '_/intl'
 import style from './style.css'
 
@@ -12,6 +13,8 @@ import { Settings, SettingsBase } from '../Settings'
 import SelectBox from '../SelectBox'
 import moment from 'moment'
 import AppConfiguration from '_/config'
+
+const GENERAL_SECTION = 'general'
 
 class GlobalSettings extends Component {
   dontDisturbList (msg) {
@@ -89,12 +92,21 @@ class GlobalSettings extends Component {
       // values submitted using 'save' action
       // inlcude both remote(server and store) or local(store only)
       sentValues: {},
+      activeSectionKey: GENERAL_SECTION,
+      defaultValues: {
+        language: DEFAULT_LOCALE,
+        showNotifications: AppConfiguration.showNotificationsDefault,
+        refreshInterval: AppConfiguration.schedulerFixedDelayInSeconds,
+        notificationSnoozeDuration: AppConfiguration.notificationSnoozeDurationInMinutes,
+        persistLocale: AppConfiguration.persistLocale,
+      },
     }
     this.handleCancel = this.handleCancel.bind(this)
     this.buildSections = this.buildSections.bind(this)
     this.saveOptions = this.saveOptions.bind(this)
     this.resetBaseValues = this.resetBaseValues.bind(this)
     this.onChange = this.onChange.bind(this)
+    this.onReset = this.onReset.bind(this)
   }
 
   resetBaseValues () {
@@ -126,25 +138,38 @@ class GlobalSettings extends Component {
       }))
     }
   }
+  onReset (saveFields, id) {
+    this.setState(state => ({
+      draftValues: {
+        ...this.props.currentValues,
+        ...state.defaultValues,
+      },
+    }))
+    this.saveOptions(saveFields, id)
+  }
 
   buildSections (onChange, translatedLabels) {
     const { draftValues } = this.state
     const { config, msg } = this.props
     const idPrefix = 'global-user-settings'
     return {
-      general: {
+      [GENERAL_SECTION]: {
         title: msg.general(),
         fields: [
           {
             title: msg.username(),
+            name: 'username',
             body: <span>{config.userName}</span>,
           },
           {
             title: msg.email(),
+            name: 'email',
             body: <span>{config.email}</span>,
           },
           {
             title: translatedLabels.language,
+            name: 'language',
+            tooltip: draftValues.persistLocale ? undefined : msg.optionIsNotSavedOnTheServer({ persistenceReEnableHowTo: msg.persistenceReEnableHowTo({ advancedOptions: msg.advancedOptions() }) }),
             body: (
               <div className={style['half-width']}>
                 <SelectBox
@@ -159,6 +184,7 @@ class GlobalSettings extends Component {
           {
             title: translatedLabels.sshKey,
             tooltip: msg.sshKeyTooltip(),
+            name: 'sshKey',
             body: (
               <div className={style['half-width']}>
                 <FormControl
@@ -179,6 +205,7 @@ class GlobalSettings extends Component {
         fields: [
           {
             title: translatedLabels.refreshInterval,
+            name: 'refreshInterval',
             body: (
               <div className={style['half-width']}>
                 <SelectBox
@@ -199,13 +226,12 @@ class GlobalSettings extends Component {
         fields: [
           {
             title: translatedLabels.showNotifications,
+            name: 'showNotificatons',
             body: (
               <Switch
                 id={`${idPrefix}-dont-disturb`}
-                bsSize='normal'
-                title='normal'
-                value={!draftValues.showNotifications}
-                onChange={(e, dontDisturb) => {
+                isChecked={!draftValues.showNotifications}
+                onChange={(dontDisturb) => {
                   onChange('showNotifications')(!dontDisturb)
                 }}
               />
@@ -213,6 +239,7 @@ class GlobalSettings extends Component {
           },
           {
             title: translatedLabels.notificationSnoozeDuration,
+            name: 'notificationSnoozeDuration',
             body: (
               <div className={style['half-width']}>
                 <SelectBox
@@ -227,12 +254,27 @@ class GlobalSettings extends Component {
           },
         ],
       },
+      advancedOptions: {
+        title: msg.advancedOptions(),
+        fields: [
+          {
+            title: msg.persistLanguage(),
+            name: 'persistLocale',
+            tooltip: msg.persistLanguageTooltip(),
+            body: (<Switch
+              id={`${idPrefix}-persist-locale`}
+              isChecked={draftValues.persistLocale}
+              onChange={(persist) => onChange('persistLocale')(persist)}
+            />),
+          },
+        ],
+      },
     }
   }
 
   render () {
     const { lastTransactionId, currentValues, msg } = this.props
-    const { draftValues, baseValues, sentValues } = this.state
+    const { draftValues, baseValues, sentValues, defaultValues, activeSectionKey } = this.state
     // required also in Settings for error handling: the case of partial success(only some fields saved)
     // the alert shows the names of the fields that were NOT saved
     const translatedLabels = {
@@ -241,23 +283,50 @@ class GlobalSettings extends Component {
       showNotifications: msg.dontDisturb(),
       notificationSnoozeDuration: msg.dontDisturbFor(),
       refreshInterval: msg.uiRefresh(),
+      persistLocale: msg.persistLanguage(),
+    }
+
+    const sections = this.buildSections(this.onChange, translatedLabels)
+    const { [activeSectionKey]: activeSection } = sections
+
+    const onSelect = result => {
+      this.setState({
+        activeSectionKey: result.itemId,
+      })
     }
 
     return (
       <div className='container'>
-        <Settings
-          draftValues={draftValues}
-          baseValues={baseValues}
-          currentValues={currentValues}
-          sentValues={sentValues}
-          translatedLabels={translatedLabels}
-          lastTransactionId={lastTransactionId}
-          resetBaseValues={this.resetBaseValues}
-          onSave={this.saveOptions}
-          onCancel={this.handleCancel}
-        >
-          <SettingsBase sections={this.buildSections(this.onChange, translatedLabels)} />
-        </Settings>
+        <Split hasGutter>
+          <SplitItem>
+            <Nav onSelect={onSelect} theme='light'>
+              <NavList className={`card-pf global-settings-nav-list`}>
+                { Object.entries(sections).map(([key, section]) =>
+                  <NavItem className='border' itemId={key} key={key} isActive={activeSectionKey === key}>
+                    {section.title}
+                  </NavItem>)
+                }
+              </NavList>
+            </Nav>
+          </SplitItem>
+          <SplitItem isFilled>
+            <Settings
+              draftValues={draftValues}
+              baseValues={baseValues}
+              currentValues={currentValues}
+              sentValues={sentValues}
+              translatedLabels={translatedLabels}
+              lastTransactionId={lastTransactionId}
+              resetBaseValues={this.resetBaseValues}
+              onSave={this.saveOptions}
+              onCancel={this.handleCancel}
+              onReset={this.onReset}
+              defaultValues={defaultValues}
+            >
+              <SettingsBase section={activeSection} name={activeSectionKey} />
+            </Settings>
+          </SplitItem>
+        </Split>
       </div>
     )
   }
@@ -284,6 +353,7 @@ export default connect(
       showNotifications: options.getIn(['localOptions', 'showNotifications']),
       notificationSnoozeDuration: options.getIn(['localOptions', 'notificationSnoozeDuration']),
       refreshInterval: options.getIn(['remoteOptions', 'refreshInterval', 'content']),
+      persistLocale: options.getIn(['remoteOptions', 'persistLocale', 'content']),
     },
     lastTransactionId: options.getIn(['lastTransactions', 'global', 'transactionId'], ''),
   }),

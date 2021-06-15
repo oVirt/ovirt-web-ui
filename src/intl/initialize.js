@@ -14,16 +14,9 @@ import 'moment-duration-format'
 
 import { BASE_LOCALE_SET, DEFAULT_LOCALE } from './index'
 import { timeDurations } from './time-durations'
-import { loadFromLocalStorage } from '_/storage'
-import type { RemoteUserOptionsType } from '_/ovirtapi/types'
 
 export function discoverUserLocale (): string {
-  return coerceToSupportedLocale(loadLocaleFromLocalStorage() || getLocaleFromUrl() || getBrowserLocale()) || DEFAULT_LOCALE
-}
-
-function loadLocaleFromLocalStorage (): ?string {
-  const { remoteOptions: { locale: { content } = {} } = {} } : {remoteOptions: RemoteUserOptionsType} = JSON.parse(loadFromLocalStorage('options')) || {}
-  return content
+  return coerceToSupportedLocale(getLocaleFromUrl() || getBrowserLocale()) || DEFAULT_LOCALE
 }
 
 export function getLocaleFromUrl (): ?string {
@@ -94,7 +87,9 @@ export function initMomentTranslations (locale: string, defaultLocale: string) {
   if (translations[locale]) {
     const t:{ [messageId: string]: string } = translations[locale]
 
-    moment.updateLocale(locale, {
+    // for built-in translations moment.js uses lower case identifiers
+    // i.e. pt-br instead of pt-BR
+    moment.updateLocale(locale.toLowerCase(), {
       durationLabelsStandard: {
         S: t.durationLabelStandard_S || timeDurations.durationLabelStandard_S.message,
         SS: t.durationLabelStandard_SS || timeDurations.durationLabelStandard_SS.message,

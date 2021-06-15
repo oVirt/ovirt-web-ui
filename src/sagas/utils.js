@@ -12,6 +12,11 @@ import semverGte from 'semver/functions/gte'
 import semverValid from 'semver/functions/valid'
 
 import {
+  DEFAULT_ARCH,
+  DEFAULT_ENGINE_OPTION_VERSION,
+} from '_/constants'
+
+import {
   checkTokenExpired,
   failedExternalAction,
   showTokenExpiredMessage,
@@ -201,4 +206,27 @@ export function* entityPermissionsToUserPermits (entity) {
   }
 
   return new Set(permitNames)
+}
+
+/**
+ * Map an entity's cpuOptions config values from engine options. The mappings are based
+ * on the (custom)? compatibility version and CPU architecture.
+ */
+export function* mapCpuOptions (version, architecture) {
+  const [ maxNumSockets, maxNumOfCores, maxNumOfThreads, maxNumOfVmCpusPerArch ] =
+    yield select(({ config }) => [
+      config.getIn(['cpuOptions', 'maxNumOfSockets']),
+      config.getIn(['cpuOptions', 'maxNumOfCores']),
+      config.getIn(['cpuOptions', 'maxNumOfThreads']),
+      config.getIn(['cpuOptions', 'maxNumOfVmCpusPerArch']),
+    ])
+
+  const maxNumOfVmCpusPerArch_ = maxNumOfVmCpusPerArch.get(version) || maxNumOfVmCpusPerArch.get(DEFAULT_ENGINE_OPTION_VERSION)
+
+  return {
+    maxNumOfSockets: maxNumSockets.get(version) || maxNumSockets.get(DEFAULT_ENGINE_OPTION_VERSION),
+    maxNumOfCores: maxNumOfCores.get(version) || maxNumOfCores.get(DEFAULT_ENGINE_OPTION_VERSION),
+    maxNumOfThreads: maxNumOfThreads.get(version) || maxNumOfThreads.get(DEFAULT_ENGINE_OPTION_VERSION),
+    maxNumOfVmCpus: maxNumOfVmCpusPerArch_[architecture] || maxNumOfVmCpusPerArch_[DEFAULT_ARCH],
+  }
 }

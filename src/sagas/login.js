@@ -17,7 +17,6 @@ import {
   setUserFilterPermission,
   setAdministrator,
   getAllEvents,
-  getOption,
 
   getAllClusters,
   getAllHosts,
@@ -53,7 +52,7 @@ import {
 } from './base-data'
 import { downloadVmConsole } from './console'
 import { fetchRoles } from './roles'
-import { fetchServerConfiguredValues } from './server-configs'
+import { fetchServerConfiguredValues, fetchGeneralEngineOption } from './server-configs'
 import { fetchDataCentersAndStorageDomains, fetchIsoFiles } from './storageDomains'
 import { loadIconsFromLocalStorage } from './osIcons'
 import {
@@ -61,7 +60,7 @@ import {
   fetchCurrentUser,
 } from './index'
 
-import { loadFromLocalStorage } from '_/storage'
+import { loadFromLocalStorage, removeFromLocalStorage } from '_/storage'
 import { loadUserOptions } from './options'
 
 /**
@@ -185,11 +184,7 @@ function* checkUserFilterPermissions () {
     return
   }
 
-  const alwaysFilterOption = yield callExternalAction(
-    'getOption',
-    Api.getOption,
-    getOption('AlwaysFilterResultsForWebUi', 'general', 'false'))
-
+  const alwaysFilterOption = yield fetchGeneralEngineOption('AlwaysFilterResultsForWebUi', 'false')
   const isAlwaysFilterOption = alwaysFilterOption === 'true'
   yield put.resolve(setUserFilterPermission(isAlwaysFilterOption))
 }
@@ -232,6 +227,9 @@ function* initialLoad () {
   yield call(fetchIsoFiles)
   console.log('\u2714 data loads that require storage domains are complete')
   console.groupEnd('needs storage domains')
+
+  // delete options left in local storage by older versions
+  removeFromLocalStorage('options')
 
   // Vms and Pools are loaded as needed / accessed
 }
