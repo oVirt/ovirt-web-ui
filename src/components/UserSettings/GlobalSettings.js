@@ -244,7 +244,8 @@ class GlobalSettings extends Component {
               <div className={style['half-width']}>
                 <SelectBox
                   id={`${idPrefix}-dont-disturb-for`}
-                  items={this.dontDisturbList(msg)}
+                  items={this.dontDisturbList(msg)
+                    .map(({ id, value }) => ({ id, value, isDefault: id === AppConfiguration.notificationSnoozeDurationInMinutes }))}
                   selected={draftValues.notificationSnoozeDuration}
                   onChange={onChange('notificationSnoozeDuration')}
                   disabled={draftValues.showNotifications}
