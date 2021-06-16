@@ -73,14 +73,20 @@ const OvirtApi = {
     assertLogin({ methodName: 'icon' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/icons/${id}` })
   },
+
   user ({ userId }: { userId: string }): Promise<Object> {
     assertLogin({ methodName: 'user' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/users/${userId}` })
   },
-  groups ({ userId }: { userId: string }): Promise<Object> {
-    assertLogin({ methodName: 'groups' })
+  userDomainGroups ({ userId }: { userId: string }): Promise<Object> {
+    assertLogin({ methodName: 'userDomainGroups' })
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/users/${userId}/groups` })
   },
+  groups (): Promise<Object> {
+    assertLogin({ methodName: 'groups' })
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/groups` })
+  },
+
   getRoles (): Promise<Object> {
     assertLogin({ methodName: 'getRoles' })
     const url = `${AppConfiguration.applicationContext}/api/roles?follow=permits`
