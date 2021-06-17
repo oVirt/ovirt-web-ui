@@ -26,6 +26,8 @@ import {
   SHOW_TOKEN_EXPIRED_MSG,
 } from '_/constants'
 
+import { toUiConsole } from '_/utils'
+
 const initialState = Immutable.fromJS({
   lastRefresh: 0,
   oVirtApiVersion: {
@@ -46,6 +48,15 @@ const initialState = Immutable.fromJS({
     id: undefined,
   },
   userGroups: [],
+
+  // allowed values: vnc, spice
+  defaultConsole: DefaultEngineOptions.ClientModeConsoleDefault,
+  // allowed values: Native, NoVnc
+  defaultVncMode: DefaultEngineOptions.ClientModeVncDefault,
+  // derrived from defaultConsole and defaultVncMode
+  // allowed values: NativeVnc, BrowserVnc, spice, rdp
+  defaultUiConsole: toUiConsole(DefaultEngineOptions.ClientModeVncDefault, DefaultEngineOptions.ClientModeConsoleDefault),
+
   filter: true,
   isFilterChecked: false,
   administrator: false,
@@ -66,8 +77,6 @@ const initialState = Immutable.fromJS({
   defaultWindowsTimezone: DefaultEngineOptions.DefaultWindowsTimeZone,
 
   websocket: DefaultEngineOptions.WebSocketProxy,
-  defaultConsole: DefaultEngineOptions.ClientModeConsoleDefault,
-  defaultVncMode: DefaultEngineOptions.ClientModeVncDefault,
 })
 
 const config = actionReducer(initialState, {
@@ -118,10 +127,15 @@ const config = actionReducer(initialState, {
     return state.mergeDeep({ user })
   },
   [SET_GLOBAL_DEFAULT_CONSOLE] (state, { payload: { defaultConsole } }) {
+    const defaultVncMode = state.get('defaultVncMode')
+
     return state.set('defaultConsole', defaultConsole)
+      .set('defaultUiConsole', toUiConsole(defaultVncMode, defaultConsole))
   },
   [SET_GLOBAL_DEFAULT_VNC_MODE] (state, { payload: { defaultVncMode } }) {
+    const defaultConsole = state.get('defaultConsole')
     return state.set('defaultVncMode', defaultVncMode)
+      .set('defaultUiConsole', toUiConsole(defaultVncMode, defaultConsole))
   },
   [SET_USER_GROUPS] (state, { payload: { groups } }) {
     return state.set('userGroups', groups)

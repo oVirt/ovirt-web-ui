@@ -34,7 +34,7 @@ import { SplitButton, Icon, Checkbox, DropdownKebab } from 'patternfly-react'
 import ConfirmationModal from './ConfirmationModal'
 import ConsoleConfirmationModal from './ConsoleConfirmationModal'
 import Action, { ActionButtonWraper, MenuItemAction, ActionMenuItemWrapper } from './Action'
-import AutoSelectConsole from './AutoSelectConsole'
+import { VNC, RDP, BROWSER_VNC, SPICE, NATIVE_VNC, NO_VNC } from '_/constants/console'
 
 const EmptyAction = ({ state, isOnCard }) => {
   if (!canConsole(state) && !canShutdown(state) && !canRestart(state) && !canStart(state)) {
@@ -127,7 +127,6 @@ class VmActions extends React.Component {
       onForceShutdown,
       onSuspend,
       onRDP,
-      isOnCard,
       msg,
     } = this.props
     const isPoolVm = !!vm.getIn(['pool', 'id'], false)
@@ -135,41 +134,53 @@ class VmActions extends React.Component {
     const status = vm.get('status')
     const onStart = (isPool ? onStartPool : onStartVm)
 
-    const vncConsole = vm.get('consoles').find(c => c.get('protocol') === 'vnc')
+    const vncConsole = vm.get('consoles').find(c => c.get('protocol') === VNC)
+    const spiceConsole = vm.get('consoles').find(c => c.get('protocol') === SPICE)
     const hasRdp = isWindows(vm.getIn(['os', 'type']))
+    const defaultUiConsole = config.get('defaultUiConsole')
     let consoles = []
-    if (isOnCard) {
-      consoles.push({
-        priority: 1,
-        actionDisabled: isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole']),
-        shortTitle: msg.console(),
-        onClick: (e) => { e.preventDefault() },
-        className: 'btn btn-success',
-        id: `${idPrefix}-button-Consoles`,
-        confirmation: (<AutoSelectConsole vm={vm} id={`${vm.get('id')}-console-selector`} />),
-      })
-    } else {
-      consoles = vm.get('consoles').map((c) => ({
-        priority: 0,
-        shortTitle: msg[c.get('protocol') + 'Console'](),
-        icon: <Icon name='external-link' />,
-        id: `${idPrefix}-button-console-${c.get('protocol')}`,
-        confirmation: (
-          <ConsoleConfirmationModal consoleId={c.get('id')} vm={vm} />
-        ),
-      })).toJS()
 
-      if (vncConsole) {
-        consoles.push({
-          priority: 0,
-          shortTitle: msg.vncConsoleBrowser(),
-          actionDisabled: config.get('websocket') === null,
-          id: `${idPrefix}-button-console-browser`,
-          confirmation: (
-            <ConsoleConfirmationModal isNoVNC consoleId={vncConsole.get('id')} vm={vm} />
-          ),
-        })
+    if (vncConsole) {
+      const vncModes = [ {
+        priority: 0,
+        protocol: VNC,
+        uiConsole: NATIVE_VNC,
+        shortTitle: msg.vncConsole(),
+        icon: <Icon name='external-link' />,
+        id: `${idPrefix}-button-console-vnc`,
+        confirmation: (
+          <ConsoleConfirmationModal consoleId={vncConsole.get('id')} vm={vm} />
+        ),
+      },
+      {
+        priority: 0,
+        uiConsole: BROWSER_VNC,
+        shortTitle: msg.vncConsoleBrowser(),
+        actionDisabled: config.get('websocket') === null,
+        id: `${idPrefix}-button-console-browser`,
+        confirmation: (
+          <ConsoleConfirmationModal isNoVNC consoleId={vncConsole.get('id')} vm={vm} />
+        ),
+      }]
+
+      if (config.get('defaultVncMode') === NO_VNC) {
+        vncModes.reverse()
       }
+      consoles = [...consoles, ...vncModes]
+    }
+
+    if (spiceConsole) {
+      consoles.push({
+        priority: 0,
+        protocol: SPICE,
+        uiConsole: SPICE,
+        shortTitle: msg.spiceConsole(),
+        icon: <Icon name='external-link' />,
+        id: `${idPrefix}-button-console-spice`,
+        confirmation: (
+          <ConsoleConfirmationModal consoleId={spiceConsole.get('id')} vm={vm} />
+        ),
+      })
     }
 
     if (hasRdp) {
@@ -177,12 +188,17 @@ class VmActions extends React.Component {
       const username = config.getIn([ 'user', 'name' ])
       consoles.push({
         priority: 0,
+        uiConsole: RDP,
         shortTitle: msg.remoteDesktop(),
         icon: <Icon name='external-link' />,
         id: `${idPrefix}-button-console-rdp`,
         onClick: (e) => { e.preventDefault(); onRDP({ domain, username }) },
       })
     }
+
+    consoles = consoles
+      .map(({ uiConsole, ...props }) => ({ ...props, priority: uiConsole === defaultUiConsole ? 1 : 0 }))
+      .sort((a, b) => b.priority - a.priority)
 
     const actions = [
       {
@@ -239,7 +255,7 @@ class VmActions extends React.Component {
       },
       {
         priority: 1,
-        actionDisabled: isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole']) || (!isOnCard && vm.get('consoles').isEmpty()),
+        actionDisabled: isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole']) || vm.get('consoles').isEmpty(),
         shortTitle: msg.console(),
         className: 'btn btn-default',
         bsStyle: 'default',

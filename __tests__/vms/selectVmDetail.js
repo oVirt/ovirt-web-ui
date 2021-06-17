@@ -1,5 +1,3 @@
-// import { call, put, take } from 'redux-saga/effects'
-
 import { initialState as configInitial } from '../../src/reducers/config'
 import { initialState as iconsInitial } from '../../src/reducers/icons'
 import { initialState as vmsInitial } from '../../src/reducers/vms'
@@ -42,7 +40,10 @@ describe('Selecting VM details', () => {
   it('selectVmDetail() equates to fetchSingleVm()', () => {
     const result = generator.next().value
     const fetchGenerator = fetchSingleVm(getSingleVm({ vmId: '123' }))
-
+    // first effect is 'select' which takes anonymous function
+    // each invocation creates a new function object which causes 'toEqual' to fail
+    expect(String(result.next())).toEqual(String(fetchGenerator.next()))
+    // continue with remaining effect
     expect(result).toEqual(fetchGenerator)
   })
 })

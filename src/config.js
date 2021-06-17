@@ -2,6 +2,7 @@ import $ from 'jquery'
 
 import { setLogDebug } from '_/logger'
 import { DEFAULT_ARCH } from '_/constants'
+import { VNC, NATIVE } from '_/constants/console'
 
 const CONFIG_URL = '/ovirt-engine/web-ui/ovirt-web-ui.config'
 
@@ -35,8 +36,8 @@ export const DefaultEngineOptions = Object.seal({
   DefaultWindowsTimeZone: 'GMT Standard Time',
 
   WebSocketProxy: null,
-  ClientModeConsoleDefault: 'vnc',
-  ClientModeVncDefault: 'Native',
+  ClientModeConsoleDefault: VNC,
+  ClientModeVncDefault: NATIVE,
 })
 
 export function readConfiguration () {
