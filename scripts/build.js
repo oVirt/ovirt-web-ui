@@ -99,10 +99,6 @@ function printFileSizes(stats, previousSizeMap) {
 
 // Create the production build and print the deployment instructions.
 function build(previousSizeMap) {
-  // Delete flow folder, because package flow will not do that before start
-  rimrafSync('/tmp/flow');
-  console.log('Flow folder deleted');
-
   console.log('Creating an optimized production build...');
 
   webpack(config).run((err, stats) => {
@@ -122,7 +118,6 @@ function build(previousSizeMap) {
     // https://github.com/facebookincubator/create-react-app/issues/401#issuecomment-238291901
 
     if (!hasErrors && !hasWarnings) {
-
       console.log(chalk.green('Compiled successfully.'));
       console.log();
 

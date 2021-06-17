@@ -1,3 +1,5 @@
+// Do this as the first thing so that any code reading it knows the right env.
+process.env.BABEL_ENV = 'development';
 process.env.NODE_ENV = 'development';
 
 var path = require('path');
@@ -16,7 +18,6 @@ var prompt = require('./utils/prompt');
 var config = require('../config/webpack.config.dev');
 var paths = require('../config/paths');
 var env = require('../config/env')
-var rimraf = require('rimraf')
 var formatMessage = require('./utils/utils').formatMessage
 var isLikelyASyntaxError = require('./utils/utils').isLikelyASyntaxError
 const fs = require('fs');
@@ -46,9 +47,6 @@ function clearConsole() {
 }
 
 function setupCompiler(port, protocol) {
-  // Delete flow folder, because package flow won't to do that before start
-  rimraf('/tmp/flow', function () { console.log('Flow folder deleted'); });
-
   // "Compiler" is a low-level interface to Webpack.
   // It lets us listen to some events and provide our own custom messages.
   compiler = webpack(config, handleCompile);
@@ -240,7 +238,7 @@ function runDevServer(port, protocol) {
     // to be used for HTML files, even <link href="./src/something.png"> would
     // get resolved correctly by Webpack and handled both in development and
     // in production without actually serving it by that path.
-    contentBase: [],
+    contentBase: false,
     // Enable hot reloading server. It will provide /sockjs-node/ endpoint
     // for the WebpackDevServer client so it can learn when the files were
     // updated. The WebpackDevServer client is included as an entry point

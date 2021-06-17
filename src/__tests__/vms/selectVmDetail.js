@@ -1,20 +1,22 @@
-import { initialState as configInitial } from '../../src/reducers/config'
-import { initialState as iconsInitial } from '../../src/reducers/icons'
-import { initialState as vmsInitial } from '../../src/reducers/vms'
-import { initialState as operatingSystemsInitial } from '../../src/reducers/operatingSystems'
-import { initialState as clustersInitial } from '../../src/reducers/clusters'
-import { initialState as templatesInitial } from '../../src/reducers/templates'
-import { initialState as optionsInitial } from '../../src/reducers/options'
-import Selectors from '../../src/selectors'
+// import { call, put, take } from 'redux-saga/effects'
+
+import { initialState as configInitial } from '_/reducers/config'
+import { initialState as iconsInitial } from '_/reducers/icons'
+import { initialState as vmsInitial } from '_/reducers/vms'
+import { initialState as operatingSystemsInitial } from '_/reducers/operatingSystems'
+import { initialState as clustersInitial } from '_/reducers/clusters'
+import { initialState as templatesInitial } from '_/reducers/templates'
+import { initialState as optionsInitial } from '_/reducers/options'
+import Selectors from '_/selectors'
 
 import {
   selectVmDetail,
   fetchSingleVm,
-} from '../../src/sagas'
+} from '_/sagas'
 import {
   selectVmDetail as selectVmDetailAction,
   getSingleVm,
-} from '../../src/actions'
+} from '_/actions'
 
 const TEST_STORE = {
   state: {

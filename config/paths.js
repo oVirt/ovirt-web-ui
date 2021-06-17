@@ -36,12 +36,10 @@ module.exports = {
   appBuild: resolveApp('build'),
   appHtml: resolveApp('static/index.hbs'),
   appIndexJs: resolveApp('src/index.js'),
-  appPackageJson: resolveApp('package.json'),
-  appSrc: resolveApp('src'),
   appNodeModules: resolveApp('node_modules'),
+  appPackageJson: resolveApp('package.json'),
+  appPath: resolveApp('.'),
+  appSrc: resolveApp('src'),
   appVersionJs: resolveApp('src/version.js'),
-  ownNodeModules: resolveApp('node_modules'),
   nodePaths: nodePaths,
-  novnc: resolveApp('node_modules/@novnc/novnc'),
-  spiceHtml5: resolveApp('node_modules/@spice-project/spice-html5')
 }

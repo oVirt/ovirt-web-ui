@@ -5,7 +5,7 @@ import React from 'react'
 const MsgContext = React.createContext()
 export const withMsg = (WrappedComponent) => {
   return ({ ...otherProps }) => (
-    <MsgContext.Consumer>{({ ...msgProps }) => (
+    <MsgContext.Consumer>{({ ...msgProps } = {}) => (
       // allow overwritting context-based props
       // main use case: context not available due to bug
       // https://github.com/react-bootstrap/react-bootstrap/issues/5016
