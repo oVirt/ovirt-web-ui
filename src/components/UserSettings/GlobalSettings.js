@@ -148,7 +148,7 @@ class GlobalSettings extends Component {
     this.saveOptions(saveFields, id)
   }
 
-  buildSections (onChange, translatedLabels) {
+  buildSections (onChange) {
     const { draftValues } = this.state
     const { config, msg } = this.props
     const idPrefix = 'global-user-settings'
@@ -156,139 +156,139 @@ class GlobalSettings extends Component {
       [GENERAL_SECTION]: {
         title: msg.general(),
         fields: [
-          {
+          ((name) => ({
             title: msg.username(),
-            name: 'username',
-            body: <span>{config.userName}</span>,
-          },
-          {
+            name,
+            body: <span>{config[name]}</span>,
+          }))('userName'),
+          ((name) => ({
             title: msg.email(),
-            name: 'email',
-            body: <span>{config.email}</span>,
-          },
-          {
-            title: translatedLabels.language,
-            name: 'language',
+            name,
+            body: <span>{config[name]}</span>,
+          }))('email'),
+          ((name) => ({
+            title: msg.language(),
+            name,
             tooltip: draftValues.persistLocale ? undefined : msg.optionIsNotSavedOnTheServer({ persistenceReEnableHowTo: msg.persistenceReEnableHowTo({ advancedOptions: msg.advancedOptions() }) }),
             body: (
               <div className={style['half-width']}>
                 <SelectBox
-                  id={`${idPrefix}-language`}
+                  id={`${idPrefix}-${name}`}
                   items={Object.entries(localeWithFullName).map(([id, value]) => ({ id, value, isDefault: id === DEFAULT_LOCALE }))}
-                  selected={draftValues.language}
-                  onChange={onChange('language')}
+                  selected={draftValues[name]}
+                  onChange={onChange(name)}
                 />
               </div>
             ),
-          },
-          {
-            title: translatedLabels.sshKey,
+          }))('language'),
+          ((name) => ({
+            title: msg.sshKey(),
             tooltip: msg.sshKeyTooltip(),
-            name: 'sshKey',
+            name,
             body: (
               <div className={style['half-width']}>
                 <FormControl
-                  id={`${idPrefix}-ssh-key`}
+                  id={`${idPrefix}-${name}`}
                   componentClass='textarea'
-                  onChange={e => onChange('sshKey')(e.target.value)}
-                  value={draftValues.sshKey || ''}
+                  onChange={e => onChange(name)(e.target.value)}
+                  value={draftValues[name] || ''}
                   rows={8}
                 />
               </div>
             ),
-          },
+          }))('sshKey'),
         ],
       },
       refreshInterval: {
         title: msg.refreshInterval(),
         tooltip: msg.refreshIntervalTooltip(),
         fields: [
-          {
-            title: translatedLabels.refreshInterval,
-            name: 'refreshInterval',
+          ((name) => ({
+            title: msg.uiRefresh(),
+            name,
             body: (
               <div className={style['half-width']}>
                 <SelectBox
-                  id={`${idPrefix}-update-rate`}
+                  id={`${idPrefix}-${name}`}
                   items={this.refreshIntervalList(msg)
                     .map(({ id, value }) => ({ id, value, isDefault: id === AppConfiguration.schedulerFixedDelayInSeconds }))}
-                  selected={draftValues.refreshInterval}
-                  onChange={onChange('refreshInterval')}
+                  selected={draftValues[name]}
+                  onChange={onChange(name)}
                 />
               </div>
             ),
-          },
+          }))('refreshInterval'),
         ],
       },
       notifications: {
         title: msg.notifications(),
         tooltip: msg.notificationSettingsAffectAllNotifications(),
         fields: [
-          {
-            title: translatedLabels.showNotifications,
-            name: 'showNotificatons',
+          ((name) => ({
+            title: msg.dontDisturb(),
+            name,
             body: (
               <Switch
-                id={`${idPrefix}-dont-disturb`}
-                isChecked={!draftValues.showNotifications}
+                id={`${idPrefix}-${name}`}
+                isChecked={!draftValues[name]}
                 onChange={(dontDisturb) => {
-                  onChange('showNotifications')(!dontDisturb)
+                  onChange(name)(!dontDisturb)
                 }}
               />
             ),
-          },
-          {
-            title: translatedLabels.notificationSnoozeDuration,
-            name: 'notificationSnoozeDuration',
+          }))('showNotifications'),
+          ((name) => ({
+            title: msg.dontDisturbFor(),
+            name,
             body: (
               <div className={style['half-width']}>
                 <SelectBox
-                  id={`${idPrefix}-dont-disturb-for`}
+                  id={`${idPrefix}-${name}`}
                   items={this.dontDisturbList(msg)
                     .map(({ id, value }) => ({ id, value, isDefault: id === AppConfiguration.notificationSnoozeDurationInMinutes }))}
-                  selected={draftValues.notificationSnoozeDuration}
-                  onChange={onChange('notificationSnoozeDuration')}
+                  selected={draftValues[name]}
+                  onChange={onChange(name)}
                   disabled={draftValues.showNotifications}
                 />
               </div>
             ),
-          },
+          }))('notificationSnoozeDuration'),
         ],
       },
       advancedOptions: {
         title: msg.advancedOptions(),
         fields: [
-          {
+          ((name) => ({
             title: msg.persistLanguage(),
-            name: 'persistLocale',
+            name,
             tooltip: msg.persistLanguageTooltip(),
             body: (<Switch
-              id={`${idPrefix}-persist-locale`}
-              isChecked={draftValues.persistLocale}
-              onChange={(persist) => onChange('persistLocale')(persist)}
+              id={`${idPrefix}-${name}`}
+              isChecked={draftValues[name]}
+              onChange={(persist) => onChange(name)(persist)}
             />),
-          },
+          }))('persistLocale'),
         ],
       },
     }
   }
 
   render () {
-    const { lastTransactionId, currentValues, msg } = this.props
+    const { lastTransactionId, currentValues } = this.props
     const { draftValues, baseValues, sentValues, defaultValues, activeSectionKey } = this.state
-    // required also in Settings for error handling: the case of partial success(only some fields saved)
-    // the alert shows the names of the fields that were NOT saved
-    const translatedLabels = {
-      sshKey: msg.sshKey(),
-      language: msg.language(),
-      showNotifications: msg.dontDisturb(),
-      notificationSnoozeDuration: msg.dontDisturbFor(),
-      refreshInterval: msg.uiRefresh(),
-      persistLocale: msg.persistLanguage(),
-    }
 
-    const sections = this.buildSections(this.onChange, translatedLabels)
+    const sections = this.buildSections(this.onChange)
     const { [activeSectionKey]: activeSection } = sections
+    // required in Settings for error handling and confirmation dialog
+    // the alert/dialog need to show the translated field labels (together with section labels)
+    // output: [ {sectionTitle: "globally unique + translated", fieldTitle: "translated", fieldName: "globally unique"}, ... ]}
+    // NOTE that the order of section/fields is preserved here
+    const translatedLabels = Object.values(sections)
+      .flatMap(section => section.sections ? Object.values(section.sections) : section)
+      .flatMap(({ title: sectionTitle, fields }) =>
+        // assume global uniqueness of: fieldName, sectionTitle
+        fields.map(({ name: fieldName, title: fieldTitle }) => ({ sectionTitle, fieldTitle, fieldName }))
+      )
 
     const onSelect = result => {
       this.setState({
