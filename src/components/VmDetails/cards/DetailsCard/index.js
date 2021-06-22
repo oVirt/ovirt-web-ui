@@ -267,7 +267,7 @@ class DetailsCard extends React.Component {
     let updates = this.state.vm
 
     const { enableInitTimezone, lastInitTimezone } = this.state
-    let initTimezoneUpdates = { enableInitTimezone, lastInitTimezone }
+    const initTimezoneUpdates = { enableInitTimezone, lastInitTimezone }
 
     const changeQueue = [{ fieldName, value }]
     const {
@@ -433,7 +433,7 @@ class DetailsCard extends React.Component {
           break
 
         case 'topology':
-          let topology = getTopology({
+          const topology = getTopology({
             value: this.state.vm.getIn(['cpu', 'vCPUs']),
             max: {
               sockets: maxNumOfSockets,

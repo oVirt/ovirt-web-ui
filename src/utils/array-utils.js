@@ -8,7 +8,7 @@ export function arrayMatch (a1, a2) {
   }
 
   const difference = new Set(a1)
-  for (let member of a2) {
+  for (const member of a2) {
     difference.delete(member)
   }
 

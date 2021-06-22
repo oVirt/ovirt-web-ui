@@ -19,7 +19,7 @@ export function getMinimizedString (str: string, maxChar: number): string {
 }
 
 export function escapeHtml (s: string): string {
-  var div = document.createElement('div')
+  const div = document.createElement('div')
   div.appendChild(document.createTextNode(s))
   return div.innerHTML
 }

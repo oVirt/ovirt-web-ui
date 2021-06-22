@@ -142,7 +142,7 @@ function* waitForDiskToBeUnlocked (vmId, attachmentId) {
 function* waitForDiskAttachment (vmId, attachmentId, test, canBeMissing = false) {
   let metTest = false
 
-  for (let delayMs of delayInMsSteps()) {
+  for (const delayMs of delayInMsSteps()) {
     const apiDiskAttachment = yield callExternalAction(
       'diskattachment',
       Api.diskattachment,

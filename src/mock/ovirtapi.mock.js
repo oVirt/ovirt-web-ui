@@ -33,7 +33,7 @@ OvirtApi = {
     return Promise.resolve(api)
   },
   getVm ({ vmId }) {
-    for (let i in vms.vm) {
+    for (const i in vms.vm) {
       if (vms.vm[i].id === vmId) {
         return Promise.resolve(vms.vm[i])
       }
@@ -66,7 +66,7 @@ OvirtApi = {
     return OvirtApi._httpGet({ url: `${AppConfiguration.applicationContext}/api/icons/${id}` })
   },
   diskattachments ({ vmId }) {
-    for (let i in vms.vm) {
+    for (const i in vms.vm) {
       if (vms.vm[i].id === vmId) {
         return Promise.resolve(vms.vm[i].diskattachments)
       }
@@ -74,7 +74,7 @@ OvirtApi = {
     return Promise.reject('')
   },
   disk ({ diskId }) {
-    for (let i in disks.disk) {
+    for (const i in disks.disk) {
       if (disks.disk[i].id === diskId) {
         return Promise.resolve(disks.disk[i])
       }
@@ -82,7 +82,7 @@ OvirtApi = {
     return Promise.reject('')
   },
   consoles ({ vmId }) {
-    for (let i in vms.vm) {
+    for (const i in vms.vm) {
       if (vms.vm[i].id === vmId) {
         return Promise.resolve({ graphics_console: vms.vm[i].graphics_console })
       }
@@ -90,9 +90,9 @@ OvirtApi = {
     return Promise.reject('')
   },
   console ({ vmId, consoleId }) {
-    for (let i in vms.vm) {
+    for (const i in vms.vm) {
       if (vms.vm[i].id === vmId) {
-        for (let j in vms.vm[i].graphics_console) {
+        for (const j in vms.vm[i].graphics_console) {
           if (vms.vm[i].graphics_console[j].id === consoleId) {
             return Promise.resolve({ graphics_console: vms.vm[i].graphics_console })
           }

@@ -15,7 +15,7 @@ import style from './style.css'
 
 const VmConsoleSelector = ({ vmId, vms, consoles, config, consoleId, isConsolePage, onRDP }) => {
   const { msg } = useContext(MsgContext)
-  let actions = vms.getIn(['vms', vmId, 'consoles'])
+  const actions = vms.getIn(['vms', vmId, 'consoles'])
   if (actions.size === 0) {
     return <div />
   }

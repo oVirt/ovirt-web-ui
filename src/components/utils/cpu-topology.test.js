@@ -25,7 +25,7 @@ describe('check topology balance', function () {
         output: { sockets: 1, cores: 71, threads: 1 },
       },
     ]
-    for (let topology of topologies) {
+    for (const topology of topologies) {
       expect(getTopology(topology.input)).toEqual(topology.output)
     }
   })
@@ -48,7 +48,7 @@ describe('check topology balance', function () {
         output: { sockets: 10, cores: 5, threads: 1 },
       },
     ]
-    for (let topology of topologies) {
+    for (const topology of topologies) {
       expect(getTopology(topology.input)).toEqual(topology.output)
     }
   })

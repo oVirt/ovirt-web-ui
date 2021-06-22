@@ -39,7 +39,7 @@ function addHttpListener (listener: ListenerType) {
   listeners.add(listener)
 }
 
-var currentLocale = DEFAULT_LOCALE
+let currentLocale = DEFAULT_LOCALE
 function updateLocale (locale: string) {
   currentLocale = locale
 }

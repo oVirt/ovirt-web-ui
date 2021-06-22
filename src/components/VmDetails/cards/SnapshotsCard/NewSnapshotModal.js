@@ -69,7 +69,7 @@ class NewSnapshotModal extends Component {
   render () {
     const { idPrefix, msg } = this.props
 
-    let modalId = `${idPrefix}-modal`
+    const modalId = `${idPrefix}-modal`
 
     return (
       <div>

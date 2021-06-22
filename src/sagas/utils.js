@@ -139,10 +139,9 @@ function shortErrorMessage ({ action: { type = 'NONE' } }) {
 }
 
 export function* foreach (array, fn, context) {
-  var i = 0
-  var length = array.length
+  const length = array.length
 
-  for (;i < length; i++) {
+  for (let i = 0; i < length; i++) {
     yield * fn.call(context, array[i], i, array)
   }
 }

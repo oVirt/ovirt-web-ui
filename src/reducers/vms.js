@@ -148,7 +148,7 @@ const vms = actionReducer(initialState, {
 
   [SET_VM_SESSIONS] (state, { payload: { vmId, sessions } }) {
     let consoleInUse = false
-    for (var i in sessions) {
+    for (const i in sessions) {
       if (sessions[i].consoleUser) {
         consoleInUse = true
         break

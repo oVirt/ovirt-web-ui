@@ -57,7 +57,7 @@ const userMessages = actionReducer(initialState, {
 
   [SET_USER_MESSAGES] (state: any, { payload: { messages } }: any): any {
     let newState = state.update('records', records => records.clear())
-    for (let message of messages) {
+    for (const message of messages) {
       newState = newState.update('records', records => records.push(Immutable.fromJS({
         id: message.id,
         message: message.description,

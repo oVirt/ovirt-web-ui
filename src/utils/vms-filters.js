@@ -15,7 +15,7 @@ export const mapFilterValues = {
 
 export function filterVms (item, filters, msg) {
   let res = true
-  for (let name in filters) {
+  for (const name in filters) {
     if (compareMap(msg)[name]) {
       res &= compareMap(msg)[name](item, filters[name])
     }

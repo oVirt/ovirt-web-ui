@@ -83,7 +83,7 @@ class VmFilters extends React.Component {
   }
 
   filterAdded (field, value) {
-    let activeFilters = Object.assign({}, this.props.vms.get('filters').toJS())
+    const activeFilters = Object.assign({}, this.props.vms.get('filters').toJS())
     if ((field.filterType === 'select')) {
       activeFilters[field.id] = value.title
     } else {

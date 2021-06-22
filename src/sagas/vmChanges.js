@@ -282,7 +282,7 @@ function* createVm (action) {
 function* waitForVmToBeUnlocked (vmId, isCloning = false) {
   const vm = yield select(state => state.vms.getIn(['vms', vmId]))
   if (vm.get('status') === 'image_locked') {
-    for (let delayMs of delayInMsSteps(isCloning ? 20 : 200)) {
+    for (const delayMs of delayInMsSteps(isCloning ? 20 : 200)) {
       yield delay(delayMs)
 
       const check = yield callExternalAction('getVm', Api.getVm, { payload: { vmId } }, true)

@@ -25,7 +25,7 @@ describe('check utils functions', function () {
         output: [1],
       },
     ]
-    for (let n of testNumbers) {
+    for (const n of testNumbers) {
       expect(dividers(n.input)).toEqual(n.output)
     }
   })

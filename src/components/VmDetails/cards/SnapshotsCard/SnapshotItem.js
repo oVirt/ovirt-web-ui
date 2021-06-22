@@ -98,7 +98,7 @@ class SnapshotItem extends React.Component {
   render () {
     const { msg, locale } = this.props
     let statusIcon = null
-    let buttons = []
+    const buttons = []
 
     // Snapshot actions
     const isActionsDisabled = !this.props.isEditing || this.props.snapshot.get('status') === 'locked'

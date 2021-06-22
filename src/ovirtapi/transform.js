@@ -69,7 +69,7 @@ function convertInt (val: ?(number | string), defaultValue: number = Number.NaN)
 }
 
 function cleanUndefined (obj: Object): Object {
-  for (let key in obj) {
+  for (const key in obj) {
     if (obj[key] === undefined) delete obj[key]
   }
   return obj

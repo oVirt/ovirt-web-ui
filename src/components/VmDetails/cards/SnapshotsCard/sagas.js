@@ -21,7 +21,7 @@ function* addVmSnapshot (action) {
 
   if (snapshot && snapshot.id) {
     yield fetchVmSnapshots({ vmId: action.payload.vmId })
-    for (let delayMilliSec of delayInMsSteps()) {
+    for (const delayMilliSec of delayInMsSteps()) {
       const apiSnapshot = yield callExternalAction('snapshot', Api.snapshot, { payload: { snapshotId: snapshot.id, vmId: action.payload.vmId } }, true)
       if (apiSnapshot.snapshot_status !== 'locked') {
         break
@@ -43,7 +43,7 @@ function* deleteVmSnapshot (action) {
   yield put(addSnapshotRemovalPendingTask(snapshotId))
   let snapshotRemoved = false
   yield fetchVmSnapshots({ vmId })
-  for (let delaySec of delayInMsSteps()) {
+  for (const delaySec of delayInMsSteps()) {
     const snapshot = yield callExternalAction('snapshot', Api.snapshot, { payload: { snapshotId, vmId } }, true)
     if (snapshot.error && snapshot.error.status === 404) {
       snapshotRemoved = true
