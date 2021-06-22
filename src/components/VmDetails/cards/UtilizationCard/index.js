@@ -18,7 +18,7 @@ import NoLiveData from './NoLiveData'
 const UtilizationCard = ({ vm }) => {
   const { msg } = useContext(MsgContext)
   const stats = vm.has('statistics') ? vm.get('statistics').toJS() : undefined
-  const isRunning = [ 'up' ].includes(vm.get('status'))
+  const isRunning = ['up'].includes(vm.get('status'))
 
   const vCpus = vm.getIn(['cpu', 'vCPUs'])
 

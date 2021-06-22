@@ -32,7 +32,7 @@ const FieldRow = ({ label, children, id, tooltip, tooltipPosition, validationSta
 FieldRow.propTypes = {
   id: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
-  tooltip: PropTypes.oneOfType([ Tooltip.propTypes.tooltip ]),
+  tooltip: PropTypes.oneOfType([Tooltip.propTypes.tooltip]),
   children: PropTypes.node.isRequired,
   tooltipPosition: Tooltip.propTypes.placement,
   validationState: FormGroup.propTypes.validationState,

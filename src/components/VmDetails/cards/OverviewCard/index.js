@@ -67,7 +67,7 @@ class OverviewCard extends React.Component {
       }
       return {
         correlatedMessages: props.userMessages.get('records').filter(
-          record => record.getIn([ 'failedAction', 'meta', 'correlationId' ]) === state.correlationId
+          record => record.getIn(['failedAction', 'meta', 'correlationId']) === state.correlationId
         ),
       }
     }

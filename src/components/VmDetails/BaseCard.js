@@ -164,14 +164,14 @@ BaseCard.propTypes = {
   editMode: PropTypes.bool,
   editable: PropTypes.bool,
   disableSaveButton: PropTypes.bool,
-  editTooltip: PropTypes.oneOfType([ Tooltip.propTypes.tooltip ]),
-  disableTooltip: PropTypes.oneOfType([ Tooltip.propTypes.tooltip ]),
+  editTooltip: PropTypes.oneOfType([Tooltip.propTypes.tooltip]),
+  disableTooltip: PropTypes.oneOfType([Tooltip.propTypes.tooltip]),
   editTooltipPlacement: Tooltip.propTypes.placement,
 
   onStartEdit: PropTypes.func,
   onCancel: PropTypes.func,
   onSave: PropTypes.func,
-  children: PropTypes.oneOfType([ PropTypes.func, PropTypes.node ]).isRequired,
+  children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]).isRequired,
 }
 BaseCard.defaultProps = {
   onStartEdit: noop,

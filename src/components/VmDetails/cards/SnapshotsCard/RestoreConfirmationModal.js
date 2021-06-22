@@ -86,7 +86,7 @@ RestoreConfirmationModal.propTypes = {
 
 export default connect(
   (state, { vmId }) => ({
-    snapshots: state.vms.getIn([ 'vms', vmId, 'snapshots' ], Immutable.fromJS([])).filter((s) => !s.get('isActive')),
+    snapshots: state.vms.getIn(['vms', vmId, 'snapshots'], Immutable.fromJS([])).filter((s) => !s.get('isActive')),
   }),
   (dispatch, { vmId, snapshot }) => ({
     onRestore: () => dispatch(restoreVmSnapshot({ vmId, snapshotId: snapshot.get('id') })),

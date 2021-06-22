@@ -22,7 +22,7 @@ import { EMPTY_VNIC_PROFILE_ID } from '_/constants'
 import { InfoTooltip } from '_/components/tooltips'
 
 const NIC_INTERFACE_DEFAULT = 'virtio'
-const NIC_INTERFACE_CANT_CHANGE = [ 'pci_passthrough' ]
+const NIC_INTERFACE_CANT_CHANGE = ['pci_passthrough']
 
 const LabelCol = ({ children, ...props }) => {
   return <Col componentClass={ControlLabel} {...props}>

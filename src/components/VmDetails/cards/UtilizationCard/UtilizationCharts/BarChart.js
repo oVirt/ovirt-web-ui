@@ -15,8 +15,8 @@ const CustomLabel = ({ label, offsetX, text, ...rest }) => {
 
 CustomLabel.defaultEvents = ChartTooltip.defaultEvents
 CustomLabel.propTypes = {
-  text: PropTypes.oneOfType([ PropTypes.string, PropTypes.func ]),
-  label: PropTypes.oneOfType([ PropTypes.string, PropTypes.func ]),
+  text: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  label: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   offsetX: PropTypes.number,
 }
 
@@ -63,7 +63,7 @@ BarChart.propTypes = {
   data: PropTypes.array.isRequired,
   thresholdWarning: PropTypes.number,
   thresholdError: PropTypes.number,
-  additionalLabel: PropTypes.oneOfType([ PropTypes.string, PropTypes.func ]),
+  additionalLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
 }
 
 export default BarChart

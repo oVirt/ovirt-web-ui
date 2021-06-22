@@ -67,7 +67,7 @@ class EllipsisValue extends React.Component {
 EllipsisValue.propTypes = {
   className: PropTypes.string,
   id: PropTypes.string,
-  children: xor(PropTypes.oneOfType([ PropTypes.string, PropTypes.node ]), 'tooltip'),
+  children: xor(PropTypes.oneOfType([PropTypes.string, PropTypes.node]), 'tooltip'),
   tooltip: xor(PropTypes.string, 'children'),
 }
 

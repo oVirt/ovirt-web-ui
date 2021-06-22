@@ -19,7 +19,7 @@ export const RouterPropTypeShapes = {
   history: PropTypes.shape({
     length: PropTypes.number, // number of entries in the history stack
     location: PropTypes.object, // current location
-    action: PropTypes.oneOf([ 'PUSH', 'REPLACE', 'POP' ]), // current navigation action
+    action: PropTypes.oneOf(['PUSH', 'REPLACE', 'POP']), // current navigation action
     push: PropTypes.func,
     replace: PropTypes.func,
     go: PropTypes.func,

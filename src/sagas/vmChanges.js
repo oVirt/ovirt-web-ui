@@ -30,7 +30,7 @@ function* createMemoryPolicyFromCluster (clusterId, memorySize) {
  * @see http://ovirt.github.io/ovirt-engine-api-model/master/#types/vm
  */
 function* composeAndCreateVm ({ payload: { basic, nics, disks }, meta: { correlationId } }) {
-  const osType = yield select(state => state.operatingSystems.getIn([ basic.operatingSystemId, 'name' ]))
+  const osType = yield select(state => state.operatingSystems.getIn([basic.operatingSystemId, 'name']))
   const memory = basic.memory * (1024 ** 2) // input in MiB, stored in bytes
   const memoryPolicy = yield createMemoryPolicyFromCluster(basic.clusterId, memory)
 
@@ -64,7 +64,7 @@ function* composeAndCreateVm ({ payload: { basic, nics, disks }, meta: { correla
   // Provision = ISO (setup boot to CD and "insert" the CD after the VM is created)
   let cdrom
   if (basic.provisionSource === 'iso') {
-    const [ vmUpdates, cdrom_ ] = yield composeProvisionSourceIso({ vm, basic })
+    const [vmUpdates, cdrom_] = yield composeProvisionSourceIso({ vm, basic })
 
     cdrom = cdrom_
     merge(vm, vmUpdates)
@@ -72,7 +72,7 @@ function* composeAndCreateVm ({ payload: { basic, nics, disks }, meta: { correla
 
   // Provision = TEMPLATE
   if (basic.provisionSource === 'template') {
-    const [ vmUpdates, vmRequiresClone_ ] = yield composeProvisionSourceTemplate({ vm, basic, disks })
+    const [vmUpdates, vmRequiresClone_] = yield composeProvisionSourceTemplate({ vm, basic, disks })
 
     vmRequiresClone = vmRequiresClone_
     merge(vm, vmUpdates)
@@ -149,13 +149,13 @@ function* composeProvisionSourceIso ({ vm, basic }) {
     os: {
       boot: {
         devices: {
-          device: [ 'cdrom' ],
+          device: ['cdrom'],
         },
       },
     },
   }
 
-  return [ vmUpdates, cdrom ]
+  return [vmUpdates, cdrom]
 }
 
 function* composeProvisionSourceTemplate ({ vm, basic, disks }) {
@@ -224,7 +224,7 @@ function* composeProvisionSourceTemplate ({ vm, basic, disks }) {
       }
     })
 
-  return [ vmUpdates, vmStorageAllocation === 'clone' || diskRequiresClone ]
+  return [vmUpdates, vmStorageAllocation === 'clone' || diskRequiresClone]
 }
 
 /*
@@ -305,7 +305,7 @@ function* waitForVmToBeUnlocked (vmId, isCloning = false) {
 function* editVm (action) {
   const { payload: { vm } } = action
   const vmId = vm.id
-  const onlyNeedChangeCd = vm && arrayMatch(Object.keys(vm), [ 'id', 'cdrom' ])
+  const onlyNeedChangeCd = vm && arrayMatch(Object.keys(vm), ['id', 'cdrom'])
 
   const editVmResult = onlyNeedChangeCd
     ? {}
@@ -358,7 +358,7 @@ function* changeVmCdRom (action) {
 function* shutdownVm (action) {
   yield startProgress({ vmId: action.payload.vmId, name: 'shutdown' })
   const result = yield callExternalAction('shutdown', Api.shutdown, action)
-  const vmName = yield select(state => state.vms.getIn([ 'vms', action.payload.vmId, 'name' ]))
+  const vmName = yield select(state => state.vms.getIn(['vms', action.payload.vmId, 'name']))
   if (result.status === 'complete') {
     yield put(A.addUserMessage({ messageDescriptor: { id: 'actionFeedbackShutdownVm', params: { VmName: vmName } }, type: 'success' }))
   }
@@ -368,7 +368,7 @@ function* shutdownVm (action) {
 function* restartVm (action) {
   yield startProgress({ vmId: action.payload.vmId, name: 'restart' })
   const result = yield callExternalAction('restart', Api.restart, action)
-  const vmName = yield select(state => state.vms.getIn([ 'vms', action.payload.vmId, 'name' ]))
+  const vmName = yield select(state => state.vms.getIn(['vms', action.payload.vmId, 'name']))
   if (result.status === 'complete') {
     yield put(A.addUserMessage({ messageDescriptor: { id: 'actionFeedbackRestartVm', 'params': { VmName: vmName } }, type: 'success' }))
   }
@@ -378,7 +378,7 @@ function* restartVm (action) {
 function* suspendVm (action) {
   yield startProgress({ vmId: action.payload.vmId, name: 'suspend' })
   const result = yield callExternalAction('suspend', Api.suspend, action)
-  const vmName = yield select(state => state.vms.getIn([ 'vms', action.payload.vmId, 'name' ]))
+  const vmName = yield select(state => state.vms.getIn(['vms', action.payload.vmId, 'name']))
   if (result.status === 'pending') {
     yield put(A.addUserMessage({ messageDescriptor: { id: 'actionFeedbackSuspendVm', params: { VmName: vmName } }, type: 'success' }))
   }
@@ -388,7 +388,7 @@ function* suspendVm (action) {
 function* startVm (action) {
   yield startProgress({ vmId: action.payload.vmId, name: 'start' })
   const result = yield callExternalAction('start', Api.start, action)
-  const vmName = yield select(state => state.vms.getIn([ 'vms', action.payload.vmId, 'name' ]))
+  const vmName = yield select(state => state.vms.getIn(['vms', action.payload.vmId, 'name']))
   // TODO: check status at refresh --> conditional refresh wait_for_launch
   if (result.status === 'complete') {
     yield put(A.addUserMessage({ messageDescriptor: { id: 'actionFeedbackStartVm', params: { VmName: vmName } }, type: 'success' }))
@@ -399,7 +399,7 @@ function* startVm (action) {
 function* startPool (action) {
   yield startProgress({ poolId: action.payload.poolId, name: 'start' })
   const result = yield callExternalAction('startPool', Api.startPool, action)
-  const poolName = yield select(state => state.vms.getIn([ 'pools', action.payload.poolId, 'name' ]))
+  const poolName = yield select(state => state.vms.getIn(['pools', action.payload.poolId, 'name']))
   if (result.status === 'complete') {
     yield put(A.addUserMessage({ messageDescriptor: { id: 'actionFeedbackAllocateVm', params: { poolname: poolName } }, type: 'success' }))
   }

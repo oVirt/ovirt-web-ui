@@ -76,7 +76,7 @@ export function coerceToSupportedLocale (locale: ?string): ?string {
 // moment and moment-duration-format setup
 //
 export function initMomentTranslations (locale: string, defaultLocale: string) {
-  const chosen = moment.locale([ locale, defaultLocale ])
+  const chosen = moment.locale([locale, defaultLocale])
   console.log(`Locale being used by moment: ${chosen}`)
 
   //

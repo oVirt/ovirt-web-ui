@@ -333,7 +333,7 @@ const VmStatistics = {
       network: {},
       elapsedUptime: {
         firstDatum: undefined,
-        datum: [ 0 ],
+        datum: [0],
         unit: 'seconds',
         description: 'Elapsed VM runtime (default to 0)',
       },

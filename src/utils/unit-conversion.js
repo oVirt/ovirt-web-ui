@@ -7,7 +7,7 @@ export function convertUnits (unitTable = [], unit, value, minThreshold = 0.1, m
   if (Array.isArray(value)) {
     newValue = value.slice(0)
   } else if (isNumber(value)) {
-    newValue = [ value ]
+    newValue = [value]
   } else {
     throw new TypeError('value must be a number or an array')
   }

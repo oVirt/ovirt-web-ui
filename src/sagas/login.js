@@ -105,7 +105,7 @@ function* login (action) {
   console.log('\u2714 login checks and server config fetches are done:',
     yield select(state => pick(
       state.config.toJS(),
-      [ 'administrator', 'filter', 'domain', 'user', 'userSessionTimeoutInterval', 'websocket', 'cpuTopology' ]))
+      ['administrator', 'filter', 'domain', 'user', 'userSessionTimeoutInterval', 'websocket', 'cpuTopology']))
   )
   console.groupEnd('user checks and server config')
 

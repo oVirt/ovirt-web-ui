@@ -57,7 +57,7 @@ ConfirmationModal.propTypes = {
   accessibleDescription: PropsTypes.string,
   confirm: PropsTypes.shape({
     title: PropsTypes.string,
-    type: PropsTypes.oneOf([ 'primary', 'success', 'info', 'warning', 'danger' ]),
+    type: PropsTypes.oneOf(['primary', 'success', 'info', 'warning', 'danger']),
     onClick: PropsTypes.func,
   }),
   extra: btnPropType,

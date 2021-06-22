@@ -169,7 +169,7 @@ class DetailsCard extends React.Component {
       }
       return {
         correlatedMessages: props.userMessages.get('records').filter(
-          record => record.getIn([ 'failedAction', 'meta', 'correlationId' ]) === state.correlationId
+          record => record.getIn(['failedAction', 'meta', 'correlationId']) === state.correlationId
         ),
       }
     }
@@ -533,13 +533,13 @@ class DetailsCard extends React.Component {
 
     if (this.trackUpdates['cluster']) {
       vmUpdates['cluster'] = {
-        id: stateVm.getIn([ 'cluster', 'id' ]),
+        id: stateVm.getIn(['cluster', 'id']),
       }
     }
 
     if (this.trackUpdates['template']) {
       vmUpdates['template'] = {
-        id: stateVm.getIn([ 'template', 'id' ]),
+        id: stateVm.getIn(['template', 'id']),
       }
     }
 

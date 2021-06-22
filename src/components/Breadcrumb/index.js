@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { MsgContext } from '_/intl'
 
-const NONE_VM_ROUTES = [ '/settings' ]
+const NONE_VM_ROUTES = ['/settings']
 
 const buildPath = ({ vms, branches, msg }) => {
   const res = []

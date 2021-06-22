@@ -480,7 +480,7 @@ class Storage extends React.Component {
       if (update && update.id === disk.id) {
         disk = { ...disk, ...update }
       }
-      disksAreValid = disksAreValid && storageDomains.getIn([ disk.storageDomainId, 'canUserUseDomain' ], false)
+      disksAreValid = disksAreValid && storageDomains.getIn([disk.storageDomainId, 'canUserUseDomain'], false)
     }
 
     return disksAreValid
@@ -662,7 +662,7 @@ class Storage extends React.Component {
     const enableCreate = storageDomainList.length > 0 && !this.isEditingMode()
 
     const diskList = sortNicsDisks([...disks], locale)
-      .concat(this.state.creating ? [ this.state.editing[this.state.creating] ] : [])
+      .concat(this.state.creating ? [this.state.editing[this.state.creating]] : [])
       .map(disk => {
         disk = this.state.editing[disk.id] || disk
         const sd = storageDomainList.find(sd => sd.id === disk.storageDomainId)

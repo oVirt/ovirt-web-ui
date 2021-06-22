@@ -141,7 +141,7 @@ class VmActions extends React.Component {
     let consoles = []
 
     if (vncConsole) {
-      const vncModes = [ {
+      const vncModes = [{
         priority: 0,
         protocol: VNC,
         uiConsole: NATIVE_VNC,
@@ -185,7 +185,7 @@ class VmActions extends React.Component {
 
     if (hasRdp) {
       const domain = config.get('domain')
-      const username = config.getIn([ 'user', 'name' ])
+      const username = config.getIn(['user', 'name'])
       consoles.push({
         priority: 0,
         uiConsole: RDP,
@@ -309,7 +309,7 @@ class VmActions extends React.Component {
     // Actions for Card
     if (isOnCard) {
       let filteredActions = actions.filter((action) => !action.actionDisabled).sort((a, b) => b.priority - a.priority)
-      filteredActions = filteredActions.length === 0 ? [ actions[0] ] : filteredActions
+      filteredActions = filteredActions.length === 0 ? [actions[0]] : filteredActions
       return <div className={`actions-line card-pf-items text-center ${style['action-height']}`} id={idPrefix}>
         <VmDropdownActions id={`${idPrefix}-dropdown`} actions={filteredActions} />
       </div>

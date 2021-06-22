@@ -72,7 +72,7 @@ DeleteConfirmationModal.propTypes = {
   children: PropTypes.node.isRequired,
   onDelete: PropTypes.func.isRequired,
   onClose: PropTypes.func,
-  severity: PropTypes.oneOf([ 'normal', 'danger' ]),
+  severity: PropTypes.oneOf(['normal', 'danger']),
   msg: PropTypes.object.isRequired,
 }
 

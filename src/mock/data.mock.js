@@ -32,16 +32,16 @@ export const vms = {
       'os': {
         'boot': {
           'devices': {
-            'device': [ 'network' ],
+            'device': ['network'],
           },
         },
         'type': 'windows_7',
       },
       'sso': {
         'methods': {
-          'method': [ {
+          'method': [{
             'id': 'guest_agent',
-          } ],
+          }],
         },
       },
       'stateless': 'false',
@@ -80,13 +80,13 @@ export const vms = {
       'cpu_profile': {
         'id': '357',
       },
-      'graphics_console': [ {
+      'graphics_console': [{
         'protocol': 'spice',
         'vm': {
           'id': '123',
         },
         'id': '123456',
-      } ],
+      }],
       'diskattachments': {},
     },
     {
@@ -122,16 +122,16 @@ export const vms = {
       'os': {
         'boot': {
           'devices': {
-            'device': [ 'network' ],
+            'device': ['network'],
           },
         },
         'type': 'other',
       },
       'sso': {
         'methods': {
-          'method': [ {
+          'method': [{
             'id': 'guest_agent',
-          } ],
+          }],
         },
       },
       'stateless': 'false',
@@ -167,14 +167,14 @@ export const vms = {
       'cpu_profile': {
         'id': '862',
       },
-      'graphics_console': [ {
+      'graphics_console': [{
         'protocol': 'vnc',
         'vm': {
           'href': '/ovirt-engine/api/vms/456',
           'id': '456',
         },
         'id': '456789',
-      } ],
+      }],
       'diskattachments': {},
     },
   ],

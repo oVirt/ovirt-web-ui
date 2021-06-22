@@ -530,6 +530,6 @@ DiskImageEditor.propTypes = {
 export default connect(
   (state, { vm }) => ({
     storageDomains: state.storageDomains,
-    dataCenterId: state.clusters.getIn([ vm.getIn([ 'cluster', 'id' ]), 'dataCenterId' ]),
+    dataCenterId: state.clusters.getIn([vm.getIn(['cluster', 'id']), 'dataCenterId']),
   })
 )(withMsg(DiskImageEditor))

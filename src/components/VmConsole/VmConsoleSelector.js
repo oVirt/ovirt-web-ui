@@ -37,7 +37,7 @@ const VmConsoleSelector = ({ vmId, vms, consoles, config, consoleId, isConsolePa
 
   if (hasRdp) {
     const domain = config.get('domain')
-    const username = config.getIn([ 'user', 'name' ])
+    const username = config.getIn(['user', 'name'])
     consoleItems.push(<MenuItem
       key={RDP_ID}
       onClick={(e) => { e.preventDefault(); onRDP({ domain, username, vms }) }}

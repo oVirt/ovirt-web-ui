@@ -117,7 +117,7 @@ SelectBox.propTypes = {
   /* eslint-enable react/no-unused-prop-types */
   onChange: PropTypes.func.isRequired, // (selectedId: string) => any
   id: PropTypes.string,
-  validationState: PropTypes.oneOf([ false, 'default', 'error' ]),
+  validationState: PropTypes.oneOf([false, 'default', 'error']),
   disabled: PropTypes.bool,
   locale: PropTypes.string.isRequired,
 }

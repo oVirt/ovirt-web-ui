@@ -86,7 +86,7 @@ const vms = actionReducer(initialState, {
   },
   [REMOVE_VMS] (state, { payload: { vmIds } }) {
     const mutable = state.asMutable()
-    vmIds.forEach(vmId => mutable.deleteIn([ 'vms', vmId ]))
+    vmIds.forEach(vmId => mutable.deleteIn(['vms', vmId]))
     mutable.update('missedVms', missedVms => missedVms.union(vmIds))
     return mutable.asImmutable()
   },
@@ -175,7 +175,7 @@ const vms = actionReducer(initialState, {
   },
   [REMOVE_POOLS] (state, { payload: { poolIds } }) {
     const mutable = state.asMutable()
-    poolIds.forEach(poolId => mutable.deleteIn([ 'pools', poolId ]))
+    poolIds.forEach(poolId => mutable.deleteIn(['pools', poolId]))
     return mutable.asImmutable()
   },
   [REMOVE_MISSING_POOLS] (state, { payload: { poolIdsToPreserve } }) {

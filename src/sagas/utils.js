@@ -213,7 +213,7 @@ export function* entityPermissionsToUserPermits (entity) {
  * on the (custom)? compatibility version and CPU architecture.
  */
 export function* mapCpuOptions (version, architecture) {
-  const [ maxNumSockets, maxNumOfCores, maxNumOfThreads, maxNumOfVmCpusPerArch ] =
+  const [maxNumSockets, maxNumOfCores, maxNumOfThreads, maxNumOfVmCpusPerArch] =
     yield select(({ config }) => [
       config.getIn(['cpuOptions', 'maxNumOfSockets']),
       config.getIn(['cpuOptions', 'maxNumOfCores']),

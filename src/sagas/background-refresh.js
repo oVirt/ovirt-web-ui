@@ -94,7 +94,7 @@ function* getIdsByType (type) {
 }
 
 function* refreshListPage () {
-  const [ vmsPage, vmsExpectMorePages, poolsPage, poolsExpectMorePages ] = yield select(st => [
+  const [vmsPage, vmsExpectMorePages, poolsPage, poolsExpectMorePages] = yield select(st => [
     st.vms.get('vmsPage'), st.vms.get('vmsExpectMorePages'),
     st.vms.get('poolsPage'), st.vms.get('poolsExpectMorePages'),
   ])
@@ -105,7 +105,7 @@ function* refreshListPage () {
     return
   }
 
-  const [ vmsCount, poolsCount ] = yield all([
+  const [vmsCount, poolsCount] = yield all([
     call(function* () {
       // refresh VMs and remove any that haven't been refreshed
       if (vmsPage > 0) {
@@ -122,7 +122,7 @@ function* refreshListPage () {
           ))
             .reduce((vmIds, vm) => { if (vm) vmIds.push(vm.id); return vmIds }, [])
 
-        yield put(Actions.removeMissingVms({ vmIdsToPreserve: [ ...fetchedVmIds, ...fetchedDirectlyVmIds ] }))
+        yield put(Actions.removeMissingVms({ vmIdsToPreserve: [...fetchedVmIds, ...fetchedDirectlyVmIds] }))
       }
 
       return yield select(state => state.vms.get('vms').size)
@@ -144,7 +144,7 @@ function* refreshListPage () {
           ))
             .reduce((poolIds, pool) => { if (pool) poolIds.push(pool.id); return poolIds }, [])
 
-        yield put(Actions.removeMissingPools({ poolIdsToPreserve: [ ...fetchedPoolIds, ...fetchedDirectlyPoolIds ] }))
+        yield put(Actions.removeMissingPools({ poolIdsToPreserve: [...fetchedPoolIds, ...fetchedDirectlyPoolIds] }))
       }
 
       return yield select(state => state.vms.get('pools').size)

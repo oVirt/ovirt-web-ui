@@ -516,7 +516,7 @@ describe('Test transform.js VmStatistics.toInternal()', () => {
   test.each(TRANSFORM_TESTS)(
     'transform test [%s]',
     (title, apiInput, expectedTransformPart) => {
-      const result = VmStatistics.toInternal({ statistics: [ apiInput ] })
+      const result = VmStatistics.toInternal({ statistics: [apiInput] })
       expect(result).toMatchObject(expectedTransformPart)
     }
   )

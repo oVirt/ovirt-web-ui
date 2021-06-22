@@ -15,7 +15,7 @@ const WindowsRdpButton = ({ vm, className, config, onRDP, id }) => {
   let component = null
   if (isWindowsVM && canConsole(vm.get('status'))) {
     const domain = config.get('domain')
-    const username = config.getIn([ 'user', 'name' ])
+    const username = config.getIn(['user', 'name'])
 
     component = (
       <a

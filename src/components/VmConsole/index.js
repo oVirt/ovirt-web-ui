@@ -61,7 +61,7 @@ class VmConsole extends React.Component {
   componentDidMount () {
     if (this.state.isFirstRun && this.props.consoleId === RDP_ID) {
       const domain = this.props.config.get('domain')
-      const username = this.props.config.getIn([ 'user', 'name' ])
+      const username = this.props.config.getIn(['user', 'name'])
       this.props.onRDP({ domain, username, vms: this.props.vms })
       this.setState({ isFirstRun: false })
     }

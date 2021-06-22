@@ -177,7 +177,7 @@ export function* fetchByPage () {
   // If no more pages are expected, grab the current page of ids from the redux store
   //
   const count = AppConfiguration.pageLimit
-  const [ vms, pools ] = yield all([
+  const [vms, pools] = yield all([
     call(vmsExpectMorePages ? fetchVms : currentVmsIds, { payload: { count, page: vmsPage + 1 } }),
     call(poolsExpectMorePages ? fetchPools : currentPoolsIds, { payload: { count, page: poolsPage + 1 } }),
   ])
@@ -376,7 +376,7 @@ function* editVmNic (action) {
 }
 
 function* getSingleInstance ({ vmId, poolId }) {
-  const fetches = [ fetchSingleVm(getSingleVm({ vmId })) ]
+  const fetches = [fetchSingleVm(getSingleVm({ vmId }))]
   if (poolId) {
     fetches.push(fetchSinglePool(getSinglePool({ poolId })))
   }

@@ -48,7 +48,7 @@ const DiskStateIcon = ({ idPrefix, diskState, showTooltip = true }) => {
 }
 DiskStateIcon.propTypes = {
   idPrefix: PropTypes.string.isRequired,
-  diskState: PropTypes.oneOf([ 'active', 'inactive', 'locked' ]),
+  diskState: PropTypes.oneOf(['active', 'inactive', 'locked']),
   showTooltip: PropTypes.bool,
 }
 

@@ -270,7 +270,7 @@ class GlobalSettings extends Component {
       },
       console: {
         title: msg.console(),
-        fields: [ ],
+        fields: [],
         sections: {
           console: {
             title: msg.console(),

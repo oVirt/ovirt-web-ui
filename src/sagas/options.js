@@ -49,7 +49,7 @@ function* fetchSSHKey (action: Object): any {
   yield put(A.setSSHKey(Api.SSHKeyToInternal({ sshKey: result })))
 }
 
-function* saveSSHKey ([ sshPropName, submittedKey ]: any): any | ResultType {
+function* saveSSHKey ([sshPropName, submittedKey]: any): any | ResultType {
   if (submittedKey === undefined) {
     // check strictly for undefined
     // it should be possible to clear ssh key by setting to empty string
@@ -108,7 +108,7 @@ function* exportInferredLocale (): any {
  *
  * @param {*} newOptions options declared as new
   */
-function* saveRemoteOption ([ name, value ]: any): any | ResultType {
+function* saveRemoteOption ([name, value]: any): any | ResultType {
   if (value === undefined) {
     // no values were submitted
     return toResult()
@@ -151,7 +151,7 @@ function* saveRemoteOption ([ name, value ]: any): any | ResultType {
     change: name })
 }
 
-function* saveLocale ([ localePropName, submittedLocale ]: any, persistLocale: boolean): any | ResultType {
+function* saveLocale ([localePropName, submittedLocale]: any, persistLocale: boolean): any | ResultType {
   const currentPersistLocale = yield select(state => state.options.getIn(['remoteOptions', 'persistLocale', 'content']))
   const enableLocaleChange = persistLocale || (persistLocale === undefined && currentPersistLocale)
 
@@ -196,12 +196,12 @@ function* saveGlobalOptions ({ payload: {
   yield all(
     ((Object.values(standardRemoteOptions): Array<any>): Array<ResultType>)
       .filter(result => !result.error && result.change && !result.sameAsCurrent)
-      .map(({ data: { name, value } }) => put(A.setOption({ key: [ 'remoteOptions', name ], value })))
+      .map(({ data: { name, value } }) => put(A.setOption({ key: ['remoteOptions', name], value })))
   )
 
   if (!shouldPersistLocale.error && shouldPersistLocale.change && !shouldPersistLocale.sameAsCurrent) {
     const { name, value } = shouldPersistLocale.data
-    yield put(A.setOption({ key: [ 'remoteOptions', name ], value }))
+    yield put(A.setOption({ key: ['remoteOptions', name], value }))
 
     if (!value.content) {
       yield call(deleteUserOption, 'locale')
@@ -212,7 +212,7 @@ function* saveGlobalOptions ({ payload: {
 
   if (!locale.error && locale.change && !locale.sameAsCurrent) {
     const { name, value } = locale.data
-    yield put(A.setOption({ key: [ 'remoteOptions', name ], value }))
+    yield put(A.setOption({ key: ['remoteOptions', name], value }))
   }
 
   if (!ssh.error && ssh.change && !ssh.sameAsCurrent) {
@@ -257,7 +257,7 @@ function* deleteUserOption (optionName: string): any {
   )
 
   if (!error) {
-    yield put(A.setOption({ key: [ 'remoteOptions', optionName ], value: { id: undefined, content: optionValue } }))
+    yield put(A.setOption({ key: ['remoteOptions', optionName], value: { id: undefined, content: optionValue } }))
   }
 }
 

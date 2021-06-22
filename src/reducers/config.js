@@ -62,10 +62,10 @@ const initialState = Immutable.fromJS({
   administrator: false,
 
   cpuOptions: {
-    maxNumOfSockets: new Map([[ DEFAULT_ENGINE_OPTION_VERSION, DefaultEngineOptions.MaxNumOfVmSockets ]]),
-    maxNumOfCores: new Map([[ DEFAULT_ENGINE_OPTION_VERSION, DefaultEngineOptions.MaxNumOfCpuPerSocket ]]),
-    maxNumOfThreads: new Map([[ DEFAULT_ENGINE_OPTION_VERSION, DefaultEngineOptions.MaxNumOfThreadsPerCpu ]]),
-    maxNumOfVmCpusPerArch: new Map([[ DEFAULT_ENGINE_OPTION_VERSION, DefaultEngineOptions.MaxNumOfVmCpusPerArch ]]),
+    maxNumOfSockets: new Map([[DEFAULT_ENGINE_OPTION_VERSION, DefaultEngineOptions.MaxNumOfVmSockets]]),
+    maxNumOfCores: new Map([[DEFAULT_ENGINE_OPTION_VERSION, DefaultEngineOptions.MaxNumOfCpuPerSocket]]),
+    maxNumOfThreads: new Map([[DEFAULT_ENGINE_OPTION_VERSION, DefaultEngineOptions.MaxNumOfThreadsPerCpu]]),
+    maxNumOfVmCpusPerArch: new Map([[DEFAULT_ENGINE_OPTION_VERSION, DefaultEngineOptions.MaxNumOfVmCpusPerArch]]),
   },
 
   usbAutoshare: DefaultEngineOptions.SpiceUsbAutoShare,
