@@ -209,7 +209,7 @@ const OvirtApi = {
     return httpDelete({
       url,
       custHeaders: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
       },
     })
   },
@@ -443,7 +443,7 @@ const OvirtApi = {
     return httpGet({
       url: `${AppConfiguration.applicationContext}/services/files/usbfilter.txt`,
       custHeaders: {
-        'Accept': 'text/plain',
+        Accept: 'text/plain',
       },
     })
   },

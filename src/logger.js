@@ -45,10 +45,10 @@ enhanceOutput({
  */
 function attachLoggers (object) {
   return Object.defineProperties(object, {
-    'log': { get () { return isDebugEnabled ? consoleFunctions.log : NOOP } },
-    'info': { get () { return isDebugEnabled ? consoleFunctions.info : NOOP } },
-    'warn': { get () { return isDebugEnabled ? consoleFunctions.warn : NOOP } },
-    'error': { get () { return isDebugEnabled ? consoleFunctions.error : NOOP } },
+    log: { get () { return isDebugEnabled ? consoleFunctions.log : NOOP } },
+    info: { get () { return isDebugEnabled ? consoleFunctions.info : NOOP } },
+    warn: { get () { return isDebugEnabled ? consoleFunctions.warn : NOOP } },
+    error: { get () { return isDebugEnabled ? consoleFunctions.error : NOOP } },
   })
 }
 

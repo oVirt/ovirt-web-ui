@@ -23,10 +23,10 @@ OvirtApi = {
   // ----
   login ({ credentials }) {
     return Promise.resolve({
-      'access_token': '123456789',
-      'scope': 'ovirt-app-api ovirt-ext=token-info:authz-search ovirt-ext=token-info:public-authz-search ovirt-ext=token-info:validate',
-      'exp': '1493207433000',
-      'token_type': 'bearer',
+      access_token: '123456789',
+      scope: 'ovirt-app-api ovirt-ext=token-info:authz-search ovirt-ext=token-info:public-authz-search ovirt-ext=token-info:validate',
+      exp: '1493207433000',
+      token_type: 'bearer',
     })
   },
   getOvirtApiMeta () {

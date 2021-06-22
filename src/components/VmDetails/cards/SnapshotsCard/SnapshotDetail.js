@@ -46,9 +46,9 @@ const nicRender = (idPrefix, nic) => {
 }
 
 const statusMap = (msg) => ({
-  'in_preview': msg.inPreview(),
-  'locked': msg.locked(),
-  'ok': msg.ok(),
+  in_preview: msg.inPreview(),
+  locked: msg.locked(),
+  ok: msg.ok(),
 })
 
 const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, id, isPoolVm, msg, locale, ...otherProps }) => {

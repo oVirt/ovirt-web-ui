@@ -229,7 +229,7 @@ class DiskImageEditor extends Component {
 
   changeAlias ({ target: { value } }) {
     this.setState(
-      (state) => ({ values: { ...state.values, alias: value }, errors: { ...state.errors, 'alias': '' } }),
+      (state) => ({ values: { ...state.values, alias: value }, errors: { ...state.errors, alias: '' } }),
       () => {
         this.validateField('alias')
       })

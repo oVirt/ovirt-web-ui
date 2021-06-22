@@ -132,9 +132,9 @@ function isValidUid (toTest) {
 }
 
 export const optimizedForMap = (msg) => ({
-  'desktop': { id: 'desktop', value: msg.vmType_desktop() },
-  'server': { id: 'server', value: msg.vmType_server() },
-  'high_performance': { id: 'high_performance', value: msg.vmType_highPerformance() },
+  desktop: { id: 'desktop', value: msg.vmType_desktop() },
+  server: { id: 'server', value: msg.vmType_server() },
+  high_performance: { id: 'high_performance', value: msg.vmType_highPerformance() },
 })
 
 /**

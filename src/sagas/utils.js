@@ -112,23 +112,23 @@ export function* waitTillEqual (leftArg, rightArg, limit) {
 }
 
 const shortMessages = {
-  'START_VM': 'failedToStartVm',
-  'RESTART_VM': 'failedToRestartVm',
-  'SHUTDOWN_VM': 'failedToShutdownVm',
-  'DOWNLOAD_CONSOLE_VM': 'failedToGetVmConsole',
-  'SUSPEND_VM': 'failedToSuspendVm',
-  'REMOVE_VM': 'failedToRemoveVm',
+  START_VM: 'failedToStartVm',
+  RESTART_VM: 'failedToRestartVm',
+  SHUTDOWN_VM: 'failedToShutdownVm',
+  DOWNLOAD_CONSOLE_VM: 'failedToGetVmConsole',
+  SUSPEND_VM: 'failedToSuspendVm',
+  REMOVE_VM: 'failedToRemoveVm',
 
-  'GET_ICON': 'failedToRetrieveVmIcon',
-  'INTERNAL_CONSOLE': 'failedToRetrieveVmConsoleDetails',
-  'INTERNAL_CONSOLES': 'failedToRetrieveListOfVmConsoles',
-  'GET_DISK_DETAILS': 'failedToRetrieveDiskDetails',
-  'GET_DISK_ATTACHMENTS': 'failedToRetrieveVmDisks',
-  'GET_ISO_FILES': 'failedToRetrieveIsoStorages',
+  GET_ICON: 'failedToRetrieveVmIcon',
+  INTERNAL_CONSOLE: 'failedToRetrieveVmConsoleDetails',
+  INTERNAL_CONSOLES: 'failedToRetrieveListOfVmConsoles',
+  GET_DISK_DETAILS: 'failedToRetrieveDiskDetails',
+  GET_DISK_ATTACHMENTS: 'failedToRetrieveVmDisks',
+  GET_ISO_FILES: 'failedToRetrieveIsoStorages',
 
-  'GET_VM': 'failedToRetrieveVmDetails',
-  'CHANGE_VM_ICON': 'failedToChangeVmIcon',
-  'CHANGE_VM_ICON_BY_ID': 'failedToChangeVmIconToDefault',
+  GET_VM: 'failedToRetrieveVmDetails',
+  CHANGE_VM_ICON: 'failedToChangeVmIcon',
+  CHANGE_VM_ICON_BY_ID: 'failedToChangeVmIconToDefault',
 }
 
 function shortErrorMessage ({ action: { type = 'NONE' } }) {

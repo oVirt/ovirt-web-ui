@@ -370,7 +370,7 @@ function* restartVm (action) {
   const result = yield callExternalAction('restart', Api.restart, action)
   const vmName = yield select(state => state.vms.getIn(['vms', action.payload.vmId, 'name']))
   if (result.status === 'complete') {
-    yield put(A.addUserMessage({ messageDescriptor: { id: 'actionFeedbackRestartVm', 'params': { VmName: vmName } }, type: 'success' }))
+    yield put(A.addUserMessage({ messageDescriptor: { id: 'actionFeedbackRestartVm', params: { VmName: vmName } }, type: 'success' }))
   }
   yield stopProgress({ vmId: action.payload.vmId, name: 'restart', result })
 }

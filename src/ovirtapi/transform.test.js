@@ -496,7 +496,7 @@ describe('Test transform.js VmStatistics.toInternal()', () => {
   const base = {
     cpu: {},
     disks: {},
-    elapsedUptime: { 'datum': [0], 'description': 'Elapsed VM runtime (default to 0)', 'firstDatum': undefined, 'unit': 'seconds' },
+    elapsedUptime: { datum: [0], description: 'Elapsed VM runtime (default to 0)', firstDatum: undefined, unit: 'seconds' },
     memory: {},
     network: {},
   }

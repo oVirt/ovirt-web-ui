@@ -59,9 +59,9 @@ import timezones from '_/components/utils/timezones.json'
 
 function rephraseVmType (vmType, msg) {
   const types = {
-    'desktop': msg.vmType_desktop(),
-    'server': msg.vmType_server(),
-    'high_performance': msg.vmType_highPerformance(),
+    desktop: msg.vmType_desktop(),
+    server: msg.vmType_server(),
+    high_performance: msg.vmType_highPerformance(),
   }
 
   const type = vmType.toLowerCase()
@@ -422,9 +422,9 @@ class DetailsCard extends React.Component {
               })
             }
             updates = updates.mergeDeep({
-              'cpu': {
+              cpu: {
                 topology,
-                'vCPUs': +value, // === sockets * cores * threads
+                vCPUs: +value, // === sockets * cores * threads
               },
             })
             fieldUpdated = 'cpu'
@@ -445,7 +445,7 @@ class DetailsCard extends React.Component {
             },
           })
           updates = updates.mergeDeep({
-            'cpu': {
+            cpu: {
               topology,
             },
           })
@@ -596,8 +596,8 @@ class DetailsCard extends React.Component {
 
       vmUpdates['memory'] = stateMemory
       vmUpdates['memory_policy'] = {
-        'max': stateMemory * MAX_VM_MEMORY_FACTOR,
-        'guaranteed': Math.round(guaranteed),
+        max: stateMemory * MAX_VM_MEMORY_FACTOR,
+        guaranteed: Math.round(guaranteed),
       }
     }
 
