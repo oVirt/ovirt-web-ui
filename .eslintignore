@@ -2,5 +2,6 @@
 # eslint to ignore config, script and build output
 #
 build/*
+
 config/*
 scripts/*
