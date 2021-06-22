@@ -128,6 +128,7 @@ class VmActions extends React.Component {
       onSuspend,
       onRDP,
       msg,
+      preferredConsole,
     } = this.props
     const isPoolVm = !!vm.getIn(['pool', 'id'], false)
     const isPool = !!pool && !isPoolVm
@@ -137,7 +138,6 @@ class VmActions extends React.Component {
     const vncConsole = vm.get('consoles').find(c => c.get('protocol') === VNC)
     const spiceConsole = vm.get('consoles').find(c => c.get('protocol') === SPICE)
     const hasRdp = isWindows(vm.getIn(['os', 'type']))
-    const defaultUiConsole = config.get('defaultUiConsole')
     let consoles = []
 
     if (vncConsole) {
@@ -197,7 +197,7 @@ class VmActions extends React.Component {
     }
 
     consoles = consoles
-      .map(({ uiConsole, ...props }) => ({ ...props, priority: uiConsole === defaultUiConsole ? 1 : 0 }))
+      .map(({ uiConsole, ...props }) => ({ ...props, priority: uiConsole === preferredConsole ? 1 : 0 }))
       .sort((a, b) => b.priority - a.priority)
 
     const actions = [
@@ -391,6 +391,7 @@ VmActions.propTypes = {
   onStartVm: PropTypes.func.isRequired,
   onRDP: PropTypes.func.isRequired,
   msg: PropTypes.object.isRequired,
+  preferredConsole: PropTypes.string,
 }
 
 export default withRouter(
@@ -398,6 +399,7 @@ export default withRouter(
     (state, { vm }) => ({
       isEditable: vm.get('canUserEditVm') && state.clusters.find(cluster => cluster.get('canUserUseCluster')) !== undefined,
       config: state.config,
+      preferredConsole: state.options.getIn(['remoteOptions', 'preferredConsole', 'content'], state.config.get('defaultUiConsole')),
     }),
     (dispatch, { vm, pool }) => ({
       onShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: false })),

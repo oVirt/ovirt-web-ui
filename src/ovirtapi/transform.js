@@ -1034,12 +1034,24 @@ const RemoteUserOptions = {
       locale,
       refreshInterval,
       persistLocale,
+      preferredConsole,
+      fullScreenVnc,
+      ctrlAltEndVnc,
+      fullScreenSpice,
+      ctrlAltEndSpice,
+      smartcardSpice,
     } = fromEntries
 
     return {
       locale,
       refreshInterval,
       persistLocale,
+      preferredConsole,
+      fullScreenVnc,
+      ctrlAltEndVnc,
+      fullScreenSpice,
+      ctrlAltEndSpice,
+      smartcardSpice,
     }
   },
 }
@@ -1171,6 +1183,7 @@ const EngineOptionMaxNumOfVmCpusPerArch = {
 // Export each transforms individually so they can be consumed individually
 //
 export {
+  convertBool,
   VM,
   Pool,
   CdRom,

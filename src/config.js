@@ -16,6 +16,7 @@ const AppConfiguration = {
   notificationSnoozeDurationInMinutes: 10,
   showNotificationsDefault: true,
   persistLocale: true,
+  smartcardSpice: true,
 
   consoleClientResourcesURL: 'https://www.ovirt.org/documentation/admin-guide/virt/console-client-resources/',
   cockpitPort: '9090',
@@ -27,7 +28,7 @@ export const DefaultEngineOptions = Object.seal({
   MaxNumOfThreadsPerCpu: 8,
   MaxNumOfVmCpusPerArch: `{${DEFAULT_ARCH}=1}`,
 
-  SpiceUsbAutoShare: 1,
+  SpiceUsbAutoShare: true,
   getUSBFilter: {},
 
   UserSessionTimeOutInterval: 30,

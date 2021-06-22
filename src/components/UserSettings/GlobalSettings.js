@@ -13,6 +13,7 @@ import { Settings, SettingsBase } from '../Settings'
 import SelectBox from '../SelectBox'
 import moment from 'moment'
 import AppConfiguration from '_/config'
+import { BROWSER_VNC, NATIVE_VNC, SPICE, RDP } from '_/constants/console'
 
 const GENERAL_SECTION = 'general'
 
@@ -59,8 +60,30 @@ class GlobalSettings extends Component {
     ]
   }
 
+  preferredConsoleList (msg) {
+    return [
+      {
+        id: NATIVE_VNC,
+        value: msg.vncConsole(),
+      },
+      {
+        id: BROWSER_VNC,
+        value: msg.vncConsoleBrowser(),
+      },
+      {
+        id: SPICE,
+        value: msg.spiceConsole(),
+      },
+      {
+        id: RDP,
+        value: msg.remoteDesktop(),
+      },
+    ]
+  }
+
   constructor (props) {
     super(props)
+    const { config } = props
     /**
      * Typical flow (happy path):
      * 1. at the begining:
@@ -99,6 +122,12 @@ class GlobalSettings extends Component {
         refreshInterval: AppConfiguration.schedulerFixedDelayInSeconds,
         notificationSnoozeDuration: AppConfiguration.notificationSnoozeDurationInMinutes,
         persistLocale: AppConfiguration.persistLocale,
+        fullScreenVnc: false,
+        fullScreenSpice: false,
+        ctrlAltEndVnc: false,
+        ctrlAltEndSpice: false,
+        preferredConsole: config.defaultUiConsole,
+        smartcardSpice: AppConfiguration.smartcardSpice,
       },
     }
     this.handleCancel = this.handleCancel.bind(this)
@@ -181,22 +210,6 @@ class GlobalSettings extends Component {
               </div>
             ),
           }))('language'),
-          ((name) => ({
-            title: msg.sshKey(),
-            tooltip: msg.sshKeyTooltip(),
-            name,
-            body: (
-              <div className={style['half-width']}>
-                <FormControl
-                  id={`${idPrefix}-${name}`}
-                  componentClass='textarea'
-                  onChange={e => onChange(name)(e.target.value)}
-                  value={draftValues[name] || ''}
-                  rows={8}
-                />
-              </div>
-            ),
-          }))('sshKey'),
         ],
       },
       refreshInterval: {
@@ -254,6 +267,144 @@ class GlobalSettings extends Component {
             ),
           }))('notificationSnoozeDuration'),
         ],
+      },
+      console: {
+        title: msg.console(),
+        fields: [ ],
+        sections: {
+          console: {
+            title: msg.console(),
+            tooltip: msg.globalSettingsTooltip(),
+            fields: [],
+          },
+          preferredConsole: {
+            title: '',
+            fields: [
+              ((name) => ({
+                title: msg.preferredConsole(),
+                tooltip: msg.preferredConsoleTooltip(),
+                name,
+                body: (
+                  <div className={style['half-width']}>
+                    <SelectBox
+                      id={`${idPrefix}-${name}`}
+                      items={this.preferredConsoleList(msg)
+                        .map(({ id, value }) => ({
+                          id,
+                          value,
+                          isDefault: id === config.defaultUiConsole,
+                        }))
+                      }
+                      selected={draftValues[name]}
+                      onChange={onChange(name)}
+                    />
+                  </div>
+                ),
+              }))('preferredConsole'),
+            ],
+          },
+          vnc: {
+            title: msg.vncOptions(),
+            fields: [
+              ((name) => ({
+                title: msg.fullScreenMode(),
+                name,
+                body: (
+                  <Switch
+                    id={`${idPrefix}-${name}`}
+                    isChecked={draftValues[name]}
+                    onChange={(fullScreen) => {
+                      onChange(name)(fullScreen)
+                    }}
+                  />
+                ),
+              }))('fullScreenVnc'),
+              ((name) => ({
+                title: msg.ctrlAltEnd(),
+                tooltip: msg.remapCtrlAltDelete(),
+                name,
+                body: (
+                  <Switch
+                    id={`${idPrefix}-${name}`}
+
+                    isChecked={draftValues[name]}
+                    onChange={(ctrlAltEnd) => {
+                      onChange(name)(ctrlAltEnd)
+                    }}
+                  />
+                ),
+              }))('ctrlAltEndVnc'),
+            ],
+          },
+          spice: {
+            title: msg.spiceOptions(),
+            fields: [
+              ((name) => ({
+                title: msg.fullScreenMode(),
+                name,
+                body: (
+                  <Switch
+                    id={`${idPrefix}-${name}`}
+                    isChecked={draftValues[name]}
+                    onChange={(fullScreen) => {
+                      onChange(name)(fullScreen)
+                    }}
+                  />
+                ),
+              }))('fullScreenSpice'),
+              ((name) => ({
+                title: msg.ctrlAltEnd(),
+                tooltip: msg.remapCtrlAltDelete(),
+                name,
+                body: (
+                  <Switch
+                    id={`${idPrefix}-${name}`}
+                    isChecked={draftValues[name]}
+                    onChange={(ctrlAltEnd) => {
+                      onChange(name)(ctrlAltEnd)
+                    }}
+                  />
+                ),
+              }))('ctrlAltEndSpice'),
+              ((name) => ({
+                title: msg.smartcard(),
+                tooltip: msg.smartcardTooltip(),
+                name,
+                body: (
+                  <Switch
+                    id={`${idPrefix}-${name}`}
+                    isChecked={draftValues[name]}
+                    onChange={(smartcard) => {
+                      onChange(name)(smartcard)
+                    }}
+                  />
+                ),
+              }))('smartcardSpice'),
+            ],
+          },
+          serial: {
+            title: msg.serialConsoleOptions(),
+            fields: [
+              ((name) => ({
+                title: msg.sshKey(),
+                tooltip: msg.sshKeyTooltip(),
+                name,
+                body: (
+                  <div className={style['half-width']}>
+                    <FormControl
+                      id={`${idPrefix}-${name}`}
+                      componentClass='textarea'
+                      onChange={e => onChange(name)(e.target.value)}
+                      value={draftValues[name] || ''}
+                      rows={8}
+                    />
+                  </div>
+                ),
+              }))('sshKey'),
+            ],
+          },
+        },
+
       },
       advancedOptions: {
         title: msg.advancedOptions(),
@@ -347,6 +498,7 @@ export default connect(
     config: {
       userName: config.getIn(['user', 'name']),
       email: config.getIn(['user', 'email']),
+      defaultUiConsole: config.getIn(['defaultUiConsole']),
     },
     currentValues: {
       sshKey: options.getIn(['ssh', 'key']),
@@ -355,6 +507,12 @@ export default connect(
       notificationSnoozeDuration: options.getIn(['localOptions', 'notificationSnoozeDuration']),
       refreshInterval: options.getIn(['remoteOptions', 'refreshInterval', 'content']),
       persistLocale: options.getIn(['remoteOptions', 'persistLocale', 'content']),
+      fullScreenVnc: options.getIn(['remoteOptions', 'fullScreenVnc', 'content']),
+      fullScreenSpice: options.getIn(['remoteOptions', 'fullScreenSpice', 'content']),
+      ctrlAltEndVnc: options.getIn(['remoteOptions', 'ctrlAltEndVnc', 'content']),
+      ctrlAltEndSpice: options.getIn(['remoteOptions', 'ctrlAltEndSpice', 'content']),
+      preferredConsole: options.getIn(['remoteOptions', 'preferredConsole', 'content'], config.getIn(['defaultUiConsole'])),
+      smartcardSpice: options.getIn(['remoteOptions', 'smartcardSpice', 'content']),
     },
     lastTransactionId: options.getIn(['lastTransactions', 'global', 'transactionId'], ''),
   }),

@@ -166,18 +166,38 @@ function* saveLocale ([ localePropName, submittedLocale ]: any, persistLocale: b
   return {}
 }
 
-function* saveGlobalOptions ({ payload: { sshKey, showNotifications, notificationSnoozeDuration, language, refreshInterval, persistLocale }, meta: { transactionId } }: SaveGlobalOptionsActionType): Generator<any, any, any> {
-  const { ssh, locale, refresh, shouldPersistLocale } = yield all({
+function* saveGlobalOptions ({ payload: {
+  sshKey,
+  showNotifications,
+  notificationSnoozeDuration,
+  language,
+  refreshInterval,
+  persistLocale,
+  preferredConsole,
+  fullScreenVnc,
+  ctrlAltEndVnc,
+  fullScreenSpice,
+  ctrlAltEndSpice,
+  smartcardSpice,
+}, meta: { transactionId } }: SaveGlobalOptionsActionType): Generator<any, any, any> {
+  const { ssh, locale, shouldPersistLocale, ...standardRemoteOptions } = yield all({
     ssh: call(saveSSHKey, ...Object.entries({ sshKey })),
     locale: call(saveLocale, ...Object.entries({ locale: language }), persistLocale),
     shouldPersistLocale: call(saveRemoteOption, ...Object.entries({ persistLocale })),
     refresh: call(saveRemoteOption, ...Object.entries({ refreshInterval })),
+    preferredConsole: call(saveRemoteOption, ...Object.entries({ preferredConsole })),
+    fullScreenVnc: call(saveRemoteOption, ...Object.entries({ fullScreenVnc })),
+    ctrlAltEndVnc: call(saveRemoteOption, ...Object.entries({ ctrlAltEndVnc })),
+    fullScreenSpice: call(saveRemoteOption, ...Object.entries({ fullScreenSpice })),
+    ctrlAltEndSpice: call(saveRemoteOption, ...Object.entries({ ctrlAltEndSpice })),
+    smartcardSpice: call(saveRemoteOption, ...Object.entries({ smartcardSpice })),
   })
 
-  if (!refresh.error && refresh.change && !refresh.sameAsCurrent) {
-    const { name, value } = refresh.data
-    yield put(A.setOption({ key: [ 'remoteOptions', name ], value }))
-  }
+  yield all(
+    ((Object.values(standardRemoteOptions): Array<any>): Array<ResultType>)
+      .filter(result => !result.error && result.change && !result.sameAsCurrent)
+      .map(({ data: { name, value } }) => put(A.setOption({ key: [ 'remoteOptions', name ], value })))
+  )
 
   if (!shouldPersistLocale.error && shouldPersistLocale.change && !shouldPersistLocale.sameAsCurrent) {
     const { name, value } = shouldPersistLocale.data

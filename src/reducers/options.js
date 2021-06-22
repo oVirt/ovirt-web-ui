@@ -27,6 +27,26 @@ const defaultOptions: UserOptionsType = {
       id: undefined,
       content: AppConfiguration.schedulerFixedDelayInSeconds,
     },
+    fullScreenVnc: {
+      id: undefined,
+      content: false,
+    },
+    ctrlAltEndVnc: {
+      id: undefined,
+      content: false,
+    },
+    fullScreenSpice: {
+      id: undefined,
+      content: false,
+    },
+    ctrlAltEndSpice: {
+      id: undefined,
+      content: false,
+    },
+    smartcardSpice: {
+      id: undefined,
+      content: AppConfiguration.smartcardSpice,
+    },
   },
   ssh: undefined,
   lastTransactions: {},

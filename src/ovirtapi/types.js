@@ -232,9 +232,15 @@ export type GlobalUserSettingsType = {|
 |}
 
 export type RemoteUserOptionsType = {|
-  locale: Object,
+  locale?: UserOptionType<string>,
   refreshInterval?: UserOptionType<number>,
-  persistLocale?: UserOptionType<boolean>
+  persistLocale?: UserOptionType<boolean>,
+  preferredConsole?: UserOptionType<string>,
+  fullScreenVnc?: UserOptionType<boolean>,
+  ctrlAltEndVnc?: UserOptionType<boolean>,
+  fullScreenSpice?: UserOptionType<boolean>,
+  ctrlAltEndSpice?: UserOptionType<boolean>,
+  smartcardSpice?: UserOptionType<boolean>
 |}
 
 export type UserOptionsType = {|
