@@ -377,7 +377,7 @@ class DetailsCard extends React.Component {
           fieldUpdated = 'cloudInit'
           break
 
-        case 'os':
+        case 'os': {
           fieldUpdated = 'os'
           const os = operatingSystems.find(os => os.get('id') === value)
           updates = this.updateOs(updates, os)
@@ -393,8 +393,9 @@ class DetailsCard extends React.Component {
             changeQueue.push({ fieldName: 'timeZone', value: this.props.defaultGeneralTimezone })
           }
           break
+        }
 
-        case 'bootDevices':
+        case 'bootDevices': {
           const copiedDevices = updates.getIn(['os', 'bootDevices'], DEFAULT_BOOT_DEVICES).toJS()
           copiedDevices[additionalArgs.device] = value
 
@@ -406,6 +407,7 @@ class DetailsCard extends React.Component {
           fieldUpdated = 'bootDevices'
           this.nextRunUpdates['bootDevices'] = true
           break
+        }
 
         case 'cpu':
           // Allow a value that is too large in case the max total changes due to a Cluster change
@@ -432,7 +434,7 @@ class DetailsCard extends React.Component {
           }
           break
 
-        case 'topology':
+        case 'topology': {
           const topology = getTopology({
             value: this.state.vm.getIn(['cpu', 'vCPUs']),
             max: {
@@ -452,6 +454,7 @@ class DetailsCard extends React.Component {
           fieldUpdated = 'topology'
           this.hotPlugUpdates['topology'] = true
           break
+        }
 
         case 'memory':
           if (isNumber(value) && value > 0) {

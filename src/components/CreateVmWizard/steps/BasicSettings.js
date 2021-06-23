@@ -289,12 +289,13 @@ class BasicSettings extends React.Component {
         changes = handleProvisionSourceChange(value, this.props)
         break
 
-      case 'templateId':
+      case 'templateId': {
         const { data: { optimizedFor } } = this.props
         changes = handleTemplateIdChange(value, optimizedFor, this.props)
         break
+      }
 
-      case 'operatingSystemId':
+      case 'operatingSystemId': {
         changes[field] = value
         const { data: { templateId } } = this.props
         changes.timeZone = checkTimeZone(value, templateId, this.props)
@@ -303,6 +304,7 @@ class BasicSettings extends React.Component {
           ? this.props.data.lastInitTimezone // set the sysprep timezone as the last selected sysprep timezone
           : ''
         break
+      }
 
       case 'memory':
         if (isNumberInRange(value, 0, this.props.maxMemorySizeInMiB)) {
@@ -310,7 +312,7 @@ class BasicSettings extends React.Component {
         }
         break
 
-      case 'cpus':
+      case 'cpus': {
         const { maxNumOfVmCpus } = this.grabCpuOptions()
         if (isNumberInRange(value, 0, maxNumOfVmCpus)) {
           changes.cpus = +value
@@ -318,6 +320,7 @@ class BasicSettings extends React.Component {
 
         changes.topology = this.getTopologySettings(changes.cpus)
         break
+      }
 
       case 'topology': // number of sockets, cores or threads changed by the user in Advanced Options section
         changes[field] = this.getTopologySettings(this.props.data.cpus, { [extra.vcpu]: +value })
