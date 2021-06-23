@@ -8,7 +8,7 @@ import Product from '../version'
 import { fixedStrings } from '../branding'
 
 const LegalInfo = () => {
-  const idPrefix = `about-legal`
+  const idPrefix = 'about-legal'
   if (fixedStrings.LEGAL_INFO_LINK_TEXT && fixedStrings.LEGAL_INFO_LINK_URL) {
     return (
       <div className='trademark-pf' id={`${idPrefix}-trademark`}>
@@ -32,7 +32,7 @@ class AboutDialog extends React.Component {
 
   render () {
     const { oVirtApiVersion, msg } = this.props
-    const idPrefix = `about`
+    const idPrefix = 'about'
 
     const webUiVersionText = msg.aboutDialogVersion({
       version: `<strong id='${idPrefix}-version-value'>${Product.version}-${Product.release}</strong>`,

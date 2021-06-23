@@ -70,7 +70,7 @@ export function* downloadVmConsole (action) {
         : yield getVncOptions({ legacyOptions })
 
       data = adjustVVFile({ data, options })
-      fileDownload({ data, fileName: `console.vv`, mimeType: 'application/x-virt-viewer' })
+      fileDownload({ data, fileName: 'console.vv', mimeType: 'application/x-virt-viewer' })
       yield put(setConsoleStatus({ vmId, status: DOWNLOAD_CONSOLE }))
     } else {
       const dataTicket = yield callExternalAction('consoleProxyTicket', Api.consoleProxyTicket,

@@ -36,7 +36,7 @@ const buildPath = ({ vms, branches, msg }) => {
 const Breadcrumb = ({ vms, branches }) => {
   const { msg } = useContext(MsgContext)
   const crumbs = buildPath({ vms, branches, msg })
-  const idPrefix = `breadcrumb`
+  const idPrefix = 'breadcrumb'
 
   return (
     <ol className='breadcrumb'>

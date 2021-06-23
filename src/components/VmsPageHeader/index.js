@@ -21,7 +21,7 @@ import { Tooltip } from '../tooltips'
 const VmsPageHeader = ({ onRefresh }) => {
   const { msg } = useContext(MsgContext)
   const [show, setShow] = useState(false)
-  const idPrefix = `pageheader`
+  const idPrefix = 'pageheader'
 
   return (
     <Header>

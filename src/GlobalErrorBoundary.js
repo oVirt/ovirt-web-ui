@@ -11,7 +11,8 @@ class GlobalErrorBoundary extends React.Component {
     super(props)
 
     this.reloadMsg = (locale) => {
-      this.setState(({ msgContextState }) => ({ msgContextState: {
+      this.setState(({ msgContextState }) => ({
+ msgContextState: {
         msg: createMessages(locale),
         locale,
         reloadMsg: msgContextState.reloadMsg,

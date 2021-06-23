@@ -28,7 +28,7 @@ export function suggestDiskName (vmName, existingDisks = []) {
  * @param {*} existingNics Array of the VM's existing nics or nic names
  */
 export function suggestNicName (existingNics = []) {
-  const regex = new RegExp(`^nic(\\d+)$`)
+  const regex = /^nic(\d+)$/
   let biggestNumber = 0
 
   for (const nic of existingNics) {

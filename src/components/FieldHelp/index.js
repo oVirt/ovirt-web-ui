@@ -18,6 +18,7 @@ class FieldHelp extends React.Component {
     this.state = { style: null, placement: 'top' }
     this.position = null
   }
+
   componentDidMount () {
     const position = ReactDOM.findDOMNode(this).getBoundingClientRect()
     this.setState({ position })
@@ -42,6 +43,7 @@ class FieldHelp extends React.Component {
     }
     this.setState({ style: popoverStyle, placement })
   }
+
   render () {
     const { msg } = this.props
     const tooltip = this.props.tooltip || msg.clickForHelp()

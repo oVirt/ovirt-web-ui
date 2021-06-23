@@ -114,7 +114,7 @@ describe('disk sorting', () => {
     })
   })
 
-  test(`invalid locale should fail`, () => {
+  test('invalid locale should fail', () => {
     expect(() => sortDisksForDisplay(samples[0].test, 'BadLocale')).toThrow()
   })
 })

@@ -319,7 +319,7 @@ class DetailsCard extends React.Component {
                 { fieldName: 'cloudInitSshAuthorizedKeys', value: template.getIn(['cloudInit', 'sshAuthorizedKeys']) },
                 { fieldName: 'cloudInitTimezone', value: template.getIn(['cloudInit', 'timezone']) },
                 { fieldName: 'cloudInitCustomScript', value: template.getIn(['cloudInit', 'customScript']) },
-                { fieldName: 'cloudInitPassword', value: template.getIn(['cloudInit', 'password']) },
+                { fieldName: 'cloudInitPassword', value: template.getIn(['cloudInit', 'password']) }
               )
             }
           }

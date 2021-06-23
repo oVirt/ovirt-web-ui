@@ -130,14 +130,14 @@ function* saveRemoteOption ([name, value]: any): any | ResultType {
     'persistUserOption',
     Api.persistUserOption,
     A.persistUserOption({ name, content: value, optionId, userId }),
-    true,
+    true
   ))
 
   if (result.error) {
     return toResult({ ...result, change: name })
   }
 
-  const parsedResult : ?[string, UserOptionType<any>] = Transforms.RemoteUserOption.toInternal(result)
+  const parsedResult: ?[string, UserOptionType<any>] = Transforms.RemoteUserOption.toInternal(result)
   if (!parsedResult) {
     console.error('Failed to parse the response', result)
     return toResult({ ...result, error: true, change: name })
@@ -148,7 +148,8 @@ function* saveRemoteOption ([name, value]: any): any | ResultType {
     ...result,
     name: parsedName,
     value: parsedValue,
-    change: name })
+    change: name,
+})
 }
 
 function* saveLocale ([localePropName, submittedLocale]: any, persistLocale: boolean): any | ResultType {
@@ -166,7 +167,8 @@ function* saveLocale ([localePropName, submittedLocale]: any, persistLocale: boo
   return {}
 }
 
-function* saveGlobalOptions ({ payload: {
+function* saveGlobalOptions ({
+ payload: {
   sshKey,
   showNotifications,
   notificationSnoozeDuration,
@@ -179,7 +181,8 @@ function* saveGlobalOptions ({ payload: {
   fullScreenSpice,
   ctrlAltEndSpice,
   smartcardSpice,
-}, meta: { transactionId } }: SaveGlobalOptionsActionType): Generator<any, any, any> {
+}, meta: { transactionId },
+}: SaveGlobalOptionsActionType): Generator<any, any, any> {
   const { ssh, locale, shouldPersistLocale, ...standardRemoteOptions } = yield all({
     ssh: call(saveSSHKey, ...Object.entries({ sshKey })),
     locale: call(saveLocale, ...Object.entries({ locale: language }), persistLocale),
@@ -234,8 +237,8 @@ function* saveGlobalOptions ({ payload: {
 
   yield put(
     A.setOption(
-      { key: ['lastTransactions', 'global'], value: { transactionId } },
-    ),
+      { key: ['lastTransactions', 'global'], value: { transactionId } }
+    )
   )
 }
 
@@ -253,7 +256,7 @@ function* deleteUserOption (optionName: string): any {
     'deleteUserOption',
     Api.deleteUserOption,
     A.deleteUserOption({ optionId, userId }),
-    true,
+    true
   )
 
   if (!error) {

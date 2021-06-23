@@ -7,6 +7,7 @@ class TableInlineEditRow extends Component {
     this.buttonsPosition = this.buttonsPosition.bind(this)
     this.rowHeight = undefined
   }
+
   buttonsPosition (window, rowDimensions) {
     const position = {}
     const modalDomElement = document.querySelectorAll('div.fade.in.modal')
@@ -22,6 +23,7 @@ class TableInlineEditRow extends Component {
     console.info('button position', position)
     return position
   }
+
   render () {
     return <TableConfirmButtonsRow {...this.props} buttonsPosition={this.buttonsPosition} buttonsClassName={'bottom'} />
   }

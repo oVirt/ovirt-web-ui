@@ -35,7 +35,7 @@ describe('xor PropType cross property validation', () => {
     const r1 = p1({ p1: 'foo' }, 'p1', 'Test', ...propTypesRest)
     const r2 = p2({ p2: 42 }, 'p2', 'Test', ...propTypesRest)
 
-    expect(r1).toEqual(new Error(`Props 'p1' and 'p2' are both required for component 'Test'`))
-    expect(r2).toEqual(new Error(`Props 'p2' and 'p1' are both required for component 'Test'`))
+    expect(r1).toEqual(new Error('Props \'p1\' and \'p2\' are both required for component \'Test\''))
+    expect(r2).toEqual(new Error('Props \'p2\' and \'p1\' are both required for component \'Test\''))
   })
 })

@@ -31,7 +31,7 @@ export function* fetchDataCentersAndStorageDomains (action) {
   for (const dataCenter of dataCenters) {
     for (const [storageDomainId, { type }] of Object.entries(dataCenter.storageDomains)) {
       if (type === 'data' || type === 'iso') {
-        const sd = sdById[ storageDomainId ]
+        const sd = sdById[storageDomainId]
         sd.statusPerDataCenter = {
           ...sd.statusPerDataCenter,
           [dataCenter.id]: dataCenter.storageDomains[storageDomainId].status,

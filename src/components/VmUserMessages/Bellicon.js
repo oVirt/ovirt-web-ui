@@ -9,7 +9,7 @@ import { Tooltip } from '../tooltips'
 const Bellicon = ({ userMessages, handleclick }) => {
   const { msg } = useContext(MsgContext)
   const messagesCount = userMessages.get('records').size
-  const idPrefix = `usermsgs`
+  const idPrefix = 'usermsgs'
   const badgeElement = messagesCount === 0
     ? null
     : <span className='badge' id={`${idPrefix}-size`}>{messagesCount}</span>

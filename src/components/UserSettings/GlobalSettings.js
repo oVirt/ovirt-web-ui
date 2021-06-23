@@ -167,6 +167,7 @@ class GlobalSettings extends Component {
       }))
     }
   }
+
   onReset (saveFields, id) {
     this.setState(state => ({
       draftValues: {
@@ -452,7 +453,7 @@ class GlobalSettings extends Component {
         <Split hasGutter>
           <SplitItem>
             <Nav onSelect={onSelect} theme='light'>
-              <NavList className={`card-pf global-settings-nav-list`}>
+              <NavList className={'card-pf global-settings-nav-list'}>
                 { Object.entries(sections).map(([key, section]) =>
                   <NavItem className='border' itemId={key} key={key} isActive={activeSectionKey === key}>
                     {section.title}

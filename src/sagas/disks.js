@@ -134,7 +134,7 @@ function* waitForDiskToBeUnlocked (vmId, attachmentId) {
   return yield waitForDiskAttachment(
     vmId,
     attachmentId,
-    attachment => attachment.disk && attachment.disk.status && attachment.disk.status !== 'locked',
+    attachment => attachment.disk && attachment.disk.status && attachment.disk.status !== 'locked'
   )
 }
 
