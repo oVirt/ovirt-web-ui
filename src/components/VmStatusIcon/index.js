@@ -8,7 +8,7 @@ import { MsgContext } from '_/intl'
 
 /* eslint-disable key-spacing, no-multi-spaces */
 const VM_STATUS_TO_ICON = (msg) => ({
-  up                : { type: 'pf', name: 'on-running',         tooltip: msg.vmStatusIconTooltipUp(), className: style['green'] },
+  up                : { type: 'pf', name: 'on-running',         tooltip: msg.vmStatusIconTooltipUp(), className: style.green },
   powering_up       : { type: 'pf', name: 'in-progress',        tooltip: msg.vmStatusIconTooltipPoweringUp() },
   down              : { type: 'pf', name: 'off',                tooltip: msg.vmStatusIconTooltipDown() },
   paused            : { type: 'pf', name: 'paused',             tooltip: msg.vmStatusIconTooltipPaused() },

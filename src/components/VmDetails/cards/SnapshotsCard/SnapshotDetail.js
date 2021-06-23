@@ -22,7 +22,7 @@ import RestoreConfirmationModal from './RestoreConfirmationModal'
 
 const Status = ({ status, msg }) => {
   return status
-    ? <span className={style['status-icon']}><Icon type='pf' name='on-running' className={style['green']} />{msg.on()}</span>
+    ? <span className={style['status-icon']}><Icon type='pf' name='on-running' className={style.green} />{msg.on()}</span>
     : <span className={style['status-icon']}><Icon type='pf' name='off' />{msg.off()}</span>
 }
 
@@ -83,7 +83,7 @@ const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, id, isPoolVm, msg, lo
         </button>
       </div>
     }
-    bsClass={`${style['popover']} popover`}
+    bsClass={`${style.popover} popover`}
     {...otherProps}
   >
     <div className={style['snapshot-detail-container']}>

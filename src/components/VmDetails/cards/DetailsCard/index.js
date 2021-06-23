@@ -333,7 +333,7 @@ class DetailsCard extends React.Component {
         case 'bootMenuEnabled':
           updates = updates.set('bootMenuEnabled', value)
           fieldUpdated = 'bootMenuEnabled'
-          this.nextRunUpdates['bootMenuEnabled'] = true
+          this.nextRunUpdates.bootMenuEnabled = true
           // TODO? If the switch gets changed twice and it's back to its original state,
           //       should it get flagged as a change?
           break
@@ -405,7 +405,7 @@ class DetailsCard extends React.Component {
 
           updates = updates.setIn(['os', 'bootDevices'], List(copiedDevices))
           fieldUpdated = 'bootDevices'
-          this.nextRunUpdates['bootDevices'] = true
+          this.nextRunUpdates.bootDevices = true
           break
         }
 
@@ -430,7 +430,7 @@ class DetailsCard extends React.Component {
               },
             })
             fieldUpdated = 'cpu'
-            this.hotPlugUpdates['cpu'] = true
+            this.hotPlugUpdates.cpu = true
           }
           break
 
@@ -452,7 +452,7 @@ class DetailsCard extends React.Component {
             },
           })
           fieldUpdated = 'topology'
-          this.hotPlugUpdates['topology'] = true
+          this.hotPlugUpdates.topology = true
           break
         }
 
@@ -461,7 +461,7 @@ class DetailsCard extends React.Component {
             const asBytes = value * (1024 ** 2) // input assumed to be MiB
             updates = updates.setIn(['memory', 'total'], asBytes)
             fieldUpdated = 'memory'
-            this.hotPlugUpdates['memory'] = true
+            this.hotPlugUpdates.memory = true
           }
           break
 
@@ -534,14 +534,14 @@ class DetailsCard extends React.Component {
     //     only including the fields that have been updated
     const vmUpdates = { id: stateVm.get('id') }
 
-    if (this.trackUpdates['cluster']) {
-      vmUpdates['cluster'] = {
+    if (this.trackUpdates.cluster) {
+      vmUpdates.cluster = {
         id: stateVm.getIn(['cluster', 'id']),
       }
     }
 
-    if (this.trackUpdates['template']) {
-      vmUpdates['template'] = {
+    if (this.trackUpdates.template) {
+      vmUpdates.template = {
         id: stateVm.getIn(['template', 'id']),
       }
     }
@@ -550,55 +550,55 @@ class DetailsCard extends React.Component {
     //       complicate the correlation tracking that needs to be done (2 changes to track
     //       instead of one).  Right now, if only the CD is changed, 2 calls will still be
     //       made.  First an editVm with an empty change.  Second the changeCd.
-    if (this.trackUpdates['cdrom']) {
-      vmUpdates['cdrom'] = {
+    if (this.trackUpdates.cdrom) {
+      vmUpdates.cdrom = {
         fileId: stateVm.getIn(['cdrom', 'fileId']),
       }
     }
 
-    if (this.trackUpdates['bootMenuEnabled']) {
-      vmUpdates['bootMenuEnabled'] = stateVm.get('bootMenuEnabled')
+    if (this.trackUpdates.bootMenuEnabled) {
+      vmUpdates.bootMenuEnabled = stateVm.get('bootMenuEnabled')
     }
 
-    if (this.trackUpdates['cloudInit']) {
-      vmUpdates['cloudInit'] = stateVm.get('cloudInit').toJS()
+    if (this.trackUpdates.cloudInit) {
+      vmUpdates.cloudInit = stateVm.get('cloudInit').toJS()
       this.setState({
-        enableInitTimezone: vmUpdates['cloudInit'].enabled,
-        lastInitTimezone: vmUpdates['cloudInit'].timezone || DEFAULT_GMT_TIMEZONE,
+        enableInitTimezone: vmUpdates.cloudInit.enabled,
+        lastInitTimezone: vmUpdates.cloudInit.timezone || DEFAULT_GMT_TIMEZONE,
       })
     }
 
-    if (this.trackUpdates['timeZone']) {
-      vmUpdates['timeZone'] = stateVm.get('timeZone').toJS()
+    if (this.trackUpdates.timeZone) {
+      vmUpdates.timeZone = stateVm.get('timeZone').toJS()
     }
 
-    if (this.trackUpdates['bootDevices']) {
-      vmUpdates['os'] = {
+    if (this.trackUpdates.bootDevices) {
+      vmUpdates.os = {
         bootDevices: stateVm.getIn(['os', 'bootDevices']).toJS(),
       }
     }
 
-    if (this.trackUpdates['cpu'] || this.trackUpdates['topology']) {
-      vmUpdates['cpu'] = {
+    if (this.trackUpdates.cpu || this.trackUpdates.topology) {
+      vmUpdates.cpu = {
         topology: stateVm.getIn(['cpu', 'topology']).toJS(),
       }
     }
 
-    if (this.trackUpdates['os']) {
-      if (!vmUpdates['os']) {
-        vmUpdates['os'] = {}
+    if (this.trackUpdates.os) {
+      if (!vmUpdates.os) {
+        vmUpdates.os = {}
       }
-      vmUpdates['os'].type = stateVm.getIn(['os', 'type'])
+      vmUpdates.os.type = stateVm.getIn(['os', 'type'])
     }
 
-    if (this.trackUpdates['memory']) {
+    if (this.trackUpdates.memory) {
       const cluster = this.props.clusters.get(stateVm.getIn(['cluster', 'id']))
       const stateMemory = stateVm.getIn(['memory', 'total'])
       const overCommitPercent = cluster && cluster.getIn(['memoryPolicy', 'overCommitPercent'])
       const guaranteed = overCommitPercent ? (stateMemory * (100 / overCommitPercent)) : stateMemory
 
-      vmUpdates['memory'] = stateMemory
-      vmUpdates['memory_policy'] = {
+      vmUpdates.memory = stateMemory
+      vmUpdates.memory_policy = {
         max: stateMemory * MAX_VM_MEMORY_FACTOR,
         guaranteed: Math.round(guaranteed),
       }

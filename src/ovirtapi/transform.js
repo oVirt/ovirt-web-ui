@@ -106,39 +106,39 @@ const VM = {
       : []
 
     const parsedVm: Object = {
-      name: vm['name'],
-      description: vm['description'],
-      id: vm['id'],
-      status: vm['status'] ? vm['status'].toLowerCase() : undefined,
-      statusDetail: vm['status_detail'],
-      type: vm['type'],
-      nextRunExists: convertBool(vm['next_run_configuration_exists']),
+      name: vm.name,
+      description: vm.description,
+      id: vm.id,
+      status: vm.status ? vm.status.toLowerCase() : undefined,
+      statusDetail: vm.status_detail,
+      type: vm.type,
+      nextRunExists: convertBool(vm.next_run_configuration_exists),
       lastMessage: '',
-      hostId: vm['host'] ? vm['host'].id : undefined,
+      hostId: vm.host ? vm.host.id : undefined,
       customCompatibilityVersion: vm.custom_compatibility_version
         ? `${vm.custom_compatibility_version.major}.${vm.custom_compatibility_version.minor}`
         : undefined,
 
-      startTime: convertEpoch(vm['start_time']),
-      stopTime: convertEpoch(vm['stop_time']),
-      creationTime: convertEpoch(vm['creation_time']),
-      startPaused: convertBool(vm['start_paused']),
+      startTime: convertEpoch(vm.start_time),
+      stopTime: convertEpoch(vm.stop_time),
+      creationTime: convertEpoch(vm.creation_time),
+      startPaused: convertBool(vm.start_paused),
 
-      stateless: vm['stateless'] === 'true',
+      stateless: vm.stateless === 'true',
 
-      fqdn: vm['fqdn'],
+      fqdn: vm.fqdn,
 
-      customProperties: vm['custom_properties'] ? vm['custom_properties']['custom_property'] : [],
+      customProperties: vm.custom_properties ? vm.custom_properties.custom_property : [],
 
       template: {
-        id: vm['template'] ? vm.template['id'] : undefined,
+        id: vm.template ? vm.template.id : undefined,
       },
       cluster: {
-        id: vm['cluster'] ? vm.cluster['id'] : undefined,
+        id: vm.cluster ? vm.cluster.id : undefined,
       },
       cpu: {
-        arch: vm['cpu'] ? vm.cpu['architecture'] : undefined,
-        vCPUs: vCpusCount({ cpu: vm['cpu'] }),
+        arch: vm.cpu ? vm.cpu.architecture : undefined,
+        vCPUs: vCpusCount({ cpu: vm.cpu }),
         topology: vm.cpu && vm.cpu.topology ? {
           cores: vm.cpu.topology.cores,
           sockets: vm.cpu.topology.sockets,
@@ -147,32 +147,32 @@ const VM = {
       },
 
       memory: {
-        total: vm['memory'],
-        guaranteed: vm['memory_policy'] ? vm.memory_policy['guaranteed'] : undefined,
-        max: vm['memory_policy'] ? vm.memory_policy['max'] : undefined,
+        total: vm.memory,
+        guaranteed: vm.memory_policy ? vm.memory_policy.guaranteed : undefined,
+        max: vm.memory_policy ? vm.memory_policy.max : undefined,
       },
 
       os: {
-        type: vm['os'] ? vm.os['type'] : undefined,
+        type: vm.os ? vm.os.type : undefined,
         bootDevices: vm.os && vm.os.boot && vm.os.boot.devices && vm.os.boot.devices.device
           ? vm.os.boot.devices.device : [],
       },
 
       highAvailability: {
-        enabled: vm['high_availability'] ? vm.high_availability['enabled'] : undefined,
-        priority: vm['high_availability'] ? vm.high_availability['priority'] : undefined,
+        enabled: vm.high_availability ? vm.high_availability.enabled : undefined,
+        priority: vm.high_availability ? vm.high_availability.priority : undefined,
       },
 
       icons: {
         large: {
-          id: vm['large_icon'] ? vm.large_icon['id'] : undefined,
+          id: vm.large_icon ? vm.large_icon.id : undefined,
         },
       },
       disks: [],
       consoles: [],
       snapshots: [],
       pool: {
-        id: vm['vm_pool'] ? vm.vm_pool['id'] : undefined,
+        id: vm.vm_pool ? vm.vm_pool.id : undefined,
       },
       cdrom: {},
       sessions: [],
@@ -477,28 +477,28 @@ const Template = {
 //
 const Pool = {
   toInternal ({ pool }: { pool: ApiPoolType}): PoolType {
-    if (!pool['name']) {
+    if (!pool.name) {
       console.info('Pool.toInternal, pool received without name:', JSON.stringify(pool), pool)
     }
 
     return {
-      id: pool['id'],
-      name: pool['name'],
-      description: pool['description'],
+      id: pool.id,
+      name: pool.name,
+      description: pool.description,
       status: 'down',
       os: {
         type: pool.vm && pool.vm.os ? pool.vm.os.type : undefined,
       },
-      type: pool['type'],
+      type: pool.type,
       lastMessage: '',
 
-      size: pool['size'],
-      maxUserVms: pool['max_user_vms'],
-      preStartedVms: pool['prestarted_vms'],
+      size: pool.size,
+      maxUserVms: pool.max_user_vms,
+      preStartedVms: pool.prestarted_vms,
 
       vm: VM.toInternal({ vm: pool.vm }),
       vmsCount: 0,
-      color: getPoolColor(pool['id']),
+      color: getPoolColor(pool.id),
     }
   },
 
@@ -536,21 +536,21 @@ const DiskAttachment = {
   toInternal ({ attachment, disk }: { attachment?: ApiDiskAttachmentType, disk: ApiDiskType }): DiskType {
     // TODO Add nested permissions support when BZ 1639784 will be done
     return cleanUndefined({
-      attachmentId: attachment && attachment['id'],
-      active: attachment && convertBool(attachment['active']),
-      bootable: attachment && convertBool(attachment['bootable']),
-      iface: attachment && attachment['interface'],
+      attachmentId: attachment && attachment.id,
+      active: attachment && convertBool(attachment.active),
+      bootable: attachment && convertBool(attachment.bootable),
+      iface: attachment && attachment.interface,
 
       id: disk.id,
-      name: disk['alias'],
-      type: disk['storage_type'], // [ image | lun | cinder ]
+      name: disk.alias,
+      type: disk.storage_type, // [ image | lun | cinder ]
 
-      format: disk['format'], // [ cow | raw ] only for types [ images | cinder ]
-      status: disk['status'], // [ illegal | locked | ok ] only for types [ images | cinder ]
+      format: disk.format, // [ cow | raw ] only for types [ images | cinder ]
+      status: disk.status, // [ illegal | locked | ok ] only for types [ images | cinder ]
       sparse: convertBool(disk.sparse),
 
-      actualSize: convertInt(disk['actual_size']),
-      provisionedSize: convertInt(disk['provisioned_size']),
+      actualSize: convertInt(disk.actual_size),
+      provisionedSize: convertInt(disk.provisioned_size),
       lunSize:
         disk.lun_storage &&
         disk.lun_storage.logical_units &&
@@ -721,10 +721,10 @@ const Cluster = {
 
       memoryPolicy: {
         overCommitPercent:
-          cluster['memory_policy'] &&
-          cluster['memory_policy']['over_commit'] &&
-          cluster['memory_policy']['over_commit']['percent']
-            ? cluster['memory_policy']['over_commit']['percent']
+          cluster.memory_policy &&
+          cluster.memory_policy.over_commit &&
+          cluster.memory_policy.over_commit.percent
+            ? cluster.memory_policy.over_commit.percent
             : 100,
       },
 
@@ -877,7 +877,7 @@ const OS = {
       architecture: os.architecture,
       icons: {
         large: {
-          id: os['large_icon'] ? os.large_icon['id'] : undefined,
+          id: os.large_icon ? os.large_icon.id : undefined,
         },
       },
       isWindows: isWindows(os.description),
@@ -893,7 +893,7 @@ const Icon = {
   toInternal ({ icon }: { icon: ApiIconType }): IconType {
     return {
       id: icon.id,
-      type: icon['media_type'],
+      type: icon.media_type,
       data: icon.data,
     }
   },
@@ -933,7 +933,7 @@ const VmConsoles = {
 //
 const VmSessions = {
   toInternal ({ sessions }: { sessions: ApiVmSessionsType }): VmSessionsType {
-    return sessions['session'].map((c: Object): Object => {
+    return sessions.session.map((c: Object): Object => {
       return {
         id: c.id,
         consoleUser: c.console_user === 'true',

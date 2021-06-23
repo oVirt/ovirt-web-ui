@@ -200,7 +200,7 @@ export function* fetchVms ({ payload: { count, page, shallowFetch = true } }) {
 
   const additional = shallowFetch ? VM_FETCH_ADDITIONAL_SHALLOW : VM_FETCH_ADDITIONAL_DEEP
   const apiVms = yield callExternalAction('getVms', Api.getVms, { payload: { count, page, additional } })
-  if (apiVms && apiVms['vm']) {
+  if (apiVms && apiVms.vm) {
     const internalVms = []
     for (const apiVm of apiVms.vm) {
       const internalVm = yield transformAndPermitVm(apiVm)
@@ -271,7 +271,7 @@ export function* fetchPools (action) {
   const fetchedPoolIds = []
 
   const apiPools = yield callExternalAction('getPools', Api.getPools, action)
-  if (apiPools && apiPools['vm_pool']) {
+  if (apiPools && apiPools.vm_pool) {
     const internalPools = apiPools.vm_pool.map(pool => Api.poolToInternal({ pool }))
     internalPools.forEach(pool => fetchedPoolIds.push(pool.id))
 
@@ -339,9 +339,9 @@ function* fetchVmDisks ({ vmId }) {
   //       This should follow the same style as `fetchSingleVm` and would require an extension to `Api.diskattachments`
   const diskattachments = yield callExternalAction('diskattachments', Api.diskattachments, { type: 'GET_DISK_ATTACHMENTS', payload: { vmId } })
 
-  if (diskattachments && diskattachments['disk_attachment']) { // array
+  if (diskattachments && diskattachments.disk_attachment) { // array
     const internalDisks = []
-    yield * foreach(diskattachments['disk_attachment'], function* (attachment) {
+    yield * foreach(diskattachments.disk_attachment, function* (attachment) {
       const diskId = attachment.disk.id
       const disk = yield callExternalAction('disk', Api.disk, { type: 'GET_DISK_DETAILS', payload: { diskId } })
       const internalDisk = yield putPermissionsInDisk(Api.diskToInternal({ disk, attachment }))
@@ -472,7 +472,7 @@ function* clearEvents (action) {
 export function* fetchVmSessions ({ vmId }) {
   const sessions = yield callExternalAction('sessions', Api.sessions, { payload: { vmId } })
 
-  if (sessions && sessions['session']) {
+  if (sessions && sessions.session) {
     return Api.sessionsToInternal({ sessions })
   }
   return []
@@ -481,7 +481,7 @@ export function* fetchVmSessions ({ vmId }) {
 export function* fetchVmPermissions ({ vmId }) {
   const permissions = yield callExternalAction('getVmPermissions', Api.getVmPermissions, { payload: { vmId } })
 
-  if (permissions && permissions['permission']) {
+  if (permissions && permissions.permission) {
     return Api.permissionsToInternal({ permissions: permissions.permission })
   }
   return []
@@ -507,7 +507,7 @@ function* saveFilters (actions) {
 
 function* fetchVmNics ({ vmId }) {
   const nics = yield callExternalAction('getVmNic', Api.getVmNic, { type: 'GET_VM_NICS', payload: { vmId } })
-  if (nics && nics['nic']) {
+  if (nics && nics.nic) {
     const nicsInternal = nics.nic.map(nic => Api.nicToInternal({ nic }))
     return nicsInternal
   }

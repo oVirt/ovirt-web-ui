@@ -13,7 +13,7 @@ import {
 export function* fetchRoles (action) {
   const rolesApi = yield callExternalAction('getRoles', Api.getRoles, action)
 
-  if (rolesApi && rolesApi['role']) {
+  if (rolesApi && rolesApi.role) {
     const roles = rolesApi.role.map(role => Transforms.Role.toInternal({ role }))
     yield put(setRoles(roles))
   }

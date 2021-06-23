@@ -32,7 +32,7 @@ const LinkButton = ({ className, tooltip, to, actionDisabled, isOnCard, shortTit
   }
 
   return (
-    <Link to={to} className={`${button} ${style['link']} ${style['full-button']}`}>
+    <Link to={to} className={`${button} ${style.link} ${style['full-button']}`}>
       <span data-toggle='tooltip' data-placement='left' title={tooltip} id={id}>
         {shortTitle}
       </span>

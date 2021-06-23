@@ -17,7 +17,7 @@ const FieldRow = ({ label, children, id, tooltip, tooltipPosition, validationSta
     <Col cols={5} className={style['col-label']}>
       <ControlLabel>{label}</ControlLabel>
       {tooltip &&
-        <span className={style['tooltip']}>
+        <span className={style.tooltip}>
           <InfoTooltip
             id={`${id}-tooltip`}
             tooltip={tooltip}

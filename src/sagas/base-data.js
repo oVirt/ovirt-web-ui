@@ -36,7 +36,7 @@ import { fetchUnknownIcons } from './osIcons'
 export function* fetchAllClusters (action) {
   const clusters = yield callExternalAction('getAllClusters', Api.getAllClusters, action)
 
-  if (clusters && clusters['cluster']) {
+  if (clusters && clusters.cluster) {
     const clustersInternal = clusters.cluster.map(
       cluster => Transforms.Cluster.toInternal({ cluster })
     )
@@ -59,7 +59,7 @@ export function* fetchAllClusters (action) {
 export function* fetchAllHosts (action) {
   const hosts = yield callExternalAction('getAllHosts', Api.getAllHosts, action)
 
-  if (hosts && hosts['host']) {
+  if (hosts && hosts.host) {
     const hostsInternal = hosts.host.map(
       host => Transforms.Host.toInternal({ host })
     )
@@ -71,7 +71,7 @@ export function* fetchAllHosts (action) {
 export function* fetchAllOS (action) {
   const operatingSystems = yield callExternalAction('getAllOperatingSystems', Api.getAllOperatingSystems, action)
 
-  if (operatingSystems && operatingSystems['operating_system']) {
+  if (operatingSystems && operatingSystems.operating_system) {
     const operatingSystemsInternal = operatingSystems.operating_system.map(
       os => Transforms.OS.toInternal({ os })
     )
@@ -84,7 +84,7 @@ export function* fetchAllOS (action) {
 export function* fetchAllTemplates (action) {
   const templates = yield callExternalAction('getAllTemplates', Api.getAllTemplates, action)
 
-  if (templates && templates['template']) {
+  if (templates && templates.template) {
     const templatesInternal = templates.template.map(
       template => Transforms.Template.toInternal({ template })
     )
@@ -111,7 +111,7 @@ export function* fetchAllTemplates (action) {
 export function* fetchAllVnicProfiles (action) {
   const vnicProfiles = yield callExternalAction('getAllVnicProfiles', Api.getAllVnicProfiles, action)
 
-  if (vnicProfiles && vnicProfiles['vnic_profile']) {
+  if (vnicProfiles && vnicProfiles.vnic_profile) {
     const vnicProfilesInternal = vnicProfiles.vnic_profile.map(
       vnicProfile => Transforms.VNicProfile.toInternal({ vnicProfile })
     )

@@ -48,7 +48,7 @@ function* fetchIcon ({ iconId }) {
   }
 
   const icon = yield callExternalAction('icon', Api.icon, { payload: { id: iconId } })
-  if (icon['media_type'] && icon['data']) {
+  if (icon.media_type && icon.data) {
     yield put(updateIcons({ icons: [Api.iconToInternal({ icon })] }))
   }
 }

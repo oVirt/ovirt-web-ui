@@ -68,7 +68,7 @@ class IconUpload extends React.Component {
               id='uploadIconInput'
               type='file'
               accept='image/*'
-              className={style['hide']}
+              className={style.hide}
               value={''}
               onChange={this.handleIconChange}
             />
