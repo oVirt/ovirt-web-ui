@@ -198,7 +198,7 @@ const vms = actionReducer(initialState, {
   [UPDATE_VMPOOLS_COUNT] (state) {
     state = state.update('pools', pools => pools.map(pool => pool.set('vmsCount', 0)))
 
-    state.get('vms').map(vm => {
+    state.get('vms').forEach(vm => {
       const poolId = vm.getIn(['pool', 'id'])
       if (poolId && state.getIn(['pools', poolId])) {
         // VM is in a known pool ... down VMs don't count against the user total unless it is a manual pool
