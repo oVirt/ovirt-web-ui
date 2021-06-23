@@ -139,11 +139,13 @@ const VM = {
       cpu: {
         arch: vm.cpu ? vm.cpu.architecture : undefined,
         vCPUs: vCpusCount({ cpu: vm.cpu }),
-        topology: vm.cpu && vm.cpu.topology ? {
-          cores: vm.cpu.topology.cores,
-          sockets: vm.cpu.topology.sockets,
-          threads: vm.cpu.topology.threads,
-        } : undefined,
+        topology: vm.cpu && vm.cpu.topology
+          ? {
+            cores: vm.cpu.topology.cores,
+            sockets: vm.cpu.topology.sockets,
+            threads: vm.cpu.topology.threads,
+          }
+          : undefined,
       },
 
       memory: {
@@ -155,7 +157,8 @@ const VM = {
       os: {
         type: vm.os ? vm.os.type : undefined,
         bootDevices: vm.os && vm.os.boot && vm.os.boot.devices && vm.os.boot.devices.device
-          ? vm.os.boot.devices.device : [],
+          ? vm.os.boot.devices.device
+          : [],
       },
 
       highAvailability: {

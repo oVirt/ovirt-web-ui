@@ -205,17 +205,19 @@ const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, id, isPoolVm, msg, lo
         vmId={vmId}
         msg={msg}
         trigger={({ onClick }) =>
-          isPoolVm ? (
+          isPoolVm
+            ? (
             <OverlayTrigger placement='top' overlay={<Tooltip id={`${id}-restore-tt`}>{ msg.vmPoolSnapshotRestoreUnavailable() }</Tooltip>}>
               <span>
                 <Button bsStyle='default' id={`${id}-restore`} disabled style={{ pointerEvents: 'none' }}>{ msg.snapshotRestore() }</Button>
               </span>
             </OverlayTrigger>
-          ) : (
+            )
+            : (
             <Button bsStyle='default' id={`${id}-restore`} onClick={onClick} disabled={restoreDisabled}>
               { msg.snapshotRestore() }
             </Button>
-          )
+            )
         }
       />
     </div>

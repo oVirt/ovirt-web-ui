@@ -55,9 +55,12 @@ class EllipsisValue extends React.Component {
         {children}
       </span>)
 
-      return this.state.isOverflow ? (<Tooltip tooltip={tooltip} id={`ellipsis_tooltip${id}`} >
-        {ellipsisValue}
-      </Tooltip>)
+      return this.state.isOverflow
+        ? (
+          <Tooltip tooltip={tooltip} id={`ellipsis_tooltip${id}`} >
+            {ellipsisValue}
+          </Tooltip>
+        )
         : (ellipsisValue)
     }
     return null

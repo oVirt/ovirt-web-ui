@@ -149,8 +149,10 @@ const ReviewStorage = ({ id, storageDomains, storage }) => {
           </div>
           <div className={style['review-entity-info']}>
             {
-              disk.diskType === 'thin' ? msg.diskEditorDiskTypeOptionThin()
-                : disk.diskType === 'pre' ? msg.diskEditorDiskTypeOptionPre()
+              disk.diskType === 'thin'
+                ? msg.diskEditorDiskTypeOptionThin()
+                : disk.diskType === 'pre'
+                  ? msg.diskEditorDiskTypeOptionPre()
                   : disk.diskType
             }
           </div>

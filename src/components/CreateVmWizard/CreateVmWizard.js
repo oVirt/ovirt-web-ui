@@ -401,8 +401,10 @@ class CreateVmWizard extends React.Component {
                    *   - server or high performance -> Clone -> raw / as defined in the template
                    */
                   const diskType = // constrain to values from createDiskTypeList()
-                    template.get('type') === 'desktop' ? 'thin'
-                      : this.state.steps.basic.optimizedFor === 'desktop' ? 'thin'
+                    template.get('type') === 'desktop'
+                      ? 'thin'
+                      : this.state.steps.basic.optimizedFor === 'desktop'
+                        ? 'thin'
                         : disk.get('sparse') ? 'thin' : 'pre'
 
                   return {
@@ -569,8 +571,10 @@ class CreateVmWizard extends React.Component {
           <Button
             bsStyle='primary'
             onClick={
-              isPrimaryNext ? this.wizardClickNext
-                : isPrimaryCreate ? this.handleCreateVm
+              isPrimaryNext
+                ? this.wizardClickNext
+                : isPrimaryCreate
+                  ? this.handleCreateVm
                   : this.hideAndNavigate
             }
             disabled={!enableGoForward}

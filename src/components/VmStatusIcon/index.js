@@ -35,9 +35,12 @@ const VmStatusIcon = ({ id, status, className = undefined }) => {
   const { msg } = useContext(MsgContext)
   const iconData = VM_STATUS_TO_ICON(msg)[status] || VM_STATUS_TO_ICON(msg).__default__
   const classNames =
-    iconData.className && className ? `${iconData.className} ${className}`
-      : iconData.className && !className ? `${iconData.className}`
-        : !iconData.className && className ? `${className}`
+    iconData.className && className
+      ? `${iconData.className} ${className}`
+      : iconData.className && !className
+        ? `${iconData.className}`
+        : !iconData.className && className
+          ? `${className}`
           : undefined
 
   return <Tooltip id={id} tooltip={iconData.tooltip} placement={'bottom'}>

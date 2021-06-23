@@ -62,8 +62,10 @@ function* refreshData ({
   ...otherPayload
 }) {
   const refreshType =
-    targetPage.type === C.NO_REFRESH_TYPE ? null
-      : targetPage.type === undefined ? C.LIST_PAGE_TYPE
+    targetPage.type === C.NO_REFRESH_TYPE
+      ? null
+      : targetPage.type === undefined
+        ? C.LIST_PAGE_TYPE
         : targetPage.type
 
   console.info('refreshData() 🡒', 'refreshType:', refreshType, 'currentPage:', targetPage, 'payload:', otherPayload)
