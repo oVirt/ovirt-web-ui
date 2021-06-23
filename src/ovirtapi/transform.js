@@ -295,7 +295,7 @@ const VM = {
         utc_offset: vm.timeZone.offset,
       },
 
-      bios: vm.hasOwnProperty('bootMenuEnabled')
+      bios: Object.prototype.hasOwnProperty.call(vm, 'bootMenuEnabled')
         ? {
           boot_menu: {
             enabled: toApiBoolean(vm.bootMenuEnabled),
