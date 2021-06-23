@@ -18,13 +18,15 @@ const CloudInit = ({ idPrefix, vm, isWindows, onChange, lastInitTimezone }) => {
           onChange={state => onChange('cloudInitEnabled', state)}
         />
       </FieldRow>
-      { cloudInitEnabled && <div style={{ marginTop: '15px' }}>
-        {
+      { cloudInitEnabled && (
+        <div style={{ marginTop: '15px' }}>
+          {
           isWindows
             ? <SysprepForm idPrefix={idPrefix} vm={vm} onChange={onChange} lastInitTimezone={lastInitTimezone} />
             : <CloudInitForm idPrefix={idPrefix} vm={vm} onChange={onChange} />
         }
-      </div> }
+        </div>
+      ) }
     </>
   )
 }

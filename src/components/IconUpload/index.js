@@ -77,7 +77,8 @@ class IconUpload extends React.Component {
             id='button-default-icon'
             className={`btn btn-default ${style['upload-button']}`}
             type='button'
-            onClick={() => { this.props.onIconChange() }} >
+            onClick={() => { this.props.onIconChange() }}
+          >
             {msg.defaultButton()}
           </button>
           {iconError}

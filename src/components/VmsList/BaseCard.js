@@ -35,12 +35,13 @@ BaseCardHeader.propTypes = {
 }
 
 const BaseCardIcon = ({ url, icon }) => {
-  const i =
+  const i = (
     <VmIcon
       icon={icon}
       className={style['card-pf-icon']}
       missingIconClassName='fa fa-birthday-cake card-pf-icon-circle'
     />
+  )
 
   return (url ? <Link to={url}>{i}</Link> : i)
 }

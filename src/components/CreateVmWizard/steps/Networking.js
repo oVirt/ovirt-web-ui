@@ -37,16 +37,18 @@ const NIC_INTERFACE_DEFAULT = 'virtio'
 export const NicNameWithLabels = ({ id, nic }) => {
   const { msg } = useContext(MsgContext)
   const idPrefix = `${id}-nic-${nic.id}`
-  return <>
-    <span id={`${idPrefix}-name`}>{ nic.name }</span>
-    { nic.isFromTemplate &&
-      <Tooltip id={`${idPrefix}-template-defined-badge`} tooltip={msg.templateDefined()}>
-        <Label id={`${idPrefix}-from-template`} className={style['nic-label']}>
-          T
-        </Label>
-      </Tooltip>
-    }
-  </>
+  return (
+    <>
+      <span id={`${idPrefix}-name`}>{ nic.name }</span>
+      { nic.isFromTemplate && (
+        <Tooltip id={`${idPrefix}-template-defined-badge`} tooltip={msg.templateDefined()}>
+          <Label id={`${idPrefix}-from-template`} className={style['nic-label']}>
+            T
+          </Label>
+        </Tooltip>
+      )}
+    </>
+  )
 }
 NicNameWithLabels.propTypes = {
   id: PropTypes.string,
@@ -164,7 +166,7 @@ class Networking extends React.Component {
                 onChange={e => this.handleCellChange(rowData, 'name', e.target.value)}
               />
               {!validAndUniqueName &&
-              <HelpBlock>{msg.createVmWizardNetVNICNameRules()}</HelpBlock>
+                <HelpBlock>{msg.createVmWizardNetVNICNameRules()}</HelpBlock>
               }
             </FormGroup>
           )
@@ -255,44 +257,46 @@ class Networking extends React.Component {
               const templateDefined = rowData.isFromTemplate
               const kebabId = `${idPrefix}-kebab-${rowData.name}`
 
-              return <>
-                { hideKebab && <Table.Cell /> }
+              return (
+                <>
+                  { hideKebab && <Table.Cell /> }
 
-                { templateDefined &&
-                  <Table.Cell className={style['nic-from-template']}>
-                    <InfoTooltip id={`${kebabId}-info-tooltip`} tooltip={msg.createVmNetNoEditHelpMessage()} />
-                  </Table.Cell>
-                }
+                  { templateDefined && (
+                    <Table.Cell className={style['nic-from-template']}>
+                      <InfoTooltip id={`${kebabId}-info-tooltip`} tooltip={msg.createVmNetNoEditHelpMessage()} />
+                    </Table.Cell>
+                  )}
 
-                { !hideKebab && !templateDefined &&
-                  <Table.Cell className={style['kebab-menu-cell']}>
-                    <Tooltip id={`tooltip-${kebabId}`} tooltip={msg.createVmNetEditActions()} placement={'bottom'}>
-                      <div className={style['kebab-menu-wrapper']}>
-                        <DropdownKebab
-                          id={kebabId}
-                          className={style['action-kebab']}
-                          pullRight
-                        >
-                          <MenuItem
-                            id={`${kebabId}-edit`}
-                            onSelect={() => { this.inlineEditController.onActivate({ rowIndex, rowData }) }}
-                            disabled={actionsDisabled}
+                  { !hideKebab && !templateDefined && (
+                    <Table.Cell className={style['kebab-menu-cell']}>
+                      <Tooltip id={`tooltip-${kebabId}`} tooltip={msg.createVmNetEditActions()} placement={'bottom'}>
+                        <div className={style['kebab-menu-wrapper']}>
+                          <DropdownKebab
+                            id={kebabId}
+                            className={style['action-kebab']}
+                            pullRight
                           >
-                            {msg.edit()}
-                          </MenuItem>
-                          <MenuItem
-                            id={`${kebabId}-delete`}
-                            onSelect={() => { this.onDeleteRow(rowData) }}
-                            disabled={actionsDisabled}
-                          >
-                            {msg.delete()}
-                          </MenuItem>
-                        </DropdownKebab>
-                      </div>
-                    </Tooltip>
-                  </Table.Cell>
-                }
-              </>
+                            <MenuItem
+                              id={`${kebabId}-edit`}
+                              onSelect={() => { this.inlineEditController.onActivate({ rowIndex, rowData }) }}
+                              disabled={actionsDisabled}
+                            >
+                              {msg.edit()}
+                            </MenuItem>
+                            <MenuItem
+                              id={`${kebabId}-delete`}
+                              onSelect={() => { this.onDeleteRow(rowData) }}
+                              disabled={actionsDisabled}
+                            >
+                              {msg.delete()}
+                            </MenuItem>
+                          </DropdownKebab>
+                        </div>
+                      </Tooltip>
+                    </Table.Cell>
+                  )}
+                </>
+              )
             },
           ],
         },
@@ -443,46 +447,52 @@ class Networking extends React.Component {
     }
     this.components = this.components || components // if the table should (re)render the value of this.components should be undefined
 
-    return <div className={style['settings-container']} id={idPrefix}>
-      { nicList.length === 0 && <>
-        <EmptyState>
-          <EmptyState.Icon />
-          <EmptyState.Title>{msg.createVmNetEmptyTitle()}</EmptyState.Title>
-          <EmptyState.Info>{msg.createVmNetEmptyInfo()}</EmptyState.Info>
-          <EmptyState.Action>
-            <Button bsStyle='primary' bsSize='large' onClick={this.onCreateNic}>
-              {msg.nicActionCreateNew()}
-            </Button>
-          </EmptyState.Action>
-        </EmptyState>
-      </> }
+    return (
+      <div className={style['settings-container']} id={idPrefix}>
+        { nicList.length === 0 && (
+          <>
+            <EmptyState>
+              <EmptyState.Icon />
+              <EmptyState.Title>{msg.createVmNetEmptyTitle()}</EmptyState.Title>
+              <EmptyState.Info>{msg.createVmNetEmptyInfo()}</EmptyState.Info>
+              <EmptyState.Action>
+                <Button bsStyle='primary' bsSize='large' onClick={this.onCreateNic}>
+                  {msg.nicActionCreateNew()}
+                </Button>
+              </EmptyState.Action>
+            </EmptyState>
+          </>
+        ) }
 
-      { nicList.length > 0 && <>
-        <div className={style['action-buttons']}>
-          <Button bsStyle='default' disabled={!enableCreate} onClick={this.onCreateNic}>
-            {msg.nicActionCreateNew()}
-          </Button>
-        </div>
-        <div className={style['nic-table']}>
-          <Table.PfProvider
-            striped
-            bordered
-            hover
-            dataTable
-            inlineEdit
-            columns={this.columns}
-            components={this.components}
-          >
-            <Table.Header />
-            <Table.Body
-              rows={nicList}
-              rowKey='id'
-              onRow={(...rest) => this.rowRenderProps(nicList, ...rest)}
-            />
-          </Table.PfProvider>
-        </div>
-      </> }
-    </div>
+        { nicList.length > 0 && (
+          <>
+            <div className={style['action-buttons']}>
+              <Button bsStyle='default' disabled={!enableCreate} onClick={this.onCreateNic}>
+                {msg.nicActionCreateNew()}
+              </Button>
+            </div>
+            <div className={style['nic-table']}>
+              <Table.PfProvider
+                striped
+                bordered
+                hover
+                dataTable
+                inlineEdit
+                columns={this.columns}
+                components={this.components}
+              >
+                <Table.Header />
+                <Table.Body
+                  rows={nicList}
+                  rowKey='id'
+                  onRow={(...rest) => this.rowRenderProps(nicList, ...rest)}
+                />
+              </Table.PfProvider>
+            </div>
+          </>
+        ) }
+      </div>
+    )
   }
 }
 

@@ -51,7 +51,8 @@ class FieldHelp extends React.Component {
     const popover = (
       <Popover id='popover-positioned-top' style={this.state.style} className={style['field-help-min-width']} title={this.props.title}>
         {this.props.content}
-      </Popover>)
+      </Popover>
+    )
 
     const container = this.props.container === null ? undefined : this.props.container || this
     return (

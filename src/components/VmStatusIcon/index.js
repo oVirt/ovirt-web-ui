@@ -43,9 +43,11 @@ const VmStatusIcon = ({ id, status, className = undefined }) => {
           ? `${className}`
           : undefined
 
-  return <Tooltip id={id} tooltip={iconData.tooltip} placement={'bottom'}>
-    <Icon type={iconData.type} name={iconData.name} className={classNames} />
-  </Tooltip>
+  return (
+    <Tooltip id={id} tooltip={iconData.tooltip} placement={'bottom'}>
+      <Icon type={iconData.type} name={iconData.name} className={classNames} />
+    </Tooltip>
+  )
 }
 VmStatusIcon.propTypes = {
   id: PropTypes.string.isRequired,

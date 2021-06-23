@@ -35,21 +35,23 @@ import { Tooltip, InfoTooltip } from '_/components/tooltips'
 export const DiskNameWithLabels = ({ id, disk }) => {
   const { msg } = useContext(MsgContext)
   const idPrefix = `${id}-disk-${disk.id}`
-  return <>
-    <span id={`${idPrefix}-name`}>{ disk.name }</span>
-    { disk.isFromTemplate &&
-      <Tooltip id={`${idPrefix}-template-defined-badge`} tooltip={msg.templateDefined()}>
-        <Label id={`${idPrefix}-from-template`} className={`${style['disk-label']}`}>
-          T
+  return (
+    <>
+      <span id={`${idPrefix}-name`}>{ disk.name }</span>
+      { disk.isFromTemplate && (
+        <Tooltip id={`${idPrefix}-template-defined-badge`} tooltip={msg.templateDefined()}>
+          <Label id={`${idPrefix}-from-template`} className={`${style['disk-label']}`}>
+            T
+          </Label>
+        </Tooltip>
+      )}
+      { disk.bootable && (
+        <Label id={`${idPrefix}-bootable`} className={style['disk-label']} bsStyle='info'>
+          { msg.diskLabelBootable() }
         </Label>
-      </Tooltip>
-    }
-    { disk.bootable &&
-      <Label id={`${idPrefix}-bootable`} className={style['disk-label']} bsStyle='info'>
-        { msg.diskLabelBootable() }
-      </Label>
-    }
-  </>
+      )}
+    </>
+  )
 }
 DiskNameWithLabels.propTypes = {
   id: PropTypes.string,
@@ -196,23 +198,25 @@ class Storage extends React.Component {
         },
         valueView: null,
         editView: (value, { rowData }) => {
-          return <div className={style['disk-bootable-edit']}>
-            { !this.isBootableDiskTemplate() &&
-              <Checkbox
-                aria-label='bootable checkbox'
-                checked={this.state.editing[rowData.id].bootable}
-                id={`${idPrefix}-bootable`}
-                onChange={e => this.handleCellChange(rowData, 'bootable', e.target.checked)}
-                title='Bootable flag'
-              />
-            }
-            <div className={style['bootable-info-tooltip']}>
-              <InfoTooltip
-                id={`${idPrefix}-bootable-tooltip`}
-                tooltip={this.bootableInfo(rowData.bootable)}
-              />
+          return (
+            <div className={style['disk-bootable-edit']}>
+              { !this.isBootableDiskTemplate() && (
+                <Checkbox
+                  aria-label='bootable checkbox'
+                  checked={this.state.editing[rowData.id].bootable}
+                  id={`${idPrefix}-bootable`}
+                  onChange={e => this.handleCellChange(rowData, 'bootable', e.target.checked)}
+                  title='Bootable flag'
+                />
+              )}
+              <div className={style['bootable-info-tooltip']}>
+                <InfoTooltip
+                  id={`${idPrefix}-bootable-tooltip`}
+                  tooltip={this.bootableInfo(rowData.bootable)}
+                />
+              </div>
             </div>
-          </div>
+          )
         },
       },
 
@@ -231,30 +235,34 @@ class Storage extends React.Component {
           formatters: [inlineEditFormatter],
         },
         valueView: (value, { rowData }) => {
-          return <>
-            { rowData.sized.value } { rowData.sized.unit }
-          </>
+          return (
+            <>
+              { rowData.sized.value } { rowData.sized.unit }
+            </>
+          )
         },
         editView: (value, { rowData }) => {
           const row = this.state.editing[rowData.id]
           const sizeGiB = row.size / (1024 ** 3)
 
-          return <div className={style['disk-size-edit']}>
-            <div>
-              <FormControl
-                id={`${idPrefix}-${value}-size-edit`}
-                type='number'
-                step={1}
-                value={sizeGiB}
-                className={style['disk-size-form-control-edit']}
-                onChange={e => this.handleCellChange(rowData, 'size', e.target.value)}
-              />
+          return (
+            <div className={style['disk-size-edit']}>
+              <div>
+                <FormControl
+                  id={`${idPrefix}-${value}-size-edit`}
+                  type='number'
+                  step={1}
+                  value={sizeGiB}
+                  className={style['disk-size-form-control-edit']}
+                  onChange={e => this.handleCellChange(rowData, 'size', e.target.value)}
+                />
+              </div>
+              <span className={style['disk-size-edit-label']}>GiB</span>
+              <div>
+                <InfoTooltip id={`${idPrefix}-${value}-size-edit-info-tooltip`} tooltip={msg.diskEditorSizeCreateInfoTooltip()} />
+              </div>
             </div>
-            <span className={style['disk-size-edit-label']}>GiB</span>
-            <div>
-              <InfoTooltip id={`${idPrefix}-${value}-size-edit-info-tooltip`} tooltip={msg.diskEditorSizeCreateInfoTooltip()} />
-            </div>
-          </div>
+          )
         },
       },
 
@@ -285,36 +293,42 @@ class Storage extends React.Component {
             const storageDomainList = createStorageDomainList({ storageDomains, dataCenterId, includeUsage: true, locale, msg })
 
             if (storageDomainList.length === 0) {
-              return <>
-                {msg.createVmStorageNoStorageDomainAvailable()}
-                <InfoTooltip
-                  id={`${idPrefix}-${rowData.id}-storage-domain-na-tooltip`}
-                  tooltip={msg.createVmStorageNoStorageDomainAvailableTooltip()}
-                />
-              </>
+              return (
+                <>
+                  {msg.createVmStorageNoStorageDomainAvailable()}
+                  <InfoTooltip
+                    id={`${idPrefix}-${rowData.id}-storage-domain-na-tooltip`}
+                    tooltip={msg.createVmStorageNoStorageDomainAvailableTooltip()}
+                  />
+                </>
+              )
             } else {
               if (!sd.isOk) {
                 storageDomainList.unshift({ id: '_', value: `-- ${msg.createVmStorageSelectStorageDomain()} --` })
               }
 
-              return <SelectBox
-                id={`${idPrefix}-${rowData.id}-storage-domain-edit`}
-                items={storageDomainList}
-                selected={sd.isOk ? rowData.storageDomainId : '_'}
-                validationState={!sd.isOk && 'error'}
-                onChange={value => this.handleTemplateDiskStorageDomainChange(rowData, value)}
-              />
+              return (
+                <SelectBox
+                  id={`${idPrefix}-${rowData.id}-storage-domain-edit`}
+                  items={storageDomainList}
+                  selected={sd.isOk ? rowData.storageDomainId : '_'}
+                  validationState={!sd.isOk && 'error'}
+                  onChange={value => this.handleTemplateDiskStorageDomainChange(rowData, value)}
+                />
+              )
             }
           }
 
-          return <>
-            { id === '_'
-              ? `-- ${msg.createVmStorageSelectStorageDomain()} --`
-              : sd.isOk
-                ? sd.name
-                : msg.createVmStorageUnknownStorageDomain()
+          return (
+            <>
+              { id === '_'
+                ? `-- ${msg.createVmStorageSelectStorageDomain()} --`
+                : sd.isOk
+                  ? sd.name
+                  : msg.createVmStorageUnknownStorageDomain()
             }
-          </>
+            </>
+          )
         },
         editView: (value, { rowData }) => {
           const { storageDomains, dataCenterId, locale } = props
@@ -392,44 +406,46 @@ class Storage extends React.Component {
               const templateDefined = rowData.isFromTemplate
               const kebabId = `${idPrefix}-kebab-${rowData.name}`
 
-              return <>
-                { hideKebab && <Table.Cell /> }
+              return (
+                <>
+                  { hideKebab && <Table.Cell /> }
 
-                { templateDefined &&
-                  <Table.Cell className={style['disk-from-template']}>
-                    <InfoTooltip id={`${kebabId}-info-tooltip`} tooltip={msg.createVmStorageNoEditHelpMessage()} />
-                  </Table.Cell>
-                }
+                  { templateDefined && (
+                    <Table.Cell className={style['disk-from-template']}>
+                      <InfoTooltip id={`${kebabId}-info-tooltip`} tooltip={msg.createVmStorageNoEditHelpMessage()} />
+                    </Table.Cell>
+                  )}
 
-                { !hideKebab && !templateDefined &&
-                  <Table.Cell className={style['kebab-menu-cell']}>
-                    <Tooltip id={`tooltip-${kebabId}`} tooltip={msg.createVmStorageEditActions()} placement={'bottom'}>
-                      <div className={style['kebab-menu-wrapper']}>
-                        <DropdownKebab
-                          id={kebabId}
-                          className={style['action-kebab']}
-                          pullRight
-                        >
-                          <MenuItem
-                            id={`${kebabId}-edit`}
-                            onSelect={() => { this.inlineEditController.onActivate({ rowIndex, rowData }) }}
-                            disabled={actionsDisabled}
+                  { !hideKebab && !templateDefined && (
+                    <Table.Cell className={style['kebab-menu-cell']}>
+                      <Tooltip id={`tooltip-${kebabId}`} tooltip={msg.createVmStorageEditActions()} placement={'bottom'}>
+                        <div className={style['kebab-menu-wrapper']}>
+                          <DropdownKebab
+                            id={kebabId}
+                            className={style['action-kebab']}
+                            pullRight
                           >
-                            {msg.edit()}
-                          </MenuItem>
-                          <MenuItem
-                            id={`${kebabId}-delete`}
-                            onSelect={() => { this.onDeleteDisk(rowData) }}
-                            disabled={actionsDisabled}
-                          >
-                            {msg.delete()}
-                          </MenuItem>
-                        </DropdownKebab>
-                      </div>
-                    </Tooltip>
-                  </Table.Cell>
-                }
-              </>
+                            <MenuItem
+                              id={`${kebabId}-edit`}
+                              onSelect={() => { this.inlineEditController.onActivate({ rowIndex, rowData }) }}
+                              disabled={actionsDisabled}
+                            >
+                              {msg.edit()}
+                            </MenuItem>
+                            <MenuItem
+                              id={`${kebabId}-delete`}
+                              onSelect={() => { this.onDeleteDisk(rowData) }}
+                              disabled={actionsDisabled}
+                            >
+                              {msg.delete()}
+                            </MenuItem>
+                          </DropdownKebab>
+                        </div>
+                      </Tooltip>
+                    </Table.Cell>
+                  )}
+                </>
+              )
             },
           ],
         },
@@ -696,53 +712,59 @@ class Storage extends React.Component {
       },
     }
 
-    return <div className={style['settings-container']} id={idPrefix}>
-      { diskList.length === 0 && <>
-        <EmptyState>
-          <EmptyState.Icon />
-          <EmptyState.Title>{msg.createVmStorageEmptyTitle()}</EmptyState.Title>
-          <EmptyState.Info>{msg.createVmStorageEmptyInfo()}</EmptyState.Info>
-          { enableCreate &&
-            <EmptyState.Action>
-              <Button bsStyle='primary' bsSize='large' onClick={this.onCreateDisk}>
+    return (
+      <div className={style['settings-container']} id={idPrefix}>
+        { diskList.length === 0 && (
+          <>
+            <EmptyState>
+              <EmptyState.Icon />
+              <EmptyState.Title>{msg.createVmStorageEmptyTitle()}</EmptyState.Title>
+              <EmptyState.Info>{msg.createVmStorageEmptyInfo()}</EmptyState.Info>
+              { enableCreate && (
+                <EmptyState.Action>
+                  <Button bsStyle='primary' bsSize='large' onClick={this.onCreateDisk}>
+                    {msg.diskActionCreateNew()}
+                  </Button>
+                </EmptyState.Action>
+              )}
+              { !enableCreate && (
+                <EmptyState.Help>
+                  {msg.diskNoCreate()}
+                </EmptyState.Help>
+              )}
+            </EmptyState>
+          </>
+        ) }
+
+        { diskList.length > 0 && (
+          <>
+            <div className={style['action-buttons']}>
+              <Button bsStyle='default' disabled={!enableCreate} onClick={this.onCreateDisk}>
                 {msg.diskActionCreateNew()}
               </Button>
-            </EmptyState.Action>
-          }
-          { !enableCreate &&
-            <EmptyState.Help>
-              {msg.diskNoCreate()}
-            </EmptyState.Help>
-          }
-        </EmptyState>
-      </> }
-
-      { diskList.length > 0 && <>
-        <div className={style['action-buttons']}>
-          <Button bsStyle='default' disabled={!enableCreate} onClick={this.onCreateDisk}>
-            {msg.diskActionCreateNew()}
-          </Button>
-        </div>
-        <div className={style['disk-table']}>
-          <Table.PfProvider
-            striped
-            bordered
-            hover
-            dataTable
-            inlineEdit
-            columns={this.columns}
-            components={this.components}
-          >
-            <Table.Header />
-            <Table.Body
-              rows={diskList}
-              rowKey='id'
-              onRow={(...rest) => this.rowRenderProps(diskList, ...rest)}
-            />
-          </Table.PfProvider>
-        </div>
-      </> }
-    </div>
+            </div>
+            <div className={style['disk-table']}>
+              <Table.PfProvider
+                striped
+                bordered
+                hover
+                dataTable
+                inlineEdit
+                columns={this.columns}
+                components={this.components}
+              >
+                <Table.Header />
+                <Table.Body
+                  rows={diskList}
+                  rowKey='id'
+                  onRow={(...rest) => this.rowRenderProps(diskList, ...rest)}
+                />
+              </Table.PfProvider>
+            </div>
+          </>
+        ) }
+      </div>
+    )
   }
 }
 

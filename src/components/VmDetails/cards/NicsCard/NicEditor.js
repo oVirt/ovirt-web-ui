@@ -25,9 +25,11 @@ const NIC_INTERFACE_DEFAULT = 'virtio'
 const NIC_INTERFACE_CANT_CHANGE = ['pci_passthrough']
 
 const LabelCol = ({ children, ...props }) => {
-  return <Col componentClass={ControlLabel} {...props}>
-    { children }
-  </Col>
+  return (
+    <Col componentClass={ControlLabel} {...props}>
+      { children }
+    </Col>
+  )
 }
 LabelCol.propTypes = {
   children: PropTypes.node.isRequired,
@@ -164,125 +166,128 @@ class NicEditor extends Component {
         (vmStatus === 'down' || !this.props.nic.plugged)
       )
 
-    return <>
-      { trigger({ onClick: this.open }) }
+    return (
+      <>
+        { trigger({ onClick: this.open }) }
 
-      <Modal
-        id={modalId}
-        show={this.state.showModal}
-        onHide={this.close}
-      >
-        <Modal.Header>
-          <Modal.CloseButton onClick={this.close} id={`${modalId}-button-close`} />
-          <Modal.Title>{createMode ? msg.addNewNic() : msg.editNic()}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+        <Modal
+          id={modalId}
+          show={this.state.showModal}
+          onHide={this.close}
+        >
+          <Modal.Header>
+            <Modal.CloseButton onClick={this.close} id={`${modalId}-button-close`} />
+            <Modal.Title>{createMode ? msg.addNewNic() : msg.editNic()}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
 
-          <Form
-            horizontal
-            onSubmit={e => { e.preventDefault() }}
-            id={`${modalId}-form`}
-          >
-            <FormGroup controlId={`${modalId}-name`}>
-              <LabelCol sm={3}>
-                { msg.nicEditorNameLabel() }
-              </LabelCol>
-              <Col sm={9}>
-                <FormControl
-                  type='text'
-                  defaultValue={this.state.values.name}
-                  onChange={this.changeName}
-                />
-              </Col>
-            </FormGroup>
-
-            <FormGroup controlId={`${modalId}-vnic-profile`}>
-              <LabelCol sm={3}>
-                { msg.vnicProfile() }
-              </LabelCol>
-              <Col sm={9}>
-                <SelectBox
-                  id={`${modalId}-vnic-profile`}
-                  items={vnicList}
-                  selected={this.state.values.vnicProfileId}
-                  onChange={this.changeVnicProfile}
-                />
-              </Col>
-            </FormGroup>
-
-            <ExpandCollapse id='nic-edit-advanced-options' textCollapsed={msg.advancedOptions()} textExpanded={msg.advancedOptions()}>
-              <FormGroup controlId={`${modalId}-interface`}>
+            <Form
+              horizontal
+              onSubmit={e => { e.preventDefault() }}
+              id={`${modalId}-form`}
+            >
+              <FormGroup controlId={`${modalId}-name`}>
                 <LabelCol sm={3}>
-                  { msg.nicEditorInterfaceLabel() }
-                  { !canChangeInterface &&
-                    <InfoTooltip
-                      id={`${modalId}-interface-edit-tooltip`}
-                      tooltip={msg.nicEditorInterfaceCantEditHelp()}
-                    />
-                  }
+                  { msg.nicEditorNameLabel() }
                 </LabelCol>
                 <Col sm={9}>
-                  { !canChangeInterface &&
-                    <div className={style['editor-value-text']} id={`${modalId}-interface`}>
-                      { nicInterface ? nicInterface.value : 'N/A' }
-                    </div>
-                  }
-                  { canChangeInterface &&
-                    <SelectBox
-                      id={`${modalId}-interface`}
-                      items={NIC_INTERFACES}
-                      selected={this.state.values.interface}
-                      onChange={this.changeInterface}
-                    />
-                  }
+                  <FormControl
+                    type='text'
+                    defaultValue={this.state.values.name}
+                    onChange={this.changeName}
+                  />
                 </Col>
               </FormGroup>
-              <FormGroup controlId='nic-link-state-group'>
+
+              <FormGroup controlId={`${modalId}-vnic-profile`}>
                 <LabelCol sm={3}>
-                  { msg.nicEditorLinkStateLabel() }
+                  { msg.vnicProfile() }
                 </LabelCol>
                 <Col sm={9}>
-                  <Radio
-                    id={`${modalId}-link-state-on`}
-                    name='nic-link-state-group'
-                    defaultChecked={this.state.values.linked}
-                    onChange={() => { this.changeLinked(true) }}
-                  >
-                    { msg.nicEditorLinkStateUp() } <NicLinkStateIcon linkState idSuffix='up' showTooltip={false} />
-                  </Radio>
-                  <Radio
-                    id={`${modalId}-link-state-off`}
-                    name='nic-link-state-group'
-                    defaultChecked={!this.state.values.linked}
-                    onChange={() => { this.changeLinked(false) }}
-                  >
-                    { msg.nicEditorLinkStateDown() } <NicLinkStateIcon idSuffix='down' showTooltip={false} />
-                  </Radio>
+                  <SelectBox
+                    id={`${modalId}-vnic-profile`}
+                    items={vnicList}
+                    selected={this.state.values.vnicProfileId}
+                    onChange={this.changeVnicProfile}
+                  />
                 </Col>
               </FormGroup>
-            </ExpandCollapse>
-          </Form>
 
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            id={`${modalId}-button-cancel`}
-            bsStyle='default'
-            className='btn-cancel'
-            onClick={this.close}
-          >
-            { msg.cancel() }
-          </Button>
-          <Button
-            id={`${modalId}-button-ok`}
-            bsStyle='primary'
-            onClick={this.handleSave}
-            disabled={this.state.values.name === ''}>
-            { msg.ok() }
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </>
+              <ExpandCollapse id='nic-edit-advanced-options' textCollapsed={msg.advancedOptions()} textExpanded={msg.advancedOptions()}>
+                <FormGroup controlId={`${modalId}-interface`}>
+                  <LabelCol sm={3}>
+                    { msg.nicEditorInterfaceLabel() }
+                    { !canChangeInterface && (
+                      <InfoTooltip
+                        id={`${modalId}-interface-edit-tooltip`}
+                        tooltip={msg.nicEditorInterfaceCantEditHelp()}
+                      />
+                    )}
+                  </LabelCol>
+                  <Col sm={9}>
+                    { !canChangeInterface && (
+                      <div className={style['editor-value-text']} id={`${modalId}-interface`}>
+                        { nicInterface ? nicInterface.value : 'N/A' }
+                      </div>
+                    )}
+                    { canChangeInterface && (
+                      <SelectBox
+                        id={`${modalId}-interface`}
+                        items={NIC_INTERFACES}
+                        selected={this.state.values.interface}
+                        onChange={this.changeInterface}
+                      />
+                    )}
+                  </Col>
+                </FormGroup>
+                <FormGroup controlId='nic-link-state-group'>
+                  <LabelCol sm={3}>
+                    { msg.nicEditorLinkStateLabel() }
+                  </LabelCol>
+                  <Col sm={9}>
+                    <Radio
+                      id={`${modalId}-link-state-on`}
+                      name='nic-link-state-group'
+                      defaultChecked={this.state.values.linked}
+                      onChange={() => { this.changeLinked(true) }}
+                    >
+                      { msg.nicEditorLinkStateUp() } <NicLinkStateIcon linkState idSuffix='up' showTooltip={false} />
+                    </Radio>
+                    <Radio
+                      id={`${modalId}-link-state-off`}
+                      name='nic-link-state-group'
+                      defaultChecked={!this.state.values.linked}
+                      onChange={() => { this.changeLinked(false) }}
+                    >
+                      { msg.nicEditorLinkStateDown() } <NicLinkStateIcon idSuffix='down' showTooltip={false} />
+                    </Radio>
+                  </Col>
+                </FormGroup>
+              </ExpandCollapse>
+            </Form>
+
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              id={`${modalId}-button-cancel`}
+              bsStyle='default'
+              className='btn-cancel'
+              onClick={this.close}
+            >
+              { msg.cancel() }
+            </Button>
+            <Button
+              id={`${modalId}-button-ok`}
+              bsStyle='primary'
+              onClick={this.handleSave}
+              disabled={this.state.values.name === ''}
+            >
+              { msg.ok() }
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </>
+    )
   }
 }
 

@@ -32,7 +32,8 @@ const Confirmation = ({ okButton, cancelButton, extraButton, text, height, uniqu
           </Button>
         )}
       </ButtonToolbar>
-    </span>)
+    </span>
+  )
 }
 
 Confirmation.propTypes = {

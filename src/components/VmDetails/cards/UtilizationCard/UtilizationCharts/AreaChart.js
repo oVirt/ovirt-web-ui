@@ -16,12 +16,12 @@ const AreaChart = ({ data, labels, id }) => {
         height={120}
         width={450}
         padding={{ top: 60 }}
-        containerComponent={
+        containerComponent={(
           <ChartVoronoiContainer
             labels={labels}
             labelComponent={<ChartTooltip style={{ fontSize: 16 }} />}
           />
-        }
+        )}
       >
         <ChartArea
           style={{ data: { fill: 'rgb(0, 136, 206)', strokeWidth: 5 } }}

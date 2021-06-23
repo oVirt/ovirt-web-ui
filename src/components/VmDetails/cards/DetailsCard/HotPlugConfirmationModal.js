@@ -10,26 +10,30 @@ import { MsgContext } from '_/intl'
 
 const HotPlugChangeConfirmationModal = ({ show, onCancel, onApplyLater, onApplyNow }) => {
   const { msg } = useContext(MsgContext)
-  return <MessageDialog
-    show={show}
-    onHide={onCancel}
-    title={msg.hotPlugConfirmTitle()}
-    icon={<Icon type='pf' name='warning-triangle-o' />}
+  return (
+    <MessageDialog
+      show={show}
+      onHide={onCancel}
+      title={msg.hotPlugConfirmTitle()}
+      icon={<Icon type='pf' name='warning-triangle-o' />}
 
-    primaryContent={<div className='lead'>{msg.hotPlugConfirmContent()}</div>}
-    secondaryContent={<div>{msg.hotPlugConfirmContentDetail()}</div>}
+      primaryContent={<div className='lead'>{msg.hotPlugConfirmContent()}</div>}
+      secondaryContent={<div>{msg.hotPlugConfirmContentDetail()}</div>}
 
-    accessibleName='prompt-hot-plug'
-    accessibleDescription='hot-plug-configuration-change-will-be-applied-now'
+      accessibleName='prompt-hot-plug'
+      accessibleDescription='hot-plug-configuration-change-will-be-applied-now'
 
-    primaryAction={noop}
-    primaryActionButtonContent=''
-    footer={<>
-      <Button onClick={onCancel}>{msg.cancel()}</Button>
-      <Button onClick={onApplyLater}>{msg.hotPlugConfirmApplyAfterRestart()}</Button>
-      <Button bsStyle='primary' onClick={onApplyNow}>{msg.hotPlugConfirmApplyNow()}</Button>
-    </>}
-  />
+      primaryAction={noop}
+      primaryActionButtonContent=''
+      footer={(
+        <>
+          <Button onClick={onCancel}>{msg.cancel()}</Button>
+          <Button onClick={onApplyLater}>{msg.hotPlugConfirmApplyAfterRestart()}</Button>
+          <Button bsStyle='primary' onClick={onApplyNow}>{msg.hotPlugConfirmApplyNow()}</Button>
+        </>
+      )}
+    />
+  )
 }
 
 HotPlugChangeConfirmationModal.propTypes = {

@@ -11,9 +11,11 @@ import { InfoTooltip } from '_/components/tooltips'
 import style from './style.css'
 
 const LabelCol = ({ children, tooltip, fieldPath, ...props }) => {
-  return <Col componentClass={ControlLabel} {...props}>
-    { children } { tooltip && <InfoTooltip tooltip={tooltip} id={`${fieldPath}-info-tooltip`} /> }
-  </Col>
+  return (
+    <Col componentClass={ControlLabel} {...props}>
+      { children } { tooltip && <InfoTooltip tooltip={tooltip} id={`${fieldPath}-info-tooltip`} /> }
+    </Col>
+  )
 }
 LabelCol.propTypes = {
   children: PropTypes.node.isRequired,
@@ -22,12 +24,14 @@ LabelCol.propTypes = {
 }
 
 const Item = ({ title, isActive, onClick }) => {
-  return <li className={`list-group-item ${isActive && 'active'}`}>
-    <a href='#' onClick={(e) => { e.preventDefault(); onClick() }}>
-      <span className='list-group-item-value'>{title}</span>
-      <div className='badge-container-pf' />
-    </a>
-  </li>
+  return (
+    <li className={`list-group-item ${isActive && 'active'}`}>
+      <a href='#' onClick={(e) => { e.preventDefault(); onClick() }}>
+        <span className='list-group-item-value'>{title}</span>
+        <div className='badge-container-pf' />
+      </a>
+    </li>
+  )
 }
 
 Item.propTypes = {
@@ -65,12 +69,13 @@ const SettingsBase = ({ name, section }) => {
   const sections = section.sections ? Object.entries(section.sections) : [[name, section]]
   return (
     <div className={style['search-content-box']}>
-      { sections.map(([name, section]) =>
+      { sections.map(([name, section]) => (
         <Card key={name} className={style['main-content']}>
           <div className={style['main-content-container']}>
             <Section name={name} section={section} />
           </div>
         </Card>
+      )
       )}
     </div>
   )

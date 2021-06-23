@@ -24,19 +24,21 @@ const ConfirmationModal = ({ show, title, confirm, body, subContent, onClose, ex
       <Modal.Body>
         {
           typeof body === 'string'
-            ? <>
-              <Icon type='pf' name='warning-triangle-o' />
-              <div id={accessibleDescription}>
-                <p className='lead'>
-                  { body }
-                </p>
-                {
+            ? (
+              <>
+                <Icon type='pf' name='warning-triangle-o' />
+                <div id={accessibleDescription}>
+                  <p className='lead'>
+                    { body }
+                  </p>
+                  {
                   subContent && typeof subContent === 'string'
                     ? <p>{ subContent }</p>
                     : subContent
                 }
-              </div>
-            </>
+                </div>
+              </>
+            )
             : body
         }
       </Modal.Body>

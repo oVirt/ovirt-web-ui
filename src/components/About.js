@@ -60,7 +60,7 @@ class AboutDialog extends React.Component {
     return (
       <>
         <a href='#' id='about-modal' onClick={() => this.setState({ openModal: true })}>{msg.about()}</a>
-        { this.state.openModal &&
+        { this.state.openModal && (
           <Modal id={`${idPrefix}-modal`} contentClassName='about-modal-pf obrand_aboutBackground' onHide={() => this.setState({ openModal: false })} show>
             <Modal.Header>
               <Modal.CloseButton onClick={() => this.setState({ openModal: false })} />
@@ -75,11 +75,11 @@ class AboutDialog extends React.Component {
                   <li id={`${idPrefix}-apiversion`}>
                     <div dangerouslySetInnerHTML={{ __html: apiVersionText }} />
                   </li>
-                  {fixedStrings.DOCUMENTATION_LINK &&
+                  {fixedStrings.DOCUMENTATION_LINK && (
                     <li id={`${idPrefix}-documentation`}>
                       <span dangerouslySetInnerHTML={{ __html: docLink }} />
                     </li>
-                  }
+                  )}
                   <li id={`${idPrefix}-issues`}>
                     <div dangerouslySetInnerHTML={{ __html: reportLink }} />
                   </li>
@@ -92,7 +92,7 @@ class AboutDialog extends React.Component {
               <div className='obrand_aboutApplicationLogo' id={`${idPrefix}-applogo`} />
             </Modal.Footer>
           </Modal>
-        }
+        )}
       </>
     )
   }

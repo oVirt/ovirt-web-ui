@@ -52,21 +52,21 @@ class RestoreConfirmationModal extends React.Component {
           secondaryActionButtonContent={msg.cancel()}
           title={msg.confirmRestore()}
           icon={icon}
-          primaryContent={
+          primaryContent={(
             <div
               id={`${id}-lead`}
               className='lead'
               dangerouslySetInnerHTML={{
                 __html: msg.areYouSureYouWantToRestoreSnapshot({ snapshotName: `"<strong>${minDescription}</strong>"` }),
               }}
-            />}
-          secondaryContent={
-            snapshotsThatWillBeDeleted.size > 0 &&
+            />
+          )}
+          secondaryContent={ snapshotsThatWillBeDeleted.size > 0 && (
             <div id={`${id}-secondary`}>
               {msg.nextSnapshotsWillBeDeleted()}
               {snapshotsThatWillBeDeleted.map((s) => <div key={s.get('date')}>{s.get('description')}</div>)}
             </div>
-          }
+          )}
         />
       </>
     )

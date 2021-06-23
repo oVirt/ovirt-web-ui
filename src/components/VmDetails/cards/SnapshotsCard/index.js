@@ -29,9 +29,11 @@ const Snapshots = ({
   const isActionDisabled = isVmInPreview || beingCreated || beingRestored || beingDeleted || isVmLocked || !canUserManipulateSnapshot
   return (
     <>
-      { canUserManipulateSnapshot && <div className={style['snapshot-create']}>
-        <NewSnapshotModal vmId={vmId} disabled={isActionDisabled} idPrefix={`${idPrefix}-new-snapshot`} isVmRunning={isVmRunning} />
-      </div> }
+      { canUserManipulateSnapshot && (
+        <div className={style['snapshot-create']}>
+          <NewSnapshotModal vmId={vmId} disabled={isActionDisabled} idPrefix={`${idPrefix}-new-snapshot`} isVmRunning={isVmRunning} />
+        </div>
+      ) }
       {
         snapshots.sort((a, b) => b.get('date') - a.get('date')).map((snapshot) => (
           <SnapshotItem

@@ -22,7 +22,7 @@ const VmConsoleSelector = ({ vmId, vms, consoles, config, consoleId, isConsolePa
 
   const vnc = actions.find((a) => a.get('protocol') === VNC)
 
-  const consoleItems = actions.map(action =>
+  const consoleItems = actions.map(action => (
     <MenuItemAction
       id={action.get('id')}
       key={action.get('id')}
@@ -31,6 +31,7 @@ const VmConsoleSelector = ({ vmId, vms, consoles, config, consoleId, isConsolePa
       shortTitle={msg[action.get('protocol') + 'Console']()}
       icon={<Icon name='external-link' />}
     />
+  )
   ).toJS()
 
   const hasRdp = isWindows(vms.getIn(['vms', vmId, 'os', 'type']))
@@ -38,12 +39,14 @@ const VmConsoleSelector = ({ vmId, vms, consoles, config, consoleId, isConsolePa
   if (hasRdp) {
     const domain = config.get('domain')
     const username = config.getIn(['user', 'name'])
-    consoleItems.push(<MenuItem
-      key={RDP_ID}
-      onClick={(e) => { e.preventDefault(); onRDP({ domain, username, vms }) }}
-    >
-      {msg.remoteDesktop()} <Icon name='external-link' />
-    </MenuItem>)
+    consoleItems.push(
+      <MenuItem
+        key={RDP_ID}
+        onClick={(e) => { e.preventDefault(); onRDP({ domain, username, vms }) }}
+      >
+        {msg.remoteDesktop()} <Icon name='external-link' />
+      </MenuItem>
+    )
   }
 
   if (vnc.size) {
@@ -64,16 +67,18 @@ const VmConsoleSelector = ({ vmId, vms, consoles, config, consoleId, isConsolePa
       ? msg[actions.find((a) => a.get('id') === consoleId).get('protocol') + 'Console']()
       : msg.vncConsoleBrowser()
 
-  return <div className={style['console-dropdown-box']}>
-    <span className={style['console-dropdown-label']}>{`${msg.console()}:`}</span>
-    <DropdownButton
-      title={activeConsole}
-      bsStyle='default'
-      id='console-selector'
-    >
-      { consoleItems }
-    </DropdownButton>
-  </div>
+  return (
+    <div className={style['console-dropdown-box']}>
+      <span className={style['console-dropdown-label']}>{`${msg.console()}:`}</span>
+      <DropdownButton
+        title={activeConsole}
+        bsStyle='default'
+        id='console-selector'
+      >
+        { consoleItems }
+      </DropdownButton>
+    </div>
+  )
 }
 
 VmConsoleSelector.propTypes = {

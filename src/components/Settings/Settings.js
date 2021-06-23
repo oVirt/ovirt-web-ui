@@ -110,50 +110,53 @@ const Settings = ({
     }
   }, [partialSuccess, completeFailure, fullSuccess, pendingChanges])
 
-  return <>
-    <NavigationPrompt when={(currentLocation, nextLocation) => !!pendingChanges.length}>
-      {({ isActive, onConfirm, onCancel }) => (
-        <NavigationConfirmationModal show={isActive} onYes={onConfirm} onNo={onCancel} />
-      )}
-    </NavigationPrompt>
-    <div className={showFullSuccess || partialSave.show || showCompleteFailure ? style['alert-container'] : null}>
-      { showFullSuccess &&
-        <CounterAlert
-          timeout={10}
-          title={isReset ? msg.changesResetSuccessfully() : msg.changesSavedSuccesfully()}
-          type='success'
-          onDismiss={() => resetNotifications(setShowFullSuccess, false)}
-        />
-      }
-      { partialSave.show &&
-        <CounterAlert
-          timeout={10}
-          type='error'
-          title={<p>{msg.failedToSaveChangesToFields()}</p>}
-          onDismiss={() => resetNotifications(setShowPartialSave, { show: false, fields: [] })} >
-          <ChangesList changes={partialSave.fields} translatedLabels={translatedLabels} />
-        </CounterAlert>
-      }
-      { showCompleteFailure &&
-        <CounterAlert
-          timeout={10}
-          type='error'
-          title={msg.failedToSaveChanges()}
-          onDismiss={() => resetNotifications(setShowCompleteFailure, false)}
-        />
-      }
-    </div>
-    <SettingsToolbar
-      onSave={handleSave}
-      onReset={handleReset}
-      enableReset={enableReset}
-      onCancel={onCancel}
-      enableSave={!!pendingChanges.length && !isReset}
-      changes={pendingChanges}
-      translatedLabels={translatedLabels}
-    />
-    {children}
-  </>
+  return (
+    <>
+      <NavigationPrompt when={(currentLocation, nextLocation) => !!pendingChanges.length}>
+        {({ isActive, onConfirm, onCancel }) => (
+          <NavigationConfirmationModal show={isActive} onYes={onConfirm} onNo={onCancel} />
+        )}
+      </NavigationPrompt>
+      <div className={showFullSuccess || partialSave.show || showCompleteFailure ? style['alert-container'] : null}>
+        { showFullSuccess && (
+          <CounterAlert
+            timeout={10}
+            title={isReset ? msg.changesResetSuccessfully() : msg.changesSavedSuccesfully()}
+            type='success'
+            onDismiss={() => resetNotifications(setShowFullSuccess, false)}
+          />
+        )}
+        { partialSave.show && (
+          <CounterAlert
+            timeout={10}
+            type='error'
+            title={<p>{msg.failedToSaveChangesToFields()}</p>}
+            onDismiss={() => resetNotifications(setShowPartialSave, { show: false, fields: [] })}
+          >
+            <ChangesList changes={partialSave.fields} translatedLabels={translatedLabels} />
+          </CounterAlert>
+        )}
+        { showCompleteFailure && (
+          <CounterAlert
+            timeout={10}
+            type='error'
+            title={msg.failedToSaveChanges()}
+            onDismiss={() => resetNotifications(setShowCompleteFailure, false)}
+          />
+        )}
+      </div>
+      <SettingsToolbar
+        onSave={handleSave}
+        onReset={handleReset}
+        enableReset={enableReset}
+        onCancel={onCancel}
+        enableSave={!!pendingChanges.length && !isReset}
+        changes={pendingChanges}
+        translatedLabels={translatedLabels}
+      />
+      {children}
+    </>
+  )
 }
 Settings.propTypes = {
   draftValues: PropTypes.object.isRequired,

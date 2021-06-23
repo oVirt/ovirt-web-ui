@@ -31,18 +31,21 @@ const diskStateSettings = (msg) => ({
 const DiskStateIcon = ({ idPrefix, diskState, showTooltip = true }) => {
   const { msg } = useContext(MsgContext)
   const diskInfo = diskStateSettings(msg)[diskState]
-  const theIcon =
+  const theIcon = (
     <Icon
       id={`${idPrefix}-state-icon`}
       type={diskInfo.type}
       name={diskInfo.name}
       className={`${style['state-icon']} ${diskInfo.className}`}
     />
+  )
 
   if (showTooltip) {
-    return <Tooltip id={`${idPrefix}-state-icon-tooltip`} tooltip={diskInfo.tooltip}>
-      {theIcon}
-    </Tooltip>
+    return (
+      <Tooltip id={`${idPrefix}-state-icon-tooltip`} tooltip={diskInfo.tooltip}>
+        {theIcon}
+      </Tooltip>
+    )
   }
   return theIcon
 }

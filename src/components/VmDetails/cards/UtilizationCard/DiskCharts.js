@@ -68,7 +68,7 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
         { vm.get('disks').size === 0 &&
           <NoLiveData id={`${id}-no-live-data`} message={msg.utilizationCardNoAttachedDisks()} />
         }
-        { vm.get('disks').size > 0 &&
+        { vm.get('disks').size > 0 && (
           <>
             <UtilizationCardDetails>
               <UtilizationCardDetailsCount id={`${id}-available`}>
@@ -87,7 +87,7 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
                 </UtilizationCardDetailsLine2>
               </UtilizationCardDetailsDesc>
             </UtilizationCardDetails>
-            { !hasDiskDetails &&
+            { !hasDiskDetails && (
               <DonutChart
                 id={`${id}-donut-chart`}
                 data={[
@@ -105,8 +105,8 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
                 subTitle={msg.utilizationCardUnitAllocated({ storageUnit: usedFormated.suffix })}
                 title={`${round(usedFormated.number, 0)}`}
               />
-            }
-            { isRunning && hasDiskDetails &&
+            )}
+            { isRunning && hasDiskDetails && (
               <div className={style['disk-fs-list']}>
                 <BarChart
                   id={`${id}-bar-chart`}
@@ -129,7 +129,7 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
                   thresholdError={90}
                 />
               </div>
-            }
+            )}
             { isRunning && !hasDiskDetails &&
               <NoHistoricData id={`${id}-no-historic-data`} message={msg.utilizationCardNoGuestAgent()} />
             }
@@ -141,7 +141,7 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
               <EmptyBlock />
             }
           </>
-        }
+        )}
       </CardBody>
     </UtilizationCard>
   )

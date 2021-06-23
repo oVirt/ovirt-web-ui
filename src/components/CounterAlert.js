@@ -44,11 +44,12 @@ class CounterAlert extends React.Component {
 
   render () {
     const { title, type, children } = this.props
-    return this.state.showAlert &&
+    return this.state.showAlert && (
       <Alert type={type} onDismiss={this.handleDismiss} className={style['text-align-left']}>
         {title}
         {children}
       </Alert>
+    )
   }
 }
 

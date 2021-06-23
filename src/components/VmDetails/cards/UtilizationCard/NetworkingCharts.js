@@ -46,42 +46,42 @@ const NetworkingCharts = ({ netStats, isRunning, id }) => {
         { isRunning && !haveNetworkStats &&
           <NoLiveData id={`${id}-no-live-data`} message={msg.utilizationNoNetStats()} />
         }
-        { isRunning && haveNetworkStats &&
-        <>
-          <UtilizationCardDetails>
-            <UtilizationCardDetailsCount id={`${id}-available`}>{available}%</UtilizationCardDetailsCount>
-            <UtilizationCardDetailsDesc>
-              <UtilizationCardDetailsLine1>{msg.utilizationCardAvailable()}</UtilizationCardDetailsLine1>
-              <UtilizationCardDetailsLine2>{msg.utilizationCardOf100()}</UtilizationCardDetailsLine2>
-            </UtilizationCardDetailsDesc>
-          </UtilizationCardDetails>
-          <DonutChart
-            id={`${id}-donut-chart`}
-            data={[
-              {
-                x: msg.utilizationCardLegendUsedP(),
-                y: used,
-                label: `${msg.utilizationCardLegendUsed()}: ${used}%`,
-              },
-              {
-                x: msg.utilizationCardLegendAvailableP(),
-                y: available,
-                label: `${msg.utilizationCardAvailable()}: ${available}%`,
-              },
-            ]}
-            subTitle={msg.utilizationCardLegendUsedP()}
-            title={`${used}`}
-          />
-          { history.length === 0 && <NoHistoricData id={`${id}-no-historic-data`} /> }
-          { history.length > 0 &&
-            <AreaChart
-              id={`${id}-history-chart`}
-              data={history.map((item, i) => ({ x: i, y: item, name: 'cpu' }))}
-              labels={datum => `${datum.y}%`}
+        { isRunning && haveNetworkStats && (
+          <>
+            <UtilizationCardDetails>
+              <UtilizationCardDetailsCount id={`${id}-available`}>{available}%</UtilizationCardDetailsCount>
+              <UtilizationCardDetailsDesc>
+                <UtilizationCardDetailsLine1>{msg.utilizationCardAvailable()}</UtilizationCardDetailsLine1>
+                <UtilizationCardDetailsLine2>{msg.utilizationCardOf100()}</UtilizationCardDetailsLine2>
+              </UtilizationCardDetailsDesc>
+            </UtilizationCardDetails>
+            <DonutChart
+              id={`${id}-donut-chart`}
+              data={[
+                {
+                  x: msg.utilizationCardLegendUsedP(),
+                  y: used,
+                  label: `${msg.utilizationCardLegendUsed()}: ${used}%`,
+                },
+                {
+                  x: msg.utilizationCardLegendAvailableP(),
+                  y: available,
+                  label: `${msg.utilizationCardAvailable()}: ${available}%`,
+                },
+              ]}
+              subTitle={msg.utilizationCardLegendUsedP()}
+              title={`${used}`}
             />
-          }
-        </>
-        }
+            { history.length === 0 && <NoHistoricData id={`${id}-no-historic-data`} /> }
+            { history.length > 0 && (
+              <AreaChart
+                id={`${id}-history-chart`}
+                data={history.map((item, i) => ({ x: i, y: item, name: 'cpu' }))}
+                labels={datum => `${datum.y}%`}
+              />
+            )}
+          </>
+        )}
       </CardBody>
     </UtilizationCard>
   )
