@@ -42,7 +42,7 @@ const enableResetToDefaultSetting = ({ defaultValues = {}, currentValues = {} })
 }
 
 const Settings = ({
- draftValues, onSave, lastTransactionId, onCancel,
+  draftValues, onSave, lastTransactionId, onCancel,
   translatedLabels, baseValues, sentValues, currentValues,
   resetBaseValues, children, onReset, defaultValues,
 }) => {

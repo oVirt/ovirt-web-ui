@@ -229,7 +229,7 @@ const OvirtApi = {
     return httpPost({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/start`,
       input: '{}',
-})
+    })
   },
   suspend ({ vmId }: VmIdType): Promise<Object> {
     assertLogin({ methodName: 'suspend' })
@@ -305,7 +305,7 @@ const OvirtApi = {
     return httpGet({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/graphicsconsoles/${consoleId}`,
       custHeaders: { Accept: 'application/x-virt-viewer', Filter: Selectors.getFilter() },
-})
+    })
   },
 
   consoleProxyTicket ({ vmId, consoleId }: { vmId: string, consoleId: string }): Promise<Object> {

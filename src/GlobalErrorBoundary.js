@@ -12,11 +12,11 @@ class GlobalErrorBoundary extends React.Component {
 
     this.reloadMsg = (locale) => {
       this.setState(({ msgContextState }) => ({
- msgContextState: {
-        msg: createMessages(locale),
-        locale,
-        reloadMsg: msgContextState.reloadMsg,
-      },
+        msgContextState: {
+          msg: createMessages(locale),
+          locale,
+          reloadMsg: msgContextState.reloadMsg,
+        },
       }))
     }
 

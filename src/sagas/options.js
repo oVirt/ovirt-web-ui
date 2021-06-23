@@ -149,7 +149,7 @@ function* saveRemoteOption ([name, value]: any): any | ResultType {
     name: parsedName,
     value: parsedValue,
     change: name,
-})
+  })
 }
 
 function* saveLocale ([localePropName, submittedLocale]: any, persistLocale: boolean): any | ResultType {
@@ -168,20 +168,20 @@ function* saveLocale ([localePropName, submittedLocale]: any, persistLocale: boo
 }
 
 function* saveGlobalOptions ({
- payload: {
-  sshKey,
-  showNotifications,
-  notificationSnoozeDuration,
-  language,
-  refreshInterval,
-  persistLocale,
-  preferredConsole,
-  fullScreenVnc,
-  ctrlAltEndVnc,
-  fullScreenSpice,
-  ctrlAltEndSpice,
-  smartcardSpice,
-}, meta: { transactionId },
+  payload: {
+    sshKey,
+    showNotifications,
+    notificationSnoozeDuration,
+    language,
+    refreshInterval,
+    persistLocale,
+    preferredConsole,
+    fullScreenVnc,
+    ctrlAltEndVnc,
+    fullScreenSpice,
+    ctrlAltEndSpice,
+    smartcardSpice,
+  }, meta: { transactionId },
 }: SaveGlobalOptionsActionType): Generator<any, any, any> {
   const { ssh, locale, shouldPersistLocale, ...standardRemoteOptions } = yield all({
     ssh: call(saveSSHKey, ...Object.entries({ sshKey })),

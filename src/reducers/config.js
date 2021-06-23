@@ -144,13 +144,13 @@ const config = actionReducer(initialState, {
     return state.set('currentPage', Object.assign({}, payload))
   },
   [SET_CPU_TOPOLOGY_OPTIONS] (state, {
- payload: {
-    maxNumOfSockets,
-    maxNumOfCores,
-    maxNumOfThreads,
-    maxNumOfVmCpusPerArch,
-  },
-}) {
+    payload: {
+      maxNumOfSockets,
+      maxNumOfCores,
+      maxNumOfThreads,
+      maxNumOfVmCpusPerArch,
+    },
+  }) {
     return state.set('cpuOptions', Immutable.fromJS({
       maxNumOfSockets,
       maxNumOfCores,
@@ -159,11 +159,11 @@ const config = actionReducer(initialState, {
     }))
   },
   [SET_DEFAULT_TIMEZONE] (state, {
- payload: {
-    defaultGeneralTimezone,
-    defaultWindowsTimezone,
-  },
-}) {
+    payload: {
+      defaultGeneralTimezone,
+      defaultWindowsTimezone,
+    },
+  }) {
     return state.merge({
       defaultGeneralTimezone,
       defaultWindowsTimezone,
