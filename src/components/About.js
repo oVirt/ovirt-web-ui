@@ -58,7 +58,7 @@ class AboutDialog extends React.Component {
     })
 
     return (
-      <React.Fragment>
+      <>
         <a href='#' id='about-modal' onClick={() => this.setState({ openModal: true })}>{msg.about()}</a>
         { this.state.openModal &&
           <Modal id={`${idPrefix}-modal`} contentClassName='about-modal-pf obrand_aboutBackground' onHide={() => this.setState({ openModal: false })} show>
@@ -93,7 +93,7 @@ class AboutDialog extends React.Component {
             </Modal.Footer>
           </Modal>
         }
-      </React.Fragment>
+      </>
     )
   }
 }

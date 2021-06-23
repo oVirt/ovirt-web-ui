@@ -24,7 +24,7 @@ const ConfirmationModal = ({ show, title, confirm, body, subContent, onClose, ex
       <Modal.Body>
         {
           typeof body === 'string'
-            ? <React.Fragment>
+            ? <>
               <Icon type='pf' name='warning-triangle-o' />
               <div id={accessibleDescription}>
                 <p className='lead'>
@@ -36,7 +36,7 @@ const ConfirmationModal = ({ show, title, confirm, body, subContent, onClose, ex
                     : subContent
                 }
               </div>
-            </React.Fragment>
+            </>
             : body
         }
       </Modal.Body>

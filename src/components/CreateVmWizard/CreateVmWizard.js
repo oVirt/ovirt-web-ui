@@ -537,7 +537,7 @@ class CreateVmWizard extends React.Component {
     const enableGoBack = activeStepIndex > 0 && !isPrimaryClose && this.wizardAllowClickBack()
     const enableGoForward = (isReviewStep && !vmCreateWorking) || this.wizardAllowClickNext()
 
-    return <React.Fragment>
+    return <>
       {!showCloseWizardDialog && <Wizard
         dialogClassName='modal-lg wizard-pf'
         show={this.props.show}
@@ -595,7 +595,7 @@ class CreateVmWizard extends React.Component {
         }}
         onNo={this.hideCloseWizardDialog}
       />
-    </React.Fragment>
+    </>
   }
 }
 

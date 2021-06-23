@@ -55,7 +55,7 @@ const Col = ({
         maxWidth: `${widthPercent}%`,
       }
 
-  return <React.Fragment>
+  return <>
     { offset > 0 &&
       <div
         style={{
@@ -73,7 +73,7 @@ const Col = ({
     >
       {children}
     </div>
-  </React.Fragment>
+  </>
 }
 Col.propTypes = {
   children: PropTypes.node.isRequired,

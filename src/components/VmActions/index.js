@@ -340,7 +340,7 @@ class VmActions extends React.Component {
         confirm={{ title: msg.remove(), type: 'danger', onClick: () => onRemove({ preserveDisks: this.state.removePreserveDisks }) }}
       />)
 
-    return (<React.Fragment>
+    return (<>
       <div className={`actions-line ${style['actions-toolbar']} visible-xs`} id={`${idPrefix}Kebab`}>
         <DropdownKebab id={`${idPrefix}Kebab-kebab`} pullRight>
           { actions.map(action => <ActionMenuItemWrapper key={action.id} {...action} />) }
@@ -367,7 +367,7 @@ class VmActions extends React.Component {
           id={`${idPrefix}-button-remove`}
         />
       </div>
-    </React.Fragment>
+    </>
     )
   }
 }

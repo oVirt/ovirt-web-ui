@@ -79,7 +79,7 @@ const VmsListToolbar = ({ match, vms, onRemoveFilter, onClearFilters }) => {
           }
         </h5>
         { vms.get('filters').size > 0 &&
-          <React.Fragment>
+          <>
             <Filter.ActiveLabel>{msg.activeFilters()}</Filter.ActiveLabel>
             <Filter.List>
               {[].concat(...vms.get('filters').map(mapLabels).toList().toJS())}
@@ -93,7 +93,7 @@ const VmsListToolbar = ({ match, vms, onRemoveFilter, onClearFilters }) => {
             >
               {msg.clearAllFilters()}
             </a>
-          </React.Fragment>
+          </>
         }
       </Toolbar.Results>
     </Toolbar>)

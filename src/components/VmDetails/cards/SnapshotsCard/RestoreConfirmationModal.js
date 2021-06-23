@@ -40,7 +40,7 @@ class RestoreConfirmationModal extends React.Component {
     const minDescription = escapeHtml(getMinimizedString(snapshot.get('description'), MAX_DESCRIPTION_SIZE))
 
     return (
-      <React.Fragment>
+      <>
         { trigger({ onClick: this.open })}
         <MessageDialog
           id={id}
@@ -68,7 +68,7 @@ class RestoreConfirmationModal extends React.Component {
             </div>
           }
         />
-      </React.Fragment>
+      </>
     )
   }
 }

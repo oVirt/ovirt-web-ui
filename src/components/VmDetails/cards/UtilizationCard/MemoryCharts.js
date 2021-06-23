@@ -52,7 +52,7 @@ const MemoryCharts = ({ memoryStats, isRunning, id }) => {
       <CardBody>
         { !isRunning && <NoLiveData id={`${id}-no-live-data`} /> }
         { isRunning &&
-        <React.Fragment>
+        <>
           <UtilizationCardDetails>
             <UtilizationCardDetailsCount id={`${id}-available`}>
               {msg.utilizationCardUnitNumber({
@@ -95,7 +95,7 @@ const MemoryCharts = ({ memoryStats, isRunning, id }) => {
               labels={datum => `${datum.y}%`}
             />
           }
-        </React.Fragment>
+        </>
         }
       </CardBody>
     </UtilizationCard>

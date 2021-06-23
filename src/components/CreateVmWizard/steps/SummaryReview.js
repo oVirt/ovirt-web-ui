@@ -35,20 +35,20 @@ const ReviewBasic = ({ id, dataCenters, clusters, isos, templates, operatingSyst
   const { msg } = useContext(MsgContext)
   const vmOS = operatingSystems.get(basic.operatingSystemId)
 
-  return <React.Fragment>
+  return <>
     <Item id={`${id}-name`} label={msg.name()}>{basic.name}</Item>
     { basic.description && <Item id={`${id}-desc`} label={msg.description()}>{basic.description}</Item> }
     <Item id={`${id}-datacenter`} label={msg.dataCenter()}>{dataCenters.find(dc => dc.id === basic.dataCenterId).name}</Item>
     <Item id={`${id}-cluster`} label={msg.cluster()}>{clusters.get(basic.clusterId).get('name')}</Item>
 
     { basic.provisionSource === 'iso' &&
-      <React.Fragment>
+      <>
         <Item id={`${id}-provision-source`} label={msg.provisionSource()}>{msg.createVmWizardSourceISO()}</Item>
         <Item id={`${id}-iso`} label={msg.cd()}>{isos[basic.isoImage]}</Item>
-      </React.Fragment>
+      </>
     }
     { basic.provisionSource === 'template' &&
-      <React.Fragment>
+      <>
         <Item id={`${id}-provision-source`} label={msg.provisionSource()}>{msg.createVmWizardSourceTemplate()}</Item>
         <Item id={`${id}-template`} label={msg.template()}>
           { templateNameRenderer(templates.get(basic.templateId)) }
@@ -56,7 +56,7 @@ const ReviewBasic = ({ id, dataCenters, clusters, isos, templates, operatingSyst
             <Label id={`${id}-template-clone`} bsStyle='info'>clone</Label>
           }
         </Item>
-      </React.Fragment>
+      </>
     }
 
     <Item id={`${id}-timezone`} label={msg.timezone()}>{basic.timeZone.name}</Item>
@@ -81,7 +81,7 @@ const ReviewBasic = ({ id, dataCenters, clusters, isos, templates, operatingSyst
         <InfoCircleIcon className={style['info-circle-icon']} />
       </Tooltip>    </Item>
     <Item id={`${id}-optimizedFor`} label={msg.optimizedFor()}>{optimizedForMap(msg)[basic.optimizedFor].value}</Item>
-  </React.Fragment>
+  </>
 }
 ReviewBasic.propTypes = {
   id: PropTypes.string,
@@ -106,7 +106,7 @@ const ReviewNetworking = ({ id, vnicProfiles, network }) => {
     { network.length === 0 && <div>{msg.createVmNetEmptyInfo()}</div> }
 
     { network.length > 0 &&
-      <React.Fragment>
+      <>
         { network.map(nic =>
           <div key={nic.id}>
             <div className={style['review-entity-info']}>
@@ -120,7 +120,7 @@ const ReviewNetworking = ({ id, vnicProfiles, network }) => {
             </div>
           </div>
         )}
-      </React.Fragment>
+      </>
     }
   </Item>
 }
@@ -180,7 +180,7 @@ const ReviewAdvanced = ({ id, operatingSystems, basic }) => {
   return <Item id={`${id}-advanced-options`} label={'Advanced'}>
     { basic.startOnCreation && <div id={`${id}-startOnCreation`}>{msg.startVmOnCreation()}</div> }
     { basic.cloudInitEnabled && !vmOS.get('isWindows') &&
-      <React.Fragment>
+      <>
         <div>{msg.createVmWizardReviewAdvancedCloudInit()}</div>
         <div className={style['review-subsection']}>
           { basic.initHostname &&
@@ -190,10 +190,10 @@ const ReviewAdvanced = ({ id, operatingSystems, basic }) => {
             <Item id={`${id}-cloud-init-sshkey`} label={msg.sshAuthorizedKeys()}>{ basic.initSshKeys }</Item>
           }
         </div>
-      </React.Fragment>
+      </>
     }
     { basic.cloudInitEnabled && vmOS.get('isWindows') &&
-      <React.Fragment>
+      <>
         <div>{msg.createVmWizardReviewAdvancedSysprep()}</div>
         <div className={style['review-subsection']}>
           { basic.initHostname &&
@@ -213,7 +213,7 @@ const ReviewAdvanced = ({ id, operatingSystems, basic }) => {
             </Item>
           }
         </div>
-      </React.Fragment>
+      </>
     }
   </Item>
 }

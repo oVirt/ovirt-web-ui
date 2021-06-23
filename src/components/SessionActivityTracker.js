@@ -77,10 +77,10 @@ class SessionActivityTracker extends React.Component {
         onHide={onLogout}
         primaryContent={<p className='lead'>{ msg.sessionExpired() }</p>}
         secondaryContent={
-          <React.Fragment>
+          <>
             <p>{ msg.logOutInSecondsSecondary({ seconds: this.state.counter }) }</p>
             <p>{ msg.continueSessionSecondary() }</p>
-          </React.Fragment>
+          </>
         }
         primaryActionButtonContent={msg.continueSessionBtn()}
         secondaryActionButtonContent={msg.logOut()}

@@ -65,7 +65,7 @@ const FieldRow = ({
     `}
   >
     { vertical &&
-      <React.Fragment>
+      <>
         <Col offset={labelCols} cols={fieldCols} className={style['col-data']} id={id}>
           <div className={style['col-label-vertical']}>
             {label}
@@ -75,10 +75,10 @@ const FieldRow = ({
             <HelpBlock>{errorMessage}</HelpBlock>
           }
         </Col>
-      </React.Fragment>
+      </>
     }
     { !vertical &&
-      <React.Fragment>
+      <>
         <Col cols={labelCols} className={`control-label ${style['col-label']}`}>
           {label}
           { tooltip &&
@@ -94,7 +94,7 @@ const FieldRow = ({
             <HelpBlock>{errorMessage}</HelpBlock>
           }
         </Col>
-      </React.Fragment>
+      </>
     }
   </Row>
 )
@@ -583,7 +583,7 @@ class BasicSettings extends React.Component {
         </FieldRow>
 
         { enableCloudInit &&
-          <React.Fragment>
+          <>
             <SubHeading>{msg.cloudInitOptions()}</SubHeading>
 
             <FieldRow
@@ -610,11 +610,11 @@ class BasicSettings extends React.Component {
                 onChange={e => this.handleChange('initSshKeys', e.target.value)}
               />
             </FieldRow>
-          </React.Fragment>
+          </>
         }
 
         { enableSysPrep &&
-          <React.Fragment>
+          <>
             <SubHeading>{msg.sysPrepOptions()}</SubHeading>
 
             <FieldRow
@@ -671,7 +671,7 @@ class BasicSettings extends React.Component {
                 onChange={e => this.handleChange('initCustomScript', e.target.value)}
               />
             </FieldRow>
-          </React.Fragment>
+          </>
         }
       </Grid>
 

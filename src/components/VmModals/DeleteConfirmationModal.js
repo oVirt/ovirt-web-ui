@@ -45,7 +45,7 @@ class DeleteConfirmationModal extends React.Component {
     const primaryButtonStyle = severity === 'normal' ? 'primary' : 'danger'
 
     return (
-      <React.Fragment>
+      <>
         { trigger({ onClick: this.handleTriggerClick }) }
         <MessageDialog
           id={id}
@@ -61,7 +61,7 @@ class DeleteConfirmationModal extends React.Component {
           primaryContent={<div id={`${id}-lead`} className='lead'>{primary}</div>}
           secondaryContent={secondary}
         />
-      </React.Fragment>
+      </>
     )
   }
 }

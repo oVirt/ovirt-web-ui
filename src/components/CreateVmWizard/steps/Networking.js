@@ -37,7 +37,7 @@ const NIC_INTERFACE_DEFAULT = 'virtio'
 export const NicNameWithLabels = ({ id, nic }) => {
   const { msg } = useContext(MsgContext)
   const idPrefix = `${id}-nic-${nic.id}`
-  return <React.Fragment>
+  return <>
     <span id={`${idPrefix}-name`}>{ nic.name }</span>
     { nic.isFromTemplate &&
       <Tooltip id={`${idPrefix}-template-defined-badge`} tooltip={msg.templateDefined()}>
@@ -46,7 +46,7 @@ export const NicNameWithLabels = ({ id, nic }) => {
         </Label>
       </Tooltip>
     }
-  </React.Fragment>
+  </>
 }
 NicNameWithLabels.propTypes = {
   id: PropTypes.string,
@@ -255,7 +255,7 @@ class Networking extends React.Component {
               const templateDefined = rowData.isFromTemplate
               const kebabId = `${idPrefix}-kebab-${rowData.name}`
 
-              return <React.Fragment>
+              return <>
                 { hideKebab && <Table.Cell /> }
 
                 { templateDefined &&
@@ -292,7 +292,7 @@ class Networking extends React.Component {
                     </Tooltip>
                   </Table.Cell>
                 }
-              </React.Fragment>
+              </>
             },
           ],
         },
@@ -444,7 +444,7 @@ class Networking extends React.Component {
     this.components = this.components || components // if the table should (re)render the value of this.components should be undefined
 
     return <div className={style['settings-container']} id={idPrefix}>
-      { nicList.length === 0 && <React.Fragment>
+      { nicList.length === 0 && <>
         <EmptyState>
           <EmptyState.Icon />
           <EmptyState.Title>{msg.createVmNetEmptyTitle()}</EmptyState.Title>
@@ -455,9 +455,9 @@ class Networking extends React.Component {
             </Button>
           </EmptyState.Action>
         </EmptyState>
-      </React.Fragment> }
+      </> }
 
-      { nicList.length > 0 && <React.Fragment>
+      { nicList.length > 0 && <>
         <div className={style['action-buttons']}>
           <Button bsStyle='default' disabled={!enableCreate} onClick={this.onCreateNic}>
             {msg.nicActionCreateNew()}
@@ -481,7 +481,7 @@ class Networking extends React.Component {
             />
           </Table.PfProvider>
         </div>
-      </React.Fragment> }
+      </> }
     </div>
   }
 }

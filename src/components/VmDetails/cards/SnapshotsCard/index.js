@@ -28,7 +28,7 @@ const Snapshots = ({
   const isVmLocked = !!snapshots.find(snapshot => snapshot.get('status') === 'locked')
   const isActionDisabled = isVmInPreview || beingCreated || beingRestored || beingDeleted || isVmLocked || !canUserManipulateSnapshot
   return (
-    <React.Fragment>
+    <>
       { canUserManipulateSnapshot && <div className={style['snapshot-create']}>
         <NewSnapshotModal vmId={vmId} disabled={isActionDisabled} idPrefix={`${idPrefix}-new-snapshot`} isVmRunning={isVmRunning} />
       </div> }
@@ -45,7 +45,7 @@ const Snapshots = ({
           />
         ))
       }
-    </React.Fragment>
+    </>
   )
 }
 Snapshots.propTypes = {

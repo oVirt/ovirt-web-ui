@@ -47,7 +47,7 @@ const NetworkingCharts = ({ netStats, isRunning, id }) => {
           <NoLiveData id={`${id}-no-live-data`} message={msg.utilizationNoNetStats()} />
         }
         { isRunning && haveNetworkStats &&
-        <React.Fragment>
+        <>
           <UtilizationCardDetails>
             <UtilizationCardDetailsCount id={`${id}-available`}>{available}%</UtilizationCardDetailsCount>
             <UtilizationCardDetailsDesc>
@@ -80,7 +80,7 @@ const NetworkingCharts = ({ netStats, isRunning, id }) => {
               labels={datum => `${datum.y}%`}
             />
           }
-        </React.Fragment>
+        </>
         }
       </CardBody>
     </UtilizationCard>

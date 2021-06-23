@@ -24,11 +24,11 @@ const HotPlugChangeConfirmationModal = ({ show, onCancel, onApplyLater, onApplyN
 
     primaryAction={noop}
     primaryActionButtonContent=''
-    footer={<React.Fragment>
+    footer={<>
       <Button onClick={onCancel}>{msg.cancel()}</Button>
       <Button onClick={onApplyLater}>{msg.hotPlugConfirmApplyAfterRestart()}</Button>
       <Button bsStyle='primary' onClick={onApplyNow}>{msg.hotPlugConfirmApplyNow()}</Button>
-    </React.Fragment>}
+    </>}
   />
 }
 

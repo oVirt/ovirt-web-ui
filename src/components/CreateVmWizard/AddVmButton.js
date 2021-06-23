@@ -40,7 +40,7 @@ class AddVmButton extends React.Component {
     }
 
     return (
-      <React.Fragment>
+      <>
         <Button
           id={`${id}-button`}
           bsStyle='primary'
@@ -54,7 +54,7 @@ class AddVmButton extends React.Component {
           show={this.state.showCreateWizard}
           onHide={this.closeCreateWizard}
         />
-      </React.Fragment>
+      </>
     )
   }
 }

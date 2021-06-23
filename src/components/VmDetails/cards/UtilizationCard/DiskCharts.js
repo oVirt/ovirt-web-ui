@@ -69,7 +69,7 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
           <NoLiveData id={`${id}-no-live-data`} message={msg.utilizationCardNoAttachedDisks()} />
         }
         { vm.get('disks').size > 0 &&
-          <React.Fragment>
+          <>
             <UtilizationCardDetails>
               <UtilizationCardDetailsCount id={`${id}-available`}>
                 {msg.utilizationCardUnitNumber({
@@ -140,7 +140,7 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
             { !(isRunning && !hasDiskDetails) &&
               <EmptyBlock />
             }
-          </React.Fragment>
+          </>
         }
       </CardBody>
     </UtilizationCard>

@@ -12,7 +12,7 @@ const CloudInitForm = ({ idPrefix, vm, onChange }) => {
   const cloudInitHostName = vm.getIn(['cloudInit', 'hostName'])
   const cloudInitSshAuthorizedKeys = vm.getIn(['cloudInit', 'sshAuthorizedKeys'])
   return (
-    <React.Fragment>
+    <>
       <FormGroup controlId={`${idPrefix}-cloud-init-hostname`}>
         <ControlLabel>
           {msg.hostName()}
@@ -33,7 +33,7 @@ const CloudInitForm = ({ idPrefix, vm, onChange }) => {
           onChange={e => onChange('cloudInitSshAuthorizedKeys', e.target.value)}
         />
       </FormGroup>
-    </React.Fragment>
+    </>
   )
 }
 

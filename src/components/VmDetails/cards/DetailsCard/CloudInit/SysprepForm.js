@@ -18,7 +18,7 @@ const SysprepForm = ({ idPrefix, vm, onChange, lastInitTimezone }) => {
   const enableInitTimezone = !!vm.getIn(['cloudInit', 'timezone']) // true if sysprep timezone set or Configure Timezone checked
 
   return (
-    <React.Fragment>
+    <>
       <FormGroup controlId={`${idPrefix}-cloud-init-hostname`}>
         <ControlLabel>
           {msg.hostName()}
@@ -71,7 +71,7 @@ const SysprepForm = ({ idPrefix, vm, onChange, lastInitTimezone }) => {
           onChange={e => onChange('cloudInitCustomScript', e.target.value)}
         />
       </FormGroup>
-    </React.Fragment>
+    </>
   )
 }
 

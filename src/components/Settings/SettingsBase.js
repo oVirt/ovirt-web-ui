@@ -37,7 +37,7 @@ Item.propTypes = {
 }
 
 const Section = ({ name, section }) => (
-  <React.Fragment>
+  <>
     <h3>
       <a id={name} />
       {section.title}
@@ -53,7 +53,7 @@ const Section = ({ name, section }) => (
         </Col>
       </FormGroup>
     )) }
-  </React.Fragment>
+  </>
 )
 
 Section.propTypes = {

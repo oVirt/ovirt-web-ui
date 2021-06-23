@@ -35,10 +35,10 @@ class Action extends React.Component {
       ? React.cloneElement(confirmation, { show: this.state.showModal, onClose: this.handleClose })
       : null
 
-    return <React.Fragment>
+    return <>
       {trigger}
       {confirmationDialog}
-    </React.Fragment>
+    </>
   }
 }
 Action.propTypes = {
@@ -145,7 +145,7 @@ const ActionMenuItemWrapper = ({ id, className, items, confirmation, actionDisab
         actionDisabled
       />
     } else {
-      return <React.Fragment>
+      return <>
         <MenuItem divider />
         {
           items.filter(i => i !== null && !i.actionDisabled).map(
@@ -153,7 +153,7 @@ const ActionMenuItemWrapper = ({ id, className, items, confirmation, actionDisab
           )
         }
         <MenuItem divider />
-      </React.Fragment>
+      </>
     }
   }
 

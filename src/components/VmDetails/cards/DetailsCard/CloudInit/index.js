@@ -10,7 +10,7 @@ const CloudInit = ({ idPrefix, vm, isWindows, onChange, lastInitTimezone }) => {
   const { msg } = useContext(MsgContext)
   const cloudInitEnabled = vm.getIn(['cloudInit', 'enabled'])
   return (
-    <React.Fragment>
+    <>
       <FieldRow label={isWindows ? msg.sysprep() : msg.cloudInit()} id={`${idPrefix}-cloud-init`}>
         <Switch
           id={`${idPrefix}-cloud-init-edit`}
@@ -25,7 +25,7 @@ const CloudInit = ({ idPrefix, vm, isWindows, onChange, lastInitTimezone }) => {
             : <CloudInitForm idPrefix={idPrefix} vm={vm} onChange={onChange} />
         }
       </div> }
-    </React.Fragment>
+    </>
   )
 }
 

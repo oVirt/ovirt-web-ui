@@ -20,7 +20,7 @@ const MarkAsDefault = withMsg(({ msg, value, isDefault }) => {
   if (!isDefault) {
     return value
   }
-  return (<React.Fragment>{value}{NOBREAK_SPACE}<i>{msg.defaultOption()}</i></React.Fragment>
+  return (<>{value}{NOBREAK_SPACE}<i>{msg.defaultOption()}</i></>
   )
 })
 

@@ -24,13 +24,13 @@ const NextRunChangeConfirmationModal = ({ show, onCancel, onSave, onSaveAndResta
 
     primaryAction={noop}
     primaryActionButtonContent=''
-    footer={<React.Fragment>
+    footer={<>
       <Button onClick={onCancel}>{msg.cancel()}</Button>
       <Button onClick={onSave}>{msg.nextRunConfirmActionSave()}</Button>
       <Button bsStyle='primary' onClick={onSaveAndRestart}>
         {msg.nextRunConfrimActionSaveRestart()}
       </Button>
-    </React.Fragment>}
+    </>}
   />
 }
 

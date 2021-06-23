@@ -110,7 +110,7 @@ const Settings = ({
     }
   }, [partialSuccess, completeFailure, fullSuccess, pendingChanges])
 
-  return <React.Fragment>
+  return <>
     <NavigationPrompt when={(currentLocation, nextLocation) => !!pendingChanges.length}>
       {({ isActive, onConfirm, onCancel }) => (
         <NavigationConfirmationModal show={isActive} onYes={onConfirm} onNo={onCancel} />
@@ -153,7 +153,7 @@ const Settings = ({
       translatedLabels={translatedLabels}
     />
     {children}
-  </React.Fragment>
+  </>
 }
 Settings.propTypes = {
   draftValues: PropTypes.object.isRequired,

@@ -164,7 +164,7 @@ class NicEditor extends Component {
         (vmStatus === 'down' || !this.props.nic.plugged)
       )
 
-    return <React.Fragment>
+    return <>
       { trigger({ onClick: this.open }) }
 
       <Modal
@@ -282,7 +282,7 @@ class NicEditor extends Component {
           </Button>
         </Modal.Footer>
       </Modal>
-    </React.Fragment>
+    </>
   }
 }
 

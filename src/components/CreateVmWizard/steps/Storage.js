@@ -35,7 +35,7 @@ import { Tooltip, InfoTooltip } from '_/components/tooltips'
 export const DiskNameWithLabels = ({ id, disk }) => {
   const { msg } = useContext(MsgContext)
   const idPrefix = `${id}-disk-${disk.id}`
-  return <React.Fragment>
+  return <>
     <span id={`${idPrefix}-name`}>{ disk.name }</span>
     { disk.isFromTemplate &&
       <Tooltip id={`${idPrefix}-template-defined-badge`} tooltip={msg.templateDefined()}>
@@ -49,7 +49,7 @@ export const DiskNameWithLabels = ({ id, disk }) => {
         { msg.diskLabelBootable() }
       </Label>
     }
-  </React.Fragment>
+  </>
 }
 DiskNameWithLabels.propTypes = {
   id: PropTypes.string,
@@ -231,9 +231,9 @@ class Storage extends React.Component {
           formatters: [inlineEditFormatter],
         },
         valueView: (value, { rowData }) => {
-          return <React.Fragment>
+          return <>
             { rowData.sized.value } { rowData.sized.unit }
-          </React.Fragment>
+          </>
         },
         editView: (value, { rowData }) => {
           const row = this.state.editing[rowData.id]
@@ -285,13 +285,13 @@ class Storage extends React.Component {
             const storageDomainList = createStorageDomainList({ storageDomains, dataCenterId, includeUsage: true, locale, msg })
 
             if (storageDomainList.length === 0) {
-              return <React.Fragment>
+              return <>
                 {msg.createVmStorageNoStorageDomainAvailable()}
                 <InfoTooltip
                   id={`${idPrefix}-${rowData.id}-storage-domain-na-tooltip`}
                   tooltip={msg.createVmStorageNoStorageDomainAvailableTooltip()}
                 />
-              </React.Fragment>
+              </>
             } else {
               if (!sd.isOk) {
                 storageDomainList.unshift({ id: '_', value: `-- ${msg.createVmStorageSelectStorageDomain()} --` })
@@ -307,14 +307,14 @@ class Storage extends React.Component {
             }
           }
 
-          return <React.Fragment>
+          return <>
             { id === '_'
               ? `-- ${msg.createVmStorageSelectStorageDomain()} --`
               : sd.isOk
                 ? sd.name
                 : msg.createVmStorageUnknownStorageDomain()
             }
-          </React.Fragment>
+          </>
         },
         editView: (value, { rowData }) => {
           const { storageDomains, dataCenterId, locale } = props
@@ -392,7 +392,7 @@ class Storage extends React.Component {
               const templateDefined = rowData.isFromTemplate
               const kebabId = `${idPrefix}-kebab-${rowData.name}`
 
-              return <React.Fragment>
+              return <>
                 { hideKebab && <Table.Cell /> }
 
                 { templateDefined &&
@@ -429,7 +429,7 @@ class Storage extends React.Component {
                     </Tooltip>
                   </Table.Cell>
                 }
-              </React.Fragment>
+              </>
             },
           ],
         },
@@ -697,7 +697,7 @@ class Storage extends React.Component {
     }
 
     return <div className={style['settings-container']} id={idPrefix}>
-      { diskList.length === 0 && <React.Fragment>
+      { diskList.length === 0 && <>
         <EmptyState>
           <EmptyState.Icon />
           <EmptyState.Title>{msg.createVmStorageEmptyTitle()}</EmptyState.Title>
@@ -715,9 +715,9 @@ class Storage extends React.Component {
             </EmptyState.Help>
           }
         </EmptyState>
-      </React.Fragment> }
+      </> }
 
-      { diskList.length > 0 && <React.Fragment>
+      { diskList.length > 0 && <>
         <div className={style['action-buttons']}>
           <Button bsStyle='default' disabled={!enableCreate} onClick={this.onCreateDisk}>
             {msg.diskActionCreateNew()}
@@ -741,7 +741,7 @@ class Storage extends React.Component {
             />
           </Table.PfProvider>
         </div>
-      </React.Fragment> }
+      </> }
     </div>
   }
 }

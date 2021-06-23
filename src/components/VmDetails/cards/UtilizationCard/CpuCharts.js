@@ -39,7 +39,7 @@ const CpuCharts = ({ cpuStats, isRunning, id, vcpus }) => {
       <CardBody>
         { !isRunning && <NoLiveData id={`${id}-no-live-data`} /> }
         { isRunning &&
-        <React.Fragment>
+        <>
           <UtilizationCardDetails>
             <UtilizationCardDetailsCount id={`${id}-available`}>{cpuAvailable}%</UtilizationCardDetailsCount>
             <UtilizationCardDetailsDesc>
@@ -74,7 +74,7 @@ const CpuCharts = ({ cpuStats, isRunning, id, vcpus }) => {
               labels={datum => `${datum.y}%`}
             />
           }
-        </React.Fragment>
+        </>
         }
       </CardBody>
     </UtilizationCard>

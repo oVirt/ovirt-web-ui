@@ -291,7 +291,7 @@ class DiskImageEditor extends Component {
     const currentBootableDisk = vm.get('disks').find(disk => disk.get('bootable'))
     const showBootableChangeAlert = currentBootableDisk && !isThisDiskCurrentBootable && this.state.values.bootable
 
-    return <React.Fragment>
+    return <>
       { trigger({ onClick: this.open }) }
 
       <Modal
@@ -348,10 +348,10 @@ class DiskImageEditor extends Component {
             <FormGroup controlId={`${idPrefix}-size-edit`}>
               <LabelCol sm={3}>
                 { createMode &&
-                  <React.Fragment>
+                  <>
                     {msg.diskEditorSizeLabel()}
                     <InfoTooltip id={`${idPrefix}-size-edit-tooltip`} tooltip={msg.diskEditorSizeCreateInfoTooltip()} />
-                  </React.Fragment>
+                  </>
                 }
                 { !createMode && msg.diskEditorResizeLabel() }
               </LabelCol>
@@ -504,7 +504,7 @@ class DiskImageEditor extends Component {
           </Button>
         </Modal.Footer>
       </Modal>
-    </React.Fragment>
+    </>
   }
 }
 

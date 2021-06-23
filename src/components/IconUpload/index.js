@@ -57,7 +57,7 @@ class IconUpload extends React.Component {
       : null
 
     return (
-      <React.Fragment>
+      <>
         <dt>
           <FieldHelp content={msg.customIcon()} text={msg.icon()} />
         </dt>
@@ -82,7 +82,7 @@ class IconUpload extends React.Component {
           </button>
           {iconError}
         </dd>
-      </React.Fragment>
+      </>
     )
   }
 }

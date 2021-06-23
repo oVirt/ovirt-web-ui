@@ -751,7 +751,7 @@ class DetailsCard extends React.Component {
     // Memory
     const memorySize = vm.getIn(['memory', 'total'])
 
-    return <React.Fragment>
+    return <>
       <NextRunChangeConfirmationModal
         show={this.state.promptNextRunChanges}
         onCancel={this.handleNextRunOnCancel}
@@ -779,7 +779,7 @@ class DetailsCard extends React.Component {
       >
         {({ isEditing }) => {
           const isFullEdit = isEditing && canEditDetails
-          return <React.Fragment>
+          return <>
             {/* Regular options */}
             <Grid className={style['details-container']}>
               <Row>
@@ -792,7 +792,7 @@ class DetailsCard extends React.Component {
                       </FieldRow>
                     }
                     <FieldRow label={msg.ipAddress()} id={`${idPrefix}-ip`} >
-                      <React.Fragment>
+                      <>
                         { ip4Addresses.length === 0 && ip6Addresses.length === 0 &&
                           <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id={`${idPrefix}-ip-not-available`} />
                         }
@@ -810,7 +810,7 @@ class DetailsCard extends React.Component {
                             </EllipsisValue>
                           )
                         }
-                      </React.Fragment>
+                      </>
                     </FieldRow>
                     <FieldRow label={msg.fqdn()} id={`${idPrefix}-fqdn`}>
                       { <EllipsisValue tooltip={fqdn}>{fqdn}</EllipsisValue> || <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id={`${idPrefix}-fqdn-not-available`} /> }
@@ -1061,10 +1061,10 @@ class DetailsCard extends React.Component {
                 <Alert key={`user-message-${key}`} type='error' style={{ margin: '5px 0 0 0' }}>{buildMessageFromRecord(message.toJS(), msg)}</Alert>
               )
             }
-          </React.Fragment>
+          </>
         }}
       </BaseCard>
-    </React.Fragment>
+    </>
   }
 }
 
