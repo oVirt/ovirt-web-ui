@@ -125,26 +125,27 @@ module.exports = {
     'react/no-unsafe': 'warn',
     'react/jsx-uses-vars': 'warn',
     'react/jsx-uses-react': 'warn',
-    // 'react/jsx-fragments': [ 'warn', 'syntax' ],
+    'react/jsx-fragments': [ 'warn', 'syntax' ],
     'react/jsx-equals-spacing': [ 'error', 'never' ],
     'react/jsx-pascal-case': [ 'warn', { allowAllCaps: true, ignore: [] } ],
 
     // JSX formatting, indents and multiline rules:
-    // 'react/jsx-closing-tag-location': 'warn',
-    // 'react/jsx-closing-bracket-location': [ 'warn', 'line-aligned' ],
-    // 'react/jsx-indent': [ 'warn', 2, { checkAttributes: true, indentLogicalExpressions: true } ],
-    // 'react/jsx-wrap-multilines': [
-    //   'warn',
-    //   {
-    //     "declaration": "parens",
-    //     "assignment": "parens",
-    //     "return": "parens",
-    //     "arrow": "parens",
-    //     "condition": "ignore",
-    //     "logical": "ignore",
-    //     "prop": "ignore"
-    //   },
-    // ],
+    'react/jsx-closing-tag-location': 'warn',
+    'react/jsx-closing-bracket-location': [ 'warn', 'line-aligned' ],
+    'react/jsx-indent': [ 'warn', 2, { checkAttributes: true, indentLogicalExpressions: true } ],
+    'react/jsx-indent-props': [ 'warn', 2 ],
+    'react/jsx-wrap-multilines': [
+      'warn',
+      {
+        "declaration": "parens-new-line",
+        "assignment": "parens-new-line",
+        "return": "parens-new-line",
+        "arrow": "parens-new-line",
+        "condition": "parens-new-line",
+        "logical": "parens-new-line",
+        "prop": "parens-new-line"
+      },
+    ],
 
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
