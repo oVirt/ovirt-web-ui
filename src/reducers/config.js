@@ -141,7 +141,7 @@ const config = actionReducer(initialState, {
     return state.set('userGroups', groups)
   },
   [SET_CURRENT_PAGE] (state, { payload }) {
-    return state.set('currentPage', Object.assign({}, payload))
+    return state.set('currentPage', { ...payload })
   },
   [SET_CPU_TOPOLOGY_OPTIONS] (state, {
     payload: {
