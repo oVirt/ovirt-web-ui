@@ -235,6 +235,7 @@ export function* fetchAndPutSingleVm (action) {
     yield put(updateVms({ vms: [internalVm], keepSubResources: action.payload.shallowFetch }))
     yield fetchUnknownIcons({ vms: [internalVm] })
   }
+  return { internalVm, error }
 }
 
 export function* fetchPools (action) {

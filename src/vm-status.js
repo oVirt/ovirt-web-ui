@@ -37,3 +37,25 @@ export function canDeleteDisk (state) {
 export function canExternalService (state, fqdn) {
   return fqdn ? canRestart(state) : false
 }
+
+/* eslint-disable key-spacing, no-multi-spaces */
+export const statusToTooltipId = {
+  up                : { id: 'vmStatusIconTooltipUp' },
+  powering_up       : { id: 'vmStatusIconTooltipPoweringUp' },
+  down              : { id: 'vmStatusIconTooltipDown' },
+  paused            : { id: 'vmStatusIconTooltipPaused' },
+  suspended         : { id: 'vmStatusIconTooltipSuspended(' },
+  powering_down     : { id: 'vmStatusIconTooltipPoweringDown' },
+  not_responding    : { id: 'vmStatusIconTooltipNotResponding' },
+  unknown           : { id: 'vmStatusIconTooltipUnknown' },
+  unassigned        : { id: 'vmStatusIconTooltipUnassigned' },
+  migrating         : { id: 'vmStatusIconTooltipMigrating' },
+  wait_for_launch   : { id: 'vmStatusIconTooltipWaitForLaunch' },
+  reboot_in_progress: { id: 'vmStatusIconTooltipRebootInProgress' },
+  saving_state      : { id: 'vmStatusIconTooltipSavingState' },
+  restoring_state   : { id: 'vmStatusIconTooltipRestoringState' },
+  image_locked      : { id: 'vmStatusIconTooltipImageLocked' },
+
+  __default__       : { id: 'vmStatusIconTooltipDefault' },
+}
+/* eslint-enable key-spacing, no-multi-spaces */

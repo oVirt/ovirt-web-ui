@@ -15,6 +15,10 @@ const defaultOptions: UserOptionsType = {
     notificationSnoozeDuration: AppConfiguration.notificationSnoozeDurationInMinutes,
   },
   remoteOptions: {
+    autoconnect: {
+      id: undefined,
+      content: '',
+    },
     locale: {
       id: undefined,
       content: locale,
@@ -73,6 +77,18 @@ const options = actionReducer(initialState, {
   },
   [C.SET_SSH_KEY] (state: any, { payload: { key, id } }: any): any {
     return state.setIn(['ssh'], fromJS({ key: key || '', id }))
+  },
+  [C.DELETE_USER_OPTION] (state: any, { payload: { optionId } }: any): any {
+    // applies only to remote options (local have no optionId)
+    const [name] = state.get('remoteOptions')
+      .findEntry((value, key) => value.get('id') === optionId) || []
+
+    if (!name) {
+      return state
+    }
+
+    // overwrite with default state
+    return state.setIn(['remoteOptions', name], fromJS(defaultOptions.remoteOptions[name]))
   },
 })
 

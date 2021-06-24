@@ -14,6 +14,7 @@ import SelectBox from '../SelectBox'
 import moment from 'moment'
 import AppConfiguration from '_/config'
 import { BROWSER_VNC, NATIVE_VNC, SPICE, RDP } from '_/constants/console'
+import VmSelect from './VmSelect'
 
 const GENERAL_SECTION = 'general'
 
@@ -117,6 +118,7 @@ class GlobalSettings extends Component {
       sentValues: {},
       activeSectionKey: GENERAL_SECTION,
       defaultValues: {
+        autoconnect: '',
         language: DEFAULT_LOCALE,
         showNotifications: AppConfiguration.showNotificationsDefault,
         refreshInterval: AppConfiguration.schedulerFixedDelayInSeconds,
@@ -302,6 +304,19 @@ class GlobalSettings extends Component {
                   </div>
                 ),
               }))('preferredConsole'),
+              ((name) => ({
+                title: msg.connectAutomatically(),
+                tooltip: msg.connectAutomaticallyTooltip(),
+                name,
+                body: (
+                  <div className={style['half-width']}>
+                    <VmSelect
+                      selected={draftValues[name]}
+                      onChange={vmId => onChange(name)(vmId)}
+                    />
+                  </div>
+                ),
+              }))('autoconnect'),
             ],
           },
           vnc: {
@@ -503,6 +518,7 @@ export default connect(
       defaultUiConsole: config.getIn(['defaultUiConsole']),
     },
     currentValues: {
+      autoconnect: options.getIn(['remoteOptions', 'autoconnect', 'content']),
       sshKey: options.getIn(['ssh', 'key']),
       language: options.getIn(['remoteOptions', 'locale', 'content']),
       showNotifications: options.getIn(['localOptions', 'showNotifications']),

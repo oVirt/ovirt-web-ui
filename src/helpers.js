@@ -1,15 +1,31 @@
 import AppConfiguration from '_/config'
 import { defaultOperatingSystemIds } from '_/constants/operatingSystems'
 
+function translateParams (params, msg) {
+  if (!params) {
+    return
+  }
+
+  return Object.fromEntries(
+    Object.entries(params)
+      .map(([name, value]) =>
+        [name, value?.id ? translate({ ...value, msg }) : value]
+      )
+  )
+}
+
 export function translate ({ id, params, msg }) {
   if (!msg) {
     console.trace('Translation object not provided.')
+    return
   }
-  if (msg && !msg[id]) {
+  if (!msg[id]) {
     console.warn(`Unknown translation key: ${id}`)
+    // display just the id as string if there is no translation
+    return id
   }
-  // display just the id as string if there is no translation
-  return msg && msg[id] ? msg[id](params) : id
+
+  return msg[id](translateParams(params, msg))
 }
 
 export function buildMessageFromRecord ({ messageDescriptor: { id, params } = {}, message }, msg) {
@@ -19,6 +35,7 @@ export function buildMessageFromRecord ({ messageDescriptor: { id, params } = {}
   if (id && !message) {
     return translate({ id, params, msg })
   }
+
   // format previously used by failedExternalAction
   return `${translate({ id, params, msg })}\n${message}`
 }

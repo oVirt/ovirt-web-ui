@@ -1044,6 +1044,7 @@ const RemoteUserOptions = {
 
     // pick only options supported by this version of the UI
     const {
+      autoconnect,
       locale,
       refreshInterval,
       persistLocale,
@@ -1056,6 +1057,7 @@ const RemoteUserOptions = {
     } = fromEntries
 
     return {
+      autoconnect,
       locale,
       refreshInterval,
       persistLocale,

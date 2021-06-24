@@ -1,7 +1,14 @@
 // @flow
 
 import Api, { Transforms } from '_/ovirtapi'
-import { all, put, select, takeLatest, call } from 'redux-saga/effects'
+import {
+  all,
+  put,
+  select,
+  takeLatest,
+  call,
+  takeEvery,
+} from 'redux-saga/effects'
 
 import * as A from '_/actions'
 import { callExternalAction } from './utils'
@@ -85,9 +92,14 @@ function* fetchUserOptions (action: Object): any {
 
   yield put(A.loadUserOptions(remoteOptions))
 
-  const { locale, persistLocale: { content: persistLocale = true } = {} } = remoteOptions
+  const {
+    locale,
+    persistLocale: { content: persistLocale = true } = {},
+  } = remoteOptions
 
-  if (!locale && persistLocale) {
+  const { payload: { isLogin } = {} } = action
+
+  if (isLogin && !locale && persistLocale) {
     // locale is not saved on the server and locale persistence is enabled
     yield put({ type: C.EXPORT_LOCALE })
   }
@@ -167,6 +179,7 @@ function* saveLocale ([localePropName, submittedLocale]: any, persistLocale: boo
 
 function* saveGlobalOptions ({
   payload: {
+    autoconnect,
     sshKey,
     showNotifications,
     notificationSnoozeDuration,
@@ -192,6 +205,7 @@ function* saveGlobalOptions ({
     fullScreenSpice: call(saveRemoteOption, ...Object.entries({ fullScreenSpice })),
     ctrlAltEndSpice: call(saveRemoteOption, ...Object.entries({ ctrlAltEndSpice })),
     smartcardSpice: call(saveRemoteOption, ...Object.entries({ smartcardSpice })),
+    autoconnect: call(saveRemoteOption, ...Object.entries({ autoconnect })),
   })
 
   yield all(
@@ -205,7 +219,7 @@ function* saveGlobalOptions ({
     yield put(A.setOption({ key: ['remoteOptions', name], value }))
 
     if (!value.content) {
-      yield call(deleteUserOption, 'locale')
+      yield call(deleteOnlyRemoteUserOption, 'locale')
     } else if (!language) {
       yield put({ type: C.EXPORT_LOCALE })
     }
@@ -240,25 +254,28 @@ function* saveGlobalOptions ({
   )
 }
 
-function* deleteUserOption (optionName: string): any {
+function* deleteOnlyRemoteUserOption (optionName: string): any {
   const { optionId, userId, optionValue } = yield select(({ options, config }) => ({
     optionId: options.getIn(['remoteOptions', optionName, 'id']),
     optionValue: options.getIn(['remoteOptions', optionName, 'content']),
     userId: config.getIn(['user', 'id']),
   }))
-  if (!optionId || !userId) {
-    return
-  }
-  const { error } = yield call(
-    callExternalAction,
-    Api.deleteUserOption,
-    A.deleteUserOption({ optionId, userId }),
-    true
-  )
+
+  const { error } = yield deleteRemoteUserOption(A.deleteUserOption({ optionId, userId }))
 
   if (!error) {
     yield put(A.setOption({ key: ['remoteOptions', optionName], value: { id: undefined, content: optionValue } }))
   }
+}
+
+function* deleteRemoteUserOption (action: any): any {
+  const result = yield call(
+    callExternalAction,
+    Api.deleteUserOption,
+    action,
+    true
+  )
+  return result
 }
 
 function* updateNotifications (show: {current: boolean, next?: boolean}, snooze: {current: number, next?: number}): any {
@@ -289,10 +306,10 @@ export function* resumeNotifications (): any {
     })
 }
 
-export function* loadUserOptions (): any {
+export function* loadUserOptions ({ isLogin = false }: any = {}): any {
   const userId = yield select(state => state.config.getIn(['user', 'id']))
   yield put(A.getSSHKey({ userId }))
-  yield put(A.fetchUserOptions({ userId }))
+  yield put(A.fetchUserOptions({ userId, isLogin }))
 }
 
 export default [
@@ -301,4 +318,5 @@ export default [
   takeLatest(C.GET_SSH_KEY, fetchSSHKey),
   takeLatest(C.FETCH_OPTIONS, fetchUserOptions),
   takeLatest(C.EXPORT_LOCALE, exportInferredLocale),
+  takeEvery(C.DELETE_USER_OPTION, deleteRemoteUserOption),
 ]
