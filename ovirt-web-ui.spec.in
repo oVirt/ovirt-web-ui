@@ -17,7 +17,7 @@ Source0:        https://github.com/oVirt/ovirt-web-ui/archive/%{source_basename}
 BuildArch: noarch
 
 # nodejs-modules embeds yarn and requires nodejs
-BuildRequires: ovirt-engine-nodejs-modules >= 2.0.50-1
+BuildRequires: ovirt-engine-nodejs-modules >= 2.0.53-1
 
 %description
 This package provides the VM Portal for %{product}.
@@ -48,6 +48,29 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Thu Jun 24 2021 Sharon Gratch <sgratch@redhat.com> - 1.7.0-1
+ - user/account settings - mark default options on Account Settings dialog
+ - user/account settings - add option to reset global user settings to default/installation settings
+ - user/account settings - seperate to sections on Account Settings
+ - user/account settings - preserve the order and group options by sections in Confirmation dialog and error notification
+ - user/account settings - add Console section options to Account Settings
+ - user/account settings - add 'persist Locale' advanced settings option to Account Settings dialog
+ - user/account settings - update the locales list on Account Settings dialog
+ - retrieve current graphic consoles for re-enabling the option to select console types on dashboard (which was removed on ovirt-web-ui-1.6.8)
+ - refactor handling ovirt engine config values in general and MaxNumOfVmCpus in specific
+ - fix a bug of handling user group permissions which didn't work in ovirt-web-ui-1.6.9-1
+ - convert all API Boolean attributes used by "toApi" functions to our new ApiBooleanType
+ - fix uptime render in VM Details and Overview Card
+ - switch formatDateFromNow() to use moment.humanize()
+ - replace custom wrapper around PF3 with PF4 Switch component
+ - upgrade the project's Webpack to version 4, babel to version 7
+ - upgrade patternfly 4 packages and force lodash version
+ - update/fix dependencies of handlebars, bootstrap-select and jquery
+ - avoid using translated strings in "key" property
+ - code cleanups
+ - bump zanata.xml version to 1.7
+ - translation update, 17-May-2021
+
 * Tue Apr 27 2021 Sharon Gratch <sgratch@redhat.com> - 1.6.9-1
  - user/account settings - support user locale changes by hot reload
  - user/account settings - adding a confirmation dialog before saving user settings changes
