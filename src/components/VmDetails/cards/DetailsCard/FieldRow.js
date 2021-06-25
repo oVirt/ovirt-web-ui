@@ -16,7 +16,7 @@ const FieldRow = ({ label, children, id, tooltip, tooltipPosition, validationSta
   >
     <Col cols={5} className={style['col-label']}>
       <ControlLabel>{label}</ControlLabel>
-      {tooltip &&
+      {tooltip && (
         <span className={style.tooltip}>
           <InfoTooltip
             id={`${id}-tooltip`}
@@ -24,7 +24,7 @@ const FieldRow = ({ label, children, id, tooltip, tooltipPosition, validationSta
             placement={tooltipPosition}
           />
         </span>
-      }
+      )}
     </Col>
     <Col cols={7} className={style['col-data']} id={id}>{children}</Col>
   </FormGroup>

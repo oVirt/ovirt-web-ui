@@ -38,44 +38,44 @@ const CpuCharts = ({ cpuStats, isRunning, id, vcpus }) => {
       <CardTitle>{msg.utilizationCardTitleCpu()}</CardTitle>
       <CardBody>
         { !isRunning && <NoLiveData id={`${id}-no-live-data`} /> }
-        { isRunning &&
-        <React.Fragment>
-          <UtilizationCardDetails>
-            <UtilizationCardDetailsCount id={`${id}-available`}>{cpuAvailable}%</UtilizationCardDetailsCount>
-            <UtilizationCardDetailsDesc>
-              <UtilizationCardDetailsLine1>{msg.utilizationCardAvailable()}</UtilizationCardDetailsLine1>
-              <UtilizationCardDetailsLine2 id={`${id}-total`}>{msg.utilizationCardOf100()}</UtilizationCardDetailsLine2>
-            </UtilizationCardDetailsDesc>
-          </UtilizationCardDetails>
+        { isRunning && (
+          <>
+            <UtilizationCardDetails>
+              <UtilizationCardDetailsCount id={`${id}-available`}>{cpuAvailable}%</UtilizationCardDetailsCount>
+              <UtilizationCardDetailsDesc>
+                <UtilizationCardDetailsLine1>{msg.utilizationCardAvailable()}</UtilizationCardDetailsLine1>
+                <UtilizationCardDetailsLine2 id={`${id}-total`}>{msg.utilizationCardOf100()}</UtilizationCardDetailsLine2>
+              </UtilizationCardDetailsDesc>
+            </UtilizationCardDetails>
 
-          <DonutChart
-            id={`${id}-donut-chart`}
-            data={[
-              {
-                x: msg.utilizationCardLegendUsedP(),
-                y: cpuUsed,
-                label: `${msg.utilizationCardLegendUsed()}: ${cpuUsed}%`,
-              },
-              {
-                x: msg.utilizationCardLegendAvailableP(),
-                y: cpuAvailable,
-                label: `${msg.utilizationCardAvailable()}: ${cpuAvailable}%`,
-              },
-            ]}
-            subTitle={msg.utilizationCardLegendUsedP()}
-            title={`${cpuUsed}`}
-          />
-
-          { history.length === 0 && <NoHistoricData id={`${id}-no-historic-data`} /> }
-          { history.length > 0 &&
-            <AreaChart
-              id={`${id}-history-chart`}
-              data={history.map((item, i) => ({ x: i, y: item }))}
-              labels={datum => `${datum.y}%`}
+            <DonutChart
+              id={`${id}-donut-chart`}
+              data={[
+                {
+                  x: msg.utilizationCardLegendUsedP(),
+                  y: cpuUsed,
+                  label: `${msg.utilizationCardLegendUsed()}: ${cpuUsed}%`,
+                },
+                {
+                  x: msg.utilizationCardLegendAvailableP(),
+                  y: cpuAvailable,
+                  label: `${msg.utilizationCardAvailable()}: ${cpuAvailable}%`,
+                },
+              ]}
+              subTitle={msg.utilizationCardLegendUsedP()}
+              title={`${cpuUsed}`}
             />
-          }
-        </React.Fragment>
-        }
+
+            { history.length === 0 && <NoHistoricData id={`${id}-no-historic-data`} /> }
+            { history.length > 0 && (
+              <AreaChart
+                id={`${id}-history-chart`}
+                data={history.map((item, i) => ({ x: i, y: item }))}
+                labels={datum => `${datum.y}%`}
+              />
+            )}
+          </>
+        )}
       </CardBody>
     </UtilizationCard>
   )

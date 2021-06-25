@@ -43,14 +43,14 @@ const Breadcrumb = ({ vms, branches }) => {
       {crumbs.map((path, index, array) =>
         (index === (array.length - 1))
           ? (
-          <li key={`${index}-${path.url}`} className='active' id={`${idPrefix}-last-${index}`}>
-            {path.title}
-          </li>
+            <li key={`${index}-${path.url}`} className='active' id={`${idPrefix}-last-${index}`}>
+              {path.title}
+            </li>
           )
           : (
-          <li key={`${index}-${path.url}`}>
-            <Link to={path.url} id={`${idPrefix}-link-${index}`}>{path.title}</Link>
-          </li>
+            <li key={`${index}-${path.url}`}>
+              <Link to={path.url} id={`${idPrefix}-link-${index}`}>{path.title}</Link>
+            </li>
           )
       )}
     </ol>

@@ -76,7 +76,7 @@ const VmDropdownActions = ({ actions, id }) => {
         onClick={primaryAction.onClick}
         id={id}
       >
-        {secondaryActions.map(action =>
+        {secondaryActions.map(action => (
           <MenuItemAction key={action.shortTitle}
             id={action.id}
             confirmation={action.confirmation}
@@ -85,6 +85,7 @@ const VmDropdownActions = ({ actions, id }) => {
             onClick={action.onClick}
             className=''
           />
+        )
         )}
       </SplitButton>
     </Action>
@@ -310,16 +311,18 @@ class VmActions extends React.Component {
     if (isOnCard) {
       let filteredActions = actions.filter((action) => !action.actionDisabled).sort((a, b) => b.priority - a.priority)
       filteredActions = filteredActions.length === 0 ? [actions[0]] : filteredActions
-      return <div className={`actions-line card-pf-items text-center ${style['action-height']}`} id={idPrefix}>
-        <VmDropdownActions id={`${idPrefix}-dropdown`} actions={filteredActions} />
-      </div>
+      return (
+        <div className={`actions-line card-pf-items text-center ${style['action-height']}`} id={idPrefix}>
+          <VmDropdownActions id={`${idPrefix}-dropdown`} actions={filteredActions} />
+        </div>
+      )
     }
 
     // Actions for the Toolbar
     const removeConfirmation = (
       <ConfirmationModal
         title={msg.removeVm()}
-        body={
+        body={(
           <div>
             <div id={`${idPrefix}-question`}>{msg.removeVmQustion()}</div>
             {vm.get('disks').size > 0 && (
@@ -336,38 +339,40 @@ class VmActions extends React.Component {
               </div>
             )}
           </div>
-        }
+        )}
         confirm={{ title: msg.remove(), type: 'danger', onClick: () => onRemove({ preserveDisks: this.state.removePreserveDisks }) }}
-      />)
+      />
+    )
 
-    return (<React.Fragment>
-      <div className={`actions-line ${style['actions-toolbar']} visible-xs`} id={`${idPrefix}Kebab`}>
-        <DropdownKebab id={`${idPrefix}Kebab-kebab`} pullRight>
-          { actions.map(action => <ActionMenuItemWrapper key={action.id} {...action} />) }
-          <ActionMenuItemWrapper
+    return (
+      <>
+        <div className={`actions-line ${style['actions-toolbar']} visible-xs`} id={`${idPrefix}Kebab`}>
+          <DropdownKebab id={`${idPrefix}Kebab-kebab`} pullRight>
+            { actions.map(action => <ActionMenuItemWrapper key={action.id} {...action} />) }
+            <ActionMenuItemWrapper
+              confirmation={removeConfirmation}
+              actionDisabled={isPool || !canRemove(status) || vm.getIn(['actionInProgress', 'remove'])}
+              shortTitle={msg.remove()}
+              className='btn btn-danger'
+              id={`${idPrefix}Kebab-button-remove`}
+            />
+          </DropdownKebab>
+        </div>
+
+        <div className={`actions-line ${style['actions-toolbar']} hidden-xs`} id={idPrefix}>
+          <EmptyAction state={status} isOnCard={isOnCard} />
+
+          {actions.map(action => <ActionButtonWraper key={action.id} {...action} />)}
+
+          <ActionButtonWraper
             confirmation={removeConfirmation}
             actionDisabled={isPool || !canRemove(status) || vm.getIn(['actionInProgress', 'remove'])}
             shortTitle={msg.remove()}
             className='btn btn-danger'
-            id={`${idPrefix}Kebab-button-remove`}
+            id={`${idPrefix}-button-remove`}
           />
-        </DropdownKebab>
-      </div>
-
-      <div className={`actions-line ${style['actions-toolbar']} hidden-xs`} id={idPrefix}>
-        <EmptyAction state={status} isOnCard={isOnCard} />
-
-        {actions.map(action => <ActionButtonWraper key={action.id} {...action} />)}
-
-        <ActionButtonWraper
-          confirmation={removeConfirmation}
-          actionDisabled={isPool || !canRemove(status) || vm.getIn(['actionInProgress', 'remove'])}
-          shortTitle={msg.remove()}
-          className='btn btn-danger'
-          id={`${idPrefix}-button-remove`}
-        />
-      </div>
-    </React.Fragment>
+        </div>
+      </>
     )
   }
 }

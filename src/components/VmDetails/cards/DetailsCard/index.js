@@ -751,320 +751,324 @@ class DetailsCard extends React.Component {
     // Memory
     const memorySize = vm.getIn(['memory', 'total'])
 
-    return <React.Fragment>
-      <NextRunChangeConfirmationModal
-        show={this.state.promptNextRunChanges}
-        onCancel={this.handleNextRunOnCancel}
-        onSave={this.handleNextRunOnSave}
-        onSaveAndRestart={this.handleNextRunOnSaveAndRestart}
-      />
-      <HotPlugChangeConfirmationModal
-        show={this.state.promptHotPlugChanges}
-        onCancel={this.handleHotPlugOnCancel}
-        onApplyLater={this.handleHotPlugOnApplyLater}
-        onApplyNow={this.handleHotPlugOnApplyNow}
-      />
-      <BaseCard
-        title={msg.cardTitleDetails()}
-        editable={canEditDetails || canChangeCd}
-        disableTooltip={isPoolVm && isPoolAutomatic ? msg.automaticPoolsNotEditable({ poolName: pool.get('name') }) : undefined}
-        editMode={isEditing}
-        editTooltip={msg.edit()}
-        editTooltipPlacement={'bottom'}
-        idPrefix={idPrefix}
-        disableSaveButton={!vCpuCountIsValid}
-        onStartEdit={this.handleCardOnStartEdit}
-        onCancel={this.handleCardOnCancel}
-        onSave={this.handleCardOnSave}
-      >
-        {({ isEditing }) => {
-          const isFullEdit = isEditing && canEditDetails
-          return <React.Fragment>
-            {/* Regular options */}
-            <Grid className={style['details-container']}>
-              <Row>
-                <Col className={style['fields-column']}>
-                  <Grid>
-                    {
-                      isAdmin &&
-                      <FieldRow label={msg.host()} id={`${idPrefix}-host`}>
-                        {<EllipsisValue tooltip={hostName}>{hostName}</EllipsisValue> || <NotAvailable tooltip={msg.notAvailableUntilRunning()} id={`${idPrefix}-host-not-available`} />}
-                      </FieldRow>
-                    }
-                    <FieldRow label={msg.ipAddress()} id={`${idPrefix}-ip`} >
-                      <React.Fragment>
-                        { ip4Addresses.length === 0 && ip6Addresses.length === 0 &&
-                          <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id={`${idPrefix}-ip-not-available`} />
-                        }
-                        { ip4Addresses.length > 0 &&
-                          ip4Addresses.map((ip4, index) =>
-                            <EllipsisValue tooltip={ip4} key={`ip4-${index}`} id={`${idPrefix}-ip-ipv4-${index}`}>
-                              {ip4}
-                            </EllipsisValue>
-                          )
-                        }
-                        { ip6Addresses.length > 0 &&
-                          ip6Addresses.map((ip4, index) =>
-                            <EllipsisValue tooltip={ip4} key={`ip4-${index}`} id={`${idPrefix}-ip-ipv6-${index}`}>
-                              {ip4}
-                            </EllipsisValue>
-                          )
-                        }
-                      </React.Fragment>
-                    </FieldRow>
-                    <FieldRow label={msg.fqdn()} id={`${idPrefix}-fqdn`}>
-                      { <EllipsisValue tooltip={fqdn}>{fqdn}</EllipsisValue> || <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id={`${idPrefix}-fqdn-not-available`} /> }
-                    </FieldRow>
-                    <FieldRow label={msg.cluster()} id={`${idPrefix}-cluster`} tooltip={isFullEdit && !canChangeCluster && msg.clusterCanOnlyChangeWhenVmStopped()} >
-                      { !isFullEdit && clusterName }
-                      { isFullEdit && !canChangeCluster &&
-                        <div>
-                          {clusterName}
-                        </div>
-                      }
-                      { isFullEdit && canChangeCluster &&
-                        <SelectBox
-                          id={`${idPrefix}-cluster-edit`}
-                          items={clusterList}
-                          selected={clusterId}
-                          onChange={(selectedId) => { this.handleChange('cluster', selectedId) }}
-                        />
-                      }
-                    </FieldRow>
-                    <FieldRow label={msg.dataCenter()} tooltip={isFullEdit && msg.dataCenterChangesWithCluster()} id={`${idPrefix}-data-center`}>
-                      {dataCenterName}
-                    </FieldRow>
-                  </Grid>
-                </Col>
-                <Col className={style['fields-column']}>
-                  <Grid>
-                    <FieldRow label={msg.template()} id={`${idPrefix}-template`}>
-                      { templateName }
-                    </FieldRow>
-                    <FieldRow label={msg.cd()} id={`${idPrefix}-cdrom`} tooltip={isEditing && !canChangeCd && msg.cdCanOnlyChangeWhenVmRunning()} >
-                      { !isEditing && <EllipsisValue tooltip={cdImageName}>{cdImageName}</EllipsisValue> }
-                      { isEditing && !canChangeCd &&
-                        <div>
-                          <EllipsisValue tooltip={cdImageName}>{cdImageName}</EllipsisValue>
-                        </div>
-                      }
-                      { isEditing && canChangeCd &&
-                        <SelectBox
-                          id={`${idPrefix}-cd-edit`}
-                          items={[
-                            { id: '', value: `[${msg.empty()}]` },
-                            ...isoList.map(isoFile => ({
-                              id: isoFile.file.id,
-                              value: isoFile.file.name,
-                            })),
-                          ]}
-                          selected={cdImageId}
-                          onChange={(selectedId) => { this.handleChange('cdrom', selectedId) }}
-                        />
-                      }
-                    </FieldRow>
-                    <FieldRow label={isOsWindows ? msg.sysprep() : msg.cloudInit()} id={`${idPrefix}-cloud-init`}>
-                      <div className={style['cloud-init-field']}>
-                        {cloudInitEnabled ? <Icon type='pf' name='on' /> : <Icon type='pf' name='off' />}
-                        {enumMsg('Switch', cloudInitEnabled ? 'on' : 'off', msg)}
-                      </div>
-                    </FieldRow>
-                    <FieldRow label={msg.bootMenu()} id={`${idPrefix}-boot-menu-readonly`}>
-                      <div className={style['boot-menu-field']}>
-                        {bootMenuEnabled ? <Icon type='pf' name='on' /> : <Icon type='pf' name='off' />}
-                        {enumMsg('Switch', bootMenuEnabled ? 'on' : 'off', msg)}
-                      </div>
-                    </FieldRow>
-
-                    <FieldRow label={msg.optimizedFor()} id={`${idPrefix}-optimized`}>
-                      {optimizedFor}
-                    </FieldRow>
-
-                    <FieldRow
-                      label={msg.cpus()}
-                      id={`${idPrefix}-cpus`}
-                      tooltip={
-                        <div>
-                          <span>The total virtual CPUs include:</span>
-                          <ul className={style['cpu-tooltip-list']} >
-                            <li>{msg.totalSocketsCpuTooltipMessage({ number: vCpuTopology.get('sockets') })}</li>
-                            <li>{msg.totalCoresCpuTooltipMessage({ number: vCpuTopology.get('cores') })}</li>
-                            <li>{msg.totalThreadsCpuTooltipMessage({ number: vCpuTopology.get('threads') })}</li>
-                          </ul>
-                        </div>
-                      }
-                      validationState={vCpuCountIsValid ? null : 'error'}
-                    >
-                      { !isFullEdit && vCpuCount }
-                      { isFullEdit &&
-                        <div>
-                          <FormControl
-                            id={`${idPrefix}-cpus-edit`}
-                            className={style['cpu-input']}
-                            type='number'
-                            min={1}
-                            max={MAX_VM_VCPU_EDIT}
-                            value={vCpuCount}
-                            onChange={e => this.handleChange('cpu', e.target.value)}
-                          />
-                          { !vCpuCountIsValid &&
-                            <div className={style['cpu-input-error']}>
-                              {msg.maxAllowedCpus({ max: maxNumOfVmCpus })}
+    return (
+      <>
+        <NextRunChangeConfirmationModal
+          show={this.state.promptNextRunChanges}
+          onCancel={this.handleNextRunOnCancel}
+          onSave={this.handleNextRunOnSave}
+          onSaveAndRestart={this.handleNextRunOnSaveAndRestart}
+        />
+        <HotPlugChangeConfirmationModal
+          show={this.state.promptHotPlugChanges}
+          onCancel={this.handleHotPlugOnCancel}
+          onApplyLater={this.handleHotPlugOnApplyLater}
+          onApplyNow={this.handleHotPlugOnApplyNow}
+        />
+        <BaseCard
+          title={msg.cardTitleDetails()}
+          editable={canEditDetails || canChangeCd}
+          disableTooltip={isPoolVm && isPoolAutomatic ? msg.automaticPoolsNotEditable({ poolName: pool.get('name') }) : undefined}
+          editMode={isEditing}
+          editTooltip={msg.edit()}
+          editTooltipPlacement={'bottom'}
+          idPrefix={idPrefix}
+          disableSaveButton={!vCpuCountIsValid}
+          onStartEdit={this.handleCardOnStartEdit}
+          onCancel={this.handleCardOnCancel}
+          onSave={this.handleCardOnSave}
+        >
+          {({ isEditing }) => {
+            const isFullEdit = isEditing && canEditDetails
+            return (
+              <>
+                {/* Regular options */}
+                <Grid className={style['details-container']}>
+                  <Row>
+                    <Col className={style['fields-column']}>
+                      <Grid>
+                        { isAdmin && (
+                          <FieldRow label={msg.host()} id={`${idPrefix}-host`}>
+                            {
+                              <EllipsisValue tooltip={hostName}>{hostName}</EllipsisValue> || <NotAvailable tooltip={msg.notAvailableUntilRunning()} id={`${idPrefix}-host-not-available`} />
+                            }
+                          </FieldRow>
+                        )}
+                        <FieldRow label={msg.ipAddress()} id={`${idPrefix}-ip`} >
+                          <>
+                            { ip4Addresses.length === 0 && ip6Addresses.length === 0 && (
+                              <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id={`${idPrefix}-ip-not-available`} />
+                            )}
+                            { ip4Addresses.length > 0 && ip4Addresses.map((ip4, index) => (
+                              <EllipsisValue tooltip={ip4} key={`ip4-${index}`} id={`${idPrefix}-ip-ipv4-${index}`}>
+                                {ip4}
+                              </EllipsisValue>
+                            ))}
+                            { ip6Addresses.length > 0 && ip6Addresses.map((ip4, index) => (
+                              <EllipsisValue tooltip={ip4} key={`ip4-${index}`} id={`${idPrefix}-ip-ipv6-${index}`}>
+                                {ip4}
+                              </EllipsisValue>
+                            ))}
+                          </>
+                        </FieldRow>
+                        <FieldRow label={msg.fqdn()} id={`${idPrefix}-fqdn`}>
+                          { <EllipsisValue tooltip={fqdn}>{fqdn}</EllipsisValue> || <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id={`${idPrefix}-fqdn-not-available`} /> }
+                        </FieldRow>
+                        <FieldRow label={msg.cluster()} id={`${idPrefix}-cluster`} tooltip={isFullEdit && !canChangeCluster && msg.clusterCanOnlyChangeWhenVmStopped()} >
+                          { !isFullEdit && clusterName }
+                          { isFullEdit && !canChangeCluster && (
+                            <div>
+                              {clusterName}
                             </div>
-                          }
-                        </div>
-                      }
-                    </FieldRow>
-                    <FieldRow label={msg.memory()} id={`${idPrefix}-memory`}>
-                      { !isFullEdit && `${userFormatOfBytes(memorySize).str}` }
-                      { isFullEdit &&
-                        <div>
-                          <FormControl
-                            id={`${idPrefix}-memory-edit`}
-                            className={style['memory-input']}
-                            type='number'
-                            value={(memorySize / (1024 ** 2))}
-                            onChange={e => this.handleChange('memory', e.target.value)}
-                          />
-                          MiB
-                        </div>
-                      }
-                    </FieldRow>
-                  </Grid>
-                </Col>
-              </Row>
-            </Grid>
-
-            {/* Advanced options */}
-            { isFullEdit && <ExpandCollapse id={`${idPrefix}-advanced-options`} textCollapsed={msg.advancedOptions()} textExpanded={msg.advancedOptions()}>
-              <Grid className={style['details-container']}>
-                <Row>
-                  {/* First column */}
-                  <Col className={style['fields-column']}>
-                    <Grid>
-                      <FieldRow label={msg.operatingSystem()} id={`${idPrefix}-os`}>
-                        <SelectBox
-                          id={`${idPrefix}-os-edit`}
-                          items={this.state.osList}
-                          selected={osId}
-                          onChange={(selectedId) => { this.handleChange('os', selectedId) }}
-                        />
-                      </FieldRow>
-                      <FieldRow label={msg.bootMenu()} id={`${idPrefix}-boot-menu`}>
-                        <Switch
-                          id={`${idPrefix}-boot-menu-edit`}
-                          isChecked={bootMenuEnabled}
-                          onChange={state => this.handleChange('bootMenuEnabled', state)}
-                        />
-                      </FieldRow>
-                      <CloudInit idPrefix={idPrefix} vm={vm} onChange={this.handleChange} isWindows={isOsWindows} lastInitTimezone={this.state.lastInitTimezone} />
-                    </Grid>
-                  </Col>
-                  {/* Second column */}
-                  <Col className={style['fields-column']}>
-                    <Grid>
-                      {/* Boot sequence */}
-                      <Row className={style['field-row']}>
-                        <Col cols={12} className={style['col-label']}>
-                          <div>
-                            <span>{msg.bootOrder()}</span>
-                            <InfoTooltip id={`${idPrefix}-edit-boot-order-tooltip`} tooltip={msg.selectTheBootableDeviceTooltip()} />
+                          )}
+                          { isFullEdit && canChangeCluster && (
+                            <SelectBox
+                              id={`${idPrefix}-cluster-edit`}
+                              items={clusterList}
+                              selected={clusterId}
+                              onChange={(selectedId) => { this.handleChange('cluster', selectedId) }}
+                            />
+                          )}
+                        </FieldRow>
+                        <FieldRow label={msg.dataCenter()} tooltip={isFullEdit && msg.dataCenterChangesWithCluster()} id={`${idPrefix}-data-center`}>
+                          {dataCenterName}
+                        </FieldRow>
+                      </Grid>
+                    </Col>
+                    <Col className={style['fields-column']}>
+                      <Grid>
+                        <FieldRow label={msg.template()} id={`${idPrefix}-template`}>
+                          { templateName }
+                        </FieldRow>
+                        <FieldRow label={msg.cd()} id={`${idPrefix}-cdrom`} tooltip={isEditing && !canChangeCd && msg.cdCanOnlyChangeWhenVmRunning()} >
+                          { !isEditing && <EllipsisValue tooltip={cdImageName}>{cdImageName}</EllipsisValue> }
+                          { isEditing && !canChangeCd && (
+                            <div>
+                              <EllipsisValue tooltip={cdImageName}>{cdImageName}</EllipsisValue>
+                            </div>
+                          )}
+                          { isEditing && canChangeCd && (
+                            <SelectBox
+                              id={`${idPrefix}-cd-edit`}
+                              items={[
+                                { id: '', value: `[${msg.empty()}]` },
+                                ...isoList.map(isoFile => ({
+                                  id: isoFile.file.id,
+                                  value: isoFile.file.name,
+                                })),
+                              ]}
+                              selected={cdImageId}
+                              onChange={(selectedId) => { this.handleChange('cdrom', selectedId) }}
+                            />
+                          )}
+                        </FieldRow>
+                        <FieldRow label={isOsWindows ? msg.sysprep() : msg.cloudInit()} id={`${idPrefix}-cloud-init`}>
+                          <div className={style['cloud-init-field']}>
+                            {cloudInitEnabled ? <Icon type='pf' name='on' /> : <Icon type='pf' name='off' />}
+                            {enumMsg('Switch', cloudInitEnabled ? 'on' : 'off', msg)}
                           </div>
+                        </FieldRow>
+                        <FieldRow label={msg.bootMenu()} id={`${idPrefix}-boot-menu-readonly`}>
+                          <div className={style['boot-menu-field']}>
+                            {bootMenuEnabled ? <Icon type='pf' name='on' /> : <Icon type='pf' name='off' />}
+                            {enumMsg('Switch', bootMenuEnabled ? 'on' : 'off', msg)}
+                          </div>
+                        </FieldRow>
+
+                        <FieldRow label={msg.optimizedFor()} id={`${idPrefix}-optimized`}>
+                          {optimizedFor}
+                        </FieldRow>
+
+                        <FieldRow
+                          label={msg.cpus()}
+                          id={`${idPrefix}-cpus`}
+                          tooltip={(
+                            <div>
+                              <span>The total virtual CPUs include:</span>
+                              <ul className={style['cpu-tooltip-list']} >
+                                <li>{msg.totalSocketsCpuTooltipMessage({ number: vCpuTopology.get('sockets') })}</li>
+                                <li>{msg.totalCoresCpuTooltipMessage({ number: vCpuTopology.get('cores') })}</li>
+                                <li>{msg.totalThreadsCpuTooltipMessage({ number: vCpuTopology.get('threads') })}</li>
+                              </ul>
+                            </div>
+                          )}
+                          validationState={vCpuCountIsValid ? null : 'error'}
+                        >
+                          { !isFullEdit && vCpuCount }
+                          { isFullEdit && (
+                            <div>
+                              <FormControl
+                                id={`${idPrefix}-cpus-edit`}
+                                className={style['cpu-input']}
+                                type='number'
+                                min={1}
+                                max={MAX_VM_VCPU_EDIT}
+                                value={vCpuCount}
+                                onChange={e => this.handleChange('cpu', e.target.value)}
+                              />
+                              { !vCpuCountIsValid && (
+                                <div className={style['cpu-input-error']}>
+                                  {msg.maxAllowedCpus({ max: maxNumOfVmCpus })}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </FieldRow>
+                        <FieldRow label={msg.memory()} id={`${idPrefix}-memory`}>
+                          { !isFullEdit && `${userFormatOfBytes(memorySize).str}` }
+                          { isFullEdit && (
+                            <div>
+                              <FormControl
+                                id={`${idPrefix}-memory-edit`}
+                                className={style['memory-input']}
+                                type='number'
+                                value={(memorySize / (1024 ** 2))}
+                                onChange={e => this.handleChange('memory', e.target.value)}
+                              />
+                              MiB
+                            </div>
+                          )}
+                        </FieldRow>
+                      </Grid>
+                    </Col>
+                  </Row>
+                </Grid>
+
+                {/* Advanced options */}
+                { isFullEdit && (
+                  <ExpandCollapse id={`${idPrefix}-advanced-options`} textCollapsed={msg.advancedOptions()} textExpanded={msg.advancedOptions()}>
+                    <Grid className={style['details-container']}>
+                      <Row>
+                        {/* First column */}
+                        <Col className={style['fields-column']}>
+                          <Grid>
+                            <FieldRow label={msg.operatingSystem()} id={`${idPrefix}-os`}>
+                              <SelectBox
+                                id={`${idPrefix}-os-edit`}
+                                items={this.state.osList}
+                                selected={osId}
+                                onChange={(selectedId) => { this.handleChange('os', selectedId) }}
+                              />
+                            </FieldRow>
+                            <FieldRow label={msg.bootMenu()} id={`${idPrefix}-boot-menu`}>
+                              <Switch
+                                id={`${idPrefix}-boot-menu-edit`}
+                                isChecked={bootMenuEnabled}
+                                onChange={state => this.handleChange('bootMenuEnabled', state)}
+                              />
+                            </FieldRow>
+                            <CloudInit idPrefix={idPrefix} vm={vm} onChange={this.handleChange} isWindows={isOsWindows} lastInitTimezone={this.state.lastInitTimezone} />
+                          </Grid>
+                        </Col>
+                        {/* Second column */}
+                        <Col className={style['fields-column']}>
+                          <Grid>
+                            {/* Boot sequence */}
+                            <Row className={style['field-row']}>
+                              <Col cols={12} className={style['col-label']}>
+                                <div>
+                                  <span>{msg.bootOrder()}</span>
+                                  <InfoTooltip id={`${idPrefix}-edit-boot-order-tooltip`} tooltip={msg.selectTheBootableDeviceTooltip()} />
+                                </div>
+                              </Col>
+                            </Row>
+                            <FieldRow label={msg.firstDevice()} id={`${idPrefix}-boot-order-first-device`}>
+                              <SelectBox
+                                id={`${idPrefix}-boot-order-first-device-edit`}
+                                items={allowedBootDevices.map(item => ({
+                                  id: item,
+                                  value: msg[`${item}Boot`](),
+                                }))}
+                                selected={bootDevices[FIRST_DEVICE]}
+                                onChange={(selectedId) => { this.handleChange('bootDevices', selectedId, { device: FIRST_DEVICE }) }}
+                              />
+                            </FieldRow>
+                            <FieldRow label={msg.secondDevice()} id={`${idPrefix}-boot-order-second-device`}>
+                              <SelectBox
+                                id={`${idPrefix}-boot-order-second-device-edit`}
+                                items={[
+                                  { id: null, value: msg.noneItem() },
+                                  ...allowedBootDevices
+                                    .filter(item => item !== bootDevices[FIRST_DEVICE])
+                                    .map(item => ({
+                                      id: item,
+                                      value: msg[`${item}Boot`](),
+                                    })),
+                                ]}
+                                selected={bootDevices[SECOND_DEVICE]}
+                                onChange={(selectedId) => { this.handleChange('bootDevices', selectedId, { device: SECOND_DEVICE }) }}
+                              />
+                            </FieldRow>
+                            {/* vCPU Topology */}
+                            <Row className={style['field-row-divide']}>
+                              <Col cols={12} className={style['col-label']}>
+                                <div>
+                                  <span>{msg.vcpuTopology()}</span>
+                                </div>
+                              </Col>
+                            </Row>
+                            <FieldRow label={msg.virtualSockets()} id={`${idPrefix}-vcpu-topology-sockets`}>
+                              <SelectBox
+                                id={`${idPrefix}-vcpu-topology-sockets-edit`}
+                                items={vCpuTopologyDividers.sockets.map(i => ({
+                                  id: i.toString(),
+                                  value: i.toString(),
+                                }))}
+                                disabled={!vCpuCountIsValid}
+                                selected={vCpuTopology.get('sockets').toString()}
+                                onChange={(selectedId) => { this.handleChange('topology', selectedId, { vcpu: SOCKETS_VCPU }) }}
+                              />
+                            </FieldRow>
+                            <FieldRow label={msg.coresPerSockets()} id={`${idPrefix}-vcpu-topology-cores`}>
+                              <SelectBox
+                                id={`${idPrefix}-vcpu-topology-cores-edit`}
+                                items={vCpuTopologyDividers.cores.map(i => ({
+                                  id: i.toString(),
+                                  value: i.toString(),
+                                }))}
+                                disabled={!vCpuCountIsValid}
+                                selected={vCpuTopology.get('cores').toString()}
+                                onChange={(selectedId) => { this.handleChange('topology', selectedId, { vcpu: CORES_VCPU }) }}
+                              />
+                            </FieldRow>
+                            <FieldRow
+                              label={msg.threadsPerCores()}
+                              id={`${idPrefix}-vcpu-topology-threads`}
+                              tooltip={
+                                isClusterPower8
+                                  ? msg.recomendedPower8ValuesForThreads({ threads: maxNumOfThreads })
+                                  : msg.recomendedValuesForThreads()
+                              }
+                            >
+                              <SelectBox
+                                id={`${idPrefix}-vcpu-topology-threads-edit`}
+                                items={vCpuTopologyDividers.threads.map(i => ({
+                                  id: i.toString(),
+                                  value: i.toString(),
+                                }))}
+                                disabled={!vCpuCountIsValid}
+                                selected={vCpuTopology.get('threads').toString()}
+                                onChange={(selectedId) => { this.handleChange('topology', selectedId, { vcpu: THREADS_VCPU }) }}
+                              />
+                            </FieldRow>
+                          </Grid>
                         </Col>
                       </Row>
-                      <FieldRow label={msg.firstDevice()} id={`${idPrefix}-boot-order-first-device`}>
-                        <SelectBox
-                          id={`${idPrefix}-boot-order-first-device-edit`}
-                          items={allowedBootDevices.map(item => ({
-                            id: item,
-                            value: msg[`${item}Boot`](),
-                          }))}
-                          selected={bootDevices[FIRST_DEVICE]}
-                          onChange={(selectedId) => { this.handleChange('bootDevices', selectedId, { device: FIRST_DEVICE }) }}
-                        />
-                      </FieldRow>
-                      <FieldRow label={msg.secondDevice()} id={`${idPrefix}-boot-order-second-device`}>
-                        <SelectBox
-                          id={`${idPrefix}-boot-order-second-device-edit`}
-                          items={[
-                            { id: null, value: msg.noneItem() },
-                            ...allowedBootDevices
-                              .filter(item => item !== bootDevices[FIRST_DEVICE])
-                              .map(item => ({
-                                id: item,
-                                value: msg[`${item}Boot`](),
-                              })),
-                          ]}
-                          selected={bootDevices[SECOND_DEVICE]}
-                          onChange={(selectedId) => { this.handleChange('bootDevices', selectedId, { device: SECOND_DEVICE }) }}
-                        />
-                      </FieldRow>
-                      {/* vCPU Topology */}
-                      <Row className={style['field-row-divide']}>
-                        <Col cols={12} className={style['col-label']}>
-                          <div>
-                            <span>{msg.vcpuTopology()}</span>
-                          </div>
-                        </Col>
-                      </Row>
-                      <FieldRow label={msg.virtualSockets()} id={`${idPrefix}-vcpu-topology-sockets`}>
-                        <SelectBox
-                          id={`${idPrefix}-vcpu-topology-sockets-edit`}
-                          items={vCpuTopologyDividers.sockets.map(i => ({
-                            id: i.toString(),
-                            value: i.toString(),
-                          }))}
-                          disabled={!vCpuCountIsValid}
-                          selected={vCpuTopology.get('sockets').toString()}
-                          onChange={(selectedId) => { this.handleChange('topology', selectedId, { vcpu: SOCKETS_VCPU }) }}
-                        />
-                      </FieldRow>
-                      <FieldRow label={msg.coresPerSockets()} id={`${idPrefix}-vcpu-topology-cores`}>
-                        <SelectBox
-                          id={`${idPrefix}-vcpu-topology-cores-edit`}
-                          items={vCpuTopologyDividers.cores.map(i => ({
-                            id: i.toString(),
-                            value: i.toString(),
-                          }))}
-                          disabled={!vCpuCountIsValid}
-                          selected={vCpuTopology.get('cores').toString()}
-                          onChange={(selectedId) => { this.handleChange('topology', selectedId, { vcpu: CORES_VCPU }) }}
-                        />
-                      </FieldRow>
-                      <FieldRow
-                        label={msg.threadsPerCores()}
-                        id={`${idPrefix}-vcpu-topology-threads`}
-                        tooltip={
-                          isClusterPower8
-                            ? msg.recomendedPower8ValuesForThreads({ threads: maxNumOfThreads })
-                            : msg.recomendedValuesForThreads()
-                        }>
-                        <SelectBox
-                          id={`${idPrefix}-vcpu-topology-threads-edit`}
-                          items={vCpuTopologyDividers.threads.map(i => ({
-                            id: i.toString(),
-                            value: i.toString(),
-                          }))}
-                          disabled={!vCpuCountIsValid}
-                          selected={vCpuTopology.get('threads').toString()}
-                          onChange={(selectedId) => { this.handleChange('topology', selectedId, { vcpu: THREADS_VCPU }) }}
-                        />
-                      </FieldRow>
                     </Grid>
-                  </Col>
-                </Row>
-              </Grid>
-            </ExpandCollapse> }
+                  </ExpandCollapse>
+                ) }
 
-            { correlatedMessages && correlatedMessages.size > 0 &&
-              correlatedMessages.map((message, key) =>
-                <Alert key={`user-message-${key}`} type='error' style={{ margin: '5px 0 0 0' }}>{buildMessageFromRecord(message.toJS(), msg)}</Alert>
-              )
-            }
-          </React.Fragment>
-        }}
-      </BaseCard>
-    </React.Fragment>
+                { correlatedMessages && correlatedMessages.size > 0 && correlatedMessages.map((message, key) => (
+                  <Alert key={`user-message-${key}`} type='error' style={{ margin: '5px 0 0 0' }}>
+                    {buildMessageFromRecord(message.toJS(), msg)}
+                  </Alert>
+                ))}
+              </>
+            )
+          }}
+        </BaseCard>
+      </>
+    )
   }
 }
 

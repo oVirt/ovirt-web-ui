@@ -38,22 +38,26 @@ const VmsListToolbar = ({ match, vms, onRemoveFilter, onClearFilters }) => {
     const labels = []
     if (List.isList(item)) {
       item.forEach((t, i) => {
-        labels.push(<Filter.Item
-          key={i}
-          onRemove={removeFilter}
-          filterData={{ value: t, id: index }}
-        >
-          {msg[index]()}: {mapFilterValues[index](t)}
-        </Filter.Item>)
+        labels.push(
+          <Filter.Item
+            key={i}
+            onRemove={removeFilter}
+            filterData={{ value: t, id: index }}
+          >
+            {msg[index]()}: {mapFilterValues[index](t)}
+          </Filter.Item>
+        )
       })
     } else {
-      labels.push(<Filter.Item
-        key={index}
-        onRemove={removeFilter}
-        filterData={{ value: item, id: index }}
-      >
-        {msg[index]()}: {mapFilterValues[index](item)}
-      </Filter.Item>)
+      labels.push(
+        <Filter.Item
+          key={index}
+          onRemove={removeFilter}
+          filterData={{ value: item, id: index }}
+        >
+          {msg[index]()}: {mapFilterValues[index](item)}
+        </Filter.Item>
+      )
     }
     return labels
   }
@@ -78,8 +82,8 @@ const VmsListToolbar = ({ match, vms, onRemoveFilter, onClearFilters }) => {
               : msg.results({ total })
           }
         </h5>
-        { vms.get('filters').size > 0 &&
-          <React.Fragment>
+        { vms.get('filters').size > 0 && (
+          <>
             <Filter.ActiveLabel>{msg.activeFilters()}</Filter.ActiveLabel>
             <Filter.List>
               {[].concat(...vms.get('filters').map(mapLabels).toList().toJS())}
@@ -93,10 +97,11 @@ const VmsListToolbar = ({ match, vms, onRemoveFilter, onClearFilters }) => {
             >
               {msg.clearAllFilters()}
             </a>
-          </React.Fragment>
-        }
+          </>
+        )}
       </Toolbar.Results>
-    </Toolbar>)
+    </Toolbar>
+  )
 }
 
 VmsListToolbar.propTypes = {

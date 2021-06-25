@@ -238,36 +238,36 @@ class OverviewCard extends React.Component {
                 <div className={style['vm-info']}>
                   <div className={style['vm-name']}>
                     { !isEditing && <span id={`${idPrefix}-name`}>{vm.get('name')}</span> }
-                    { isEditing &&
+                    { isEditing && (
                       <FormGroup controlId={`${idPrefix}-name-edit`} validationState={nameError ? 'error' : null}>
                         <FormControl
                           type='text'
                           value={this.state.vm.get('name')}
                           onChange={e => this.handleChange('name', e.target.value)}
                         />
-                        { nameError &&
+                        { nameError && (
                           <HelpBlock>
                             {msg.pleaseEnterValidVmName()}
                           </HelpBlock>
-                        }
+                        )}
                       </FormGroup>
-                    }
+                    )}
                     {
-                      showCloudInitCheckbox &&
-                      <div className={style['vm-checkbox']}>
-                        <Checkbox
-                          id={`${idPrefix}-cloud-init`}
-                          checked={updateCloudInit}
-                          onChange={(e) => this.setState({ updateCloudInit: e.target.checked })}
-                          disabled={disableHostnameToggle}
-                        >
-                          { !disableHostnameToggle
-                            ? msg.updateCloudInit()
-                            : msg.cannotUpdateCloudInitHostname()
+                      showCloudInitCheckbox && (
+                        <div className={style['vm-checkbox']}>
+                          <Checkbox
+                            id={`${idPrefix}-cloud-init`}
+                            checked={updateCloudInit}
+                            onChange={(e) => this.setState({ updateCloudInit: e.target.checked })}
+                            disabled={disableHostnameToggle}
+                          >
+                            { !disableHostnameToggle
+                              ? msg.updateCloudInit()
+                              : msg.cannotUpdateCloudInitHostname()
                           }
-                        </Checkbox>
-                      </div>
-                    }
+                          </Checkbox>
+                        </div>
+                      )}
                   </div>
 
                   <div className={style['vm-status']} id={`${idPrefix}-status`}>
@@ -283,7 +283,7 @@ class OverviewCard extends React.Component {
                     { !isEditing &&
                       <div id={`${idPrefix}-description`} className={style['vm-description']}>{vm.get('description')}</div>
                     }
-                    { isEditing &&
+                    { isEditing && (
                       <FormControl
                         id={`${idPrefix}-description-edit`}
                         componentClass='textarea'
@@ -291,16 +291,17 @@ class OverviewCard extends React.Component {
                         value={this.state.vm.get('description')}
                         onChange={e => this.handleChange('description', e.target.value)}
                       />
-                    }
+                    )}
                   </div>
                 </div>
               </div>
 
               { correlatedMessages && correlatedMessages.size > 0 &&
-                correlatedMessages.map((message, key) =>
+                correlatedMessages.map((message, key) => (
                   <Alert key={`user-message-${key}`} type='error' style={{ margin: '5px 0 0 0' }} id={`${idPrefix}-alert`}>
                     {buildMessageFromRecord(message.toJS(), msg)}
                   </Alert>
+                )
                 )
               }
             </div>

@@ -454,10 +454,11 @@ class GlobalSettings extends Component {
           <SplitItem>
             <Nav onSelect={onSelect} theme='light'>
               <NavList className={'card-pf global-settings-nav-list'}>
-                { Object.entries(sections).map(([key, section]) =>
+                { Object.entries(sections).map(([key, section]) => (
                   <NavItem className='border' itemId={key} key={key} isActive={activeSectionKey === key}>
                     {section.title}
-                  </NavItem>)
+                  </NavItem>
+                ))
                 }
               </NavList>
             </Nav>

@@ -139,9 +139,9 @@ class DisksCard extends React.Component {
         onCancel={() => { onEditChange(false) }}
         onSave={() => { onEditChange(false) }}
       >
-        {({ isEditing }) =>
+        {({ isEditing }) => (
           <Grid className={style['disks-container']}>
-            { isEditing && canCreateDisks &&
+            { isEditing && canCreateDisks && (
               <Row key={`${vm.get('id')}-disk-add`}>
                 <Col>
                   <DiskImageEditor
@@ -162,17 +162,17 @@ class DisksCard extends React.Component {
                   />
                 </Col>
               </Row>
-            }
+            )}
 
-            { diskList.size === 0 &&
+            { diskList.size === 0 && (
               <Row>
                 <Col>
                   <div className={itemStyle['no-items']} id={`${idPrefix}-no-disks`}>{msg.noDisks()}</div>
                 </Col>
               </Row>
-            }
+            )}
 
-            { diskList.size > 0 && diskList.map(disk =>
+            { diskList.size > 0 && diskList.map(disk => (
               <Row key={disk.get('id')}>
                 <Col style={{ display: 'block' }}>
                   <DiskListItem
@@ -187,9 +187,10 @@ class DisksCard extends React.Component {
                   />
                 </Col>
               </Row>
+            )
             )}
           </Grid>
-        }
+        )}
       </BaseCard>
     )
   }

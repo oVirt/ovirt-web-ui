@@ -16,20 +16,23 @@ function normalizeType (theType) {
 }
 
 const ToastNotifications = ({ userMessages, onDismissNotification, msg }) => {
-  return <ToastNotificationList>
-    { userMessages.get('records').filter(r => !r.get('notified')).map(r =>
-      <TimedToastNotification
-        className={style['toast-margin-top']}
-        type={normalizeType(r.get('type'))}
-        onDismiss={() => onDismissNotification(r.get('id'))}
-        key={r.get('time')}
-      >
-        <span>
-          {buildMessageFromRecord(r.toJS(), msg)}
-        </span>
-      </TimedToastNotification>
-    )}
-  </ToastNotificationList>
+  return (
+    <ToastNotificationList>
+      { userMessages.get('records').filter(r => !r.get('notified')).map(r => (
+        <TimedToastNotification
+          className={style['toast-margin-top']}
+          type={normalizeType(r.get('type'))}
+          onDismiss={() => onDismissNotification(r.get('id'))}
+          key={r.get('time')}
+        >
+          <span>
+            {buildMessageFromRecord(r.toJS(), msg)}
+          </span>
+        </TimedToastNotification>
+      )
+      )}
+    </ToastNotificationList>
+  )
 }
 
 ToastNotifications.propTypes = {

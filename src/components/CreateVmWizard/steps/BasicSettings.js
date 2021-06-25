@@ -64,8 +64,8 @@ const FieldRow = ({
       ${validationState ? `has-${validationState}` : ''}
     `}
   >
-    { vertical &&
-      <React.Fragment>
+    { vertical && (
+      <>
         <Col offset={labelCols} cols={fieldCols} className={style['col-data']} id={id}>
           <div className={style['col-label-vertical']}>
             {label}
@@ -75,18 +75,18 @@ const FieldRow = ({
             <HelpBlock>{errorMessage}</HelpBlock>
           }
         </Col>
-      </React.Fragment>
-    }
-    { !vertical &&
-      <React.Fragment>
+      </>
+    )}
+    { !vertical && (
+      <>
         <Col cols={labelCols} className={`control-label ${style['col-label']}`}>
           {label}
-          { tooltip &&
+          { tooltip && (
             <InfoTooltip
               tooltip={tooltip}
               id={`${id}-tooltip`}
             />
-          }
+          )}
         </Col>
         <Col cols={fieldCols} className={style['col-data']} id={id}>
           {children}
@@ -94,8 +94,8 @@ const FieldRow = ({
             <HelpBlock>{errorMessage}</HelpBlock>
           }
         </Col>
-      </React.Fragment>
-    }
+      </>
+    )}
   </Row>
 )
 FieldRow.propTypes = {
@@ -453,263 +453,265 @@ class BasicSettings extends React.Component {
       : msg.recomendedValuesForThreads({ threads: maxNumOfThreads })
 
     // ----- RENDER -----
-    return <Form horizontal id={idPrefix}>
-      <Grid className={style['settings-container']}>
-        {/* -- VM name and where it will live -- */}
-        <FieldRow label={msg.name()} id={`${idPrefix}-name`} required validationState={indicators.name} errorMessage={data.name ? msg.pleaseEnterValidVmName() : ''}>
-          <FormControl
-            id={`${idPrefix}-name-edit`}
-            autoFocus
-            autoComplete='off'
-            type='text'
-            defaultValue={data.name}
-            onChange={e => this.handleChange('name', e.target.value)}
-          />
-        </FieldRow>
-
-        <FieldRow label={msg.description()} id={`${idPrefix}-description`}>
-          <FormControl
-            id={`${idPrefix}-description-edit`}
-            componentClass='textarea'
-            defaultValue={data.description}
-            onChange={e => this.handleChange('description', e.target.value)}
-          />
-        </FieldRow>
-
-        <FieldRow label={msg.cluster()} id={`${idPrefix}-cluster`} required>
-          <SelectBox
-            id={`${idPrefix}-cluster-edit`}
-            items={clusterList}
-            selected={data.clusterId || '_'}
-            onChange={selectedId => this.handleChange('clusterId', selectedId)}
-            validationState={indicators.cluster}
-          />
-        </FieldRow>
-
-        {/* -- Provision Source -- */}
-        <FieldRow label={msg.provisionSource()} id={`${idPrefix}-provision`} required>
-          <SelectBox
-            id={`${idPrefix}-provision-edit`}
-            items={provisionSourceList}
-            selected={data.provisionSource || '_'}
-            onChange={selectedId => this.handleChange('provisionSource', selectedId)}
-          />
-        </FieldRow>
-
-        {/* -- Provision Source: ISO -- */}
-        { data.provisionSource === 'iso' &&
-          <FieldRow label={msg.cd()} id={`${idPrefix}-iso`} required>
-            <SelectBox
-              id={`${idPrefix}-iso-edit`}
-              items={isoList}
-              selected={data.isoImage || '_'}
-              onChange={selectedId => this.handleChange('isoImage', selectedId)}
-              validationState={indicators.isoList}
-            />
-          </FieldRow>
-        }
-
-        {/* -- Provision Source: Template -- */}
-        { data.provisionSource === 'template' &&
-          <FieldRow label={msg.template()} id={`${idPrefix}-template`} required>
-            <SelectBox
-              id={`${idPrefix}-template-edit`}
-              items={templateList}
-              selected={data.templateId || '_'}
-              onChange={selectedId => this.handleChange('templateId', selectedId)}
-              validationState={indicators.template}
-            />
-          </FieldRow>
-        }
-
-        {/* -- Common -- */}
-        <FieldRow label={msg.operatingSystem()} id={`${idPrefix}-os`} required>
-          <SelectBox
-            id={`${idPrefix}-os-edit`}
-            items={operatingSystemList}
-            selected={enableOsSelect ? (data.operatingSystemId || '0') : '_'}
-            onChange={selectedId => this.handleChange('operatingSystemId', selectedId)}
-          />
-        </FieldRow>
-
-        <FieldRow label={`${msg.memory()} (MiB)`} id={`${idPrefix}-memory`} required>
-          <FormControl
-            id={`${idPrefix}-memory-edit`}
-            className={style['memory-input']}
-            type='number'
-            value={data.memory}
-            onChange={e => this.handleChange('memory', e.target.value)}
-          />
-        </FieldRow>
-
-        <FieldRow label={msg.cpus()} id={`${idPrefix}-cpus`} required>
-          <FormControl
-            id={`${idPrefix}-cpus-edit`}
-            className={style['cpus-input']}
-            type='number'
-            value={data.cpus}
-            onChange={e => this.handleChange('cpus', e.target.value)}
-          />
-        </FieldRow>
-
-        <FieldRow label={msg.optimizedFor()} id={`${idPrefix}-optimizedFor`} required>
-          <SelectBox
-            id={`${idPrefix}-optimizedFor-edit`}
-            items={Object.values(this.buildOptimizedForList(data, msg))}
-            selected={data.optimizedFor || '_'}
-            onChange={selectedId => this.handleChange('optimizedFor', selectedId)}
-          />
-        </FieldRow>
-
-        <FieldRow id={`${idPrefix}-startOnCreation`}>
-          <Checkbox
-            id={`${idPrefix}-startOnCreation-edit`}
-            checked={!!data.startOnCreation}
-            onChange={e => this.handleChange('startOnCreation', e.target.checked)}
-          >
-            {msg.startVmOnCreation()}
-          </Checkbox>
-        </FieldRow>
-
-        {/* -- Cloud-Init -- */}
-        <FieldRow id={`${idPrefix}-cloudInitEnabled`} rowClassName={style['cloud-init']}>
-          <Checkbox
-            id={`${idPrefix}-cloudInitEnabled-edit`}
-            checked={!!data.cloudInitEnabled}
-            onChange={e => this.handleChange('cloudInitEnabled', e.target.checked)}
-          >
-            {msg.cloudInitEnable()}
-          </Checkbox>
-        </FieldRow>
-
-        { enableCloudInit &&
-          <React.Fragment>
-            <SubHeading>{msg.cloudInitOptions()}</SubHeading>
-
-            <FieldRow
-              label={msg.hostName()}
-              id={`${idPrefix}-cloudInitHostname`}
-              vertical
-              validationState={data.initHostname && indicators.hostName ? 'error' : undefined}
-              errorMessage={msg.pleaseEnterValidHostName()}
-            >
-              <FormControl
-                id={`${idPrefix}-cloudInitHostname-edit`}
-                type='text'
-                defaultValue={data.initHostname}
-                onChange={e => this.handleChange('initHostname', e.target.value)}
-              />
-            </FieldRow>
-
-            <FieldRow label={msg.sshAuthorizedKeys()} id={`${idPrefix}-cloudInitSshKeys`} vertical>
-              <FormControl
-                id={`${idPrefix}-cloudInitSshKeys-edit`}
-                componentClass='textarea'
-                rows={5}
-                defaultValue={data.initSshKeys}
-                onChange={e => this.handleChange('initSshKeys', e.target.value)}
-              />
-            </FieldRow>
-          </React.Fragment>
-        }
-
-        { enableSysPrep &&
-          <React.Fragment>
-            <SubHeading>{msg.sysPrepOptions()}</SubHeading>
-
-            <FieldRow
-              label={msg.hostName()}
-              id={`${idPrefix}-sysPrepHostname`}
-              vertical
-              validationState={data.initHostname && indicators.hostName ? 'error' : undefined}
-              errorMessage={msg.pleaseEnterValidHostName()}
-            >
-              <FormControl
-                id={`${idPrefix}-sysPrepHostname-edit`}
-                type='text'
-                defaultValue={data.initHostname}
-                onChange={e => this.handleChange('initHostname', e.target.value)}
-              />
-            </FieldRow>
-
-            {/*  Configure Timezone checkbox */}
-            <FieldRow id={`${idPrefix}-sysPrepTimezone-configure`} vertical>
-              <Checkbox
-                id={`${idPrefix}-sysprep-timezone-config`}
-                checked={data.enableInitTimezone}
-                onChange={e => this.handleChange('enableInitTimezone', e.target.checked)}
-              >
-                {msg.sysPrepTimezoneConfigure()}
-              </Checkbox>
-            </FieldRow>
-
-            <FieldRow label={msg.sysPrepTimezone()} id={`${idPrefix}-sysPrepTimezone`} vertical>
-              <SelectBox
-                id={`${idPrefix}-sysprep-timezone-select`}
-                items={timezones}
-                selected={data.lastInitTimezone}
-                onChange={selectedId => this.handleChange('initTimezone', selectedId)}
-                disabled={!data.enableInitTimezone}
-              />
-            </FieldRow>
-
-            <FieldRow label={msg.sysPrepAdministratorPassword()} id={`${idPrefix}-sysPrepAdminPassword`} vertical>
-              <FormControl
-                id={`${idPrefix}-sysPrepAdminPassword-edit`}
-                type='password'
-                defaultValue={data.initAdminPassword}
-                onChange={e => this.handleChange('initAdminPassword', e.target.value)}
-              />
-            </FieldRow>
-
-            <FieldRow label={msg.sysPrepCustomScript()} id={`${idPrefix}-sysPrepCustomScript`} vertical>
-              <FormControl
-                id={`${idPrefix}-sysPrepCustomScript-edit`}
-                componentClass='textarea'
-                rows={5}
-                defaultValue={data.initCustomScript}
-                onChange={e => this.handleChange('initCustomScript', e.target.value)}
-              />
-            </FieldRow>
-          </React.Fragment>
-        }
-      </Grid>
-
-      {/* Advanced CPU Topology Options */}
-      <ExpandCollapse id={`${idPrefix}-advanced-options`} textCollapsed={msg.advancedCpuTopologyOptions()} textExpanded={msg.advancedCpuTopologyOptions()}>
+    return (
+      <Form horizontal id={idPrefix}>
         <Grid className={style['settings-container']}>
-          <FieldRow fieldCols={3} label={msg.virtualSockets()} id={`${idPrefix}-topology-sockets`}>
-            <SelectBox
-              id={`${idPrefix}-topology-sockets-edit`}
-              items={this.mapVCpuTopologyItems(vCpuTopologyDividers.sockets)}
-              selected={data.topology.sockets.toString()}
-              onChange={selectedId => { this.handleChange('topology', selectedId, { vcpu: 'sockets' }) }}
+          {/* -- VM name and where it will live -- */}
+          <FieldRow label={msg.name()} id={`${idPrefix}-name`} required validationState={indicators.name} errorMessage={data.name ? msg.pleaseEnterValidVmName() : ''}>
+            <FormControl
+              id={`${idPrefix}-name-edit`}
+              autoFocus
+              autoComplete='off'
+              type='text'
+              defaultValue={data.name}
+              onChange={e => this.handleChange('name', e.target.value)}
             />
           </FieldRow>
-          <FieldRow fieldCols={3} label={msg.coresPerSockets()} id={`${idPrefix}-topology-cores`}>
-            <SelectBox
-              id={`${idPrefix}-topology-cores-edit`}
-              items={this.mapVCpuTopologyItems(vCpuTopologyDividers.cores)}
-              selected={data.topology.cores.toString()}
-              onChange={selectedId => { this.handleChange('topology', selectedId, { vcpu: 'cores' }) }}
+
+          <FieldRow label={msg.description()} id={`${idPrefix}-description`}>
+            <FormControl
+              id={`${idPrefix}-description-edit`}
+              componentClass='textarea'
+              defaultValue={data.description}
+              onChange={e => this.handleChange('description', e.target.value)}
             />
           </FieldRow>
-          <FieldRow
-            fieldCols={3}
-            label={msg.threadsPerCores()}
-            id={`${idPrefix}-topology-threads`}
-            tooltip={threadsTooltip}
-          >
+
+          <FieldRow label={msg.cluster()} id={`${idPrefix}-cluster`} required>
             <SelectBox
-              id={`${idPrefix}-topology-threads-edit`}
-              items={this.mapVCpuTopologyItems(vCpuTopologyDividers.threads)}
-              selected={data.topology.threads.toString()}
-              onChange={selectedId => { this.handleChange('topology', selectedId, { vcpu: 'threads' }) }}
+              id={`${idPrefix}-cluster-edit`}
+              items={clusterList}
+              selected={data.clusterId || '_'}
+              onChange={selectedId => this.handleChange('clusterId', selectedId)}
+              validationState={indicators.cluster}
             />
           </FieldRow>
+
+          {/* -- Provision Source -- */}
+          <FieldRow label={msg.provisionSource()} id={`${idPrefix}-provision`} required>
+            <SelectBox
+              id={`${idPrefix}-provision-edit`}
+              items={provisionSourceList}
+              selected={data.provisionSource || '_'}
+              onChange={selectedId => this.handleChange('provisionSource', selectedId)}
+            />
+          </FieldRow>
+
+          {/* -- Provision Source: ISO -- */}
+          { data.provisionSource === 'iso' && (
+            <FieldRow label={msg.cd()} id={`${idPrefix}-iso`} required>
+              <SelectBox
+                id={`${idPrefix}-iso-edit`}
+                items={isoList}
+                selected={data.isoImage || '_'}
+                onChange={selectedId => this.handleChange('isoImage', selectedId)}
+                validationState={indicators.isoList}
+              />
+            </FieldRow>
+          )}
+
+          {/* -- Provision Source: Template -- */}
+          { data.provisionSource === 'template' && (
+            <FieldRow label={msg.template()} id={`${idPrefix}-template`} required>
+              <SelectBox
+                id={`${idPrefix}-template-edit`}
+                items={templateList}
+                selected={data.templateId || '_'}
+                onChange={selectedId => this.handleChange('templateId', selectedId)}
+                validationState={indicators.template}
+              />
+            </FieldRow>
+          )}
+
+          {/* -- Common -- */}
+          <FieldRow label={msg.operatingSystem()} id={`${idPrefix}-os`} required>
+            <SelectBox
+              id={`${idPrefix}-os-edit`}
+              items={operatingSystemList}
+              selected={enableOsSelect ? (data.operatingSystemId || '0') : '_'}
+              onChange={selectedId => this.handleChange('operatingSystemId', selectedId)}
+            />
+          </FieldRow>
+
+          <FieldRow label={`${msg.memory()} (MiB)`} id={`${idPrefix}-memory`} required>
+            <FormControl
+              id={`${idPrefix}-memory-edit`}
+              className={style['memory-input']}
+              type='number'
+              value={data.memory}
+              onChange={e => this.handleChange('memory', e.target.value)}
+            />
+          </FieldRow>
+
+          <FieldRow label={msg.cpus()} id={`${idPrefix}-cpus`} required>
+            <FormControl
+              id={`${idPrefix}-cpus-edit`}
+              className={style['cpus-input']}
+              type='number'
+              value={data.cpus}
+              onChange={e => this.handleChange('cpus', e.target.value)}
+            />
+          </FieldRow>
+
+          <FieldRow label={msg.optimizedFor()} id={`${idPrefix}-optimizedFor`} required>
+            <SelectBox
+              id={`${idPrefix}-optimizedFor-edit`}
+              items={Object.values(this.buildOptimizedForList(data, msg))}
+              selected={data.optimizedFor || '_'}
+              onChange={selectedId => this.handleChange('optimizedFor', selectedId)}
+            />
+          </FieldRow>
+
+          <FieldRow id={`${idPrefix}-startOnCreation`}>
+            <Checkbox
+              id={`${idPrefix}-startOnCreation-edit`}
+              checked={!!data.startOnCreation}
+              onChange={e => this.handleChange('startOnCreation', e.target.checked)}
+            >
+              {msg.startVmOnCreation()}
+            </Checkbox>
+          </FieldRow>
+
+          {/* -- Cloud-Init -- */}
+          <FieldRow id={`${idPrefix}-cloudInitEnabled`} rowClassName={style['cloud-init']}>
+            <Checkbox
+              id={`${idPrefix}-cloudInitEnabled-edit`}
+              checked={!!data.cloudInitEnabled}
+              onChange={e => this.handleChange('cloudInitEnabled', e.target.checked)}
+            >
+              {msg.cloudInitEnable()}
+            </Checkbox>
+          </FieldRow>
+
+          { enableCloudInit && (
+            <>
+              <SubHeading>{msg.cloudInitOptions()}</SubHeading>
+
+              <FieldRow
+                label={msg.hostName()}
+                id={`${idPrefix}-cloudInitHostname`}
+                vertical
+                validationState={data.initHostname && indicators.hostName ? 'error' : undefined}
+                errorMessage={msg.pleaseEnterValidHostName()}
+              >
+                <FormControl
+                  id={`${idPrefix}-cloudInitHostname-edit`}
+                  type='text'
+                  defaultValue={data.initHostname}
+                  onChange={e => this.handleChange('initHostname', e.target.value)}
+                />
+              </FieldRow>
+
+              <FieldRow label={msg.sshAuthorizedKeys()} id={`${idPrefix}-cloudInitSshKeys`} vertical>
+                <FormControl
+                  id={`${idPrefix}-cloudInitSshKeys-edit`}
+                  componentClass='textarea'
+                  rows={5}
+                  defaultValue={data.initSshKeys}
+                  onChange={e => this.handleChange('initSshKeys', e.target.value)}
+                />
+              </FieldRow>
+            </>
+          )}
+
+          { enableSysPrep && (
+            <>
+              <SubHeading>{msg.sysPrepOptions()}</SubHeading>
+
+              <FieldRow
+                label={msg.hostName()}
+                id={`${idPrefix}-sysPrepHostname`}
+                vertical
+                validationState={data.initHostname && indicators.hostName ? 'error' : undefined}
+                errorMessage={msg.pleaseEnterValidHostName()}
+              >
+                <FormControl
+                  id={`${idPrefix}-sysPrepHostname-edit`}
+                  type='text'
+                  defaultValue={data.initHostname}
+                  onChange={e => this.handleChange('initHostname', e.target.value)}
+                />
+              </FieldRow>
+
+              {/*  Configure Timezone checkbox */}
+              <FieldRow id={`${idPrefix}-sysPrepTimezone-configure`} vertical>
+                <Checkbox
+                  id={`${idPrefix}-sysprep-timezone-config`}
+                  checked={data.enableInitTimezone}
+                  onChange={e => this.handleChange('enableInitTimezone', e.target.checked)}
+                >
+                  {msg.sysPrepTimezoneConfigure()}
+                </Checkbox>
+              </FieldRow>
+
+              <FieldRow label={msg.sysPrepTimezone()} id={`${idPrefix}-sysPrepTimezone`} vertical>
+                <SelectBox
+                  id={`${idPrefix}-sysprep-timezone-select`}
+                  items={timezones}
+                  selected={data.lastInitTimezone}
+                  onChange={selectedId => this.handleChange('initTimezone', selectedId)}
+                  disabled={!data.enableInitTimezone}
+                />
+              </FieldRow>
+
+              <FieldRow label={msg.sysPrepAdministratorPassword()} id={`${idPrefix}-sysPrepAdminPassword`} vertical>
+                <FormControl
+                  id={`${idPrefix}-sysPrepAdminPassword-edit`}
+                  type='password'
+                  defaultValue={data.initAdminPassword}
+                  onChange={e => this.handleChange('initAdminPassword', e.target.value)}
+                />
+              </FieldRow>
+
+              <FieldRow label={msg.sysPrepCustomScript()} id={`${idPrefix}-sysPrepCustomScript`} vertical>
+                <FormControl
+                  id={`${idPrefix}-sysPrepCustomScript-edit`}
+                  componentClass='textarea'
+                  rows={5}
+                  defaultValue={data.initCustomScript}
+                  onChange={e => this.handleChange('initCustomScript', e.target.value)}
+                />
+              </FieldRow>
+            </>
+          )}
         </Grid>
-      </ExpandCollapse>
-    </Form>
+
+        {/* Advanced CPU Topology Options */}
+        <ExpandCollapse id={`${idPrefix}-advanced-options`} textCollapsed={msg.advancedCpuTopologyOptions()} textExpanded={msg.advancedCpuTopologyOptions()}>
+          <Grid className={style['settings-container']}>
+            <FieldRow fieldCols={3} label={msg.virtualSockets()} id={`${idPrefix}-topology-sockets`}>
+              <SelectBox
+                id={`${idPrefix}-topology-sockets-edit`}
+                items={this.mapVCpuTopologyItems(vCpuTopologyDividers.sockets)}
+                selected={data.topology.sockets.toString()}
+                onChange={selectedId => { this.handleChange('topology', selectedId, { vcpu: 'sockets' }) }}
+              />
+            </FieldRow>
+            <FieldRow fieldCols={3} label={msg.coresPerSockets()} id={`${idPrefix}-topology-cores`}>
+              <SelectBox
+                id={`${idPrefix}-topology-cores-edit`}
+                items={this.mapVCpuTopologyItems(vCpuTopologyDividers.cores)}
+                selected={data.topology.cores.toString()}
+                onChange={selectedId => { this.handleChange('topology', selectedId, { vcpu: 'cores' }) }}
+              />
+            </FieldRow>
+            <FieldRow
+              fieldCols={3}
+              label={msg.threadsPerCores()}
+              id={`${idPrefix}-topology-threads`}
+              tooltip={threadsTooltip}
+            >
+              <SelectBox
+                id={`${idPrefix}-topology-threads-edit`}
+                items={this.mapVCpuTopologyItems(vCpuTopologyDividers.threads)}
+                selected={data.topology.threads.toString()}
+                onChange={selectedId => { this.handleChange('topology', selectedId, { vcpu: 'threads' }) }}
+              />
+            </FieldRow>
+          </Grid>
+        </ExpandCollapse>
+      </Form>
+    )
   }
 }
 

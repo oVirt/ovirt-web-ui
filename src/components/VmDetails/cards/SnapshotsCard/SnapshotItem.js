@@ -42,9 +42,11 @@ SnapshotAction.propTypes = {
 }
 
 const StatusTooltip = ({ icon, text, id, placement }) => {
-  return <OverlayTrigger overlay={<PFTooltip id={id}>{text}</PFTooltip>} placement={placement} trigger={['hover', 'focus']}>
-    <a>{icon}</a>
-  </OverlayTrigger>
+  return (
+    <OverlayTrigger overlay={<PFTooltip id={id}>{text}</PFTooltip>} placement={placement} trigger={['hover', 'focus']}>
+      <a>{icon}</a>
+    </OverlayTrigger>
+  )
 }
 StatusTooltip.propTypes = {
   icon: PropTypes.node.isRequired,
@@ -107,7 +109,7 @@ class SnapshotItem extends React.Component {
       // Info popover
       buttons.push(
         <OverlayTrigger
-          overlay={
+          overlay={(
             <SnapshotDetail key='detail'
               id={`${this.props.id}-info-popover`}
               snapshot={this.props.snapshot}
@@ -117,7 +119,7 @@ class SnapshotItem extends React.Component {
               msg={msg}
               locale={locale}
             />
-          }
+          )}
           placement={this.state.isMobile || this.state.isTablet ? 'top' : 'left'}
           trigger='click'
           rootClose

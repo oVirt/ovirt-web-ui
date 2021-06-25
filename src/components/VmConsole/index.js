@@ -29,11 +29,11 @@ const InfoPageContainer = ({ mainText, secondaryText, icon, secondaryComponent }
       <img src={icon} />
       <span className={style['download-page-main-text']}>{ mainText }</span>
       <span className={style['download-page-secondary-text']}>{ secondaryText }</span>
-      { secondaryComponent &&
+      { secondaryComponent && (
         <span className={style['download-page-secondary-text']}>
           { secondaryComponent }
         </span>
-      }
+      )}
     </div>
   </div>
 )
@@ -105,25 +105,29 @@ class VmConsole extends React.Component {
     const websocket = config.get('websocket')
     const vmConsole = this.props.consoles.getIn(['vms', vmId])
     if (consoleId === RDP_ID) {
-      return <InfoPageContainer
-        icon={downloadIcon}
-        mainText={msg.downloadedRDPFile()}
-        secondaryText={msg.downloadedRDP()}
-      />
+      return (
+        <InfoPageContainer
+          icon={downloadIcon}
+          mainText={msg.downloadedRDPFile()}
+          secondaryText={msg.downloadedRDP()}
+        />
+      )
     }
     const currentConsole = vms.getIn(['vms', vmId, 'consoles']).find(c => c.get('id') === consoleId)
     if (this.state.isFirstRun) {
-      return <div>
-        <Loader loaderText={msg.loadingTripleDot()} size={SIZES.SMALL} />
-        <ConsoleConfirmationModal
-          vm={vms.getIn(['vms', vmId])}
-          consoleId={consoleId}
-          onClose={() => this.setState({ isFirstRun: false })}
-          isConsolePage
-          isNoVNC
-          show
-        />
-      </div>
+      return (
+        <div>
+          <Loader loaderText={msg.loadingTripleDot()} size={SIZES.SMALL} />
+          <ConsoleConfirmationModal
+            vm={vms.getIn(['vms', vmId])}
+            consoleId={consoleId}
+            onClose={() => this.setState({ isFirstRun: false })}
+            isConsolePage
+            isNoVNC
+            show
+          />
+        </div>
+      )
     }
 
     const proxyTicket = vmConsole && vmConsole.get('proxyTicket')
@@ -131,41 +135,43 @@ class VmConsole extends React.Component {
     switch (vmConsole && vmConsole.get('consoleStatus')) {
       case INIT_CONSOLE:
         if (ticket !== undefined && websocket !== null) {
-          return <div id='console-component' className={isFullScreen ? style['full-screen'] : null}>
-            {isFullScreen &&
-              <div className={style['toast-message']}>
-                <CounterAlert timeout={5} type='info' title={msg.pressF11ExitFullScreen()} />
-              </div>
-            }
-            <VncConsole
-              encrypt
-              resizeSession
-              scaleViewport
-              textConnecting={<Loader loaderText={msg.connecting()} size={SIZES.SMALL} />}
-              textDisconnect={msg.disconnect()}
-              textSendShortcut={msg.sendShortcutKey()}
-              textCtrlAltDel={msg.sendCtrlAltDel()}
-              credentials={{ password: ticket.value }}
-              path={proxyTicket}
-              host={websocket.get('host')}
-              port={websocket.get('port')}
-              portalToolbarTo='vm-console-toolbar-sendkeys'
-              consoleContainerId={NOVNC_CONTAINER_ID}
-              onDisconnected={
+          return (
+            <div id='console-component' className={isFullScreen ? style['full-screen'] : null}>
+              {isFullScreen && (
+                <div className={style['toast-message']}>
+                  <CounterAlert timeout={5} type='info' title={msg.pressF11ExitFullScreen()} />
+                </div>
+              )}
+              <VncConsole
+                encrypt
+                resizeSession
+                scaleViewport
+                textConnecting={<Loader loaderText={msg.connecting()} size={SIZES.SMALL} />}
+                textDisconnect={msg.disconnect()}
+                textSendShortcut={msg.sendShortcutKey()}
+                textCtrlAltDel={msg.sendCtrlAltDel()}
+                credentials={{ password: ticket.value }}
+                path={proxyTicket}
+                host={websocket.get('host')}
+                port={websocket.get('port')}
+                portalToolbarTo='vm-console-toolbar-sendkeys'
+                consoleContainerId={NOVNC_CONTAINER_ID}
+                onDisconnected={
                 (e) => !e.detail.clean ? onDisconnected('CONNECTION_FAILURE') : onDisconnected()
               }
-              onConnected={() => $(`#${NOVNC_CONTAINER_ID} canvas`).focus()}
-              additionalButtons={[
-                <Button
-                  key='full-screen'
-                  bsStyle='default'
-                  onClick={() => this.setState({ isFullScreen: true })}
-                >
-                  {msg.fullScreen()}
-                </Button>,
-              ]}
-            />
-          </div>
+                onConnected={() => $(`#${NOVNC_CONTAINER_ID} canvas`).focus()}
+                additionalButtons={[
+                  <Button
+                    key='full-screen'
+                    bsStyle='default'
+                    onClick={() => this.setState({ isFullScreen: true })}
+                  >
+                    {msg.fullScreen()}
+                  </Button>,
+                ]}
+              />
+            </div>
+          )
         }
         break
 
@@ -173,16 +179,20 @@ class VmConsole extends React.Component {
         return <InfoPageContainer icon={downloadIcon} mainText={msg.downloadedVVFile()} secondaryText={msg[`downloaded${currentConsole.get('protocol').toUpperCase()}`]()} />
 
       case DISCONNECTED_CONSOLE:
-        return <InfoPageContainer
-          icon={disconnectIcon}
-          mainText={msg.disconectedConsole()}
-          secondaryText={vmConsole.get('reason') === 'CONNECTION_FAILURE' ? <span dangerouslySetInnerHTML={{ __html: msg.connectionFailConsoleInfo() }} /> : msg.disconectedConsoleInfo()}
-          secondaryComponent={<Button bsStyle='primary' onClick={() => this.setState({ isFirstRun: true })}>{ msg.connect() }</Button>}
-        />
+        return (
+          <InfoPageContainer
+            icon={disconnectIcon}
+            mainText={msg.disconectedConsole()}
+            secondaryText={vmConsole.get('reason') === 'CONNECTION_FAILURE' ? <span dangerouslySetInnerHTML={{ __html: msg.connectionFailConsoleInfo() }} /> : msg.disconectedConsoleInfo()}
+            secondaryComponent={<Button bsStyle='primary' onClick={() => this.setState({ isFirstRun: true })}>{ msg.connect() }</Button>}
+          />
+        )
     }
-    return <div>
-      <Loader loaderText={msg.loadingTripleDot()} size={SIZES.SMALL} />
-    </div>
+    return (
+      <div>
+        <Loader loaderText={msg.loadingTripleDot()} size={SIZES.SMALL} />
+      </div>
+    )
   }
 }
 

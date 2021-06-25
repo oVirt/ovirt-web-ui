@@ -47,13 +47,15 @@ class EllipsisValue extends React.Component {
     const { className, id, children, tooltip } = this.props
 
     if (children) {
-      const ellipsisValue = (<span
-        className={classnames(style['field-value'], className)}
-        id={id}
-        ref={this.ref}
-      >
-        {children}
-      </span>)
+      const ellipsisValue = (
+        <span
+          className={classnames(style['field-value'], className)}
+          id={id}
+          ref={this.ref}
+        >
+          {children}
+        </span>
+      )
 
       return this.state.isOverflow
         ? (

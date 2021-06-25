@@ -55,25 +55,27 @@ const Col = ({
         maxWidth: `${widthPercent}%`,
       }
 
-  return <React.Fragment>
-    { offset > 0 &&
+  return (
+    <>
+      { offset > 0 && (
+        <div
+          style={{
+            flex: `0 0 ${offset * 100 / 12}%`,
+            maxWidth: `${offset * 100 / 12}%`,
+          }}
+        />
+      )}
       <div
-        style={{
-          flex: `0 0 ${offset * 100 / 12}%`,
-          maxWidth: `${offset * 100 / 12}%`,
-        }}
-      />
-    }
-    <div
-      column-content={content}
-      className={cn}
-      style={{ ...colStyle, ...style }}
-      id={id}
-      {...props}
-    >
-      {children}
-    </div>
-  </React.Fragment>
+        column-content={content}
+        className={cn}
+        style={{ ...colStyle, ...style }}
+        id={id}
+        {...props}
+      >
+        {children}
+      </div>
+    </>
+  )
 }
 Col.propTypes = {
   children: PropTypes.node.isRequired,

@@ -280,17 +280,19 @@ class CreateVmWizard extends React.Component {
               .map(record => buildMessageFromRecord(record.toJS(), msg))
               .toJS()
 
-          return <SummaryReview
-            id='create-vm-wizard-review'
-            basic={this.state.steps.basic}
-            network={this.state.steps.network.nics}
-            storage={this.state.steps.storage.disks}
-            progress={{
-              inProgress,
-              result: correlatedResult, // undefined (no result yet) | 'success' | 'error'
-              messages: correlatedMessages,
-            }}
-          />
+          return (
+            <SummaryReview
+              id='create-vm-wizard-review'
+              basic={this.state.steps.basic}
+              network={this.state.steps.network.nics}
+              storage={this.state.steps.storage.disks}
+              progress={{
+                inProgress,
+                result: correlatedResult, // undefined (no result yet) | 'success' | 'error'
+                messages: correlatedMessages,
+              }}
+            />
+          )
         },
         onExit: () => {
           this.setState(produce(draft => { draft.correlationId = null }))
@@ -537,65 +539,69 @@ class CreateVmWizard extends React.Component {
     const enableGoBack = activeStepIndex > 0 && !isPrimaryClose && this.wizardAllowClickBack()
     const enableGoForward = (isReviewStep && !vmCreateWorking) || this.wizardAllowClickNext()
 
-    return <React.Fragment>
-      {!showCloseWizardDialog && <Wizard
-        dialogClassName='modal-lg wizard-pf'
-        show={this.props.show}
-      >
-        <Wizard.Header onClose={this.showCloseWizardDialog} title={msg.addNewVm()} />
-        <Wizard.Body>
-          <Wizard.Pattern.Body
-            steps={this.wizardSteps}
-            activeStepIndex={activeStepIndex}
-            activeStepStr={(activeStepIndex + 1).toString()}
-            goToStep={this.wizardGoToStep}
-          />
-        </Wizard.Body>
-        <Wizard.Footer>
-          <Button bsStyle='default' onClick={this.showCloseWizardDialog}>
-            { msg.createVmWizardButtonCancel() }
-          </Button>
-          <Button
-            bsStyle='default'
-            onClick={this.wizardClickBack}
-            disabled={!enableGoBack}
+    return (
+      <>
+        {!showCloseWizardDialog && (
+          <Wizard
+            dialogClassName='modal-lg wizard-pf'
+            show={this.props.show}
           >
-            <Icon type='fa' name='angle-left' />
-            { msg.createVmWizardButtonBack() }
-          </Button>
-          { isPrimaryClose &&
-          <Button onClick={this.hideAndResetState}>
-            { msg.createVmWizardButtonClose() }
-          </Button>
-          }
-          <Button
-            bsStyle='primary'
-            onClick={
-              isPrimaryNext
-                ? this.wizardClickNext
-                : isPrimaryCreate
-                  ? this.handleCreateVm
-                  : this.hideAndNavigate
-            }
-            disabled={!enableGoForward}
-          >
-            { isPrimaryNext && msg.createVmWizardButtonNext() }
-            { isPrimaryCreate && msg.createVmWizardButtonCreate() }
-            { isPrimaryClose && msg.createVmWizardButtonCloseAndNavigate() }
-            <Icon type='fa' name='angle-right' />
-          </Button>
-        </Wizard.Footer>
-      </Wizard>
+            <Wizard.Header onClose={this.showCloseWizardDialog} title={msg.addNewVm()} />
+            <Wizard.Body>
+              <Wizard.Pattern.Body
+                steps={this.wizardSteps}
+                activeStepIndex={activeStepIndex}
+                activeStepStr={(activeStepIndex + 1).toString()}
+                goToStep={this.wizardGoToStep}
+              />
+            </Wizard.Body>
+            <Wizard.Footer>
+              <Button bsStyle='default' onClick={this.showCloseWizardDialog}>
+                { msg.createVmWizardButtonCancel() }
+              </Button>
+              <Button
+                bsStyle='default'
+                onClick={this.wizardClickBack}
+                disabled={!enableGoBack}
+              >
+                <Icon type='fa' name='angle-left' />
+                { msg.createVmWizardButtonBack() }
+              </Button>
+              { isPrimaryClose && (
+                <Button onClick={this.hideAndResetState}>
+                  { msg.createVmWizardButtonClose() }
+                </Button>
+              )}
+              <Button
+                bsStyle='primary'
+                onClick={
+                  isPrimaryNext
+                    ? this.wizardClickNext
+                    : isPrimaryCreate
+                      ? this.handleCreateVm
+                      : this.hideAndNavigate
+                }
+                disabled={!enableGoForward}
+              >
+                { isPrimaryNext && msg.createVmWizardButtonNext() }
+                { isPrimaryCreate && msg.createVmWizardButtonCreate() }
+                { isPrimaryClose && msg.createVmWizardButtonCloseAndNavigate() }
+                <Icon type='fa' name='angle-right' />
+              </Button>
+            </Wizard.Footer>
+          </Wizard>
+        )
       }
-      <NavigationConfirmationModal
-        show={showCloseWizardDialog}
-        onYes={() => {
-          this.setState(produce(draft => { draft.showCloseWizardDialog = false }))
-          this.hideAndResetState()
-        }}
-        onNo={this.hideCloseWizardDialog}
-      />
-    </React.Fragment>
+        <NavigationConfirmationModal
+          show={showCloseWizardDialog}
+          onYes={() => {
+            this.setState(produce(draft => { draft.showCloseWizardDialog = false }))
+            this.hideAndResetState()
+          }}
+          onNo={this.hideCloseWizardDialog}
+        />
+      </>
+    )
   }
 }
 

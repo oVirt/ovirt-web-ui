@@ -40,7 +40,7 @@ class RestoreConfirmationModal extends React.Component {
     const minDescription = escapeHtml(getMinimizedString(snapshot.get('description'), MAX_DESCRIPTION_SIZE))
 
     return (
-      <React.Fragment>
+      <>
         { trigger({ onClick: this.open })}
         <MessageDialog
           id={id}
@@ -52,23 +52,23 @@ class RestoreConfirmationModal extends React.Component {
           secondaryActionButtonContent={msg.cancel()}
           title={msg.confirmRestore()}
           icon={icon}
-          primaryContent={
+          primaryContent={(
             <div
               id={`${id}-lead`}
               className='lead'
               dangerouslySetInnerHTML={{
                 __html: msg.areYouSureYouWantToRestoreSnapshot({ snapshotName: `"<strong>${minDescription}</strong>"` }),
               }}
-            />}
-          secondaryContent={
-            snapshotsThatWillBeDeleted.size > 0 &&
+            />
+          )}
+          secondaryContent={ snapshotsThatWillBeDeleted.size > 0 && (
             <div id={`${id}-secondary`}>
               {msg.nextSnapshotsWillBeDeleted()}
               {snapshotsThatWillBeDeleted.map((s) => <div key={s.get('date')}>{s.get('description')}</div>)}
             </div>
-          }
+          )}
         />
-      </React.Fragment>
+      </>
     )
   }
 }

@@ -25,18 +25,21 @@ const nicLinkInfoSettings = (msg) => ({
 const NicLinkStateIcon = ({ linkState = false, showTooltip = true, idSuffix }) => {
   const { msg } = useContext(MsgContext)
   const linkInfo = nicLinkInfoSettings(msg)[linkState]
-  const theIcon =
+  const theIcon = (
     <Icon
       id={`nic-link-icon-${idSuffix || linkState}`}
       type={linkInfo.type}
       name={linkInfo.name}
       className={`${style['link-icon']} ${linkInfo.className}`}
     />
+  )
 
   if (showTooltip) {
-    return <Tooltip id={`nic-link-icon-tooltip-${idSuffix || linkState}`} tooltip={linkInfo.tooltip}>
-      {theIcon}
-    </Tooltip>
+    return (
+      <Tooltip id={`nic-link-icon-tooltip-${idSuffix || linkState}`} tooltip={linkInfo.tooltip}>
+        {theIcon}
+      </Tooltip>
+    )
   }
 
   return theIcon

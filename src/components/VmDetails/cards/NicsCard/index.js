@@ -139,9 +139,9 @@ class NicsCard extends React.Component {
         onCancel={() => { onEditChange(false) }}
         onSave={() => { onEditChange(false) }}
       >
-        {({ isEditing }) =>
+        {({ isEditing }) => (
           <Grid className={style['nics-container']}>
-            { isEditing && canCreateNic &&
+            { isEditing && canCreateNic && (
               <Row key={`${idPrefix}-new`} id={`${idPrefix}-new`}>
                 <Col>
                   <NicEditor
@@ -160,16 +160,16 @@ class NicsCard extends React.Component {
                   />
                 </Col>
               </Row>
-            }
+            )}
 
-            { nicList.length === 0 &&
+            { nicList.length === 0 && (
               <Row>
                 <Col>
                   <div className={itemStyle['no-items']} id={`${idPrefix}-no-nics`}>{msg.noNics()}</div>
                 </Col>
               </Row>
-            }
-            { nicList.length > 0 && nicList.map(nic =>
+            )}
+            { nicList.length > 0 && nicList.map(nic => (
               <Row key={nic.id} id={`${idPrefix}-${nic.name}`}>
                 <Col style={{ display: 'block' }}>
                   <NicListItem
@@ -184,9 +184,10 @@ class NicsCard extends React.Component {
                   />
                 </Col>
               </Row>
+            )
             )}
           </Grid>
-        }
+        )}
       </BaseCard>
     )
   }

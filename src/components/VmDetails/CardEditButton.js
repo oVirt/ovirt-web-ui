@@ -45,15 +45,17 @@ class CardEditButton extends React.Component {
     const myClick = editEnabled ? noop : this.enableEditHandler
 
     if (!editable && disableTooltip) {
-      return (<Tooltip
-        tooltip={<span>{disableTooltip}</span>}
-        placement={placement}
-        id={`${id}-card-edit-button-tooltip`}
-      >
-        <a className={`${style['card-edit-button']} ${style['card-edit-button-disabled']}`} id={id}>
-          <Icon type='pf' name='edit' />
-        </a>
-      </Tooltip>)
+      return (
+        <Tooltip
+          tooltip={<span>{disableTooltip}</span>}
+          placement={placement}
+          id={`${id}-card-edit-button-tooltip`}
+        >
+          <a className={`${style['card-edit-button']} ${style['card-edit-button-disabled']}`} id={id}>
+            <Icon type='pf' name='edit' />
+          </a>
+        </Tooltip>
+      )
     }
     if (!editable) {
       return null

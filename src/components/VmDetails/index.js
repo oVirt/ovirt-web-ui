@@ -58,7 +58,7 @@ class VmDetailsContainer extends React.Component {
           )}
         </NavigationPrompt>
 
-        {vm.get('nextRunExists') &&
+        {vm.get('nextRunExists') && (
           <Row>
             <Col>
               <Card>
@@ -68,7 +68,7 @@ class VmDetailsContainer extends React.Component {
               </Card>
             </Col>
           </Row>
-        }
+        )}
 
         <Row>
           <Col cols={4} className={styles['col-overview']}><OverviewCard vm={vm} onEditChange={(isEdit, isDirty) => this.handleEditChange('over', isEdit, isDirty)} /></Col>

@@ -13,20 +13,22 @@ import { MsgContext } from '_/intl'
 const UserMessage = ({ record, id, onDismissMessage }) => {
   const { msg } = useContext(MsgContext)
   const time = getFormatedDateTime(record.get('time'))
-  return (<Notification seen>
-    <NotificationDrawer.Dropdown id={id}>
-      <MenuItem onClick={onDismissMessage}>
-        { msg.clear() }
-      </MenuItem>
-    </NotificationDrawer.Dropdown>
-    <Icon className='pull-left' type='pf' name='warning-triangle-o' />
-    <Notification.Content>
-      <Notification.Message>
-        { buildMessageFromRecord(record.toJS(), msg) }
-      </Notification.Message>
-      <Notification.Info leftText={time.date} rightText={time.time} />
-    </Notification.Content>
-  </Notification>)
+  return (
+    <Notification seen>
+      <NotificationDrawer.Dropdown id={id}>
+        <MenuItem onClick={onDismissMessage}>
+          { msg.clear() }
+        </MenuItem>
+      </NotificationDrawer.Dropdown>
+      <Icon className='pull-left' type='pf' name='warning-triangle-o' />
+      <Notification.Content>
+        <Notification.Message>
+          { buildMessageFromRecord(record.toJS(), msg) }
+        </Notification.Message>
+        <Notification.Info leftText={time.date} rightText={time.time} />
+      </Notification.Content>
+    </Notification>
+  )
 }
 UserMessage.propTypes = {
   record: PropTypes.object.isRequired,
@@ -59,7 +61,7 @@ const VmUserMessages = ({ userMessages, onClearMessages, onDismissMessage, onClo
         <div className={style['notifications-list']}>
           {messagesList}
         </div>
-        { messagesCount > 0 &&
+        { messagesCount > 0 && (
           <NotificationDrawer.PanelAction className={style['action-panel']}>
             <NotificationDrawer.PanelActionLink data-toggle='clear-all'>
               <Button bsStyle='link' onClick={onClearMessages}>
@@ -68,7 +70,7 @@ const VmUserMessages = ({ userMessages, onClearMessages, onDismissMessage, onClo
               </Button>
             </NotificationDrawer.PanelActionLink>
           </NotificationDrawer.PanelAction>
-        }
+        )}
       </NotificationDrawer.PanelBody>
     </NotificationDrawer>
   )

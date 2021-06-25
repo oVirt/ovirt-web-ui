@@ -24,19 +24,21 @@ const ConfirmationModal = ({ show, title, confirm, body, subContent, onClose, ex
       <Modal.Body>
         {
           typeof body === 'string'
-            ? <React.Fragment>
-              <Icon type='pf' name='warning-triangle-o' />
-              <div id={accessibleDescription}>
-                <p className='lead'>
-                  { body }
-                </p>
-                {
+            ? (
+              <>
+                <Icon type='pf' name='warning-triangle-o' />
+                <div id={accessibleDescription}>
+                  <p className='lead'>
+                    { body }
+                  </p>
+                  {
                   subContent && typeof subContent === 'string'
                     ? <p>{ subContent }</p>
                     : subContent
                 }
-              </div>
-            </React.Fragment>
+                </div>
+              </>
+            )
             : body
         }
       </Modal.Body>

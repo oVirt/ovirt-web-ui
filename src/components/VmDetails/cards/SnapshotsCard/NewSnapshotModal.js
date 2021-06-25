@@ -110,28 +110,28 @@ class NewSnapshotModal extends Component {
                     id={`${modalId}-description-edit`}
                   />
                   {
-                    this.state.emptyDescription &&
-                    <HelpBlock>
-                      {msg.emptySnapshotDescription()}
-                    </HelpBlock>
-                  }
+                    this.state.emptyDescription && (
+                      <HelpBlock>
+                        {msg.emptySnapshotDescription()}
+                      </HelpBlock>
+                    )}
                 </div>
               </FormGroup>
               {
-                this.props.isVmRunning &&
-                <FormGroup bsClass='form-group col-sm-12'>
-                  <label className='col-sm-3 control-label'>
-                    {msg.saveMemory()}
-                  </label>
-                  <div className='col-sm-9'>
-                    <Checkbox
-                      id={`${idPrefix}-snapshot-save-memory`}
-                      checked={this.state.saveMemory}
-                      onChange={this.handleSaveMemoryChange}
-                    />
-                  </div>
-                </FormGroup>
-              }
+                this.props.isVmRunning && (
+                  <FormGroup bsClass='form-group col-sm-12'>
+                    <label className='col-sm-3 control-label'>
+                      {msg.saveMemory()}
+                    </label>
+                    <div className='col-sm-9'>
+                      <Checkbox
+                        id={`${idPrefix}-snapshot-save-memory`}
+                        checked={this.state.saveMemory}
+                        onChange={this.handleSaveMemoryChange}
+                      />
+                    </div>
+                  </FormGroup>
+                )}
             </Form>
           </Modal.Body>
           <Modal.Footer>
