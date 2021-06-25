@@ -173,7 +173,7 @@ function* refreshDetailPage ({ id, manualRefresh }) {
 
   // Load ISO images on manual refresh click only
   if (manualRefresh) {
-    yield fetchIsoFiles(Actions.getIsoFiles())
+    yield fetchIsoFiles()
   }
 }
 
@@ -184,7 +184,7 @@ function* refreshCreatePage ({ id, manualRefresh }) {
 
   // Load ISO images on manual refresh click only
   if (manualRefresh) {
-    yield fetchIsoFiles(Actions.getIsoFiles())
+    yield fetchIsoFiles()
   }
 }
 

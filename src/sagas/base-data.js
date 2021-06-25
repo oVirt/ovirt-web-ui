@@ -1,5 +1,5 @@
 import Api, { Transforms } from '_/ovirtapi'
-import { put, select, takeLatest, all, call } from 'redux-saga/effects'
+import { put, select, all, call } from 'redux-saga/effects'
 import {
   canUserUseTemplate,
   canUserUseCluster,
@@ -22,20 +22,11 @@ import {
   setVnicProfiles,
 } from '_/actions'
 
-import {
-  GET_ALL_CLUSTERS,
-  GET_ALL_HOSTS,
-  GET_ALL_OS,
-  GET_ALL_TEMPLATES,
-  GET_ALL_VNIC_PROFILES,
-  GET_USER_GROUPS,
-} from '_/constants'
-
 import { EVERYONE_GROUP_ID } from './index'
 import { fetchUnknownIcons } from './osIcons'
 
-export function* fetchAllClusters (action) {
-  const clusters = yield callExternalAction('getAllClusters', Api.getAllClusters, action)
+export function* fetchAllClusters () {
+  const clusters = yield callExternalAction('getAllClusters', Api.getAllClusters)
 
   if (clusters && clusters.cluster) {
     const clustersInternal = clusters.cluster.map(
@@ -57,8 +48,8 @@ export function* fetchAllClusters (action) {
   }
 }
 
-export function* fetchAllHosts (action) {
-  const hosts = yield callExternalAction('getAllHosts', Api.getAllHosts, action)
+export function* fetchAllHosts () {
+  const hosts = yield callExternalAction('getAllHosts', Api.getAllHosts)
 
   if (hosts && hosts.host) {
     const hostsInternal = hosts.host.map(
@@ -69,8 +60,8 @@ export function* fetchAllHosts (action) {
   }
 }
 
-export function* fetchAllOS (action) {
-  const operatingSystems = yield callExternalAction('getAllOperatingSystems', Api.getAllOperatingSystems, action)
+export function* fetchAllOS () {
+  const operatingSystems = yield callExternalAction('getAllOperatingSystems', Api.getAllOperatingSystems)
 
   if (operatingSystems && operatingSystems.operating_system) {
     const operatingSystemsInternal = operatingSystems.operating_system.map(
@@ -82,8 +73,8 @@ export function* fetchAllOS (action) {
   }
 }
 
-export function* fetchAllTemplates (action) {
-  const templates = yield callExternalAction('getAllTemplates', Api.getAllTemplates, action)
+export function* fetchAllTemplates () {
+  const templates = yield callExternalAction('getAllTemplates', Api.getAllTemplates)
 
   if (templates && templates.template) {
     const templatesInternal = templates.template.map(
@@ -109,8 +100,8 @@ export function* fetchAllTemplates (action) {
   }
 }
 
-export function* fetchAllVnicProfiles (action) {
-  const vnicProfiles = yield callExternalAction('getAllVnicProfiles', Api.getAllVnicProfiles, action)
+export function* fetchAllVnicProfiles () {
+  const vnicProfiles = yield callExternalAction('getAllVnicProfiles', Api.getAllVnicProfiles)
 
   if (vnicProfiles && vnicProfiles.vnic_profile) {
     const vnicProfilesInternal = vnicProfiles.vnic_profile.map(
@@ -182,12 +173,3 @@ export function* fetchUserGroups () {
 
   yield put(setUserGroups({ groups: groupIds }))
 }
-
-export default [
-  takeLatest(GET_ALL_CLUSTERS, fetchAllClusters),
-  takeLatest(GET_ALL_HOSTS, fetchAllHosts),
-  takeLatest(GET_ALL_OS, fetchAllOS),
-  takeLatest(GET_ALL_TEMPLATES, fetchAllTemplates),
-  takeLatest(GET_ALL_VNIC_PROFILES, fetchAllVnicProfiles),
-  takeLatest(GET_USER_GROUPS, fetchUserGroups),
-]
