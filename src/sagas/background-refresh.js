@@ -6,6 +6,7 @@ import {
 import {
   all,
   call,
+  fork,
   put,
   race,
   select,
@@ -53,7 +54,13 @@ function* refreshManually () {
 /**
  * Invoke the correct refresh function based on the app's current page type.
  */
-function* refreshData ({ payload: { targetPage, ...otherPayload } }) {
+function* refreshData ({
+  targetPage = { type: C.NO_REFRESH_TYPE },
+  pageRouterRefresh,
+  schedulerRefresh,
+  manualRefresh,
+  ...otherPayload
+}) {
   const refreshType =
     targetPage.type === C.NO_REFRESH_TYPE ? null
       : targetPage.type === undefined ? C.LIST_PAGE_TYPE
@@ -61,8 +68,15 @@ function* refreshData ({ payload: { targetPage, ...otherPayload } }) {
 
   console.info('refreshData() 🡒', 'refreshType:', refreshType, 'currentPage:', targetPage, 'payload:', otherPayload)
   if (refreshType) {
-    yield pagesRefreshers[refreshType](Object.assign({ id: targetPage.id }, otherPayload))
+    yield pagesRefreshers[refreshType]({
+      id: targetPage.id,
+      pageRouterRefresh,
+      schedulerRefresh,
+      manualRefresh,
+      ...otherPayload,
+    })
   }
+  yield put(Actions.updateLastRefresh())
   console.info('refreshData() 🡒 finished')
 }
 
@@ -80,11 +94,14 @@ function* getIdsByType (type) {
 }
 
 function* refreshListPage () {
-  const [ vmsPage, poolsPage ] = yield select(st => [ st.vms.get('vmsPage'), st.vms.get('poolsPage') ])
+  const [ vmsPage, vmsExpectMorePages, poolsPage, poolsExpectMorePages ] = yield select(st => [
+    st.vms.get('vmsPage'), st.vms.get('vmsExpectMorePages'),
+    st.vms.get('poolsPage'), st.vms.get('poolsExpectMorePages'),
+  ])
 
-  // Special case for the very first `refreshListPage` of the App .. use fetchByPage()!
-  if (vmsPage === 0 && poolsPage === 0) {
-    yield call(fetchByPage)
+  // list page initial state - fetch the first page
+  if (vmsPage === 0 && vmsExpectMorePages && poolsPage === 0 && poolsExpectMorePages) {
+    yield fetchByPage()
     return
   }
 
@@ -190,14 +207,17 @@ function* startSchedulerWithFixedDelay ({ payload: { delayInSeconds, startDelayI
   })
 }
 
-/* Continue previous wait period (unless immediate refresh is forced).
+/*
+  Continue previous wait period (unless immediate refresh is forced).
   Restarting the wait period could lead to irregular, long intervals without refresh
   or prevent the refresh (as long as user will keep changing the interval)
+
   Example:
-  1. previous refresh period is 2 min (1m 30sec already elapsed)
-  2. user changes it to 5min
-  3. already elapsed time will be taken into consideration and refresh will be
-     triggered after 3 m 30sec.
+    1. previous refresh period is 2 min (1m 30sec already elapsed)
+    2. user changes it to 5min
+    3. already elapsed time will be taken into consideration and refresh will be
+       triggered after 3 m 30sec.
+
   Result: Wait intervals will be 2min -> 2min -> 5min -> 5min.
   With restarting timers: 2min -> 2min -> 6min 30 sec -> 5min.
 */
@@ -217,6 +237,7 @@ function* schedulerWaitFor (timeInSeconds, cancelActionType = C.STOP_SCHEDULER_F
   if (!timeInSeconds) {
     return {}
   }
+
   const { stopped } = yield race({
     stopped: take(cancelActionType),
     fixedDelay: delay(timeInSeconds * 1000),
@@ -268,12 +289,12 @@ function* schedulerWithFixedDelay ({
       continue
     }
 
-    yield put(Actions.refresh({
+    yield refreshData({
       pageRouterRefresh: pageRouterRefresh && firstRun,
       manualRefresh: manualRefresh && firstRun,
       targetPage,
       schedulerRefresh: true,
-    }))
+    })
     firstRun = false
 
     console.log(`⏰ schedulerWithFixedDelay[${myId}] 🡒 stoppable delay for: ${delayInSeconds}`)
@@ -312,13 +333,46 @@ function* scheduleResumingNotifications ({ payload: { delayInSeconds } }) {
 function* logoutAndCancelScheduler () {
   yield put(Actions.setCurrentPage({ type: C.NO_REFRESH_TYPE }))
   yield put(Actions.stopSchedulerFixedDelay())
+  yield put(Actions.stopSchedulerForResumingNotifications())
+}
+
+// TODO: Remove after an upgrade to a redux-saga version that includes this effect
+// Adapted from https://redux-saga.js.org/docs/api#debouncems-pattern-saga-args
+function* debounce(interval, pattern, saga) {
+  while (true) {
+    let action = yield take(pattern)
+
+    while (true) {
+      const { debounced, latestAction } = yield race({
+        debounced: delay(interval),
+        latestAction: take(pattern),
+      })
+
+      if (debounced) {
+        yield fork(saga, action)
+        break
+      }
+
+      action = latestAction
+    }
+  }
 }
 
 export default [
-  takeEvery(C.START_SCHEDULER_FIXED_DELAY, startSchedulerWithFixedDelay),
+  // only process the 1st manual refresh received in a 5 second window
   throttle(5000, C.MANUAL_REFRESH, refreshManually),
-  throttle(5000, C.REFRESH_DATA, refreshData),
+
+  /*
+   * Note: If a user goes crazy swapping between pages very quickly, a lot of `CHANGE_PAGE`
+   *       actions will be fired.  Since changePage() puts `START_SCHEDULER_FIXED_DELAY`
+   *       to refresh the new page data each time, it is possible to get to a point where
+   *       multiple page refresh sagas are running at the same time.  That can cause
+   *       problems and slow down the app.  Not much to be done to prevent this from
+   *       happening without slowing down the responsiveness of the app.
+   */
   takeLatest(C.CHANGE_PAGE, changePage),
-  takeEvery(C.LOGOUT, logoutAndCancelScheduler),
+
+  takeEvery(C.START_SCHEDULER_FIXED_DELAY, startSchedulerWithFixedDelay),
   takeEvery(C.START_SCHEDULER_FOR_RESUMING_NOTIFICATIONS, scheduleResumingNotifications),
+  takeEvery(C.LOGOUT, logoutAndCancelScheduler),
 ]

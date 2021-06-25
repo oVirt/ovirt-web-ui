@@ -5,16 +5,17 @@ import { connect } from 'react-redux'
 import { ConnectedRouter } from 'connected-react-router'
 import { renderRoutes } from 'react-router-config'
 
-import LoadingData from './components/LoadingData'
-import OvirtApiCheckFailed from './components/OvirtApiCheckFailed'
-import SessionActivityTracker from './components/SessionActivityTracker'
-import VmsPageHeader from './components/VmsPageHeader'
-import ToastNotifications from './components/ToastNotifications'
-
-import getRoutes from './routes'
-import { fixedStrings } from './branding'
-import { MsgContext } from '_/intl'
+import LoadingData from '_/components/LoadingData'
 import NoLogin from '_/components/NoLogin'
+import OvirtApiCheckFailed from '_/components/OvirtApiCheckFailed'
+import RefreshIntervalChangeHandler from '_/components/RefreshIntervalChangeHandler'
+import SessionActivityTracker from '_/components/SessionActivityTracker'
+import ToastNotifications from '_/components/ToastNotifications'
+import VmsPageHeader from '_/components/VmsPageHeader'
+
+import getRoutes from '_/routes'
+import { fixedStrings } from '_/branding'
+import { MsgContext } from '_/intl'
 
 function isLoginMissing (config) {
   return !config.get('loginToken') || config.get('isTokenExpired')
@@ -71,6 +72,7 @@ const App = ({ history, config, appReady, activateSessionTracker }) => {
         <ToastNotifications />
         { appReady && activateSessionTracker && <SessionActivityTracker /> }
         { appReady && renderRoutes(getRoutes()) }
+        { appReady && <RefreshIntervalChangeHandler /> }
       </div>
     </ConnectedRouter>
   )

@@ -8,7 +8,6 @@ import {
   LOGIN_FAILED,
   LOGIN_SUCCESSFUL,
   LOGOUT,
-  REFRESH_DATA,
   SET_ADMINISTRATOR,
   SET_CPU_TOPOLOGY_OPTIONS,
   SET_CURRENT_PAGE,
@@ -24,6 +23,7 @@ import {
   SET_USER,
   SET_WEBSOCKET,
   SHOW_TOKEN_EXPIRED_MSG,
+  UPDATE_LAST_REFRESH,
 } from '_/constants'
 
 import { toUiConsole } from '_/utils'
@@ -165,7 +165,7 @@ const config = actionReducer(initialState, {
       defaultWindowsTimezone,
     })
   },
-  [REFRESH_DATA] (state) {
+  [UPDATE_LAST_REFRESH] (state) {
     return state.set('lastRefresh', Date.now())
   },
   [APP_CONFIGURED] (state) {

@@ -23,9 +23,9 @@ import {
 } from '_/actions'
 
 /**
- * Resolve a promise after the given delay (in milliseconds)
+ * Resolve a promise with the given value (default to `true`) after the given delay (in milliseconds)
  */
-export const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+export const delay = (ms, value = true) => new Promise(resolve => setTimeout(resolve, ms, value))
 
 /**
  * Compare the actual { major, minor, build} version to the required { major, minor} and

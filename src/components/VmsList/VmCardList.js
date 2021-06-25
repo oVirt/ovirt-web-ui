@@ -14,6 +14,10 @@ import style from './style.css'
 /**
  * Use Patternfly 'Single Select Card View' pattern to show every VM and Pool
  * available to the current user.
+ *
+ * NOTE: It is important that the first page of VMs & Pools has already been loaded
+ * before this component is rendered.  This will prevent two "initial page" fetches
+ * from running at the same time.  The `VmsList` component handles this normally.
  */
 const VmCardList = ({ vms, alwaysShowPoolCard, fetchMoreVmsAndPools }) => {
   const { msg, locale } = useContext(MsgContext)
@@ -42,7 +46,7 @@ const VmCardList = ({ vms, alwaysShowPoolCard, fetchMoreVmsAndPools }) => {
   const hasMore = vms.get('vmsExpectMorePages') || vms.get('poolsExpectMorePages')
   const [ page, sentinelRef, scrollerRef ] = useInfiniteScroll({ hasMore, distance: 0 })
 
-  useEffect(() => { // `refreshListPage` handles loading the first page of data
+  useEffect(() => { // `VmsList` will not display this component until the first page of data is loaded
     if (page > 0) {
       fetchMoreVmsAndPools()
     }

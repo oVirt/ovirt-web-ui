@@ -30,16 +30,16 @@ const NoVmAvailable = () => {
   )
 }
 
-const VmsList = ({ vms, requestActive }) => {
+const VmsList = ({ vms, waitForFirstFetch }) => {
   const haveVms = (vms.get('vms') && !vms.get('vms').isEmpty())
   const havePools = (vms.get('pools') && !vms.get('pools').isEmpty())
 
   let el = null
 
-  if (haveVms || havePools) {
-    el = <VmCardList />
-  } else if (requestActive) {
+  if (waitForFirstFetch) {
     el = <VmLoading />
+  } else if (haveVms || havePools) {
+    el = <VmCardList />
   } else {
     el = <NoVmAvailable />
   }
@@ -48,12 +48,15 @@ const VmsList = ({ vms, requestActive }) => {
 }
 VmsList.propTypes = {
   vms: PropTypes.object.isRequired,
-  requestActive: PropTypes.bool.isRequired,
+  waitForFirstFetch: PropTypes.bool.isRequired,
 }
 
 export default withRouter(connect(
   (state) => ({
     vms: state.vms,
-    requestActive: !state.activeRequests.isEmpty(),
+    waitForFirstFetch: (
+      state.vms.get('vmsPage') === 0 && !!state.vms.get('vmsExpectMorePages') &&
+      state.vms.get('poolsPage') === 0 && !!state.vms.get('poolsExpectMorePages')
+    ),
   })
 )(VmsList))
