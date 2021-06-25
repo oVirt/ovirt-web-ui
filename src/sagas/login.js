@@ -24,9 +24,6 @@ import {
   getAllStorageDomains,
   getAllTemplates,
   getAllVnicProfiles,
-  getRoles,
-  getUserGroups,
-  getUser,
 
   downloadConsole,
   getSingleVm,
@@ -48,6 +45,7 @@ import {
   fetchAllOS,
   fetchAllVnicProfiles,
   fetchAllTemplates,
+  fetchCurrentUser,
   fetchUserGroups,
 } from './base-data'
 import { downloadVmConsole } from './console'
@@ -55,10 +53,7 @@ import { fetchRoles } from './roles'
 import { fetchServerConfiguredValues, fetchGeneralEngineOption } from './server-configs'
 import { fetchDataCentersAndStorageDomains, fetchIsoFiles } from './storageDomains'
 import { loadIconsFromLocalStorage } from './osIcons'
-import {
-  transformAndPermitVm,
-  fetchCurrentUser,
-} from './index'
+import { transformAndPermitVm } from './index'
 
 import { loadFromLocalStorage, removeFromLocalStorage } from '_/storage'
 import { loadUserOptions } from './options'
@@ -209,9 +204,9 @@ function* initialLoad () {
   console.group('no data prerequisites')
   yield all([
     call(loadIconsFromLocalStorage),
-    call(fetchRoles, getRoles()),
-    call(fetchCurrentUser, getUser()),
-    call(fetchUserGroups, getUserGroups()),
+    call(fetchRoles),
+    call(fetchCurrentUser),
+    call(fetchUserGroups),
     call(fetchAllOS, getAllOperatingSystems()),
     call(fetchAllHosts, getAllHosts()),
     call(loadFilters),

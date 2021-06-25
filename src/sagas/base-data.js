@@ -17,6 +17,7 @@ import {
   setHosts,
   setOperatingSystems,
   setTemplates,
+  setUser,
   setUserGroups,
   setVnicProfiles,
 } from '_/actions'
@@ -124,6 +125,17 @@ export function* fetchAllVnicProfiles (action) {
 
     yield put(setVnicProfiles({ vnicProfiles: vnicProfilesInternal }))
   }
+}
+
+export function* fetchCurrentUser () {
+  const userId = yield select((state) => state.config.getIn(['user', 'id']))
+  const user = yield callExternalAction('user', Api.user, {
+    payload: {
+      userId,
+    },
+  })
+
+  yield put(setUser({ user: Transforms.User.toInternal({ user }) }))
 }
 
 /**
