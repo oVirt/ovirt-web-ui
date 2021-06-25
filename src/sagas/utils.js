@@ -1,7 +1,10 @@
 import {
   call,
+  fork,
   put,
+  race,
   select,
+  take,
 } from 'redux-saga/effects'
 
 import AppConfiguration from '_/config'
@@ -26,6 +29,28 @@ import {
  * Resolve a promise with the given value (default to `true`) after the given delay (in milliseconds)
  */
 export const delay = (ms, value = true) => new Promise(resolve => setTimeout(resolve, ms, value))
+
+// TODO: Remove after an upgrade to a redux-saga version that includes this effect
+// Adapted from https://redux-saga.js.org/docs/api#debouncems-pattern-saga-args
+export function* debounce (interval, pattern, saga) {
+  while (true) {
+    let action = yield take(pattern)
+
+    while (true) {
+      const { debounced, latestAction } = yield race({
+        debounced: delay(interval),
+        latestAction: take(pattern),
+      })
+
+      if (debounced) {
+        yield fork(saga, action)
+        break
+      }
+
+      action = latestAction
+    }
+  }
+}
 
 /**
  * Compare the actual { major, minor, build} version to the required { major, minor} and

@@ -6,7 +6,6 @@ import {
 import {
   all,
   call,
-  fork,
   put,
   race,
   select,
@@ -336,28 +335,6 @@ function* logoutAndCancelScheduler () {
   yield put(Actions.setCurrentPage({ type: C.NO_REFRESH_TYPE }))
   yield put(Actions.stopSchedulerFixedDelay())
   yield put(Actions.stopSchedulerForResumingNotifications())
-}
-
-// TODO: Remove after an upgrade to a redux-saga version that includes this effect
-// Adapted from https://redux-saga.js.org/docs/api#debouncems-pattern-saga-args
-function* debounce(interval, pattern, saga) {
-  while (true) {
-    let action = yield take(pattern)
-
-    while (true) {
-      const { debounced, latestAction } = yield race({
-        debounced: delay(interval),
-        latestAction: take(pattern),
-      })
-
-      if (debounced) {
-        yield fork(saga, action)
-        break
-      }
-
-      action = latestAction
-    }
-  }
 }
 
 export default [
