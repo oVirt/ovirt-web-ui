@@ -6,7 +6,7 @@ import AppConfiguration from '_/config'
 import { startSchedulerFixedDelay } from '_/actions'
 
 const RefreshIntervalChangeHandler = ({ refreshInterval, currentPage, restartScheduler }) => {
-  const [ currentRefresh, setCurrentRefresh ] = useState(refreshInterval)
+  const [currentRefresh, setCurrentRefresh] = useState(refreshInterval)
 
   useEffect(() => {
     if (currentRefresh !== refreshInterval) {
@@ -14,7 +14,7 @@ const RefreshIntervalChangeHandler = ({ refreshInterval, currentPage, restartSch
       setCurrentRefresh(refreshInterval)
       restartScheduler(refreshInterval, currentPage)
     }
-  }, [ currentRefresh, refreshInterval ])
+  }, [currentRefresh, refreshInterval])
 
   return null
 }
