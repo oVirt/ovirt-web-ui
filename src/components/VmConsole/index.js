@@ -61,7 +61,7 @@ class VmConsole extends React.Component {
   componentDidMount () {
     if (this.state.isFirstRun && this.props.consoleId === RDP_ID) {
       const domain = this.props.config.get('domain')
-      const username = this.props.config.getIn([ 'user', 'name' ])
+      const username = this.props.config.getIn(['user', 'name'])
       this.props.onRDP({ domain, username, vms: this.props.vms })
       this.setState({ isFirstRun: false })
     }
@@ -77,7 +77,7 @@ class VmConsole extends React.Component {
   }
 
   onFullScreen () {
-    var elem = document.getElementById('console-component')
+    const elem = document.getElementById('console-component')
     elem.onfullscreenchange = this.handleFullscreenChange
     if (elem.requestFullscreen) {
       elem.requestFullscreen()
@@ -91,8 +91,8 @@ class VmConsole extends React.Component {
   }
 
   handleFullscreenChange (event) {
-    let elem = event.target
-    let isFullscreen = document.fullscreenElement === elem
+    const elem = event.target
+    const isFullscreen = document.fullscreenElement === elem
 
     if (!isFullscreen) {
       this.setState({ isFullScreen: false })

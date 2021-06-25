@@ -33,10 +33,10 @@ import { INIT_CONSOLE, DOWNLOAD_CONSOLE } from '_/constants'
  * Push a virt-viewer connection file (__console.vv__) to connect a user to a VM's console
  */
 export function* downloadVmConsole (action) {
-  let { modalId, vmId, consoleId, usbAutoshare, usbFilter, hasGuestAgent, skipSSO, openInPage, isNoVNC } = action.payload
+  const { modalId, vmId, consoleId, usbAutoshare, usbFilter, hasGuestAgent, skipSSO, openInPage, isNoVNC } = action.payload
 
   if (hasGuestAgent && !skipSSO) {
-    let result = yield callExternalAction('vmLogon', Api.vmLogon, { payload: { vmId } }, true)
+    const result = yield callExternalAction('vmLogon', Api.vmLogon, { payload: { vmId } }, true)
     if (!result || result.status !== 'complete') {
       const {
         error: {
@@ -70,12 +70,12 @@ export function* downloadVmConsole (action) {
         : yield getVncOptions({ legacyOptions })
 
       data = adjustVVFile({ data, options })
-      fileDownload({ data, fileName: `console.vv`, mimeType: 'application/x-virt-viewer' })
+      fileDownload({ data, fileName: 'console.vv', mimeType: 'application/x-virt-viewer' })
       yield put(setConsoleStatus({ vmId, status: DOWNLOAD_CONSOLE }))
     } else {
-      let dataTicket = yield callExternalAction('consoleProxyTicket', Api.consoleProxyTicket,
+      const dataTicket = yield callExternalAction('consoleProxyTicket', Api.consoleProxyTicket,
         { type: 'INTRENAL_CONSOLE', payload: { vmId, consoleId } })
-      let ticket = yield callExternalAction('consoleTicket', Api.consoleTicket,
+      const ticket = yield callExternalAction('consoleTicket', Api.consoleTicket,
         { type: 'INTRENAL_CONSOLE', payload: { vmId, consoleId } })
       yield put(setConsoleTickets({ vmId, proxyTicket: dataTicket.proxy_ticket.value, ticket: ticket.ticket }))
       yield put(setConsoleStatus({ vmId, status: INIT_CONSOLE }))
@@ -147,7 +147,7 @@ export function* getRDPVm (action) {
  * console (which will disconnect the other user's existing session).
  */
 export function* openConsoleModal (action) {
-  let { modalId, vmId, usbAutoshare, usbFilter, userId, hasGuestAgent, consoleId, isNoVNC, openInPage } = action.payload
+  const { modalId, vmId, usbAutoshare, usbFilter, userId, hasGuestAgent, consoleId, isNoVNC, openInPage } = action.payload
   yield put(setNewConsoleModal({ modalId, vmId, consoleId }))
   const sessionsInternal = yield fetchVmSessions({ vmId })
   const consoleUsers = sessionsInternal && sessionsInternal

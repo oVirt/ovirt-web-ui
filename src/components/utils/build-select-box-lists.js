@@ -49,7 +49,7 @@ function createIsoList (storageDomains, dataCenterId = null) {
       storageDomain.get('canUserUseDomain') &&
       (dataCenterId === null
         ? true
-        : storageDomain.getIn([ 'statusPerDataCenter', dataCenterId ]) === 'active')
+        : storageDomain.getIn(['statusPerDataCenter', dataCenterId]) === 'active')
     )
     .forEach(storageDomain => {
       storageDomain.get('files').forEach(file => {

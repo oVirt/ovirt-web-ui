@@ -18,8 +18,8 @@ const Loader = ({ loaderText, size }) => {
       wh = 100
       break
   }
-  return <div className={style['loaderBox']}>
-    <div style={{ height: wh, width: wh }} className={style['loader']} />
+  return <div className={style.loaderBox}>
+    <div style={{ height: wh, width: wh }} className={style.loader} />
     <div>{loaderText}</div>
   </div>
 }

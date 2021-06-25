@@ -124,7 +124,7 @@ SubHeading.propTypes = {
 }
 
 function isValidSource (toTest) {
-  return [ 'iso', 'template' ].includes(toTest)
+  return ['iso', 'template'].includes(toTest)
 }
 
 function isValidUid (toTest) {
@@ -132,9 +132,9 @@ function isValidUid (toTest) {
 }
 
 export const optimizedForMap = (msg) => ({
-  'desktop': { id: 'desktop', value: msg.vmType_desktop() },
-  'server': { id: 'server', value: msg.vmType_server() },
-  'high_performance': { id: 'high_performance', value: msg.vmType_highPerformance() },
+  desktop: { id: 'desktop', value: msg.vmType_desktop() },
+  server: { id: 'server', value: msg.vmType_server() },
+  high_performance: { id: 'high_performance', value: msg.vmType_highPerformance() },
 })
 
 /**
@@ -175,17 +175,17 @@ class BasicSettings extends React.Component {
     const okDataCenter = isValidUid(dataSet.dataCenterId) && dataCenters.find(dc => dc.id === dataSet.dataCenterId) !== undefined
     const okCluster = isValidUid(dataSet.clusterId) &&
       clusters.get(dataSet.clusterId) !== undefined &&
-      clusters.getIn([ dataSet.clusterId, 'dataCenterId' ]) === dataSet.dataCenterId
+      clusters.getIn([dataSet.clusterId, 'dataCenterId']) === dataSet.dataCenterId
 
     const okProvision = isValidSource(dataSet.provisionSource)
     const okProvisionIso = dataSet.provisionSource === 'iso' &&
       storageDomains.find(sd =>
-        sd.getIn([ 'statusPerDataCenter', dataSet.dataCenterId ]) === 'active' &&
+        sd.getIn(['statusPerDataCenter', dataSet.dataCenterId]) === 'active' &&
         sd.get('files', []).find(f => f.id === dataSet.isoImage)
       ) !== undefined
 
     const okProvisionTemplate = dataSet.provisionSource === 'template' &&
-        [ null, dataSet.clusterId ].includes(templates.getIn([ dataSet.templateId, 'clusterId' ]))
+        [null, dataSet.clusterId].includes(templates.getIn([dataSet.templateId, 'clusterId']))
 
     const okCpu = isNumberInRange(dataSet.cpus, 0, maxNumOfVmCpus)
 
@@ -289,12 +289,13 @@ class BasicSettings extends React.Component {
         changes = handleProvisionSourceChange(value, this.props)
         break
 
-      case 'templateId':
+      case 'templateId': {
         const { data: { optimizedFor } } = this.props
         changes = handleTemplateIdChange(value, optimizedFor, this.props)
         break
+      }
 
-      case 'operatingSystemId':
+      case 'operatingSystemId': {
         changes[field] = value
         const { data: { templateId } } = this.props
         changes.timeZone = checkTimeZone(value, templateId, this.props)
@@ -303,6 +304,7 @@ class BasicSettings extends React.Component {
           ? this.props.data.lastInitTimezone // set the sysprep timezone as the last selected sysprep timezone
           : ''
         break
+      }
 
       case 'memory':
         if (isNumberInRange(value, 0, this.props.maxMemorySizeInMiB)) {
@@ -310,7 +312,7 @@ class BasicSettings extends React.Component {
         }
         break
 
-      case 'cpus':
+      case 'cpus': {
         const { maxNumOfVmCpus } = this.grabCpuOptions()
         if (isNumberInRange(value, 0, maxNumOfVmCpus)) {
           changes.cpus = +value
@@ -318,6 +320,7 @@ class BasicSettings extends React.Component {
 
         changes.topology = this.getTopologySettings(changes.cpus)
         break
+      }
 
       case 'topology': // number of sockets, cores or threads changed by the user in Advanced Options section
         changes[field] = this.getTopologySettings(this.props.data.cpus, { [extra.vcpu]: +value })
@@ -399,10 +402,10 @@ class BasicSettings extends React.Component {
       delete indicators.provisionSource
     }
 
-    const enableOsSelect = isValidUid(data.clusterId) && [ 'iso', 'template' ].includes(data.provisionSource)
+    const enableOsSelect = isValidUid(data.clusterId) && ['iso', 'template'].includes(data.provisionSource)
     const operatingSystemList = enableOsSelect
       ? createOsList({ clusterId: data.clusterId, clusters, operatingSystems, locale })
-      : [ { id: '_', value: `-- ${msg.createVmWizardSelectClusterBeforeOS()} --` } ]
+      : [{ id: '_', value: `-- ${msg.createVmWizardSelectClusterBeforeOS()} --` }]
 
     const enableIsoSelect = data.provisionSource === 'iso' && isValidUid(data.dataCenterId)
     const isoList = enableIsoSelect
@@ -412,7 +415,7 @@ class BasicSettings extends React.Component {
           value: iso.file.name,
         }))
         .sort((a, b) => localeCompare(a.value, b.value, locale))
-      : [ { id: '_', value: `-- ${msg.createVmWizardSelectClusterBeforeISO()} --` } ]
+      : [{ id: '_', value: `-- ${msg.createVmWizardSelectClusterBeforeISO()} --` }]
     if (enableIsoSelect && !isValidUid(data.isoImage)) {
       isoList.unshift({ id: '_', value: isoList.length === 0 ? `-- ${msg.noCdsAvailable()} --` : `-- ${msg.createVmWizardSelectISO()} --` })
       indicators.isoList = !indicators.provisionSource && !indicators.name && 'error'
@@ -423,7 +426,7 @@ class BasicSettings extends React.Component {
     const enableTemplateSelect = data.provisionSource === 'template'
     const templateList = enableTemplateSelect && isValidUid(data.clusterId)
       ? createTemplateList({ templates, clusterId: data.clusterId, locale })
-      : [ { id: '_', value: `-- ${msg.createVmWizardSelectClusterBeforeTemplate()} --` } ]
+      : [{ id: '_', value: `-- ${msg.createVmWizardSelectClusterBeforeTemplate()} --` }]
     if (enableTemplateSelect && isValidUid(data.clusterId) && !isValidUid(data.templateId)) {
       templateList.unshift({ id: '_', value: `-- ${msg.createVmWizardSelectTemplate()} --` })
       indicators.template = !indicators.provisionSource && !indicators.name && 'error'

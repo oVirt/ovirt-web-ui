@@ -43,7 +43,7 @@ export const actionReducer = (initialState, handlers, verbose) => (state = initi
       }
     }
 
-    if (![ ADD_ACTIVE_REQUEST, REMOVE_ACTIVE_REQUEST, DELAYED_REMOVE_ACTIVE_REQUEST ].includes(action.type)) {
+    if (![ADD_ACTIVE_REQUEST, REMOVE_ACTIVE_REQUEST, DELAYED_REMOVE_ACTIVE_REQUEST].includes(action.type)) {
       console.log('Reducing action:', actionJson)
     }
   }

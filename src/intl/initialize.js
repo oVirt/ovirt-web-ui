@@ -76,7 +76,7 @@ export function coerceToSupportedLocale (locale: ?string): ?string {
 // moment and moment-duration-format setup
 //
 export function initMomentTranslations (locale: string, defaultLocale: string) {
-  const chosen = moment.locale([ locale, defaultLocale ])
+  const chosen = moment.locale([locale, defaultLocale])
   console.log(`Locale being used by moment: ${chosen}`)
 
   //
@@ -85,7 +85,7 @@ export function initMomentTranslations (locale: string, defaultLocale: string) {
   //
   const translations = require('./translated-time-durations.json')
   if (translations[locale]) {
-    const t:{ [messageId: string]: string } = translations[locale]
+    const t: { [messageId: string]: string } = translations[locale]
 
     // for built-in translations moment.js uses lower case identifiers
     // i.e. pt-br instead of pt-BR

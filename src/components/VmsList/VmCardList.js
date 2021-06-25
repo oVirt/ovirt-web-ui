@@ -40,17 +40,17 @@ const VmCardList = ({ vms, alwaysShowPoolCard, fetchMoreVmsAndPools }) => {
     .toList()
 
   // Display the VMs and Pools together, sorted nicely
-  const vmsAndPools = [ ...filteredVms, ...filteredPools ].sort(sortFunction(sort, locale, msg))
+  const vmsAndPools = [...filteredVms, ...filteredPools].sort(sortFunction(sort, locale, msg))
 
   // Handle the infinite scroll and pagination
   const hasMore = vms.get('vmsExpectMorePages') || vms.get('poolsExpectMorePages')
-  const [ page, sentinelRef, scrollerRef ] = useInfiniteScroll({ hasMore, distance: 0 })
+  const [page, sentinelRef, scrollerRef] = useInfiniteScroll({ hasMore, distance: 0 })
 
   useEffect(() => { // `VmsList` will not display this component until the first page of data is loaded
     if (page > 0) {
       fetchMoreVmsAndPools()
     }
-  }, [ page ])
+  }, [page])
 
   useEffect(() => {
     if (!scrollerRef.current || !sentinelRef.current) {
@@ -76,7 +76,7 @@ const VmCardList = ({ vms, alwaysShowPoolCard, fetchMoreVmsAndPools }) => {
     if (sentinelStillInView) {
       fetchMoreVmsAndPools()
     }
-  }, [ vms, scrollerRef, sentinelRef ])
+  }, [vms, scrollerRef, sentinelRef])
 
   return (
     <div className={style['scroll-container-wrapper']}>

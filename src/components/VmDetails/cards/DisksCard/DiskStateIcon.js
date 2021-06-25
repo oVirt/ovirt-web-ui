@@ -8,19 +8,19 @@ import style from './style.css'
 import { Tooltip } from '_/components/tooltips'
 
 const diskStateSettings = (msg) => ({
-  'active': {
+  active: {
     type: 'fa',
     name: 'arrow-circle-o-up',
     className: style['state-icon-active'],
     tooltip: msg.diskTooltipStatusMessage({ statusInfo: msg.diskStateActiveTooltip() }),
   },
-  'inactive': {
+  inactive: {
     type: 'fa',
     name: 'arrow-circle-o-down',
     className: style['state-icon-inactive'],
     tooltip: msg.diskTooltipStatusMessage({ statusInfo: msg.diskStateInactiveTooltip() }),
   },
-  'locked': {
+  locked: {
     type: 'pf',
     name: 'locked',
     className: style['state-icon-locked'],
@@ -48,7 +48,7 @@ const DiskStateIcon = ({ idPrefix, diskState, showTooltip = true }) => {
 }
 DiskStateIcon.propTypes = {
   idPrefix: PropTypes.string.isRequired,
-  diskState: PropTypes.oneOf([ 'active', 'inactive', 'locked' ]),
+  diskState: PropTypes.oneOf(['active', 'inactive', 'locked']),
   showTooltip: PropTypes.bool,
 }
 

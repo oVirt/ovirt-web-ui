@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { MsgContext } from '_/intl'
 
-const NONE_VM_ROUTES = [ '/settings' ]
+const NONE_VM_ROUTES = ['/settings']
 
 const buildPath = ({ vms, branches, msg }) => {
   const res = []
@@ -36,20 +36,22 @@ const buildPath = ({ vms, branches, msg }) => {
 const Breadcrumb = ({ vms, branches }) => {
   const { msg } = useContext(MsgContext)
   const crumbs = buildPath({ vms, branches, msg })
-  const idPrefix = `breadcrumb`
+  const idPrefix = 'breadcrumb'
 
   return (
     <ol className='breadcrumb'>
       {crumbs.map((path, index, array) =>
-        (index === (array.length - 1)) ? (
+        (index === (array.length - 1))
+          ? (
           <li key={`${index}-${path.url}`} className='active' id={`${idPrefix}-last-${index}`}>
             {path.title}
           </li>
-        ) : (
+          )
+          : (
           <li key={`${index}-${path.url}`}>
             <Link to={path.url} id={`${idPrefix}-link-${index}`}>{path.title}</Link>
           </li>
-        )
+          )
       )}
     </ol>
   )

@@ -36,15 +36,15 @@ describe('round a number string', () => {
 
 describe('rounding an array', function () {
   it('to tens', function () {
-    expect(round([ 12344, 12345, 12346, 12354 ], -1)).toEqual([ 12340, 12350, 12350, 12350 ])
+    expect(round([12344, 12345, 12346, 12354], -1)).toEqual([12340, 12350, 12350, 12350])
   })
 
   it('to integer', function () {
-    expect(round([ 123, 123.4, 123.5, 123.6 ], 0)).toEqual([ 123, 123, 124, 124 ])
+    expect(round([123, 123.4, 123.5, 123.6], 0)).toEqual([123, 123, 124, 124])
   })
 
   it('to decimal', function () {
-    expect(round([ 1.23, 1.24, 1.25, 1.26 ], 1)).toEqual([ 1.2, 1.2, 1.3, 1.3 ])
+    expect(round([1.23, 1.24, 1.25, 1.26], 1)).toEqual([1.2, 1.2, 1.3, 1.3])
   })
 })
 
@@ -78,14 +78,14 @@ describe('rounding an array of objects', function () {
 describe('rounding an object of arrays of number', function () {
   it('to decimal', function () {
     expect(round({
-      a: [ 1.23, 1.24, 1.25 ],
+      a: [1.23, 1.24, 1.25],
       b: 2.67,
-      c: [ 9.99, 8.76, 5.43 ],
+      c: [9.99, 8.76, 5.43],
     }, 1))
       .toEqual({
-        a: [ 1.2, 1.2, 1.3 ],
+        a: [1.2, 1.2, 1.3],
         b: 2.7,
-        c: [ 10.0, 8.8, 5.4 ],
+        c: [10.0, 8.8, 5.4],
       })
   })
 })

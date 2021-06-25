@@ -5,7 +5,7 @@ import styles from './style.css'
 
 const ErrorContent = ({ title, description, leftButton, rightButton }) => (
   <div>
-    <div className={`container text-center ${styles['errorContentContainer']}`}>
+    <div className={`container text-center ${styles.errorContentContainer}`}>
       <img src={branding.resourcesUrls.errorImg} />
       <h1 className='bolder'>{title}</h1>
       <p className='h4' dangerouslySetInnerHTML={{ __html: description }} />

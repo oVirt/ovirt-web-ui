@@ -209,7 +209,7 @@ const OvirtApi = {
     return httpDelete({
       url,
       custHeaders: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
       },
     })
   },
@@ -228,7 +228,8 @@ const OvirtApi = {
     assertLogin({ methodName: 'start' })
     return httpPost({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/start`,
-      input: '{}' })
+      input: '{}',
+    })
   },
   suspend ({ vmId }: VmIdType): Promise<Object> {
     assertLogin({ methodName: 'suspend' })
@@ -303,7 +304,8 @@ const OvirtApi = {
     assertLogin({ methodName: 'console' })
     return httpGet({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/graphicsconsoles/${consoleId}`,
-      custHeaders: { Accept: 'application/x-virt-viewer', Filter: Selectors.getFilter() } })
+      custHeaders: { Accept: 'application/x-virt-viewer', Filter: Selectors.getFilter() },
+    })
   },
 
   consoleProxyTicket ({ vmId, consoleId }: { vmId: string, consoleId: string }): Promise<Object> {
@@ -443,7 +445,7 @@ const OvirtApi = {
     return httpGet({
       url: `${AppConfiguration.applicationContext}/services/files/usbfilter.txt`,
       custHeaders: {
-        'Accept': 'text/plain',
+        Accept: 'text/plain',
       },
     })
   },

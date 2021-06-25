@@ -28,7 +28,7 @@ const Item = ({ id, label, children }) =>
 Item.propTypes = {
   id: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
-  children: PropTypes.oneOfType([ PropTypes.node, PropTypes.string ]),
+  children: PropTypes.oneOfType([PropTypes.node, PropTypes.string]),
 }
 
 const ReviewBasic = ({ id, dataCenters, clusters, isos, templates, operatingSystems, basic }) => {
@@ -145,12 +145,14 @@ const ReviewStorage = ({ id, storageDomains, storage }) => {
             { userFormatOfBytes(disk.size, 'B').str }
           </div>
           <div className={style['review-entity-info']}>
-            { storageDomains.getIn([ disk.storageDomainId, 'name' ], msg.createVmStorageUnknownStorageDomain()) }
+            { storageDomains.getIn([disk.storageDomainId, 'name'], msg.createVmStorageUnknownStorageDomain()) }
           </div>
           <div className={style['review-entity-info']}>
             {
-              disk.diskType === 'thin' ? msg.diskEditorDiskTypeOptionThin()
-                : disk.diskType === 'pre' ? msg.diskEditorDiskTypeOptionPre()
+              disk.diskType === 'thin'
+                ? msg.diskEditorDiskTypeOptionThin()
+                : disk.diskType === 'pre'
+                  ? msg.diskEditorDiskTypeOptionPre()
                   : disk.diskType
             }
           </div>
@@ -348,7 +350,7 @@ SummaryReview.propTypes = {
 
   progress: PropTypes.shape({
     inProgress: PropTypes.bool.isRequired,
-    result: PropTypes.oneOf([ 'success', 'error' ]),
+    result: PropTypes.oneOf(['success', 'error']),
     messages: PropTypes.arrayOf(PropTypes.string),
   }),
 

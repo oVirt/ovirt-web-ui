@@ -15,7 +15,7 @@ import style from './style.css'
 
 const VmConsoleSelector = ({ vmId, vms, consoles, config, consoleId, isConsolePage, onRDP }) => {
   const { msg } = useContext(MsgContext)
-  let actions = vms.getIn(['vms', vmId, 'consoles'])
+  const actions = vms.getIn(['vms', vmId, 'consoles'])
   if (actions.size === 0) {
     return <div />
   }
@@ -37,7 +37,7 @@ const VmConsoleSelector = ({ vmId, vms, consoles, config, consoleId, isConsolePa
 
   if (hasRdp) {
     const domain = config.get('domain')
-    const username = config.getIn([ 'user', 'name' ])
+    const username = config.getIn(['user', 'name'])
     consoleItems.push(<MenuItem
       key={RDP_ID}
       onClick={(e) => { e.preventDefault(); onRDP({ domain, username, vms }) }}

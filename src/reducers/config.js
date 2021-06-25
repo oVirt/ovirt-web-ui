@@ -62,10 +62,10 @@ const initialState = Immutable.fromJS({
   administrator: false,
 
   cpuOptions: {
-    maxNumOfSockets: new Map([[ DEFAULT_ENGINE_OPTION_VERSION, DefaultEngineOptions.MaxNumOfVmSockets ]]),
-    maxNumOfCores: new Map([[ DEFAULT_ENGINE_OPTION_VERSION, DefaultEngineOptions.MaxNumOfCpuPerSocket ]]),
-    maxNumOfThreads: new Map([[ DEFAULT_ENGINE_OPTION_VERSION, DefaultEngineOptions.MaxNumOfThreadsPerCpu ]]),
-    maxNumOfVmCpusPerArch: new Map([[ DEFAULT_ENGINE_OPTION_VERSION, DefaultEngineOptions.MaxNumOfVmCpusPerArch ]]),
+    maxNumOfSockets: new Map([[DEFAULT_ENGINE_OPTION_VERSION, DefaultEngineOptions.MaxNumOfVmSockets]]),
+    maxNumOfCores: new Map([[DEFAULT_ENGINE_OPTION_VERSION, DefaultEngineOptions.MaxNumOfCpuPerSocket]]),
+    maxNumOfThreads: new Map([[DEFAULT_ENGINE_OPTION_VERSION, DefaultEngineOptions.MaxNumOfThreadsPerCpu]]),
+    maxNumOfVmCpusPerArch: new Map([[DEFAULT_ENGINE_OPTION_VERSION, DefaultEngineOptions.MaxNumOfVmCpusPerArch]]),
   },
 
   usbAutoshare: DefaultEngineOptions.SpiceUsbAutoShare,
@@ -141,14 +141,16 @@ const config = actionReducer(initialState, {
     return state.set('userGroups', groups)
   },
   [SET_CURRENT_PAGE] (state, { payload }) {
-    return state.set('currentPage', Object.assign({}, payload))
+    return state.set('currentPage', { ...payload })
   },
-  [SET_CPU_TOPOLOGY_OPTIONS] (state, { payload: {
-    maxNumOfSockets,
-    maxNumOfCores,
-    maxNumOfThreads,
-    maxNumOfVmCpusPerArch,
-  } }) {
+  [SET_CPU_TOPOLOGY_OPTIONS] (state, {
+    payload: {
+      maxNumOfSockets,
+      maxNumOfCores,
+      maxNumOfThreads,
+      maxNumOfVmCpusPerArch,
+    },
+  }) {
     return state.set('cpuOptions', Immutable.fromJS({
       maxNumOfSockets,
       maxNumOfCores,
@@ -156,10 +158,12 @@ const config = actionReducer(initialState, {
       maxNumOfVmCpusPerArch,
     }))
   },
-  [SET_DEFAULT_TIMEZONE] (state, { payload: {
-    defaultGeneralTimezone,
-    defaultWindowsTimezone,
-  } }) {
+  [SET_DEFAULT_TIMEZONE] (state, {
+    payload: {
+      defaultGeneralTimezone,
+      defaultWindowsTimezone,
+    },
+  }) {
     return state.merge({
       defaultGeneralTimezone,
       defaultWindowsTimezone,

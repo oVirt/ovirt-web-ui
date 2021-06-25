@@ -496,7 +496,7 @@ describe('Test transform.js VmStatistics.toInternal()', () => {
   const base = {
     cpu: {},
     disks: {},
-    elapsedUptime: { 'datum': [0], 'description': 'Elapsed VM runtime (default to 0)', 'firstDatum': undefined, 'unit': 'seconds' },
+    elapsedUptime: { datum: [0], description: 'Elapsed VM runtime (default to 0)', firstDatum: undefined, unit: 'seconds' },
     memory: {},
     network: {},
   }
@@ -516,7 +516,7 @@ describe('Test transform.js VmStatistics.toInternal()', () => {
   test.each(TRANSFORM_TESTS)(
     'transform test [%s]',
     (title, apiInput, expectedTransformPart) => {
-      const result = VmStatistics.toInternal({ statistics: [ apiInput ] })
+      const result = VmStatistics.toInternal({ statistics: [apiInput] })
       expect(result).toMatchObject(expectedTransformPart)
     }
   )

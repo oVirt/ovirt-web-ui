@@ -38,7 +38,7 @@ const VmUserMessages = ({ userMessages, onClearMessages, onDismissMessage, onClo
   const { msg } = useContext(MsgContext)
   const [expanded, setExpanded] = useState(false)
 
-  const idPrefix = `usermsgs`
+  const idPrefix = 'usermsgs'
 
   const messagesCount = userMessages.get('records').size
   const messagesList = messagesCount

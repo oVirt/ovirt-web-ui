@@ -40,7 +40,7 @@ export function canUserManipulateSnapshots (permits: Set<string>): boolean {
 }
 
 export function canUserUseStorageDomain (permits: Set<string>): boolean {
-  return checkUserPermit([ 'create_disk', 'attach_disk_profile' ], permits)
+  return checkUserPermit(['create_disk', 'attach_disk_profile'], permits)
 }
 
 export function canUserEditVmStorage (permits: Set<string>): boolean {

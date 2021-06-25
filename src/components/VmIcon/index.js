@@ -14,7 +14,7 @@ const VmIcon = ({ icon, className, missingIconClassName }) => {
 
     if (data) {
       const src = `data:${type};base64,${data}`
-      return <img src={src} className={`${style['icon']} ${className}`} alt='' />
+      return <img src={src} className={`${style.icon} ${className}`} alt='' />
     }
   }
 

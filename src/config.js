@@ -49,7 +49,7 @@ export function readConfiguration () {
         Object.assign(AppConfiguration, JSON.parse(result))
       },
       error: (result) => {
-        console.log(`Failed to load production configuration, assuming development mode.`)
+        console.log('Failed to load production configuration, assuming development mode.')
       },
       complete: () => {
         setLogDebug(AppConfiguration.debug)

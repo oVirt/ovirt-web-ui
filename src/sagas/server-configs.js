@@ -61,7 +61,7 @@ export function* fetchServerConfiguredValues () {
   }))
 
   if (eo.websocketProxy) {
-    const [ host = '', port = '' ] = eo.websocketProxy.split(':')
+    const [host = '', port = ''] = eo.websocketProxy.split(':')
     yield put(setWebsocket({ host, port }))
   }
   if (eo.consoleDefault) {

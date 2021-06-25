@@ -20,7 +20,7 @@ import {
  * center.
  */
 export function* fetchDataCentersAndStorageDomains (action) {
-  const [ dataCenters, storageDomains ] =
+  const [dataCenters, storageDomains] =
     yield all([
       call(fetchDataCenters),
       call(fetchDataAndIsoStorageDomains),
@@ -29,9 +29,9 @@ export function* fetchDataCentersAndStorageDomains (action) {
   // figure out the domain's status per data center
   const sdById = storageDomains.reduce((acc, sd) => ({ ...acc, [sd.id]: sd }), {})
   for (const dataCenter of dataCenters) {
-    for (const [ storageDomainId, { type } ] of Object.entries(dataCenter.storageDomains)) {
+    for (const [storageDomainId, { type }] of Object.entries(dataCenter.storageDomains)) {
       if (type === 'data' || type === 'iso') {
-        const sd = sdById[ storageDomainId ]
+        const sd = sdById[storageDomainId]
         sd.statusPerDataCenter = {
           ...sd.statusPerDataCenter,
           [dataCenter.id]: dataCenter.storageDomains[storageDomainId].status,
@@ -45,7 +45,7 @@ export function* fetchDataCentersAndStorageDomains (action) {
 }
 
 function* fetchDataCenters () {
-  const payload = { additional: [ 'permissions', 'storage_domains' ] }
+  const payload = { additional: ['permissions', 'storage_domains'] }
   const dataCentersApi = yield callExternalAction('getAllDataCenters', Api.getAllDataCenters, { payload })
 
   if (dataCentersApi && dataCentersApi.data_center) {

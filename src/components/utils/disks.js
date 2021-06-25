@@ -14,8 +14,10 @@ export function sortDisksForDisplay (disks, locale) {
 export function sortNicsDisks (objs, locale) {
   return objs
     .sort((a, b) =>
-      a.isFromTemplate && !b.isFromTemplate ? -1
-        : !a.isFromTemplate && b.isFromTemplate ? 1
+      a.isFromTemplate && !b.isFromTemplate
+        ? -1
+        : !a.isFromTemplate && b.isFromTemplate
+          ? 1
           : localeCompare(a.name, b.name, locale)
     )
 }

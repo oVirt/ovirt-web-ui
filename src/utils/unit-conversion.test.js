@@ -45,29 +45,29 @@ describe('convertUnits', function () {
   })
 
   it('scale all values down 1 unit', function () {
-    expect(convertUnits(storageUnitTable, 'TiB', [ 0.0123, 0.0456 ])).toEqual({
+    expect(convertUnits(storageUnitTable, 'TiB', [0.0123, 0.0456])).toEqual({
       unit: 'GiB',
-      value: [ 0.0123 * 1024, 0.0456 * 1024 ],
+      value: [0.0123 * 1024, 0.0456 * 1024],
     })
   })
 
   it('scale all values up 2 units', function () {
-    expect(convertUnits(storageUnitTable, 'MiB', [ (1 * (1024 ** 2)), (2 * (1024 ** 2)) ])).toEqual({
+    expect(convertUnits(storageUnitTable, 'MiB', [(1 * (1024 ** 2)), (2 * (1024 ** 2))])).toEqual({
       unit: 'TiB',
-      value: [ 1, 2 ],
+      value: [1, 2],
     })
   })
 
   it('no scaling, 1 value in the array is in range', function () {
-    expect(convertUnits(storageUnitTable, 'TiB', [ 1.01, 0.02 ])).toEqual({
+    expect(convertUnits(storageUnitTable, 'TiB', [1.01, 0.02])).toEqual({
       unit: 'TiB',
-      value: [ 1.01, 0.02 ],
+      value: [1.01, 0.02],
     })
   })
 
   it('returns the same unit and values when unit is not in the table', function () {
-    expect(convertUnits(storageUnitTable, 'foo', [ 1, 2, 3 ])).toEqual({
-      unit: 'foo', value: [ 1, 2, 3 ],
+    expect(convertUnits(storageUnitTable, 'foo', [1, 2, 3])).toEqual({
+      unit: 'foo', value: [1, 2, 3],
     })
   })
 })

@@ -18,7 +18,7 @@ export function failedExternalAction ({ message, messageDescriptor, exception, f
     message = message || extractErrorText(exception)
     message = customizeErrorMessage(message)
 
-    const type = exception['status'] ? exception['status'] : 'ERROR'
+    const type = exception.status ? exception.status : 'ERROR'
 
     return {
       type: FAILED_EXTERNAL_ACTION,

@@ -40,7 +40,7 @@ const SettingsToolbar = ({ onSave, onReset, onCancel, enableSave, enableReset, t
   }
 
   return ReactDOM.createPortal(
-    <Toolbar className={style['toolbar']}>
+    <Toolbar className={style.toolbar}>
       <ConfirmationModal
         show={showSaveConfirmModal}
         title={msg.saveChanges()}

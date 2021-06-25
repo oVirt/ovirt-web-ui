@@ -10,7 +10,7 @@ const Confirmation = ({ okButton, cancelButton, extraButton, text, height, uniqu
 
   const s = {}
   if (height) {
-    s['height'] = height
+    s.height = height
   }
 
   return (

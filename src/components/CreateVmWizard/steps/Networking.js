@@ -428,7 +428,7 @@ class Networking extends React.Component {
     const enableCreate = vnicList.length > 0 && Object.keys(this.state.editing).length === 0
 
     const nicList = sortNicsDisks([...nics], locale)
-      .concat(this.state.creating ? [ this.state.editing[this.state.creating] ] : [])
+      .concat(this.state.creating ? [this.state.editing[this.state.creating]] : [])
       .map(nic => ({
         ...(this.state.editing[nic.id] ? this.state.editing[nic.id] : nic),
         vnic: vnicList.find(vnic => vnic.id === nic.vnicProfileId)

@@ -67,7 +67,7 @@ class OverviewCard extends React.Component {
       }
       return {
         correlatedMessages: props.userMessages.get('records').filter(
-          record => record.getIn([ 'failedAction', 'meta', 'correlationId' ]) === state.correlationId
+          record => record.getIn(['failedAction', 'meta', 'correlationId']) === state.correlationId
         ),
       }
     }
@@ -165,17 +165,17 @@ class OverviewCard extends React.Component {
     //     only including the fields that have been updated
     const vmUpdates = { id: stateVm.get('id') }
 
-    if (this.trackUpdates['name']) {
-      vmUpdates['name'] = stateVm.get('name')
+    if (this.trackUpdates.name) {
+      vmUpdates.name = stateVm.get('name')
     }
 
-    if (this.trackUpdates['description']) {
-      vmUpdates['description'] = stateVm.get('description')
+    if (this.trackUpdates.description) {
+      vmUpdates.description = stateVm.get('description')
     }
 
-    if (this.trackUpdates['name'] && updateCloudInit && this.isCloudInitHostnameUpdate()) {
-      vmUpdates['cloudInit'] = stateVm.get('cloudInit').toJS()
-      vmUpdates['cloudInit']['hostName'] = stateVm.get('name')
+    if (this.trackUpdates.name && updateCloudInit && this.isCloudInitHostnameUpdate()) {
+      vmUpdates.cloudInit = stateVm.get('cloudInit').toJS()
+      vmUpdates.cloudInit.hostName = stateVm.get('name')
     }
 
     // --- dispatch the save
@@ -200,7 +200,7 @@ class OverviewCard extends React.Component {
     const icon = getVmIcon(icons, operatingSystems, vm)
     const idPrefix = 'vmdetail-overview'
 
-    const showCloudInitCheckbox = isEditing && this.trackUpdates['name'] && !nameError && this.isCloudInitHostnameUpdate()
+    const showCloudInitCheckbox = isEditing && this.trackUpdates.name && !nameError && this.isCloudInitHostnameUpdate()
 
     const poolId = vm.getIn(['pool', 'id'])
     const isPoolVm = !!poolId
@@ -231,7 +231,7 @@ class OverviewCard extends React.Component {
               </div>
 
               {isPoolVm && pool && <span className={style['pool-vm-label']} style={{ backgroundColor: pool.get('color') }}>{ pool.get('name') }</span>}
-              <div className={style['container']}>
+              <div className={style.container}>
                 <div className={style['os-icon']}>
                   <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' />
                 </div>

@@ -86,7 +86,7 @@ const vms = actionReducer(initialState, {
   },
   [REMOVE_VMS] (state, { payload: { vmIds } }) {
     const mutable = state.asMutable()
-    vmIds.forEach(vmId => mutable.deleteIn([ 'vms', vmId ]))
+    vmIds.forEach(vmId => mutable.deleteIn(['vms', vmId]))
     mutable.update('missedVms', missedVms => missedVms.union(vmIds))
     return mutable.asImmutable()
   },
@@ -148,7 +148,7 @@ const vms = actionReducer(initialState, {
 
   [SET_VM_SESSIONS] (state, { payload: { vmId, sessions } }) {
     let consoleInUse = false
-    for (var i in sessions) {
+    for (const i in sessions) {
       if (sessions[i].consoleUser) {
         consoleInUse = true
         break
@@ -175,7 +175,7 @@ const vms = actionReducer(initialState, {
   },
   [REMOVE_POOLS] (state, { payload: { poolIds } }) {
     const mutable = state.asMutable()
-    poolIds.forEach(poolId => mutable.deleteIn([ 'pools', poolId ]))
+    poolIds.forEach(poolId => mutable.deleteIn(['pools', poolId]))
     return mutable.asImmutable()
   },
   [REMOVE_MISSING_POOLS] (state, { payload: { poolIdsToPreserve } }) {
@@ -198,7 +198,7 @@ const vms = actionReducer(initialState, {
   [UPDATE_VMPOOLS_COUNT] (state) {
     state = state.update('pools', pools => pools.map(pool => pool.set('vmsCount', 0)))
 
-    state.get('vms').map(vm => {
+    state.get('vms').forEach(vm => {
       const poolId = vm.getIn(['pool', 'id'])
       if (poolId && state.getIn(['pools', poolId])) {
         // VM is in a known pool ... down VMs don't count against the user total unless it is a manual pool

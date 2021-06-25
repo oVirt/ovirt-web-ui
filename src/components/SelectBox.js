@@ -90,7 +90,7 @@ class SelectBox extends React.Component {
               <span className='caret' id={`${id}-button-caret`} />
             </button>
           </Tooltip>
-          <ul className={`dropdown-menu ${style['dropdown']}`} role='menu'>
+          <ul className={`dropdown-menu ${style.dropdown}`} role='menu'>
             {this.state.items.map(item => (
               <li role='presentation' className={item.id === this.state.selected ? 'selected' : ''} key={item.id}>
                 <a role='menuitem' tabIndex='-1' onClick={this.handleChange(item.id)} id={`${id}-item-${item.value}`}>
@@ -117,7 +117,7 @@ SelectBox.propTypes = {
   /* eslint-enable react/no-unused-prop-types */
   onChange: PropTypes.func.isRequired, // (selectedId: string) => any
   id: PropTypes.string,
-  validationState: PropTypes.oneOf([ false, 'default', 'error' ]),
+  validationState: PropTypes.oneOf([false, 'default', 'error']),
   disabled: PropTypes.bool,
   locale: PropTypes.string.isRequired,
 }

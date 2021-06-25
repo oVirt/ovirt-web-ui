@@ -41,7 +41,7 @@ export function hidePassword ({ action, param }) {
   }
 
   if (param) {
-    if (param['password']) {
+    if (param.password) {
       const hidden = JSON.parse(JSON.stringify(param))
       hidden.password = '*****'
       return hidden

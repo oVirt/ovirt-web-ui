@@ -204,10 +204,10 @@ class DiskImageEditor extends Component {
     switch (field) {
       case 'alias':
         if (!isDiskNameValid(this.state.values.alias)) {
-          errors['alias'] = msg.diskNameValidationRules()
+          errors.alias = msg.diskNameValidationRules()
           isErrorOnField = true
         } else {
-          delete errors['alias']
+          delete errors.alias
         }
         break
     }
@@ -229,7 +229,7 @@ class DiskImageEditor extends Component {
 
   changeAlias ({ target: { value } }) {
     this.setState(
-      (state) => ({ values: { ...state.values, alias: value }, errors: { ...state.errors, 'alias': '' } }),
+      (state) => ({ values: { ...state.values, alias: value }, errors: { ...state.errors, alias: '' } }),
       () => {
         this.validateField('alias')
       })
@@ -312,7 +312,7 @@ class DiskImageEditor extends Component {
             id={`${idPrefix}-modal-form`}
           >
             {/* Alias */}
-            <FormGroup controlId={`${idPrefix}-alias`} validationState={this.state.errors['alias'] ? 'error' : null}>
+            <FormGroup controlId={`${idPrefix}-alias`} validationState={this.state.errors.alias ? 'error' : null}>
               <LabelCol sm={3}>
                 { msg.diskEditorAliasLabel() }
               </LabelCol>
@@ -322,7 +322,7 @@ class DiskImageEditor extends Component {
                   defaultValue={this.state.values.alias}
                   onChange={this.changeAlias}
                 />
-                {this.state.errors['alias'] && <HelpBlock>{this.state.errors['alias']}</HelpBlock>}
+                {this.state.errors.alias && <HelpBlock>{this.state.errors.alias}</HelpBlock>}
               </Col>
             </FormGroup>
 
@@ -530,6 +530,6 @@ DiskImageEditor.propTypes = {
 export default connect(
   (state, { vm }) => ({
     storageDomains: state.storageDomains,
-    dataCenterId: state.clusters.getIn([ vm.getIn([ 'cluster', 'id' ]), 'dataCenterId' ]),
+    dataCenterId: state.clusters.getIn([vm.getIn(['cluster', 'id']), 'dataCenterId']),
   })
 )(withMsg(DiskImageEditor))

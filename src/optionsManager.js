@@ -34,7 +34,7 @@ export default {
   },
 
   clearAutoConnect () {
-    let vmId = loadFromLocalStorage('autoConnect')
+    const vmId = loadFromLocalStorage('autoConnect')
     if (vmId) {
       saveToLocalStorage('autoConnect', '')
       removeFromLocalStorage(`consoleOptions.${vmId}`)

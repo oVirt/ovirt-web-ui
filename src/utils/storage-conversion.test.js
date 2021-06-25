@@ -7,8 +7,8 @@ describe('storage size conversions', () => {
   })
 
   test('paired values, start from byte (B)', () => {
-    const results = Storage.convertValues('B', [ 3 * 1024 * 1024, 7.5 * 1024 * 1024 ])
-    expect(results).toEqual({ unit: 'MiB', value: [ 3, 7.5 ] })
+    const results = Storage.convertValues('B', [3 * 1024 * 1024, 7.5 * 1024 * 1024])
+    expect(results).toEqual({ unit: 'MiB', value: [3, 7.5] })
   })
 
   test('value map, start from byte (B)', () => {

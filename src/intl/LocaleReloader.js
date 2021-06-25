@@ -29,7 +29,7 @@ const LocaleReloader = ({ children, localeFromStore, locale, reloadMsg }) => {
     OvirtApi.updateLocale(locale)
   }, [locale])
 
-  return ([ children ])
+  return ([children])
 }
 
 LocaleReloader.propTypes = {

@@ -224,7 +224,7 @@ export const messages: { [messageId: string]: MessageType } = {
   diskEditorSizeCreateInfoTooltip: 'After creating a disk, you can only extend its size. It is not possible to decrease disk size.',
   diskEditorSizeLabel: 'Size (GiB)',
   diskEditorSizeEditLabel: 'Current Size (GiB)',
-  diskEditorResizeNote: `After resizing the disk, you must also increase the size of the guest's filesystem`,
+  diskEditorResizeNote: 'After resizing the disk, you must also increase the size of the guest\'s filesystem',
   diskEditorStorageDomainCantChangeHelp: 'A disk\'s storage domain cannot be changed after it has been created.',
   diskEditorStorageDomainCreateHelp: 'Once you have selected a storage domain, you will not be able to change it.',
   diskEditorStorageDomainLabel: 'Storage Domain',

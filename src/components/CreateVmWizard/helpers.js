@@ -92,11 +92,11 @@ const handleTemplateIdChange = (templateId, defaultOptimizedFor, { templates, op
   changes.templateId = template.get('id')
 
   changes.memory = template.get('memory') / (1024 ** 2) // stored in bytes, input in Mib
-  changes.cpus = template.getIn([ 'cpu', 'vCPUs' ])
-  changes.topology = template.getIn([ 'cpu', 'topology' ]).toJS()
+  changes.cpus = template.getIn(['cpu', 'vCPUs'])
+  changes.topology = template.getIn(['cpu', 'topology']).toJS()
   changes.optimizedFor = template.get('type', defaultOptimizedFor)
   const suggestedOs = operatingSystems
-    .find(os => os.get('name') === template.getIn([ 'os', 'type' ]))
+    .find(os => os.get('name') === template.getIn(['os', 'type']))
     .get('id')
   changes.operatingSystemId = verifyOsIdToCluster(suggestedOs, clusterId, { clusters, operatingSystems })
   // Check template's timezone compatibility with the template's OS, set the timezone corresponding to the template's OS
@@ -124,7 +124,7 @@ const checkTimeZone = (osId, templateId, { defaultGeneralTimezone, defaultWindow
   let timeZone = {
     name: defaultGeneralTimezone,
   }
-  const osType = operatingSystems.getIn([ osId, 'name' ])
+  const osType = operatingSystems.getIn([osId, 'name'])
 
   if (template && template.getIn(['timeZone', 'name'])) {
     timeZone = template.get('timeZone').toJS()

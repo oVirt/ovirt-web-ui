@@ -105,7 +105,7 @@ function* login (action) {
   console.log('\u2714 login checks and server config fetches are done:',
     yield select(state => pick(
       state.config.toJS(),
-      [ 'administrator', 'filter', 'domain', 'user', 'userSessionTimeoutInterval', 'websocket', 'cpuTopology' ]))
+      ['administrator', 'filter', 'domain', 'user', 'userSessionTimeoutInterval', 'websocket', 'cpuTopology']))
   )
   console.groupEnd('user checks and server config')
 
@@ -153,7 +153,7 @@ function* checkOvirtApiVersion (oVirtMeta) {
     return false
   }
 
-  const actual = Transforms.Version.toInternal(oVirtMeta['product_info']['version'])
+  const actual = Transforms.Version.toInternal(oVirtMeta.product_info.version)
   const required = Product.ovirtApiVersionRequired
   const passed = compareVersion(actual, required)
 
@@ -163,11 +163,11 @@ function* checkOvirtApiVersion (oVirtMeta) {
 
 function isValidOvirtMeta (oVirtMeta) {
   return oVirtMeta &&
-        oVirtMeta['product_info'] &&
-        oVirtMeta['product_info']['version'] &&
-        oVirtMeta['product_info']['version']['major'] &&
-        oVirtMeta['product_info']['version']['minor'] &&
-        oVirtMeta['product_info']['version']['build']
+        oVirtMeta.product_info &&
+        oVirtMeta.product_info.version &&
+        oVirtMeta.product_info.version.major &&
+        oVirtMeta.product_info.version.minor &&
+        oVirtMeta.product_info.version.build
 }
 
 function composeIncompatibleOVirtApiVersionMessage (oVirtMeta) {
@@ -176,7 +176,7 @@ function composeIncompatibleOVirtApiVersionMessage (oVirtMeta) {
   if (!isValidOvirtMeta(oVirtMeta)) {
     found = JSON.stringify(oVirtMeta)
   } else {
-    const version = oVirtMeta['product_info']['version']
+    const version = oVirtMeta.product_info.version
     found = `${version.major}.${version.minor}`
   }
   return `oVirt API version requested >= ${requested}, but ${found} found` // TODO: Localize

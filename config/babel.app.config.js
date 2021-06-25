@@ -9,6 +9,8 @@ const util = require('util')
  * See: https://github.com/facebook/create-react-app/blob/master/packages/babel-preset-react-app
  */
 module.exports = function (api, opts = {}) {
+  api.cache(true)
+
   const env = process.env.BABEL_ENV || process.env.NODE_ENV;
   const verbose = process.env.V === '1'
   const isEnvDevelopment = env === 'development';

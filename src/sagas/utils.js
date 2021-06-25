@@ -112,23 +112,23 @@ export function* waitTillEqual (leftArg, rightArg, limit) {
 }
 
 const shortMessages = {
-  'START_VM': 'failedToStartVm',
-  'RESTART_VM': 'failedToRestartVm',
-  'SHUTDOWN_VM': 'failedToShutdownVm',
-  'DOWNLOAD_CONSOLE_VM': 'failedToGetVmConsole',
-  'SUSPEND_VM': 'failedToSuspendVm',
-  'REMOVE_VM': 'failedToRemoveVm',
+  START_VM: 'failedToStartVm',
+  RESTART_VM: 'failedToRestartVm',
+  SHUTDOWN_VM: 'failedToShutdownVm',
+  DOWNLOAD_CONSOLE_VM: 'failedToGetVmConsole',
+  SUSPEND_VM: 'failedToSuspendVm',
+  REMOVE_VM: 'failedToRemoveVm',
 
-  'GET_ICON': 'failedToRetrieveVmIcon',
-  'INTERNAL_CONSOLE': 'failedToRetrieveVmConsoleDetails',
-  'INTERNAL_CONSOLES': 'failedToRetrieveListOfVmConsoles',
-  'GET_DISK_DETAILS': 'failedToRetrieveDiskDetails',
-  'GET_DISK_ATTACHMENTS': 'failedToRetrieveVmDisks',
-  'GET_ISO_FILES': 'failedToRetrieveIsoStorages',
+  GET_ICON: 'failedToRetrieveVmIcon',
+  INTERNAL_CONSOLE: 'failedToRetrieveVmConsoleDetails',
+  INTERNAL_CONSOLES: 'failedToRetrieveListOfVmConsoles',
+  GET_DISK_DETAILS: 'failedToRetrieveDiskDetails',
+  GET_DISK_ATTACHMENTS: 'failedToRetrieveVmDisks',
+  GET_ISO_FILES: 'failedToRetrieveIsoStorages',
 
-  'GET_VM': 'failedToRetrieveVmDetails',
-  'CHANGE_VM_ICON': 'failedToChangeVmIcon',
-  'CHANGE_VM_ICON_BY_ID': 'failedToChangeVmIconToDefault',
+  GET_VM: 'failedToRetrieveVmDetails',
+  CHANGE_VM_ICON: 'failedToChangeVmIcon',
+  CHANGE_VM_ICON_BY_ID: 'failedToChangeVmIconToDefault',
 }
 
 function shortErrorMessage ({ action: { type = 'NONE' } }) {
@@ -139,10 +139,9 @@ function shortErrorMessage ({ action: { type = 'NONE' } }) {
 }
 
 export function* foreach (array, fn, context) {
-  var i = 0
-  var length = array.length
+  const length = array.length
 
-  for (;i < length; i++) {
+  for (let i = 0; i < length; i++) {
     yield * fn.call(context, array[i], i, array)
   }
 }
@@ -213,7 +212,7 @@ export function* entityPermissionsToUserPermits (entity) {
  * on the (custom)? compatibility version and CPU architecture.
  */
 export function* mapCpuOptions (version, architecture) {
-  const [ maxNumSockets, maxNumOfCores, maxNumOfThreads, maxNumOfVmCpusPerArch ] =
+  const [maxNumSockets, maxNumOfCores, maxNumOfThreads, maxNumOfVmCpusPerArch] =
     yield select(({ config }) => [
       config.getIn(['cpuOptions', 'maxNumOfSockets']),
       config.getIn(['cpuOptions', 'maxNumOfCores']),

@@ -117,9 +117,9 @@ function getInitialState ({
     const operatingSystem = operatingSystems.find(os => os.get('name') === osName)
     const operatingSystemId = operatingSystem.get('id')
     const memoryInB = blankTemplate.get('memory')
-    const cpus = blankTemplate.getIn([ 'cpu', 'vCPUs' ])
-    const initEnabled = blankTemplate.getIn([ 'cloudInit', 'enabled' ])
-    const topology = blankTemplate.getIn([ 'cpu', 'topology' ]).toJS()
+    const cpus = blankTemplate.getIn(['cpu', 'vCPUs'])
+    const initEnabled = blankTemplate.getIn(['cloudInit', 'enabled'])
+    const topology = blankTemplate.getIn(['cpu', 'topology']).toJS()
 
     blankTemplateValues = {
       operatingSystemId,
@@ -275,7 +275,7 @@ class CreateVmWizard extends React.Component {
             : this.props.userMessages
               .get('records')
               .filter(
-                record => record.getIn([ 'failedAction', 'meta', 'correlationId' ]) === correlationId
+                record => record.getIn(['failedAction', 'meta', 'correlationId']) === correlationId
               )
               .map(record => buildMessageFromRecord(record.toJS(), msg))
               .toJS()
@@ -401,8 +401,10 @@ class CreateVmWizard extends React.Component {
                    *   - server or high performance -> Clone -> raw / as defined in the template
                    */
                   const diskType = // constrain to values from createDiskTypeList()
-                    template.get('type') === 'desktop' ? 'thin'
-                      : this.state.steps.basic.optimizedFor === 'desktop' ? 'thin'
+                    template.get('type') === 'desktop'
+                      ? 'thin'
+                      : this.state.steps.basic.optimizedFor === 'desktop'
+                        ? 'thin'
                         : disk.get('sparse') ? 'thin' : 'pre'
 
                   return {
@@ -569,8 +571,10 @@ class CreateVmWizard extends React.Component {
           <Button
             bsStyle='primary'
             onClick={
-              isPrimaryNext ? this.wizardClickNext
-                : isPrimaryCreate ? this.handleCreateVm
+              isPrimaryNext
+                ? this.wizardClickNext
+                : isPrimaryCreate
+                  ? this.handleCreateVm
                   : this.hideAndNavigate
             }
             disabled={!enableGoForward}

@@ -41,9 +41,11 @@ const enableResetToDefaultSetting = ({ defaultValues = {}, currentValues = {} })
   return !!Object.keys(defaultValues).find(key => defaultValues[key] !== currentValues[key])
 }
 
-const Settings = ({ draftValues, onSave, lastTransactionId, onCancel,
+const Settings = ({
+  draftValues, onSave, lastTransactionId, onCancel,
   translatedLabels, baseValues, sentValues, currentValues,
-  resetBaseValues, children, onReset, defaultValues }) => {
+  resetBaseValues, children, onReset, defaultValues,
+}) => {
   const { msg } = useContext(MsgContext)
   const [transactionId, setTransactionId] = useState(null)
 

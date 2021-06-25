@@ -77,8 +77,10 @@ class BaseCard extends React.Component {
 
   renderChildren (childProps) {
     const children = this.props.children || noop
-    return typeof children === 'function' ? children(childProps)
-      : React.isValidElement(children) ? React.cloneElement(children, childProps)
+    return typeof children === 'function'
+      ? children(childProps)
+      : React.isValidElement(children)
+        ? React.cloneElement(children, childProps)
         : children
   }
 
@@ -164,14 +166,14 @@ BaseCard.propTypes = {
   editMode: PropTypes.bool,
   editable: PropTypes.bool,
   disableSaveButton: PropTypes.bool,
-  editTooltip: PropTypes.oneOfType([ Tooltip.propTypes.tooltip ]),
-  disableTooltip: PropTypes.oneOfType([ Tooltip.propTypes.tooltip ]),
+  editTooltip: PropTypes.oneOfType([Tooltip.propTypes.tooltip]),
+  disableTooltip: PropTypes.oneOfType([Tooltip.propTypes.tooltip]),
   editTooltipPlacement: Tooltip.propTypes.placement,
 
   onStartEdit: PropTypes.func,
   onCancel: PropTypes.func,
   onSave: PropTypes.func,
-  children: PropTypes.oneOfType([ PropTypes.func, PropTypes.node ]).isRequired,
+  children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]).isRequired,
 }
 BaseCard.defaultProps = {
   onStartEdit: noop,

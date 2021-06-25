@@ -22,7 +22,7 @@ import RestoreConfirmationModal from './RestoreConfirmationModal'
 
 const Status = ({ status, msg }) => {
   return status
-    ? <span className={style['status-icon']}><Icon type='pf' name='on-running' className={style['green']} />{msg.on()}</span>
+    ? <span className={style['status-icon']}><Icon type='pf' name='on-running' className={style.green} />{msg.on()}</span>
     : <span className={style['status-icon']}><Icon type='pf' name='off' />{msg.off()}</span>
 }
 
@@ -46,9 +46,9 @@ const nicRender = (idPrefix, nic) => {
 }
 
 const statusMap = (msg) => ({
-  'in_preview': msg.inPreview(),
-  'locked': msg.locked(),
-  'ok': msg.ok(),
+  in_preview: msg.inPreview(),
+  locked: msg.locked(),
+  ok: msg.ok(),
 })
 
 const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, id, isPoolVm, msg, locale, ...otherProps }) => {
@@ -83,7 +83,7 @@ const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, id, isPoolVm, msg, lo
         </button>
       </div>
     }
-    bsClass={`${style['popover']} popover`}
+    bsClass={`${style.popover} popover`}
     {...otherProps}
   >
     <div className={style['snapshot-detail-container']}>
@@ -205,17 +205,19 @@ const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, id, isPoolVm, msg, lo
         vmId={vmId}
         msg={msg}
         trigger={({ onClick }) =>
-          isPoolVm ? (
+          isPoolVm
+            ? (
             <OverlayTrigger placement='top' overlay={<Tooltip id={`${id}-restore-tt`}>{ msg.vmPoolSnapshotRestoreUnavailable() }</Tooltip>}>
               <span>
                 <Button bsStyle='default' id={`${id}-restore`} disabled style={{ pointerEvents: 'none' }}>{ msg.snapshotRestore() }</Button>
               </span>
             </OverlayTrigger>
-          ) : (
+            )
+            : (
             <Button bsStyle='default' id={`${id}-restore`} onClick={onClick} disabled={restoreDisabled}>
               { msg.snapshotRestore() }
             </Button>
-          )
+            )
         }
       />
     </div>

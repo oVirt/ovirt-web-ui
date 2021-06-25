@@ -34,7 +34,7 @@ export function* createDiskForVm (action) {
     const errorText = extractErrorText(result.error)
     yield put(setNewDiskDialogErrorText(errorText))
   } else {
-    yield fetchDisks({ vms: [ { id: vmId } ] })
+    yield fetchDisks({ vms: [{ id: vmId }] })
     yield waitForDiskToBeUnlocked(vmId, result.id)
     yield put(setNewDiskDialogDone())
   }
@@ -55,7 +55,7 @@ function* removeDisk (action) {
   yield put(removeDiskRemovalPendingTask(diskId))
 
   if (diskRemoved && vmToRefreshId) {
-    yield fetchDisks({ vms: [ { id: vmToRefreshId } ] })
+    yield fetchDisks({ vms: [{ id: vmToRefreshId }] })
   }
 }
 
@@ -79,11 +79,11 @@ function* editDiskOnVm (action) {
   }
 
   yield waitForDiskToBeUnlocked(vmId, disk.id)
-  yield fetchDisks({ vms: [ { id: vmId } ] })
+  yield fetchDisks({ vms: [{ id: vmId }] })
 }
 
 function* clearBootableFlagOnVm (vmId, currentDisk) {
-  const vmDisks = yield select(state => state.vms.getIn([ 'vms', vmId, 'disks' ]))
+  const vmDisks = yield select(state => state.vms.getIn(['vms', vmId, 'disks']))
   const bootableDisk = vmDisks.find(disk => disk.get('bootable'))
 
   if (bootableDisk && (!currentDisk || bootableDisk.get('id') !== currentDisk.id)) {
@@ -134,7 +134,7 @@ function* waitForDiskToBeUnlocked (vmId, attachmentId) {
   return yield waitForDiskAttachment(
     vmId,
     attachmentId,
-    attachment => attachment.disk && attachment.disk.status && attachment.disk.status !== 'locked',
+    attachment => attachment.disk && attachment.disk.status && attachment.disk.status !== 'locked'
   )
 }
 
@@ -142,7 +142,7 @@ function* waitForDiskToBeUnlocked (vmId, attachmentId) {
 function* waitForDiskAttachment (vmId, attachmentId, test, canBeMissing = false) {
   let metTest = false
 
-  for (let delayMs of delayInMsSteps()) {
+  for (const delayMs of delayInMsSteps()) {
     const apiDiskAttachment = yield callExternalAction(
       'diskattachment',
       Api.diskattachment,
