@@ -10,7 +10,6 @@ import {
 import AppConfiguration from '_/config'
 import { hidePassword } from '_/helpers'
 import Api from '_/ovirtapi'
-import { getUserPermits } from '_/utils'
 import semverGte from 'semver/functions/gte'
 import semverValid from 'semver/functions/valid'
 
@@ -184,18 +183,6 @@ export function* delayInMsSteps (count = 20, msMultiplier = 2000) {
   for (let i = 2; i < (count + 2); i++) {
     yield Math.round(Math.log2(i) * msMultiplier)
   }
-}
-
-export function* fetchPermits ({ entityType, id }) {
-  const permissions = yield callExternalAction(`get${entityType}Permissions`, Api[`get${entityType}Permissions`], { payload: { id } })
-  if (permissions && Array.isArray(permissions.permission)) {
-    return getUserPermits(Api.permissionsToInternal({ permissions: permissions.permission }))
-  }
-  return []
-}
-
-export const PermissionsType = {
-  DISK_TYPE: 'Disk',
 }
 
 /**

@@ -1,21 +1,54 @@
 import { takeEvery, put, select } from 'redux-saga/effects'
 
-import { CREATE_DISK_FOR_VM, REMOVE_DISK, EDIT_VM_DISK } from '../constants'
-import Api from '../ovirtapi'
-import { callExternalAction, delay, delayInMsSteps } from './utils'
-import { fetchDisks } from './index'
+import Api, { Transforms } from '_/ovirtapi'
+import { CREATE_DISK_FOR_VM, REMOVE_DISK, EDIT_VM_DISK } from '_/constants'
+
+import {
+  callExternalAction,
+  delay,
+  delayInMsSteps,
+  entityPermissionsToUserPermits,
+} from './utils'
 
 import {
   addDiskRemovalPendingTask,
   removeDiskRemovalPendingTask,
   extractErrorText,
   updateVmDisk,
-} from '../actions'
+  setVmDisks,
+} from '_/actions'
+
 import {
   setNewDiskDialogProgressIndicator,
   setNewDiskDialogErrorText,
   setNewDiskDialogDone,
-} from '../components/NewDiskDialog/actions'
+} from '_/components/NewDiskDialog/actions'
+
+import { canUserEditDisk } from '_/utils'
+
+function* transformAndPermitDiskAttachment (attachment) {
+  const internalDisk = Transforms.DiskAttachment.toInternal({ attachment, disk: attachment.disk })
+
+  internalDisk.userPermits = yield entityPermissionsToUserPermits(internalDisk)
+  internalDisk.canUserEditDisk = canUserEditDisk(internalDisk.userPermits)
+
+  return internalDisk
+}
+
+function* fetchVmDisks ({ vmId }) {
+  const diskattachments = yield callExternalAction('diskattachments', Api.diskattachments, { payload: { vmId } })
+
+  const internalDisks = []
+
+  if (diskattachments && diskattachments.disk_attachment) {
+    for (const attachment of diskattachments.disk_attachment) {
+      internalDisks.push(yield transformAndPermitDiskAttachment(attachment))
+    }
+  }
+
+  yield put(setVmDisks({ vmId, disks: internalDisks }))
+  return internalDisks
+}
 
 export function* createDiskForVm (action) {
   yield put(setNewDiskDialogProgressIndicator(true))
@@ -34,7 +67,7 @@ export function* createDiskForVm (action) {
     const errorText = extractErrorText(result.error)
     yield put(setNewDiskDialogErrorText(errorText))
   } else {
-    yield fetchDisks({ vms: [{ id: vmId }] })
+    yield fetchVmDisks({ vmId })
     yield waitForDiskToBeUnlocked(vmId, result.id)
     yield put(setNewDiskDialogDone())
   }
@@ -55,7 +88,7 @@ function* removeDisk (action) {
   yield put(removeDiskRemovalPendingTask(diskId))
 
   if (diskRemoved && vmToRefreshId) {
-    yield fetchDisks({ vms: [{ id: vmToRefreshId }] })
+    yield fetchVmDisks({ vmId: vmToRefreshId })
   }
 }
 
@@ -79,7 +112,7 @@ function* editDiskOnVm (action) {
   }
 
   yield waitForDiskToBeUnlocked(vmId, disk.id)
-  yield fetchDisks({ vms: [{ id: vmId }] })
+  yield fetchVmDisks({ vmId })
 }
 
 function* clearBootableFlagOnVm (vmId, currentDisk) {
@@ -151,8 +184,7 @@ function* waitForDiskAttachment (vmId, attachmentId, test, canBeMissing = false)
     )
 
     if (!apiDiskAttachment.error) {
-      const apiDisk = apiDiskAttachment.disk
-      const edited = Api.diskToInternal({ attachment: apiDiskAttachment, disk: apiDisk })
+      const edited = yield transformAndPermitDiskAttachment(apiDiskAttachment)
       if (vmId) {
         yield put(updateVmDisk({ vmId, disk: edited }))
       }

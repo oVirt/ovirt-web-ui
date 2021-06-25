@@ -537,8 +537,11 @@ const Snapshot = {
 // VM -> DiskAttachments.DiskAttachment[] -> Disk
 const DiskAttachment = {
   toInternal ({ attachment, disk }: { attachment?: ApiDiskAttachmentType, disk: ApiDiskType }): DiskType {
-    // TODO Add nested permissions support when BZ 1639784 will be done
-    return cleanUndefined({
+    const permissions = disk.permissions && disk.permissions.permission
+      ? Permissions.toInternal({ permissions: disk.permissions.permission })
+      : []
+
+    const cleanBase = cleanUndefined({
       attachmentId: attachment && attachment.id,
       active: attachment && convertBool(attachment.active),
       bootable: attachment && convertBool(attachment.bootable),
@@ -567,6 +570,15 @@ const DiskAttachment = {
         disk.storage_domains.storage_domain[0] &&
         disk.storage_domains.storage_domain[0].id,
     })
+
+    return {
+      ...cleanBase,
+
+      // roles are required to calculate permits and 'canUse*', therefore its done in sagas
+      permissions,
+      userPermits: new Set(),
+      canUserEditDisk: false,
+    }
   },
 
   // NOTE: This will only work if disk.type == "image"

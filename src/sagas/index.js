@@ -21,7 +21,6 @@ import sagasVmSnapshots from '_/components/VmDetails/cards/SnapshotsCard/sagas'
 
 import {
   updatePagingData,
-  setVmDisks,
   updateVms,
   removeVms,
   vmActionInProgress,
@@ -49,10 +48,7 @@ import {
   delay,
   doCheckTokenExpired,
   entityPermissionsToUserPermits,
-  foreach,
-  fetchPermits,
   mapCpuOptions,
-  PermissionsType,
 } from './utils'
 
 import { fetchUnknownIcons } from './osIcons'
@@ -99,7 +95,7 @@ import AppConfiguration from '_/config'
 
 const VM_FETCH_ADDITIONAL_DEEP = [
   'cdroms',
-  'disk_attachments.disk',
+  'disk_attachments.disk.permissions',
   'graphics_consoles',
   'nics.reporteddevices',
   'permissions',
@@ -132,13 +128,13 @@ export function* transformAndPermitVm (vm) {
     internalVm.cpuOptions = null
   }
 
-  return internalVm
-}
+  // Permit disks fetched and transformed along with the VM
+  for (const disk of internalVm.disks) {
+    disk.userPermits = yield entityPermissionsToUserPermits(disk)
+    disk.canUserEditDisk = canUserEditDisk(disk.userPermits)
+  }
 
-function* putPermissionsInDisk (disk) {
-  disk.permits = yield fetchPermits({ entityType: PermissionsType.DISK_TYPE, id: disk.id })
-  disk.canUserEditDisk = canUserEditDisk(disk.permits)
-  return disk
+  return internalVm
 }
 
 /**
@@ -235,10 +231,6 @@ export function* fetchSingleVm (action) {
       internalVm.cdrom = yield fetchVmCdRom({ vmId: internalVm.id, current: true })
     }
 
-    if (!shallowFetch) {
-      internalVm.disks = (yield all(internalVm.disks.map(putPermissionsInDisk)))
-    }
-
     // NOTE: Snapshot Disks and Nics are not currently (Sept-2018) available via
     //       additional/follow param on the VM/snapshot fetch.  We need to fetch them
     //       directly.
@@ -309,32 +301,6 @@ function* fetchVmCdRom ({ vmId, current }) {
     cdromInternal = Api.cdRomToInternal({ cdrom })
   }
   return cdromInternal
-}
-
-export function* fetchDisks ({ vms }) {
-  yield * foreach(vms, function* (vm) {
-    const vmId = vm.id
-    const disks = yield fetchVmDisks({ vmId })
-    yield put(setVmDisks({ vmId, disks }))
-  })
-}
-
-function* fetchVmDisks ({ vmId }) {
-  // TODO: Enhance to use the `follow` API parameter (in API >=4.2) to reduce the request count
-  //       This should follow the same style as `fetchSingleVm` and would require an extension to `Api.diskattachments`
-  const diskattachments = yield callExternalAction('diskattachments', Api.diskattachments, { type: 'GET_DISK_ATTACHMENTS', payload: { vmId } })
-
-  if (diskattachments && diskattachments.disk_attachment) { // array
-    const internalDisks = []
-    yield * foreach(diskattachments.disk_attachment, function* (attachment) {
-      const diskId = attachment.disk.id
-      const disk = yield callExternalAction('disk', Api.disk, { type: 'GET_DISK_DETAILS', payload: { diskId } })
-      const internalDisk = yield putPermissionsInDisk(Api.diskToInternal({ disk, attachment }))
-      internalDisks.push(internalDisk)
-    })
-    return internalDisks
-  }
-  return []
 }
 
 export function* addVmNic (action) {
@@ -459,15 +425,6 @@ export function* fetchVmSessions ({ vmId }) {
 
   if (sessions && sessions.session) {
     return Api.sessionsToInternal({ sessions })
-  }
-  return []
-}
-
-export function* fetchVmPermissions ({ vmId }) {
-  const permissions = yield callExternalAction('getVmPermissions', Api.getVmPermissions, { payload: { vmId } })
-
-  if (permissions && permissions.permission) {
-    return Api.permissionsToInternal({ permissions: permissions.permission })
   }
   return []
 }
