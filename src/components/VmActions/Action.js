@@ -87,7 +87,15 @@ Button.propTypes = {
   id: PropTypes.string.isRequired,
 }
 
-const MenuItemAction = ({ confirmation, onClick, shortTitle, icon, actionDisabled = false, ...rest }) => {
+const MenuItemAction = ({
+  confirmation,
+  onClick,
+  shortTitle,
+  icon,
+  actionDisabled = false,
+  id,
+  className,
+}) => {
   return (
     <Action confirmation={confirmation}>
       <MenuItem
@@ -96,7 +104,8 @@ const MenuItemAction = ({ confirmation, onClick, shortTitle, icon, actionDisable
           onClick && onClick(...args)
           document.dispatchEvent(new MouseEvent('click'))
         }}
-        {...rest}
+        id={id}
+        className={className}
       >
         <span>{shortTitle}</span> {icon}
       </MenuItem>

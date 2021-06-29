@@ -2,6 +2,8 @@
 //
 // Types used in the API and the types used internal to the App.
 //
+import * as C from '_/constants/console'
+
 export type ApiVmType = Object
 export type VmType = Object
 
@@ -218,6 +220,28 @@ export type UserOptionType<T> = {
 
 export type ApiVmConsolesType = Object
 export type VmConsolesType = Object
+
+export type UiConsoleType = typeof C.SPICE | typeof C.RDP | typeof C.NATIVE_VNC | typeof C.BROWSER_VNC
+
+export type ConsoleErrorType = {|
+  vmId: string,
+  vmName: string,
+  consoleType: UiConsoleType,
+  status: typeof C.CONSOLE_LOGON | typeof C.CONSOLE_IN_USE,
+  consoleId: string
+|}
+
+export type UiConsoleStateType = {
+  state: typeof C.INIT_CONSOLE | typeof C.DOWNLOAD_CONSOLE | typeof C.DISCONNECTED_CONSOLE | typeof C.OPEN_IN_PROGRESS,
+  reason: string
+}
+
+export type VmConsoleType = {
+  ticket: string,
+  proxyTicket?: string,
+  reason?: string,
+  [consoleType: UiConsoleType]: UiConsoleStateType
+}
 
 export type ApiVmSessionsType = Object
 export type VmSessionsType = Object

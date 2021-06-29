@@ -57,7 +57,7 @@ export default function getRoutes () {
             type: DETAIL_PAGE_TYPE,
             routes: [
               {
-                path: '/vm/:id/console/:console',
+                path: '/vm/:id/console/:consoleType',
                 title: ({ msg }) => msg.console(),
                 component: VmConsolePage,
                 closeable: true,

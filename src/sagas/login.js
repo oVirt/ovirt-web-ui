@@ -18,7 +18,6 @@ import {
   setAdministrator,
   getAllEvents,
 
-  downloadConsole,
   getSingleVm,
 
   updateVms,
@@ -41,7 +40,6 @@ import {
   fetchCurrentUser,
   fetchUserGroups,
 } from './base-data'
-import { downloadVmConsole } from './console'
 import { fetchRoles } from './roles'
 import { fetchServerConfiguredValues, fetchGeneralEngineOption } from './server-configs'
 import { fetchDataCentersAndStorageDomains, fetchIsoFiles } from './storageDomains'
@@ -240,7 +238,6 @@ function* autoConnectCheck () {
     } else if (vm && vm.id && vm.status !== 'down') {
       const internalVm = yield transformAndPermitVm(vm)
       yield put(updateVms({ vms: [internalVm] }))
-      yield downloadVmConsole(downloadConsole({ vmId, hasGuestAgent: internalVm.ssoGuestAgent }))
     }
   }
 }

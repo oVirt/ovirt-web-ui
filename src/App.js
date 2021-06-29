@@ -12,6 +12,7 @@ import RefreshIntervalChangeHandler from '_/components/RefreshIntervalChangeHand
 import SessionActivityTracker from '_/components/SessionActivityTracker'
 import ToastNotifications from '_/components/ToastNotifications'
 import VmsPageHeader from '_/components/VmsPageHeader'
+import ConsoleNotificationsDialog from '_/components/VmActions/ConsoleNotificationsDialog'
 
 import getRoutes from '_/routes'
 import { fixedStrings } from '_/branding'
@@ -70,6 +71,7 @@ const App = ({ history, config, appReady, activateSessionTracker }) => {
         <OvirtApiCheckFailed />
         <LoadingData />
         <ToastNotifications />
+        <ConsoleNotificationsDialog/>
         { appReady && activateSessionTracker && <SessionActivityTracker /> }
         { appReady && renderRoutes(getRoutes()) }
         { appReady && <RefreshIntervalChangeHandler /> }

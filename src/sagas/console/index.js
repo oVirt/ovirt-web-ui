@@ -1,88 +1,78 @@
-import { put, select } from 'redux-saga/effects'
+import { put, select, call } from 'redux-saga/effects'
 
 import Api from '_/ovirtapi'
 import OptionsManager from '_/optionsManager'
 import { fileDownload } from '_/helpers'
-import { doesVmSessionExistForUserId } from '_/utils'
-import {
-  downloadConsole,
-  getConsoleOptions as getConsoleOptionsAction,
-  setConsoleOptions,
-  setVmSessions,
-  setConsoleStatus,
-  setConsoleTickets,
-  setInUseConsoleModalState,
-  setLogonConsoleModalState,
-  closeConsoleModal,
-  setNewConsoleModal,
-  addUserMessage,
-} from '_/actions'
+import { doesVmSessionExistForUserId, idFromType } from '_/utils'
+import * as Actions from '_/actions'
 
 import { callExternalAction } from '../utils'
-import { fetchVmSessions } from '../index'
+import {
+  fetchVmSessions,
+} from '../index'
 
 import { adjustVVFile } from './vvFileUtils'
 import RDPBuilder from './rdpBuilder'
 
 import { push } from 'connected-react-router'
-import { setActiveConsole } from '../../actions'
-import { INIT_CONSOLE, DOWNLOAD_CONSOLE } from '_/constants'
+import * as C from '_/constants'
 
 // ----- Connection files
 /**
  * Push a virt-viewer connection file (__console.vv__) to connect a user to a VM's console
  */
-export function* downloadVmConsole (action) {
-  const { modalId, vmId, consoleId, usbAutoshare, usbFilter, hasGuestAgent, skipSSO, openInPage, isNoVNC } = action.payload
-
+function* downloadVmConsole ({
+  vmName,
+  consoleType,
+  vmId,
+  consoleId,
+  usbAutoshare,
+  usbFilter,
+  hasGuestAgent,
+  skipSSO,
+  openInPage,
+}) {
   if (hasGuestAgent && !skipSSO) {
     const result = yield callExternalAction(Api.vmLogon, { payload: { vmId } }, true)
     if (!result || result.status !== 'complete') {
-      const {
-        error: {
-          responseJSON: {
-            fault: {
-              detail:
-                message = '',
-            } = {},
-          } = {},
-        } = {},
-      } = result
-      yield put(setLogonConsoleModalState({ modalId }))
-      yield put(addUserMessage({ messageDescriptor: { id: 'cantOpenConsole', params: { message } }, type: 'error' }))
+      const message = result?.error?.responseJSON?.fault?.detail ?? ''
+      yield put(Actions.addConsoleError({ vmId, vmName, consoleType, status: C.CONSOLE_LOGON, consoleId }))
+      yield put(Actions.addUserMessage({ messageDescriptor: { id: 'cantOpenConsole', params: { message } }, type: 'error' }))
       return
     }
   }
 
-  yield put(closeConsoleModal({ modalId }))
+  yield put(Actions.dismissConsoleError({ vmId, consoleType }))
 
   let data = yield callExternalAction(Api.console, { type: 'INTERNAL_CONSOLE', payload: { vmId, consoleId } })
-  if (data.error === undefined) {
-    yield put(setActiveConsole({ vmId, consoleId }))
-    /**
-     *Download console if type is spice or novnc is running already
-     */
-    const isSpice = data.indexOf('type=spice') > -1
-    if (isSpice || !isNoVNC) {
-      const legacyOptions = getLegacyOptions({ vmId })
-      const options = isSpice
-        ? yield getSpiceConsoleOptions({ legacyOptions, usbAutoshare, usbFilter, vmId })
-        : yield getVncOptions({ legacyOptions })
+  if (data.error) {
+    return
+  }
 
-      data = adjustVVFile({ data, options })
-      fileDownload({ data, fileName: 'console.vv', mimeType: 'application/x-virt-viewer' })
-      yield put(setConsoleStatus({ vmId, status: DOWNLOAD_CONSOLE }))
-    } else {
-      const dataTicket = yield callExternalAction(Api.consoleProxyTicket,
-        { type: 'INTRENAL_CONSOLE', payload: { vmId, consoleId } })
-      const ticket = yield callExternalAction(Api.consoleTicket,
-        { type: 'INTRENAL_CONSOLE', payload: { vmId, consoleId } })
-      yield put(setConsoleTickets({ vmId, proxyTicket: dataTicket.proxy_ticket.value, ticket: ticket.ticket }))
-      yield put(setConsoleStatus({ vmId, status: INIT_CONSOLE }))
-    }
-    if (openInPage || isNoVNC) {
-      yield put(push('/vm/' + vmId + '/console/' + consoleId))
-    }
+  const isSpice = consoleType === C.SPICE
+  if (consoleType === C.NATIVE_VNC || isSpice) {
+    const legacyOptions = getLegacyOptions({ vmId })
+    const options = isSpice
+      ? yield getSpiceConsoleOptions({ legacyOptions, usbAutoshare, usbFilter, vmId })
+      : yield getVncOptions({ legacyOptions })
+
+    data = adjustVVFile({ data, options })
+    fileDownload({ data, fileName: 'console.vv', mimeType: 'application/x-virt-viewer' })
+    yield put(Actions.setConsoleStatus({ vmId, status: C.DOWNLOAD_CONSOLE, consoleType }))
+  }
+
+  const isNoVNC = consoleType === C.BROWSER_VNC
+  if (isNoVNC) {
+    const dataTicket = yield callExternalAction(Api.consoleProxyTicket,
+      { type: 'INTRENAL_CONSOLE', payload: { vmId, consoleId } })
+    const ticket = yield callExternalAction(Api.consoleTicket,
+      { type: 'INTRENAL_CONSOLE', payload: { vmId, consoleId } })
+    yield put(Actions.setConsoleTickets({ vmId, proxyTicket: dataTicket.proxy_ticket.value, ticket: ticket.ticket }))
+    yield put(Actions.setConsoleStatus({ vmId, status: C.INIT_CONSOLE, consoleType }))
+  }
+
+  if (openInPage || isNoVNC) {
+    yield put(push('/vm/' + vmId + '/console/' + consoleType))
   }
 }
 
@@ -98,7 +88,7 @@ function* getLegacyOptions ({ vmId }) {
     return (options.toJS && options.toJS()) || options
   }
   console.log('downloadVmConsole() console options not yet present, trying to load from local storage')
-  yield getConsoleOptions(getConsoleOptionsAction({ vmId }))
+  yield getConsoleOptions(Actions.getConsoleOptions({ vmId }))
 }
 
 function* getSpiceConsoleOptions ({ legacyOptions, usbAutoshare, usbFilter, vmId }) {
@@ -133,10 +123,23 @@ function* getVncOptions ({ legacyOptions }) {
 /**
  * Push a RDP connection file (__console.rdp__) to connect a user to the Windows VM's RDP session
  */
-export function* getRDPVm (action) {
-  const rdpBuilder = new RDPBuilder(action.payload)
+function* getRDPVm ({
+  openInPage,
+  vmId,
+  vmName,
+  fqdn,
+  username,
+  domain,
+}) {
+  // note that vmName was skipped here (intentionally or not)
+  // which results in address === fqdn
+  const rdpBuilder = new RDPBuilder({ username, domain, fqdn })
   const data = rdpBuilder.buildRDP()
   fileDownload({ data, fileName: 'console.rdp', mimeType: 'application/rdp' })
+  yield put(Actions.setConsoleStatus({ vmId, status: C.DOWNLOAD_CONSOLE, consoleType: C.RDP }))
+  if (openInPage) {
+    yield put(push('/vm/' + vmId + '/console/rdp'))
+  }
 }
 
 // -----
@@ -146,40 +149,88 @@ export function* getRDPVm (action) {
  * console, flag the console as "in use" requiring manual confirmation to open the
  * console (which will disconnect the other user's existing session).
  */
-export function* openConsoleModal (action) {
-  const { modalId, vmId, usbAutoshare, usbFilter, userId, hasGuestAgent, consoleId, isNoVNC, openInPage } = action.payload
-  yield put(setNewConsoleModal({ modalId, vmId, consoleId }))
+export function* openConsole ({
+  payload: {
+    consoleType,
+    vmId,
+    openInPage,
+    skipSSO,
+    logoutOtherUsers,
+  },
+}) {
+  yield put(Actions.setConsoleStatus({ vmId, status: C.OPEN_IN_PROGRESS, consoleType }))
+
+  const {
+    userId,
+    usbAutoshare,
+    usbFilter,
+    vmName,
+    hasGuestAgent,
+    consoleId,
+    fqdn,
+    domain,
+    username,
+  } = yield select(({ config, vms }) => ({
+    usbAutoshare: config.get('usbAutoshare'),
+    usbFilter: config.get('usbFilter'),
+    userId: config.getIn(['user', 'id']),
+    domain: config.get('domain'),
+    username: config.getIn(['user', 'name']),
+    vmName: vms.getIn(['vms', vmId, 'name']),
+    hasGuestAgent: vms.getIn(['vms', vmId, 'ssoGuestAgent']),
+    consoleId: idFromType({ consoleType, vm: vms.getIn(['vms', vmId]) }),
+    fqdn: vms.getIn(['vms', vmId, 'fqdn']),
+  }))
+
+  if (consoleType === C.RDP) {
+    yield call(getRDPVm, {
+      openInPage,
+      vmId,
+      vmName,
+      fqdn,
+      username,
+      domain,
+    })
+    return
+  }
+
   const sessionsInternal = yield fetchVmSessions({ vmId })
   const consoleUsers = sessionsInternal && sessionsInternal
     .filter(session => session.consoleUser)
     .map(session => session.user)
-  yield put(setVmSessions({ vmId, sessions: sessionsInternal }))
+  yield put(Actions.setVmSessions({ vmId, sessions: sessionsInternal }))
 
-  if (consoleUsers.length > 0 && consoleUsers.find(user => user.id === userId) === undefined) {
-    yield put(setInUseConsoleModalState({ modalId }))
+  if (!logoutOtherUsers && consoleUsers.length > 0 && consoleUsers.find(user => user.id === userId) === undefined) {
+    yield put(Actions.addConsoleError({
+      vmId,
+      vmName,
+      consoleType,
+      status: C.CONSOLE_IN_USE,
+      consoleId,
+    }))
   } else {
-    yield put(downloadConsole({
-      modalId,
+    yield call(downloadVmConsole, {
+      vmName,
+      consoleType,
       vmId,
       usbAutoshare,
       usbFilter,
       hasGuestAgent,
       consoleId,
-      isNoVNC,
       openInPage,
-      skipSSO: doesVmSessionExistForUserId(sessionsInternal, userId),
-    }))
+      skipSSO: skipSSO || doesVmSessionExistForUserId(sessionsInternal, userId),
+    })
   }
 }
 
 // ----- Console Options (per VM) held by `OptionsManager`
 export function* getConsoleOptions (action) {
   const options = OptionsManager.loadConsoleOptions(action.payload)
-  yield put(setConsoleOptions({ vmId: action.payload.vmId, options }))
+  yield put(Actions.setConsoleOptions({ vmId: action.payload.vmId, options }))
   return options
 }
 
 export function* saveConsoleOptions (action) {
   OptionsManager.saveConsoleOptions(action.payload)
-  yield getConsoleOptions(getConsoleOptionsAction({ vmId: action.payload.vmId }))
+  yield getConsoleOptions(Actions.getConsoleOptions({ vmId: action.payload.vmId }))
 }

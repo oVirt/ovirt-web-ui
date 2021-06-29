@@ -18,21 +18,12 @@ import {
   canExternalService,
 } from '../../vm-status'
 
-import {
-  shutdownVm,
-  restartVm,
-  suspendVm,
-  startPool,
-  startVm,
-  removeVm,
-  getRDP,
-} from '_/actions'
+import * as Actions from '_/actions'
 
 import { isWindows } from '_/helpers'
 
 import { SplitButton, Icon, Checkbox, DropdownKebab } from 'patternfly-react'
 import ConfirmationModal from './ConfirmationModal'
-import ConsoleConfirmationModal from './ConsoleConfirmationModal'
 import Action, { ActionButtonWraper, MenuItemAction, ActionMenuItemWrapper } from './Action'
 import { VNC, RDP, BROWSER_VNC, SPICE, NATIVE_VNC, NO_VNC } from '_/constants/console'
 
@@ -96,6 +87,65 @@ VmDropdownActions.propTypes = {
   id: PropTypes.string.isRequired,
 }
 
+export function getConsoleActions ({ vm, msg, onOpenConsole, idPrefix, config, preferredConsole }) {
+  const vncConsole = vm.get('consoles').find(c => c.get('protocol') === VNC)
+  const spiceConsole = vm.get('consoles').find(c => c.get('protocol') === SPICE)
+  const hasRdp = isWindows(vm.getIn(['os', 'type']))
+  let consoles = []
+
+  if (vncConsole) {
+    const vncModes = [{
+      priority: 0,
+      protocol: VNC,
+      consoleType: NATIVE_VNC,
+      shortTitle: msg.vncConsole(),
+      icon: <Icon name='external-link' />,
+      id: `${idPrefix}-button-console-vnc`,
+      onClick: () => { onOpenConsole({ consoleType: NATIVE_VNC }) },
+    },
+    {
+      priority: 0,
+      consoleType: BROWSER_VNC,
+      shortTitle: msg.vncConsoleBrowser(),
+      actionDisabled: config.get('websocket') === null,
+      id: `${idPrefix}-button-console-browser`,
+      onClick: () => { onOpenConsole({ consoleType: BROWSER_VNC }) },
+    }]
+
+    if (config.get('defaultVncMode') === NO_VNC) {
+      vncModes.reverse()
+    }
+    consoles = [...consoles, ...vncModes]
+  }
+
+  if (spiceConsole) {
+    consoles.push({
+      priority: 0,
+      protocol: SPICE,
+      consoleType: SPICE,
+      shortTitle: msg.spiceConsole(),
+      icon: <Icon name='external-link' />,
+      id: `${idPrefix}-button-console-spice`,
+      onClick: (e) => { onOpenConsole({ consoleType: SPICE }) },
+    })
+  }
+
+  if (hasRdp) {
+    consoles.push({
+      priority: 0,
+      consoleType: RDP,
+      shortTitle: msg.remoteDesktop(),
+      icon: <Icon name='external-link' />,
+      id: `${idPrefix}-button-console-rdp`,
+      onClick: (e) => { onOpenConsole({ consoleType: RDP }) },
+    })
+  }
+
+  return consoles
+    .map(({ consoleType, ...props }) => ({ ...props, consoleType, priority: consoleType === preferredConsole ? 1 : 0 }))
+    .sort((a, b) => b.priority - a.priority)
+}
+
 /**
  * Set of actions for a single VM or Pool, either on a single VM card or on the VM
  * edit page.  The availability of actions depends on the VM state and the `isOnCard`
@@ -127,7 +177,7 @@ class VmActions extends React.Component {
       onRestart,
       onForceShutdown,
       onSuspend,
-      onRDP,
+      onOpenConsole,
       msg,
       preferredConsole,
     } = this.props
@@ -136,70 +186,7 @@ class VmActions extends React.Component {
     const status = vm.get('status')
     const onStart = (isPool ? onStartPool : onStartVm)
 
-    const vncConsole = vm.get('consoles').find(c => c.get('protocol') === VNC)
-    const spiceConsole = vm.get('consoles').find(c => c.get('protocol') === SPICE)
-    const hasRdp = isWindows(vm.getIn(['os', 'type']))
-    let consoles = []
-
-    if (vncConsole) {
-      const vncModes = [{
-        priority: 0,
-        protocol: VNC,
-        uiConsole: NATIVE_VNC,
-        shortTitle: msg.vncConsole(),
-        icon: <Icon name='external-link' />,
-        id: `${idPrefix}-button-console-vnc`,
-        confirmation: (
-          <ConsoleConfirmationModal consoleId={vncConsole.get('id')} vm={vm} />
-        ),
-      },
-      {
-        priority: 0,
-        uiConsole: BROWSER_VNC,
-        shortTitle: msg.vncConsoleBrowser(),
-        actionDisabled: config.get('websocket') === null,
-        id: `${idPrefix}-button-console-browser`,
-        confirmation: (
-          <ConsoleConfirmationModal isNoVNC consoleId={vncConsole.get('id')} vm={vm} />
-        ),
-      }]
-
-      if (config.get('defaultVncMode') === NO_VNC) {
-        vncModes.reverse()
-      }
-      consoles = [...consoles, ...vncModes]
-    }
-
-    if (spiceConsole) {
-      consoles.push({
-        priority: 0,
-        protocol: SPICE,
-        uiConsole: SPICE,
-        shortTitle: msg.spiceConsole(),
-        icon: <Icon name='external-link' />,
-        id: `${idPrefix}-button-console-spice`,
-        confirmation: (
-          <ConsoleConfirmationModal consoleId={spiceConsole.get('id')} vm={vm} />
-        ),
-      })
-    }
-
-    if (hasRdp) {
-      const domain = config.get('domain')
-      const username = config.getIn(['user', 'name'])
-      consoles.push({
-        priority: 0,
-        uiConsole: RDP,
-        shortTitle: msg.remoteDesktop(),
-        icon: <Icon name='external-link' />,
-        id: `${idPrefix}-button-console-rdp`,
-        onClick: (e) => { e.preventDefault(); onRDP({ domain, username }) },
-      })
-    }
-
-    consoles = consoles
-      .map(({ uiConsole, ...props }) => ({ ...props, priority: uiConsole === preferredConsole ? 1 : 0 }))
-      .sort((a, b) => b.priority - a.priority)
+    const consoles = getConsoleActions({ vm, msg, onOpenConsole, idPrefix, config, preferredConsole })
 
     const actions = [
       {
@@ -256,7 +243,7 @@ class VmActions extends React.Component {
       },
       {
         priority: 1,
-        actionDisabled: isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole']) || vm.get('consoles').isEmpty(),
+        actionDisabled: isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole']),
         shortTitle: msg.console(),
         className: 'btn btn-default',
         bsStyle: 'default',
@@ -394,9 +381,9 @@ VmActions.propTypes = {
   onRemove: PropTypes.func.isRequired,
   onStartPool: PropTypes.func.isRequired,
   onStartVm: PropTypes.func.isRequired,
-  onRDP: PropTypes.func.isRequired,
   msg: PropTypes.object.isRequired,
   preferredConsole: PropTypes.string,
+  onOpenConsole: PropTypes.func.isRequired,
 }
 
 export default withRouter(
@@ -407,14 +394,19 @@ export default withRouter(
       preferredConsole: state.options.getIn(['remoteOptions', 'preferredConsole', 'content'], state.config.get('defaultUiConsole')),
     }),
     (dispatch, { vm, pool }) => ({
-      onShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: false })),
-      onRestart: () => dispatch(restartVm({ vmId: vm.get('id'), force: false })),
-      onForceShutdown: () => dispatch(shutdownVm({ vmId: vm.get('id'), force: true })),
-      onSuspend: () => dispatch(suspendVm({ vmId: vm.get('id') })),
-      onRemove: ({ preserveDisks }) => dispatch(removeVm({ vmId: vm.get('id'), preserveDisks })),
-      onStartPool: () => dispatch(startPool({ poolId: pool.get('id') })),
-      onStartVm: () => dispatch(startVm({ vmId: vm.get('id') })),
-      onRDP: ({ domain, username }) => dispatch(getRDP({ name: vm.get('name'), fqdn: vm.get('fqdn'), domain, username })),
+      onShutdown: () => dispatch(Actions.shutdownVm({ vmId: vm.get('id'), force: false })),
+      onRestart: () => dispatch(Actions.restartVm({ vmId: vm.get('id'), force: false })),
+      onForceShutdown: () => dispatch(Actions.shutdownVm({ vmId: vm.get('id'), force: true })),
+      onSuspend: () => dispatch(Actions.suspendVm({ vmId: vm.get('id') })),
+      onRemove: ({ preserveDisks }) => dispatch(Actions.removeVm({ vmId: vm.get('id'), preserveDisks })),
+      onStartPool: () => dispatch(Actions.startPool({ poolId: pool.get('id') })),
+      onStartVm: () => dispatch(Actions.startVm({ vmId: vm.get('id') })),
+      onOpenConsole: ({ consoleType }) => {
+        dispatch(Actions.openConsole({
+          vmId: vm.get('id'),
+          consoleType,
+        }))
+      },
     })
   )(withMsg(VmActions))
 )

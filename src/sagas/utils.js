@@ -119,7 +119,6 @@ const shortMessages = {
   START_VM: 'failedToStartVm',
   RESTART_VM: 'failedToRestartVm',
   SHUTDOWN_VM: 'failedToShutdownVm',
-  DOWNLOAD_CONSOLE_VM: 'failedToGetVmConsole',
   SUSPEND_VM: 'failedToSuspendVm',
   REMOVE_VM: 'failedToRemoveVm',
 

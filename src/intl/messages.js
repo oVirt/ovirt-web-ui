@@ -63,7 +63,7 @@ export const messages: { [messageId: string]: MessageType } = {
   bootSequence: 'Boot Sequence',
   cancel: 'Cancel',
   cannotUpdateCloudInitHostname: 'Host name cannot be synchronized with VM name because the VM name is not a valid host name.',
-  cantLogonToConsole: 'Single sign on failed. Please check to see if the guest agent is running on your virtual machine. Contact your administrator if the problem continues.',
+  cantLogonToConsole: 'Single sign on failed. Please check to see if the guest agent is running on {vmName}. Contact your administrator if the problem continues.',
   cantOpenConsole: 'Can\'t open console: {message}',
   cardTitleDetails: 'Details',
   cd: 'CD',
@@ -107,7 +107,7 @@ export const messages: { [messageId: string]: MessageType } = {
   console: 'Console',
   consoleDefaultNotAvailable: 'The default console type {defaultConsole} is not available for {vmName}. All available console types are available on the VM Details page.',
   consoleInstructions: 'Console Instructions',
-  consoleInUseContinue: 'Console in use, continue?',
+  consoleInUseContinue: 'Console for {vmName} is already in use, continue?',
   consoleNotAvailableHeadless: 'No console is available for {vmName}. It is a headless VM.',
   containsConfigurationAndDisksWhichWillBeUsedToCreateThisVm: 'Contains the configuration and disks which will be used to create this virtual machine. Please customize as needed.',
   continueSessionSecondary: {

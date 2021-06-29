@@ -43,11 +43,9 @@ import {
 import { fetchUnknownIcons } from './osIcons'
 
 import {
-  downloadVmConsole,
   getConsoleOptions,
   saveConsoleOptions,
-  getRDPVm,
-  openConsoleModal,
+  openConsole,
 } from './console'
 
 import {
@@ -57,18 +55,16 @@ import {
   DELAYED_REMOVE_ACTIVE_REQUEST,
   DELETE_VM_NIC,
   DISMISS_EVENT,
-  DOWNLOAD_CONSOLE_VM,
   EDIT_VM_NIC,
   GET_ALL_EVENTS,
   GET_BY_PAGE,
   GET_CONSOLE_OPTIONS,
   GET_POOL,
   GET_POOLS,
-  GET_RDP_VM,
   GET_VM,
   GET_VMS,
   NAVIGATE_TO_VM_DETAILS,
-  OPEN_CONSOLE_MODAL,
+  OPEN_CONSOLE,
   SAVE_CONSOLE_OPTIONS,
   SAVE_FILTERS,
 } from '_/constants'
@@ -518,9 +514,7 @@ export function* rootSaga () {
 
     takeEvery(GET_CONSOLE_OPTIONS, getConsoleOptions),
     takeEvery(SAVE_CONSOLE_OPTIONS, saveConsoleOptions),
-    takeEvery(OPEN_CONSOLE_MODAL, openConsoleModal),
-    takeEvery(DOWNLOAD_CONSOLE_VM, downloadVmConsole),
-    takeEvery(GET_RDP_VM, getRDPVm),
+    takeEvery(OPEN_CONSOLE, openConsole),
 
     takeEvery(SAVE_FILTERS, saveFilters),
 
