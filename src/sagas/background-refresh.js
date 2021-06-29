@@ -4,11 +4,13 @@ import {
 } from './options'
 
 import {
+  actionChannel,
   all,
   call,
   put,
   race,
   select,
+  spawn,
   take,
   takeEvery,
   takeLatest,
@@ -33,55 +35,66 @@ import {
 import { getConsoleOptions } from './console'
 import { fetchIsoFiles } from './storageDomains'
 
+const BACKGROUND_REFRESH = 'BACKGROUND_REFRESH'
+
+//
+// ** User Action Sagas **
+//
 /**
  * Change the background refresh type based on the page type, and force a refresh.
  *
  * This should be done at the time of navigation to the page, typically by the page router.
  */
-function* changePage (action) {
-  yield put(Actions.setCurrentPage(action.payload))
-  const delayInSeconds = yield select(state => state.options.getIn(['remoteOptions', 'refreshInterval', 'content'], AppConfiguration.schedulerFixedDelayInSeconds))
-  yield put(Actions.startSchedulerFixedDelay({ pageRouterRefresh: true, targetPage: action.payload, startDelayInSeconds: 0, delayInSeconds }))
+function* changePage ({ payload: { type, id } }) {
+  yield put(Actions.setCurrentPage({ type, id }))
+  yield put({ type: BACKGROUND_REFRESH, subType: 'changePage' })
 }
 
 function* refreshManually () {
-  const currentPage = yield select(state => state.config.get('currentPage'))
-  const delayInSeconds = yield select(state => state.options.getIn(['remoteOptions', 'refreshInterval', 'content'], AppConfiguration.schedulerFixedDelayInSeconds))
-  yield put(Actions.startSchedulerFixedDelay({ manualRefresh: true, targetPage: currentPage, startDelayInSeconds: 0, delayInSeconds }))
+  yield put({ type: BACKGROUND_REFRESH, subType: 'manual' })
 }
 
 /**
+ * When ovirt-web-ui is installed to ovirt-engine, a logout should push the user to the
+ * base ovirt welcome page.  But when running in dev mode or via container, the logout
+ * page is displayed.  In that case, we want to make sure the page is set to something
+ * appropriate and that background refreshing is no longer done.
+ */
+function* logoutAndCancelScheduler () {
+  yield put(Actions.setCurrentPage({ type: C.NO_REFRESH_TYPE }))
+  yield put({ type: BACKGROUND_REFRESH, subType: 'stop' })
+  yield put(Actions.cancelDoNotDisturbTimer())
+}
+
+//
+// ** Refresh Sagas **
+//
+/**
  * Invoke the correct refresh function based on the app's current page type.
  */
-function* refreshData ({
-  targetPage = { type: C.NO_REFRESH_TYPE },
+function* refreshDataForCurrentPage ({
   pageRouterRefresh,
   schedulerRefresh,
   manualRefresh,
-  ...otherPayload
 }) {
-  const refreshType =
-    targetPage.type === C.NO_REFRESH_TYPE
-      ? null
-      : targetPage.type === undefined
-        ? C.LIST_PAGE_TYPE
-        : targetPage.type
+  const currentPage = yield select(state => state.config.get('currentPage'))
+  const pageRefreshFunction = pagesRefreshers[currentPage.type]
 
-  console.info('refreshData() 🡒', 'refreshType:', refreshType, 'currentPage:', targetPage, 'payload:', otherPayload)
-  if (refreshType) {
-    yield pagesRefreshers[refreshType]({
-      id: targetPage.id,
+  console.log('🔄 refreshDataForCurrentPage() 🡒 start, currentPage:', currentPage, 'pageRefreshFunction?', !!pageRefreshFunction)
+  if (pageRefreshFunction) {
+    yield call(pageRefreshFunction, {
+      id: currentPage.id,
       pageRouterRefresh,
       schedulerRefresh,
       manualRefresh,
-      ...otherPayload,
     })
   }
   yield put(Actions.updateLastRefresh())
-  console.info('refreshData() 🡒 finished')
+  console.log('🔄 refreshDataForCurrentPage() 🡒 finished')
 }
 
 const pagesRefreshers = {
+  [C.NO_REFRESH_TYPE]: null,
   [C.LIST_PAGE_TYPE]: refreshListPage,
   [C.DETAIL_PAGE_TYPE]: refreshDetailPage,
   [C.CREATE_PAGE_TYPE]: refreshCreatePage,
@@ -194,129 +207,119 @@ function* refreshConsolePage ({ id }) {
   }
 }
 
-function* startSchedulerWithFixedDelay ({ payload: { delayInSeconds, startDelayInSeconds, ...rest } }) {
-  // if a scheduler is already running, stop it
-  yield put(Actions.stopSchedulerFixedDelay())
-
-  const lastRefresh = yield select(state => state.config.get('lastRefresh', 0))
-
-  // run a new scheduler
-  yield schedulerWithFixedDelay({
-    delayInSeconds,
-    startDelayInSeconds: calculateStartDelayIfMissing({ delayInSeconds, startDelayInSeconds, lastRefresh }),
-    ...rest,
-  })
-}
-
-/*
-  Continue previous wait period (unless immediate refresh is forced).
-  Restarting the wait period could lead to irregular, long intervals without refresh
-  or prevent the refresh (as long as user will keep changing the interval)
-
-  Example:
-    1. previous refresh period is 2 min (1m 30sec already elapsed)
-    2. user changes it to 5min
-    3. already elapsed time will be taken into consideration and refresh will be
-       triggered after 3 m 30sec.
-
-  Result: Wait intervals will be 2min -> 2min -> 5min -> 5min.
-  With restarting timers: 2min -> 2min -> 6min 30 sec -> 5min.
-*/
-function calculateStartDelayIfMissing ({ delayInSeconds, startDelayInSeconds, lastRefresh }) {
-  if (startDelayInSeconds !== undefined) {
-    return startDelayInSeconds
-  }
-  const timeFromLastRefresh = ((Date.now() - lastRefresh) / 1000).toFixed(0)
-  return timeFromLastRefresh > delayInSeconds ? 0 : delayInSeconds - timeFromLastRefresh
-}
-
+//
+// *** Scheduler/Timer Sagas ***
+//
 /**
- * Starts a cancellable timer.
- * Timer can be cancelled by dispatching configurable action.
+ * Starts a timer that can be cancelled by dispatching the given action.
+ *
+ * @param {number} timeInSeconds Timer duration
+ * @param {string} cancelActionType Action type that will cancel this timer
  */
-function* schedulerWaitFor (timeInSeconds, cancelActionType = C.STOP_SCHEDULER_FIXED_DELAY) {
+function* runCancellableTimer (timeInSeconds, cancelActionType) {
   if (!timeInSeconds) {
     return {}
   }
 
-  const { stopped } = yield race({
-    stopped: take(cancelActionType),
+  const { cancelAction, fixedDelay } = yield race({
+    cancelAction: take(cancelActionType),
     fixedDelay: delay(timeInSeconds * 1000),
   })
-  return { stopped: !!stopped }
+
+  return {
+    stopped: !!cancelAction,
+    timerCompleted: !!fixedDelay,
+  }
 }
 
-let _SchedulerCount = 0
+/**
+ * Continue previous wait period (unless immediate refresh is forced).
+ * Restarting the wait period could lead to irregular, long intervals without refresh
+ * or prevent the refresh (as long as user will keep changing the interval)
+ *
+ * Example:
+ *   1. previous refresh period is 2 min (1m 30sec already elapsed)
+ *   2. user changes it to 5min
+ *   3. already elapsed time will be taken into consideration and refresh will be
+ *      triggered after 3 m 30sec.
+ *
+ * Result: Wait intervals will be 2min -> 2min -> 5min -> 5min.
+ * With restarting timers: 2min -> 2min -> 6min 30 sec -> 5min.
+ */
+function* calculateStartDelayFromLastRefresh () {
+  const [
+    delayInSeconds,
+    lastRefresh,
+  ] = yield select(state => ([
+    state.options.getIn(['remoteOptions', 'refreshInterval', 'content'], AppConfiguration.schedulerFixedDelayInSeconds),
+    state.config.get('lastRefresh', 0),
+  ]))
 
-function* schedulerWithFixedDelay ({
-  delayInSeconds = AppConfiguration.schedulerFixedDelayInSeconds,
-  startDelayInSeconds = AppConfiguration.schedulerFixedDelayInSeconds,
-  targetPage,
-  pageRouterRefresh = false,
-  manualRefresh = false,
-}) {
-  if (!isNumber(delayInSeconds) || delayInSeconds <= 0 ||
-  !isNumber(startDelayInSeconds) || startDelayInSeconds < 0) {
-    console.error(`⏰ schedulerWithFixedDelay 🡒 invalid arguments: delayInSeconds=${delayInSeconds} startDelayInSeconds=${startDelayInSeconds}`)
+  const timeFromLastRefresh = ((Date.now() - lastRefresh) / 1000).toFixed(0)
+  return timeFromLastRefresh > delayInSeconds ? 0 : delayInSeconds - timeFromLastRefresh
+}
+
+//
+// Background refresh timer
+//
+let _BackgroundRefreshTimerCount = 0
+
+/**
+ * Start a cancelable timer that will fire a background-refresh 'timer' action when the
+ * timer completes successfully.
+ *
+ * @param {number} timerDuration Time to wait, in seconds, before firing the 'timer' action
+ */
+function* backgroundRefreshTimer (timerDuration = AppConfiguration.schedulerFixedDelayInSeconds) {
+  if (!isNumber(timerDuration) || timerDuration <= 0) {
+    console.error(`⏰ backgroundRefreshTimer 🡒 invalid arguments: timerDuration=${timerDuration}`)
     return
   }
-  let firstRun = true
-  const myId = ++_SchedulerCount
-  console.log(`⏰ schedulerWithFixedDelay[${myId}] 🡒 starting fixed delay scheduler with start delay ${startDelayInSeconds}`)
 
-  const { stopped: stoppedBeforeStarted } = yield call(schedulerWaitFor, startDelayInSeconds)
-  if (stoppedBeforeStarted) {
-    console.log(`⏰ schedulerWithFixedDelay[${myId}] 🡒 scheduler has been stopped during start delay`)
+  const myId = ++_BackgroundRefreshTimerCount
+  console.log(`⏰ backgroundRefreshTimer[${myId}] 🡒 starting a timer with duration ${timerDuration}`)
+
+  const { stopped: cancelled } = yield call(
+    runCancellableTimer,
+    timerDuration,
+    C.CANCEL_REFRESH_TIMER
+  )
+  if (cancelled) {
+    console.log(`⏰ backgroundRefreshTimer[${myId}] 🡒 timer has been cancelled`)
+    return
   }
 
-  let enabled = !stoppedBeforeStarted
-  while (enabled) {
-    if (myId !== _SchedulerCount) {
-      enabled = false
-      console.log(`⏰ schedulerWithFixedDelay[${myId}] 🡒 scheduler has been stopped due to newer scheduler detected [${_SchedulerCount}]`)
-      continue
-    }
-
-    const isTokenExpired = yield select(state => state.config.get('isTokenExpired'))
-    if (isTokenExpired) {
-      enabled = false
-      console.log(`⏰ schedulerWithFixedDelay[${myId}] 🡒 scheduler has been stopped due to SSO token expiration`)
-      continue
-    }
-
-    const oVirtVersion = yield select(state => state.config.get('oVirtApiVersion'))
-    if (!oVirtVersion.get('passed')) {
-      console.log(`⏰ schedulerWithFixedDelay[${myId}] 🡒 event skipped since oVirt API version does not match`)
-      continue
-    }
-
-    yield refreshData({
-      pageRouterRefresh: pageRouterRefresh && firstRun,
-      manualRefresh: manualRefresh && firstRun,
-      targetPage,
-      schedulerRefresh: true,
-    })
-    firstRun = false
-
-    console.log(`⏰ schedulerWithFixedDelay[${myId}] 🡒 stoppable delay for: ${delayInSeconds}`)
-    const { stopped } = yield call(schedulerWaitFor, delayInSeconds)
-
-    if (stopped) {
-      enabled = false
-      console.log(`⏰ schedulerWithFixedDelay[${myId}] 🡒 scheduler has been stopped`)
-      continue
-    }
-
-    console.log(`⏰ schedulerWithFixedDelay[${myId}] 🡒 running after delay of: ${delayInSeconds}`)
+  if (myId !== _BackgroundRefreshTimerCount) {
+    console.log(`⏰ backgroundRefreshTimer[${myId}] 🡒 timer has been cancelled, newer timer detected [${_BackgroundRefreshTimerCount}]`)
+    return
   }
+
+  const isTokenExpired = yield select(state => state.config.get('isTokenExpired'))
+  if (isTokenExpired) {
+    console.log(`⏰ backgroundRefreshTimer[${myId}] 🡒 timer has been cancelled, SSO token expired`)
+    return
+  }
+
+  const oVirtVersionOk = yield select(state => state.config.getIn(['oVirtApiVersion', 'passed'], false))
+  if (!oVirtVersionOk) {
+    console.log(`⏰ backgroundRefreshTimer[${myId}] 🡒 timer event skipped, oVirt API is not ok`)
+    return
+  }
+
+  console.log(`⏰ backgroundRefreshTimer[${myId}] 🡒 timer event!, duration: ${timerDuration}`)
+  yield put({ type: BACKGROUND_REFRESH, subType: 'timer' })
 }
 
-let _SchedulerForNotificationsCount = 0
-function* scheduleResumingNotifications ({ payload: { delayInSeconds } }) {
-  yield put(Actions.stopSchedulerForResumingNotifications())
-  const myId = _SchedulerForNotificationsCount++
+//
+// Do Not Disturb timer
+//
+let _DoNotDisturbTimerCount = 0
+function* startDoNotDisturbTimer ({ payload: { delayInSeconds } }) {
+  yield put(Actions.cancelDoNotDisturbTimer())
+
+  const myId = _DoNotDisturbTimerCount++
   console.log(`notification timer [${myId}] - delay [${delayInSeconds}] sec`)
-  const { stopped } = yield call(schedulerWaitFor, delayInSeconds, C.STOP_SCHEDULER_FOR_RESUMING_NOTIFICATIONS)
+  const { stopped } = yield call(runCancellableTimer, delayInSeconds, C.CANCEL_DO_NOT_DISTURB_TIMER)
   if (stopped) {
     console.log(`notification timer [${myId}] - stopped`)
   } else {
@@ -325,33 +328,93 @@ function* scheduleResumingNotifications ({ payload: { delayInSeconds } }) {
   }
 }
 
-/**
- * When ovirt-web-ui is installed to ovirt-engine, a logout should push the user to the
- * base ovirt welcome page.  But when running in dev mode or via container, the logout
- * page is displayed.  In that case, we want to make sure the page is set to something
- * appropriate and that background refreshing is no longer done.
- */
-function* logoutAndCancelScheduler () {
-  yield put(Actions.setCurrentPage({ type: C.NO_REFRESH_TYPE }))
-  yield put(Actions.stopSchedulerFixedDelay())
-  yield put(Actions.stopSchedulerForResumingNotifications())
+//
+// ** BACKGROUND_REFRESH channel handler **
+//
+function* handleBackgroundChannel (action) {
+  const { subType } = action
+
+  yield put(Actions.cancelRefreshTimer())
+
+  let startNewTimer = true
+  let timerDuration =
+    yield select(({ options }) => options.getIn(['remoteOptions', 'refreshInterval', 'content'], AppConfiguration.schedulerFixedDelayInSeconds))
+
+  switch (subType) {
+    case 'changePage':
+      yield refreshDataForCurrentPage({ pageRouterRefresh: true })
+      break
+
+    case 'manual':
+      yield refreshDataForCurrentPage({ manualRefresh: true })
+      break
+
+    case 'timer':
+      yield refreshDataForCurrentPage({ schedulerRefresh: true })
+      break
+
+    case 'fetchNextPageOfVmsAndPools':
+      yield fetchByPage()
+      break
+
+    case 'restartBackgroundRefreshTimer':
+      timerDuration = yield calculateStartDelayFromLastRefresh()
+      break
+
+    case 'stop':
+      startNewTimer = false
+      break
+  }
+
+  if (startNewTimer) {
+    yield spawn(backgroundRefreshTimer, timerDuration)
+  }
 }
 
-export default [
-  // only process the 1st manual refresh received in a 5 second window
-  throttle(5000, C.MANUAL_REFRESH, refreshManually),
+function* takeAndCallOnTheChannel (actionChannel) {
+  console.log('BACKGROUND_REFRESH channel is open')
 
-  /*
-   * Note: If a user goes crazy swapping between pages very quickly, a lot of `CHANGE_PAGE`
-   *       actions will be fired.  Since changePage() puts `START_SCHEDULER_FIXED_DELAY`
-   *       to refresh the new page data each time, it is possible to get to a point where
-   *       multiple page refresh sagas are running at the same time.  That can cause
-   *       problems and slow down the app.  Not much to be done to prevent this from
-   *       happening without slowing down the responsiveness of the app.
-   */
-  takeLatest(C.CHANGE_PAGE, changePage),
+  try {
+    while (true) {
+      const action = yield take(actionChannel)
+      yield call(handleBackgroundChannel, action)
+    }
+  } finally {
+    console.log('BACKGROUND_REFRESH channel is closed')
+  }
+}
 
-  takeEvery(C.START_SCHEDULER_FIXED_DELAY, startSchedulerWithFixedDelay),
-  takeEvery(C.START_SCHEDULER_FOR_RESUMING_NOTIFICATIONS, scheduleResumingNotifications),
-  takeEvery(C.LOGOUT, logoutAndCancelScheduler),
-]
+//
+// Export an initialization saga that yields an array of effects to be run by the root saga
+//
+export default function* () {
+  const backgroundChannel = yield actionChannel(BACKGROUND_REFRESH)
+
+  return [
+    call(takeAndCallOnTheChannel, backgroundChannel),
+
+    // only process the 1st manual refresh received in a 5 second window
+    throttle(5000, C.MANUAL_REFRESH, refreshManually),
+
+    /*
+    * Note: If a user goes crazy swapping between pages very quickly, a lot of `CHANGE_PAGE`
+    *       actions will be fired.  Since changePage() will refresh the new page's data
+    *       each time, it is possible to get to a point where multiple page refresh sagas
+    *       are queued.  That can cause problems and slow down the app.  Not much to be
+    *       done to prevent this from happening without slowing down the responsiveness
+    *       of the app (by using a debounce or similar).
+    */
+    takeLatest(C.CHANGE_PAGE, changePage),
+
+    throttle(100, C.GET_BY_PAGE, function* () {
+      yield put({ type: BACKGROUND_REFRESH, subType: 'fetchNextPageOfVmsAndPools' })
+    }),
+
+    takeEvery(C.START_REFRESH_TIMER, function* () {
+      yield put({ type: BACKGROUND_REFRESH, subType: 'restartBackgroundRefreshTimer' })
+    }),
+
+    takeEvery(C.START_DO_NOT_DISTURB_TIMER, startDoNotDisturbTimer),
+    takeEvery(C.LOGOUT, logoutAndCancelScheduler),
+  ]
+}

@@ -8,6 +8,7 @@ import {
   LOGIN_FAILED,
   LOGIN_SUCCESSFUL,
   LOGOUT,
+  NO_REFRESH_TYPE,
   SET_ADMINISTRATOR,
   SET_CPU_TOPOLOGY_OPTIONS,
   SET_CURRENT_PAGE,
@@ -42,7 +43,7 @@ const initialState = Immutable.fromJS({
   isTokenExpired: false,
   appConfigured: false,
 
-  currentPage: {},
+  currentPage: { type: NO_REFRESH_TYPE },
   user: {
     name: undefined,
     id: undefined,
@@ -53,7 +54,7 @@ const initialState = Immutable.fromJS({
   defaultConsole: DefaultEngineOptions.ClientModeConsoleDefault,
   // allowed values: Native, NoVnc
   defaultVncMode: DefaultEngineOptions.ClientModeVncDefault,
-  // derrived from defaultConsole and defaultVncMode
+  // derived from defaultConsole and defaultVncMode
   // allowed values: NativeVnc, BrowserVnc, spice, rdp
   defaultUiConsole: toUiConsole(DefaultEngineOptions.ClientModeVncDefault, DefaultEngineOptions.ClientModeConsoleDefault),
 

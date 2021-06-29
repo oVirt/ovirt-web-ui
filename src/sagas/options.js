@@ -270,10 +270,10 @@ function* updateNotifications (show: {current: boolean, next?: boolean}, snooze:
   yield put(A.setOption({ key: ['localOptions', 'notificationSnoozeDuration'], value: snoozeDuration }))
   yield put(A.setAutoAcknowledge(!showNotifications))
   if (showNotifications || snoozeUntilPageReload) {
-    yield put(A.stopSchedulerForResumingNotifications())
+    yield put(A.cancelDoNotDisturbTimer())
   } else {
     // minutes -> seconds
-    yield put(A.startSchedulerForResumingNotifications(snoozeDuration * 60))
+    yield put(A.startDoNotDisturbTimer(snoozeDuration * 60))
   }
 }
 

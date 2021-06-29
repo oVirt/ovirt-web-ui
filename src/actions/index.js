@@ -1,4 +1,3 @@
-import AppConfiguration from '_/config'
 import {
   APP_CONFIGURED,
   CHANGE_PAGE,
@@ -20,10 +19,10 @@ import {
   SET_USER,
   SET_WEBSOCKET,
   SHOW_TOKEN_EXPIRED_MSG,
-  START_SCHEDULER_FIXED_DELAY,
-  START_SCHEDULER_FOR_RESUMING_NOTIFICATIONS,
-  STOP_SCHEDULER_FIXED_DELAY,
-  STOP_SCHEDULER_FOR_RESUMING_NOTIFICATIONS,
+  START_REFRESH_TIMER,
+  START_DO_NOT_DISTURB_TIMER,
+  CANCEL_REFRESH_TIMER,
+  CANCEL_DO_NOT_DISTURB_TIMER,
   UPDATE_LAST_REFRESH,
   UPDATE_PAGING_DATA,
 } from '_/constants'
@@ -55,34 +54,25 @@ export function manualRefresh () {
   return { type: MANUAL_REFRESH }
 }
 
-export function startSchedulerFixedDelay ({
-  delayInSeconds = AppConfiguration.schedulerFixedDelayInSeconds,
-  startDelayInSeconds,
-  targetPage,
-  pageRouterRefresh = false,
-  manualRefresh = false,
-}) {
-  return {
-    type: START_SCHEDULER_FIXED_DELAY,
-    payload: { delayInSeconds, startDelayInSeconds, targetPage, pageRouterRefresh, manualRefresh },
-  }
+export function startRefreshTimer () {
+  return { type: START_REFRESH_TIMER }
 }
 
-export function stopSchedulerFixedDelay () {
-  return { type: STOP_SCHEDULER_FIXED_DELAY }
+export function cancelRefreshTimer () {
+  return { type: CANCEL_REFRESH_TIMER }
 }
 
-export function startSchedulerForResumingNotifications (delayInSeconds) {
+export function startDoNotDisturbTimer (delayInSeconds) {
   return {
-    type: START_SCHEDULER_FOR_RESUMING_NOTIFICATIONS,
+    type: START_DO_NOT_DISTURB_TIMER,
     payload: {
       delayInSeconds,
     },
   }
 }
 
-export function stopSchedulerForResumingNotifications () {
-  return { type: STOP_SCHEDULER_FOR_RESUMING_NOTIFICATIONS }
+export function cancelDoNotDisturbTimer () {
+  return { type: CANCEL_DO_NOT_DISTURB_TIMER }
 }
 
 export function updateLastRefresh () {

@@ -71,7 +71,6 @@ import {
   DOWNLOAD_CONSOLE_VM,
   EDIT_VM_NIC,
   GET_ALL_EVENTS,
-  GET_BY_PAGE,
   GET_CONSOLE_OPTIONS,
   GET_POOLS,
   GET_RDP_VM,
@@ -285,7 +284,7 @@ export function* fetchSinglePool (action) {
  * info comes from "current=true" while a non-running VM's cdrom info comes from the
  * next_run/"current=false" API parameter.
  */
-function* fetchVmCdRom ({ vmId, current }) {
+function* fetchVmCdRom ({ vmId, current = true }) {
   const cdrom = yield callExternalAction(Api.getCdRom, getVmCdRom({ vmId, current }))
 
   let cdromInternal = null
@@ -529,12 +528,11 @@ function* navigateToVmDetails ({ payload: { vmId } }) {
 export function* rootSaga () {
   yield all([
     ...sagasLogin,
-    ...sagasRefresh,
+    ...yield sagasRefresh(),
 
     takeLatest(CHECK_TOKEN_EXPIRED, doCheckTokenExpired),
     takeEvery(DELAYED_REMOVE_ACTIVE_REQUEST, delayedRemoveActiveRequest),
 
-    throttle(100, GET_BY_PAGE, fetchByPage),
     throttle(100, GET_VMS, fetchVms),
     throttle(100, GET_POOLS, fetchPools),
 
