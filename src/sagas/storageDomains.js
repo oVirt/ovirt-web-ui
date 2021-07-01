@@ -1,7 +1,7 @@
 import Api, { Transforms } from '_/ovirtapi'
-import { all, call, put, select, takeLatest, throttle } from 'redux-saga/effects'
-import { callExternalAction, entityPermissionsToUserPermits } from './utils'
+import { all, call, put, select } from 'redux-saga/effects'
 
+import { callExternalAction, entityPermissionsToUserPermits } from './utils'
 import { canUserUseStorageDomain } from '_/utils'
 
 import {
@@ -9,17 +9,13 @@ import {
   setStorageDomains,
   setStorageDomainsFiles,
 } from '_/actions'
-import {
-  GET_ALL_STORAGE_DOMAINS,
-  GET_ISO_FILES,
-} from '_/constants'
 
 /**
  * Fetch all data centers and attached storage domains.  By fetching the storage domains
  * along with the data centers, we can keep track of the storage domain status per data
  * center.
  */
-export function* fetchDataCentersAndStorageDomains (action) {
+export function* fetchDataCentersAndStorageDomains () {
   const [dataCenters, storageDomains] =
     yield all([
       call(fetchDataCenters),
@@ -148,8 +144,3 @@ function* fetchIsoFilesFromIsoStorageDomain (storageDomainId) {
     yield put(setStorageDomainsFiles(storageDomainId, filesInternal))
   }
 }
-
-export default [
-  takeLatest(GET_ALL_STORAGE_DOMAINS, fetchDataCentersAndStorageDomains),
-  throttle(100, GET_ISO_FILES, fetchIsoFiles),
-]

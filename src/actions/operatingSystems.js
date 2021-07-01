@@ -1,5 +1,4 @@
 import {
-  GET_ALL_OS,
   SET_OPERATING_SYSTEMS,
 } from '_/constants'
 
@@ -11,8 +10,4 @@ export function setOperatingSystems (operatingSystems) {
     type: SET_OPERATING_SYSTEMS,
     payload: operatingSystems,
   }
-}
-
-export function getAllOperatingSystems () {
-  return { type: GET_ALL_OS }
 }

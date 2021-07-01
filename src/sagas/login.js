@@ -18,16 +18,6 @@ import {
   setAdministrator,
   getAllEvents,
 
-  getAllClusters,
-  getAllHosts,
-  getAllOperatingSystems,
-  getAllStorageDomains,
-  getAllTemplates,
-  getAllVnicProfiles,
-  getRoles,
-  getUserGroups,
-  getUser,
-
   downloadConsole,
   getSingleVm,
 
@@ -48,6 +38,7 @@ import {
   fetchAllOS,
   fetchAllVnicProfiles,
   fetchAllTemplates,
+  fetchCurrentUser,
   fetchUserGroups,
 } from './base-data'
 import { downloadVmConsole } from './console'
@@ -55,10 +46,7 @@ import { fetchRoles } from './roles'
 import { fetchServerConfiguredValues, fetchGeneralEngineOption } from './server-configs'
 import { fetchDataCentersAndStorageDomains, fetchIsoFiles } from './storageDomains'
 import { loadIconsFromLocalStorage } from './osIcons'
-import {
-  transformAndPermitVm,
-  fetchCurrentUser,
-} from './index'
+import { transformAndPermitVm } from './index'
 
 import { loadFromLocalStorage, removeFromLocalStorage } from '_/storage'
 import { loadUserOptions } from './options'
@@ -209,11 +197,11 @@ function* initialLoad () {
   console.group('no data prerequisites')
   yield all([
     call(loadIconsFromLocalStorage),
-    call(fetchRoles, getRoles()),
-    call(fetchCurrentUser, getUser()),
-    call(fetchUserGroups, getUserGroups()),
-    call(fetchAllOS, getAllOperatingSystems()),
-    call(fetchAllHosts, getAllHosts()),
+    call(fetchRoles),
+    call(fetchCurrentUser),
+    call(fetchUserGroups),
+    call(fetchAllOS),
+    call(fetchAllHosts),
     call(loadFilters),
     call(loadUserOptions),
   ])
@@ -223,10 +211,10 @@ function* initialLoad () {
   // requires user groups and roles to be in redux store for authorization checks
   console.group('needs user groups and roles')
   yield all([
-    call(fetchDataCentersAndStorageDomains, getAllStorageDomains()),
-    call(fetchAllTemplates, getAllTemplates()),
-    call(fetchAllClusters, getAllClusters()),
-    call(fetchAllVnicProfiles, getAllVnicProfiles()),
+    call(fetchDataCentersAndStorageDomains),
+    call(fetchAllTemplates),
+    call(fetchAllClusters),
+    call(fetchAllVnicProfiles),
   ])
   console.log('\u2714 data loads that require user groups and roles are complete')
   console.groupEnd('needs user groups and roles')

@@ -5,8 +5,6 @@ import {
   CHECK_TOKEN_EXPIRED,
   GET_BY_PAGE,
   GET_OPTION,
-  GET_USER_GROUPS,
-  GET_USER,
   MANUAL_REFRESH,
   SET_ADMINISTRATOR,
   SET_CPU_TOPOLOGY_OPTIONS,
@@ -224,10 +222,6 @@ export function setUserGroups ({ groups }) {
   }
 }
 
-export function getUserGroups () {
-  return { type: GET_USER_GROUPS }
-}
-
 export function setUser ({ user }) {
   return {
     type: SET_USER,
@@ -235,10 +229,6 @@ export function setUser ({ user }) {
       user,
     },
   }
-}
-
-export function getUser () {
-  return { type: GET_USER }
 }
 
 export function setCpuTopologyOptions ({
