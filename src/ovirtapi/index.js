@@ -54,8 +54,6 @@ const OvirtApi = {
 
   snapshotToInternal: Transforms.Snapshot.toInternal,
 
-  permissionsToInternal: Transforms.Permissions.toInternal,
-
   eventToInternal: Transforms.Event.toInternal,
 
   //

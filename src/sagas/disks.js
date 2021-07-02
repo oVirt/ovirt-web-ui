@@ -40,7 +40,7 @@ function* fetchVmDisks ({ vmId }) {
 
   const internalDisks = []
 
-  if (diskattachments && diskattachments.disk_attachment) {
+  if (diskattachments?.disk_attachment) {
     for (const attachment of diskattachments.disk_attachment) {
       internalDisks.push(yield transformAndPermitDiskAttachment(attachment))
     }

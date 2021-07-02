@@ -101,9 +101,7 @@ function getPoolColor (id: string): string {
 //
 const VM = {
   toInternal ({ vm }: { vm: ApiVmType }): VmType {
-    const permissions = vm.permissions && vm.permissions.permission
-      ? Permissions.toInternal({ permissions: vm.permissions.permission })
-      : []
+    const permissions = Permissions.toInternal({ permissions: vm?.permissions?.permission })
 
     const parsedVm: Object = {
       name: vm.name,
@@ -407,9 +405,7 @@ const Template = {
       baseTemplateId: template.version && template.version.base_template ? template.version.base_template.id : undefined,
     }
 
-    const permissions = template.permissions && template.permissions.permission
-      ? Permissions.toInternal({ permissions: template.permissions.permission })
-      : []
+    const permissions = Permissions.toInternal({ permissions: template?.permissions?.permission })
 
     return cleanUndefined({
       id: template.id,
@@ -537,9 +533,7 @@ const Snapshot = {
 // VM -> DiskAttachments.DiskAttachment[] -> Disk
 const DiskAttachment = {
   toInternal ({ attachment, disk }: { attachment?: ApiDiskAttachmentType, disk: ApiDiskType }): DiskType {
-    const permissions = disk.permissions && disk.permissions.permission
-      ? Permissions.toInternal({ permissions: disk.permissions.permission })
-      : []
+    const permissions = Permissions.toInternal({ permissions: disk?.permissions?.permission })
 
     const cleanBase = cleanUndefined({
       attachmentId: attachment && attachment.id,
@@ -622,9 +616,7 @@ const DiskAttachment = {
 //
 const DataCenter = {
   toInternal ({ dataCenter }: { dataCenter: ApiDataCenterType }): DataCenterType {
-    const permissions = dataCenter.permissions && dataCenter.permissions.permission
-      ? Permissions.toInternal({ permissions: dataCenter.permissions.permission })
-      : []
+    const permissions = Permissions.toInternal({ permissions: dataCenter?.permissions?.permission })
 
     const storageDomains = dataCenter.storage_domains && dataCenter.storage_domains.storage_domain
       ? dataCenter.storage_domains.storage_domain.reduce((acc, storageDomain) => {
@@ -655,9 +647,7 @@ const DataCenter = {
 //
 const StorageDomain = {
   toInternal ({ storageDomain }: { storageDomain: ApiStorageDomainType }): StorageDomainType {
-    const permissions = storageDomain.permissions && storageDomain.permissions.permission
-      ? Permissions.toInternal({ permissions: storageDomain.permissions.permission })
-      : []
+    const permissions = Permissions.toInternal({ permissions: storageDomain?.permissions?.permission })
 
     return {
       id: storageDomain.id,
@@ -722,9 +712,7 @@ const StorageDomainFile = {
 //
 const Cluster = {
   toInternal ({ cluster }: { cluster: ApiClusterType }): ClusterType {
-    const permissions = cluster.permissions && cluster.permissions.permission
-      ? Permissions.toInternal({ permissions: cluster.permissions.permission })
-      : []
+    const permissions = Permissions.toInternal({ permissions: cluster?.permissions?.permission })
 
     const c: Object = {
       id: cluster.id,
@@ -821,9 +809,7 @@ const Nic = {
 //
 const VNicProfile = {
   toInternal ({ vnicProfile }: { vnicProfile: ApiVnicProfileType }): VnicProfileType {
-    const permissions = vnicProfile.permissions && vnicProfile.permissions.permission
-      ? Permissions.toInternal({ permissions: vnicProfile.permissions.permission })
-      : []
+    const permissions = Permissions.toInternal({ permissions: vnicProfile?.permissions?.permission })
 
     const vnicProfileInternal = {
       id: vnicProfile.id,
