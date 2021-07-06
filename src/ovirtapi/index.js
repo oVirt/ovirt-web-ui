@@ -54,8 +54,6 @@ const OvirtApi = {
 
   snapshotToInternal: Transforms.Snapshot.toInternal,
 
-  permissionsToInternal: Transforms.Permissions.toInternal,
-
   eventToInternal: Transforms.Event.toInternal,
 
   //
@@ -118,19 +116,6 @@ const OvirtApi = {
     assertLogin({ methodName: 'getAllTemplates' })
     const url = `${AppConfiguration.applicationContext}/api/templates?follow=nics,disk_attachments.disk,permissions`
     return httpGet({ url })
-  },
-
-  // TODO: Convert to use frontend based role to permission mapping
-  getDiskPermissions ({ id }: { id: string }): Promise<Object> {
-    assertLogin({ methodName: 'getDiskPermissions' })
-    const url = `${AppConfiguration.applicationContext}/api/disks/${id}/permissions?follow=role.permits`
-    return httpGet({ url, custHeaders: { Filter: true } })
-  },
-  // TODO: Convert to use frontend based role to permission mapping
-  getVmPermissions ({ vmId }: VmIdType): Promise<Object> {
-    assertLogin({ methodName: 'getVmPermissions' })
-    const url = `${AppConfiguration.applicationContext}/api/vms/${vmId}/permissions?follow=role.permits`
-    return httpGet({ url, custHeaders: { Filter: true } })
   },
 
   // ---- VM fetching
@@ -287,13 +272,13 @@ const OvirtApi = {
     return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots` })
   },
 
-  diskattachment ({ vmId, attachmentId }: { vmId: string, attachmentId: string}): Promise<Object> {
-    assertLogin({ methodName: 'diskattachment' })
-    return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/diskattachments/${attachmentId}?follow=disk` })
-  },
   diskattachments ({ vmId }: VmIdType): Promise<Object> {
     assertLogin({ methodName: 'diskattachments' })
-    return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/diskattachments` })
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/diskattachments?follow=disk.permissions` })
+  },
+  diskattachment ({ vmId, attachmentId }: { vmId: string, attachmentId: string}): Promise<Object> {
+    assertLogin({ methodName: 'diskattachment' })
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/diskattachments/${attachmentId}?follow=disk.permissions` })
   },
   disk ({ diskId }: { diskId: string }): Promise<Object> {
     assertLogin({ methodName: 'disk' })

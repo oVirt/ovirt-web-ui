@@ -1,6 +1,5 @@
 // @flow
-import Selectors from '_/selectors'
-import type { ClusterType, PermissionType, VnicProfileType } from '_/ovirtapi/types'
+import type { ClusterType, VnicProfileType } from '_/ovirtapi/types'
 
 function checkUserPermit (permit: string | Array<string>, permits: Set<string>): boolean {
   if (Array.isArray(permit)) {
@@ -67,22 +66,4 @@ export function canUserUseAnyVnicProfile (vnicProfiles: Array<VnicProfileType>, 
   return vnicProfiles.find(vnicProfile =>
     vnicProfile.get('canUserUseProfile') && vnicProfile.getIn(['network', 'dataCenterId']) === dataCenterId
   ) !== undefined
-}
-
-export function getUserPermits (permissions: Array<PermissionType>): Set<string> {
-  const userFilter = Selectors.getFilter()
-  const userGroups = Selectors.getUserGroups()
-  const userId = Selectors.getUserId()
-
-  const permits = new Set()
-  permissions.forEach((role) => {
-    if (userFilter ||
-      (
-        (role.groupId && userGroups.includes(role.groupId)) ||
-        (role.userId && role.userId === userId)
-      )) {
-      role.permits.map((permit) => permit.name).forEach((permit) => permits.add(permit))
-    }
-  })
-  return permits
 }
