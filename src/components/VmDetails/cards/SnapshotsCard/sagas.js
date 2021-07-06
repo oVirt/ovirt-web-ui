@@ -1,6 +1,6 @@
 import { takeEvery, put } from 'redux-saga/effects'
 
-import Api from '_/ovirtapi'
+import Api, { Transforms } from '_/ovirtapi'
 import { callExternalAction, delay, delayInMsSteps } from '_/sagas/utils'
 import { fetchVmSnapshots, startProgress, stopProgress } from '_/sagas'
 import {
@@ -49,7 +49,7 @@ function* deleteVmSnapshot (action) {
       snapshotRemoved = true
       break
     } else {
-      const snapshotInternal = Api.snapshotToInternal({ snapshot })
+      const snapshotInternal = Transforms.Snapshot.toInternal({ snapshot })
       yield put(updateVmSnapshot({ vmId, snapshot: snapshotInternal }))
     }
     yield delay(delaySec * 1000)

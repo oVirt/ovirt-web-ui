@@ -1,25 +1,9 @@
 /* eslint-disable prefer-promise-reject-errors */
 import AppConfiguration from '../config'
 import { vms, disks, api } from './data.mock'
-import MainApi from '../ovirtapi'
 
 let OvirtApi = {}
 OvirtApi = {
-  // ----
-  /**
-   * @param vm - Single entry from oVirt REST /api/vms
-   * @returns {} - Internal representation of a VM
-   */
-  vmToInternal: MainApi.vmToInternal,
-  /**
-   *
-   * @param attachment - single entry from vms/[VM_ID]/diskattachments
-   * @param disk - disk corresponding to the attachment
-   * @returns {} - Internal representation of a single VM disk
-   */
-  diskToInternal: MainApi.diskToInternal,
-  iconToInternal: MainApi.iconToInternal,
-  consolesToInternal: MainApi.consolesToInternal,
   // ----
   login ({ credentials }) {
     return Promise.resolve({
