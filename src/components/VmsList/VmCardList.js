@@ -50,7 +50,7 @@ const VmCardList = ({ vms, alwaysShowPoolCard, fetchMoreVmsAndPools }) => {
     if (page > 0) {
       fetchMoreVmsAndPools()
     }
-  }, [page])
+  }, [page, fetchMoreVmsAndPools])
 
   useEffect(() => {
     if (!scrollerRef.current || !sentinelRef.current) {
@@ -76,7 +76,7 @@ const VmCardList = ({ vms, alwaysShowPoolCard, fetchMoreVmsAndPools }) => {
     if (sentinelStillInView) {
       fetchMoreVmsAndPools()
     }
-  }, [vms, scrollerRef, sentinelRef])
+  }, [vms, scrollerRef, sentinelRef, fetchMoreVmsAndPools])
 
   return (
     <div className={style['scroll-container-wrapper']}>
