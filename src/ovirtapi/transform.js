@@ -57,8 +57,24 @@ function convertBool (val: ?string): boolean {
   return val ? val.toLowerCase() === 'true' : false
 }
 
-function toApiBoolean (value: any): ApiBooleanType {
-  return value ? 'true' : 'false'
+/**
+ * Convert the given value to an oVirt REST API boolean.  The output can be one
+ * of three states:
+ *
+ *   - `undefined`: If the value is `undefined` the output is `undefined`.  An `undefined`
+ *     value does not get sent in a request, and the backend will fill in the value from
+ *     the entity's existing value (or template value if it is a new entity).
+ *
+ *   - `"true"`: If the value is defined and truthy `true`, send the string "true" to
+ *     match the API's expected `true` value.
+ *
+ *   - `"false"`: If the value is defined and truthy `false`, send the string "false" to
+ *     match the API's expected `false` value.
+ *
+ * @returns undefined | "true" | "false"
+ */
+function toApiBoolean (value: any): ApiBooleanType | void {
+  return value === undefined ? undefined : value ? 'true' : 'false'
 }
 
 function convertInt (val: ?(number | string), defaultValue: number = Number.NaN): number {
@@ -296,12 +312,8 @@ const VM = {
         utc_offset: vm.timeZone.offset,
       },
 
-      bios: Object.prototype.hasOwnProperty.call(vm, 'bootMenuEnabled')
-        ? {
-          boot_menu: {
-            enabled: toApiBoolean(vm.bootMenuEnabled),
-          },
-        }
+      bios: 'bootMenuEnabled' in vm
+        ? { boot_menu: { enabled: toApiBoolean(vm.bootMenuEnabled) } }
         : undefined,
 
       // NOTE: Disable cloudInit by sending "initialization: {}"
@@ -788,7 +800,7 @@ const Nic = {
   },
 
   toApi ({ nic }: { nic: NicType }): ApiNicType {
-    const res = {
+    const res: ApiNicType = {
       id: nic.id,
       name: nic.name,
       plugged: toApiBoolean(nic.plugged),

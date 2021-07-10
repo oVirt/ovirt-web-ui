@@ -66,8 +66,8 @@ export type DiskInterfaceType = "ide" | "sata" | "virtio" | "virtio_scsi"
 
 // http://ovirt.github.io/ovirt-engine-api-model/4.4/#types/disk_attachment
 export type ApiDiskAttachmentType = {
-  active: ApiBooleanType,
-  bootable: ApiBooleanType,
+  active?: ApiBooleanType,
+  bootable?: ApiBooleanType,
   disk?: Object,
   href?: string,
   comment?: string,
@@ -151,8 +151,8 @@ export type ApiNicType = {
   id: string,
   name: string,
   mac?: Object,
-  plugged: ApiBooleanType,
-  linked: ApiBooleanType,
+  plugged?: ApiBooleanType,
+  linked?: ApiBooleanType,
   interface: NicInterfaceType,
   vnic_profile?: {
     id: string | null | typeof undefined
