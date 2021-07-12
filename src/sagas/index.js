@@ -231,16 +231,8 @@ export function* fetchSingleVm (action) {
       internalVm.cdrom = yield fetchVmCdRom({ vmId: internalVm.id, current: true })
     }
 
-    // NOTE: Snapshot Disks and Nics are not currently (Sept-2018) available via
-    //       additional/follow param on the VM/snapshot fetch.  We need to fetch them
-    //       directly.
-    for (const snapshot of internalVm.snapshots) {
-      const follows = yield all([
-        call(fetchVmSnapshotDisks, { vmId: internalVm.id, snapshotId: snapshot.id }),
-        call(fetchVmSnapshotNics, { vmId: internalVm.id, snapshotId: snapshot.id }),
-      ])
-      snapshot.disks = follows[0]
-      snapshot.nics = follows[1]
+    if (!shallowFetch) {
+      yield parallelFetchAndPopulateSnapshotDisksAndNics(internalVm.id, internalVm.snapshots)
     }
 
     yield put(updateVms({ vms: [internalVm], copySubResources: shallowFetch }))
@@ -461,28 +453,56 @@ export function* fetchVmSnapshots ({ vmId }) {
   let snapshotsInternal = []
 
   if (snapshots && snapshots.snapshot) {
-    snapshotsInternal = snapshots.snapshot.map(snapshot => Transforms.Snapshot.toInternal({ snapshot }))
-
-    // NOTE: Snapshot Disks and Nics are not currently (Sept-2018) available via
-    //       additional/follow param on the snapshot fetch.  We need to fetch them
-    //       directly.
-    for (const snapshot of snapshotsInternal) {
-      const follows = yield all([
-        call(fetchVmSnapshotDisks, { vmId, snapshotId: snapshot.id }),
-        call(fetchVmSnapshotNics, { vmId, snapshotId: snapshot.id }),
-      ])
-      snapshot.disks = follows[0]
-      snapshot.nics = follows[1]
-    }
+    snapshotsInternal = snapshots.snapshot.map(snapshot => Api.snapshotToInternal({ snapshot }))
+    yield parallelFetchAndPopulateSnapshotDisksAndNics(vmId, snapshotsInternal)
   }
 
   yield put(setVmSnapshots({ vmId, snapshots: snapshotsInternal }))
 }
 
+/**
+ * Setup all of the calls needed to fetch, transform and populate the disks and nics
+ * for a set of VM snapshots.  To minimize wall clock time, all of the required fetches
+ * are done in parallel.
+ *
+ * This technique is required since snapshot disks and nics are not currently (July-2021)
+ * available via additional/follow param on the VM/snapshot fetch.  They need to be
+ * fetched directly.
+ *
+ * NOTE: Looks like the `?follows=snapshots` returns the active and regular snapshots.
+ *       The active snapshot does not contain links to disks and nics, but the regular
+ *       ones do.  That is probably the reason why the VM REST API call with
+ *       `?follows=snapshots.disks` fails.
+ *
+ * @param {string} vmId VM to work on
+ * @param {*} snapshots Array of internal `SnapshotType` objects
+ * @returns
+ */
+function* parallelFetchAndPopulateSnapshotDisksAndNics (vmId, snapshots) {
+  if (!Array.isArray(snapshots) || snapshots.length === 0) {
+    return
+  }
+
+  const fetches = []
+  for (const snapshot of snapshots.filter(snapshot => snapshot.type !== 'active')) {
+    fetches.push(
+      call(fetchVmSnapshotDisks, { vmId, snapshotId: snapshot.id }),
+      call(fetchVmSnapshotNics, { vmId, snapshotId: snapshot.id })
+    )
+  }
+
+  const results = yield all(fetches)
+
+  for (const snapshot of snapshots.filter(snapshot => snapshot.type !== 'active')) {
+    snapshot.disks = results.shift()
+    snapshot.nics = results.shift()
+  }
+}
+
 function* fetchVmSnapshotDisks ({ vmId, snapshotId }) {
   const disks = yield callExternalAction('snapshotDisks', Api.snapshotDisks, { payload: { vmId, snapshotId } }, true)
   let disksInternal = []
-  if (disks && disks.disk) {
+  if (disks?.disk) {
     disksInternal = disks.disk.map(disk => Transforms.DiskAttachment.toInternal({ disk }))
   }
   return disksInternal
@@ -491,7 +511,7 @@ function* fetchVmSnapshotDisks ({ vmId, snapshotId }) {
 function* fetchVmSnapshotNics ({ vmId, snapshotId }) {
   const nics = yield callExternalAction('snapshotNics', Api.snapshotNics, { payload: { vmId, snapshotId } }, true)
   let nicsInternal = []
-  if (nics && nics.nic) {
+  if (nics?.nic) {
     nicsInternal = nics.nic.map((nic) => Transforms.Nic.toInternal({ nic }))
   }
   return nicsInternal
