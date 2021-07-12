@@ -1,7 +1,7 @@
 import { all, call, put, select } from 'redux-saga/effects'
 import { loadFromLocalStorage, saveToLocalStorage } from '_/storage'
 import { updateIcons } from '_/actions'
-import Api from '_/ovirtapi'
+import Api, { Transforms } from '_/ovirtapi'
 
 import { callExternalAction } from './utils'
 
@@ -49,6 +49,6 @@ function* fetchIcon ({ iconId }) {
 
   const icon = yield callExternalAction('icon', Api.icon, { payload: { id: iconId } })
   if (icon.media_type && icon.data) {
-    yield put(updateIcons({ icons: [Api.iconToInternal({ icon })] }))
+    yield put(updateIcons({ icons: [Transforms.Icon.toInternal({ icon })] }))
   }
 }

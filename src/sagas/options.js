@@ -46,7 +46,7 @@ function* fetchSSHKey (action: Object): any {
     return
   }
 
-  yield put(A.setSSHKey(Api.SSHKeyToInternal({ sshKey: result })))
+  yield put(A.setSSHKey(Transforms.SSHKey.toInternal({ sshKey: result })))
 }
 
 function* saveSSHKey ([sshPropName, submittedKey]: any): any | ResultType {
@@ -219,7 +219,7 @@ function* saveGlobalOptions ({
   }
 
   if (!ssh.error && ssh.change && !ssh.sameAsCurrent) {
-    yield put(A.setSSHKey(Api.SSHKeyToInternal({ sshKey: ssh.data })))
+    yield put(A.setSSHKey(Transforms.SSHKey.toInternal({ sshKey: ssh.data })))
   }
 
   if (showNotifications !== undefined || notificationSnoozeDuration !== undefined) {

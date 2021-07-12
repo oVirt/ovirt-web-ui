@@ -260,7 +260,7 @@ export function* fetchPools (action) {
 
   const apiPools = yield callExternalAction('getPools', Api.getPools, action)
   if (apiPools && apiPools.vm_pool) {
-    const internalPools = apiPools.vm_pool.map(pool => Api.poolToInternal({ pool }))
+    const internalPools = apiPools.vm_pool.map(pool => Transforms.Pool.toInternal({ pool }))
     internalPools.forEach(pool => fetchedPoolIds.push(pool.id))
 
     yield put(updatePools({ pools: internalPools }))
@@ -276,7 +276,7 @@ export function* fetchSinglePool (action) {
   const pool = yield callExternalAction('getPool', Api.getPool, action, true)
   let internalPool = false
   if (pool && pool.id) {
-    internalPool = Api.poolToInternal({ pool })
+    internalPool = Transforms.Pool.toInternal({ pool })
     yield put(updatePools({ pools: [internalPool] }))
   } else {
     if (pool && pool.error && pool.error.status === 404) {
@@ -298,7 +298,7 @@ function* fetchVmCdRom ({ vmId, current }) {
 
   let cdromInternal = null
   if (cdrom) {
-    cdromInternal = Api.cdRomToInternal({ cdrom })
+    cdromInternal = Transforms.CdRom.toInternal({ cdrom })
   }
   return cdromInternal
 }
@@ -377,7 +377,7 @@ function* fetchAllEvents (action) {
         event.user &&
         (event.user.id === user.id || event.user.name === user.name)
       )
-      .map((event) => Api.eventToInternal({ event }))
+      .map((event) => Transforms.Event.toInternal({ event }))
     : []
   yield put(setUserMessages({ messages: internalEvents }))
 }
@@ -424,7 +424,7 @@ export function* fetchVmSessions ({ vmId }) {
   const sessions = yield callExternalAction('sessions', Api.sessions, { payload: { vmId } })
 
   if (sessions && sessions.session) {
-    return Api.sessionsToInternal({ sessions })
+    return Transforms.VmSessions.toInternal({ sessions })
   }
   return []
 }
@@ -450,7 +450,7 @@ function* saveFilters (actions) {
 function* fetchVmNics ({ vmId }) {
   const nics = yield callExternalAction('getVmNic', Api.getVmNic, { type: 'GET_VM_NICS', payload: { vmId } })
   if (nics && nics.nic) {
-    const nicsInternal = nics.nic.map(nic => Api.nicToInternal({ nic }))
+    const nicsInternal = nics.nic.map(nic => Transforms.Nic.toInternal({ nic }))
     return nicsInternal
   }
   return []
@@ -461,7 +461,7 @@ export function* fetchVmSnapshots ({ vmId }) {
   let snapshotsInternal = []
 
   if (snapshots && snapshots.snapshot) {
-    snapshotsInternal = snapshots.snapshot.map(snapshot => Api.snapshotToInternal({ snapshot }))
+    snapshotsInternal = snapshots.snapshot.map(snapshot => Transforms.Snapshot.toInternal({ snapshot }))
 
     // NOTE: Snapshot Disks and Nics are not currently (Sept-2018) available via
     //       additional/follow param on the snapshot fetch.  We need to fetch them
@@ -483,7 +483,7 @@ function* fetchVmSnapshotDisks ({ vmId, snapshotId }) {
   const disks = yield callExternalAction('snapshotDisks', Api.snapshotDisks, { payload: { vmId, snapshotId } }, true)
   let disksInternal = []
   if (disks && disks.disk) {
-    disksInternal = disks.disk.map(disk => Api.diskToInternal({ disk }))
+    disksInternal = disks.disk.map(disk => Transforms.DiskAttachment.toInternal({ disk }))
   }
   return disksInternal
 }
@@ -492,7 +492,7 @@ function* fetchVmSnapshotNics ({ vmId, snapshotId }) {
   const nics = yield callExternalAction('snapshotNics', Api.snapshotNics, { payload: { vmId, snapshotId } }, true)
   let nicsInternal = []
   if (nics && nics.nic) {
-    nicsInternal = nics.nic.map((nic) => Api.nicToInternal({ nic }))
+    nicsInternal = nics.nic.map((nic) => Transforms.Nic.toInternal({ nic }))
   }
   return nicsInternal
 }

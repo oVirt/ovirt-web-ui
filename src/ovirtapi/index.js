@@ -33,31 +33,6 @@ const OvirtApi = {
 
   //
   //
-  // ---- Data transform functions (API -> internal, internal -> API)
-  //
-  //
-  poolToInternal: Transforms.Pool.toInternal,
-
-  diskToInternal: Transforms.DiskAttachment.toInternal,
-
-  nicToInternal: Transforms.Nic.toInternal,
-
-  sessionsToInternal: Transforms.VmSessions.toInternal,
-
-  iconToInternal: Transforms.Icon.toInternal,
-
-  cdRomToInternal: Transforms.CdRom.toInternal,
-
-  SSHKeyToInternal: Transforms.SSHKey.toInternal,
-
-  consolesToInternal: Transforms.VmConsoles.toInternal,
-
-  snapshotToInternal: Transforms.Snapshot.toInternal,
-
-  eventToInternal: Transforms.Event.toInternal,
-
-  //
-  //
   // ---- API interaction functions
   //
   //
