@@ -115,26 +115,6 @@ export function* doCheckTokenExpired (action) {
   }
 }
 
-// TODO: Can't this be replaced by saga's blocking put.resolve()?
-export function* waitTillEqual (leftArg, rightArg, limit) {
-  let counter = limit
-
-  const left = typeof leftArg === 'function' ? leftArg : () => leftArg
-  const right = typeof rightArg === 'function' ? rightArg : () => rightArg
-
-  while (counter > 0) {
-    if (left() === right()) {
-      return true
-    }
-    yield delay(20) // in ms
-    counter--
-
-    console.log('waitTillEqual() delay ...')
-  }
-
-  return false
-}
-
 const shortMessages = {
   START_VM: 'failedToStartVm',
   RESTART_VM: 'failedToRestartVm',
@@ -160,14 +140,6 @@ function shortErrorMessage ({ action: { type = 'NONE' } }) {
     return { id: shortMessages[type] }
   }
   return { id: 'actionFailed', params: { action: type } }
-}
-
-export function* foreach (array, fn, context) {
-  const length = array.length
-
-  for (let i = 0; i < length; i++) {
-    yield * fn.call(context, array[i], i, array)
-  }
 }
 
 /**
