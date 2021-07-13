@@ -18,7 +18,7 @@ import { Tooltip } from '../tooltips'
 /**
  * Main application header on top of the page
  */
-const VmsPageHeader = ({ onRefresh }) => {
+const VmsPageHeader = ({ appReady, onRefresh }) => {
   const { msg } = useContext(MsgContext)
   const [show, setShow] = useState(false)
   const idPrefix = 'pageheader'
@@ -28,23 +28,27 @@ const VmsPageHeader = ({ onRefresh }) => {
       <div className='collapse navbar-collapse'>
         <VmUserMessages show={show} onClose={() => setShow(!show)} />
         <ul className='nav navbar-nav navbar-right navbar-iconic'>
-          <li>
-            <Tooltip id={`${idPrefix}-tooltip`} tooltip={msg.refresh()} placement='bottom'>
-              <a href='#' className='nav-item-iconic' onClick={hrefWithoutHistory(() => onRefresh())} id={`${idPrefix}-refresh`}>
-                <i className='fa fa-refresh' />
-              </a>
-            </Tooltip>
-          </li>
-          <li>
-            <Tooltip id={`${idPrefix}-tooltip`} tooltip={msg.accountSettings()} placement='bottom'>
-              <Link to='/settings' className='nav-item-iconic'>
-                <Icon
-                  name='cog'
-                  type='fa'
-                />
-              </Link>
-            </Tooltip>
-          </li>
+          {appReady && (
+            <li>
+              <Tooltip id={`${idPrefix}-tooltip`} tooltip={msg.refresh()} placement='bottom'>
+                <a href='#' className='nav-item-iconic' onClick={hrefWithoutHistory(() => onRefresh())} id={`${idPrefix}-refresh`}>
+                  <i className='fa fa-refresh' />
+                </a>
+              </Tooltip>
+            </li>
+          )}
+          {appReady && (
+            <li>
+              <Tooltip id={`${idPrefix}-tooltip`} tooltip={msg.accountSettings()} placement='bottom'>
+                <Link to='/settings' className='nav-item-iconic'>
+                  <Icon
+                    name='cog'
+                    type='fa'
+                  />
+                </Link>
+              </Tooltip>
+            </li>
+          )}
           <UserMenu />
           <Bellicon handleclick={() => setShow(!show)} />
         </ul>
@@ -53,11 +57,14 @@ const VmsPageHeader = ({ onRefresh }) => {
   )
 }
 VmsPageHeader.propTypes = {
+  appReady: PropTypes.bool.isRequired,
   onRefresh: PropTypes.func.isRequired,
 }
 
 export default connect(
-  null,
+  (state) => ({
+    appReady: !!state.config.get('appConfigured'), // When is the app ready to display data components?
+  }),
   (dispatch) => ({
     onRefresh: () => dispatch(manualRefresh()),
   })
