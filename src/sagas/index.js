@@ -453,7 +453,7 @@ export function* fetchVmSnapshots ({ vmId }) {
   let snapshotsInternal = []
 
   if (snapshots && snapshots.snapshot) {
-    snapshotsInternal = snapshots.snapshot.map(snapshot => Api.snapshotToInternal({ snapshot }))
+    snapshotsInternal = snapshots.snapshot.map(snapshot => Transforms.Snapshot.toInternal({ snapshot }))
     yield parallelFetchAndPopulateSnapshotDisksAndNics(vmId, snapshotsInternal)
   }
 
