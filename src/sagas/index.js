@@ -526,7 +526,7 @@ function* navigateToVmDetails ({ payload: { vmId } }) {
 export function* rootSaga () {
   yield all([
     ...sagasLogin,
-    ...yield sagasRefresh(),
+    ...sagasRefresh,
 
     takeEvery(CHECK_TOKEN_EXPIRED, doCheckTokenExpired),
     takeEvery(DELAYED_REMOVE_ACTIVE_REQUEST, delayedRemoveActiveRequest),

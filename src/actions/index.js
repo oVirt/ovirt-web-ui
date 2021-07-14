@@ -20,9 +20,9 @@ import {
   SET_WEBSOCKET,
   SHOW_TOKEN_EXPIRED_MSG,
   START_REFRESH_TIMER,
-  START_DO_NOT_DISTURB_TIMER,
+  START_RESUME_NOTIFICATIONS_TIMER,
   CANCEL_REFRESH_TIMER,
-  CANCEL_DO_NOT_DISTURB_TIMER,
+  CANCEL_RESUME_NOTIFICATIONS_TIMER,
   UPDATE_LAST_REFRESH,
   UPDATE_PAGING_DATA,
 } from '_/constants'
@@ -61,17 +61,17 @@ export function cancelRefreshTimer () {
   return { type: CANCEL_REFRESH_TIMER }
 }
 
-export function startDoNotDisturbTimer (delayInSeconds) {
+export function startResumeNotificationsTimer (delayInSeconds) {
   return {
-    type: START_DO_NOT_DISTURB_TIMER,
+    type: START_RESUME_NOTIFICATIONS_TIMER,
     payload: {
       delayInSeconds,
     },
   }
 }
 
-export function cancelDoNotDisturbTimer () {
-  return { type: CANCEL_DO_NOT_DISTURB_TIMER }
+export function cancelResumeNotificationsTimer () {
+  return { type: CANCEL_RESUME_NOTIFICATIONS_TIMER }
 }
 
 export function updateLastRefresh () {

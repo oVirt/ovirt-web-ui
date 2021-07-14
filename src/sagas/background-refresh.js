@@ -4,7 +4,6 @@ import {
 } from './options'
 
 import {
-  // actionChannel,
   all,
   call,
   put,
@@ -77,7 +76,7 @@ function* restartBackgroundRefreshTimer () {
 function* logoutAndCancelScheduler () {
   yield put(Actions.setCurrentPage({ type: C.NO_REFRESH_TYPE }))
   yield put(backgroundRefreshAction('stop'))
-  yield put(Actions.cancelDoNotDisturbTimer())
+  yield put(Actions.cancelResumeNotificationsTimer())
 }
 
 //
@@ -344,15 +343,15 @@ function* backgroundRefreshTimer (timerDuration = AppConfiguration.schedulerFixe
 }
 
 //
-// Do Not Disturb timer
+// Resume notifications timer (the do not disturb interval ends with a resume notifications action)
 //
-let _DoNotDisturbTimerCount = 0
-function* startDoNotDisturbTimer ({ payload: { delayInSeconds } }) {
-  yield put(Actions.cancelDoNotDisturbTimer())
+let _ResumeNotificationTimerCount = 0
+function* startResumeNotificationsTimer ({ payload: { delayInSeconds } }) {
+  yield put(Actions.cancelResumeNotificationsTimer())
 
-  const myId = _DoNotDisturbTimerCount++
+  const myId = _ResumeNotificationTimerCount++
   console.log(`notification timer [${myId}] - delay [${delayInSeconds}] sec`)
-  const { stopped } = yield call(runCancellableTimer, delayInSeconds, C.CANCEL_DO_NOT_DISTURB_TIMER)
+  const { stopped } = yield call(runCancellableTimer, delayInSeconds, C.CANCEL_RESUME_NOTIFICATIONS_TIMER)
   if (stopped) {
     console.log(`notification timer [${myId}] - stopped`)
   } else {
@@ -411,45 +410,34 @@ function* handleBackgroundChannel (action) {
   }
 }
 
-// function* takeAndCallOnTheChannel (actionChannel) {
-//   console.log('BACKGROUND_REFRESH channel is open')
-
-//   try {
-//     while (true) {
-//       const action = yield take(actionChannel)
-//       yield call(handleBackgroundChannel, action)
-//     }
-//   } finally {
-//     console.log('BACKGROUND_REFRESH channel is closed')
-//   }
-// }
-
 //
-// Export an initialization saga that yields an array of effects to be run by the root saga
 //
-export default function* () {
-  // const backgroundChannel = yield actionChannel(BACKGROUND_REFRESH)
+export default [
+  takeEvery(BACKGROUND_REFRESH, handleBackgroundChannel),
 
-  return [
-    // call(takeAndCallOnTheChannel, backgroundChannel),
-    takeEvery(BACKGROUND_REFRESH, handleBackgroundChannel),
+  // only process the 1st manual refresh received in a 5 second window
+  throttle(5000, C.MANUAL_REFRESH, refreshManually),
 
-    // only process the 1st manual refresh received in a 5 second window
-    throttle(5000, C.MANUAL_REFRESH, refreshManually),
+  /*
+  * Note: If a user goes crazy swapping between pages very quickly, a lot of `CHANGE_PAGE`
+  *       actions will be fired.  The `takeLatest()` effect used here will cancel[1] the
+  *       currently running `changePage()` saga and start the new one.
+  *
+  *       There are two important things to think about with task cancellation.  First,
+  *       our external call handler does not detect task cancellation and abort the API
+  *       call.  The transport call will always complete.  Second, the cancellation
+  *       propagates down, so the safest thing to do is to do a single `put()` action at
+  *       the end of the saga to update the store.  That will help prevent state from
+  *       getting broken in the case when `CHANGE_PAGE` actions overlap.
+  *
+  *       [1] - https://redux-saga.js.org/docs/advanced/TaskCancellation
+  */
+  takeLatest(C.CHANGE_PAGE, changePage),
 
-    /*
-    * Note: If a user goes crazy swapping between pages very quickly, a lot of `CHANGE_PAGE`
-    *       actions will be fired.  Since changePage() will refresh the new page's data
-    *       each time, it is possible to get to a point where multiple page refresh sagas
-    *       are queued.  That can cause problems and slow down the app.  Not much to be
-    *       done to prevent this from happening without slowing down the responsiveness
-    *       of the app (by using a debounce or similar).
-    */
-    takeLatest(C.CHANGE_PAGE, changePage),
+  takeEvery(C.START_REFRESH_TIMER, restartBackgroundRefreshTimer),
 
-    takeEvery(C.START_REFRESH_TIMER, restartBackgroundRefreshTimer),
-
-    takeEvery(C.START_DO_NOT_DISTURB_TIMER, startDoNotDisturbTimer),
-    takeEvery(C.LOGOUT, logoutAndCancelScheduler),
-  ]
-}
+  takeEvery(C.START_RESUME_NOTIFICATIONS_TIMER, startResumeNotificationsTimer),
+  takeEvery(C.LOGOUT, logoutAndCancelScheduler),
+]
+//
+//
