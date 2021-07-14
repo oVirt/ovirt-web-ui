@@ -4,7 +4,7 @@ import {
 } from './options'
 
 import {
-  actionChannel,
+  // actionChannel,
   all,
   call,
   put,
@@ -25,15 +25,16 @@ import { isNumber } from '_/utils'
 import { delay } from './utils'
 
 import {
+  fetchAndPutSingleVm,
   fetchByPage,
   fetchPools,
   fetchSinglePool,
   fetchSingleVm,
   fetchVms,
-  selectVmDetail,
 } from './index'
 import { getConsoleOptions } from './console'
 import { fetchIsoFiles } from './storageDomains'
+import { fetchUnknownIcons } from './osIcons'
 
 const BACKGROUND_REFRESH = 'BACKGROUND_REFRESH'
 
@@ -46,12 +47,25 @@ const BACKGROUND_REFRESH = 'BACKGROUND_REFRESH'
  * This should be done at the time of navigation to the page, typically by the page router.
  */
 function* changePage ({ payload: { type, id } }) {
-  yield put(Actions.setCurrentPage({ type, id }))
-  yield put({ type: BACKGROUND_REFRESH, subType: 'changePage' })
+  const targetPage = { type, id }
+  yield put(Actions.setCurrentPage(targetPage))
+  yield put(backgroundRefreshAction('changePage', targetPage))
 }
 
+/**
+ * Refresh the current page NOW.
+ */
 function* refreshManually () {
-  yield put({ type: BACKGROUND_REFRESH, subType: 'manual' })
+  const targetPage = yield select(({ config }) => config.get('currentPage'))
+  yield put(backgroundRefreshAction('manual', targetPage))
+}
+
+/**
+ * Start or restart the background refresh timer, picking up the current refresh
+ * interval from the store.
+ */
+function* restartBackgroundRefreshTimer () {
+  yield put(backgroundRefreshAction('restartBackgroundRefreshTimer'))
 }
 
 /**
@@ -62,7 +76,7 @@ function* refreshManually () {
  */
 function* logoutAndCancelScheduler () {
   yield put(Actions.setCurrentPage({ type: C.NO_REFRESH_TYPE }))
-  yield put({ type: BACKGROUND_REFRESH, subType: 'stop' })
+  yield put(backgroundRefreshAction('stop'))
   yield put(Actions.cancelDoNotDisturbTimer())
 }
 
@@ -70,20 +84,20 @@ function* logoutAndCancelScheduler () {
 // ** Refresh Sagas **
 //
 /**
- * Invoke the correct refresh function based on the app's current page type.
+ * Invoke the correct refresh function based on the provided page.
  */
-function* refreshDataForCurrentPage ({
-  pageRouterRefresh,
-  schedulerRefresh,
-  manualRefresh,
+function* refreshDataForTargetPage ({
+  pageRouterRefresh = false,
+  schedulerRefresh = false,
+  manualRefresh = false,
+  targetPage,
 }) {
-  const currentPage = yield select(state => state.config.get('currentPage'))
-  const pageRefreshFunction = pagesRefreshers[currentPage.type]
+  const pageRefreshFunction = pagesRefreshers[targetPage.type]
 
-  console.log('🔄 refreshDataForCurrentPage() 🡒 start, currentPage:', currentPage, 'pageRefreshFunction?', !!pageRefreshFunction)
+  console.log('🔄 refreshDataForCurrentPage() 🡒 start, targetPage:', targetPage, 'pageRefreshFunction?', !!pageRefreshFunction)
   if (pageRefreshFunction) {
     yield call(pageRefreshFunction, {
-      id: currentPage.id,
+      id: targetPage.id,
       pageRouterRefresh,
       schedulerRefresh,
       manualRefresh,
@@ -102,7 +116,7 @@ const pagesRefreshers = {
   [C.SETTINGS_PAGE_TYPE]: loadUserOptions,
 }
 
-function* getIdsByType (type) {
+function* getIdSetByType (type) {
   const ids = Array.from(yield select(state => state.vms.get(type).keys()))
   return ids
 }
@@ -119,51 +133,69 @@ function* refreshListPage () {
     return
   }
 
-  const [vmsCount, poolsCount] = yield all([
+  const [vmsResults, poolsResults] = yield all([
     call(function* () {
-      // refresh VMs and remove any that haven't been refreshed
-      if (vmsPage > 0) {
-        const fetchedVmIds = yield fetchVms(Actions.getVmsByCount({
-          count: vmsPage * AppConfiguration.pageLimit,
-        }))
+      // fetch the VMs we are expecting to be in the pages we have fetched
+      const { internalVms: expectedVms } = yield fetchVms(Actions.getVmsByCount({
+        count: vmsPage * AppConfiguration.pageLimit,
+      }))
 
-        const vmsIds = yield getIdsByType('vms')
-        const fetchedDirectlyVmIds =
-          (yield all(
-            vmsIds
-              .filter(vmId => !fetchedVmIds.includes(vmId))
-              .map(vmId => call(fetchSingleVm, Actions.getSingleVm({ vmId, shallowFetch: true })))
-          ))
-            .reduce((vmIds, vm) => { if (vm) vmIds.push(vm.id); return vmIds }, [])
+      // if any existing VMs are not in expectedVms, fetch them individually
+      const expectedVmIds = new Set(expectedVms.map(vm => vm.id))
+      const existingVmIds = yield getIdSetByType('vms')
 
-        yield put(Actions.removeMissingVms({ vmIdsToPreserve: [...fetchedVmIds, ...fetchedDirectlyVmIds] }))
+      const unexpectedVms = yield all(
+        existingVmIds
+          .filter(vmId => !expectedVmIds.has(vmId))
+          .map(vmId => call(fetchSingleVm, Actions.getSingleVm({ vmId, shallowFetch: true })))
+      )
+
+      return {
+        refreshedVms: [
+          ...expectedVms,
+          ...unexpectedVms.filter(result => !result.error).map(result => result.internalVm),
+        ],
+        missedVmIds: unexpectedVms.filter(result => result.error).map(result => result.vmId),
       }
-
-      return yield select(state => state.vms.get('vms').size)
     }),
 
     call(function* () {
-      // refresh Pools and remove any that haven't been refreshed
-      if (poolsPage > 0) {
-        const fetchedPoolIds = yield fetchPools(Actions.getPoolsByCount({
-          count: poolsPage * AppConfiguration.pageLimit,
-        }))
+      // fetch the Pools we are expecting to be in the pages we have fetched
+      const { internalPools: expectedPools } = yield fetchPools(Actions.getPoolsByCount({
+        count: poolsPage * AppConfiguration.pageLimit,
+      }))
 
-        const filteredPoolIds = yield getIdsByType('pools')
-        const fetchedDirectlyPoolIds =
-          (yield all(
-            filteredPoolIds
-              .filter(poolId => !fetchedPoolIds.includes(poolId))
-              .map(poolId => call(fetchSinglePool, Actions.getSinglePool({ poolId })))
-          ))
-            .reduce((poolIds, pool) => { if (pool) poolIds.push(pool.id); return poolIds }, [])
+      // if any existing VMs are not in expectedVms, fetch them individually
+      const expectedPoolIds = new Set(expectedPools.map(pool => pool.id))
+      const existingPoolIds = yield getIdSetByType('pools')
 
-        yield put(Actions.removeMissingPools({ poolIdsToPreserve: [...fetchedPoolIds, ...fetchedDirectlyPoolIds] }))
+      const unexpectedPools = yield all(
+        existingPoolIds
+          .filter(poolId => !expectedPoolIds.has(poolId))
+          .map(poolId => call(fetchSinglePool, Actions.getSinglePool({ poolId })))
+      )
+
+      return {
+        refreshedPools: [
+          ...expectedPools,
+          ...unexpectedPools.filter(result => !result.error).map(result => result.internalPool),
+        ],
+        missedPoolIds: unexpectedPools.filter(result => result.error).map(result => result.poolId),
       }
-
-      return yield select(state => state.vms.get('pools').size)
     }),
   ])
+
+  // TODO: move these (6!) puts to the reducers, keep state changes in 1 action
+  // Push the refreshed VMs and Pools to the store
+  yield put(Actions.updateVms({ vms: vmsResults.refreshedVms, copySubResources: true }))
+  yield put(Actions.updatePools({ pools: poolsResults.refreshedPools }))
+
+  // Remove any VMs and Pools that couldn't be refreshed
+  yield put(Actions.removeVms({ vmIds: vmsResults.missedVmIds }))
+  yield put(Actions.removePools({ poolIds: poolsResults.missedPoolIds }))
+
+  // Update counts
+  yield put(Actions.updateVmsPoolsCount())
 
   //
   // Since it is possible that VMs or Pools have been added since the last refresh,
@@ -172,17 +204,18 @@ function* refreshListPage () {
   // size of VMs/Pools is full.
   //
   yield put(Actions.updatePagingData({
-    vmsExpectMorePages: vmsCount >= vmsPage * AppConfiguration.pageLimit,
-    poolsExpectMorePages: poolsCount >= poolsPage * AppConfiguration.pageLimit,
+    vmsExpectMorePages: vmsResults.refreshedVms.length >= vmsPage * AppConfiguration.pageLimit,
+    poolsExpectMorePages: poolsResults.refreshedPools.length >= poolsPage * AppConfiguration.pageLimit,
   }))
 
-  // update counts
-  yield put(Actions.updateVmsPoolsCount())
+  yield fetchUnknownIcons({ vms: vmsResults.refreshedVms })
 }
 
-function* refreshDetailPage ({ id, manualRefresh }) {
-  yield selectVmDetail(Actions.selectVmDetail({ vmId: id }))
-  yield getConsoleOptions(Actions.getConsoleOptions({ vmId: id }))
+function* refreshDetailPage ({ id: vmId, manualRefresh }) {
+  yield fetchAndPutSingleVm(Actions.getSingleVm({ vmId }))
+  yield getConsoleOptions(Actions.getConsoleOptions({ vmId }))
+
+  // TODO: If the VM is from a Pool, refresh the Pool as well.
 
   // Load ISO images on manual refresh click only
   if (manualRefresh) {
@@ -190,9 +223,9 @@ function* refreshDetailPage ({ id, manualRefresh }) {
   }
 }
 
-function* refreshCreatePage ({ id, manualRefresh }) {
-  if (id) {
-    yield selectVmDetail(Actions.selectVmDetail({ vmId: id }))
+function* refreshCreatePage ({ id: vmId, manualRefresh }) {
+  if (vmId) {
+    yield fetchAndPutSingleVm(Actions.getSingleVm({ vmId }))
   }
 
   // Load ISO images on manual refresh click only
@@ -201,9 +234,9 @@ function* refreshCreatePage ({ id, manualRefresh }) {
   }
 }
 
-function* refreshConsolePage ({ id }) {
-  if (id) {
-    yield selectVmDetail(Actions.selectVmDetail({ vmId: id }))
+function* refreshConsolePage ({ id: vmId }) {
+  if (vmId) {
+    yield fetchAndPutSingleVm(Actions.getSingleVm({ vmId }))
   }
 }
 
@@ -302,12 +335,12 @@ function* backgroundRefreshTimer (timerDuration = AppConfiguration.schedulerFixe
 
   const oVirtVersionOk = yield select(state => state.config.getIn(['oVirtApiVersion', 'passed'], false))
   if (!oVirtVersionOk) {
-    console.log(`⏰ backgroundRefreshTimer[${myId}] 🡒 timer event skipped, oVirt API is not ok`)
+    console.log(`⏰ backgroundRefreshTimer[${myId}] 🡒 timer has been cancelled, oVirt API is not ok`)
     return
   }
 
   console.log(`⏰ backgroundRefreshTimer[${myId}] 🡒 timer event!, duration: ${timerDuration}`)
-  yield put({ type: BACKGROUND_REFRESH, subType: 'timer' })
+  yield put(backgroundRefreshAction('timer'))
 }
 
 //
@@ -329,10 +362,18 @@ function* startDoNotDisturbTimer ({ payload: { delayInSeconds } }) {
 }
 
 //
-// ** BACKGROUND_REFRESH channel handler **
+// ** BACKGROUND_REFRESH handling **
 //
+function backgroundRefreshAction (subType, targetPage) {
+  return {
+    type: BACKGROUND_REFRESH,
+    subType,
+    targetPage,
+  }
+}
+
 function* handleBackgroundChannel (action) {
-  const { subType } = action
+  const { subType, targetPage } = action
 
   yield put(Actions.cancelRefreshTimer())
 
@@ -342,19 +383,18 @@ function* handleBackgroundChannel (action) {
 
   switch (subType) {
     case 'changePage':
-      yield refreshDataForCurrentPage({ pageRouterRefresh: true })
+      yield refreshDataForTargetPage({ pageRouterRefresh: true, targetPage })
       break
 
     case 'manual':
-      yield refreshDataForCurrentPage({ manualRefresh: true })
+      yield refreshDataForTargetPage({ manualRefresh: true, targetPage })
       break
 
     case 'timer':
-      yield refreshDataForCurrentPage({ schedulerRefresh: true })
-      break
-
-    case 'fetchNextPageOfVmsAndPools':
-      yield fetchByPage()
+      yield refreshDataForTargetPage({
+        schedulerRefresh: true,
+        targetPage: yield select(({ config }) => config.get('currentPage')),
+      })
       break
 
     case 'restartBackgroundRefreshTimer':
@@ -371,27 +411,28 @@ function* handleBackgroundChannel (action) {
   }
 }
 
-function* takeAndCallOnTheChannel (actionChannel) {
-  console.log('BACKGROUND_REFRESH channel is open')
+// function* takeAndCallOnTheChannel (actionChannel) {
+//   console.log('BACKGROUND_REFRESH channel is open')
 
-  try {
-    while (true) {
-      const action = yield take(actionChannel)
-      yield call(handleBackgroundChannel, action)
-    }
-  } finally {
-    console.log('BACKGROUND_REFRESH channel is closed')
-  }
-}
+//   try {
+//     while (true) {
+//       const action = yield take(actionChannel)
+//       yield call(handleBackgroundChannel, action)
+//     }
+//   } finally {
+//     console.log('BACKGROUND_REFRESH channel is closed')
+//   }
+// }
 
 //
 // Export an initialization saga that yields an array of effects to be run by the root saga
 //
 export default function* () {
-  const backgroundChannel = yield actionChannel(BACKGROUND_REFRESH)
+  // const backgroundChannel = yield actionChannel(BACKGROUND_REFRESH)
 
   return [
-    call(takeAndCallOnTheChannel, backgroundChannel),
+    // call(takeAndCallOnTheChannel, backgroundChannel),
+    takeEvery(BACKGROUND_REFRESH, handleBackgroundChannel),
 
     // only process the 1st manual refresh received in a 5 second window
     throttle(5000, C.MANUAL_REFRESH, refreshManually),
@@ -406,13 +447,7 @@ export default function* () {
     */
     takeLatest(C.CHANGE_PAGE, changePage),
 
-    throttle(100, C.GET_BY_PAGE, function* () {
-      yield put({ type: BACKGROUND_REFRESH, subType: 'fetchNextPageOfVmsAndPools' })
-    }),
-
-    takeEvery(C.START_REFRESH_TIMER, function* () {
-      yield put({ type: BACKGROUND_REFRESH, subType: 'restartBackgroundRefreshTimer' })
-    }),
+    takeEvery(C.START_REFRESH_TIMER, restartBackgroundRefreshTimer),
 
     takeEvery(C.START_DO_NOT_DISTURB_TIMER, startDoNotDisturbTimer),
     takeEvery(C.LOGOUT, logoutAndCancelScheduler),

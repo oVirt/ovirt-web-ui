@@ -1,5 +1,7 @@
 import AppConfiguration from '_/config'
 import {
+  ACTION_IN_PROGRESS_START,
+  ACTION_IN_PROGRESS_STOP,
   ADD_VM_NIC,
   CHANGE_VM_CDROM,
   COMPOSE_CREATE_VM,
@@ -15,7 +17,6 @@ import {
   LOGIN,
   LOGOUT,
   NAVIGATE_TO_VM_DETAILS,
-  REMOVE_MISSING_VMS,
   REMOVE_VM,
   REMOVE_VMS,
   RESTART_VM,
@@ -263,18 +264,6 @@ export function removeVms ({ vmIds }) {
   }
 }
 
-/**
- * Remove all VMs from store which ID is not listed among vmIdsToPreserve
- */
-export function removeMissingVms ({ vmIdsToPreserve }) {
-  return {
-    type: REMOVE_MISSING_VMS,
-    payload: {
-      vmIdsToPreserve,
-    },
-  }
-}
-
 export function updateIcons ({ icons }) {
   return {
     type: UPDATE_ICONS,
@@ -300,6 +289,29 @@ export function updateVmDisk ({ vmId, disk }) {
     payload: {
       vmId,
       disk,
+    },
+  }
+}
+
+export function startActionInProgress ({ vmId, poolId, name }) {
+  return {
+    type: ACTION_IN_PROGRESS_START,
+    payload: {
+      vmId,
+      poolId,
+      name,
+    },
+  }
+}
+
+export function stopActionInProgress ({ vmId, poolId, name, result }) {
+  return {
+    type: ACTION_IN_PROGRESS_STOP,
+    payload: {
+      vmId,
+      poolId,
+      name,
+      result,
     },
   }
 }

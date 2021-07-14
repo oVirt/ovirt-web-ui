@@ -1,11 +1,9 @@
-import Immutable, { Map } from 'immutable'
+import Immutable from 'immutable'
 
 import {
   FAILED_EXTERNAL_ACTION,
   LOGOUT,
   POOL_ACTION_IN_PROGRESS,
-  REMOVE_MISSING_POOLS,
-  REMOVE_MISSING_VMS,
   REMOVE_POOLS,
   REMOVE_VMS,
   SET_FILTERS,
@@ -23,7 +21,7 @@ import {
   UPDATE_VMS,
   VM_ACTION_IN_PROGRESS,
 } from '_/constants'
-import { actionReducer, removeMissingItems } from './utils'
+import { actionReducer } from './utils'
 import { SortFields } from '_/utils'
 
 const initialState = Immutable.fromJS({
@@ -89,9 +87,6 @@ const vms = actionReducer(initialState, {
     vmIds.forEach(vmId => mutable.deleteIn(['vms', vmId]))
     mutable.update('missedVms', missedVms => missedVms.union(vmIds))
     return mutable.asImmutable()
-  },
-  [REMOVE_MISSING_VMS] (state, { payload: { vmIdsToPreserve } }) {
-    return removeMissingItems({ state, subStateName: 'vms', idsToPreserve: vmIdsToPreserve })
   },
 
   [SET_VM_DISKS] (state, { payload: { vmId, disks } }) {
@@ -177,18 +172,6 @@ const vms = actionReducer(initialState, {
     const mutable = state.asMutable()
     poolIds.forEach(poolId => mutable.deleteIn(['pools', poolId]))
     return mutable.asImmutable()
-  },
-  [REMOVE_MISSING_POOLS] (state, { payload: { poolIdsToPreserve } }) {
-    const newPools = poolIdsToPreserve
-      .reduce((pools, poolId) => {
-        const pool = state.getIn(['pools', poolId])
-        if (pool) {
-          pools.set(poolId, pool)
-        }
-        return pools
-      }, Map().asMutable())
-      .asImmutable()
-    return state.set('pools', newPools)
   },
 
   [POOL_ACTION_IN_PROGRESS] (state, { payload: { poolId, name, started } }) {

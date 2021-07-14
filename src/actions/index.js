@@ -29,7 +29,6 @@ import {
 
 export * from './error'
 export * from './vm'
-export * from './visibility'
 export * from './clusters'
 export * from './hosts'
 export * from './operatingSystems'

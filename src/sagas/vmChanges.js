@@ -8,7 +8,7 @@ import * as C from '_/constants'
 import { arrayMatch } from '_/utils'
 
 import { callExternalAction, delay, delayInMsSteps } from './utils'
-import { startProgress, stopProgress, addVmNic, fetchSingleVm } from './index'
+import { addVmNic, fetchSingleVm } from './index'
 import { createDiskForVm } from './disks'
 
 function* createMemoryPolicyFromCluster (clusterId, memorySize) {
@@ -232,7 +232,7 @@ function* composeProvisionSourceTemplate ({ vm, basic, disks }) {
  * for the new VM.
  */
 function* createVm (action) {
-  const correlationId = action.meta && action.meta.correlationId
+  const correlationId = action?.meta?.correlationId
 
   // Create the VM
   const createVmResult = yield callExternalAction(Api.addNewVm, action)
@@ -286,7 +286,7 @@ function* waitForVmToBeUnlocked (vmId, isCloning = false) {
       yield delay(delayMs)
 
       const check = yield callExternalAction(Api.getVm, { payload: { vmId } }, true)
-      if (check && check.id === vmId && check.status !== 'image_locked') {
+      if (check?.id === vmId && check?.status !== 'image_locked') {
         break
       }
     }
@@ -317,18 +317,17 @@ function* editVm (action) {
       vmId,
       cdrom: vm.cdrom,
       current: action.payload.changeCurrentCd,
-      updateVm: false, // A.selectVmDetail will update the VMs info with all of the edits
     }))
 
     commitError = changeCdResult.error
   }
 
+  // if edit call succeed, deep fetch refresh the VM with the updates applied
   if (!commitError) {
-    // deep fetch refresh the VM with any/all updates applied
-    yield put(A.selectVmDetail({ vmId }))
+    yield put(A.getSingleVm({ vmId }))
   }
 
-  if (action.meta && action.meta.correlationId) {
+  if (action?.meta?.correlationId) {
     yield put(A.setVmActionResult({
       vmId,
       correlationId: action.meta.correlationId,
@@ -344,7 +343,7 @@ function* editVm (action) {
 function* changeVmCdRom (action) {
   const result = yield callExternalAction(Api.changeCdRom, action)
 
-  if (action.meta && action.meta.correlationId) {
+  if (action?.meta?.correlationId) {
     yield put(A.setVmActionResult({
       vmId: action.payload.vmId,
       correlationId: action.meta.correlationId,
@@ -355,67 +354,127 @@ function* changeVmCdRom (action) {
   return result
 }
 
+export function* startProgress ({ vmId, poolId, name }) {
+  if (vmId) {
+    yield put(A.vmActionInProgress({ vmId, name, started: true }))
+  } else {
+    yield put(A.poolActionInProgress({ poolId, name, started: true }))
+  }
+}
+
+export function* stopProgress ({ vmId, poolId, name, result }) {
+  if (result?.status === 'complete' && result?.job?.id) {
+    // If the result is complete, refresh the entity to grab the current status
+    if (vmId) {
+      yield put(A.getSingleVm({ vmId, shallowFetch: true }))
+    } else {
+      yield put(A.getSinglePool({ poolId }))
+    }
+
+    // If the result has an async job associated with it, wait
+    // for the job to finish then refresh the VM or Pool again
+    const jobId = result.job.id
+
+    for (const delayMs of delayInMsSteps()) {
+      yield delay(delayMs)
+
+      const check = yield callExternalAction(Api.getJob, { payload: { jobId } }, true)
+      if (check.end_time) {
+        break
+      }
+    }
+
+    if (vmId) {
+      yield put(A.getSingleVm({ vmId }))
+    } else {
+      yield put(A.getSinglePool({ poolId }))
+    }
+  }
+
+  if (vmId) {
+    yield put(A.vmActionInProgress({ vmId, name, started: false }))
+  } else {
+    yield put(A.poolActionInProgress({ poolId, name, started: false }))
+  }
+}
+
 function* shutdownVm (action) {
-  yield startProgress({ vmId: action.payload.vmId, name: 'shutdown' })
+  const vmId = action.payload.vmId
+  yield startProgress({ vmId, name: 'shutdown' })
+
   const result = yield callExternalAction(Api.shutdown, action)
-  const vmName = yield select(state => state.vms.getIn(['vms', action.payload.vmId, 'name']))
   if (result.status === 'complete') {
+    const vmName = yield select(state => state.vms.getIn(['vms', action.payload.vmId, 'name']))
     yield put(A.addUserMessage({ messageDescriptor: { id: 'actionFeedbackShutdownVm', params: { VmName: vmName } }, type: 'success' }))
   }
-  yield stopProgress({ vmId: action.payload.vmId, name: 'shutdown', result })
+
+  yield stopProgress({ vmId, name: 'shutdown', result })
 }
 
 function* restartVm (action) {
-  yield startProgress({ vmId: action.payload.vmId, name: 'restart' })
+  const vmId = action.payload.vmId
+  yield startProgress({ vmId, name: 'restart' })
+
   const result = yield callExternalAction(Api.restart, action)
-  const vmName = yield select(state => state.vms.getIn(['vms', action.payload.vmId, 'name']))
   if (result.status === 'complete') {
+    const vmName = yield select(state => state.vms.getIn(['vms', action.payload.vmId, 'name']))
     yield put(A.addUserMessage({ messageDescriptor: { id: 'actionFeedbackRestartVm', params: { VmName: vmName } }, type: 'success' }))
   }
-  yield stopProgress({ vmId: action.payload.vmId, name: 'restart', result })
+
+  yield stopProgress({ vmId, name: 'restart', result })
 }
 
 function* suspendVm (action) {
-  yield startProgress({ vmId: action.payload.vmId, name: 'suspend' })
+  const vmId = action.payload.vmId
+  yield startProgress({ vmId, name: 'suspend' })
+
   const result = yield callExternalAction(Api.suspend, action)
-  const vmName = yield select(state => state.vms.getIn(['vms', action.payload.vmId, 'name']))
   if (result.status === 'pending') {
+    const vmName = yield select(state => state.vms.getIn(['vms', action.payload.vmId, 'name']))
     yield put(A.addUserMessage({ messageDescriptor: { id: 'actionFeedbackSuspendVm', params: { VmName: vmName } }, type: 'success' }))
   }
-  yield stopProgress({ vmId: action.payload.vmId, name: 'suspend', result })
+
+  yield stopProgress({ vmId, name: 'suspend', result })
 }
 
 function* startVm (action) {
-  yield startProgress({ vmId: action.payload.vmId, name: 'start' })
+  const vmId = action.payload.vmId
+  yield startProgress({ vmId, name: 'start' })
+
   const result = yield callExternalAction(Api.start, action)
-  const vmName = yield select(state => state.vms.getIn(['vms', action.payload.vmId, 'name']))
   // TODO: check status at refresh --> conditional refresh wait_for_launch
   if (result.status === 'complete') {
+    const vmName = yield select(state => state.vms.getIn(['vms', action.payload.vmId, 'name']))
     yield put(A.addUserMessage({ messageDescriptor: { id: 'actionFeedbackStartVm', params: { VmName: vmName } }, type: 'success' }))
   }
-  yield stopProgress({ vmId: action.payload.vmId, name: 'start', result })
+
+  yield stopProgress({ vmId, name: 'start', result })
 }
 
 function* startPool (action) {
-  yield startProgress({ poolId: action.payload.poolId, name: 'start' })
+  const poolId = action.payload.poolId
+  yield startProgress({ poolId, name: 'start' })
+
   const result = yield callExternalAction(Api.startPool, action)
-  const poolName = yield select(state => state.vms.getIn(['pools', action.payload.poolId, 'name']))
   if (result.status === 'complete') {
+    const poolName = yield select(state => state.vms.getIn(['pools', action.payload.poolId, 'name']))
     yield put(A.addUserMessage({ messageDescriptor: { id: 'actionFeedbackAllocateVm', params: { poolname: poolName } }, type: 'success' }))
   }
-  yield stopProgress({ poolId: action.payload.poolId, name: 'start', result })
+
+  yield stopProgress({ poolId, name: 'start', result })
 }
 
 function* removeVm (action) {
-  yield startProgress({ vmId: action.payload.vmId, name: 'remove' })
-  const result = yield callExternalAction(Api.remove, action)
+  const vmId = action.payload.vmId
+  yield startProgress({ vmId, name: 'remove' })
 
+  const result = yield callExternalAction(Api.remove, action)
   if (result.status === 'complete') {
     // TODO: Remove the VM from the store so we don't see it on the list page!
     yield put(push('/'))
   }
 
-  yield stopProgress({ vmId: action.payload.vmId, name: 'remove', result })
+  yield stopProgress({ vmId, name: 'remove', result })
 }
 
 export default [
@@ -427,6 +486,8 @@ export default [
   takeLatest(C.REMOVE_VM, removeVm),
 
   // VM Status Changes
+  takeEvery(C.ACTION_IN_PROGRESS_START, startProgress),
+  takeEvery(C.ACTION_IN_PROGRESS_STOP, stopProgress),
   takeEvery(C.SHUTDOWN_VM, shutdownVm),
   takeEvery(C.RESTART_VM, restartVm),
   takeEvery(C.START_VM, startVm),

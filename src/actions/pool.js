@@ -3,7 +3,6 @@ import {
   GET_POOL,
   GET_POOLS,
   POOL_ACTION_IN_PROGRESS,
-  REMOVE_MISSING_POOLS,
   REMOVE_POOL,
   START_POOL,
   UPDATE_POOLS,
@@ -62,18 +61,6 @@ export function removePools ({ poolIds }) {
     type: REMOVE_POOL,
     payload: {
       poolIds,
-    },
-  }
-}
-
-/**
- * Remove all Pools from the store whose ID is not listed among poolIdsToPreserve
- */
-export function removeMissingPools ({ poolIdsToPreserve }) {
-  return {
-    type: REMOVE_MISSING_POOLS,
-    payload: {
-      poolIdsToPreserve,
     },
   }
 }
