@@ -23,16 +23,9 @@ import style from './style.css'
 import { Tooltip, InfoTooltip } from '_/components/tooltips'
 
 const DISK_DEFAULTS = {
-  active: true,
-  iface: 'virtio_scsi', // virtio | virtio_scsi
-
-  id: undefined,
-  name: '',
-  type: 'image',
   bootable: false,
-
+  name: '',
   diskType: 'thin', // constrain to values in DISK_TYPES
-
   provisionedSize: 1 * 1024 ** 3,
 }
 
@@ -155,47 +148,59 @@ class DiskImageEditor extends Component {
     this.setState({ showModal: false })
   }
 
-  // NOTE: Add and edit both can use the same composeDisk() since the add and edit
-  //       sagas will use what they need from the composed disk.  The sagas ultimately
-  //       control the REST calls and data.
   composeDisk () {
-    const { vm, disk } = this.props
-    const vmDiskInSameStorageDomain =
-      vm.get('disks') &&
-      vm.get('disks').find(disk => disk.get('storageDomainId') === this.state.values.storageDomain)
+    const { vm, disk, storageDomains } = this.props
+    const { values } = this.state
 
-    const iface =
-      (disk && disk.get('iface')) ||
-      (vmDiskInSameStorageDomain && vmDiskInSameStorageDomain.get('iface')) ||
-      'virtio_scsi'
+    if (disk) { // edit
+      const provisionedSize = disk.get('provisionedSize') + values.size * 1024 ** 3
 
-    const provisionedSize = disk
-      ? disk.get('provisionedSize') + this.state.values.size * 1024 ** 3
-      : this.state.values.size * 1024 ** 3
+      return disk.get('type') === 'image'
+        ? { // image disk (change name, size, bootable)
+          attachmentId: disk.get('attachmentId'),
+          id: disk.get('id'),
 
-    const bootable = this.state.values.bootable
+          bootable: values.bootable,
+          name: values.alias,
+          provisionedSize,
+        }
+        : { // cinder or lun disk (only change name and bootable)
+          attachmentId: disk.get('attachmentId'),
+          id: disk.get('id'),
+          type: disk.get('type'),
 
-    const newDisk = {
-      ...DISK_DEFAULTS,
-      attachmentId: disk && disk.get('attachmentId'),
-      storageDomainId: this.state.values.storageDomain,
+          bootable: values.bootable,
+          name: values.alias,
+        }
+    } else { // new
+      const vmDiskInSameStorageDomain =
+        vm.get('disks') &&
+        vm.get('disks').find(disk => disk.get('storageDomainId') === values.storageDomain)
 
-      iface,
-      id: this.state.id,
-      name: this.state.values.alias,
-      provisionedSize,
-      bootable,
+      const iface = vmDiskInSameStorageDomain
+        ? vmDiskInSameStorageDomain.get('iface')
+        : 'virtio_scsi'
 
-      // the __diskType__ field maps to format + sparse REST Disk attributes
-      format: 'raw', // Match webadmin behavior, disks are created as 'raw'
-      sparse: this.state.values.diskType === 'thin',
+      const provisionedSize = values.size * 1024 ** 3
+
+      const storageDomainDiskAttributes =
+        storageDomains.getIn([values.storageDomain, 'diskAttributesForDiskType', values.diskType]).toJS()
+
+      const newDisk = {
+        active: true,
+        bootable: values.bootable,
+        iface,
+
+        name: values.alias,
+        type: 'image', // we only know how to create 'image' type disks
+        provisionedSize,
+
+        ...storageDomainDiskAttributes,
+        storageDomainId: values.storageDomain,
+      }
+
+      return newDisk
     }
-
-    if (disk && disk.get('type') !== 'image') {
-      newDisk.type = disk.get('type')
-      newDisk.provisionedSize = undefined
-    }
-    return newDisk
   }
 
   validateField (field = '') {

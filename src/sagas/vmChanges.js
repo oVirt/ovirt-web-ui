@@ -97,40 +97,29 @@ function* composeAndCreateVm ({ payload: { basic, nics, disks }, meta: { correla
   yield waitForVmToBeUnlocked(newVmId, vmRequiresClone)
 
   // Assuming NICs cannot be added along with the VM create request, add them now
-  yield all(nics.filter(nic => !nic.isFromTemplate).map(nic =>
-    call(addVmNic, A.addVmNic({
-      vmId: newVmId,
-      nic: {
-        name: nic.name,
-        plugged: true,
-        linked: true,
-        vnicProfile: { id: nic.vnicProfileId },
-        interface: nic.deviceType,
-      },
-    }))
-  ))
-  // TODO? If cloning, toast notify that NICs have been added.
+  const newNics = nics.filter(nic => !nic.isFromTemplate)
+  if (newNics.length > 0) {
+    yield all(newNics.map(nic =>
+      call(addVmNic, A.addVmNic({
+        vmId: newVmId,
+        nic: {
+          name: nic.name,
+          plugged: true,
+          linked: true,
+          vnicProfile: { id: nic.vnicProfileId },
+          interface: nic.deviceType,
+        },
+      }))
+    ))
+    // TODO? toast notify that Nics have been added
+  }
 
   // Assuming Disks cannot be added along with the VM create request, add them now
-  yield all(disks.filter(disk => !disk.isFromTemplate).map(disk =>
-    call(createDiskForVm, A.createDiskForVm({
-      vmId: newVmId,
-      disk: {
-        active: true,
-        bootable: disk.bootable,
-        iface: disk.iface,
-
-        name: disk.name,
-        type: 'image',
-        format: 'raw', // Match webadmin behavior, disks are created as 'raw'
-        sparse: disk.diskType === 'thin',
-        provisionedSize: disk.size,
-
-        storageDomainId: disk.storageDomainId,
-      },
-    }))
-  ))
-  // TODO? If cloning, toast notify that Disks have been added.
+  const newDisks = disks.filter(disk => !disk.isFromTemplate)
+  if (newDisks.length > 0) {
+    yield all(newDisks.map(disk => call(createNewDiskForNewVm, newVmId, disk)))
+    // TODO? toast notify that Disks have been added
+  }
 
   // start on create, but after everything else is done...
   if (newVmId !== -1 && basic.startOnCreation) {
@@ -159,11 +148,7 @@ function* composeProvisionSourceIso ({ vm, basic }) {
 }
 
 function* composeProvisionSourceTemplate ({ vm, basic, disks }) {
-  const template = yield select(state => state.templates.get(basic.templateId))
-
-  const vmStorageAllocation = basic.optimizedFor === 'desktop' ? 'thin' : 'clone'
-  const templateStorageAllocation = template.get('type') === 'desktop' ? 'thin' : 'clone'
-  let diskRequiresClone = false
+  const template = yield select(({ templates }) => templates.get(basic.templateId))
 
   const vmUpdates = {
     template: { id: template.get('id') },
@@ -177,54 +162,132 @@ function* composeProvisionSourceTemplate ({ vm, basic, disks }) {
 
   /*
    * If a template defined disk needs to be created in a storage domain different than
-   * the one defined in the template, or if the disk's sparse value is changed, the
-   * changes need to passed along in the VM create call.
+   * the one defined in the template, or if the disk's format/sparse values need to be
+   * changed, pass those changes along in the VM create call.
    *
    * See: http://ovirt.github.io/ovirt-engine-api-model/master/#services/vms/methods/add
    */
-  disks
+  const storageDomains = yield select(state => state.storageDomains) // { [id]: sd }
+  const disksFromTemplate = disks
     .filter(disk => disk.isFromTemplate)
-    .forEach(disk => {
-      const templateDisk = template.get('disks').find(tdisk => tdisk.get('id') === disk.id)
-      if (!templateDisk) {
-        return
-      }
+    .map(disk => ({ disk, baseDisk: template.get('disks').find(tdisk => tdisk.get('id') === disk.id) }))
 
-      const changesToTemplateDisk = {
-        id: disk.id,
-      }
+  const templateOptimizedFor = template.get('type')
+  const vmOptimizedFor = basic.optimizedFor
+  const storageAllocation =
+    vmOptimizedFor === 'desktop' &&
+    disksFromTemplate.every(({ disk, baseDisk }) => disk.storageDomainId === baseDisk.get('storageDomainId'))
+      ? 'thin'
+      : 'clone'
 
-      // make sure disk format (and therefore sparse) matches the template's storageAllocation
-      if (templateStorageAllocation === 'thin') {
-        changesToTemplateDisk.format = 'cow'
-      } else if (templateStorageAllocation === 'clone') {
-        changesToTemplateDisk.format = vmStorageAllocation === 'thin' ? 'cow' : 'raw'
-      }
+  const diskChanges = disksFromTemplate.map(({ disk, baseDisk }) => {
+    const changes = {}
 
-      // did the storage domain change?
-      if (disk.storageDomainId !== templateDisk.get('storageDomainId')) {
-        diskRequiresClone = true
-        changesToTemplateDisk.storage_domains = {
-          storage_domain: [{ id: disk.storageDomainId }],
-        }
+    // did the disk's storage domain change?
+    if (disk.storageDomainId !== baseDisk.get('storageDomainId')) {
+      changes.storage_domains = {
+        storage_domain: [{ id: disk.storageDomainId }],
       }
+    }
 
-      if (Object.keys(changesToTemplateDisk).length > 1) {
-        if (vmUpdates.disk_attachments) {
-          // add another disk to clone
-          vmUpdates.disk_attachments.disk_attachment.push({ disk: changesToTemplateDisk })
-        } else {
-          // initial setup a disk to clone
-          vmUpdates.disk_attachments = {
-            disk_attachment: [{
-              disk: changesToTemplateDisk,
-            }],
-          }
-        }
-      }
-    })
+    // figure out the disk's format and sparse values
+    const targetSD = storageDomains.get(disk.storageDomainId)
+    Object.assign(
+      changes,
+      determineTemplateDiskFormatAndSparse(templateOptimizedFor, vmOptimizedFor, baseDisk, disk, storageAllocation, targetSD)
+    )
 
-  return [vmUpdates, vmStorageAllocation === 'clone' || diskRequiresClone]
+    return Object.keys(changes).length === 0
+      ? false
+      : { id: disk.id, ...changes }
+  })
+
+  /*
+   * If we change ANY disk on the template, we need to send in ALL disks.
+   */
+  if (diskChanges.some(Boolean)) {
+    vmUpdates.disk_attachments = {
+      disk_attachment: diskChanges.map(
+        (changed, index) => ({
+          disk: changed || { id: disksFromTemplate[index].disk.id },
+        })
+      ),
+    }
+  }
+
+  return [vmUpdates, storageAllocation === 'clone']
+}
+
+/**
+ * Select the disk's __format__ and __sparse__ based on where the disk is coming from,
+ * what changes the user has made to the VM from the template, and what the disk's
+ * target storage domain looks like.
+ *
+ * Webadmin behavior:
+ *   [Template OptimizedFor -> VM OptimizedFor -> SD changes? ~~ Storage allocation ... disk format/sparse outcome]
+ *   (* = default)
+ *
+ *   Server  -> Server*  -> No SD changes* ~~ Clone ... format stays the same, sparse stays the same
+ *   Server  -> Server*  -> SD changes ~~ Clone     ... format stays the same, sparse changes as necessary based on format + SD
+ *   Server  -> Desktop  -> No SD changes* ~~ Thin  ... format: cow, sparse: true
+ *   Server  -> Desktop  -> SD changes ~~ Clone     ... format: cow, sparse: true (Thin settings retained)
+ *   Desktop -> Desktop* -> No SD changes* ~~ Thin  ... format: cow, sparse: true
+ *   Desktop -> Desktop* -> SD changes ~~ Clone     ... format: cow, sparse: true (Thin settings retained)
+ *   Desktop -> Server   -> No SD changes* ~~ Clone ... format: cow, sparse: true (Thin settings retained)
+ *   Desktop -> Server   -> SD changes ~~ Clone     ... format: cow, sparse: true (Thin settings retained)
+ */
+function determineTemplateDiskFormatAndSparse (templateOptimizedFor, vmOptimizedFor, baseDisk, userDisk, storageAllocation, targetSD) {
+  const attributes = {}
+
+  if (storageAllocation === 'thin') {
+    attributes.format = 'cow'
+    attributes.sparse = targetSD.getIn(['defaultDiskFormatToSparse', 'cow'])
+  }
+
+  if (templateOptimizedFor === 'desktop' || vmOptimizedFor === 'desktop') {
+    attributes.format = 'cow'
+    attributes.sparse = targetSD.getIn(['defaultDiskFormatToSparse', 'cow'])
+  }
+
+  if (templateOptimizedFor === 'server' && vmOptimizedFor === 'server') {
+    const format = baseDisk.get('format')
+    const sparse =
+      userDisk.storageDomainId === baseDisk.get('storageDomainId')
+        ? baseDisk.get('sparse')
+        : targetSD.getIn(['defaultDiskFormatToSparse', format])
+
+    attributes.format = format
+    attributes.sparse = sparse
+  }
+
+  return (baseDisk.get('format') === attributes.format && baseDisk.get('sparse') === attributes.sparse)
+    ? {}
+    : attributes
+}
+
+/**
+ * Create a new disk for a newly created vm.
+ */
+function* createNewDiskForNewVm (newVmId, disk) {
+  const storageDomainDiskAttributes = yield select(({ storageDomains }) =>
+    storageDomains.getIn([disk.storageDomainId, 'diskAttributesForDiskType', disk.diskType]).toJS()
+  )
+
+  yield createDiskForVm(A.createDiskForVm({
+    vmId: newVmId,
+    disk: {
+      active: true,
+      bootable: disk.bootable,
+      iface: 'virtio_scsi',
+
+      name: disk.name,
+      type: 'image', // we only know how to create 'image' type disks
+      provisionedSize: disk.size,
+
+      ...storageDomainDiskAttributes,
+      storageDomainId: disk.storageDomainId,
+    },
+  }))
 }
 
 /*

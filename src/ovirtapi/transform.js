@@ -555,26 +555,20 @@ const DiskAttachment = {
 
       id: disk.id,
       name: disk.alias,
-      type: disk.storage_type, // [ image | lun | cinder ]
-
-      format: disk.format, // [ cow | raw ] only for types [ images | cinder ]
       status: disk.status, // [ illegal | locked | ok ] only for types [ images | cinder ]
+
+      type: disk.storage_type, // [ image | lun | cinder ]
+      format: disk.format, // [ cow | raw ] only for types [ images | cinder ]
       sparse: convertBool(disk.sparse),
 
       actualSize: convertInt(disk.actual_size),
       provisionedSize: convertInt(disk.provisioned_size),
       lunSize:
-        disk.lun_storage &&
-        disk.lun_storage.logical_units &&
-        disk.lun_storage.logical_units.logical_unit &&
-        disk.lun_storage.logical_units.logical_unit[0] &&
+        disk.lun_storage?.logical_units?.logical_unit?.[0] &&
         convertInt(disk.lun_storage.logical_units.logical_unit[0].size),
 
       storageDomainId: // only for types [ image | cinder ]
-        disk.storage_domains &&
-        disk.storage_domains.storage_domain &&
-        disk.storage_domains.storage_domain[0] &&
-        disk.storage_domains.storage_domain[0].id,
+        disk.storage_domains?.storage_domain?.[0].id,
     })
 
     return {
@@ -605,8 +599,8 @@ const DiskAttachment = {
         id: disk.id,
         alias: disk.name,
 
-        storage_type: 'image',
-        format: disk.format || (disk.sparse && disk.sparse ? 'cow' : 'raw'),
+        storage_type: disk.type,
+        format: disk.format,
         sparse: toApiBoolean(disk.sparse),
         provisioned_size: disk.provisionedSize,
 
@@ -661,10 +655,79 @@ const StorageDomain = {
   toInternal ({ storageDomain }: { storageDomain: ApiStorageDomainType }): StorageDomainType {
     const permissions = Permissions.toInternal({ permissions: storageDomain?.permissions?.permission })
 
+    // frontend/webadmin/modules/uicommonweb/src/main/java/org/ovirt/engine/ui/uicommonweb/dataprovider/AsyncDataProvider.java#getDiskVolumeFormat
+    const diskAttributesForDiskType: {
+      ['thin' | 'pre']: { sparse: boolean, format?: 'raw' | 'cow' }
+    } = {
+      thin: { sparse: true },
+      pre: { sparse: false },
+    }
+
+    // frontend/webadmin/modules/uicommonweb/src/main/java/org/ovirt/engine/ui/uicommonweb/dataprovider/AsyncDataProvider.java#getVolumeType
+    const defaultDiskFormatToSparse: {
+      ['raw' | 'cow']: boolean
+    } = {
+      cow: true,
+      raw: true,
+    }
+
+    const storageType = storageDomain?.storage?.type ?? 'unknown'
+    let storageSubType
+    switch (storageType) {
+      case 'nfs':
+      case 'localfs':
+      case 'posixfs':
+      case 'glusterfs':
+      case 'glance':
+        storageSubType = 'file'
+        diskAttributesForDiskType.thin.format = 'raw'
+        diskAttributesForDiskType.pre.format = 'raw'
+        defaultDiskFormatToSparse.cow = true
+        defaultDiskFormatToSparse.raw = true
+        break
+
+      case 'fcp':
+      case 'iscsi':
+        storageSubType = 'block'
+        diskAttributesForDiskType.thin.format = 'cow'
+        diskAttributesForDiskType.pre.format = 'raw'
+        defaultDiskFormatToSparse.cow = true
+        defaultDiskFormatToSparse.raw = false
+        break
+
+      case 'cinder':
+      case 'managed_block_storage':
+        storageSubType = 'openstack'
+        diskAttributesForDiskType.thin.format = undefined
+        diskAttributesForDiskType.pre.format = 'raw'
+        defaultDiskFormatToSparse.cow = true
+        defaultDiskFormatToSparse.raw = false
+        break
+
+      case 'unmanaged':
+        storageSubType = 'kubernetes'
+        diskAttributesForDiskType.thin.format = undefined
+        diskAttributesForDiskType.pre.format = undefined
+        defaultDiskFormatToSparse.cow = true
+        defaultDiskFormatToSparse.raw = false
+        break
+
+      default:
+        storageSubType = 'none'
+        diskAttributesForDiskType.thin.format = undefined
+        diskAttributesForDiskType.pre.format = undefined
+        defaultDiskFormatToSparse.cow = true
+        defaultDiskFormatToSparse.raw = false
+    }
+
     return {
       id: storageDomain.id,
       name: storageDomain.name,
       type: storageDomain.type,
+      storageType,
+      storageSubType,
+      diskAttributesForDiskType,
+      defaultDiskFormatToSparse,
 
       availableSpace: convertInt(storageDomain.available),
       usedSpace: convertInt(storageDomain.used),
@@ -963,7 +1026,7 @@ const VmSessions = {
 //
 //
 const Permissions = {
-  toInternal ({ permissions = [] }: { permissions: Array<ApiPermissionType> }): Array<PermissionType> {
+  toInternal ({ permissions = [] }: { permissions?: Array<ApiPermissionType> }): Array<PermissionType> {
     return permissions.map(permission => ({
       name: permission.role.name,
       userId: permission.user && permission.user.id,

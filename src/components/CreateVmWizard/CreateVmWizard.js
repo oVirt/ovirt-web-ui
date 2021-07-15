@@ -403,25 +403,22 @@ class CreateVmWizard extends React.Component {
                    *   - server or high performance -> Clone -> raw / as defined in the template
                    */
                   const diskType = // constrain to values from createDiskTypeList()
-                    template.get('type') === 'desktop'
+                    template.get('type') === 'desktop' ||
+                    this.state.steps.basic.optimizedFor === 'desktop'
                       ? 'thin'
-                      : this.state.steps.basic.optimizedFor === 'desktop'
-                        ? 'thin'
-                        : disk.get('sparse') ? 'thin' : 'pre'
+                      : disk.get('sparse') ? 'thin' : 'pre'
 
                   return {
                     id: disk.get('attachmentId'),
-                    name: disk.get('name'),
-
                     diskId: disk.get('id'),
-                    storageDomainId: disk.get('storageDomainId'),
-                    canUserUseStorageDomain,
 
+                    name: disk.get('name'),
                     bootable: disk.get('bootable'),
-                    iface: disk.get('iface'),
-                    type: disk.get('type'), // [ image | lun | cinder ]
                     diskType,
                     size: disk.get('provisionedSize'), // bytes
+                    storageDomainId: disk.get('storageDomainId'),
+
+                    canUserUseStorageDomain,
                     isFromTemplate: true,
                   }
                 })
