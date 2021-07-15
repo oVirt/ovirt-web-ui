@@ -235,7 +235,7 @@ function* createVm (action) {
   const correlationId = action.meta && action.meta.correlationId
 
   // Create the VM
-  const createVmResult = yield callExternalAction('createVm', Api.addNewVm, action)
+  const createVmResult = yield callExternalAction(Api.addNewVm, action)
   const successCreate = !!createVmResult.id
 
   // Log the success of the action via correlation id
@@ -285,7 +285,7 @@ function* waitForVmToBeUnlocked (vmId, isCloning = false) {
     for (const delayMs of delayInMsSteps(isCloning ? 20 : 200)) {
       yield delay(delayMs)
 
-      const check = yield callExternalAction('getVm', Api.getVm, { payload: { vmId } }, true)
+      const check = yield callExternalAction(Api.getVm, { payload: { vmId } }, true)
       if (check && check.id === vmId && check.status !== 'image_locked') {
         break
       }
@@ -309,7 +309,7 @@ function* editVm (action) {
 
   const editVmResult = onlyNeedChangeCd
     ? {}
-    : yield callExternalAction('editVm', Api.editVm, action)
+    : yield callExternalAction(Api.editVm, action)
 
   let commitError = editVmResult.error
   if (!commitError && vm.cdrom) {
@@ -342,7 +342,7 @@ function* editVm (action) {
 }
 
 function* changeVmCdRom (action) {
-  const result = yield callExternalAction('changeCdRom', Api.changeCdRom, action)
+  const result = yield callExternalAction(Api.changeCdRom, action)
 
   if (action.meta && action.meta.correlationId) {
     yield put(A.setVmActionResult({
@@ -357,7 +357,7 @@ function* changeVmCdRom (action) {
 
 function* shutdownVm (action) {
   yield startProgress({ vmId: action.payload.vmId, name: 'shutdown' })
-  const result = yield callExternalAction('shutdown', Api.shutdown, action)
+  const result = yield callExternalAction(Api.shutdown, action)
   const vmName = yield select(state => state.vms.getIn(['vms', action.payload.vmId, 'name']))
   if (result.status === 'complete') {
     yield put(A.addUserMessage({ messageDescriptor: { id: 'actionFeedbackShutdownVm', params: { VmName: vmName } }, type: 'success' }))
@@ -367,7 +367,7 @@ function* shutdownVm (action) {
 
 function* restartVm (action) {
   yield startProgress({ vmId: action.payload.vmId, name: 'restart' })
-  const result = yield callExternalAction('restart', Api.restart, action)
+  const result = yield callExternalAction(Api.restart, action)
   const vmName = yield select(state => state.vms.getIn(['vms', action.payload.vmId, 'name']))
   if (result.status === 'complete') {
     yield put(A.addUserMessage({ messageDescriptor: { id: 'actionFeedbackRestartVm', params: { VmName: vmName } }, type: 'success' }))
@@ -377,7 +377,7 @@ function* restartVm (action) {
 
 function* suspendVm (action) {
   yield startProgress({ vmId: action.payload.vmId, name: 'suspend' })
-  const result = yield callExternalAction('suspend', Api.suspend, action)
+  const result = yield callExternalAction(Api.suspend, action)
   const vmName = yield select(state => state.vms.getIn(['vms', action.payload.vmId, 'name']))
   if (result.status === 'pending') {
     yield put(A.addUserMessage({ messageDescriptor: { id: 'actionFeedbackSuspendVm', params: { VmName: vmName } }, type: 'success' }))
@@ -387,7 +387,7 @@ function* suspendVm (action) {
 
 function* startVm (action) {
   yield startProgress({ vmId: action.payload.vmId, name: 'start' })
-  const result = yield callExternalAction('start', Api.start, action)
+  const result = yield callExternalAction(Api.start, action)
   const vmName = yield select(state => state.vms.getIn(['vms', action.payload.vmId, 'name']))
   // TODO: check status at refresh --> conditional refresh wait_for_launch
   if (result.status === 'complete') {
@@ -398,7 +398,7 @@ function* startVm (action) {
 
 function* startPool (action) {
   yield startProgress({ poolId: action.payload.poolId, name: 'start' })
-  const result = yield callExternalAction('startPool', Api.startPool, action)
+  const result = yield callExternalAction(Api.startPool, action)
   const poolName = yield select(state => state.vms.getIn(['pools', action.payload.poolId, 'name']))
   if (result.status === 'complete') {
     yield put(A.addUserMessage({ messageDescriptor: { id: 'actionFeedbackAllocateVm', params: { poolname: poolName } }, type: 'success' }))
@@ -408,7 +408,7 @@ function* startPool (action) {
 
 function* removeVm (action) {
   yield startProgress({ vmId: action.payload.vmId, name: 'remove' })
-  const result = yield callExternalAction('remove', Api.remove, action)
+  const result = yield callExternalAction(Api.remove, action)
 
   if (result.status === 'complete') {
     // TODO: Remove the VM from the store so we don't see it on the list page!

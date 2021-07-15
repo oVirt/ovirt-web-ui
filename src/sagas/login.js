@@ -70,7 +70,7 @@ function* login (action) {
   yield put(loginSuccessful({ token, userId, username, domain }))
 
   // Verify the API (exists and is the correct version)
-  const oVirtMeta = yield callExternalAction('getOvirtApiMeta', Api.getOvirtApiMeta, action)
+  const oVirtMeta = yield callExternalAction(Api.getOvirtApiMeta, action)
   const versionOk = yield checkOvirtApiVersion(oVirtMeta)
   if (!versionOk) {
     console.error('oVirt API version check failed')
@@ -171,7 +171,7 @@ function composeIncompatibleOVirtApiVersionMessage (oVirtMeta) {
 }
 
 function* checkUserFilterPermissions () {
-  const data = yield callExternalAction('checkFilter', Api.checkFilter, { action: 'CHECK_FILTER' }, true)
+  const data = yield callExternalAction(Api.checkFilter, { action: 'CHECK_FILTER' }, true)
 
   const isAdmin = data.error === undefined // expect an error on `checkFilter` if the user isn't admin
   yield put(setAdministrator(isAdmin))
@@ -234,7 +234,7 @@ function* initialLoad () {
 function* autoConnectCheck () {
   const vmId = OptionsManager.loadAutoConnectOption()
   if (vmId && vmId.length > 0) {
-    const vm = yield callExternalAction('getVm', Api.getVm, getSingleVm({ vmId }), true)
+    const vm = yield callExternalAction(Api.getVm, getSingleVm({ vmId }), true)
     if (vm && vm.error && vm.error.status === 404) {
       OptionsManager.clearAutoConnect()
     } else if (vm && vm.id && vm.status !== 'down') {

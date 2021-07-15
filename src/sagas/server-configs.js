@@ -25,7 +25,7 @@ export function* fetchServerConfiguredValues () {
     maxNumOfVmCpusPerArch: call(fetchEngineOption, 'MaxNumOfVmCpus', DefaultEngineOptions.MaxNumOfVmCpusPerArch),
 
     usbAutoShare: call(fetchGeneralEngineOption, 'SpiceUsbAutoShare', DefaultEngineOptions.SpiceUsbAutoShare),
-    usbFilter: callExternalAction('getUSBFilter', Api.getUSBFilter, DefaultEngineOptions.getUSBFilter),
+    usbFilter: callExternalAction(Api.getUSBFilter, DefaultEngineOptions.getUSBFilter),
 
     userSessionTimeout: call(fetchGeneralEngineOption, 'UserSessionTimeOutInterval', DefaultEngineOptions.UserSessionTimeOutInterval),
 
@@ -74,7 +74,6 @@ export function* fetchServerConfiguredValues () {
 
 export function* fetchEngineOption (name, defaultValue) {
   const option = yield callExternalAction(
-    'getEngineOption',
     Api.getEngineOption,
     getEngineOption(name),
     true

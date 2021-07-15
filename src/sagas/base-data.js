@@ -26,7 +26,7 @@ import { EVERYONE_GROUP_ID } from './index'
 import { fetchUnknownIcons } from './osIcons'
 
 export function* fetchAllClusters () {
-  const clusters = yield callExternalAction('getAllClusters', Api.getAllClusters)
+  const clusters = yield callExternalAction(Api.getAllClusters)
 
   if (clusters && clusters.cluster) {
     const clustersInternal = clusters.cluster.map(
@@ -49,7 +49,7 @@ export function* fetchAllClusters () {
 }
 
 export function* fetchAllHosts () {
-  const hosts = yield callExternalAction('getAllHosts', Api.getAllHosts)
+  const hosts = yield callExternalAction(Api.getAllHosts)
 
   if (hosts && hosts.host) {
     const hostsInternal = hosts.host.map(
@@ -61,7 +61,7 @@ export function* fetchAllHosts () {
 }
 
 export function* fetchAllOS () {
-  const operatingSystems = yield callExternalAction('getAllOperatingSystems', Api.getAllOperatingSystems)
+  const operatingSystems = yield callExternalAction(Api.getAllOperatingSystems)
 
   if (operatingSystems && operatingSystems.operating_system) {
     const operatingSystemsInternal = operatingSystems.operating_system.map(
@@ -74,7 +74,7 @@ export function* fetchAllOS () {
 }
 
 export function* fetchAllTemplates () {
-  const templates = yield callExternalAction('getAllTemplates', Api.getAllTemplates)
+  const templates = yield callExternalAction(Api.getAllTemplates)
 
   if (templates && templates.template) {
     const templatesInternal = templates.template.map(
@@ -101,7 +101,7 @@ export function* fetchAllTemplates () {
 }
 
 export function* fetchAllVnicProfiles () {
-  const vnicProfiles = yield callExternalAction('getAllVnicProfiles', Api.getAllVnicProfiles)
+  const vnicProfiles = yield callExternalAction(Api.getAllVnicProfiles)
 
   if (vnicProfiles && vnicProfiles.vnic_profile) {
     const vnicProfilesInternal = vnicProfiles.vnic_profile.map(
@@ -120,7 +120,7 @@ export function* fetchAllVnicProfiles () {
 
 export function* fetchCurrentUser () {
   const userId = yield select((state) => state.config.getIn(['user', 'id']))
-  const user = yield callExternalAction('user', Api.user, {
+  const user = yield callExternalAction(Api.user, {
     payload: {
       userId,
     },
@@ -147,12 +147,12 @@ export function* fetchUserGroups () {
     ovirtGroups,
   } = yield all({
     domainGroups: call(function* (userId) {
-      const { group: groups = [] } = yield callExternalAction('userDomainGroups', Api.userDomainGroups, { payload: { userId } })
+      const { group: groups = [] } = yield callExternalAction(Api.userDomainGroups, { payload: { userId } })
       return groups.map(group => group.id)
     }, userId),
 
     ovirtGroups: call(function* () {
-      const { group: groups = [] } = yield callExternalAction('groups', Api.groups)
+      const { group: groups = [] } = yield callExternalAction(Api.groups)
       return groups.map(group => ({
         domainEntryId: group.domain_entry_id,
         ovirtId: group.id,

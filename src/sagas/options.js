@@ -41,7 +41,7 @@ function toResult ({ error = false, change = undefined, sameAsCurrent = false, .
 }
 
 function* fetchSSHKey (action: Object): any {
-  const result = yield call(callExternalAction, 'getSSHKey', Api.getSSHKey, action)
+  const result = yield call(callExternalAction, Api.getSSHKey, action)
   if (result.error) {
     return
   }
@@ -68,7 +68,6 @@ function* saveSSHKey ([sshPropName, submittedKey]: any): any | ResultType {
 
   const result = yield call(
     callExternalAction,
-    'saveSSHKey',
     Api.saveSSHKey,
     A.saveSSHKey({ sshId, key: submittedKey, userId }),
     true)
@@ -77,7 +76,7 @@ function* saveSSHKey ([sshPropName, submittedKey]: any): any | ResultType {
 }
 
 function* fetchUserOptions (action: Object): any {
-  const result = yield call(callExternalAction, 'fetchUserOptions', Api.fetchUserOptions, action)
+  const result = yield call(callExternalAction, Api.fetchUserOptions, action)
   if (!result || result.error) {
     return
   }
@@ -127,7 +126,6 @@ function* saveRemoteOption ([name, value]: any): any | ResultType {
 
   const result = (yield call(
     callExternalAction,
-    'persistUserOption',
     Api.persistUserOption,
     A.persistUserOption({ name, content: value, optionId, userId }),
     true
@@ -253,7 +251,6 @@ function* deleteUserOption (optionName: string): any {
   }
   const { error } = yield call(
     callExternalAction,
-    'deleteUserOption',
     Api.deleteUserOption,
     A.deleteUserOption({ optionId, userId }),
     true
