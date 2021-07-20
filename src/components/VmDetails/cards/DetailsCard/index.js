@@ -733,6 +733,10 @@ class DetailsCard extends React.Component {
       })
       : { sockets: [1], cores: [1], threads: [1] }
 
+    // Check if the number of the total VCPUs can be factored for the VCPU topology properly,
+    // i.e. check for the bad Total Virtual CPUs number
+    const vCpuCountIsFactored = vCpuCount === 1 || (vCpuCount > 1 && !!Object.values(vCpuTopologyDividers).find(arr => arr.length > 1))
+
     // Boot devices
     const allowedBootDevices = ['hd', 'network', 'cdrom']
     const FIRST_DEVICE = 0
@@ -773,7 +777,7 @@ class DetailsCard extends React.Component {
           editTooltip={msg.edit()}
           editTooltipPlacement={'bottom'}
           idPrefix={idPrefix}
-          disableSaveButton={!vCpuCountIsValid}
+          disableSaveButton={!vCpuCountIsValid || !vCpuCountIsFactored}
           onStartEdit={this.handleCardOnStartEdit}
           onCancel={this.handleCardOnCancel}
           onSave={this.handleCardOnSave}
@@ -892,7 +896,7 @@ class DetailsCard extends React.Component {
                               </ul>
                             </div>
                           )}
-                          validationState={vCpuCountIsValid ? null : 'error'}
+                          validationState={vCpuCountIsValid && vCpuCountIsFactored ? null : 'error'}
                         >
                           { !isFullEdit && vCpuCount }
                           { isFullEdit && (
@@ -909,6 +913,11 @@ class DetailsCard extends React.Component {
                               { !vCpuCountIsValid && (
                                 <div className={style['cpu-input-error']}>
                                   {msg.maxAllowedCpus({ max: maxNumOfVmCpus })}
+                                </div>
+                              )}
+                              { !vCpuCountIsFactored && (
+                                <div className={style['cpu-input-error']}>
+                                  {msg.cpusBadTopology()}
                                 </div>
                               )}
                             </div>
@@ -1014,7 +1023,7 @@ class DetailsCard extends React.Component {
                                   id: i.toString(),
                                   value: i.toString(),
                                 }))}
-                                disabled={!vCpuCountIsValid}
+                                disabled={!vCpuCountIsValid || !vCpuCountIsFactored}
                                 selected={vCpuTopology.get('sockets').toString()}
                                 onChange={(selectedId) => { this.handleChange('topology', selectedId, { vcpu: SOCKETS_VCPU }) }}
                               />
@@ -1026,7 +1035,7 @@ class DetailsCard extends React.Component {
                                   id: i.toString(),
                                   value: i.toString(),
                                 }))}
-                                disabled={!vCpuCountIsValid}
+                                disabled={!vCpuCountIsValid || !vCpuCountIsFactored}
                                 selected={vCpuTopology.get('cores').toString()}
                                 onChange={(selectedId) => { this.handleChange('topology', selectedId, { vcpu: CORES_VCPU }) }}
                               />
@@ -1046,7 +1055,7 @@ class DetailsCard extends React.Component {
                                   id: i.toString(),
                                   value: i.toString(),
                                 }))}
-                                disabled={!vCpuCountIsValid}
+                                disabled={!vCpuCountIsValid || !vCpuCountIsFactored}
                                 selected={vCpuTopology.get('threads').toString()}
                                 onChange={(selectedId) => { this.handleChange('topology', selectedId, { vcpu: THREADS_VCPU }) }}
                               />

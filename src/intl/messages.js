@@ -121,6 +121,7 @@ export const messages: { [messageId: string]: MessageType } = {
   },
   coresPerSockets: 'Cores per Virtual Socket',
   cpus: 'Total Virtual CPUs',
+  cpusBadTopology: 'The number cannot be factored for the VCPU topology properly, pick another one.',
   create: 'Create',
   createANewVm: 'Create A New Virtual Machine',
   created: 'Created',
