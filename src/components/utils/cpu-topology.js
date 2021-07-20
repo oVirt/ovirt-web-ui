@@ -52,3 +52,17 @@ export function getTopologyPossibleValues ({
 
   return { sockets, cores, threads }
 }
+
+export function validateTopologyValues ({
+  vCpuCount,
+  numOfSockets,
+  numOfCores,
+  numOfThreads,
+}: {
+  vCpuCount: number,
+  numOfSockets: number,
+  numOfCores: number,
+  numOfThreads: number
+}): boolean {
+  return numOfSockets * numOfCores * numOfThreads === vCpuCount
+}
