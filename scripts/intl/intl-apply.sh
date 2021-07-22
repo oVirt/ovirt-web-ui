@@ -12,4 +12,4 @@ rip po2json \
     -m 'extra/to-zanata/time-durations.json' \
     -o 'extra/from-zanata/translated-time-durations.json'
 
-babel-node scripts/intl/normalize-messages.js --presets env,flow
+babel-node --presets @babel/env,@babel/flow scripts/intl/normalize-messages.js
