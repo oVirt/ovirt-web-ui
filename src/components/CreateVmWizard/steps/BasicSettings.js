@@ -189,7 +189,12 @@ class BasicSettings extends React.Component {
     const okProvisionTemplate = dataSet.provisionSource === 'template' &&
         [null, dataSet.clusterId].includes(templates.getIn([dataSet.templateId, 'clusterId']))
 
-    const okCpu = isNumberInRange(dataSet.cpus, 0, maxNumOfVmCpus) && this.validateCpuValue()
+    const okCpu = isNumberInRange(dataSet.cpus, 0, maxNumOfVmCpus) && this.validateCpuValue(dataSet.cpus) && validateTopologyValues({
+      vCpuCount: dataSet.cpus,
+      numOfSockets: dataSet.topology.sockets,
+      numOfCores: dataSet.topology.cores,
+      numOfThreads: dataSet.topology.threads,
+    })
 
     const okOperatingSystem = dataSet.operatingSystemId && operatingSystems.find(os => os.get('id') === dataSet.operatingSystemId) !== undefined
     const okMemory = isNumberInRange(dataSet.memory, 0, maxMemorySizeInMiB)
@@ -366,16 +371,15 @@ class BasicSettings extends React.Component {
 
   // Check if the number of the total VCPUs can be factored for the VCPU topology properly,
   // i.e. check for the bad Total Virtual CPUs number
-  validateCpuValue () {
-    const totalVcpus = this.props.data.cpus
+  validateCpuValue (value) {
     const { maxNumOfSockets, maxNumOfCores, maxNumOfThreads } = this.grabCpuOptions()
     const vCpuTopologyDividers = getTopologyPossibleValues({
-      value: totalVcpus,
+      value,
       maxNumOfSockets,
       maxNumOfCores,
       maxNumOfThreads,
     })
-    return totalVcpus === 1 || (totalVcpus > 1 && !!Object.values(vCpuTopologyDividers).find(arr => arr.length > 1))
+    return value === 1 || (value > 1 && !!Object.values(vCpuTopologyDividers).find(arr => arr.length > 1))
   }
 
   render () {
@@ -470,7 +474,7 @@ class BasicSettings extends React.Component {
     const vCpuCount = data.cpus
     const { sockets, cores, threads } = data.topology
 
-    const vCpuCountIsFactored = this.validateCpuValue()
+    const vCpuCountIsFactored = this.validateCpuValue(vCpuCount)
 
     // check if the product of the number of sockets, cores, threads is consistent with the number of the total VCPus,
     // i.e. check for the values of the VCPU Topology
