@@ -17,8 +17,6 @@ import consoles from './consoles'
 import pendingTasks from './pendingTasks'
 import roles from './roles'
 
-import NewDiskDialog from '../components/NewDiskDialog/reducers'
-
 export default combineReducers({
   config,
   vms,
@@ -36,6 +34,4 @@ export default combineReducers({
   consoles,
   pendingTasks,
   roles,
-
-  NewDiskDialog,
 })

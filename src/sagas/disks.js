@@ -13,16 +13,9 @@ import {
 import {
   addDiskRemovalPendingTask,
   removeDiskRemovalPendingTask,
-  extractErrorText,
   updateVmDisk,
   setVmDisks,
 } from '_/actions'
-
-import {
-  setNewDiskDialogProgressIndicator,
-  setNewDiskDialogErrorText,
-  setNewDiskDialogDone,
-} from '_/components/NewDiskDialog/actions'
 
 import { canUserEditDisk } from '_/utils'
 
@@ -51,7 +44,6 @@ function* fetchVmDisks ({ vmId }) {
 }
 
 export function* createDiskForVm (action) {
-  yield put(setNewDiskDialogProgressIndicator(true))
   const vmId = action.payload.vmId
 
   let originalBootableDisk
@@ -64,14 +56,10 @@ export function* createDiskForVm (action) {
     if (originalBootableDisk) {
       yield updateDiskAttachmentBootable(vmId, originalBootableDisk, true)
     }
-    const errorText = extractErrorText(result.error)
-    yield put(setNewDiskDialogErrorText(errorText))
   } else {
     yield fetchVmDisks({ vmId })
     yield waitForDiskToBeUnlocked(vmId, result.id)
-    yield put(setNewDiskDialogDone())
   }
-  yield put(setNewDiskDialogProgressIndicator(false))
 }
 
 function* removeDisk (action) {
