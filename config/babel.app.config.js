@@ -76,6 +76,8 @@ module.exports = function (api, opts = {}) {
       //   },
       // ],
 
+      isEnvDevelopment && './babel-plugin/fancy-console',
+
     ].filter(Boolean),
 
     // define overrides to configs for a specific test/include/exclude case

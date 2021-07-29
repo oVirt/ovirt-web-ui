@@ -25,6 +25,7 @@ EXTRA_DIST = \
 	ovirt-web-ui.spec.in \
 	README.md \
 	LICENSE \
+	babel-plugin \
 	branding \
 	src \
 	config \
@@ -38,6 +39,8 @@ EXTRA_DIST = \
 
 DISTCLEANFILES = $(PACKAGE)-$(VERSION).tar.gz \
 	aclocal.m4 \
+	config.log \
+	config.status \
 	configure \
 	install-sh \
 	missing \
