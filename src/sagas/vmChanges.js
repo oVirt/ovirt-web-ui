@@ -470,7 +470,7 @@ function* removeVm (action) {
 
   const result = yield callExternalAction(Api.remove, action)
   if (result.status === 'complete') {
-    // TODO: Remove the VM from the store so we don't see it on the list page!
+    yield put(A.updateVms({ removeVmIds: [vmId] }))
     yield put(push('/'))
   }
 

@@ -20,18 +20,11 @@ import sagasVmChanges from './vmChanges'
 import sagasVmSnapshots from '_/components/VmDetails/cards/SnapshotsCard/sagas'
 
 import {
-  updatePagingData,
   updateVms,
-  removeVms,
-
   setVmSnapshots,
 
   setUserMessages,
   dismissUserMessage,
-
-  removePools,
-  updatePools,
-  updateVmsPoolsCount,
 
   setVmNics,
   removeActiveRequest,
@@ -164,41 +157,37 @@ export function* fetchByPage () {
       : { internalPools: null },
   })
 
-  // TODO: move to reducer, keep state changes in 1 action...
   // Put the new page of data to the store
-  if (vms) {
-    yield put(updateVms({ vms, copySubResources: true }))
-  }
-  if (pools) {
-    yield put(updatePools({ pools }))
-  }
-  yield put(updateVmsPoolsCount())
+  yield put(updateVms({
+    keepSubResources: true,
+    vms,
+    pools,
 
-  //
-  // Since the REST API doesn't give a record count in paginated responses, we have
-  // to guess if there is more to fetch.  Assume there is more to fetch if the page
-  // of ids fetched/accessed is full.
-  //
-  yield put(updatePagingData({
-    ...vmsExpectMorePages
-      ? {
-        vmsPage: vmsPage + 1,
-        vmsExpectMorePages: vms ? vms.length >= count : false,
-      }
-      : {
-        vmsExpectMorePages: vmsCount >= (vmsPage * count),
-      },
+    //
+    // Since the REST API doesn't give a record count in paginated responses, we have
+    // to guess if there is more to fetch.  Assume there is more to fetch if the page
+    // of VMs or Pools fetched/accessed is full.
+    //
+    pagingData: {
+      ...vmsExpectMorePages
+        ? {
+          vmsPage: vmsPage + 1,
+          vmsExpectMorePages: vms ? vms.length >= count : false,
+        }
+        : {
+          vmsExpectMorePages: vmsCount >= (vmsPage * count),
+        },
 
-    ...poolsExpectMorePages
-      ? {
-        poolsPage: poolsPage + 1,
-        poolsExpectMorePages: pools ? pools.length >= count : false,
-      }
-      : {
-        poolsExpectMorePages: poolsCount >= (poolsPage * count),
-      },
+      ...poolsExpectMorePages
+        ? {
+          poolsPage: poolsPage + 1,
+          poolsExpectMorePages: pools ? pools.length >= count : false,
+        }
+        : {
+          poolsExpectMorePages: poolsCount >= (poolsPage * count),
+        },
+    },
   }))
-  // TODO: ...move to reducer, keep state changes in 1 action
 
   if (vms) {
     yield fetchUnknownIcons({ vms })
@@ -231,8 +220,7 @@ function* fetchAndPutVms (action) {
   const { internalVms } = yield fetchVms(action)
 
   if (internalVms) {
-    yield put(updateVms({ vms: internalVms, copySubResources: action.payload.shallowFetch }))
-    yield put(updateVmsPoolsCount()) // TODO: move to reducer, keep state changes in 1 action
+    yield put(updateVms({ vms: internalVms, keepSubResources: action.payload.shallowFetch }))
     yield fetchUnknownIcons({ vms: internalVms })
   }
 }
@@ -268,14 +256,12 @@ export function* fetchAndPutSingleVm (action) {
 
   if (error) {
     if (error === 404) {
-      yield put(removeVms({ vmIds: [action.payload.vmId] }))
+      yield put(updateVms({ removeVmIds: [action.payload.vmId] }))
     }
   } else {
-    yield put(updateVms({ vms: [internalVm], copySubResources: action.payload.shallowFetch }))
+    yield put(updateVms({ vms: [internalVm], keepSubResources: action.payload.shallowFetch }))
     yield fetchUnknownIcons({ vms: [internalVm] })
   }
-
-  yield put(updateVmsPoolsCount()) // TODO: move to reducer, keep state changes in 1 action
 }
 
 export function* fetchPools (action) {
@@ -292,8 +278,7 @@ function* fetchAndPutPools (action) {
   const { internalPools } = yield fetchPools(action)
 
   if (internalPools) {
-    yield put(updatePools({ pools: internalPools }))
-    yield put(updateVmsPoolsCount()) // TODO: move to reducer, keep state changes in 1 action
+    yield put(updateVms({ pools: internalPools }))
   }
 }
 
@@ -311,13 +296,11 @@ function* fetchAndPutSinglePool (action) {
 
   if (error) {
     if (error === 404) {
-      yield put(removePools({ poolIds: [action.payload.poolId] }))
+      yield put(updateVms({ removePoolIds: [action.payload.poolId] }))
     }
   } else {
-    yield put(updatePools({ pools: [internalPool] }))
+    yield put(updateVms({ pools: [internalPool] }))
   }
-
-  yield put(updateVmsPoolsCount()) // TODO: move to reducer, keep state changes in 1 action
 }
 
 /*

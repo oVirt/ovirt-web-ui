@@ -24,7 +24,6 @@ import {
   CANCEL_REFRESH_TIMER,
   CANCEL_RESUME_NOTIFICATIONS_TIMER,
   UPDATE_LAST_REFRESH,
-  UPDATE_PAGING_DATA,
 } from '_/constants'
 
 export * from './error'
@@ -161,18 +160,6 @@ export function showTokenExpiredMessage () {
 
 export function getByPage () {
   return { type: GET_BY_PAGE }
-}
-
-export function updatePagingData ({ vmsPage, vmsExpectMorePages, poolsPage, poolsExpectMorePages }) {
-  return {
-    type: UPDATE_PAGING_DATA,
-    payload: {
-      vmsPage,
-      vmsExpectMorePages,
-      poolsPage,
-      poolsExpectMorePages,
-    },
-  }
 }
 
 export function setUSBFilter ({ usbFilter }) {

@@ -184,29 +184,25 @@ function* refreshListPage () {
     }),
   ])
 
-  // TODO: move these (6!) puts to the reducers, keep state changes in 1 action
-  // Push the refreshed VMs and Pools to the store
-  yield put(Actions.updateVms({ vms: vmsResults.refreshedVms, copySubResources: true }))
-  yield put(Actions.updatePools({ pools: poolsResults.refreshedPools }))
+  yield put(Actions.updateVms({
+    keepSubResources: true,
+    vms: vmsResults.refreshedVms,
+    removeVmIds: vmsResults.missedVmIds,
 
-  // Remove any VMs and Pools that couldn't be refreshed
-  yield put(Actions.removeVms({ vmIds: vmsResults.missedVmIds }))
-  yield put(Actions.removePools({ poolIds: poolsResults.missedPoolIds }))
+    pools: poolsResults.refreshedPools,
+    removePoolIds: poolsResults.missedPoolIds,
 
-  // Update counts
-  yield put(Actions.updateVmsPoolsCount())
-
-  //
-  // Since it is possible that VMs or Pools have been added since the last refresh,
-  // and another page of data could be available, the *ExpectMorePages values need
-  // to be updated.  Similar to `fetchByPage()`, assume there is more to fetch if the
-  // size of VMs/Pools is full.
-  //
-  yield put(Actions.updatePagingData({
-    vmsExpectMorePages: vmsResults.refreshedVms.length >= vmsPage * AppConfiguration.pageLimit,
-    poolsExpectMorePages: poolsResults.refreshedPools.length >= poolsPage * AppConfiguration.pageLimit,
+    //
+    // Since it is possible that VMs or Pools have been added since the last refresh,
+    // and another page of data could be available, the *ExpectMorePages values need
+    // to be updated.  Similar to `fetchByPage()`, assume there is more to fetch if the
+    // size of VMs/Pools is full.
+    //
+    pagingData: {
+      vmsExpectMorePages: vmsResults.refreshedVms.length >= vmsPage * AppConfiguration.pageLimit,
+      poolsExpectMorePages: poolsResults.refreshedPools.length >= poolsPage * AppConfiguration.pageLimit,
+    },
   }))
-
   yield fetchUnknownIcons({ vms: vmsResults.refreshedVms })
 }
 
