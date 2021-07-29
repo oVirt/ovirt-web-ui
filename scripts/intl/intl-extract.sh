@@ -2,7 +2,7 @@
 [[ -e package.json ]] || cd ../..
 PATH=node_modules/.bin:$PATH
 
-babel-node scripts/intl/extract-messages.js --presets env,flow
+babel-node --presets @babel/env,@babel/flow scripts/intl/extract-messages.js
 
 rip json2pot \
     'extra/to-zanata/messages.json' \
