@@ -1077,13 +1077,15 @@ class DetailsCard extends React.Component {
                                 validationState={topologyValuesAreValid ? null : 'error'}
                               />
                             </FieldRow>
-                            <FieldRow>
-                              { !topologyValuesAreValid && vCpuCountIsFactored && (
-                                <div className={style['cpu-input-error']}>
-                                  {msg.cpusBadTopologySelection()}
-                                </div>
-                              )}
-                            </FieldRow>
+                            { !topologyValuesAreValid && vCpuCountIsFactored && (
+                              <Row className={style['field-row-divide']}>
+                                <Col cols={12} className={style['col-label']}>
+                                  <div className={style['cpu-input-error']}>
+                                    {msg.cpusBadTopologySelection()}
+                                  </div>
+                                </Col>
+                              </Row>
+                            )}
                           </Grid>
                         </Col>
                       </Row>

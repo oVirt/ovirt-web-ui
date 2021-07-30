@@ -588,7 +588,13 @@ class BasicSettings extends React.Component {
             />
           </FieldRow>
 
-          <FieldRow label={msg.cpus()} id={`${idPrefix}-cpus`} required validationState={indicators.cpu || indicators.topology} errorMessage={!vCpuCountIsFactored ? msg.cpusBadTopology() : ''}>
+          <FieldRow
+            label={msg.cpus()}
+            id={`${idPrefix}-cpus`}
+            required
+            validationState={indicators.cpu || indicators.topology}
+            errorMessage={!vCpuCountIsFactored ? msg.cpusBadTopology() : ''}
+          >
             <FormControl
               id={`${idPrefix}-cpus-edit`}
               className={style['cpus-input']}
@@ -734,7 +740,7 @@ class BasicSettings extends React.Component {
                 items={this.mapVCpuTopologyItems(vCpuTopologyDividers.sockets)}
                 selected={data.topology.sockets.toString()}
                 onChange={selectedId => { this.handleChange('topology', selectedId, { vcpu: 'sockets' }) }}
-                disabled={indicators.cpu}
+                disabled={!!indicators.cpu}
                 validationState={indicators.topology}
               />
             </FieldRow>
@@ -748,7 +754,7 @@ class BasicSettings extends React.Component {
                 items={this.mapVCpuTopologyItems(vCpuTopologyDividers.cores)}
                 selected={data.topology.cores.toString()}
                 onChange={selectedId => { this.handleChange('topology', selectedId, { vcpu: 'cores' }) }}
-                disabled={indicators.cpu}
+                disabled={!!indicators.cpu}
                 validationState={indicators.topology}
               />
             </FieldRow>
@@ -765,7 +771,7 @@ class BasicSettings extends React.Component {
                 items={this.mapVCpuTopologyItems(vCpuTopologyDividers.threads)}
                 selected={data.topology.threads.toString()}
                 onChange={selectedId => { this.handleChange('topology', selectedId, { vcpu: 'threads' }) }}
-                disabled={indicators.cpu}
+                disabled={!!indicators.cpu}
                 validationState={indicators.topology}
               />
             </FieldRow>
