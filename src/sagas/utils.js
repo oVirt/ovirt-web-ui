@@ -64,9 +64,9 @@ export function compareVersion (actual, required) {
   return !!semverValid(fullActual) && semverGte(fullActual, fullRequired)
 }
 
-export function* callExternalAction (methodName, method, action = {}, canBeMissing = false) {
+export function* callExternalAction (method, action = {}, canBeMissing = false) {
   try {
-    console.log(`External action: ${JSON.stringify(hidePassword({ action }))}, API method: ${methodName}()`)
+    console.log(`External action: ${JSON.stringify(hidePassword({ action }))}, API method: ${method.name}`)
     const result = yield call(method, action.payload || {})
     return result
   } catch (e) {

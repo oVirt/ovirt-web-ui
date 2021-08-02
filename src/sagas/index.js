@@ -191,7 +191,7 @@ export function* fetchVms ({ payload: { count, page, shallowFetch = true } }) {
   const fetchedVmIds = []
 
   const additional = shallowFetch ? VM_FETCH_ADDITIONAL_SHALLOW : VM_FETCH_ADDITIONAL_DEEP
-  const apiVms = yield callExternalAction('getVms', Api.getVms, { payload: { count, page, additional } })
+  const apiVms = yield callExternalAction(Api.getVms, { payload: { count, page, additional } })
   if (apiVms && apiVms.vm) {
     const internalVms = []
     for (const apiVm of apiVms.vm) {
@@ -219,7 +219,7 @@ export function* fetchSingleVm (action) {
 
   action.payload.additional = shallowFetch ? VM_FETCH_ADDITIONAL_SHALLOW : VM_FETCH_ADDITIONAL_DEEP
 
-  const vm = yield callExternalAction('getVm', Api.getVm, action, true)
+  const vm = yield callExternalAction(Api.getVm, action, true)
   let internalVm = null
   if (vm && vm.id) {
     internalVm = yield transformAndPermitVm(vm)
@@ -250,7 +250,7 @@ export function* fetchSingleVm (action) {
 export function* fetchPools (action) {
   const fetchedPoolIds = []
 
-  const apiPools = yield callExternalAction('getPools', Api.getPools, action)
+  const apiPools = yield callExternalAction(Api.getPools, action)
   if (apiPools && apiPools.vm_pool) {
     const internalPools = apiPools.vm_pool.map(pool => Transforms.Pool.toInternal({ pool }))
     internalPools.forEach(pool => fetchedPoolIds.push(pool.id))
@@ -265,7 +265,7 @@ export function* fetchPools (action) {
 export function* fetchSinglePool (action) {
   const { poolId } = action.payload
 
-  const pool = yield callExternalAction('getPool', Api.getPool, action, true)
+  const pool = yield callExternalAction(Api.getPool, action, true)
   let internalPool = false
   if (pool && pool.id) {
     internalPool = Transforms.Pool.toInternal({ pool })
@@ -286,7 +286,7 @@ export function* fetchSinglePool (action) {
  * next_run/"current=false" API parameter.
  */
 function* fetchVmCdRom ({ vmId, current }) {
-  const cdrom = yield callExternalAction('getCdRom', Api.getCdRom, getVmCdRom({ vmId, current }))
+  const cdrom = yield callExternalAction(Api.getCdRom, getVmCdRom({ vmId, current }))
 
   let cdromInternal = null
   if (cdrom) {
@@ -296,7 +296,7 @@ function* fetchVmCdRom ({ vmId, current }) {
 }
 
 export function* addVmNic (action) {
-  const nic = yield callExternalAction('addNicToVm', Api.addNicToVm, action)
+  const nic = yield callExternalAction(Api.addNicToVm, action)
 
   if (nic && nic.id) {
     const nicsInternal = yield fetchVmNics({ vmId: action.payload.vmId })
@@ -305,14 +305,14 @@ export function* addVmNic (action) {
 }
 
 function* deleteVmNic (action) {
-  yield callExternalAction('deleteNicFromVm', Api.deleteNicFromVm, action)
+  yield callExternalAction(Api.deleteNicFromVm, action)
 
   const nicsInternal = yield fetchVmNics({ vmId: action.payload.vmId })
   yield put(setVmNics({ vmId: action.payload.vmId, nics: nicsInternal }))
 }
 
 function* editVmNic (action) {
-  yield callExternalAction('editNicInVm', Api.editNicInVm, action)
+  yield callExternalAction(Api.editNicInVm, action)
 
   const nicsInternal = yield fetchVmNics({ vmId: action.payload.vmId })
   yield put(setVmNics({ vmId: action.payload.vmId, nics: nicsInternal }))
@@ -356,7 +356,7 @@ function* fetchAllEvents (action) {
     name: `${state.config.getIn(['user', 'name'])}@${state.config.get('domain')}`,
   }))
 
-  const events = yield callExternalAction('events', Api.events, { payload: {} })
+  const events = yield callExternalAction(Api.events, { payload: {} })
 
   if (events.error) {
     return
@@ -377,7 +377,7 @@ function* fetchAllEvents (action) {
 function* dismissEvent (action) {
   const { event } = action.payload
   if (event.source === 'server') {
-    const result = yield callExternalAction('dismissEvent', Api.dismissEvent, { payload: { eventId: event.id } })
+    const result = yield callExternalAction(Api.dismissEvent, { payload: { eventId: event.id } })
 
     if (result.status === 'complete') {
       yield fetchAllEvents(action)
@@ -392,7 +392,7 @@ function* clearEvents (action) {
     id: state.config.getIn(['user', 'id']),
     name: `${state.config.getIn(['user', 'name'])}@${state.config.get('domain')}`,
   }))
-  const events = yield callExternalAction('events', Api.events, { payload: {} })
+  const events = yield callExternalAction(Api.events, { payload: {} })
 
   if (events.error) {
     return
@@ -404,7 +404,7 @@ function* clearEvents (action) {
         event.severity === 'error' &&
         event.user &&
         (event.user.id === user.id || event.user.name === user.name)
-      ).map((event) => callExternalAction('dismissEvent', Api.dismissEvent, { payload: { eventId: event.id } }))
+      ).map((event) => callExternalAction(Api.dismissEvent, { payload: { eventId: event.id } }))
     : []
 
   yield all(sagaEvents)
@@ -413,7 +413,7 @@ function* clearEvents (action) {
 }
 
 export function* fetchVmSessions ({ vmId }) {
-  const sessions = yield callExternalAction('sessions', Api.sessions, { payload: { vmId } })
+  const sessions = yield callExternalAction(Api.sessions, { payload: { vmId } })
 
   if (sessions && sessions.session) {
     return Transforms.VmSessions.toInternal({ sessions })
@@ -440,7 +440,7 @@ function* saveFilters (actions) {
 }
 
 function* fetchVmNics ({ vmId }) {
-  const nics = yield callExternalAction('getVmNic', Api.getVmNic, { type: 'GET_VM_NICS', payload: { vmId } })
+  const nics = yield callExternalAction(Api.getVmNic, { type: 'GET_VM_NICS', payload: { vmId } })
   if (nics && nics.nic) {
     const nicsInternal = nics.nic.map(nic => Transforms.Nic.toInternal({ nic }))
     return nicsInternal
@@ -449,7 +449,7 @@ function* fetchVmNics ({ vmId }) {
 }
 
 export function* fetchVmSnapshots ({ vmId }) {
-  const snapshots = yield callExternalAction('snapshots', Api.snapshots, { type: 'GET_VM_SNAPSHOT', payload: { vmId } })
+  const snapshots = yield callExternalAction(Api.snapshots, { type: 'GET_VM_SNAPSHOT', payload: { vmId } })
   let snapshotsInternal = []
 
   if (snapshots && snapshots.snapshot) {
@@ -500,7 +500,7 @@ function* parallelFetchAndPopulateSnapshotDisksAndNics (vmId, snapshots) {
 }
 
 function* fetchVmSnapshotDisks ({ vmId, snapshotId }) {
-  const disks = yield callExternalAction('snapshotDisks', Api.snapshotDisks, { payload: { vmId, snapshotId } }, true)
+  const disks = yield callExternalAction(Api.snapshotDisks, { payload: { vmId, snapshotId } }, true)
   let disksInternal = []
   if (disks?.disk) {
     disksInternal = disks.disk.map(disk => Transforms.DiskAttachment.toInternal({ disk }))
@@ -509,7 +509,7 @@ function* fetchVmSnapshotDisks ({ vmId, snapshotId }) {
 }
 
 function* fetchVmSnapshotNics ({ vmId, snapshotId }) {
-  const nics = yield callExternalAction('snapshotNics', Api.snapshotNics, { payload: { vmId, snapshotId } }, true)
+  const nics = yield callExternalAction(Api.snapshotNics, { payload: { vmId, snapshotId } }, true)
   let nicsInternal = []
   if (nics?.nic) {
     nicsInternal = nics.nic.map((nic) => Transforms.Nic.toInternal({ nic }))

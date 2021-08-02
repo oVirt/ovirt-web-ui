@@ -36,7 +36,7 @@ export function* downloadVmConsole (action) {
   const { modalId, vmId, consoleId, usbAutoshare, usbFilter, hasGuestAgent, skipSSO, openInPage, isNoVNC } = action.payload
 
   if (hasGuestAgent && !skipSSO) {
-    const result = yield callExternalAction('vmLogon', Api.vmLogon, { payload: { vmId } }, true)
+    const result = yield callExternalAction(Api.vmLogon, { payload: { vmId } }, true)
     if (!result || result.status !== 'complete') {
       const {
         error: {
@@ -56,7 +56,7 @@ export function* downloadVmConsole (action) {
 
   yield put(closeConsoleModal({ modalId }))
 
-  let data = yield callExternalAction('console', Api.console, { type: 'INTERNAL_CONSOLE', payload: { vmId, consoleId } })
+  let data = yield callExternalAction(Api.console, { type: 'INTERNAL_CONSOLE', payload: { vmId, consoleId } })
   if (data.error === undefined) {
     yield put(setActiveConsole({ vmId, consoleId }))
     /**
@@ -73,9 +73,9 @@ export function* downloadVmConsole (action) {
       fileDownload({ data, fileName: 'console.vv', mimeType: 'application/x-virt-viewer' })
       yield put(setConsoleStatus({ vmId, status: DOWNLOAD_CONSOLE }))
     } else {
-      const dataTicket = yield callExternalAction('consoleProxyTicket', Api.consoleProxyTicket,
+      const dataTicket = yield callExternalAction(Api.consoleProxyTicket,
         { type: 'INTRENAL_CONSOLE', payload: { vmId, consoleId } })
-      const ticket = yield callExternalAction('consoleTicket', Api.consoleTicket,
+      const ticket = yield callExternalAction(Api.consoleTicket,
         { type: 'INTRENAL_CONSOLE', payload: { vmId, consoleId } })
       yield put(setConsoleTickets({ vmId, proxyTicket: dataTicket.proxy_ticket.value, ticket: ticket.ticket }))
       yield put(setConsoleStatus({ vmId, status: INIT_CONSOLE }))

@@ -17,12 +17,12 @@ import { ADD_VM_SNAPSHOT, DELETE_VM_SNAPSHOT, RESTORE_VM_SNAPSHOT } from './cons
 
 function* addVmSnapshot (action) {
   yield put(addSnapshotAddPendingTask())
-  const snapshot = yield callExternalAction('addNewSnapshot', Api.addNewSnapshot, action)
+  const snapshot = yield callExternalAction(Api.addNewSnapshot, action)
 
   if (snapshot && snapshot.id) {
     yield fetchVmSnapshots({ vmId: action.payload.vmId })
     for (const delayMilliSec of delayInMsSteps()) {
-      const apiSnapshot = yield callExternalAction('snapshot', Api.snapshot, { payload: { snapshotId: snapshot.id, vmId: action.payload.vmId } }, true)
+      const apiSnapshot = yield callExternalAction(Api.snapshot, { payload: { snapshotId: snapshot.id, vmId: action.payload.vmId } }, true)
       if (apiSnapshot.snapshot_status !== 'locked') {
         break
       }
@@ -36,7 +36,7 @@ function* addVmSnapshot (action) {
 function* deleteVmSnapshot (action) {
   const snapshotId = action.payload.snapshotId
   const vmId = action.payload.vmId
-  const result = yield callExternalAction('deleteVmSnapshot', Api.deleteSnapshot, { payload: { snapshotId, vmId } })
+  const result = yield callExternalAction(Api.deleteSnapshot, { payload: { snapshotId, vmId } })
   if (result.error) {
     return
   }
@@ -44,7 +44,7 @@ function* deleteVmSnapshot (action) {
   let snapshotRemoved = false
   yield fetchVmSnapshots({ vmId })
   for (const delaySec of delayInMsSteps()) {
-    const snapshot = yield callExternalAction('snapshot', Api.snapshot, { payload: { snapshotId, vmId } }, true)
+    const snapshot = yield callExternalAction(Api.snapshot, { payload: { snapshotId, vmId } }, true)
     if (snapshot.error && snapshot.error.status === 404) {
       snapshotRemoved = true
       break
@@ -63,7 +63,7 @@ function* deleteVmSnapshot (action) {
 function* restoreVmSnapshot (action) {
   yield put(addSnapshotRestorePendingTask())
   yield startProgress({ vmId: action.payload.vmId, name: 'restoreSnapshot' })
-  const result = yield callExternalAction('restoreSnapshot', Api.restoreSnapshot, action)
+  const result = yield callExternalAction(Api.restoreSnapshot, action)
   yield stopProgress({ vmId: action.payload.vmId, name: 'restoreSnapshot', result })
   yield put(removeSnapshotRestorePendingTask())
 }
