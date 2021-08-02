@@ -64,11 +64,16 @@ export function coerceToSupportedLocale (locale: ?string): ?string {
     return 'en'
   }
 
-  if (BASE_LOCALE_SET.has(locale)) {
-    return locale
+  let commonLocale = locale.replace('_', '-')
+  const localeArray = commonLocale.split(/[-]/)
+  if (localeArray.length === 2) {
+    commonLocale = localeArray[0] + '-' + localeArray[1].toUpperCase()
+  }
+  if (BASE_LOCALE_SET.has(commonLocale)) {
+    return commonLocale
   }
 
-  const languageOnlyLocale = locale.split(/[-_]/)[0]
+  const languageOnlyLocale = localeArray[0]
   return BASE_LOCALE_SET.has(languageOnlyLocale) ? languageOnlyLocale : null
 }
 
