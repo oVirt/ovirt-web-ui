@@ -316,9 +316,8 @@ class BasicSettings extends React.Component {
         const { maxNumOfVmCpus } = this.grabCpuOptions()
         if (isNumberInRange(value, 0, maxNumOfVmCpus)) {
           changes.cpus = +value
+          changes.topology = this.getTopologySettings(changes.cpus)
         }
-
-        changes.topology = this.getTopologySettings(changes.cpus)
         break
       }
 
