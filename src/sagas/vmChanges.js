@@ -42,6 +42,7 @@ function* composeAndCreateVm ({ payload: { basic, nics, disks }, meta: { correla
     memory_policy: memoryPolicy,
     memory,
     name: basic.name,
+    quota: {},
     os: { type: osType },
     type: basic.optimizedFor,
     time_zone: {
