@@ -206,20 +206,22 @@ export function logout (isManual = false) {
 export function updateVms ({
   keepSubResources = false,
   vms,
+  vmsPage,
   removeVmIds,
   pools,
+  poolsPage,
   removePoolIds,
-  pagingData,
 }) {
   return {
     type: C.UPDATE_VMS,
     payload: {
       keepSubResources,
       vms,
+      vmsPage,
       removeVmIds,
       pools,
+      poolsPage,
       removePoolIds,
-      pagingData,
     },
   }
 }

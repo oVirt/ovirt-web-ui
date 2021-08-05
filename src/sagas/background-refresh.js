@@ -115,16 +115,22 @@ const pagesRefreshers = {
   [C.SETTINGS_PAGE_TYPE]: loadUserOptions,
 }
 
-function* getIdSetByType (type) {
-  const ids = Array.from(yield select(state => state.vms.get(type).keys()))
-  return ids
-}
-
 function* refreshListPage () {
-  const [vmsPage, vmsExpectMorePages, poolsPage, poolsExpectMorePages] = yield select(st => [
-    st.vms.get('vmsPage'), st.vms.get('vmsExpectMorePages'),
-    st.vms.get('poolsPage'), st.vms.get('poolsExpectMorePages'),
-  ])
+  const {
+    vmsPage,
+    vmsExpectMorePages,
+    existingVmIds,
+    poolsPage,
+    poolsExpectMorePages,
+    existingPoolIds,
+  } = yield select(({ vms }) => ({
+    vmsPage: vms.get('vmsPage'),
+    vmsExpectMorePages: !!vms.get('vmsExpectMorePages'),
+    existingVmIds: Array.from(vms.get('vms').keys()),
+    poolsPage: vms.get('poolsPage'),
+    poolsExpectMorePages: !!vms.get('poolsExpectMorePages'),
+    existingPoolIds: Array.from(vms.get('pools').keys()),
+  }))
 
   // list page initial state - fetch the first page
   if (vmsPage === 0 && vmsExpectMorePages && poolsPage === 0 && poolsExpectMorePages) {
@@ -141,8 +147,6 @@ function* refreshListPage () {
 
       // if any existing VMs are not in expectedVms, fetch them individually
       const expectedVmIds = new Set(expectedVms.map(vm => vm.id))
-      const existingVmIds = yield getIdSetByType('vms')
-
       const unexpectedVms = yield all(
         existingVmIds
           .filter(vmId => !expectedVmIds.has(vmId))
@@ -166,8 +170,6 @@ function* refreshListPage () {
 
       // if any existing VMs are not in expectedVms, fetch them individually
       const expectedPoolIds = new Set(expectedPools.map(pool => pool.id))
-      const existingPoolIds = yield getIdSetByType('pools')
-
       const unexpectedPools = yield all(
         existingPoolIds
           .filter(poolId => !expectedPoolIds.has(poolId))
@@ -184,6 +186,7 @@ function* refreshListPage () {
     }),
   ])
 
+  // Put the refreshed VMs and pools to the store
   yield put(Actions.updateVms({
     keepSubResources: true,
     vms: vmsResults.refreshedVms,
@@ -191,17 +194,6 @@ function* refreshListPage () {
 
     pools: poolsResults.refreshedPools,
     removePoolIds: poolsResults.missedPoolIds,
-
-    //
-    // Since it is possible that VMs or Pools have been added since the last refresh,
-    // and another page of data could be available, the *ExpectMorePages values need
-    // to be updated.  Similar to `fetchByPage()`, assume there is more to fetch if the
-    // size of VMs/Pools is full.
-    //
-    pagingData: {
-      vmsExpectMorePages: vmsResults.refreshedVms.length >= vmsPage * AppConfiguration.pageLimit,
-      poolsExpectMorePages: poolsResults.refreshedPools.length >= poolsPage * AppConfiguration.pageLimit,
-    },
   }))
   yield fetchUnknownIcons({ vms: vmsResults.refreshedVms })
 }

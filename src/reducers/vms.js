@@ -1,5 +1,6 @@
 import Immutable from 'immutable'
 
+import AppConfiguration from '_/config'
 import * as C from '_/constants'
 import { actionReducer } from './utils'
 import { SortFields } from '_/utils'
@@ -26,13 +27,16 @@ const vms = actionReducer(initialState, {
     payload: {
       keepSubResources,
       vms,
+      vmsPage,
       removeVmIds,
       pools,
+      poolsPage,
       removePoolIds,
-      pagingData,
     },
   }) {
-    state = updateVms(state, vms, keepSubResources)
+    if (vms && vms.length > 0) {
+      state = updateVms(state, vms, keepSubResources)
+    }
 
     if (removeVmIds && removeVmIds.length > 0) {
       state = removeVms(state, removeVmIds)
@@ -48,8 +52,25 @@ const vms = actionReducer(initialState, {
 
     state = updateVmsCountForPools(state)
 
-    if (pagingData) {
-      state = updatePagingData(state, pagingData)
+    //
+    // Since the REST API doesn't give a record count in paginated responses, we have
+    // to guess if there is more to fetch.  Assume there is more to fetch if the pages
+    // of VMs or Pools fetched/accessed are full.  Only change a page number if it
+    // gets bigger because it is possible to (re)fetch pages that have already been
+    // fetched.
+    //
+    const pageSize = AppConfiguration.pageLimit
+
+    const vmsExpectMorePages = state.get('vms').size >= (state.get('vmsPage') * pageSize)
+    state = state.set('vmsExpectMorePages', vmsExpectMorePages)
+    if (vmsPage && vmsPage > state.get('vmsPage')) {
+      state = state.set('vmsPage', vmsPage)
+    }
+
+    const poolsExpectMorePages = state.get('pools').size >= (state.get('poolsPage') * pageSize)
+    state = state.set('poolsExpectMorePages', poolsExpectMorePages)
+    if (poolsPage && poolsPage > state.get('poolsPage')) {
+      state = state.set('poolsPage', poolsPage)
     }
 
     return state
@@ -264,20 +285,6 @@ function updateVmsCountForPools (state) {
       }
     }
   })
-
-  return state
-}
-
-function updatePagingData (state, { vmsPage, vmsExpectMorePages, poolsPage, poolsExpectMorePages }) {
-  if (vmsPage) {
-    state = state.set('vmsPage', vmsPage)
-  }
-  state = state.set('vmsExpectMorePages', vmsExpectMorePages)
-
-  if (poolsPage) {
-    state = state.set('poolsPage', poolsPage)
-  }
-  state = state.set('poolsExpectMorePages', poolsExpectMorePages)
 
   return state
 }

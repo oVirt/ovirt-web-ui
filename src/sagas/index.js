@@ -131,13 +131,17 @@ export function* transformAndPermitVm (vm) {
  * be) available,
  */
 export function* fetchByPage () {
-  const [
-    vmsCount, vmsPage, vmsExpectMorePages,
-    poolsCount, poolsPage, poolsExpectMorePages,
-  ] = yield select(({ vms }) => [
-    vms.get('vms').size, vms.get('vmsPage'), !!vms.get('vmsExpectMorePages'),
-    vms.get('pools').size, vms.get('poolsPage'), !!vms.get('poolsExpectMorePages'),
-  ])
+  const {
+    vmsPage,
+    vmsExpectMorePages,
+    poolsPage,
+    poolsExpectMorePages,
+  } = yield select(({ vms }) => ({
+    vmsPage: vms.get('vmsPage'),
+    vmsExpectMorePages: !!vms.get('vmsExpectMorePages'),
+    poolsPage: vms.get('poolsPage'),
+    poolsExpectMorePages: !!vms.get('poolsExpectMorePages'),
+  }))
 
   //
   // If more pages are expected, fetch the next page
@@ -164,29 +168,10 @@ export function* fetchByPage () {
     pools,
 
     //
-    // Since the REST API doesn't give a record count in paginated responses, we have
-    // to guess if there is more to fetch.  Assume there is more to fetch if the page
-    // of VMs or Pools fetched/accessed is full.
+    // Bump the VMs / Pools page if a new page was fetched
     //
-    pagingData: {
-      ...vmsExpectMorePages
-        ? {
-          vmsPage: vmsPage + 1,
-          vmsExpectMorePages: vms ? vms.length >= count : false,
-        }
-        : {
-          vmsExpectMorePages: vmsCount >= (vmsPage * count),
-        },
-
-      ...poolsExpectMorePages
-        ? {
-          poolsPage: poolsPage + 1,
-          poolsExpectMorePages: pools ? pools.length >= count : false,
-        }
-        : {
-          poolsExpectMorePages: poolsCount >= (poolsPage * count),
-        },
-    },
+    vmsPage: vmsExpectMorePages ? vmsPage + 1 : undefined,
+    poolsPage: poolsExpectMorePages ? poolsPage + 1 : undefined,
   }))
 
   if (vms) {
