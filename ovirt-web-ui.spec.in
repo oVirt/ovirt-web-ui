@@ -17,7 +17,7 @@ Source0:        %{source_basename}-%{version}.tar.gz
 BuildArch: noarch
 
 # nodejs-modules embeds yarn and requires nodejs
-BuildRequires: ovirt-engine-nodejs-modules >= 2.0.60-1
+BuildRequires: ovirt-engine-nodejs-modules >= 2.1.0-1
 
 %description
 This package provides the VM Portal for %{product}.
