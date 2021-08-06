@@ -19,7 +19,6 @@ import { isNativeConsole } from '_/utils/console'
 
 import downloadIcon from './images/download_icon.png'
 import disconnectIcon from './images/disconnect_icon.png'
-import { toJS } from '_/helpers'
 
 const NOVNC_CONTAINER_ID = 'novnc-console-container'
 
@@ -67,7 +66,7 @@ const VmConsole = ({
       status: consoleStatus,
       reason: disconnectReason,
     } = {},
-  } = toJS(vmConsoleState) || {}
+  } = vmConsoleState
 
   const getNativeConsoleMessages = () => {
     switch (consoleType) {
@@ -173,7 +172,9 @@ const VmConsole = ({
           <InfoPageContainer
             icon={disconnectIcon}
             mainText={msg.disconectedConsole()}
-            secondaryText={disconnectReason === 'CONNECTION_FAILURE' ? <span dangerouslySetInnerHTML={{ __html: msg.connectionFailConsoleInfo() }} /> : msg.disconectedConsoleInfo()}
+            secondaryText={disconnectReason === 'CONNECTION_FAILURE'
+              ? <span dangerouslySetInnerHTML={{ __html: msg.connectionFailConsoleInfo() }} />
+              : msg.disconectedConsoleInfo()}
             secondaryComponent={<Button bsStyle='primary' onClick={openConsole}>{ msg.connect() }</Button>}
           />
         )
@@ -217,7 +218,7 @@ VmConsole.propTypes = {
 
 export default connect(
   ({ consoles, vms, config }, { vmId }) => ({
-    vmConsoleState: consoles.getIn(['vms', vmId]),
+    vmConsoleState: consoles?.vms?.[vmId] ?? {},
     vm: vms.getIn(['vms', vmId]),
     websocketPort: config.getIn(['websocket', 'port']),
     websocketHost: config.getIn(['websocket', 'host']),

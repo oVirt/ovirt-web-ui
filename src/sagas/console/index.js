@@ -1,4 +1,4 @@
-import { put, select, call } from 'redux-saga/effects'
+import { takeEvery, put, select, call } from 'redux-saga/effects'
 
 import Api from '_/ovirtapi'
 import OptionsManager from '_/optionsManager'
@@ -234,3 +234,9 @@ export function* saveConsoleOptions (action) {
   OptionsManager.saveConsoleOptions(action.payload)
   yield getConsoleOptions(Actions.getConsoleOptions({ vmId: action.payload.vmId }))
 }
+
+export default [
+  takeEvery(C.GET_CONSOLE_OPTIONS, getConsoleOptions),
+  takeEvery(C.SAVE_CONSOLE_OPTIONS, saveConsoleOptions),
+  takeEvery(C.OPEN_CONSOLE, openConsole),
+]

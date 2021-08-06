@@ -12,6 +12,7 @@ import { push } from 'connected-react-router'
 import Api, { Transforms } from '_/ovirtapi'
 import { saveToLocalStorage } from '_/storage'
 
+import sagasConsole from './console'
 import sagasOptions from './options'
 import sagasRefresh from './background-refresh'
 import sagasDisks from './disks'
@@ -43,12 +44,6 @@ import {
 import { fetchUnknownIcons } from './osIcons'
 
 import {
-  getConsoleOptions,
-  saveConsoleOptions,
-  openConsole,
-} from './console'
-
-import {
   ADD_VM_NIC,
   CHECK_TOKEN_EXPIRED,
   CLEAR_USER_MSGS,
@@ -58,14 +53,11 @@ import {
   EDIT_VM_NIC,
   GET_ALL_EVENTS,
   GET_BY_PAGE,
-  GET_CONSOLE_OPTIONS,
   GET_POOL,
   GET_POOLS,
   GET_VM,
   GET_VMS,
   NAVIGATE_TO_VM_DETAILS,
-  OPEN_CONSOLE,
-  SAVE_CONSOLE_OPTIONS,
   SAVE_FILTERS,
 } from '_/constants'
 
@@ -512,13 +504,10 @@ export function* rootSaga () {
     takeEvery(DELETE_VM_NIC, deleteVmNic),
     takeEvery(EDIT_VM_NIC, editVmNic),
 
-    takeEvery(GET_CONSOLE_OPTIONS, getConsoleOptions),
-    takeEvery(SAVE_CONSOLE_OPTIONS, saveConsoleOptions),
-    takeEvery(OPEN_CONSOLE, openConsole),
-
     takeEvery(SAVE_FILTERS, saveFilters),
 
     // Sagas from Components
+    ...sagasConsole,
     ...sagasDisks,
     ...sagasOptions,
     ...sagasVmChanges,

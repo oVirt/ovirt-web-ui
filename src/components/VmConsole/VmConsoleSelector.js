@@ -63,7 +63,7 @@ VmConsoleSelector.propTypes = {
 }
 
 export default connect(
-  ({ vms, consoles, config, options }, { vmId, consoleType, isConsolePage }) => ({
+  ({ vms, config, options }, { vmId, consoleType, isConsolePage }) => ({
     vm: vms.getIn(['vms', vmId]),
     config,
     preferredConsole: options.getIn(['remoteOptions', 'preferredConsole', 'content'], config.get('defaultUiConsole')),

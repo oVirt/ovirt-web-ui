@@ -3,7 +3,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withMsg } from '_/intl'
-import { toJS } from '_/helpers'
 import ConfirmationModal from './ConfirmationModal'
 
 import * as Actions from '_/actions/console'
@@ -48,7 +47,7 @@ const ConsoleNotificationsDialog = ({
           show={true}
           onClose={onClose}
           title={getTitle()}
-          body={msg.cantLogonToConsole({ vmName })}
+          body={msg.cantLogonToConsole()}
           confirm={{
             title: msg.yes(),
             onClick: () => openConsole({
@@ -65,7 +64,7 @@ const ConsoleNotificationsDialog = ({
           onClose={onClose}
           show={true}
           title={getTitle()}
-          body={msg.consoleInUseContinue({ vmName })}
+          body={msg.consoleInUseContinue()}
           confirm={{
             title: msg.yes(),
             onClick: () => openConsole({
@@ -92,21 +91,33 @@ ConsoleNotificationsDialog.propTypes = {
 }
 
 export default connect(
-  ({ consoles, vms }) => ({
-    ...toJS(consoles.getIn(['errors', 0], {})),
+  ({
+    consoles: {
+      errors: [{
+        vmId,
+        vmName,
+        consoleType,
+        status,
+      } = {}] = [],
+    },
+  }) => ({
+    vmId,
+    vmName,
+    consoleType,
+    status,
   })
   ,
   (dispatch) => ({
     dismissConsoleError: ({ vmId, consoleType }) => dispatch(Actions.dismissConsoleError({ vmId, consoleType })),
     openConsole: ({
-      skipSSO,
       vmId,
+      skipSSO,
       consoleType,
       logoutOtherUsers,
     }) => dispatch(Actions.openConsole({
-      consoleType,
       vmId,
       skipSSO,
+      consoleType,
       logoutOtherUsers,
     }))
     ,

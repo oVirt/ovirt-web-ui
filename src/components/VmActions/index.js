@@ -91,7 +91,7 @@ export function getConsoleActions ({ vm, msg, onOpenConsole, idPrefix, config, p
   const vncConsole = vm.get('consoles').find(c => c.get('protocol') === VNC)
   const spiceConsole = vm.get('consoles').find(c => c.get('protocol') === SPICE)
   const hasRdp = isWindows(vm.getIn(['os', 'type']))
-  let consoles = []
+  const consoles = []
 
   if (vncConsole) {
     const vncModes = [{
@@ -115,7 +115,7 @@ export function getConsoleActions ({ vm, msg, onOpenConsole, idPrefix, config, p
     if (config.get('defaultVncMode') === NO_VNC) {
       vncModes.reverse()
     }
-    consoles = [...consoles, ...vncModes]
+    consoles.push(...vncModes)
   }
 
   if (spiceConsole) {
@@ -243,7 +243,7 @@ class VmActions extends React.Component {
       },
       {
         priority: 1,
-        actionDisabled: isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole']),
+        actionDisabled: isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole']) || !consoles.length,
         shortTitle: msg.console(),
         className: 'btn btn-default',
         bsStyle: 'default',

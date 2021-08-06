@@ -1,6 +1,6 @@
 // @flow
 
-import * as Immutable from 'immutable'
+import produce from 'immer'
 import {
   SET_CONSOLE_TICKETS,
   SET_CONSOLE_STATUS,
@@ -22,16 +22,24 @@ const initialState: {
   },
 }
 
-const consoles = actionReducer(Immutable.fromJS(initialState), {
-  [SET_CONSOLE_TICKETS] (state: any, { payload: { vmId, proxyTicket, ticket } }: any): any {
-    return state
-      .setIn(['vms', vmId, 'ticket'], ticket)
-      .setIn(['vms', vmId, 'proxyTicket'], proxyTicket)
-  },
-  [SET_CONSOLE_STATUS] (state: any, { payload: { vmId, status, reason, consoleType } }: any): any {
-    return state.setIn(['vms', vmId, consoleType], Immutable.fromJS({ status, reason }))
-  },
-  [ADD_CONSOLE_ERROR] (state: any, {
+const consoles = actionReducer(initialState, {
+  [SET_CONSOLE_TICKETS]: produce((draft: any, { payload: { vmId, proxyTicket, ticket } }: any): any => {
+    draft.vms[vmId] = {
+      ...draft.vms[vmId],
+      ticket,
+      proxyTicket,
+    }
+  }),
+  [SET_CONSOLE_STATUS]: produce((draft: any, { payload: { vmId, status, reason, consoleType } }: any): any => {
+    draft.vms[vmId] = {
+      ...draft.vms[vmId],
+      [consoleType]: {
+        status,
+        reason,
+      },
+    }
+  }),
+  [ADD_CONSOLE_ERROR]: produce((draft: any, {
     payload: {
       vmId,
       vmName,
@@ -39,17 +47,18 @@ const consoles = actionReducer(Immutable.fromJS(initialState), {
       status,
       consoleId,
     },
-  }: any): any {
-    return state.update('errors', errors => errors.push(Immutable.fromJS({ vmId, vmName, consoleType, status, consoleId })))
-  },
-  [DISMISS_CONSOLE_ERROR] (state: any, {
+  }: any): any => {
+    draft.errors.push({ vmId, vmName, consoleType, status, consoleId })
+  }),
+  [DISMISS_CONSOLE_ERROR]: produce((draft: any, {
     payload: {
       vmId,
       consoleType,
     },
-  }: any): any {
-    return state.update('errors', errors => errors.filterNot(error => error.get('vmId') === vmId && error.get('consoleType') === consoleType))
-  },
+  }: any): any => {
+    draft.errors = draft.errors.filter(({ vmId: id, consoleType: type }) => id !== vmId || type !== consoleType)
+  }),
+
 })
 
 export default consoles
