@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`fancy-console-test test [error] 1`] = `
+"const foo = 1;
+const bar = {};
+console.error(\\"%c error %c\\" + (\\" \\" + 'just a message'), \\"font-weight: bold; background-color: #ed403c; color: white;\\", \\"\\");
+console.error(\\"%c error %c\\", \\"font-weight: bold; background-color: #ed403c; color: white;\\", \\"\\", bar);
+console.error(\\"%c error %c\\" + (\\" \\" + 'bar'), \\"font-weight: bold; background-color: #ed403c; color: white;\\", \\"\\", bar);
+console.error(\\"%c error %c\\" + (\\" \\" + \`bar: \${bar}\`), \\"font-weight: bold; background-color: #ed403c; color: white;\\", \\"\\");"
+`;
+
+exports[`fancy-console-test test [group] 1`] = `
+"console.group('groupName');
+console.group('groupName, level 2');
+console.groupEnd();
+console.groupEnd();"
+`;
+
+exports[`fancy-console-test test [info] 1`] = `
+"const foo = 1;
+const bar = {};
+console.info(\\"%c info %c\\" + (\\" \\" + 'just a message'), \\"font-weight: bold; background-color: #01acac; color: white;\\", \\"\\");
+console.info(\\"%c info %c\\", \\"font-weight: bold; background-color: #01acac; color: white;\\", \\"\\", bar);
+console.info(\\"%c info %c\\" + (\\" \\" + 'bar'), \\"font-weight: bold; background-color: #01acac; color: white;\\", \\"\\", bar);
+console.info(\\"%c info %c\\" + (\\" \\" + \`bar: \${bar}\`), \\"font-weight: bold; background-color: #01acac; color: white;\\", \\"\\");"
+`;
+
+exports[`fancy-console-test test [log] 1`] = `
+"const foo = 1;
+const bar = {};
+console.log(\\"%c debug %c\\" + (\\" \\" + \\"just a message\\"), \\"font-weight: bold; background-color: #21409a; color: white;\\", \\"\\");
+console.log(\\"%c debug %c\\", \\"font-weight: bold; background-color: #21409a; color: white;\\", \\"\\", foo);
+console.log(\\"%c debug %c\\" + (\\" \\" + \\"foo\\"), \\"font-weight: bold; background-color: #21409a; color: white;\\", \\"\\", foo);
+console.log(\\"%c debug %c\\" + (\\" \\" + \\"foo\\"), \\"font-weight: bold; background-color: #21409a; color: white;\\", \\"\\", foo, \\"bar\\", bar);
+console.log(\\"%c debug %c\\" + (\\" \\" + \\"%cFANCY%c - \\"), \\"font-weight: bold; background-color: #21409a; color: white;\\", \\"\\", \\"color: red\\", \\"\\", foo);"
+`;
+
+exports[`fancy-console-test test [warn] 1`] = `
+"const foo = 1;
+const bar = {};
+console.warn(\\"%c warn %c\\" + (\\" \\" + 'just a message'), \\"font-weight: bold; background-color: #f8a51b; color: white;\\", \\"\\");
+console.warn(\\"%c warn %c\\", \\"font-weight: bold; background-color: #f8a51b; color: white;\\", \\"\\", bar);
+console.warn(\\"%c warn %c\\" + (\\" \\" + 'bar'), \\"font-weight: bold; background-color: #f8a51b; color: white;\\", \\"\\", bar);
+console.warn(\\"%c warn %c\\" + (\\" \\" + \`bar: \${bar}\`), \\"font-weight: bold; background-color: #f8a51b; color: white;\\", \\"\\");"
+`;
