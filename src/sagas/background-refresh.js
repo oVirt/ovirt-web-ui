@@ -146,7 +146,7 @@ function* refreshListPage () {
       }))
 
       // if any existing VMs are not in expectedVms, fetch them individually
-      const expectedVmIds = new Set(expectedVms.map(vm => vm.id))
+      const expectedVmIds = new Set(expectedVms ? expectedVms.map(vm => vm.id) : [])
       const unexpectedVms = yield all(
         existingVmIds
           .filter(vmId => !expectedVmIds.has(vmId))
@@ -155,7 +155,7 @@ function* refreshListPage () {
 
       return {
         refreshedVms: [
-          ...expectedVms,
+          ...(expectedVms || []),
           ...unexpectedVms.filter(result => !result.error).map(result => result.internalVm),
         ],
         missedVmIds: unexpectedVms.filter(result => result.error).map(result => result.vmId),
@@ -169,7 +169,7 @@ function* refreshListPage () {
       }))
 
       // if any existing VMs are not in expectedVms, fetch them individually
-      const expectedPoolIds = new Set(expectedPools.map(pool => pool.id))
+      const expectedPoolIds = new Set(expectedPools ? expectedPools.map(pool => pool.id) : [])
       const unexpectedPools = yield all(
         existingPoolIds
           .filter(poolId => !expectedPoolIds.has(poolId))
@@ -178,7 +178,7 @@ function* refreshListPage () {
 
       return {
         refreshedPools: [
-          ...expectedPools,
+          ...(expectedPools || []),
           ...unexpectedPools.filter(result => !result.error).map(result => result.internalPool),
         ],
         missedPoolIds: unexpectedPools.filter(result => result.error).map(result => result.poolId),
