@@ -51,7 +51,7 @@
     "opn": "4.0.2",
     "optimize-css-assets-webpack-plugin": "6.0.0",
     "path-exists": "3.0.0",
-    "postcss": "7.0.35",
+    "postcss": "7.0.36",
     "postcss-loader": "4.2.0",
     "postcss-preset-env": "6.7.0",
     "postcss-safe-parser": "5.0.2",
