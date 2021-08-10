@@ -131,9 +131,7 @@ function* getRDPVm ({
   username,
   domain,
 }) {
-  // note that vmName was skipped here (intentionally or not)
-  // which results in address === fqdn
-  const rdpBuilder = new RDPBuilder({ username, domain, fqdn })
+  const rdpBuilder = new RDPBuilder({ username, domain, fqdn, vmName })
   const data = rdpBuilder.buildRDP()
   fileDownload({ data, fileName: 'console.rdp', mimeType: 'application/rdp' })
   yield put(Actions.setConsoleStatus({ vmId, status: C.DOWNLOAD_CONSOLE, consoleType: C.RDP }))
