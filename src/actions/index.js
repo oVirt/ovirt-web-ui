@@ -1,4 +1,3 @@
-import AppConfiguration from '_/config'
 import {
   APP_CONFIGURED,
   CHANGE_PAGE,
@@ -20,17 +19,15 @@ import {
   SET_USER,
   SET_WEBSOCKET,
   SHOW_TOKEN_EXPIRED_MSG,
-  START_SCHEDULER_FIXED_DELAY,
-  START_SCHEDULER_FOR_RESUMING_NOTIFICATIONS,
-  STOP_SCHEDULER_FIXED_DELAY,
-  STOP_SCHEDULER_FOR_RESUMING_NOTIFICATIONS,
+  START_REFRESH_TIMER,
+  START_RESUME_NOTIFICATIONS_TIMER,
+  CANCEL_REFRESH_TIMER,
+  CANCEL_RESUME_NOTIFICATIONS_TIMER,
   UPDATE_LAST_REFRESH,
-  UPDATE_PAGING_DATA,
 } from '_/constants'
 
 export * from './error'
 export * from './vm'
-export * from './visibility'
 export * from './clusters'
 export * from './hosts'
 export * from './operatingSystems'
@@ -55,34 +52,25 @@ export function manualRefresh () {
   return { type: MANUAL_REFRESH }
 }
 
-export function startSchedulerFixedDelay ({
-  delayInSeconds = AppConfiguration.schedulerFixedDelayInSeconds,
-  startDelayInSeconds,
-  targetPage,
-  pageRouterRefresh = false,
-  manualRefresh = false,
-}) {
-  return {
-    type: START_SCHEDULER_FIXED_DELAY,
-    payload: { delayInSeconds, startDelayInSeconds, targetPage, pageRouterRefresh, manualRefresh },
-  }
+export function startRefreshTimer () {
+  return { type: START_REFRESH_TIMER }
 }
 
-export function stopSchedulerFixedDelay () {
-  return { type: STOP_SCHEDULER_FIXED_DELAY }
+export function cancelRefreshTimer () {
+  return { type: CANCEL_REFRESH_TIMER }
 }
 
-export function startSchedulerForResumingNotifications (delayInSeconds) {
+export function startResumeNotificationsTimer (delayInSeconds) {
   return {
-    type: START_SCHEDULER_FOR_RESUMING_NOTIFICATIONS,
+    type: START_RESUME_NOTIFICATIONS_TIMER,
     payload: {
       delayInSeconds,
     },
   }
 }
 
-export function stopSchedulerForResumingNotifications () {
-  return { type: STOP_SCHEDULER_FOR_RESUMING_NOTIFICATIONS }
+export function cancelResumeNotificationsTimer () {
+  return { type: CANCEL_RESUME_NOTIFICATIONS_TIMER }
 }
 
 export function updateLastRefresh () {
@@ -172,18 +160,6 @@ export function showTokenExpiredMessage () {
 
 export function getByPage () {
   return { type: GET_BY_PAGE }
-}
-
-export function updatePagingData ({ vmsPage, vmsExpectMorePages, poolsPage, poolsExpectMorePages }) {
-  return {
-    type: UPDATE_PAGING_DATA,
-    payload: {
-      vmsPage,
-      vmsExpectMorePages,
-      poolsPage,
-      poolsExpectMorePages,
-    },
-  }
 }
 
 export function setUSBFilter ({ usbFilter }) {

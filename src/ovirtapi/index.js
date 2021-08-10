@@ -5,6 +5,7 @@ import type {
   NicType,
   SnapshotType,
   VmType,
+  ActionResponseType,
 } from './types'
 
 import Selectors from '../selectors'
@@ -93,6 +94,12 @@ const OvirtApi = {
     return httpGet({ url })
   },
 
+  getJob ({ jobId }: { jobId: string }): Promise<Object> {
+    assertLogin({ methodName: 'getJob' })
+    const url = `${AppConfiguration.applicationContext}/api/jobs/${jobId}`
+    return httpGet({ url })
+  },
+
   // ---- VM fetching
   getVm ({ vmId, additional }: { vmId: string, additional: Array<string> }): Promise<Object> {
     assertLogin({ methodName: 'getVm' })
@@ -160,7 +167,7 @@ const OvirtApi = {
       input,
     })
   },
-  remove ({ vmId, preserveDisks }: { vmId: string, preserveDisks: boolean }): Promise<Object> {
+  remove ({ vmId, preserveDisks }: { vmId: string, preserveDisks: boolean }): Promise<ActionResponseType> {
     assertLogin({ methodName: 'remove' })
     let url = `${AppConfiguration.applicationContext}/api/vms/${vmId}`
     if (preserveDisks) {
@@ -173,32 +180,29 @@ const OvirtApi = {
       },
     })
   },
-  shutdown ({ vmId, force }: { vmId: string, force: boolean }): Promise<Object> {
+  shutdown ({ vmId, force }: { vmId: string, force: boolean }): Promise<ActionResponseType> {
     assertLogin({ methodName: 'shutdown' })
-    let restMethod = 'shutdown'
-    if (force) {
-      restMethod = 'stop'
-    }
+    const restMethod = force ? 'stop' : 'shutdown'
     return httpPost({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/${restMethod}`,
       input: '{}',
     })
   },
-  start ({ vmId }: VmIdType): Promise<Object> {
+  start ({ vmId }: VmIdType): Promise<ActionResponseType> {
     assertLogin({ methodName: 'start' })
     return httpPost({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/start`,
       input: '{}',
     })
   },
-  suspend ({ vmId }: VmIdType): Promise<Object> {
+  suspend ({ vmId }: VmIdType): Promise<ActionResponseType> {
     assertLogin({ methodName: 'suspend' })
     return httpPost({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/suspend`,
       input: '{}',
     })
   },
-  restart ({ vmId }: VmIdType): Promise<Object> { // 'force' is not exposed by oVirt API
+  restart ({ vmId }: VmIdType): Promise<ActionResponseType> {
     assertLogin({ methodName: 'restart' })
     return httpPost({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/reboot`,
@@ -210,7 +214,6 @@ const OvirtApi = {
   addNewSnapshot ({ vmId, snapshot }: { vmId: string, snapshot: SnapshotType }): Promise<Object> {
     assertLogin({ methodName: 'addNewSnapshot' })
     const input = JSON.stringify(Transforms.Snapshot.toApi({ snapshot }))
-    console.log(`OvirtApi.addNewSnapshot(): ${input}`)
     return httpPost({
       url: `${AppConfiguration.applicationContext}/api/vms/${vmId}/snapshots`,
       input,

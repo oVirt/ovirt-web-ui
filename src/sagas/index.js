@@ -20,22 +20,11 @@ import sagasVmChanges from './vmChanges'
 import sagasVmSnapshots from '_/components/VmDetails/cards/SnapshotsCard/sagas'
 
 import {
-  updatePagingData,
   updateVms,
-  removeVms,
-  vmActionInProgress,
-
-  getSingleVm,
   setVmSnapshots,
 
   setUserMessages,
   dismissUserMessage,
-
-  getSinglePool,
-  removePools,
-  updatePools,
-  updateVmsPoolsCount,
-  poolActionInProgress,
 
   setVmNics,
   removeActiveRequest,
@@ -73,15 +62,15 @@ import {
   GET_ALL_EVENTS,
   GET_BY_PAGE,
   GET_CONSOLE_OPTIONS,
+  GET_POOL,
   GET_POOLS,
   GET_RDP_VM,
+  GET_VM,
   GET_VMS,
   NAVIGATE_TO_VM_DETAILS,
   OPEN_CONSOLE_MODAL,
   SAVE_CONSOLE_OPTIONS,
   SAVE_FILTERS,
-  SELECT_POOL_DETAIL,
-  SELECT_VM_DETAIL,
 } from '_/constants'
 
 import {
@@ -142,66 +131,65 @@ export function* transformAndPermitVm (vm) {
  * be) available,
  */
 export function* fetchByPage () {
-  const [
+  const {
     vmsPage,
     vmsExpectMorePages,
     poolsPage,
     poolsExpectMorePages,
-  ] = yield select(({ vms }) => [
-    vms.get('vmsPage'), !!vms.get('vmsExpectMorePages'),
-    vms.get('poolsPage'), !!vms.get('poolsExpectMorePages'),
-  ])
-
-  function* currentVmsIds ({ payload: { count, page } }) {
-    const start = count * page
-    const end = start + count
-    return Array.from(yield select(state => state.vms.get('vms').keys())).slice(start, end)
-  }
-
-  function* currentPoolsIds ({ payload: { count, page } }) {
-    const start = count * page
-    const end = start + count
-    return Array.from(yield select(state => state.vms.get('pools').keys())).slice(start, end)
-  }
+  } = yield select(({ vms }) => ({
+    vmsPage: vms.get('vmsPage'),
+    vmsExpectMorePages: !!vms.get('vmsExpectMorePages'),
+    poolsPage: vms.get('poolsPage'),
+    poolsExpectMorePages: !!vms.get('poolsExpectMorePages'),
+  }))
 
   //
-  // If more pages are expected, fetch the next page and grab the ids fetched
-  // If no more pages are expected, grab the current page of ids from the redux store
+  // If more pages are expected, fetch the next page
+  // If no more pages are expected, skip the fetch
   //
   const count = AppConfiguration.pageLimit
-  const [vms, pools] = yield all([
-    call(vmsExpectMorePages ? fetchVms : currentVmsIds, { payload: { count, page: vmsPage + 1 } }),
-    call(poolsExpectMorePages ? fetchPools : currentPoolsIds, { payload: { count, page: poolsPage + 1 } }),
-  ])
+  const {
+    vms: { internalVms: vms },
+    pools: { internalPools: pools },
+  } = yield all({
+    vms: vmsExpectMorePages
+      ? call(fetchVms, { payload: { count, page: vmsPage + 1 } })
+      : { internalVms: null },
 
-  //
-  // Since the REST API doesn't give a record count in paginated responses, we have
-  // to guess if there is more to fetch.  Assume there is more to fetch if the page
-  // of ids fetched/accessed is full.
-  //
-  yield put(updatePagingData({
+    pools: poolsExpectMorePages
+      ? call(fetchPools, { payload: { count, page: poolsPage + 1 } })
+      : { internalPools: null },
+  })
+
+  // Put the new page of data to the store
+  yield put(updateVms({
+    keepSubResources: true,
+    vms,
+    pools,
+
+    //
+    // Bump the VMs / Pools page if a new page was fetched
+    //
     vmsPage: vmsExpectMorePages ? vmsPage + 1 : undefined,
-    vmsExpectMorePages: vms.length >= count,
     poolsPage: poolsExpectMorePages ? poolsPage + 1 : undefined,
-    poolsExpectMorePages: pools.length >= count,
   }))
+
+  if (vms) {
+    yield fetchUnknownIcons({ vms })
+  }
 }
 
 export function* fetchVms ({ payload: { count, page, shallowFetch = true } }) {
-  const fetchedVmIds = []
-
   const additional = shallowFetch ? VM_FETCH_ADDITIONAL_SHALLOW : VM_FETCH_ADDITIONAL_DEEP
   const apiVms = yield callExternalAction(Api.getVms, { payload: { count, page, additional } })
-  if (apiVms && apiVms.vm) {
-    const internalVms = []
+
+  let internalVms = null
+  if (apiVms?.vm) {
+    internalVms = []
     for (const apiVm of apiVms.vm) {
       const internalVm = yield transformAndPermitVm(apiVm)
-      fetchedVmIds.push(internalVm.id)
       internalVms.push(internalVm)
     }
-
-    yield put(updateVms({ vms: internalVms, copySubResources: shallowFetch }))
-    yield fetchUnknownIcons({ vms: internalVms })
 
     // NOTE: No need to fetch the current=true cdrom info at this point. The cdrom info
     //       is needed on the VM details page and `fetchSingleVm` is called upon entry
@@ -210,18 +198,27 @@ export function* fetchVms ({ payload: { count, page, shallowFetch = true } }) {
     //       details.
   }
 
-  yield put(updateVmsPoolsCount())
-  return fetchedVmIds
+  return { internalVms }
+}
+
+function* fetchAndPutVms (action) {
+  const { internalVms } = yield fetchVms(action)
+
+  if (internalVms) {
+    yield put(updateVms({ vms: internalVms, keepSubResources: action.payload.shallowFetch }))
+    yield fetchUnknownIcons({ vms: internalVms })
+  }
 }
 
 export function* fetchSingleVm (action) {
   const { vmId, shallowFetch } = action.payload
 
   action.payload.additional = shallowFetch ? VM_FETCH_ADDITIONAL_SHALLOW : VM_FETCH_ADDITIONAL_DEEP
-
   const vm = yield callExternalAction(Api.getVm, action, true)
+  const error = vm.error ? vm.error.status ?? 'fetch-error' : null
+
   let internalVm = null
-  if (vm && vm.id) {
+  if (vm?.id) {
     internalVm = yield transformAndPermitVm(vm)
 
     // If the VM is running, we want to display the current=true cdrom info. Due
@@ -234,50 +231,61 @@ export function* fetchSingleVm (action) {
     if (!shallowFetch) {
       yield parallelFetchAndPopulateSnapshotDisksAndNics(internalVm.id, internalVm.snapshots)
     }
-
-    yield put(updateVms({ vms: [internalVm], copySubResources: shallowFetch }))
-    yield fetchUnknownIcons({ vms: [internalVm] })
-  } else {
-    if (vm && vm.error && vm.error.status === 404) {
-      yield put(removeVms({ vmIds: [vmId] }))
-    }
   }
 
-  yield put(updateVmsPoolsCount())
-  return internalVm
+  return { vmId, internalVm, error }
+}
+
+export function* fetchAndPutSingleVm (action) {
+  const { internalVm, error } = yield fetchSingleVm(action)
+
+  if (error) {
+    if (error === 404) {
+      yield put(updateVms({ removeVmIds: [action.payload.vmId] }))
+    }
+  } else {
+    yield put(updateVms({ vms: [internalVm], keepSubResources: action.payload.shallowFetch }))
+    yield fetchUnknownIcons({ vms: [internalVm] })
+  }
 }
 
 export function* fetchPools (action) {
-  const fetchedPoolIds = []
-
   const apiPools = yield callExternalAction(Api.getPools, action)
-  if (apiPools && apiPools.vm_pool) {
-    const internalPools = apiPools.vm_pool.map(pool => Transforms.Pool.toInternal({ pool }))
-    internalPools.forEach(pool => fetchedPoolIds.push(pool.id))
 
-    yield put(updatePools({ pools: internalPools }))
-    yield put(updateVmsPoolsCount())
+  const internalPools = apiPools?.vm_pool
+    ? apiPools.vm_pool.map(pool => Transforms.Pool.toInternal({ pool }))
+    : null
+
+  return { internalPools }
+}
+
+function* fetchAndPutPools (action) {
+  const { internalPools } = yield fetchPools(action)
+
+  if (internalPools) {
+    yield put(updateVms({ pools: internalPools }))
   }
-
-  return fetchedPoolIds
 }
 
 export function* fetchSinglePool (action) {
-  const { poolId } = action.payload
-
   const pool = yield callExternalAction(Api.getPool, action, true)
-  let internalPool = false
-  if (pool && pool.id) {
-    internalPool = Transforms.Pool.toInternal({ pool })
-    yield put(updatePools({ pools: [internalPool] }))
-  } else {
-    if (pool && pool.error && pool.error.status === 404) {
-      yield put(removePools({ poolIds: [poolId] }))
-    }
-  }
 
-  yield put(updateVmsPoolsCount())
-  return internalPool
+  const internalPool = pool.id ? Transforms.Pool.toInternal({ pool }) : null
+  const error = pool.error ? pool.error.status ?? 'fetch-error' : null
+
+  return { poolId: action.payload.poolId, internalPool, error }
+}
+
+function* fetchAndPutSinglePool (action) {
+  const { internalPool, error } = yield fetchSinglePool(action)
+
+  if (error) {
+    if (error === 404) {
+      yield put(updateVms({ removePoolIds: [action.payload.poolId] }))
+    }
+  } else {
+    yield put(updateVms({ pools: [internalPool] }))
+  }
 }
 
 /*
@@ -285,7 +293,7 @@ export function* fetchSinglePool (action) {
  * info comes from "current=true" while a non-running VM's cdrom info comes from the
  * next_run/"current=false" API parameter.
  */
-function* fetchVmCdRom ({ vmId, current }) {
+function* fetchVmCdRom ({ vmId, current = true }) {
   const cdrom = yield callExternalAction(Api.getCdRom, getVmCdRom({ vmId, current }))
 
   let cdromInternal = null
@@ -293,6 +301,15 @@ function* fetchVmCdRom ({ vmId, current }) {
     cdromInternal = Transforms.CdRom.toInternal({ cdrom })
   }
   return cdromInternal
+}
+
+function* fetchVmNics ({ vmId }) {
+  const nics = yield callExternalAction(Api.getVmNic, { type: 'GET_VM_NICS', payload: { vmId } })
+  if (nics && nics.nic) {
+    const nicsInternal = nics.nic.map(nic => Transforms.Nic.toInternal({ nic }))
+    return nicsInternal
+  }
+  return []
 }
 
 export function* addVmNic (action) {
@@ -316,38 +333,6 @@ function* editVmNic (action) {
 
   const nicsInternal = yield fetchVmNics({ vmId: action.payload.vmId })
   yield put(setVmNics({ vmId: action.payload.vmId, nics: nicsInternal }))
-}
-
-function* getSingleInstance ({ vmId, poolId }) {
-  const fetches = [fetchSingleVm(getSingleVm({ vmId }))]
-  if (poolId) {
-    fetches.push(fetchSinglePool(getSinglePool({ poolId })))
-  }
-  yield all(fetches)
-}
-
-export function* startProgress ({ vmId, poolId, name }) {
-  if (vmId) {
-    yield put(vmActionInProgress({ vmId, name, started: true }))
-  } else {
-    yield put(poolActionInProgress({ poolId, name, started: true }))
-  }
-}
-
-export function* stopProgress ({ vmId, poolId, name, result }) {
-  if (result && result.status === 'complete') {
-    vmId = vmId || result.vm.id
-    // do not call 'end of in progress' if successful,
-    // since UI will be updated by refresh
-    yield delay(5 * 1000)
-    yield getSingleInstance({ vmId, poolId })
-
-    yield delay(30 * 1000)
-    yield getSingleInstance({ vmId, poolId })
-  }
-
-  const actionInProgress = vmId ? vmActionInProgress : poolActionInProgress
-  yield put(actionInProgress(Object.assign(vmId ? { vmId } : { poolId }, { name, started: false })))
 }
 
 function* fetchAllEvents (action) {
@@ -421,31 +406,11 @@ export function* fetchVmSessions ({ vmId }) {
   return []
 }
 
-/**
- * VmDetail is to be rendered.
- */
-export function* selectVmDetail (action) {
-  yield fetchSingleVm(getSingleVm({ vmId: action.payload.vmId })) // async data refresh
-}
-
-function* selectPoolDetail (action) {
-  yield fetchSinglePool(getSinglePool({ poolId: action.payload.poolId }))
-}
-
 function* saveFilters (actions) {
   const { filters } = actions.payload
   const userId = yield select(state => state.config.getIn(['user', 'id']))
   saveToLocalStorage(`vmFilters-${userId}`, JSON.stringify(filters))
   yield put(setVmsFilters({ filters }))
-}
-
-function* fetchVmNics ({ vmId }) {
-  const nics = yield callExternalAction(Api.getVmNic, { type: 'GET_VM_NICS', payload: { vmId } })
-  if (nics && nics.nic) {
-    const nicsInternal = nics.nic.map(nic => Transforms.Nic.toInternal({ nic }))
-    return nicsInternal
-  }
-  return []
 }
 
 export function* fetchVmSnapshots ({ vmId }) {
@@ -531,20 +496,21 @@ export function* rootSaga () {
     ...sagasLogin,
     ...sagasRefresh,
 
-    takeLatest(CHECK_TOKEN_EXPIRED, doCheckTokenExpired),
+    takeEvery(CHECK_TOKEN_EXPIRED, doCheckTokenExpired),
     takeEvery(DELAYED_REMOVE_ACTIVE_REQUEST, delayedRemoveActiveRequest),
 
-    throttle(100, GET_BY_PAGE, fetchByPage),
-    throttle(100, GET_VMS, fetchVms),
-    throttle(100, GET_POOLS, fetchPools),
+    throttle(100, GET_VMS, fetchAndPutVms),
+    throttle(100, GET_POOLS, fetchAndPutPools),
 
     takeLatest(GET_ALL_EVENTS, fetchAllEvents),
     takeEvery(DISMISS_EVENT, dismissEvent),
     takeEvery(CLEAR_USER_MSGS, clearEvents),
 
     takeLatest(NAVIGATE_TO_VM_DETAILS, navigateToVmDetails),
-    takeEvery(SELECT_VM_DETAIL, selectVmDetail),
-    takeEvery(SELECT_POOL_DETAIL, selectPoolDetail),
+    takeEvery(GET_VM, fetchAndPutSingleVm),
+    takeEvery(GET_POOL, fetchAndPutSinglePool),
+
+    throttle(100, GET_BY_PAGE, fetchByPage),
 
     takeEvery(ADD_VM_NIC, addVmNic),
     takeEvery(DELETE_VM_NIC, deleteVmNic),

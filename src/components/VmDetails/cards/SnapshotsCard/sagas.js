@@ -2,7 +2,7 @@ import { takeEvery, put } from 'redux-saga/effects'
 
 import Api, { Transforms } from '_/ovirtapi'
 import { callExternalAction, delay, delayInMsSteps } from '_/sagas/utils'
-import { fetchVmSnapshots, startProgress, stopProgress } from '_/sagas'
+import { fetchVmSnapshots } from '_/sagas'
 import {
   addSnapshotRemovalPendingTask,
   removeSnapshotRemovalPendingTask,
@@ -11,6 +11,8 @@ import {
   addSnapshotAddPendingTask,
   removeSnapshotAddPendingTask,
   updateVmSnapshot,
+  startActionInProgress,
+  stopActionInProgress,
 } from '_/actions'
 
 import { ADD_VM_SNAPSHOT, DELETE_VM_SNAPSHOT, RESTORE_VM_SNAPSHOT } from './constants'
@@ -62,9 +64,11 @@ function* deleteVmSnapshot (action) {
 
 function* restoreVmSnapshot (action) {
   yield put(addSnapshotRestorePendingTask())
-  yield startProgress({ vmId: action.payload.vmId, name: 'restoreSnapshot' })
+  yield put(startActionInProgress({ vmId: action.payload.vmId, name: 'restoreSnapshot' }))
+
   const result = yield callExternalAction(Api.restoreSnapshot, action)
-  yield stopProgress({ vmId: action.payload.vmId, name: 'restoreSnapshot', result })
+
+  yield put(stopActionInProgress({ vmId: action.payload.vmId, name: 'restoreSnapshot', result }))
   yield put(removeSnapshotRestorePendingTask())
 }
 

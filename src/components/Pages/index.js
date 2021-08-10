@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import { selectPoolDetail } from '_/actions'
+import { getSinglePool } from '_/actions'
 import { RouterPropTypeShapes } from '_/propTypeShapes'
 
 import VmsList from '../VmsList'
@@ -79,7 +79,7 @@ const VmDetailsPageConnected = connect(
     vms: state.vms,
   }),
   (dispatch) => ({
-    fetchPool: (poolId) => dispatch(selectPoolDetail({ poolId })),
+    fetchPool: (poolId) => dispatch(getSinglePool({ poolId })),
   })
 )(VmDetailsPage)
 
