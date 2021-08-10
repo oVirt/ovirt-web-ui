@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { Modal, Button, Alert } from 'patternfly-react'
 import { MsgContext } from '_/intl'
 
-const NavigationConfirmationModal = ({ show, onYes, onNo }) => {
+const NavigationConfirmationModal = ({ show, onYes, onNo, additionalNote }) => {
   const { msg } = useContext(MsgContext)
   const idPrefix = 'close-dialog-confim'
 
@@ -14,6 +14,7 @@ const NavigationConfirmationModal = ({ show, onYes, onNo }) => {
       </Modal.Header>
       <Modal.Body>
         <Alert type='warning' id={`${idPrefix}-body-text`}>{msg.unsavedChangesConfirmMessage()}</Alert>
+        {additionalNote}
       </Modal.Body>
       <Modal.Footer>
         <Button id={`${idPrefix}-button-no`} onClick={onNo} bsStyle='default'>{msg.no()}</Button>
@@ -26,6 +27,7 @@ NavigationConfirmationModal.propTypes = {
   show: PropTypes.bool,
   onYes: PropTypes.func.isRequired,
   onNo: PropTypes.func.isRequired,
+  additionalNote: PropTypes.string,
 }
 NavigationConfirmationModal.defaultProps = {
   show: false,

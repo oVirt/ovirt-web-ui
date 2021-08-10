@@ -46,6 +46,7 @@ export const messages: { [messageId: string]: MessageType } = {
     description: 'In sense of "human friendly name"',
   },
   allocatedVms: 'Allocated VMs',
+  allTabs: 'This action is applied to all tabs.',
   apiConnectionFailed: 'oVirt API connection failed',
   apiVersionCheckFailed: 'oVirt API version check failed',
   areYouSureYouWantToDeleteDisk: 'Are you sure you want to delete disk {diskName}?',
