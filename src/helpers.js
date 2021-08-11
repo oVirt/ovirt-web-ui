@@ -267,3 +267,7 @@ export function findOsByName (operatingSystems, name) {
   return operatingSystems.toList().find(os =>
     os.get('name') === name)
 }
+
+export function toJS (obj) {
+  return (obj && obj.toJS && obj.toJS()) || obj
+}

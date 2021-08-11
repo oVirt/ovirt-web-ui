@@ -27,7 +27,7 @@ import {
   UPDATE_LAST_REFRESH,
 } from '_/constants'
 
-import { toUiConsole } from '_/utils'
+import { toUiConsole } from '_/utils/console'
 
 const initialState = Immutable.fromJS({
   lastRefresh: 0,

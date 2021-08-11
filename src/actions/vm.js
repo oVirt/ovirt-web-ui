@@ -309,18 +309,6 @@ export function setVmSnapshots ({ vmId, snapshots }) {
   }
 }
 
-export function getRDP ({ vmName, username, domain, fqdn }) {
-  return {
-    type: C.GET_RDP_VM,
-    payload: {
-      vmName,
-      username,
-      domain,
-      fqdn,
-    },
-  }
-}
-
 export function setChanged ({ value }) {
   return {
     type: C.SET_CHANGED,

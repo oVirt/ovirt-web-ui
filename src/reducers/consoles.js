@@ -1,51 +1,65 @@
-import Immutable from 'immutable'
+// @flow
+
+import produce from 'immer'
 import {
   SET_CONSOLE_TICKETS,
-  SET_CONSOLE_NOVNC_STATUS,
-  SET_NEW_CONSOLE_MODAL,
-  CLOSE_CONSOLE_MODAL,
-  SET_IN_USE_CONSOLE_MODAL_STATE,
-  SET_LOGON_CONSOLE_MODAL_STATE,
-
-  CONSOLE_OPENED,
-  CONSOLE_IN_USE,
-  CONSOLE_LOGON,
+  SET_CONSOLE_STATUS,
+  ADD_CONSOLE_ERROR,
+  DISMISS_CONSOLE_ERROR,
 } from '_/constants'
 
 import { actionReducer } from './utils'
-import { SET_ACTIVE_CONSOLE } from '../constants'
+import type { ConsoleErrorType, VmConsoleType } from '_/ovirtapi/types'
 
-const initialState = Immutable.fromJS({ vms: {}, modals: {} })
+const initialState: {
+  errors: Array<ConsoleErrorType>,
+  vms: {
+    [vmId: string]: VmConsoleType
+  }
+} = {
+  errors: [],
+  vms: {
+  },
+}
 
 const consoles = actionReducer(initialState, {
-  [SET_CONSOLE_TICKETS] (state, { payload: { vmId, proxyTicket, ticket } }) {
-    return state
-      .setIn(['vms', vmId, 'ticket'], ticket)
-      .setIn(['vms', vmId, 'proxyTicket'], proxyTicket)
-  },
-  [SET_ACTIVE_CONSOLE] (state, { payload: { vmId, consoleId } }) {
-    return state.setIn(['vms', vmId, 'id'], consoleId)
-  },
-  [SET_CONSOLE_NOVNC_STATUS] (state, { payload: { vmId, status, reason } }) {
-    return state.setIn(['vms', vmId, 'consoleStatus'], status).setIn(['vms', vmId, 'reason'], reason)
-  },
-  [SET_NEW_CONSOLE_MODAL] (state, { payload: { modalId, vmId, consoleId } }) {
-    const modal = {
-      vmId,
-      consoleId,
-      state: CONSOLE_OPENED,
+  [SET_CONSOLE_TICKETS]: produce((draft: any, { payload: { vmId, proxyTicket, ticket } }: any): any => {
+    draft.vms[vmId] = {
+      ...draft.vms[vmId],
+      ticket,
+      proxyTicket,
     }
-    return state.setIn(['modals', modalId], Immutable.fromJS(modal))
-  },
-  [CLOSE_CONSOLE_MODAL] (state, { payload: { modalId } }) {
-    return state.update('modals', modals => modals.delete(modalId))
-  },
-  [SET_IN_USE_CONSOLE_MODAL_STATE] (state, { payload: { modalId } }) {
-    return state.setIn(['modals', modalId, 'state'], CONSOLE_IN_USE)
-  },
-  [SET_LOGON_CONSOLE_MODAL_STATE] (state, { payload: { modalId } }) {
-    return state.setIn(['modals', modalId, 'state'], CONSOLE_LOGON)
-  },
+  }),
+  [SET_CONSOLE_STATUS]: produce((draft: any, { payload: { vmId, status, reason, consoleType } }: any): any => {
+    draft.vms[vmId] = {
+      ...draft.vms[vmId],
+      [consoleType]: {
+        status,
+        reason,
+      },
+    }
+  }),
+  [ADD_CONSOLE_ERROR]: produce((draft: any, {
+    payload: {
+      vmId,
+      vmName,
+      consoleType,
+      status,
+      consoleId,
+      logoutOtherUsers,
+    },
+  }: any): any => {
+    draft.errors.push({ vmId, vmName, consoleType, status, consoleId, logoutOtherUsers })
+  }),
+  [DISMISS_CONSOLE_ERROR]: produce((draft: any, {
+    payload: {
+      vmId,
+      consoleType,
+    },
+  }: any): any => {
+    draft.errors = draft.errors.filter(({ vmId: id, consoleType: type }) => id !== vmId || type !== consoleType)
+  }),
+
 })
 
 export default consoles

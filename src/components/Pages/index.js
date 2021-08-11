@@ -90,7 +90,7 @@ class VmConsolePage extends React.Component {
   render () {
     const { vms, match } = this.props
     if (match.params.id && vms.getIn(['vms', match.params.id])) {
-      return <VmConsole consoleId={match.params.console} vmId={match.params.id} />
+      return <VmConsole consoleType={match.params.consoleType} vmId={match.params.id} />
     }
     return null
   }

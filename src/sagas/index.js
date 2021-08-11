@@ -12,6 +12,7 @@ import { push } from 'connected-react-router'
 import Api, { Transforms } from '_/ovirtapi'
 import { saveToLocalStorage } from '_/storage'
 
+import sagasConsole from './console'
 import sagasOptions from './options'
 import sagasRefresh from './background-refresh'
 import sagasDisks from './disks'
@@ -43,33 +44,20 @@ import {
 import { fetchUnknownIcons } from './osIcons'
 
 import {
-  downloadVmConsole,
-  getConsoleOptions,
-  saveConsoleOptions,
-  getRDPVm,
-  openConsoleModal,
-} from './console'
-
-import {
   ADD_VM_NIC,
   CHECK_TOKEN_EXPIRED,
   CLEAR_USER_MSGS,
   DELAYED_REMOVE_ACTIVE_REQUEST,
   DELETE_VM_NIC,
   DISMISS_EVENT,
-  DOWNLOAD_CONSOLE_VM,
   EDIT_VM_NIC,
   GET_ALL_EVENTS,
   GET_BY_PAGE,
-  GET_CONSOLE_OPTIONS,
   GET_POOL,
   GET_POOLS,
-  GET_RDP_VM,
   GET_VM,
   GET_VMS,
   NAVIGATE_TO_VM_DETAILS,
-  OPEN_CONSOLE_MODAL,
-  SAVE_CONSOLE_OPTIONS,
   SAVE_FILTERS,
 } from '_/constants'
 
@@ -516,15 +504,10 @@ export function* rootSaga () {
     takeEvery(DELETE_VM_NIC, deleteVmNic),
     takeEvery(EDIT_VM_NIC, editVmNic),
 
-    takeEvery(GET_CONSOLE_OPTIONS, getConsoleOptions),
-    takeEvery(SAVE_CONSOLE_OPTIONS, saveConsoleOptions),
-    takeEvery(OPEN_CONSOLE_MODAL, openConsoleModal),
-    takeEvery(DOWNLOAD_CONSOLE_VM, downloadVmConsole),
-    takeEvery(GET_RDP_VM, getRDPVm),
-
     takeEvery(SAVE_FILTERS, saveFilters),
 
     // Sagas from Components
+    ...sagasConsole,
     ...sagasDisks,
     ...sagasOptions,
     ...sagasVmChanges,
