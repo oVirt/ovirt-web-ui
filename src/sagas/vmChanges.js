@@ -486,8 +486,8 @@ export default [
   takeLatest(C.REMOVE_VM, removeVm),
 
   // VM Status Changes
-  takeEvery(C.ACTION_IN_PROGRESS_START, startProgress),
-  takeEvery(C.ACTION_IN_PROGRESS_STOP, stopProgress),
+  takeEvery(C.ACTION_IN_PROGRESS_START, function* (action) { yield startProgress(action.payload) }),
+  takeEvery(C.ACTION_IN_PROGRESS_STOP, function* (action) { yield stopProgress(action.payload) }),
   takeEvery(C.SHUTDOWN_VM, shutdownVm),
   takeEvery(C.RESTART_VM, restartVm),
   takeEvery(C.START_VM, startVm),
