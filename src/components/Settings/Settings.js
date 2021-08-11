@@ -114,7 +114,7 @@ const Settings = ({
     <>
       <NavigationPrompt when={(currentLocation, nextLocation) => !!pendingChanges.length}>
         {({ isActive, onConfirm, onCancel }) => (
-          <NavigationConfirmationModal show={isActive} onYes={onConfirm} onNo={onCancel} />
+          <NavigationConfirmationModal show={isActive} onYes={onConfirm} onNo={onCancel} additionalNote={msg.allTabs()}/>
         )}
       </NavigationPrompt>
       <div className={showFullSuccess || partialSave.show || showCompleteFailure ? style['alert-container'] : null}>
