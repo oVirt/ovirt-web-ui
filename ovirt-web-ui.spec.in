@@ -17,7 +17,7 @@ Source0:        https://github.com/oVirt/ovirt-web-ui/archive/%{source_basename}
 BuildArch: noarch
 
 # nodejs-modules embeds yarn and requires nodejs
-BuildRequires: ovirt-engine-nodejs-modules >= 2.0.57-1
+BuildRequires: ovirt-engine-nodejs-modules >= 2.0.58-1
 
 %description
 This package provides the VM Portal for %{product}.
@@ -48,6 +48,27 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Wed Aug 11 2021 Sharon Gratch <sgratch@redhat.com> - 1.7.1-1
+ - refactor initial VM/Pool page loading and background refresh
+ - refactor login managed base-data, user, group, and role fetches
+ - refactor and improve disk permit/permissions calculations
+ - refactor and remove unused sagas utils
+ - refactor and optimize snapshot disks and nics fetching
+ - refactor callExternalAction() to log the API method with Function.name
+ - refactor console connection code and also support opening RDP console for headless Windows VMs
+ - remove all of the OvirtApi toInternal functions
+ - remove non used NewDiskDialog actions/reducers
+ - upgrade eslint and all related dependencies to current versions and update configurations for react/jsx indent and eslint errors
+ - add packages dependencies of flow-bin and postcss
+ - add babel plugin fancy-console
+ - avoid displaying manual refresh or setting actions in the header/navbar until the app is ready
+ - fix a bug that when editing an exising disk via VM details, it always resulted with an inactive disk
+ - fix fetchVmSnapshots() transform error
+ - make the package.json scripts intl:* working again
+ - fix a bug for enable loading Portuguese or Chinese languages when reading locales from the url
+ - fix a bug for always setting a VM with the correct number of virtual CPUs
+ - enhance user settings cancel dialog by informing the user that it is applied to all tabs/sections
+
 * Thu Jun 24 2021 Sharon Gratch <sgratch@redhat.com> - 1.7.0-1
  - user/account settings - mark default options on Account Settings dialog
  - user/account settings - add option to reset global user settings to default/installation settings
