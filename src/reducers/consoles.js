@@ -46,9 +46,10 @@ const consoles = actionReducer(initialState, {
       consoleType,
       status,
       consoleId,
+      logoutOtherUsers,
     },
   }: any): any => {
-    draft.errors.push({ vmId, vmName, consoleType, status, consoleId })
+    draft.errors.push({ vmId, vmName, consoleType, status, consoleId, logoutOtherUsers })
   }),
   [DISMISS_CONSOLE_ERROR]: produce((draft: any, {
     payload: {

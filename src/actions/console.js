@@ -48,6 +48,7 @@ export function addConsoleError ({
   consoleType,
   status,
   consoleId,
+  logoutOtherUsers,
 }) {
   return {
     type: C.ADD_CONSOLE_ERROR,
@@ -57,6 +58,7 @@ export function addConsoleError ({
       consoleType,
       status,
       consoleId,
+      logoutOtherUsers,
     },
   }
 }

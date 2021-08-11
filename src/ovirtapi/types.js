@@ -228,7 +228,8 @@ export type ConsoleErrorType = {|
   vmName: string,
   consoleType: UiConsoleType,
   status: typeof C.CONSOLE_LOGON | typeof C.CONSOLE_IN_USE,
-  consoleId: string
+  consoleId: string,
+  logoutOtherUsers: boolean
 |}
 
 export type UiConsoleStateType = {

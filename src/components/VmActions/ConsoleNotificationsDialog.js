@@ -26,6 +26,7 @@ const ConsoleNotificationsDialog = ({
   msg,
   dismissConsoleError,
   openConsole,
+  logoutOtherUsers,
 }) => {
   const onClose = () => dismissConsoleError({ consoleType, vmId })
   const getTitle = () => {
@@ -52,6 +53,7 @@ const ConsoleNotificationsDialog = ({
             title: msg.yes(),
             onClick: () => openConsole({
               skipSSO: true,
+              logoutOtherUsers,
               vmId,
               consoleType,
             }),
@@ -85,6 +87,7 @@ ConsoleNotificationsDialog.propTypes = {
   vmName: PropTypes.string,
   consoleType: PropTypes.string,
   status: PropTypes.string,
+  logoutOtherUsers: PropTypes.bool,
   msg: PropTypes.object.isRequired,
   dismissConsoleError: PropTypes.func.isRequired,
   openConsole: PropTypes.func.isRequired,
@@ -98,6 +101,7 @@ export default connect(
         vmName,
         consoleType,
         status,
+        logoutOtherUsers,
       } = {}] = [],
     },
   }) => ({
@@ -105,6 +109,7 @@ export default connect(
     vmName,
     consoleType,
     status,
+    logoutOtherUsers,
   })
   ,
   (dispatch) => ({
