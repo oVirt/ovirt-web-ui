@@ -8,7 +8,7 @@ import * as C from '_/constants'
 import { arrayMatch } from '_/utils'
 
 import { callExternalAction, delay, delayInMsSteps } from './utils'
-import { addVmNic, fetchSingleVm } from './index'
+import { addVmNic, fetchAndPutSingleVm } from './index'
 import { createDiskForVm } from './disks'
 
 function* createMemoryPolicyFromCluster (clusterId, memorySize) {
@@ -265,7 +265,7 @@ function* createVm (action) {
     if (action.payload.pushToDetailsOnSuccess) {
       yield put(A.navigateToVmDetails(`/vm/${vmId}`))
     } else {
-      yield fetchSingleVm(A.getSingleVm({ vmId }))
+      yield fetchAndPutSingleVm(A.getSingleVm({ vmId }))
     }
     return vmId
   }
@@ -291,7 +291,7 @@ function* waitForVmToBeUnlocked (vmId, isCloning = false) {
       }
     }
 
-    yield fetchSingleVm(A.getSingleVm({ vmId }))
+    yield fetchAndPutSingleVm(A.getSingleVm({ vmId }))
   }
 }
 
