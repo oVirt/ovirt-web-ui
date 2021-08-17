@@ -259,6 +259,13 @@ function cannotOpenConsole ({ id, params }) {
 }
 
 function* autoconnect () {
+  // edge case: if user started VM Portal with a direct link to console/BrowserVnc screen then
+  // a console is already being loaded. There is no point to autoconnect to another(or the same) console.
+  // NOTE the check is low level because page router is starting in parallel (config.currentPage is not valid yet)
+  if (window?.location?.pathname.endsWith?.(C.BROWSER_VNC)) {
+    return
+  }
+
   const {
     userId,
     websocket,
