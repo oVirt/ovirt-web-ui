@@ -81,7 +81,7 @@ const options = actionReducer(initialState, {
   [C.DELETE_USER_OPTION] (state: any, { payload: { optionId } }: any): any {
     // applies only to remote options (local have no optionId)
     const [name] = state.get('remoteOptions')
-      .findEntry((value, key) => value.get('id') === optionId) || []
+      .findEntry((value, key) => value && value.get?.('id') === optionId) || []
 
     if (!name) {
       return state
