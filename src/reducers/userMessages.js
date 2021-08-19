@@ -7,9 +7,11 @@ import {
   FAILED_EXTERNAL_ACTION,
   LOGIN_FAILED,
   SET_USERMSG_NOTIFIED,
-  SET_USER_MESSAGES,
+  SET_SERVER_MESSAGES,
+  CLEAR_USER_MSGS,
 } from '_/constants'
 import { actionReducer } from './utils'
+import { toJS } from '_/helpers'
 import uniqueId from 'lodash/uniqueId'
 
 import type { FailedExternalActionType } from '_/actions'
@@ -27,6 +29,10 @@ function addLogEntry ({ state, message, type = 'ERROR', failedAction, messageDes
       notified: state.get('autoAcknowledge'),
       source: 'local',
     })))
+}
+
+function removeEvents (targetIds: Set<string>, state: any): any {
+  return state.update('records', records => records.filter(record => !targetIds.has(record.get('id'))))
 }
 
 const initialState = Immutable.fromJS({
@@ -54,9 +60,16 @@ const userMessages = actionReducer(initialState, {
       state, message, messageDescriptor, type,
     })
   },
+  [CLEAR_USER_MSGS] (state: any, { payload: { records } }: any): any {
+    // remove only events visible on the UI when user truggered the action
+    return removeEvents(new Set(records.map(({ id }) => id)), state)
+  },
 
-  [SET_USER_MESSAGES] (state: any, { payload: { messages } }: any): any {
-    let newState = state.update('records', records => records.clear())
+  [SET_SERVER_MESSAGES] (state: any, { payload: { messages } }: any): any {
+    const existingServerEvents = toJS(state.get('records', []))
+      .filter(({ source }) => source === 'server')
+    // replace existing server events
+    let newState = removeEvents(new Set(existingServerEvents.map(({ id }) => id)), state)
     for (const message of messages) {
       newState = newState.update('records', records => records.push(Immutable.fromJS({
         id: message.id,
@@ -75,7 +88,7 @@ const userMessages = actionReducer(initialState, {
   },
 
   [DISMISS_USER_MSG] (state: any, { payload: { eventId } }: any): any {
-    return state.update('records', records => records.delete(state.get('records').findIndex(r => r.get('id') === eventId)))
+    return removeEvents(new Set([eventId]), state)
   },
 
   [AUTO_ACKNOWLEDGE] (state: any, { payload: { autoAcknowledge = false } }: any): any {

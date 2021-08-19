@@ -24,7 +24,7 @@ import {
   updateVms,
   setVmSnapshots,
 
-  setUserMessages,
+  setServerMessages,
   dismissUserMessage,
 
   setVmNics,
@@ -324,66 +324,47 @@ function* editVmNic (action) {
   yield put(setVmNics({ vmId: action.payload.vmId, nics: nicsInternal }))
 }
 
-function* fetchAllEvents (action) {
-  const user = yield select(state => ({
-    id: state.config.getIn(['user', 'id']),
-    name: `${state.config.getIn(['user', 'name'])}@${state.config.get('domain')}`,
+function* fetchAllEvents () {
+  const { userId, userName } = yield select(state => ({
+    userId: state.config.getIn(['user', 'id']),
+    userName: `${state.config.getIn(['user', 'name'])}@${state.config.get('domain')}`,
   }))
 
   const events = yield callExternalAction(Api.events, { payload: {} })
 
-  if (events.error) {
+  if (events.error || !Array.isArray(events.event)) {
     return
   }
 
   const internalEvents = events.event
-    ? events.event
-      .filter((event) =>
-        event.severity === 'error' &&
-        event.user &&
-        (event.user.id === user.id || event.user.name === user.name)
-      )
-      .map((event) => Transforms.Event.toInternal({ event }))
-    : []
-  yield put(setUserMessages({ messages: internalEvents }))
+    .filter(({ severity, user }) =>
+      severity === 'error' && user && (user?.id === userId || user?.name === userName)
+    )
+    .map((event) => Transforms.Event.toInternal({ event }))
+  yield put(setServerMessages({ messages: internalEvents }))
 }
 
-function* dismissEvent (action) {
-  const { event } = action.payload
-  if (event.source === 'server') {
-    const result = yield callExternalAction(Api.dismissEvent, { payload: { eventId: event.id } })
+function* dismissEvent ({ payload: { event: { source, id: eventId } } }) {
+  if (source === 'server') {
+    const result = yield callExternalAction(Api.dismissEvent, { payload: { eventId } })
 
     if (result.status === 'complete') {
-      yield fetchAllEvents(action)
+      yield fetchAllEvents()
     }
   } else {
-    yield put(dismissUserMessage({ eventId: event.id }))
+    yield put(dismissUserMessage({ eventId }))
   }
 }
 
-function* clearEvents (action) {
-  const user = yield select(state => ({
-    id: state.config.getIn(['user', 'id']),
-    name: `${state.config.getIn(['user', 'name'])}@${state.config.get('domain')}`,
-  }))
-  const events = yield callExternalAction(Api.events, { payload: {} })
-
-  if (events.error) {
-    return
-  }
-
-  const sagaEvents = events.event
-    ? events.event
-      .filter((event) =>
-        event.severity === 'error' &&
-        event.user &&
-        (event.user.id === user.id || event.user.name === user.name)
-      ).map((event) => callExternalAction(Api.dismissEvent, { payload: { eventId: event.id } }))
-    : []
+function* clearEvents ({ payload: { records = [] } }) {
+  // at this point selected events were removed from userMessages.records
+  const sagaEvents = records
+    .filter(({ source }) => source === 'server')
+    .map(({ id: eventId }) => callExternalAction(Api.dismissEvent, { payload: { eventId } }))
 
   yield all(sagaEvents)
 
-  yield fetchAllEvents(action)
+  yield fetchAllEvents()
 }
 
 export function* fetchVmSessions ({ vmId }) {
