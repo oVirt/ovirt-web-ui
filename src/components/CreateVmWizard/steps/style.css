@@ -43,6 +43,11 @@
   width: 40%;
 }
 
+.cpu-input-error {
+  color: #cc0000;
+  margin-bottom: 3px;
+}
+
 .memory-input {
   margin-bottom: 3px;
   margin-right: 5px;

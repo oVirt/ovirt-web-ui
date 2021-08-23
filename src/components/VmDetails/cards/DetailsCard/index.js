@@ -30,6 +30,7 @@ import {
   getTopology,
   getTopologyPossibleValues,
   isValidOsIcon,
+  validateTopologyValues,
 } from '_/components/utils'
 
 import {
@@ -733,6 +734,23 @@ class DetailsCard extends React.Component {
       })
       : { sockets: [1], cores: [1], threads: [1] }
 
+    // Check if the number of the total VCPUs can be factored for the VCPU topology properly,
+    // i.e. check for the bad Total Virtual CPUs number
+    const vCpuCountIsFactored = vCpuCount === 1 || (vCpuCount > 1 && !!Object.values(vCpuTopologyDividers).find(arr => arr.length > 1))
+
+    const numOfSockets = vCpuTopology.get('sockets')
+    const numOfCores = vCpuTopology.get('cores')
+    const numOfThreads = vCpuTopology.get('threads')
+
+    // check if the product of the number of sockets, cores, threads is consistent with the number of the total VCPus,
+    // i.e. check for the values of the VCPU Topology
+    const topologyValuesAreValid = validateTopologyValues({
+      vCpuCount,
+      numOfSockets,
+      numOfCores,
+      numOfThreads,
+    })
+
     // Boot devices
     const allowedBootDevices = ['hd', 'network', 'cdrom']
     const FIRST_DEVICE = 0
@@ -773,7 +791,7 @@ class DetailsCard extends React.Component {
           editTooltip={msg.edit()}
           editTooltipPlacement={'bottom'}
           idPrefix={idPrefix}
-          disableSaveButton={!vCpuCountIsValid}
+          disableSaveButton={!vCpuCountIsValid || !vCpuCountIsFactored || !topologyValuesAreValid}
           onStartEdit={this.handleCardOnStartEdit}
           onCancel={this.handleCardOnCancel}
           onSave={this.handleCardOnSave}
@@ -886,13 +904,13 @@ class DetailsCard extends React.Component {
                             <div>
                               <span>The total virtual CPUs include:</span>
                               <ul className={style['cpu-tooltip-list']} >
-                                <li>{msg.totalSocketsCpuTooltipMessage({ number: vCpuTopology.get('sockets') })}</li>
-                                <li>{msg.totalCoresCpuTooltipMessage({ number: vCpuTopology.get('cores') })}</li>
-                                <li>{msg.totalThreadsCpuTooltipMessage({ number: vCpuTopology.get('threads') })}</li>
+                                <li>{msg.totalSocketsCpuTooltipMessage({ number: numOfSockets })}</li>
+                                <li>{msg.totalCoresCpuTooltipMessage({ number: numOfCores })}</li>
+                                <li>{msg.totalThreadsCpuTooltipMessage({ number: numOfThreads })}</li>
                               </ul>
                             </div>
                           )}
-                          validationState={vCpuCountIsValid ? null : 'error'}
+                          validationState={vCpuCountIsValid && vCpuCountIsFactored && topologyValuesAreValid ? null : 'error'}
                         >
                           { !isFullEdit && vCpuCount }
                           { isFullEdit && (
@@ -909,6 +927,11 @@ class DetailsCard extends React.Component {
                               { !vCpuCountIsValid && (
                                 <div className={style['cpu-input-error']}>
                                   {msg.maxAllowedCpus({ max: maxNumOfVmCpus })}
+                                </div>
+                              )}
+                              { !vCpuCountIsFactored && !topologyValuesAreValid && (
+                                <div className={style['cpu-input-error']}>
+                                  {msg.cpusBadTopology()}
                                 </div>
                               )}
                             </div>
@@ -1014,9 +1037,10 @@ class DetailsCard extends React.Component {
                                   id: i.toString(),
                                   value: i.toString(),
                                 }))}
-                                disabled={!vCpuCountIsValid}
-                                selected={vCpuTopology.get('sockets').toString()}
+                                disabled={!vCpuCountIsValid || !vCpuCountIsFactored}
+                                selected={numOfSockets.toString()}
                                 onChange={(selectedId) => { this.handleChange('topology', selectedId, { vcpu: SOCKETS_VCPU }) }}
+                                validationState={topologyValuesAreValid ? null : 'error'}
                               />
                             </FieldRow>
                             <FieldRow label={msg.coresPerSockets()} id={`${idPrefix}-vcpu-topology-cores`}>
@@ -1026,9 +1050,10 @@ class DetailsCard extends React.Component {
                                   id: i.toString(),
                                   value: i.toString(),
                                 }))}
-                                disabled={!vCpuCountIsValid}
-                                selected={vCpuTopology.get('cores').toString()}
+                                disabled={!vCpuCountIsValid || !vCpuCountIsFactored}
+                                selected={numOfCores.toString()}
                                 onChange={(selectedId) => { this.handleChange('topology', selectedId, { vcpu: CORES_VCPU }) }}
+                                validationState={topologyValuesAreValid ? null : 'error'}
                               />
                             </FieldRow>
                             <FieldRow
@@ -1046,11 +1071,21 @@ class DetailsCard extends React.Component {
                                   id: i.toString(),
                                   value: i.toString(),
                                 }))}
-                                disabled={!vCpuCountIsValid}
-                                selected={vCpuTopology.get('threads').toString()}
+                                disabled={!vCpuCountIsValid || !vCpuCountIsFactored}
+                                selected={numOfThreads.toString()}
                                 onChange={(selectedId) => { this.handleChange('topology', selectedId, { vcpu: THREADS_VCPU }) }}
+                                validationState={topologyValuesAreValid ? null : 'error'}
                               />
                             </FieldRow>
+                            { !topologyValuesAreValid && vCpuCountIsFactored && (
+                              <Row className={style['field-row-divide']}>
+                                <Col cols={12} className={style['col-label']}>
+                                  <div className={style['cpu-input-error']}>
+                                    {msg.cpusBadTopologySelection()}
+                                  </div>
+                                </Col>
+                              </Row>
+                            )}
                           </Grid>
                         </Col>
                       </Row>

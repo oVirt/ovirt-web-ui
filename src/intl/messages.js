@@ -121,6 +121,8 @@ export const messages: { [messageId: string]: MessageType } = {
   },
   coresPerSockets: 'Cores per Virtual Socket',
   cpus: 'Total Virtual CPUs',
+  cpusBadTopology: 'No valid CPU topology exists for this total Virtual CPUs count.',
+  cpusBadTopologySelection: 'Selected CPU topology is invalid.',
   create: 'Create',
   createANewVm: 'Create A New Virtual Machine',
   created: 'Created',
