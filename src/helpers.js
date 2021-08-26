@@ -91,12 +91,12 @@ export function fileDownload ({ data, fileName = 'myFile.dat', mimeType = 'appli
 
       myForm.target = targetName
       myForm.method = 'post'
-      myForm.action = `${AppConfiguration.applicationContext}/services/attachment/console.vv`
+      myForm.action = `${AppConfiguration.applicationContext}/services/attachment/${fileName}`
       myForm.enctype = 'application/x-www-form-urlencoded'
       myForm.style = 'display: none;'
 
       textArea1.name = 'contenttype'
-      textArea1.appendChild(document.createTextNode('application/x-virt-viewer;+charset=UTF-8'))
+      textArea1.appendChild(document.createTextNode(`${mimeType};+charset=UTF-8`))
       myForm.appendChild(textArea1)
 
       textArea2.name = 'content'
