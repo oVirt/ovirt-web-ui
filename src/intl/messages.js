@@ -511,6 +511,7 @@ export const messages: { [messageId: string]: MessageType } = {
   notificationSettingsAffectAllNotifications: 'Notification settings applied here affect all notifications (including all VMs and Pools notifications) and are not persisted (a page reload will clear them).',
   noVmAvailable: 'No VM available.',
   noVmAvailableForLoggedUser: 'No VM is available for the logged user.',
+  noVncOptions: 'VNC (Browser) Options',
   off: 'Off',
   ok: 'OK',
   on: 'On',

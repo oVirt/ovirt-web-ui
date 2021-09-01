@@ -20,6 +20,7 @@ export type SaveGlobalOptionsActionType = {
     sshKey?: string,
     preferredConsole?: string,
     fullScreenVnc?: boolean,
+    fullScreenNoVnc?: boolean,
     ctrlAltEndVnc?: boolean,
     fullScreenSpice?: boolean,
     ctrlAltEndSpice?: boolean,

@@ -52,11 +52,12 @@ const VmConsole = ({
   websocketHost,
   vmConsoleState,
   msg,
+  fullScreenNoVnc,
   onDisconnected,
   goToDetails,
   openConsole,
 }) => {
-  const [isFullScreen, setIsFullScreen] = useState(false)
+  const [isFullScreen, setIsFullScreen] = useState(fullScreenNoVnc)
   const isVmRunning = isRunning(vm.get('status'))
 
   const {
@@ -210,6 +211,7 @@ VmConsole.propTypes = {
   websocketHost: PropTypes.string,
   vmConsoleState: PropTypes.object,
   msg: PropTypes.object.isRequired,
+  fullScreenNoVnc: PropTypes.bool.isRequired,
 
   onDisconnected: PropTypes.func.isRequired,
   goToDetails: PropTypes.func.isRequired,
@@ -217,11 +219,12 @@ VmConsole.propTypes = {
 }
 
 export default connect(
-  ({ consoles, vms, config }, { vmId }) => ({
+  ({ consoles, vms, config, options }, { vmId }) => ({
     vmConsoleState: consoles?.vms?.[vmId] ?? {},
     vm: vms.getIn(['vms', vmId]),
     websocketPort: config.getIn(['websocket', 'port']),
     websocketHost: config.getIn(['websocket', 'host']),
+    fullScreenNoVnc: options.getIn(['remoteOptions', 'fullScreenNoVnc', 'content']),
   }),
   (dispatch, { vmId, consoleType }) => ({
     onDisconnected: (reason) => dispatch(Actions.setConsoleStatus({ vmId, status: C.DISCONNECTED_CONSOLE, reason, consoleType: C.BROWSER_VNC })),

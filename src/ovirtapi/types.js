@@ -315,6 +315,7 @@ export type RemoteUserOptionsType = {|
   persistLocale?: UserOptionType<boolean>,
   preferredConsole?: UserOptionType<string>,
   fullScreenVnc?: UserOptionType<boolean>,
+  fullScreenNoVnc?: UserOptionType<boolean>,
   ctrlAltEndVnc?: UserOptionType<boolean>,
   fullScreenSpice?: UserOptionType<boolean>,
   ctrlAltEndSpice?: UserOptionType<boolean>,

@@ -31,6 +31,10 @@ const defaultOptions: UserOptionsType = {
       id: undefined,
       content: false,
     },
+    fullScreenNoVnc: {
+      id: undefined,
+      content: false,
+    },
     ctrlAltEndVnc: {
       id: undefined,
       content: false,
