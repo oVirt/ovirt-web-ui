@@ -88,7 +88,8 @@ class DiskImageEditor extends Component {
 
     this.open = this.open.bind(this)
     this.close = this.close.bind(this)
-    this.composeDisk = this.composeDisk.bind(this)
+    this.composeDiskEdit = this.composeDiskEdit.bind(this)
+    this.composeNewDisk = this.composeNewDisk.bind(this)
     this.isFormValid = this.isFormValid.bind(this)
     this.validateField = this.validateField.bind(this)
     this.handleSave = this.handleSave.bind(this)
@@ -147,59 +148,62 @@ class DiskImageEditor extends Component {
     this.setState({ showModal: false })
   }
 
-  composeDisk () {
-    const { vm, disk, storageDomains } = this.props
+  composeDiskEdit () {
+    const { disk } = this.props
     const { values } = this.state
 
-    if (disk) { // edit
-      const provisionedSize = disk.get('provisionedSize') + values.size * 1024 ** 3
+    const provisionedSize = disk.get('provisionedSize') + values.size * 1024 ** 3
 
-      return disk.get('type') === 'image'
-        ? { // image disk (change name, size, bootable)
-          attachmentId: disk.get('attachmentId'),
-          id: disk.get('id'),
+    return disk.get('type') === 'image'
+      ? { // image disk (change name, size, bootable)
+        attachmentId: disk.get('attachmentId'),
+        id: disk.get('id'),
 
-          bootable: values.bootable,
-          name: values.alias,
-          provisionedSize,
-        }
-        : { // cinder or lun disk (only change name and bootable)
-          attachmentId: disk.get('attachmentId'),
-          id: disk.get('id'),
-          type: disk.get('type'),
-
-          bootable: values.bootable,
-          name: values.alias,
-        }
-    } else { // new
-      const vmDiskInSameStorageDomain =
-        vm.get('disks') &&
-        vm.get('disks').find(disk => disk.get('storageDomainId') === values.storageDomain)
-
-      const iface = vmDiskInSameStorageDomain
-        ? vmDiskInSameStorageDomain.get('iface')
-        : 'virtio_scsi'
-
-      const provisionedSize = values.size * 1024 ** 3
-
-      const storageDomainDiskAttributes =
-        storageDomains.getIn([values.storageDomain, 'diskAttributesForDiskType', values.diskType]).toJS()
-
-      const newDisk = {
-        active: true,
         bootable: values.bootable,
-        iface,
-
         name: values.alias,
-        type: 'image', // we only know how to create 'image' type disks
         provisionedSize,
-
-        ...storageDomainDiskAttributes,
-        storageDomainId: values.storageDomain,
       }
+      : { // cinder or lun disk (only change name and bootable)
+        attachmentId: disk.get('attachmentId'),
+        id: disk.get('id'),
+        type: disk.get('type'),
 
-      return newDisk
+        bootable: values.bootable,
+        name: values.alias,
+      }
+  }
+
+  composeNewDisk () {
+    const { vm, storageDomains } = this.props
+    const { values } = this.state
+
+    const vmDiskInSameStorageDomain =
+      vm.get('disks') &&
+      vm.get('disks').find(disk => disk.get('storageDomainId') === values.storageDomain)
+
+    const iface = vmDiskInSameStorageDomain
+      ? vmDiskInSameStorageDomain.get('iface')
+      : 'virtio_scsi'
+
+    const provisionedSize = values.size * 1024 ** 3
+
+    const storageDomainDiskAttributes =
+      storageDomains.getIn([values.storageDomain, 'diskAttributesForDiskType', values.diskType]).toJS()
+
+    const newDisk = {
+      active: true,
+      bootable: values.bootable,
+      iface,
+
+      name: values.alias,
+      type: 'image', // we only know how to create 'image' type disks
+      provisionedSize,
+
+      ...storageDomainDiskAttributes,
+      storageDomainId: values.storageDomain,
     }
+
+    return newDisk
   }
 
   validateField (field = '') {
@@ -227,7 +231,7 @@ class DiskImageEditor extends Component {
       return
     }
     if (!this.props.disk || this.changesMade) {
-      const newDisk = this.composeDisk()
+      const newDisk = this.props.disk ? this.composeDiskEdit() : this.composeNewDisk()
       this.props.onSave(this.props.vm.get('id'), newDisk)
     }
     this.close()
