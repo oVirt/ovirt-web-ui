@@ -525,13 +525,14 @@ class Storage extends React.Component {
         ...state.editing,
         [newId]: {
           id: newId,
-          diskId: '_',
-
           name: suggestDiskName(vmName, disks),
-          bootable: disks.length === 0,
+
+          diskId: '_',
+          storageDomainId,
+
+          bootable: false,
           diskType: 'thin',
           size: (diskInitialSizeInGib * 1024 ** 3),
-          storageDomainId,
         },
       },
     }))

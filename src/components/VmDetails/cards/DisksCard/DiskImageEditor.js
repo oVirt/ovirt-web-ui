@@ -24,7 +24,6 @@ import { Tooltip, InfoTooltip } from '_/components/tooltips'
 
 const DISK_DEFAULTS = {
   bootable: false,
-  name: '',
   diskType: 'thin', // constrain to values in DISK_TYPES
   provisionedSize: 1 * 1024 ** 3,
 }

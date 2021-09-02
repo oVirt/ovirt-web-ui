@@ -410,15 +410,15 @@ class CreateVmWizard extends React.Component {
 
                   return {
                     id: disk.get('attachmentId'),
-                    diskId: disk.get('id'),
-
                     name: disk.get('name'),
+
+                    diskId: disk.get('id'),
+                    storageDomainId: disk.get('storageDomainId'),
+                    canUserUseStorageDomain,
+
                     bootable: disk.get('bootable'),
                     diskType,
                     size: disk.get('provisionedSize'), // bytes
-                    storageDomainId: disk.get('storageDomainId'),
-
-                    canUserUseStorageDomain,
                     isFromTemplate: true,
                   }
                 })

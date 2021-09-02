@@ -555,10 +555,9 @@ const DiskAttachment = {
 
       id: disk.id,
       name: disk.alias,
-      status: disk.status, // [ illegal | locked | ok ] only for types [ images | cinder ]
-
       type: disk.storage_type, // [ image | lun | cinder ]
       format: disk.format, // [ cow | raw ] only for types [ images | cinder ]
+      status: disk.status, // [ illegal | locked | ok ] only for types [ images | cinder ]
       sparse: convertBool(disk.sparse),
 
       actualSize: convertInt(disk.actual_size),
