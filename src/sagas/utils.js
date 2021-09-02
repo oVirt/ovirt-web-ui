@@ -212,3 +212,20 @@ export function* mapCpuOptions (version, architecture) {
     maxNumOfVmCpus: maxNumOfVmCpusPerArch_[architecture] || maxNumOfVmCpusPerArch_[DEFAULT_ARCH],
   }
 }
+
+/**
+ * Map an entity's cluster version to the given redux `config.configValue` key.
+ *
+ * @param {string} configKey Configuration key in the `config.configValues` redux store
+ * @param {string} version Cluster version
+ * @param {*} defaultValue Value to return if key or version for the key is not found
+ */
+export function* mapConfigKeyVersion (configKey, version, defaultValue) {
+  const configValue = yield select(({ config }) => config.get(configKey).toJS())
+
+  let value = defaultValue
+  if (version in configValue) {
+    value = configValue[version]
+  }
+  return value
+}

@@ -114,9 +114,10 @@ class DiskImageEditor extends Component {
           size: 0,
           storageDomain: disk.get('storageDomainId'),
 
-          // NOTE: Key the diskType from the disk's sparse flag.  Since webadmin always
-          //       uses raw when creating disks, when editing a disk, this is the most
-          //       reliable way to determine the thin vs preallocated status.
+          // NOTE: Key the diskType from the disk's sparse flag.  Webadmin always uses
+          //       raw when creating disks on file type storage domain.  When editing
+          //       a disk, using __sparse__ this is the most reliable way to determine
+          //       the thin vs preallocated status.
           diskType: disk.get('sparse') ? 'thin' : 'pre',
         },
       }
@@ -148,6 +149,11 @@ class DiskImageEditor extends Component {
     this.setState({ showModal: false })
   }
 
+  /**
+   * Create a minimal `DiskType` object to effect the changes made by the user.  We
+   * only want to send the fields that are either required to identify a disk attachment/
+   * disk or need to change.  This minimizes issues.
+   */
   composeDiskEdit () {
     const { disk } = this.props
     const { values } = this.state
@@ -173,6 +179,15 @@ class DiskImageEditor extends Component {
       }
   }
 
+  /**
+   * Create a minimal `DiskType` object to create a disk as specified by the user.
+   *
+   * A disk's `iface` determines the kind of device the hypervisor uses to present
+   * the disk to the VM.  The `iface` only affects the VM, it does not affect the disk
+   * image at all.  If a new disk is in the same storage domain as an existing disk,
+   * the existing disk's `iface` setting will be used.  This can make things easier for
+   * VMs where the OS doesn't include support for `virtio_scsi` devices.
+   */
   composeNewDisk () {
     const { vm, storageDomains } = this.props
     const { values } = this.state
@@ -188,7 +203,7 @@ class DiskImageEditor extends Component {
     const provisionedSize = values.size * 1024 ** 3
 
     const storageDomainDiskAttributes =
-      storageDomains.getIn([values.storageDomain, 'diskAttributesForDiskType', values.diskType]).toJS()
+      storageDomains.getIn([values.storageDomain, 'diskTypeToDiskAttributes', values.diskType]).toJS()
 
     const newDisk = {
       active: true,

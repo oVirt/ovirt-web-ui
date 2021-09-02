@@ -402,6 +402,8 @@ class CreateVmWizard extends React.Component {
                    *   - desktop -> Thin -> cow / 'thin'
                    *   - server or high performance -> Clone -> raw / as defined in the template
                    */
+                  // TODO: See if the function `determineTemplateDiskFormatAndSparse()` can be used here
+                  //       to give exactly matching results to the UI and the API create call
                   const diskType = // constrain to values from createDiskTypeList()
                     template.get('type') === 'desktop' ||
                     this.state.steps.basic.optimizedFor === 'desktop'

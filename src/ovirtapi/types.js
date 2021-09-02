@@ -154,7 +154,8 @@ export type ApiStorageDomainType = { // subset we care about
     description: string,
     id: string,
     name: string,
-    type: "cinder" | "fcp" | "glance" | "glusterfs" | "iscsi" | "localfs" | "managed_block_storage" | "nfs" | "posixfs"
+    // NOTE: "unmanaged" is a valid value but is not documented in the REST API
+    type: "cinder" | "fcp" | "glance" | "glusterfs" | "iscsi" | "localfs" | "managed_block_storage" | "nfs" | "posixfs" | "unmanaged"
   },
   type: "data" | "export" | "image" | "iso" | "managed_block_storage" | "volume",
   used: number,

@@ -470,14 +470,14 @@ const Template = {
 
       // engine option config values that map to the Templates's custom compatibility version.
       // the mapping from engine options are done in sagas. if custom compatibility version
-      // is not set, the fetch saga will set `cpuOptions` to `null`. -1 values here make it
-      // obvious if the fetch saga fails.
+      // is not set, the fetch saga will set the values to `null`.
       cpuOptions: {
-        maxNumOfSockets: -1,
+        maxNumOfSockets: -1, // -1 values make it obvious if the fetch saga fails
         maxNumOfCores: -1,
         maxNumOfThreads: -1,
         maxNumOfVmCpus: -1,
       },
+      isCopyPreallocatedFileBasedDiskSupported: null,
     })
   },
 
@@ -654,79 +654,42 @@ const StorageDomain = {
   toInternal ({ storageDomain }: { storageDomain: ApiStorageDomainType }): StorageDomainType {
     const permissions = Permissions.toInternal({ permissions: storageDomain?.permissions?.permission })
 
-    // frontend/webadmin/modules/uicommonweb/src/main/java/org/ovirt/engine/ui/uicommonweb/dataprovider/AsyncDataProvider.java#getDiskVolumeFormat
-    const diskAttributesForDiskType: {
+    //
+    // When creating a new disk, the diskType (disk allocation on the UI) maps to a disk
+    // __sparse__ and __format__ attributes.  Hold the default __sparse__ and __format__
+    // disk attributes for each diskType available for selection in the app.  These values
+    // change per storage domain based on the domain's __storageType__ and are calculated
+    // by `fetchDataAndIsoStorageDomains()` along side permits and permissions.
+    //
+    // Valid values for __format__ are 'raw', 'cow' and `undefined`. The values are mapped
+    // by the REST api from api model `DiskFormat` to business entity `VolumeFormat.COW`,
+    // `VolumeFormat.RAW`, or `VolumeFormat.Unassigned` respectively.
+    //
+    const diskTypeToDiskAttributes: {
       ['thin' | 'pre']: { sparse: boolean, format?: 'raw' | 'cow' }
     } = {
-      thin: { sparse: true },
-      pre: { sparse: false },
+      thin: { sparse: true, format: 'raw' },
+      pre: { sparse: false, format: 'raw' },
     }
 
-    // frontend/webadmin/modules/uicommonweb/src/main/java/org/ovirt/engine/ui/uicommonweb/dataprovider/AsyncDataProvider.java#getVolumeType
+    //
+    // When handling template disks during VM create, a disk's __format__ is primary over
+    // __sparse__.  Hold the __sparse__ value to use for each __format__.  These values change
+    // per storage domain based on the domain's __storageType__  and are calculated by
+    // `fetchDataAndIsoStorageDomains()` along side permits and permissions.
+    //
     const defaultDiskFormatToSparse: {
-      ['raw' | 'cow']: boolean
+      ['raw' | 'cow']: boolean | (string, DiskType) => boolean
     } = {
       cow: true,
       raw: true,
-    }
-
-    const storageType = storageDomain?.storage?.type ?? 'unknown'
-    let storageSubType
-    switch (storageType) {
-      case 'nfs':
-      case 'localfs':
-      case 'posixfs':
-      case 'glusterfs':
-      case 'glance':
-        storageSubType = 'file'
-        diskAttributesForDiskType.thin.format = 'raw'
-        diskAttributesForDiskType.pre.format = 'raw'
-        defaultDiskFormatToSparse.cow = true
-        defaultDiskFormatToSparse.raw = true
-        break
-
-      case 'fcp':
-      case 'iscsi':
-        storageSubType = 'block'
-        diskAttributesForDiskType.thin.format = 'cow'
-        diskAttributesForDiskType.pre.format = 'raw'
-        defaultDiskFormatToSparse.cow = true
-        defaultDiskFormatToSparse.raw = false
-        break
-
-      case 'cinder':
-      case 'managed_block_storage':
-        storageSubType = 'openstack'
-        diskAttributesForDiskType.thin.format = undefined
-        diskAttributesForDiskType.pre.format = 'raw'
-        defaultDiskFormatToSparse.cow = true
-        defaultDiskFormatToSparse.raw = false
-        break
-
-      case 'unmanaged':
-        storageSubType = 'kubernetes'
-        diskAttributesForDiskType.thin.format = undefined
-        diskAttributesForDiskType.pre.format = undefined
-        defaultDiskFormatToSparse.cow = true
-        defaultDiskFormatToSparse.raw = false
-        break
-
-      default:
-        storageSubType = 'none'
-        diskAttributesForDiskType.thin.format = undefined
-        diskAttributesForDiskType.pre.format = undefined
-        defaultDiskFormatToSparse.cow = true
-        defaultDiskFormatToSparse.raw = false
     }
 
     return {
       id: storageDomain.id,
       name: storageDomain.name,
       type: storageDomain.type,
-      storageType,
-      storageSubType,
-      diskAttributesForDiskType,
-      defaultDiskFormatToSparse,
+      storageType: storageDomain.storage?.type ?? 'unknown',
 
       availableSpace: convertInt(storageDomain.available),
       usedSpace: convertInt(storageDomain.used),
@@ -739,10 +702,15 @@ const StorageDomain = {
         ? { [storageDomain.data_center.id]: storageDomain.status }
         : { },
 
-      // roles are required to calculate permits and 'canUse*', therefore its done in sagas
+      // roles are required to calculate permits and 'canUse*', therefore it's done in sagas
       permissions,
       userPermits: new Set(),
       canUserUseDomain: false,
+
+      // configuration values may be required to calculate these values, therefore it's done in sagas
+      storageSubType: 'unknown',
+      diskTypeToDiskAttributes,
+      defaultDiskFormatToSparse,
     }
   },
 
@@ -811,13 +779,14 @@ const Cluster = {
       canUserUseCluster: false,
 
       // engine option config values that map to cluster compatibility version. mappings
-      // are done in sagas. -1 values make it obvious if the fetch saga fails
+      // are done in sagas.
       cpuOptions: {
-        maxNumOfSockets: -1,
+        maxNumOfSockets: -1, // -1 values make it obvious if the fetch saga fails
         maxNumOfCores: -1,
         maxNumOfThreads: -1,
         maxNumOfVmCpus: -1,
       },
+      isCopyPreallocatedFileBasedDiskSupported: null,
     }
 
     if (cluster.networks && cluster.networks.network && cluster.networks.network.length > 0) {

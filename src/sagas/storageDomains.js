@@ -74,6 +74,70 @@ function* fetchDataAndIsoStorageDomains () {
       storageDomain.canUserUseDomain = canUserUseStorageDomain(storageDomain.userPermits)
     }
 
+    // Calculate values that require system configuration knowledge
+    for (const storageDomain of storageDomainsInternal) {
+      const diskTypeToDiskAttributes = storageDomain.diskTypeToDiskAttributes
+      const defaultDiskFormatToSparse = storageDomain.defaultDiskFormatToSparse
+
+      //
+      // These values are calculated as needed in webadmin.  We pre-calculate the values
+      // here for ease of use via simple lookup.
+      //
+      // storageSubType from: backend/manager/modules/common/src/main/java/org/ovirt/engine/core/common/businessentities/storage/StorageType.java
+      // diskTypeToDiskAttributes from: frontend/webadmin/modules/uicommonweb/src/main/java/org/ovirt/engine/ui/uicommonweb/dataprovider/AsyncDataProvider.java#getDiskVolumeFormat
+      // defaultDiskFormatToSparse from: frontend/webadmin/modules/uicommonweb/src/main/java/org/ovirt/engine/ui/uicommonweb/dataprovider/AsyncDataProvider.java#getVolumeType
+      //
+      switch (storageDomain.storageType) {
+        case 'nfs':
+        case 'localfs':
+        case 'posixfs':
+        case 'glusterfs':
+        case 'glance':
+          storageDomain.storageSubType = 'file'
+          diskTypeToDiskAttributes.thin.format = 'raw'
+          diskTypeToDiskAttributes.pre.format = 'raw'
+          defaultDiskFormatToSparse.cow = true
+          defaultDiskFormatToSparse.raw = (isCopyPreallocatedFileBasedDiskSupported, disk) =>
+            disk && isCopyPreallocatedFileBasedDiskSupported
+              ? disk.sparse
+              : true
+          break
+
+        case 'fcp':
+        case 'iscsi':
+          storageDomain.storageSubType = 'block'
+          diskTypeToDiskAttributes.thin.format = 'cow'
+          diskTypeToDiskAttributes.pre.format = 'raw'
+          defaultDiskFormatToSparse.cow = true
+          defaultDiskFormatToSparse.raw = false
+          break
+
+        case 'cinder':
+        case 'managed_block_storage':
+          storageDomain.storageSubType = 'openstack'
+          diskTypeToDiskAttributes.thin.format = undefined
+          diskTypeToDiskAttributes.pre.format = 'raw'
+          defaultDiskFormatToSparse.cow = true
+          defaultDiskFormatToSparse.raw = false
+          break
+
+        case 'unmanaged':
+          storageDomain.storageSubType = 'kubernetes'
+          diskTypeToDiskAttributes.thin.format = undefined
+          diskTypeToDiskAttributes.pre.format = undefined
+          defaultDiskFormatToSparse.cow = true
+          defaultDiskFormatToSparse.raw = false
+          break
+
+        default:
+          storageDomain.storageSubType = 'none'
+          diskTypeToDiskAttributes.thin.format = undefined
+          diskTypeToDiskAttributes.pre.format = undefined
+          defaultDiskFormatToSparse.cow = true
+          defaultDiskFormatToSparse.raw = false
+      }
+    }
+
     return storageDomainsInternal
   }
 

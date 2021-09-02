@@ -78,6 +78,11 @@ const initialState = Immutable.fromJS({
   defaultWindowsTimezone: DefaultEngineOptions.DefaultWindowsTimeZone,
 
   websocket: DefaultEngineOptions.WebSocketProxy,
+
+  clusterVersions: ['4.2', '4.3', '4.4', '4.5', '4.6'],
+  CopyPreallocatedFileBasedDiskSupported: { // NOTE: Not available as an engine-option
+    4.2: false, 4.3: true, 4.4: true, 4.5: true, 4.6: true,
+  },
 })
 
 const config = actionReducer(initialState, {
