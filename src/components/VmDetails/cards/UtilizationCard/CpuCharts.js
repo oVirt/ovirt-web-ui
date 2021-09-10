@@ -71,7 +71,7 @@ const CpuCharts = ({ cpuStats, isRunning, id, vcpus }) => {
               <AreaChart
                 id={`${id}-history-chart`}
                 data={history.map((item, i) => ({ x: i, y: item }))}
-                labels={datum => `${datum.y}%`}
+                labels={({ datum }) => `${datum.y}%`}
               />
             )}
           </>
