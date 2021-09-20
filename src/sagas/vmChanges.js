@@ -303,26 +303,21 @@ function determineTemplateDiskFormatAndSparse (
   targetCluster
 ) {
   const attributes = {}
+  const isCopyPreallocatedFileBasedDiskSupported =
+    template.get('isCopyPreallocatedFileBasedDiskSupported') ?? targetCluster.get('isCopyPreallocatedFileBasedDiskSupported')
 
   if (vmStorageAllocationIsThin || templateIsDesktop || vmIsDesktop) {
     attributes.format = 'cow'
-    attributes.sparse = targetSD.getIn(['defaultDiskFormatToSparse', 'cow'])
+    attributes.sparse = targetSD.get('templateDiskFormatToSparse')('cow', isCopyPreallocatedFileBasedDiskSupported, baseDisk)
   } else {
     const format = baseDisk.get('format')
     const sparse =
       userDisk.storageDomainId === baseDisk.get('storageDomainId')
         ? baseDisk.get('sparse')
-        : targetSD.getIn(['defaultDiskFormatToSparse', format])
+        : targetSD.get('templateDiskFormatToSparse')(format, isCopyPreallocatedFileBasedDiskSupported, baseDisk)
 
     attributes.format = format
     attributes.sparse = sparse
-  }
-
-  if (typeof attributes.sparse === 'function') {
-    const isCopyPreallocatedFileBasedDiskSupported =
-      template.isCopyPreallocatedFileBasedDiskSupported ?? targetCluster.isCopyPreallocatedFileBasedDiskSupported
-
-    attributes.sparse = attributes.sparse(isCopyPreallocatedFileBasedDiskSupported, baseDisk)
   }
 
   return (baseDisk.get('format') === attributes.format && baseDisk.get('sparse') === attributes.sparse)

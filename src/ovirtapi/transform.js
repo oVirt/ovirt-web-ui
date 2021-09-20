@@ -657,9 +657,10 @@ const StorageDomain = {
     //
     // When creating a new disk, the diskType (disk allocation on the UI) maps to a disk
     // __sparse__ and __format__ attributes.  Hold the default __sparse__ and __format__
-    // disk attributes for each diskType available for selection in the app.  These values
-    // change per storage domain based on the domain's __storageType__ and are calculated
-    // by `fetchDataAndIsoStorageDomains()` along side permits and permissions.
+    // disk attributes for each diskType available for selection in the app.  Currently
+    // diskType may be thin provisioned ('thin') or preallocated ('pre').  These values
+    // change per storage domain based on the domain's __storageType__ and are mapped
+    // in this transform.
     //
     // Valid values for __format__ are 'raw', 'cow' and `undefined`. The values are mapped
     // by the REST api from api model `DiskFormat` to business entity `VolumeFormat.COW`,
@@ -673,23 +674,98 @@ const StorageDomain = {
     }
 
     //
-    // When handling template disks during VM create, a disk's __format__ is primary over
-    // __sparse__.  Hold the __sparse__ value to use for each __format__.  These values change
-    // per storage domain based on the domain's __storageType__  and are calculated by
-    // `fetchDataAndIsoStorageDomains()` along side permits and permissions.
+    // When handling template disks during Create VM, a disk's __format__ is the primary
+    // disk attribute to consider.  Provide a mapping function from the disk's __format__
+    // to the disk's __sparse__ value with a few extra pieces of information available to
+    // help make the decision.  The diskType is not relevant.  These values change per
+    // storage domain based on the domain's __storageType__ and are mapped in this
+    // transform.
     //
-    const defaultDiskFormatToSparse: {
-      ['raw' | 'cow']: boolean | (string, DiskType) => boolean
-    } = {
-      cow: true,
-      raw: true,
+    let templateDiskFormatToSparse =
+      (format: string, isCopyPreallocatedFileBasedDiskSupported: boolean, disk: DiskType): boolean =>
+        false
+
+    const createAsMapping = (mapping: {| 'cow': boolean, 'raw': boolean |}) =>
+      (format: string, isCopyPreallocatedFileBasedDiskSupported: boolean, disk: DiskType): boolean =>
+        mapping[format]
+
+    //
+    // These values are calculated as needed in webadmin.  We pre-calculate the values
+    // here for ease of use via simple lookup.
+    //
+    // storageSubType from: backend/manager/modules/common/src/main/java/org/ovirt/engine/core/common/businessentities/storage/StorageType.java
+    // diskTypeToDiskAttributes from: frontend/webadmin/modules/uicommonweb/src/main/java/org/ovirt/engine/ui/uicommonweb/dataprovider/AsyncDataProvider.java#getDiskVolumeFormat
+    // templateDiskFormatToSparse from: frontend/webadmin/modules/uicommonweb/src/main/java/org/ovirt/engine/ui/uicommonweb/dataprovider/AsyncDataProvider.java#getVolumeType
+    //
+    const storageType = storageDomain.storage?.type ?? 'unknown'
+    let storageSubType = 'unknown'
+
+    switch (storageType) {
+      case 'nfs':
+      case 'localfs':
+      case 'posixfs':
+      case 'glusterfs':
+      case 'glance':
+        storageSubType = 'file'
+        diskTypeToDiskAttributes.thin.format = 'raw'
+        diskTypeToDiskAttributes.pre.format = 'raw'
+        templateDiskFormatToSparse =
+          (format, isCopyPreallocatedFileBasedDiskSupported, disk) =>
+            format === 'cow'
+              ? true
+              : (isCopyPreallocatedFileBasedDiskSupported && disk) ? disk.sparse : true
+        break
+
+      case 'fcp':
+      case 'iscsi':
+        storageSubType = 'block'
+        diskTypeToDiskAttributes.thin.format = 'cow'
+        diskTypeToDiskAttributes.pre.format = 'raw'
+        templateDiskFormatToSparse = createAsMapping({
+          cow: true,
+          raw: false,
+        })
+        break
+
+      case 'cinder':
+      case 'managed_block_storage':
+        storageSubType = 'openstack'
+        diskTypeToDiskAttributes.thin.format = undefined
+        diskTypeToDiskAttributes.pre.format = 'raw'
+        templateDiskFormatToSparse = createAsMapping({
+          cow: true,
+          raw: false,
+        })
+        break
+
+      case 'unmanaged':
+        storageSubType = 'kubernetes'
+        diskTypeToDiskAttributes.thin.format = undefined
+        diskTypeToDiskAttributes.pre.format = undefined
+        templateDiskFormatToSparse = createAsMapping({
+          cow: true,
+          raw: false,
+        })
+        break
+
+      default:
+        storageSubType = 'none'
+        diskTypeToDiskAttributes.thin.format = undefined
+        diskTypeToDiskAttributes.pre.format = undefined
+        templateDiskFormatToSparse = createAsMapping({
+          cow: true,
+          raw: false,
+        })
     }
 
     return {
       id: storageDomain.id,
       name: storageDomain.name,
       type: storageDomain.type,
-      storageType: storageDomain.storage?.type ?? 'unknown',
+      storageType,
+      storageSubType,
+      diskTypeToDiskAttributes,
+      templateDiskFormatToSparse,
 
       availableSpace: convertInt(storageDomain.available),
       usedSpace: convertInt(storageDomain.used),
@@ -706,11 +782,6 @@ const StorageDomain = {
       permissions,
       userPermits: new Set(),
       canUserUseDomain: false,
-
-      // configuration values may be required to calculate these values, therefore it's done in sagas
-      storageSubType: 'unknown',
-      diskTypeToDiskAttributes,
-      defaultDiskFormatToSparse,
     }
   },
 
