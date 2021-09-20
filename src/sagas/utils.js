@@ -8,7 +8,7 @@ import {
 } from 'redux-saga/effects'
 
 import AppConfiguration from '_/config'
-import { hidePassword } from '_/helpers'
+import { hidePassword, toJS } from '_/helpers'
 import Api from '_/ovirtapi'
 import semverGte from 'semver/functions/gte'
 import semverValid from 'semver/functions/valid'
@@ -221,7 +221,7 @@ export function* mapCpuOptions (version, architecture) {
  * @param {*} defaultValue Value to return if key or version for the key is not found
  */
 export function* mapConfigKeyVersion (configKey, version, defaultValue) {
-  const configValue = yield select(({ config }) => config.get(configKey).toJS())
+  const configValue = yield select(({ config }) => toJS(config.get(configKey, {})))
 
   let value = defaultValue
   if (version in configValue) {
