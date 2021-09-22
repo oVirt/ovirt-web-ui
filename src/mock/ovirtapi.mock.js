@@ -89,3 +89,4 @@ OvirtApi = {
 
 const Api = OvirtApi
 export default Api
+export * as Transforms from '../ovirtapi/transform'

@@ -206,21 +206,23 @@ function* composeProvisionSourceTemplate ({ vm, basic, disks }) {
    */
   const disksFromTemplate = disks
     .filter(disk => disk.isFromTemplate)
-    .map(disk => ({ disk, baseDisk: template.get('disks').find(tdisk => tdisk.get('id') === disk.id) }))
+    .map(disk => ({
+      disk,
+      templateDisk: template.get('disks').find(tdisk => tdisk.get('id') === disk.id),
+    }))
 
-  const templateIsDesktop = template.get('type') === 'desktop'
   const vmIsDesktop = basic.optimizedFor === 'desktop'
   const storageAllocation =
     vmIsDesktop &&
-    disksFromTemplate.every(({ disk, baseDisk }) => disk.storageDomainId === baseDisk.get('storageDomainId'))
+    disksFromTemplate.every(({ disk, templateDisk }) => disk.storageDomainId === templateDisk.get('storageDomainId'))
       ? 'thin'
       : 'clone'
 
-  const diskChanges = disksFromTemplate.map(({ disk, baseDisk }) => {
+  const diskChanges = disksFromTemplate.map(({ disk, templateDisk }) => {
     const changes = {}
 
     // did the disk's storage domain change?
-    if (disk.storageDomainId !== baseDisk.get('storageDomainId')) {
+    if (disk.storageDomainId !== templateDisk.get('storageDomainId')) {
       changes.storage_domains = {
         storage_domain: [{ id: disk.storageDomainId }],
       }
@@ -230,16 +232,14 @@ function* composeProvisionSourceTemplate ({ vm, basic, disks }) {
     const targetSD = storageDomains.get(disk.storageDomainId)
     Object.assign(
       changes,
-      determineTemplateDiskFormatAndSparse(
-        disk,
-        baseDisk,
+      determineTemplateDiskFormatAndSparse({
+        templateDisk,
         template,
-        templateIsDesktop,
         vmIsDesktop,
-        storageAllocation === 'thin',
+        vmStorageAllocationIsThin: storageAllocation === 'thin',
         targetSD,
-        targetCluster
-      )
+        targetCluster,
+      })
     )
 
     return Object.keys(changes).length === 0
@@ -283,8 +283,7 @@ function* composeProvisionSourceTemplate ({ vm, basic, disks }) {
  *   Desktop -> Server   -> No SD changes* ~~ Clone ... format: cow, sparse: true (Thin settings retained)
  *   Desktop -> Server   -> SD changes     ~~ Clone ... format: cow, sparse: true (Thin settings retained)
  *
- * @param userDisk Disk as approved by the user in the Create VM Storage step
- * @param baseDisk Disk as defined in the template
+ * @param templateDisk Disk as defined in the template
  * @param template Template the VM is being created from
  * @param templateIsDesktop Is the template type 'desktop'?
  * @param vmIsDesktop Is the VM being created with user selectable type/optimizedFor 'desktop'?
@@ -292,35 +291,34 @@ function* composeProvisionSourceTemplate ({ vm, basic, disks }) {
  * @param targetSD The storage domain where the disk will be created
  * @param targetCluster The cluster where the VM will be created
  */
-function determineTemplateDiskFormatAndSparse (
-  userDisk,
-  baseDisk,
+export function determineTemplateDiskFormatAndSparse ({
+  templateDisk,
   template,
-  templateIsDesktop,
+  templateIsDesktop = template.get('type') === 'desktop',
   vmIsDesktop,
   vmStorageAllocationIsThin,
   targetSD,
-  targetCluster
-) {
+  targetCluster,
+}) {
   const attributes = {}
   const isCopyPreallocatedFileBasedDiskSupported =
     template.get('isCopyPreallocatedFileBasedDiskSupported') ?? targetCluster.get('isCopyPreallocatedFileBasedDiskSupported')
 
   if (vmStorageAllocationIsThin || templateIsDesktop || vmIsDesktop) {
     attributes.format = 'cow'
-    attributes.sparse = targetSD.get('templateDiskFormatToSparse')('cow', isCopyPreallocatedFileBasedDiskSupported, baseDisk)
+    attributes.sparse = targetSD.get('templateDiskFormatToSparse')('cow', isCopyPreallocatedFileBasedDiskSupported, templateDisk)
   } else {
-    const format = baseDisk.get('format')
+    const format = templateDisk.get('format')
     const sparse =
-      userDisk.storageDomainId === baseDisk.get('storageDomainId')
-        ? baseDisk.get('sparse')
-        : targetSD.get('templateDiskFormatToSparse')(format, isCopyPreallocatedFileBasedDiskSupported, baseDisk)
+      targetSD.get('id') === templateDisk.get('storageDomainId')
+        ? templateDisk.get('sparse')
+        : targetSD.get('templateDiskFormatToSparse')(format, isCopyPreallocatedFileBasedDiskSupported, templateDisk)
 
     attributes.format = format
     attributes.sparse = sparse
   }
 
-  return (baseDisk.get('format') === attributes.format && baseDisk.get('sparse') === attributes.sparse)
+  return (templateDisk.get('format') === attributes.format && templateDisk.get('sparse') === attributes.sparse)
     ? {}
     : attributes
 }

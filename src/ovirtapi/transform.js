@@ -35,7 +35,7 @@ import type {
   EngineOptionMaxNumOfVmCpusPerArchType,
 } from './types'
 
-import { isWindows } from '_/helpers'
+import { isWindows, toJS } from '_/helpers'
 import { DEFAULT_ARCH } from '_/constants'
 
 function vCpusCount ({ cpu }: { cpu: Object }): number {
@@ -713,7 +713,9 @@ const StorageDomain = {
           (format, isCopyPreallocatedFileBasedDiskSupported, disk) =>
             format === 'cow'
               ? true
-              : (isCopyPreallocatedFileBasedDiskSupported && disk) ? disk.sparse : true
+              : (isCopyPreallocatedFileBasedDiskSupported && disk)
+                ? toJS(disk).sparse
+                : true
         break
 
       case 'fcp':
