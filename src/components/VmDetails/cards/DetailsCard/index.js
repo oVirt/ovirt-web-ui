@@ -692,8 +692,7 @@ class DetailsCard extends React.Component {
 
     // Data Center
     const dataCenterId = (clusters && clusters.getIn([clusterId, 'dataCenterId']))
-    const dataCenter = dataCenters && dataCenters.find(v => v.id === dataCenterId)
-    const dataCenterName = (dataCenter && dataCenter.name) || msg.notAvailable()
+    const dataCenterName = dataCenters?.[dataCenterId]?.name ?? msg.notAvailable()
 
     // Template
     const templateId = vm.getIn(['template', 'id'])

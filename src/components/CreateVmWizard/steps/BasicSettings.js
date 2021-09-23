@@ -174,7 +174,7 @@ class BasicSettings extends React.Component {
 
     const okName = dataSet.name && isVmNameValid(dataSet.name)
 
-    const okDataCenter = isValidUid(dataSet.dataCenterId) && dataCenters.find(dc => dc.id === dataSet.dataCenterId) !== undefined
+    const okDataCenter = isValidUid(dataSet.dataCenterId) && dataCenters[dataSet.dataCenterId] !== undefined
     const okCluster = isValidUid(dataSet.clusterId) &&
       clusters.get(dataSet.clusterId) !== undefined &&
       clusters.getIn([dataSet.clusterId, 'dataCenterId']) === dataSet.dataCenterId
@@ -400,7 +400,7 @@ class BasicSettings extends React.Component {
       createClusterList({ clusters, locale })
         .map(cluster => ({
           id: cluster.id,
-          value: `${cluster.value} (${dataCenters.find(dc => dc.id === cluster.datacenter).name})`,
+          value: `${cluster.value} (${dataCenters[cluster.datacenter].name})`,
         }))
     if (!isValidUid(data.clusterId)) {
       clusterList.unshift({ id: '_', value: clusterList.length === 0 ? `-- ${msg.noClustersAvailable()} --` : `-- ${msg.createVmWizardSelectCluster()} --` })
