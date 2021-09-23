@@ -7,15 +7,10 @@ import style from './style.css'
  * or default when icon not provided
  */
 
-const VmIcon = ({ icon, className, missingIconClassName }) => {
-  if (icon) {
-    const data = icon.get('data')
-    const type = icon.get('type')
-
-    if (data) {
-      const src = `data:${type};base64,${data}`
-      return <img src={src} className={`${style.icon} ${className}`} alt='' />
-    }
+const VmIcon = ({ icon: { data, type } = {}, className, missingIconClassName }) => {
+  if (data) {
+    const src = `data:${type};base64,${data}`
+    return <img src={src} className={`${style.icon} ${className}`} alt='' />
   }
 
   return <span className={missingIconClassName} />
