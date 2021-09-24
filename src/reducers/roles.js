@@ -1,10 +1,20 @@
-import { fromJS } from 'immutable'
+// @flow
+import type { RoleType } from '_/ovirtapi/types'
 
-import { actionReducer } from './utils'
-import { arrayToMap } from '_/helpers'
+import produce from 'immer'
 import { SET_ROLES } from '_/constants'
+import { arrayToMap } from '_/helpers'
+import { actionReducer } from './utils'
 
-const initialState = fromJS({})
+type RoleStateType = RoleType & {
+  permitNames: Array<string>
+}
+
+type RolesStateType = {
+  [roleId: string]: RoleStateType
+}
+
+const initialState: RolesStateType = {}
 
 /*
  * Store system roles (groups of permits) the App's user has access to:
@@ -29,19 +39,16 @@ const initialState = fromJS({})
  * }
  */
 
-const roles = actionReducer(
-  initialState,
-  {
-    [SET_ROLES] (state, { payload: { roles } }) {
-      const idToRoleMap = arrayToMap(roles, role => role.id)
-      for (const id of Object.keys(idToRoleMap)) {
-        idToRoleMap[id].permitNames =
-          idToRoleMap[id].permits.map(permit => permit.name)
-      }
-      return fromJS(idToRoleMap)
-    },
-  }
-)
+const roles = actionReducer(initialState, {
+  [SET_ROLES]: produce((draft: RolesStateType, { payload: { roles } }: { payload: { roles: Array<RoleType> }}) => {
+    const extendedRoles: Array<RoleStateType> = roles.map(role => ({
+      ...role,
+      permitNames: role.permits.map(permit => permit.name),
+    }))
+
+    return arrayToMap(extendedRoles, role => role.id)
+  }),
+})
 
 export default roles
 export {
