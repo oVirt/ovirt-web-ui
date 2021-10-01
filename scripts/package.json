@@ -1,0 +1,10 @@
+{
+    "name": "script_package",
+    "version": "0.0.1",
+    "eslintConfig": {
+        "env": {
+            "node": true
+        },
+        "extends": "../config/eslint.js"
+    }
+}

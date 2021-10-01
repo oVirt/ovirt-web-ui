@@ -107,7 +107,7 @@ function SagaErrorBridge (storeRootTask: Task) {
     }
   }
 
-  storeRootTask.done.catch(err => this.throw(err))
+  storeRootTask.toPromise().catch(err => this.throw(err))
 }
 
 function onResourcesLoaded () {

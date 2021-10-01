@@ -1,5 +1,3 @@
-import { combineReducers } from 'redux'
-
 import config from './config'
 import vms from './vms'
 import userMessages from './userMessages'
@@ -17,7 +15,7 @@ import consoles from './consoles'
 import pendingTasks from './pendingTasks'
 import roles from './roles'
 
-export default combineReducers({
+export default {
   config,
   vms,
   userMessages,
@@ -34,4 +32,4 @@ export default combineReducers({
   consoles,
   pendingTasks,
   roles,
-})
+}

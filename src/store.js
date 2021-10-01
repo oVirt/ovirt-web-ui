@@ -1,5 +1,5 @@
 // @flow
-import { createStore, applyMiddleware, compose, type History, type StoreCreator } from 'redux'
+import { createStore, applyMiddleware, compose, type History, type StoreCreator, combineReducers } from 'redux'
 import createSagaMiddleware, { type SagaMiddleware, type Task } from 'redux-saga'
 import { connectRouter, routerMiddleware } from 'connected-react-router'
 import { createBrowserHistory } from 'history'
@@ -52,7 +52,10 @@ export default function configureStore (): StoreCreator & { rootTask: Task, hist
   })
 
   const store: StoreCreator = createStore(
-    connectRouter(history)(reducers),
+    combineReducers({
+      router: connectRouter(history),
+      ...reducers,
+    }),
     composeEnhancers(
       applyMiddleware(
         routerMiddleware(history),

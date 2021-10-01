@@ -15,20 +15,21 @@
 
     <link id="branding-favicon" rel="shortcut icon" href="{{htmlWebpackPlugin.options.publicPath}}branding/images/favicon.ico" />
 
-  {{#if htmlWebpackPlugin.options.jspSSO}}
-    <!-- In prod mode, JSP code will inject SSO tokens on the server side. -->
     <script type="text/javascript">
-      <c:if test="${sessionScope['userInfo'] != null}">
-      var userInfo = {
-        <c:forEach items="${sessionScope['userInfo']}" var="entry" varStatus="loop">
-          "${entry.key}": "${entry.value}"${loop.last ? '' : ','}
-        </c:forEach>
-      };
-      </c:if>
+    {{#if htmlWebpackPlugin.options.jspSSO}}
+      <!-- In prod mode, JSP code will inject SSO tokens on the server side. -->
+        <c:if test="${sessionScope['userInfo'] != null}">
+        var userInfo = {
+          <c:forEach items="${sessionScope['userInfo']}" var="entry" varStatus="loop">
+            "${entry.key}": "${entry.value}"${loop.last ? '' : ','}
+          </c:forEach>
+        };
+        </c:if>
+    {{else}}
+      <!-- In dev mode, webpack will inject SSO tokens -->
+      var userInfo = {{{ htmlWebpackPlugin.options.userInfo }}}  
+    {{/if}}
     </script>
-  {{else}}
-    <!-- In dev mode, webpack will inject SSO tokens to the js bundle. -->
-  {{/if}}
   </head>
   <body>
     <div id="root"></div>

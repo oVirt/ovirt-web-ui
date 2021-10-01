@@ -1,4 +1,4 @@
-import { all, call, put, takeEvery, select } from 'redux-saga/effects'
+import { all, call, put, takeEvery, select, putResolve } from 'redux-saga/effects'
 import pick from 'lodash/pick'
 
 import Product from '_/version'
@@ -176,13 +176,13 @@ function* checkUserFilterPermissions () {
   yield put(setAdministrator(isAdmin))
 
   if (!isAdmin) {
-    yield put.resolve(setUserFilterPermission(true))
+    yield putResolve(setUserFilterPermission(true))
     return
   }
 
   const alwaysFilterOption = yield fetchGeneralEngineOption('AlwaysFilterResultsForWebUi', 'false')
   const isAlwaysFilterOption = alwaysFilterOption === 'true'
-  yield put.resolve(setUserFilterPermission(isAlwaysFilterOption))
+  yield putResolve(setUserFilterPermission(isAlwaysFilterOption))
 }
 
 function* loadFilters () {

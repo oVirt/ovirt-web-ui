@@ -11,9 +11,8 @@ const InlineChunkHtmlPlugin = require('react-dev-utils/InlineChunkHtmlPlugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin')
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin')
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
-const safePostCssParser = require('postcss-safe-parser')
 
 const postcssPresetEnv = require('postcss-preset-env')
 const paths = require('./paths')
@@ -38,15 +37,13 @@ if (!publicPath.endsWith('/')) {
 
 // This is the production configuration.
 // It compiles slowly and is focused on producing a fast and minimal bundle.
-module.exports = ((webpackEnv) => {
-  const isEnvDevelopment = webpackEnv === 'development'
-  const isEnvProduction = webpackEnv === 'production'
+module.exports = (() => {
   let fontsToEmbed
 
   const theConfig = {
     mode: 'production',
     bail: true,
-    devtool: isEnvDevelopment ? 'eval-source-map' : 'source-map',
+    devtool: 'source-map',
 
     // These are the "entry points" to our application.
     // This means they will be the "root" imports that are included in JS bundle.
@@ -60,7 +57,7 @@ module.exports = ((webpackEnv) => {
       // The build folder.
       path: paths.appBuild,
       // Add /* filename */ comments to generated require()s in the output.
-      pathinfo: isEnvDevelopment,
+      pathinfo: false,
       // Generated JS file names (with nested folders).
       // There will be one main bundle, and one file per asynchronous chunk.
       // We don't currently advertise code splitting but Webpack supports it.
@@ -93,7 +90,7 @@ module.exports = ((webpackEnv) => {
         name: entrypoint => `runtime-${entrypoint.name}`,
       },
 
-      minimize: isEnvProduction,
+      minimize: true,
       minimizer: [
         new TerserPlugin({ // minify JS with source maps
           cache: true,
@@ -125,12 +122,7 @@ module.exports = ((webpackEnv) => {
             },
           },
         }),
-        new OptimizeCSSAssetsPlugin({ // minify CSS with source maps
-          cssProcessorOptions: {
-            parser: safePostCssParser,
-            map: { inline: false, annotation: true },
-          }
-        })
+        new CssMinimizerPlugin(),
       ],
     },
 
@@ -169,7 +161,7 @@ module.exports = ((webpackEnv) => {
                 options: {
                   babelrc: false,
                   configFile: false,
-                  compact: isEnvProduction,
+                  compact: true,
 
                   presets: [ './config/babel.app.config.js' ],
 
@@ -405,32 +397,20 @@ module.exports = ((webpackEnv) => {
       new webpack.DefinePlugin(env),
 
       // Embed the small webpack runtime script in index.html
-      isEnvProduction && new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/runtime-.+[.]js/]),
+      new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/runtime-.+[.]js/]),
 
       // Keep the chunk id stable as long as the contents of the chunks stay the same (i.e. no new modules are used)
-      isEnvProduction && new webpack.HashedModuleIdsPlugin(),
+      new webpack.HashedModuleIdsPlugin(),
 
       // Extract CSS to files - style-loader leaves them embedded in the JS bundle
-      isEnvProduction && new MiniCssExtractPlugin({
+      new MiniCssExtractPlugin({
         filename: 'static/css/[name].[contenthash:8].css',
         chunkFilename: 'static/css/[name].[contenthash:8].chunk.css',
       }),
 
-      // This is necessary to emit hot updates (CSS and Fast Refresh):
-      isEnvDevelopment && new webpack.HotModuleReplacementPlugin(),
-
-      // Watcher doesn't work well if you mistype casing in a path so we use
-      // a plugin that prints an error when you attempt to do this.
-      isEnvDevelopment && new CaseSensitivePathsPlugin(),
-
-      // If you require a missing module and then `npm install` it, you still have
-      // to restart the development server for Webpack to discover it. This plugin
-      // makes the discovery automatic so you don't have to restart.
-      isEnvDevelopment && new WatchMissingNodeModulesPlugin(paths.appNodeModules),
-
       // Fail the build if the app sources have lint errors
       // TODO: Add ESLintPlugin (https://github.com/webpack-contrib/eslint-webpack-plugin)
-    ].filter(Boolean),
+    ],
 
     // Some libraries import Node modules but don't use them in the browser.
     // Tell webpack to provide empty mocks for them so importing them works.
@@ -452,8 +432,8 @@ module.exports = ((webpackEnv) => {
 
   if (process.env.V) {
     const colors = tty.isatty(1)
-    console.log(`${webpackEnv} webpack configuration:`)
+    console.log('Production webpack configuration:')
     console.log(util.inspect(theConfig, { compact: false, breakLength: 120, depth: null, colors }))
   }
   return theConfig
-})('production')
+})()

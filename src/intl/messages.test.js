@@ -1,6 +1,6 @@
 /* eslint-env jest */
 
-import parser from 'intl-messageformat-parser'
+import parser from '@formatjs/icu-messageformat-parser'
 import { messages as englishMessages } from './messages'
 import translatedMessages from './translated-messages.json'
 
