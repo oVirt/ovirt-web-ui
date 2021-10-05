@@ -64,7 +64,7 @@ const messageFormatCache: {[MessageIdType]: typeof IntlMessageFormat} = {}
 function formatMessage (id: MessageIdType, values: ?Object, targetLocale: string): string {
   let messageFormat = messageFormatCache[id]
   if (!messageFormat) {
-    messageFormat = new IntlMessageFormat(getMessage(id, targetLocale), targetLocale)
+    messageFormat = new IntlMessageFormat(getMessage(id, targetLocale), targetLocale, {}, { ignoreTag: true })
     messageFormatCache[id] = messageFormat
   }
   return messageFormat.format(values)
