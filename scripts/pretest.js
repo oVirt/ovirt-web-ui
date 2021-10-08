@@ -1,3 +1,3 @@
-var checkRequiredFiles = require('./utils/checkRequiredFiles');
+const checkRequiredFiles = require('./utils/checkRequiredFiles')
 
-checkRequiredFiles();
+checkRequiredFiles()

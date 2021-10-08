@@ -3,7 +3,7 @@ import path from 'path'
 import { sync as mkdirpSync } from 'mkdirp'
 import chalk from 'chalk'
 
-function normalizeMessages(messages) {
+function normalizeMessages (messages) {
   return Object.keys(messages)
     .map(key => {
       const value = messages[key]
@@ -11,17 +11,17 @@ function normalizeMessages(messages) {
     })
 }
 
-function toReactIntlMessageDescriptor(messageId, messageValue) {
+function toReactIntlMessageDescriptor (messageId, messageValue) {
   if (typeof messageValue === 'string' || messageValue instanceof String) {
     return {
       id: messageId,
-      defaultMessage: messageValue
+      defaultMessage: messageValue,
     }
   }
   if ('message' in messageValue) {
-    const messageDescriptor: Object = {
+    const messageDescriptor = {
       id: messageId,
-      defaultMessage: messageValue.message
+      defaultMessage: messageValue.message,
     }
     if ('description' in messageValue) {
       messageDescriptor.description = messageValue.description
@@ -30,7 +30,7 @@ function toReactIntlMessageDescriptor(messageId, messageValue) {
   }
 }
 
-function extractMessages(messages, destDir, destFile) {
+function extractMessages (messages, destDir, destFile) {
   console.log(chalk.green(`> [extract-messages.js] write file -> ${destFile} ✔️`))
   const json2poMessages = normalizeMessages(messages)
   mkdirpSync(destDir)

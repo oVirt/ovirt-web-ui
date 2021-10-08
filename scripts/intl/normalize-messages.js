@@ -9,7 +9,7 @@ import stableStringify from 'json-stable-stringify-without-jsonify'
  *
  * @param translations object from zanata
  */
-function removeEmptyMessages(translations) {
+function removeEmptyMessages (translations) {
   Object.keys(translations).forEach(langKey => {
     const languageMessages = translations[langKey]
     Object.keys(languageMessages).forEach(messageKey => {
@@ -21,16 +21,15 @@ function removeEmptyMessages(translations) {
   })
 }
 
-function normalize(source, destination) {
+function normalize (source, destination) {
   console.log(chalk.green(`> [normalize-messages.js] write file -> ${destination} ✔`))
   const stringContent = fs.readFileSync(source, { encoding: 'utf8' })
   const parsedContent = JSON.parse(stringContent)
   removeEmptyMessages(parsedContent)
-  const serializedContent = stableStringify(parsedContent, { space: 2 }) + '\n'
 
   const pretty = stableStringify(parsedContent, {
     space: '  ',
-    cmp: (a, b) => { return a.key > b.key ? 1 : -1 }
+    cmp: (a, b) => { return a.key > b.key ? 1 : -1 },
   }) + '\n'
 
   fs.writeFileSync(destination, pretty)
@@ -46,4 +45,3 @@ normalize(
   path.join('extra', 'from-zanata', 'translated-time-durations.json'),
   path.join('src', 'intl', 'translated-time-durations.json')
 )
-
