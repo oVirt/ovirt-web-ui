@@ -8,7 +8,7 @@ import {
 } from 'redux-saga/effects'
 
 import AppConfiguration from '_/config'
-import { hidePassword } from '_/helpers'
+import { hidePassword, toJS } from '_/helpers'
 import Api from '_/ovirtapi'
 import semverGte from 'semver/functions/gte'
 import semverValid from 'semver/functions/valid'
@@ -211,4 +211,21 @@ export function* mapCpuOptions (version, architecture) {
     maxNumOfThreads: maxNumOfThreads.get(version) || maxNumOfThreads.get(DEFAULT_ENGINE_OPTION_VERSION),
     maxNumOfVmCpus: maxNumOfVmCpusPerArch_[architecture] || maxNumOfVmCpusPerArch_[DEFAULT_ARCH],
   }
+}
+
+/**
+ * Map an entity's cluster version to the given redux `config.configValue` key.
+ *
+ * @param {string} configKey Configuration key in the `config.configValues` redux store
+ * @param {string} version Cluster version
+ * @param {*} defaultValue Value to return if key or version for the key is not found
+ */
+export function* mapConfigKeyVersion (configKey, version, defaultValue) {
+  const configValue = yield select(({ config }) => toJS(config.get(configKey, {})))
+
+  let value = defaultValue
+  if (version in configValue) {
+    value = configValue[version]
+  }
+  return value
 }

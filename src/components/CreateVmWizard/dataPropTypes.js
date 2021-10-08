@@ -49,8 +49,6 @@ export const STORAGE_SHAPE = {
   storageDomainId: PropTypes.string,
 
   bootable: PropTypes.bool,
-  iface: PropTypes.string, // [ ide | sata | virtio | virtio_scsi ]
-  type: PropTypes.string, // [ image | lun | cinder ]
   format: PropTypes.string, // [ cow | raw ]
   size: PropTypes.number, // bytes
   isFromTemplate: PropTypes.bool,

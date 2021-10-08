@@ -402,12 +402,13 @@ class CreateVmWizard extends React.Component {
                    *   - desktop -> Thin -> cow / 'thin'
                    *   - server or high performance -> Clone -> raw / as defined in the template
                    */
+                  // TODO: See if the function `determineTemplateDiskFormatAndSparse()` can be used here
+                  //       to give exactly matching results to the UI and the API create call
                   const diskType = // constrain to values from createDiskTypeList()
-                    template.get('type') === 'desktop'
+                    template.get('type') === 'desktop' ||
+                    this.state.steps.basic.optimizedFor === 'desktop'
                       ? 'thin'
-                      : this.state.steps.basic.optimizedFor === 'desktop'
-                        ? 'thin'
-                        : disk.get('sparse') ? 'thin' : 'pre'
+                      : disk.get('sparse') ? 'thin' : 'pre'
 
                   return {
                     id: disk.get('attachmentId'),
@@ -418,8 +419,6 @@ class CreateVmWizard extends React.Component {
                     canUserUseStorageDomain,
 
                     bootable: disk.get('bootable'),
-                    iface: disk.get('iface'),
-                    type: disk.get('type'), // [ image | lun | cinder ]
                     diskType,
                     size: disk.get('provisionedSize'), // bytes
                     isFromTemplate: true,

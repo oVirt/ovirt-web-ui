@@ -9,6 +9,33 @@ export type VmType = Object
 
 export type ApiBooleanType = "true" | "false"
 
+export type ApiPermissionType = {
+  role: {
+    id: string,
+    name: string,
+    permits: {
+      permit: Array<{
+        name: string
+      }>
+    }
+  },
+  user?: {
+    id: string
+  },
+  group?: {
+    id: string
+  }
+}
+export type PermissionType = {
+  name: string,
+  userId?: string,
+  groupId?: string,
+  roleId?: string,
+  permits: Array<{
+    name: string
+  }>
+}
+
 export type ApiStatisticKindType = "counter" | "gauge"
 export type ApiStatisticTypeType = "decimal" | "integer" | "string"
 export type ApiStatisticUnitType = "bytes" | "bits_per_second" | "bytes_per_second" | "count_per_second" | "seconds" | "percent" | "none"
@@ -96,10 +123,10 @@ export type DiskType = {
   id?: string,
   name: string, // aka alias
   status?: "illegal" | "locked" | "ok", // for type = [ "image" | "cinder" ]
-  type: DiskTypeType,
+  type?: DiskTypeType,
 
   // disk parts for type = "image"
-  format?: "cow" | "raw", // if sparse then "cow" else "raw"
+  format?: "cow" | "raw",
   sparse?: boolean,
   actualSize?: number,
   provisionedSize?: number,
@@ -112,7 +139,33 @@ export type DiskType = {
 export type ApiDataCenterType = Object
 export type DataCenterType = Object
 
-export type ApiStorageDomainType = Object
+export type ApiStorageDomainType = { // subset we care about
+  id: string,
+  available: number,
+  backup: boolean,
+  comment: string,
+  description: string,
+  import: boolean,
+  master: boolean,
+  name: string,
+  status: "activating" | "active" | "detaching" | "inactive" | "locked" | "maintenance" | "mixed" | "preparing_for_maintenance" | "unattached" | "unknown",
+  storage: {
+    comment: string,
+    description: string,
+    id: string,
+    name: string,
+    // NOTE: "unmanaged" is a valid value but is not documented in the REST API
+    type: "cinder" | "fcp" | "glance" | "glusterfs" | "iscsi" | "localfs" | "managed_block_storage" | "nfs" | "posixfs" | "unmanaged"
+  },
+  type: "data" | "export" | "image" | "iso" | "managed_block_storage" | "volume",
+  used: number,
+
+  // linked data
+  data_center?: Object,
+  permissions?: {
+    permission: Array<ApiPermissionType>
+  }
+}
 export type StorageDomainType = Object
 
 export type ApiCdRomType = {
@@ -284,33 +337,6 @@ export type UserType = {
   lastName: string,
   email: string,
   principal: string
-}
-
-export type ApiPermissionType = {
-  role: {
-    id: string,
-    name: string,
-    permits: {
-      permit: Array<{
-        name: string
-      }>
-    }
-  },
-  user?: {
-    id: string
-  },
-  group?: {
-    id: string
-  }
-}
-export type PermissionType = {
-  name: string,
-  userId?: string,
-  groupId?: string,
-  roleId?: string,
-  permits: Array<{
-    name: string
-  }>
 }
 
 export type ApiRoleType = Object

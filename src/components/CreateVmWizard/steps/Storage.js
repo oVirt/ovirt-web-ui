@@ -531,10 +531,7 @@ class Storage extends React.Component {
           storageDomainId,
 
           bootable: false,
-          iface: 'virtio_scsi',
-          type: 'image',
           diskType: 'thin',
-
           size: (diskInitialSizeInGib * 1024 ** 3),
         },
       },

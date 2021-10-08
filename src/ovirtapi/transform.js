@@ -35,7 +35,7 @@ import type {
   EngineOptionMaxNumOfVmCpusPerArchType,
 } from './types'
 
-import { isWindows } from '_/helpers'
+import { isWindows, toJS } from '_/helpers'
 import { DEFAULT_ARCH } from '_/constants'
 
 function vCpusCount ({ cpu }: { cpu: Object }): number {
@@ -470,14 +470,14 @@ const Template = {
 
       // engine option config values that map to the Templates's custom compatibility version.
       // the mapping from engine options are done in sagas. if custom compatibility version
-      // is not set, the fetch saga will set `cpuOptions` to `null`. -1 values here make it
-      // obvious if the fetch saga fails.
+      // is not set, the fetch saga will set the values to `null`.
       cpuOptions: {
-        maxNumOfSockets: -1,
+        maxNumOfSockets: -1, // -1 values make it obvious if the fetch saga fails
         maxNumOfCores: -1,
         maxNumOfThreads: -1,
         maxNumOfVmCpus: -1,
       },
+      isCopyPreallocatedFileBasedDiskSupported: null,
     })
   },
 
@@ -556,7 +556,6 @@ const DiskAttachment = {
       id: disk.id,
       name: disk.alias,
       type: disk.storage_type, // [ image | lun | cinder ]
-
       format: disk.format, // [ cow | raw ] only for types [ images | cinder ]
       status: disk.status, // [ illegal | locked | ok ] only for types [ images | cinder ]
       sparse: convertBool(disk.sparse),
@@ -564,17 +563,11 @@ const DiskAttachment = {
       actualSize: convertInt(disk.actual_size),
       provisionedSize: convertInt(disk.provisioned_size),
       lunSize:
-        disk.lun_storage &&
-        disk.lun_storage.logical_units &&
-        disk.lun_storage.logical_units.logical_unit &&
-        disk.lun_storage.logical_units.logical_unit[0] &&
+        disk.lun_storage?.logical_units?.logical_unit?.[0] &&
         convertInt(disk.lun_storage.logical_units.logical_unit[0].size),
 
       storageDomainId: // only for types [ image | cinder ]
-        disk.storage_domains &&
-        disk.storage_domains.storage_domain &&
-        disk.storage_domains.storage_domain[0] &&
-        disk.storage_domains.storage_domain[0].id,
+        disk.storage_domains?.storage_domain?.[0].id,
     })
 
     return {
@@ -605,8 +598,8 @@ const DiskAttachment = {
         id: disk.id,
         alias: disk.name,
 
-        storage_type: 'image',
-        format: disk.format || (disk.sparse && disk.sparse ? 'cow' : 'raw'),
+        storage_type: disk.type,
+        format: disk.format,
         sparse: toApiBoolean(disk.sparse),
         provisioned_size: disk.provisionedSize,
 
@@ -661,10 +654,120 @@ const StorageDomain = {
   toInternal ({ storageDomain }: { storageDomain: ApiStorageDomainType }): StorageDomainType {
     const permissions = Permissions.toInternal({ permissions: storageDomain?.permissions?.permission })
 
+    //
+    // When creating a new disk, the diskType (disk allocation on the UI) maps to a disk
+    // __sparse__ and __format__ attributes.  Hold the default __sparse__ and __format__
+    // disk attributes for each diskType available for selection in the app.  Currently
+    // diskType may be thin provisioned ('thin') or preallocated ('pre').  These values
+    // change per storage domain based on the domain's __storageType__ and are mapped
+    // in this transform.
+    //
+    // Valid values for __format__ are 'raw', 'cow' and `undefined`. The values are mapped
+    // by the REST api from api model `DiskFormat` to business entity `VolumeFormat.COW`,
+    // `VolumeFormat.RAW`, or `VolumeFormat.Unassigned` respectively.
+    //
+    const diskTypeToDiskAttributes: {
+      ['thin' | 'pre']: { sparse: boolean, format?: 'raw' | 'cow' }
+    } = {
+      thin: { sparse: true, format: 'raw' },
+      pre: { sparse: false, format: 'raw' },
+    }
+
+    //
+    // When handling template disks during Create VM, a disk's __format__ is the primary
+    // disk attribute to consider.  Provide a mapping function from the disk's __format__
+    // to the disk's __sparse__ value with a few extra pieces of information available to
+    // help make the decision.  The diskType is not relevant.  These values change per
+    // storage domain based on the domain's __storageType__ and are mapped in this
+    // transform.
+    //
+    let templateDiskFormatToSparse =
+      (format: string, isCopyPreallocatedFileBasedDiskSupported: boolean, disk: DiskType): boolean =>
+        false
+
+    const createAsMapping = (mapping: {| 'cow': boolean, 'raw': boolean |}) =>
+      (format: string, isCopyPreallocatedFileBasedDiskSupported: boolean, disk: DiskType): boolean =>
+        mapping[format]
+
+    //
+    // These values are calculated as needed in webadmin.  We pre-calculate the values
+    // here for ease of use via simple lookup.
+    //
+    // storageSubType from: backend/manager/modules/common/src/main/java/org/ovirt/engine/core/common/businessentities/storage/StorageType.java
+    // diskTypeToDiskAttributes from: frontend/webadmin/modules/uicommonweb/src/main/java/org/ovirt/engine/ui/uicommonweb/dataprovider/AsyncDataProvider.java#getDiskVolumeFormat
+    // templateDiskFormatToSparse from: frontend/webadmin/modules/uicommonweb/src/main/java/org/ovirt/engine/ui/uicommonweb/dataprovider/AsyncDataProvider.java#getVolumeType
+    //
+    const storageType = storageDomain.storage?.type ?? 'unknown'
+    let storageSubType = 'unknown'
+
+    switch (storageType) {
+      case 'nfs':
+      case 'localfs':
+      case 'posixfs':
+      case 'glusterfs':
+      case 'glance':
+        storageSubType = 'file'
+        diskTypeToDiskAttributes.thin.format = 'raw'
+        diskTypeToDiskAttributes.pre.format = 'raw'
+        templateDiskFormatToSparse =
+          (format, isCopyPreallocatedFileBasedDiskSupported, disk) =>
+            format === 'cow'
+              ? true
+              : (isCopyPreallocatedFileBasedDiskSupported && disk)
+                ? toJS(disk).sparse
+                : true
+        break
+
+      case 'fcp':
+      case 'iscsi':
+        storageSubType = 'block'
+        diskTypeToDiskAttributes.thin.format = 'cow'
+        diskTypeToDiskAttributes.pre.format = 'raw'
+        templateDiskFormatToSparse = createAsMapping({
+          cow: true,
+          raw: false,
+        })
+        break
+
+      case 'cinder':
+      case 'managed_block_storage':
+        storageSubType = 'openstack'
+        diskTypeToDiskAttributes.thin.format = undefined
+        diskTypeToDiskAttributes.pre.format = 'raw'
+        templateDiskFormatToSparse = createAsMapping({
+          cow: true,
+          raw: false,
+        })
+        break
+
+      case 'unmanaged':
+        storageSubType = 'kubernetes'
+        diskTypeToDiskAttributes.thin.format = undefined
+        diskTypeToDiskAttributes.pre.format = undefined
+        templateDiskFormatToSparse = createAsMapping({
+          cow: true,
+          raw: false,
+        })
+        break
+
+      default:
+        storageSubType = 'none'
+        diskTypeToDiskAttributes.thin.format = undefined
+        diskTypeToDiskAttributes.pre.format = undefined
+        templateDiskFormatToSparse = createAsMapping({
+          cow: true,
+          raw: false,
+        })
+    }
+
     return {
       id: storageDomain.id,
       name: storageDomain.name,
       type: storageDomain.type,
+      storageType,
+      storageSubType,
+      diskTypeToDiskAttributes,
+      templateDiskFormatToSparse,
 
       availableSpace: convertInt(storageDomain.available),
       usedSpace: convertInt(storageDomain.used),
@@ -677,7 +780,7 @@ const StorageDomain = {
         ? { [storageDomain.data_center.id]: storageDomain.status }
         : { },
 
-      // roles are required to calculate permits and 'canUse*', therefore its done in sagas
+      // roles are required to calculate permits and 'canUse*', therefore it's done in sagas
       permissions,
       userPermits: new Set(),
       canUserUseDomain: false,
@@ -749,13 +852,14 @@ const Cluster = {
       canUserUseCluster: false,
 
       // engine option config values that map to cluster compatibility version. mappings
-      // are done in sagas. -1 values make it obvious if the fetch saga fails
+      // are done in sagas.
       cpuOptions: {
-        maxNumOfSockets: -1,
+        maxNumOfSockets: -1, // -1 values make it obvious if the fetch saga fails
         maxNumOfCores: -1,
         maxNumOfThreads: -1,
         maxNumOfVmCpus: -1,
       },
+      isCopyPreallocatedFileBasedDiskSupported: null,
     }
 
     if (cluster.networks && cluster.networks.network && cluster.networks.network.length > 0) {
@@ -963,7 +1067,7 @@ const VmSessions = {
 //
 //
 const Permissions = {
-  toInternal ({ permissions = [] }: { permissions: Array<ApiPermissionType> }): Array<PermissionType> {
+  toInternal ({ permissions = [] }: { permissions?: Array<ApiPermissionType> }): Array<PermissionType> {
     return permissions.map(permission => ({
       name: permission.role.name,
       userId: permission.user && permission.user.id,

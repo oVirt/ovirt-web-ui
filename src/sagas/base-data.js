@@ -10,6 +10,7 @@ import {
   callExternalAction,
   entityPermissionsToUserPermits,
   mapCpuOptions,
+  mapConfigKeyVersion,
 } from './utils'
 
 import {
@@ -42,6 +43,7 @@ export function* fetchAllClusters () {
     // Map cluster attribute derived config values to the clusters
     for (const cluster of clustersInternal) {
       cluster.cpuOptions = yield mapCpuOptions(cluster.version, cluster.architecture)
+      cluster.isCopyPreallocatedFileBasedDiskSupported = yield mapConfigKeyVersion('CopyPreallocatedFileBasedDiskSupported', cluster.version, true)
     }
 
     yield put(setClusters(clustersInternal))
@@ -90,10 +92,13 @@ export function* fetchAllTemplates () {
     // Map template attribute derived config values to the templates
     for (const template of templatesInternal) {
       const customCompatVer = template.customCompatibilityVersion
-
-      template.cpuOptions = customCompatVer
-        ? yield mapCpuOptions(customCompatVer, template.cpu.arch)
-        : null
+      if (customCompatVer) {
+        template.cpuOptions = yield mapCpuOptions(customCompatVer, template.cpu.arch)
+        template.isCopyPreallocatedFileBasedDiskSupported = yield mapConfigKeyVersion('CopyPreallocatedFileBasedDiskSupported', customCompatVer, null)
+      } else {
+        template.cpuOptions = null
+        template.isCopyPreallocatedFileBasedDiskSupported = null
+      }
     }
 
     yield put(setTemplates(templatesInternal))
