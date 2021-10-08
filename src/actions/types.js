@@ -3,14 +3,14 @@ import * as C from '_/constants'
 import type { RemoteUserOptionsType } from '_/ovirtapi/types'
 
 export type LoadUserOptionsActionType = {
-  type: C.LOAD_USER_OPTIONS,
+  type: typeof C.LOAD_USER_OPTIONS,
   payload: {
     userOptions: RemoteUserOptionsType
   }
 }
 
 export type SaveGlobalOptionsActionType = {
-  type: C.SAVE_GLOBAL_OPTIONS,
+  type: typeof C.SAVE_GLOBAL_OPTIONS,
   payload: {|
     autoconnect?: string,
     refreshInterval?: number,
@@ -46,11 +46,8 @@ export type FailedExternalActionType = {
   type: 'FAILED_EXTERNAL_ACTION',
   payload: {
     message: string,
-    failedAction?: Object
-  } | {
-    message: string,
+    failedAction?: Object,
     messageDescriptor: ?MessageDescriptorType,
-    type: number | 'ERROR',
-    failedAction: Object
+    type?: number | 'ERROR'
   }
 }

@@ -4,10 +4,8 @@
 [include]
 
 [libs]
+<PROJECT_ROOT/flow-typed
 
 [options]
 module.name_mapper.extension='css' -> '<PROJECT_ROOT>/config/flow/css.js.flow'
 module.name_mapper='^_\/\(.*\)$' ->'<PROJECT_ROOT>/src/\1'
-suppress_comment=\\(.\\|\n\\)*\\$FlowFixMe
-suppress_comment=\\(.\\|\n\\)*\\$FlowIssue
-esproposal.optional_chaining=enable

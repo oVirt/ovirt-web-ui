@@ -14,7 +14,7 @@ import { actionReducer } from './utils'
 import { toJS } from '_/helpers'
 import uniqueId from 'lodash/uniqueId'
 
-import type { FailedExternalActionType } from '_/actions'
+import type { FailedExternalActionType } from '_/actions/types'
 
 function addLogEntry ({ state, message, type = 'ERROR', failedAction, messageDescriptor }: any): any {
   // TODO: use seq
@@ -40,7 +40,7 @@ const initialState = Immutable.fromJS({
   autoAcknowledge: false,
 })
 
-const userMessages = actionReducer(initialState, {
+const userMessages: any = actionReducer(initialState, {
   // Log external action failures (i.e. AJAX calls) as user messages
   [FAILED_EXTERNAL_ACTION] (state: any, { payload: { message, messageDescriptor, type, failedAction } }: FailedExternalActionType): any {
     return addLogEntry({

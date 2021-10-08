@@ -22,7 +22,7 @@ const initialState: {
   },
 }
 
-const consoles = actionReducer(initialState, {
+const consoles: any = actionReducer(initialState, {
   [SET_CONSOLE_TICKETS]: produce((draft: any, { payload: { vmId, proxyTicket, ticket } }: any): any => {
     draft.vms[vmId] = {
       ...draft.vms[vmId],

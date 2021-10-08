@@ -94,7 +94,7 @@ function addLinkElement (id: string, rel: string, href: string) {
   }
 }
 
-function SagaErrorBridge (storeRootTask: Task) {
+function SagaErrorBridge (storeRootTask: Task<any>) {
   let handler = null
 
   this.setErrorHandler = (errorHandler) => {

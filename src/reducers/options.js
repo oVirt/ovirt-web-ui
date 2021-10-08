@@ -61,9 +61,9 @@ const defaultOptions: UserOptionsType = {
   consoleOptions: {},
 }
 
-const initialState = fromJS({ ...defaultOptions })
+const initialState: any = fromJS({ ...defaultOptions })
 
-const options = actionReducer(initialState, {
+const options: any = actionReducer(initialState, {
   [C.SET_CONSOLE_OPTIONS] (clientState: any, { payload: { vmId, options } }: any): any {
     return clientState.setIn(['consoleOptions', vmId], options)
   },
