@@ -84,7 +84,7 @@
     "connected-react-router": "4.3.0",
     "core-js": "3.13.0",
     "history": "4.7.2",
-    "immer": "8.0.1",
+    "immer": "9.0.6",
     "immutable": "3.8.2",
     "intl-messageformat": "2.2.0",
     "jquery": "3.5.1",
@@ -115,11 +115,14 @@
   },
   "resolutions": {
     "bootstrap-select": "1.13.6",
+    "glob-parent": "^5.1.2",
     "handlebars": "4.7.7",
+    "immer": "9.0.6",
     "jquery": "3.5.1",
     "js-yaml": "3.13.1",
     "lodash": "^4.17.21",
-    "redux": "4.0.0"
+    "redux": "4.0.0",
+    "ua-parser-js": "^0.7.22"
   },
   "scripts": {
     "preinstall": "test -e ./autogen.sh && ./autogen.sh --prefix=/usr --datarootdir=/share || :",
