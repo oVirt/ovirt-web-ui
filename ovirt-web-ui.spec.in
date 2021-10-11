@@ -12,12 +12,12 @@ Release:        @PACKAGE_RPM_RELEASE@%{?release_suffix}%{?checkout}%{?dist}
 Summary:        VM Portal for %{product}
 License:        ASL 2.0
 URL:            https://github.com/oVirt/ovirt-web-ui
-Source0:        https://github.com/oVirt/ovirt-web-ui/archive/%{source_basename}-@PACKAGE_VERSION@.tar.gz
+Source0:        %{source_basename}-%{version}.tar.gz
 
 BuildArch: noarch
 
 # nodejs-modules embeds yarn and requires nodejs
-BuildRequires: ovirt-engine-nodejs-modules >= 2.0.58-1
+BuildRequires: ovirt-engine-nodejs-modules >= 2.0.60-1
 
 %description
 This package provides the VM Portal for %{product}.
@@ -48,6 +48,14 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Mon Oct 11 2021 Sharon Gratch <sgratch@redhat.com> - 1.7.2-1
+ - fix disks creation by correctly handling disk format and sparse attributes based on the target storage domain and
+   also based on the template's disk format for server/high performace/desktop VM types
+ - display error messages when VM's virtual CPU topology is set to invalid values
+ - fix downloading Remote Destop file for Firefox browser with the correct .rdp file extension instead of .vv extension
+ - push master builds to ovirt-4.4 branch as well
+ - update dependencies of immer, ua-parser-js and glob-parent packages
+
 * Wed Aug 11 2021 Sharon Gratch <sgratch@redhat.com> - 1.7.1-1
  - refactor initial VM/Pool page loading and background refresh
  - refactor login managed base-data, user, group, and role fetches
