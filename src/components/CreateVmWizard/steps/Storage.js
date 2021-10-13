@@ -530,7 +530,7 @@ class Storage extends React.Component {
           diskId: '_',
           storageDomainId,
 
-          bootable: false,
+          bootable: disks.length === 0,
           diskType: 'thin',
           size: (diskInitialSizeInGib * 1024 ** 3),
         },
