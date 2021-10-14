@@ -100,6 +100,6 @@ LoadingData.defaultProps = {
 
 export default connect(
   (state) => ({
-    requestActive: !state.activeRequests.isEmpty(),
+    requestActive: state.activeRequests.length > 0,
   })
 )(withMsg(LoadingData))

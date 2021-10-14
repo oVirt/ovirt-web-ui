@@ -21,14 +21,16 @@ const composeEnhancers: any =
    })) ||
   compose
 
-function initializeApiListener (store: StoreCreator) {
-  OvirtApi.addHttpListener((requestId, eventType) => {
-    if (eventType === 'START') {
-      store.dispatch(addActiveRequest(requestId))
-      return
-    }
-    if (eventType === 'STOP') {
-      store.dispatch(delayedRemoveActiveRequest(requestId))
+function initializeApiTransportListener (store: StoreCreator) {
+  OvirtApi.addHttpListener((requestTracker, eventType) => {
+    switch (eventType) {
+      case 'START':
+        store.dispatch(addActiveRequest(requestTracker))
+        break
+
+      case 'STOP':
+        store.dispatch(delayedRemoveActiveRequest(requestTracker))
+        break
     }
   })
 }
@@ -59,7 +61,7 @@ export default function configureStore (): StoreCreator & { rootTask: Task, hist
     )
   )
 
-  initializeApiListener(store)
+  initializeApiTransportListener(store)
   const rootTask: Task = sagaMiddleware.run(rootSaga)
 
   return {

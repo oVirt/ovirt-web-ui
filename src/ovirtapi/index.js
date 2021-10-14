@@ -481,7 +481,7 @@ const OvirtApi = {
        * Expected result from 4.4.5 : { user: <> , content: <>, id: <>, href: <> }
        *
        * Since legacy POST method does not return the newly created key/key_id we need to
-       * fetch it imemdiately after (successful) creation.
+       * fetch it immediately after (successful) creation.
        */
       return httpPost({
         url: `${AppConfiguration.applicationContext}/api/users/${userId}/sshpublickeys`,
@@ -565,15 +565,8 @@ const OvirtApi = {
   },
 }
 
-// export default new Proxy(OvirtApi, {
-//   get (target: Object, prop: string, receiver: Object): any {
-//     if (typeof target[prop] === 'function') {
-//       console.info(`getting OvirtApi.${prop}`)
-//     }
-//     return Reflect.get(...arguments)
-//   },
-// })
 export default OvirtApi
 export {
   Transforms,
 }
+export type * from './transport'
