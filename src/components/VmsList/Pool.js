@@ -22,7 +22,7 @@ const Pool = ({ pool, icons, onStart }) => {
   const idPrefix = `pool-${pool.get('name')}`
   const osName = getOsHumanName(pool.getIn(['vm', 'os', 'type']))
   const iconId = pool.getIn(['vm', 'icons', 'large', 'id'])
-  const icon = icons.get(iconId)
+  const icon = icons[iconId]
 
   return (
     <BaseCard idPrefix={idPrefix}>

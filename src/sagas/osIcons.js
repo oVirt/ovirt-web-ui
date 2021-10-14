@@ -20,7 +20,7 @@ export function* loadIconsFromLocalStorage () {
 }
 
 function* pushIconsToLocalStorage () {
-  const iconMap = yield select(state => state.icons) // ImmutableJS Map
+  const iconMap = yield select(state => state.icons)
   const iconsString = JSON.stringify(iconMap)
   saveToLocalStorage('icons', iconsString)
 }
@@ -32,8 +32,8 @@ export function* fetchUnknownIcons ({ vms = [], os = [] }) {
   os.forEach(os => iconsIds.add(os.icons.large.id))
 
   // reduce to just unknown
-  const allKnownIcons = yield select(state => state.icons)
-  const notLoadedIconIds = [...iconsIds].filter(id => id && !allKnownIcons.has(id))
+  const allKnownIconIds = yield select(state => Object.keys(state.icons))
+  const notLoadedIconIds = [...iconsIds].filter(id => id && !allKnownIconIds.includes(id))
 
   if (notLoadedIconIds.length > 0) {
     console.log(`Fetching ${notLoadedIconIds.length} OS icons:`, notLoadedIconIds)

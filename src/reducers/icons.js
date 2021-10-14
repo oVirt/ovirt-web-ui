@@ -1,16 +1,21 @@
-import { Map } from 'immutable'
+// @flow
+
+import produce from 'immer'
 import { UPDATE_ICONS } from '_/constants'
 import { actionReducer } from './utils'
 
-const initialState = Map()
+type IconsStateType = {
+  [iconId: string]: Object
+}
+
+const initialState: IconsStateType = {}
 
 const icons = actionReducer(initialState, {
-  [UPDATE_ICONS] (state, { payload: { icons } }) {
-    const updates = {}
-    icons.forEach(icon => { updates[icon.id] = icon })
-    // we don't need deep-immutable
-    return state.merge(updates)
-  },
+  [UPDATE_ICONS]: produce((draft: IconsStateType, { payload: { icons } }) => {
+    icons.forEach(icon => {
+      draft[icon.id] = icon
+    })
+  }),
 })
 
 export default icons
