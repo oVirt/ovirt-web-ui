@@ -1,5 +1,4 @@
-import { Map } from 'immutable'
-import { UPDATE_ICONS, REMOVE_ACTIVE_REQUEST, DELAYED_REMOVE_ACTIVE_REQUEST, ADD_ACTIVE_REQUEST } from '_/constants'
+import * as C from '_/constants'
 
 /**
  * Takes initial state of the reducer and a map of action handlers and returns a redux-compatible reducer.
@@ -38,12 +37,12 @@ export const actionReducer = (initialState, handlers, verbose) => (state = initi
   if (verbose) {
     let actionJson = JSON.stringify(action)
     if (actionJson.length > 250) {
-      if (action.type === UPDATE_ICONS) {
+      if (action.type === C.UPDATE_ICONS) {
         actionJson = actionJson.substring(0, 50) + ' ... [truncated] ...'
       }
     }
 
-    if (![ADD_ACTIVE_REQUEST, REMOVE_ACTIVE_REQUEST, DELAYED_REMOVE_ACTIVE_REQUEST].includes(action.type)) {
+    if (![C.ADD_ACTIVE_REQUEST, C.REMOVE_ACTIVE_REQUEST, C.DELAYED_REMOVE_ACTIVE_REQUEST].includes(action.type)) {
       console.log('Reducing action:', actionJson)
     }
   }
@@ -52,17 +51,4 @@ export const actionReducer = (initialState, handlers, verbose) => (state = initi
     return handlers[action.type](state, action)
   }
   return state
-}
-
-export function removeMissingItems ({ state, subStateName, idsToPreserve }) {
-  const newItems = idsToPreserve
-    .reduce((items, id) => {
-      const item = state.getIn([subStateName, id])
-      if (item) {
-        items.set(id, item)
-      }
-      return items
-    }, Map().asMutable())
-    .asImmutable()
-  return state.set(subStateName, newItems)
 }
