@@ -92,7 +92,7 @@ const MemoryCharts = ({ memoryStats, isRunning, id }) => {
               <AreaChart
                 id={`${id}-history-chart`}
                 data={history.map((item, i) => ({ x: i + 1, y: item, name: 'memory' }))}
-                labels={datum => `${datum.y}%`}
+                labels={({ datum }) => `${datum.y}%`}
               />
             )}
           </>

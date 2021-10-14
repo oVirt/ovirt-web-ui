@@ -77,7 +77,7 @@ const NetworkingCharts = ({ netStats, isRunning, id }) => {
               <AreaChart
                 id={`${id}-history-chart`}
                 data={history.map((item, i) => ({ x: i, y: item, name: 'cpu' }))}
-                labels={datum => `${datum.y}%`}
+                labels={({ datum }) => `${datum.y}%`}
               />
             )}
           </>
