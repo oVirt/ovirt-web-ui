@@ -123,6 +123,7 @@ class GlobalSettings extends Component {
         notificationSnoozeDuration: AppConfiguration.notificationSnoozeDurationInMinutes,
         persistLocale: AppConfiguration.persistLocale,
         fullScreenVnc: false,
+        fullScreenNoVnc: false,
         fullScreenSpice: false,
         ctrlAltEndVnc: false,
         ctrlAltEndSpice: false,
@@ -337,6 +338,24 @@ class GlobalSettings extends Component {
               }))('ctrlAltEndVnc'),
             ],
           },
+          noVnc: {
+            title: msg.noVncOptions(),
+            fields: [
+              ((name) => ({
+                title: msg.fullScreenMode(),
+                name,
+                body: (
+                  <Switch
+                    id={`${idPrefix}-${name}`}
+                    isChecked={draftValues[name]}
+                    onChange={(fullScreen) => {
+                      onChange(name)(fullScreen)
+                    }}
+                  />
+                ),
+              }))('fullScreenNoVnc'),
+            ],
+          },
           spice: {
             title: msg.spiceOptions(),
             fields: [
@@ -510,6 +529,7 @@ export default connect(
       refreshInterval: options.getIn(['remoteOptions', 'refreshInterval', 'content']),
       persistLocale: options.getIn(['remoteOptions', 'persistLocale', 'content']),
       fullScreenVnc: options.getIn(['remoteOptions', 'fullScreenVnc', 'content']),
+      fullScreenNoVnc: options.getIn(['remoteOptions', 'fullScreenNoVnc', 'content']),
       fullScreenSpice: options.getIn(['remoteOptions', 'fullScreenSpice', 'content']),
       ctrlAltEndVnc: options.getIn(['remoteOptions', 'ctrlAltEndVnc', 'content']),
       ctrlAltEndSpice: options.getIn(['remoteOptions', 'ctrlAltEndSpice', 'content']),
