@@ -40,7 +40,7 @@ const ReviewBasic = ({ id, dataCenters, clusters, isos, templates, operatingSyst
     <>
       <Item id={`${id}-name`} label={msg.name()}>{basic.name}</Item>
       { basic.description && <Item id={`${id}-desc`} label={msg.description()}>{basic.description}</Item> }
-      <Item id={`${id}-datacenter`} label={msg.dataCenter()}>{dataCenters.find(dc => dc.id === basic.dataCenterId).name}</Item>
+      <Item id={`${id}-datacenter`} label={msg.dataCenter()}>{dataCenters[basic.dataCenterId].name}</Item>
       <Item id={`${id}-cluster`} label={msg.cluster()}>{clusters.get(basic.clusterId).get('name')}</Item>
 
       { basic.provisionSource === 'iso' && (
