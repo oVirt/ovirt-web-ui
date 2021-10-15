@@ -168,9 +168,15 @@ export function* entityPermissionsToUserPermits (entity) {
     ? Array.isArray(entity.permissions) ? entity.permissions : [entity.permissions]
     : []
 
-  const userGroups = yield select(state => state.config.get('userGroups'))
-  const userId = yield select(state => state.config.getIn(['user', 'id']))
-  const roles = yield select(state => state.roles)
+  const {
+    userGroups,
+    userId,
+    roles,
+  } = yield select(state => ({
+    userGroups: state.config.get('userGroups'),
+    userId: state.config.getIn(['user', 'id']),
+    roles: state.roles,
+  }))
 
   const permitNames = []
   for (const permission of permissions) {
@@ -178,16 +184,16 @@ export function* entityPermissionsToUserPermits (entity) {
       (permission.groupId && userGroups.includes(permission.groupId)) ||
       (permission.userId && permission.userId === userId)
     ) {
-      const role = roles.get(permission.roleId)
+      const role = roles[permission.roleId]
       if (!role) {
         console.info('Could not find role in redux state, roleId:', permission.roleId)
       } else {
-        permitNames.push(...role.get('permitNames', []))
+        permitNames.push(...role.permitNames)
       }
     }
   }
 
-  return new Set(permitNames)
+  return Array.from(new Set(permitNames))
 }
 
 /**

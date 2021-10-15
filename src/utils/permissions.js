@@ -1,52 +1,52 @@
 // @flow
 import type { ClusterType, VnicProfileType } from '_/ovirtapi/types'
 
-function checkUserPermit (permit: string | Array<string>, permits: Set<string>): boolean {
+function checkUserPermit (permit: string | Array<string>, permits: Array<string>): boolean {
   if (Array.isArray(permit)) {
     for (const p of permit) {
-      if (!permits.has(p)) {
+      if (!permits.includes(p)) {
         return false
       }
     }
     return true
   } else {
-    return permits.has(permit)
+    return permits.includes(permit)
   }
 }
 
-export function canUserChangeCd (permits: Set<string>): boolean {
+export function canUserChangeCd (permits: Array<string>): boolean {
   return checkUserPermit('change_vm_cd', permits)
 }
 
-export function canUserUseCluster (permits: Set<string>): boolean {
+export function canUserUseCluster (permits: Array<string>): boolean {
   return checkUserPermit('create_vm', permits)
 }
 
-export function canUserUseTemplate (permits: Set<string>): boolean {
+export function canUserUseTemplate (permits: Array<string>): boolean {
   return checkUserPermit('create_vm', permits)
 }
 
-export function canUserEditVm (permits: Set<string>): boolean {
+export function canUserEditVm (permits: Array<string>): boolean {
   return checkUserPermit('edit_vm_properties', permits)
 }
 
-export function canUserUseVnicProfile (permits: Set<string>): boolean {
+export function canUserUseVnicProfile (permits: Array<string>): boolean {
   return checkUserPermit('configure_vm_network', permits)
 }
 
-export function canUserManipulateSnapshots (permits: Set<string>): boolean {
+export function canUserManipulateSnapshots (permits: Array<string>): boolean {
   return checkUserPermit('manipulate_vm_snapshots', permits)
 }
 
-export function canUserUseStorageDomain (permits: Set<string>): boolean {
+export function canUserUseStorageDomain (permits: Array<string>): boolean {
   return checkUserPermit(['create_disk', 'attach_disk_profile'], permits)
 }
 
-export function canUserEditVmStorage (permits: Set<string>): boolean {
+export function canUserEditVmStorage (permits: Array<string>): boolean {
   return checkUserPermit('configure_vm_storage', permits)
 }
 
-export function canUserEditDisk (permits: Set<string>): boolean {
+export function canUserEditDisk (permits: Array<string>): boolean {
   return checkUserPermit('edit_disk_properties', permits)
 }
 

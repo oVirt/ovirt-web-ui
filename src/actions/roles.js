@@ -1,10 +1,11 @@
-import {
-  SET_ROLES,
-} from '_/constants'
+// @flow
+import type { RoleType } from '_/ovirtapi/types'
 
-export function setRoles (roles) {
+import * as C from '_/constants'
+
+export function setRoles (roles: Array<RoleType>): Object {
   return {
-    type: SET_ROLES,
+    type: C.SET_ROLES,
     payload: {
       roles,
     },
