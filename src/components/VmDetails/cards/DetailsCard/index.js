@@ -669,7 +669,7 @@ class DetailsCard extends React.Component {
     const status = vm.get('status')
 
     // Host Name
-    const hostName = hosts && hosts.getIn([vm.get('hostId'), 'name'])
+    const hostName = hosts?.[vm.get('hostId')]?.name
 
     // IP Addresses
     const ip4Addresses = [...(new Set(!vm.has('nics') || !showIPs

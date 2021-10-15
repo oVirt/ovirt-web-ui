@@ -1,15 +1,20 @@
-import { fromJS } from 'immutable'
+// @flow
 
+import produce from 'immer'
 import { SET_HOSTS } from '_/constants'
-import { actionReducer } from './utils'
 import { arrayToMap } from '_/helpers'
+import { actionReducer } from './utils'
 
-const initialState = fromJS({})
+type HostsStateType = {
+  [hostId: string]: Object
+}
+
+const initialState: HostsStateType = {}
 
 const hosts = actionReducer(initialState, {
-  [SET_HOSTS] (state, { payload: hosts }) {
-    return fromJS(arrayToMap(hosts, host => host.id))
-  },
+  [SET_HOSTS]: produce((draft: HostsStateType, { payload: hosts }: { payload: { hosts: Array<Object> }}) => {
+    return arrayToMap(hosts, host => host.id)
+  }),
 })
 
 export default hosts
