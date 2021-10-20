@@ -56,7 +56,8 @@ const Settings = ({
     onSave(saveFields, id)
   }
 
-  const conflictingChanges = changedInTheMeantime({ currentValues, baseValues, draftValues, sentValues }).map(field => translatedLabels[field])
+  const conflictingChanges = changedInTheMeantime({ currentValues, baseValues, draftValues, sentValues })
+    .map(field => translatedLabels.find(({ fieldName }) => fieldName === field)?.fieldTitle ?? field)
   const pendingChanges = pendingUserChanges({ currentValues, draftValues })
   const stillPendingAfterSave = stillPending({ currentValues, sentValues })
   const changedInLastTrans = changedInLastTransaction({ currentValues, sentValues })
@@ -108,7 +109,7 @@ const Settings = ({
       // reset to new base level that contains last modifications
       resetBaseValues()
     }
-  }, [partialSuccess, completeFailure, fullSuccess, pendingChanges])
+  }, [partialSuccess, completeFailure, fullSuccess, pendingChanges, resetBaseValues])
 
   return (
     <>

@@ -20,12 +20,12 @@ import {
 
 import * as Actions from '_/actions'
 
-import { isWindows } from '_/helpers'
+import { toJS, translate } from '_/helpers'
 
 import { SplitButton, Icon, Checkbox, DropdownKebab } from 'patternfly-react'
 import ConfirmationModal from './ConfirmationModal'
 import Action, { ActionButtonWraper, MenuItemAction, ActionMenuItemWrapper } from './Action'
-import { VNC, RDP, BROWSER_VNC, SPICE, NATIVE_VNC, NO_VNC } from '_/constants/console'
+import { getConsoles, isNativeConsole } from '_/utils/console'
 
 const EmptyAction = ({ state, isOnCard }) => {
   if (!canConsole(state) && !canShutdown(state) && !canRestart(state) && !canStart(state)) {
@@ -88,62 +88,20 @@ VmDropdownActions.propTypes = {
 }
 
 export function getConsoleActions ({ vm, msg, onOpenConsole, idPrefix, config, preferredConsole }) {
-  const vncConsole = vm.get('consoles').find(c => c.get('protocol') === VNC)
-  const spiceConsole = vm.get('consoles').find(c => c.get('protocol') === SPICE)
-  const hasRdp = isWindows(vm.getIn(['os', 'type']))
-  const consoles = []
-
-  if (vncConsole) {
-    const vncModes = [{
-      priority: 0,
-      protocol: VNC,
-      consoleType: NATIVE_VNC,
-      shortTitle: msg.vncConsole(),
-      icon: <Icon name='external-link' />,
-      id: `${idPrefix}-button-console-vnc`,
-      onClick: () => { onOpenConsole({ consoleType: NATIVE_VNC }) },
-    },
-    {
-      priority: 0,
-      consoleType: BROWSER_VNC,
-      shortTitle: msg.vncConsoleBrowser(),
-      actionDisabled: config.get('websocket') === null,
-      id: `${idPrefix}-button-console-browser`,
-      onClick: () => { onOpenConsole({ consoleType: BROWSER_VNC }) },
-    }]
-
-    if (config.get('defaultVncMode') === NO_VNC) {
-      vncModes.reverse()
-    }
-    consoles.push(...vncModes)
-  }
-
-  if (spiceConsole) {
-    consoles.push({
-      priority: 0,
-      protocol: SPICE,
-      consoleType: SPICE,
-      shortTitle: msg.spiceConsole(),
-      icon: <Icon name='external-link' />,
-      id: `${idPrefix}-button-console-spice`,
-      onClick: (e) => { onOpenConsole({ consoleType: SPICE }) },
-    })
-  }
-
-  if (hasRdp) {
-    consoles.push({
-      priority: 0,
-      consoleType: RDP,
-      shortTitle: msg.remoteDesktop(),
-      icon: <Icon name='external-link' />,
-      id: `${idPrefix}-button-console-rdp`,
-      onClick: (e) => { onOpenConsole({ consoleType: RDP }) },
-    })
-  }
-
-  return consoles
-    .map(({ consoleType, ...props }) => ({ ...props, consoleType, priority: consoleType === preferredConsole ? 1 : 0 }))
-    .sort((a, b) => b.priority - a.priority)
+  return getConsoles({
+    vmConsoles: toJS(vm.get('consoles')),
+    vmOsType: vm.getIn(['os', 'type']),
+    websocket: config.get('websocket'),
+    defaultVncMode: config.get('defaultVncMode'),
+    preferredConsole,
+  }).map(({ consoleType, shortTitle, ...rest }) => ({
+    consoleType,
+    shortTitle: translate({ ...shortTitle, msg }),
+    ...rest,
+    id: `${idPrefix}-${consoleType}`,
+    icon: isNativeConsole(consoleType) ? <Icon name='external-link' /> : undefined,
+    onClick: () => { onOpenConsole({ consoleType }) },
+  }))
 }
 
 /**

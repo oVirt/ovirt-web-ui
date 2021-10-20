@@ -7,7 +7,7 @@ import { Notification, NotificationDrawer, MenuItem, Icon, Button } from 'patter
 import style from './style.css'
 
 import { clearUserMessages, dismissEvent } from '_/actions'
-import { getFormatedDateTime, buildMessageFromRecord } from '_/helpers'
+import { getFormatedDateTime, buildMessageFromRecord, toJS } from '_/helpers'
 import { MsgContext } from '_/intl'
 
 const UserMessage = ({ record, id, onDismissMessage }) => {
@@ -64,7 +64,7 @@ const VmUserMessages = ({ userMessages, onClearMessages, onDismissMessage, onClo
         { messagesCount > 0 && (
           <NotificationDrawer.PanelAction className={style['action-panel']}>
             <NotificationDrawer.PanelActionLink data-toggle='clear-all'>
-              <Button bsStyle='link' onClick={onClearMessages}>
+              <Button bsStyle='link' onClick={() => onClearMessages(toJS(userMessages.get('records', [])))}>
                 <Icon type='pf' name='close' />
                 { msg.clearAll() }
               </Button>
@@ -88,7 +88,7 @@ export default connect(
     userMessages: state.userMessages,
   }),
   (dispatch) => ({
-    onClearMessages: () => dispatch(clearUserMessages()),
+    onClearMessages: (records) => dispatch(clearUserMessages(records)),
     onDismissMessage: (event) => dispatch(dismissEvent({ event })),
   })
 )(VmUserMessages)

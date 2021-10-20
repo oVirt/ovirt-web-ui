@@ -74,6 +74,7 @@ export function loadUserOptions (userOptions: RemoteUserOptionsType): LoadUserOp
 
 export function saveGlobalOptions ({
   values: {
+    autoconnect,
     sshKey,
     language,
     persistLocale,
@@ -92,6 +93,7 @@ export function saveGlobalOptions ({
   return {
     type: C.SAVE_GLOBAL_OPTIONS,
     payload: {
+      autoconnect,
       sshKey,
       language,
       persistLocale,
@@ -144,11 +146,12 @@ export function persistUserOption ({ userId, name, content, optionId }: Object):
   }
 }
 
-export function fetchUserOptions ({ userId }: Object): Object {
+export function fetchUserOptions ({ userId, isLogin }: Object): Object {
   return {
     type: C.FETCH_OPTIONS,
     payload: {
       userId,
+      isLogin,
     },
   }
 }

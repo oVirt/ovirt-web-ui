@@ -1,6 +1,6 @@
 // @flow
 import * as C from '_/constants/console'
-import { toJS } from '_/helpers'
+import { toJS, isWindows } from '_/helpers'
 import type { UiConsoleType } from '_/ovirtapi/types'
 
 export function idFromType ({ vm, consoleType }: {vm: any, consoleType: UiConsoleType}) {
@@ -40,4 +40,59 @@ export function isNativeConsole (consoleType: UiConsoleType): boolean {
     default:
       return false
   }
+}
+
+export function getConsoles ({
+  vmConsoles = [],
+  vmOsType,
+  websocket,
+  defaultVncMode,
+  preferredConsole,
+}: any): any {
+  const vncConsole = vmConsoles.find(({ protocol }) => protocol === C.VNC)
+  const spiceConsole = vmConsoles.find(({ protocol }) => protocol === C.SPICE)
+  const hasRdp = isWindows(vmOsType)
+  const consoles = []
+
+  if (vncConsole) {
+    const vncModes = [{
+      priority: 0,
+      protocol: C.VNC,
+      consoleType: C.NATIVE_VNC,
+      shortTitle: { id: 'vncConsole' },
+    },
+    {
+      priority: 0,
+      consoleType: C.BROWSER_VNC,
+      shortTitle: { id: 'vncConsoleBrowser' },
+      actionDisabled: !websocket,
+    }]
+
+    if (defaultVncMode === C.NO_VNC) {
+      vncModes.reverse()
+    }
+    consoles.push(...vncModes)
+  }
+
+  if (spiceConsole) {
+    consoles.push({
+      priority: 0,
+      protocol: C.SPICE,
+      consoleType: C.SPICE,
+      shortTitle: { id: 'spiceConsole' },
+    })
+  }
+
+  if (hasRdp) {
+    consoles.push({
+      priority: 0,
+      protocol: C.RDP,
+      consoleType: C.RDP,
+      shortTitle: { id: 'remoteDesktop' },
+    })
+  }
+
+  return consoles
+    .map(({ consoleType, ...props }) => ({ ...props, consoleType, priority: consoleType === preferredConsole ? 1 : 0 }))
+    .sort((a, b) => b.priority - a.priority)
 }

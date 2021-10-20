@@ -79,6 +79,7 @@ export const messages: { [messageId: string]: MessageType } = {
   clearAll: 'Clear all',
   clearAllFilters: 'Clear All Filters',
   clearMessages: 'Clear Messages',
+  clearAutoconnectVmNotAvailable: 'VM chosen for automatic console connection is no longer available. The setting will be cleared.',
   clickForHelp: 'Click for help',
   close: 'Close',
   cloudInit: {
@@ -104,6 +105,7 @@ export const messages: { [messageId: string]: MessageType } = {
     description: 'Connecting to VNC console',
   },
   connectAutomatically: 'Connect automatically',
+  connectAutomaticallyTooltip: 'When you open VM Portal and if the selected VM has an available console, automatically connect to the VM\'s console. If possible the console is chosen according to user preferences.',
   connectionFailConsoleInfo: 'Cannot connect to websocket proxy server. Please check your websocket proxy certificate or ask your administrator for help. For further information please refer to the <a href=\'https://www.ovirt.org/documentation/admin-guide/virt/console-client-resources.html\'>console manual</a>.<br/>Press the \'Connect\' button to reconnect the console.',
   console: 'Console',
   consoleDefaultNotAvailable: 'The default console type {defaultConsole} is not available for {vmName}. All available console types are available on the VM Details page.',
@@ -599,6 +601,7 @@ export const messages: { [messageId: string]: MessageType } = {
   secondDevice: 'Second Device',
   secondDeviceTooltip: 'Second device in order.',
   selectTheBootableDeviceTooltip: 'Select the bootable devices in the order you would like them to boot.',
+  selectVm: 'Select a VM',
   sendShortcutKey: 'Send Key',
   sendCtrlAltDel: 'Ctrl+Alt+Del',
   serialConsole: 'Serial Console',

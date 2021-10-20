@@ -1,14 +1,20 @@
-import { takeEvery, put, select, call } from 'redux-saga/effects'
+import {
+  takeEvery,
+  put,
+  select,
+  call,
+} from 'redux-saga/effects'
 
 import Api from '_/ovirtapi'
 import OptionsManager from '_/optionsManager'
-import { fileDownload } from '_/helpers'
+import { fileDownload, toJS } from '_/helpers'
 import { doesVmSessionExistForUserId, idFromType } from '_/utils'
 import * as Actions from '_/actions'
 
 import { callExternalAction } from '../utils'
 import {
   fetchVmSessions,
+  fetchAndPutSingleVm,
 } from '../index'
 
 import { adjustVVFile } from './vvFileUtils'
@@ -16,12 +22,14 @@ import RDPBuilder from './rdpBuilder'
 
 import { push } from 'connected-react-router'
 import * as C from '_/constants'
+import { canConsole, statusToTooltipId } from '_/vm-status'
+import { getConsoles } from '_/utils/console'
 
 // ----- Connection files
 /**
  * Push a virt-viewer connection file (__console.vv__) to connect a user to a VM's console
  */
-function* downloadVmConsole ({
+function* downloadOrOpenVmConsole ({
   vmName,
   consoleType,
   vmId,
@@ -88,7 +96,7 @@ function* getLegacyOptions ({ vmId }) {
   if (options) {
     return (options.toJS && options.toJS()) || options
   }
-  console.log('downloadVmConsole() console options not yet present, trying to load from local storage')
+  console.log('console options not yet present, trying to load from local storage')
   yield getConsoleOptions(Actions.getConsoleOptions({ vmId }))
 }
 
@@ -208,7 +216,7 @@ export function* openConsole ({
       consoleId,
     }))
   } else {
-    yield call(downloadVmConsole, {
+    yield call(downloadOrOpenVmConsole, {
       vmName,
       consoleType,
       vmId,
@@ -235,8 +243,86 @@ export function* saveConsoleOptions (action) {
   yield getConsoleOptions(Actions.getConsoleOptions({ vmId: action.payload.vmId }))
 }
 
+function cannotOpenConsole ({ id, params }) {
+  return {
+    messageDescriptor: {
+      id: 'cantOpenConsole',
+      params: {
+        message: {
+          id,
+          params,
+        },
+      },
+    },
+    type: 'error',
+  }
+}
+
+function* autoconnect () {
+  // edge case: if user started VM Portal with a direct link to console/BrowserVnc screen then
+  // a console is already being loaded. There is no point to autoconnect to another(or the same) console.
+  // NOTE the check is low level because page router is starting in parallel (config.currentPage is not valid yet)
+  if (window?.location?.pathname.endsWith?.(C.BROWSER_VNC)) {
+    return
+  }
+
+  const {
+    userId,
+    websocket,
+    defaultVncMode,
+    preferredConsole,
+    autoconnectOption,
+  } = yield select(({ config, options }) => ({
+    userId: config.getIn(['user', 'id']),
+    websocket: config.get('websocket'),
+    defaultVncMode: config.get('defaultVncMode'),
+    preferredConsole: options.getIn(['remoteOptions', 'preferredConsole', 'content'], config.getIn(['defaultUiConsole'])),
+    autoconnectOption: toJS(options.getIn(['remoteOptions', 'autoconnect'])),
+  }))
+
+  const { content: vmId, id: optionId } = autoconnectOption || {}
+
+  if (!vmId) {
+    return
+  }
+
+  const { internalVm: vm, error } = yield call(fetchAndPutSingleVm, Actions.getSingleVm({ vmId, shallowFetch: true }))
+  if (error === 404) {
+    yield put(Actions.deleteUserOption({ optionId, userId }))
+    yield put(Actions.addUserMessage({ messageDescriptor: { id: 'clearAutoconnectVmNotAvailable' }, type: 'INFO' }))
+    return
+  }
+
+  if (!vm || error) {
+    yield put(Actions.addUserMessage(cannotOpenConsole({ id: 'apiConnectionFailed' })))
+    return
+  }
+
+  if (!canConsole(vm.status)) {
+    yield put(Actions.addUserMessage(cannotOpenConsole(statusToTooltipId[vm.status] ?? statusToTooltipId.__default__)))
+    return
+  }
+
+  const consoles = getConsoles({
+    vmConsoles: vm?.consoles ?? [],
+    vmOsType: vm?.os?.type,
+    websocket,
+    defaultVncMode,
+    preferredConsole,
+  })
+  if (!consoles.length) {
+    yield put(Actions.addUserMessage(cannotOpenConsole({ id: 'consoleNotAvailableHeadless', params: { vmName: vm.name } })))
+    return
+  }
+
+  const [{ consoleType }] = consoles
+
+  yield put(Actions.openConsole({ consoleType, vmId }))
+}
+
 export default [
   takeEvery(C.GET_CONSOLE_OPTIONS, getConsoleOptions),
   takeEvery(C.SAVE_CONSOLE_OPTIONS, saveConsoleOptions),
   takeEvery(C.OPEN_CONSOLE, openConsole),
+  takeEvery(C.APP_CONFIGURED, autoconnect),
 ]

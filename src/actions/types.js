@@ -12,6 +12,7 @@ export type LoadUserOptionsActionType = {
 export type SaveGlobalOptionsActionType = {
   type: C.SAVE_GLOBAL_OPTIONS,
   payload: {|
+    autoconnect?: string,
     refreshInterval?: number,
     language?: string,
     persistLocale?: boolean,
