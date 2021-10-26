@@ -1,4 +1,4 @@
-import Immutable from 'immutable'
+import Immutable, { fromJS } from 'immutable'
 import { actionReducer } from './utils'
 
 import { DefaultEngineOptions } from '_/config'
@@ -87,7 +87,7 @@ const initialState = Immutable.fromJS({
 
 const config = actionReducer(initialState, {
   [LOGIN_SUCCESSFUL] (state, { payload: { username, domain, token, userId, firstLogin } }) {
-    return state.merge({
+    return state.merge(fromJS({
       loginToken: token,
       user: {
         name: username,
@@ -95,7 +95,7 @@ const config = actionReducer(initialState, {
         firstLogin,
       },
       domain,
-    })
+    }))
   },
   [LOGIN_FAILED] (state) {
     return state.delete('loginToken').deleteIn(['user', 'name'])
@@ -107,7 +107,7 @@ const config = actionReducer(initialState, {
       .set('logoutWasManual', isManual)
   },
   [SET_OVIRT_API_VERSION] (state, { payload: { oVirtApiVersion } }) {
-    return state.merge({ oVirtApiVersion: oVirtApiVersion })
+    return state.merge(fromJS({ oVirtApiVersion: oVirtApiVersion }))
   },
   [SET_USER_FILTER_PERMISSION] (state, { payload: { filter } }) {
     return state.set('filter', filter).set('isFilterChecked', true)
@@ -171,10 +171,10 @@ const config = actionReducer(initialState, {
       defaultWindowsTimezone,
     },
   }) {
-    return state.merge({
+    return state.merge(fromJS({
       defaultGeneralTimezone,
       defaultWindowsTimezone,
-    })
+    }))
   },
   [UPDATE_LAST_REFRESH] (state) {
     return state.set('lastRefresh', Date.now())
