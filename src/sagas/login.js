@@ -48,7 +48,7 @@ import { loadUserOptions } from './options'
  * Perform login checks, and if they pass, perform initial data loading
  */
 function* login (action) {
-  const { payload: { token, userId, username, domain } } = action
+  const { payload: { token, userId, username, domain, sessionAgeInSecAtPageLoad } } = action
   console.group('Login Verification')
 
   // Verify a SSO token exists
@@ -60,7 +60,7 @@ function* login (action) {
     return
   }
 
-  yield put(loginSuccessful({ token, userId, username, domain }))
+  yield put(loginSuccessful({ token, userId, username, domain, sessionAgeInSecAtPageLoad }))
 
   // Verify the API (exists and is the correct version)
   const oVirtMeta = yield callExternalAction(Api.getOvirtApiMeta, action)

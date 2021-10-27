@@ -53,7 +53,7 @@ function renderApp (store: Object, errorBridge: Object) {
  *
  * See web.xml.
  */
-function fetchToken (): { token: string, username: string, domain: string, userId: string } {
+function fetchToken (): { token: string, username: string, domain: string, userId: string, sessionAgeInSecAtPageLoad: number } {
   const userInfo = window.userInfo
   console.log(`SSO userInfo: ${JSON.stringify(userInfo)}`)
 
@@ -63,6 +63,7 @@ function fetchToken (): { token: string, username: string, domain: string, userI
       username: userInfo.userName,
       domain: userInfo.domain,
       userId: userInfo.userId,
+      sessionAgeInSecAtPageLoad: Number(userInfo.sessionAgeInSec) || 0,
     }
   }
   return {
@@ -70,6 +71,7 @@ function fetchToken (): { token: string, username: string, domain: string, userI
     username: '',
     domain: '',
     userId: '',
+    sessionAgeInSecAtPageLoad: 0,
   }
 }
 
@@ -120,9 +122,15 @@ function onResourcesLoaded () {
   renderApp(store, new SagaErrorBridge(store.rootTask))
 
   // and start the login/init-data-load action
-  const { token, username, domain, userId }: { token: string, username: string, domain: string, userId: string } = fetchToken()
+  const {
+    token,
+    username,
+    domain,
+    userId,
+    sessionAgeInSecAtPageLoad,
+  }: { token: string, username: string, domain: string, userId: string, sessionAgeInSecAtPageLoad: number } = fetchToken()
   if (token) {
-    store.dispatch(login({ username, token, userId, domain }))
+    store.dispatch(login({ username, token, userId, domain, sessionAgeInSecAtPageLoad }))
   } else {
     console.error('Missing SSO Token!')
   }
