@@ -1,22 +1,24 @@
-const path = require('path')
-const tty = require('tty')
-const url = require('url')
-const util = require('util')
-const webpack = require('webpack')
+import path from 'path'
+import tty from 'tty'
+import url from 'url'
+import util from 'util'
+import webpack from 'webpack'
 
-const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const InlineChunkHtmlPlugin = require('react-dev-utils/InlineChunkHtmlPlugin')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin')
-const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin')
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
-const TerserPlugin = require('terser-webpack-plugin')
+import CaseSensitivePathsPlugin from 'case-sensitive-paths-webpack-plugin'
+import CopyWebpackPlugin from 'copy-webpack-plugin'
+import HtmlWebpackPlugin from 'html-webpack-plugin'
+import InlineChunkHtmlPlugin from 'react-dev-utils/InlineChunkHtmlPlugin.js'
+import MiniCssExtractPlugin from 'mini-css-extract-plugin'
+import ModuleNotFoundPlugin from 'react-dev-utils/ModuleNotFoundPlugin.js'
+import WatchMissingNodeModulesPlugin from 'react-dev-utils/WatchMissingNodeModulesPlugin.js'
+import CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
+import TerserPlugin from 'terser-webpack-plugin'
 
-const postcssPresetEnv = require('postcss-preset-env')
-const paths = require('./paths')
-const env = require('./env')
+import postcssPresetEnv from 'postcss-preset-env'
+import paths from './paths.js'
+import env from './env.js'
+import { createRequire } from 'module'
+const require = createRequire(import.meta.url)
 const appPackageJson = require(paths.appPackageJson)
 
 const imageInlineSizeLimit = parseInt(process.env.IMAGE_INLINE_SIZE_LIMIT, 10) || 8192
@@ -27,17 +29,19 @@ const imageInlineSizeLimit = parseInt(process.env.IMAGE_INLINE_SIZE_LIMIT, 10) |
 // single-page apps that may serve index.html for nested URLs like /todos/42.
 // We can't use a relative path in HTML because we don't want to load something
 // like /todos/42/static/js/bundle.7289d.js. We have to know the root.
-var homepagePath = require(paths.appPackageJson).productionHomepage
-console.log('Building with homepagePath: ' + homepagePath)
-var publicPath = homepagePath ? url.parse(homepagePath).pathname : '/'
-if (!publicPath.endsWith('/')) {
-  // If we don't do this, file assets will get incorrect paths.
-  publicPath += '/'
+function getPublicPath() {
+  const homepagePath = appPackageJson.productionHomepage
+  var publicPath = homepagePath ? url.parse(homepagePath).pathname : '/'
+  if (!publicPath.endsWith('/')) {
+    // If we don't do this, file assets will get incorrect paths.
+    publicPath += '/'
+  }
+  return publicPath
 }
 
 // This is the production configuration.
 // It compiles slowly and is focused on producing a fast and minimal bundle.
-module.exports = (() => {
+export default (() => {
   let fontsToEmbed
 
   const theConfig = {
@@ -48,8 +52,6 @@ module.exports = (() => {
     // These are the "entry points" to our application.
     // This means they will be the "root" imports that are included in JS bundle.
     entry: [
-      // In production, we only want to load the polyfills and the app code.
-      require.resolve('./polyfills'),
       paths.appIndexJs,
     ],
 
@@ -64,7 +66,7 @@ module.exports = (() => {
       filename: 'static/js/[name].[chunkhash:8].js',
       chunkFilename: 'static/js/[name].[chunkhash:8].chunk.js',
       // We already inferred the "public path"
-      publicPath: publicPath,
+      publicPath: getPublicPath(),
       // Prevents conflicts when multiple webpack runtimes (from different apps)
       // are used on the same page.
       jsonpFunction: `webpackJsonp${appPackageJson.name}`,
@@ -163,7 +165,7 @@ module.exports = (() => {
                   configFile: false,
                   compact: true,
 
-                  presets: [ './config/babel.app.config.js' ],
+                  presets: [ './config/babel.app.config.cjs' ],
 
                   // This is a feature of `babel-loader` for webpack (not Babel itself).
                   // It enables caching results in ./node_modules/.cache/babel-loader/
@@ -378,7 +380,7 @@ module.exports = (() => {
         filename: 'index.jsp',
         inject: true,
         template: `!!handlebars-loader!${paths.appHtml}`,
-        publicPath,
+        publicPath: getPublicPath(),
         jspSSO: true,
         minify: {
           collapseWhitespace: false,

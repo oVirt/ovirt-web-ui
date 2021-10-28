@@ -2,19 +2,19 @@
 process.env.BABEL_ENV = 'development'
 process.env.NODE_ENV = 'development'
 
-const chalk = require('chalk')
-const readlineSync = require('readline-sync')
-const webpack = require('webpack')
-const WebpackDevServer = require('webpack-dev-server')
-const detect = require('detect-port')
-const checkRequiredFiles = require('./utils/checkRequiredFiles')
-const prompt = require('./utils/prompt')
-const createDevConfig = require('../config/webpack.config.dev')
-const fetch = require('node-fetch')
-const https = require('https')
-const fs = require('fs')
-const dotenv = require('dotenv')
-const paths = require('../config/paths')
+import chalk from 'chalk'
+import readlineSync from 'readline-sync'
+import webpack from 'webpack'
+import WebpackDevServer from 'webpack-dev-server'
+import detect from 'detect-port'
+import checkRequiredFiles from './utils/checkRequiredFiles.js'
+import prompt from './utils/prompt.js'
+import createDevConfig from '../config/webpack.config.dev.js'
+import fetch from 'node-fetch'
+import https from 'https'
+import fs from 'fs'
+import dotenv from 'dotenv'
+import paths from '../config/paths.js'
 
 if (process.env.ENGINE_ENV) {
   const envFilePath = `.env.${process.env.ENGINE_ENV}`

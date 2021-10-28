@@ -1,3 +1,3 @@
 
-const createDevConfig = require('./webpack.config.dev')
-module.exports = createDevConfig()
+import createDevConfig from './webpack.config.dev'
+export default createDevConfig()

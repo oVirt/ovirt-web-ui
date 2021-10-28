@@ -4,7 +4,7 @@
 var REACT_APP = /^REACT_APP_/i
 var NODE_ENV = JSON.stringify(process.env.NODE_ENV || 'development')
 
-module.exports = Object
+export default Object
   .keys(process.env)
   .filter(key => REACT_APP.test(key))
   .reduce((env, key) => {

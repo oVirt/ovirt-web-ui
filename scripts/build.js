@@ -1,20 +1,22 @@
 // Do this as the first thing so that any code reading it knows the right env.
-process.env.NODE_ENV = 'production'
+import chalk from 'chalk'
+import fs from 'fs'
+import path from 'path'
+import filesize from 'filesize'
+import gzipSize from 'gzip-size'
+import rimraf from 'rimraf'
+import webpack from 'webpack'
+import config from '../config/webpack.config.prod.js'
+import paths from '../config/paths.js'
+import checkRequiredFiles from './utils/checkRequiredFiles.js'
+import recursive from 'recursive-readdir'
+import stripAnsi from 'strip-ansi'
+import { formatMessage, isLikelyASyntaxError } from './utils/utils.js'
+import { createRequire } from 'module'
+const require = createRequire(import.meta.url)
+const appPackageJson = require(paths.appPackageJson)
 
-const chalk = require('chalk')
-const fs = require('fs')
-const path = require('path')
-const filesize = require('filesize')
-const gzipSize = require('gzip-size').sync
-const rimrafSync = require('rimraf').sync
-const webpack = require('webpack')
-const config = require('../config/webpack.config.prod')
-const paths = require('../config/paths')
-const checkRequiredFiles = require('./utils/checkRequiredFiles')
-const recursive = require('recursive-readdir')
-const stripAnsi = require('strip-ansi')
-const formatMessage = require('./utils/utils').formatMessage
-const isLikelyASyntaxError = require('./utils/utils').isLikelyASyntaxError
+process.env.NODE_ENV = 'production'
 
 checkRequiredFiles()
 
@@ -54,13 +56,13 @@ recursive(paths.appBuild, (err, fileNames) => {
     .reduce((memo, fileName) => {
       const contents = fs.readFileSync(fileName)
       const key = removeFileNameHash(fileName)
-      memo[key] = gzipSize(contents)
+      memo[key] = gzipSize.sync(contents)
       return memo
     }, {})
 
   // Remove all content but keep the directory so that
   // if you're in it, you don't end up in Trash
-  rimrafSync(paths.appBuild + '/*')
+  rimraf.sync(paths.appBuild + '/*')
 
   // Start the webpack build
   build(previousSizeMap)
@@ -72,7 +74,7 @@ function printFileSizes (stats, previousSizeMap) {
     .filter(asset => /\.(js|css)$/.test(asset.name))
     .map(asset => {
       const fileContents = fs.readFileSync(paths.appBuild + '/' + asset.name)
-      const size = gzipSize(fileContents)
+      const size = gzipSize.sync(fileContents)
       const previousSize = previousSizeMap[removeFileNameHash(asset.name)]
       const difference = getDifferenceLabel(size, previousSize)
       return {
@@ -130,7 +132,7 @@ function build (previousSizeMap) {
       console.log()
 
       const openCommand = process.platform === 'win32' ? 'start' : 'open'
-      const homepagePath = require(paths.appPackageJson).homepage
+      const homepagePath = appPackageJson.homepage
       const publicPath = config.output.publicPath
       if (homepagePath && homepagePath.indexOf('.github.io/') !== -1) {
         // "homepage": "http://user.github.io/project"

@@ -3,7 +3,7 @@ const friendlySyntaxErrorLabel = 'Syntax error:'
 // Some custom utilities to prettify Webpack output.
 // This is a little hacky.
 // It would be easier if webpack provided a rich error object.
-function formatMessage (message) {
+export function formatMessage (message) {
   return message
     // Make some common errors shorter:
     .replace(
@@ -22,11 +22,6 @@ function formatMessage (message) {
     .replace('./~/css-loader!./~/postcss-loader!', '')
 }
 
-function isLikelyASyntaxError (message) {
+export function isLikelyASyntaxError (message) {
   return message.indexOf(friendlySyntaxErrorLabel) !== -1
-}
-
-module.exports = {
-  formatMessage: formatMessage,
-  isLikelyASyntaxError: isLikelyASyntaxError,
 }

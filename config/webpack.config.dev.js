@@ -1,19 +1,21 @@
-const path = require('path')
-const tty = require('tty')
-const util = require('util')
-const webpack = require('webpack')
+import path from 'path'
+import tty from 'tty'
+import util from 'util'
+import webpack from 'webpack'
 
-const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const InlineChunkHtmlPlugin = require('react-dev-utils/InlineChunkHtmlPlugin')
-const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin')
-const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin')
-const CleanTerminalPlugin = require('clean-terminal-webpack-plugin');
+import CaseSensitivePathsPlugin from 'case-sensitive-paths-webpack-plugin'
+import CopyWebpackPlugin from 'copy-webpack-plugin'
+import HtmlWebpackPlugin from 'html-webpack-plugin'
+import InlineChunkHtmlPlugin from 'react-dev-utils/InlineChunkHtmlPlugin.js'
+import ModuleNotFoundPlugin from 'react-dev-utils/ModuleNotFoundPlugin.js'
+import WatchMissingNodeModulesPlugin from 'react-dev-utils/WatchMissingNodeModulesPlugin.js'
+import CleanTerminalPlugin from 'clean-terminal-webpack-plugin'
 
-const postcssPresetEnv = require('postcss-preset-env')
-const paths = require('./paths')
-const env = require('./env')
+import postcssPresetEnv from 'postcss-preset-env'
+import paths from './paths.js'
+import env from './env.js'
+import { createRequire } from 'module'
+const require = createRequire(import.meta.url)
 const appPackageJson = require(paths.appPackageJson)
 
 const imageInlineSizeLimit = parseInt(process.env.IMAGE_INLINE_SIZE_LIMIT, 10) || 8192
@@ -21,15 +23,15 @@ const imageInlineSizeLimit = parseInt(process.env.IMAGE_INLINE_SIZE_LIMIT, 10) |
 
 // This is the development configuration.
 // It is focused on developer experience and fast rebuilds.
-module.exports = ({
-    userInfo = {},
-    publicPath = '/',
-    browser = 'chromium-browser',
-    engineUrl = 'http://localhost:8080',
-    port = 3000,
-    host = 'localhost',
-    https = false,
-    cleanTerminalMessage = 'Dev server running...',
+export default ({
+  userInfo = {},
+  publicPath = '/',
+  browser = 'chromium-browser',
+  engineUrl = 'http://localhost:8080',
+  port = 3000,
+  host = 'localhost',
+  https = false,
+  cleanTerminalMessage = 'Dev server running...',
 } = {}) => {
   const isClientDefaultAppConfig = publicPath === '/'
   const isServerDefaultAppConfig = publicPath === '/ovirt-engine/web-ui/'
@@ -97,23 +99,6 @@ module.exports = ({
     // These are the "entry points" to our application.
     // This means they will be the "root" imports that are included in JS bundle.
     entry: [
-      // Include an alternative client for WebpackDevServer. A client's job is to
-      // connect to WebpackDevServer by a socket and get notified about changes.
-      // When you save a file, the client will either apply hot updates (in case
-      // of CSS changes), or refresh the page (in case of JS changes). When you
-      // make a syntax error, this client will display a syntax error overlay.
-      // Note: instead of the default WebpackDevServer client, we use a custom one
-      // to bring better experience for Create React App users. You can replace
-      // the line below with these two lines if you prefer the stock client:
-      require.resolve('webpack-dev-server/client') + '?/',
-      require.resolve('webpack/hot/dev-server'),
-      // When using the experimental react-refresh integration,
-      // the webpack plugin takes care of injecting the dev client for us.
-      // webpackDevClientEntry,
-
-      // Polyfill and app code goes last so the dev server can stay running if
-      // polyfill or app code is broken
-      require.resolve('./polyfills'),
       paths.appIndexJs,
     ],
 
@@ -193,7 +178,7 @@ module.exports = ({
                   configFile: false,
                   compact: false,
 
-                  presets: [ './config/babel.app.config.js' ],
+                  presets: [ './config/babel.app.config.cjs' ],
 
                   // This is a feature of `babel-loader` for webpack (not Babel itself).
                   // It enables caching results in ./node_modules/.cache/babel-loader/

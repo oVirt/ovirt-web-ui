@@ -1,5 +1,5 @@
-var path = require('path')
-var fs = require('fs')
+import path from 'path'
+import fs from 'fs'
 
 // Make sure any symlinks in the project folder are resolved:
 // https://github.com/facebookincubator/create-react-app/issues/637
@@ -19,7 +19,7 @@ function resolveApp (relativePath) {
 // It will then be used by Webpack configs.
 // Jest doesn’t need this because it already handles `NODE_PATH` out of the box.
 
-var nodePaths = (process.env.NODE_PATH || '')
+const nodePaths = (process.env.NODE_PATH || '')
   .split(process.platform === 'win32' ? ';' : ':')
   .filter(Boolean)
   .map(resolveApp)
@@ -31,7 +31,8 @@ if (process.env.BRANDING && fs.existsSync(process.env.BRANDING)) {
 }
 
 // config after eject: we're in ./config/
-module.exports = {
+
+export default {
   appBranding: brandingPath || resolveApp('branding'),
   appBuild: resolveApp('build'),
   appHtml: resolveApp('static/index.hbs'),
@@ -41,5 +42,5 @@ module.exports = {
   appPath: resolveApp('.'),
   appSrc: resolveApp('src'),
   appVersionJs: resolveApp('src/version.js'),
-  nodePaths: nodePaths,
+  nodePaths,
 }

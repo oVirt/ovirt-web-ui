@@ -1,9 +1,9 @@
-const fs = require('fs')
-const path = require('path')
-const chalk = require('chalk')
-const paths = require('../../config/paths')
+import fs from 'fs'
+import path from 'path'
+import chalk from 'chalk'
+import paths from '../../config/paths.js'
 
-function checkRequiredFiles () {
+export default function checkRequiredFiles () {
   const filesPathToCheck = [paths.appHtml, paths.appIndexJs, paths.appVersionJs]
 
   filesPathToCheck.forEach(filePath => {
@@ -19,5 +19,3 @@ function checkRequiredFiles () {
     }
   })
 }
-
-module.exports = checkRequiredFiles

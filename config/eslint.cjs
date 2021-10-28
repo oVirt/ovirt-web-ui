@@ -54,7 +54,7 @@ module.exports = {
       jsx: true,
     },
     babelOptions: {
-      configFile: './config/babel.app.config.js',
+      configFile: './config/babel.app.config.cjs',
     },
   },
 
@@ -70,6 +70,11 @@ module.exports = {
 
   overrides: [
     // this is where we can handle different files with different rules (jest, typescript)
+    {
+      // dummy override to force checking *.cjs files
+      files: '**/*.cjs',
+      rules: {},
+    }
   ],
 
   // override the rules we inherit from the `extends` modules

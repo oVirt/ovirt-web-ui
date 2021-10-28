@@ -1,5 +1,5 @@
-const tty = require('tty')
-const util = require('util')
+import tty from 'tty'
+import util from 'util'
 
 /*
  * The preset for ovirt-web-ui is based on the `babel-preset-react-app/dependencies`
@@ -8,7 +8,7 @@ const util = require('util')
  *
  * See: https://github.com/facebook/create-react-app/blob/master/packages/babel-preset-react-app
  */
-module.exports = function (api, opts = {}) {
+export default function (api, opts = {}) {
   const env = process.env.BABEL_ENV || process.env.NODE_ENV;
   const verbose = process.env.V === '1'
   const isEnvDevelopment = env === 'development';

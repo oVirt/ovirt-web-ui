@@ -96,8 +96,7 @@
     "react-router-navigation-prompt": "1.9.1",
     "redux": "^4.1.2",
     "redux-saga": "1.1.3",
-    "semver": "7.3.5",
-    "whatwg-fetch": "3.6.2"
+    "semver": "7.3.5"
   },
   "resolutions": {
     "bootstrap-select": ">=1.13.6",
@@ -119,8 +118,8 @@
     "pretest": "node scripts/pretest.js",
     "test": "jest --no-watchman",
     "test:watch": "yarn run pretest && jest --watch --no-watchman",
-    "eslint": "eslint src scripts",
-    "eslint:fix": "eslint src scripts --fix",
+    "eslint": "eslint src config scripts",
+    "eslint:fix": "eslint src config scripts --fix",
     "intl:dummy": "babel-node --presets @babel/env,@babel/flow scripts/intl/dummy-locale.js",
     "intl:extract": "scripts/intl/intl-extract.sh",
     "intl:push": "scripts/intl/intl-zanata-push.sh",
@@ -132,7 +131,6 @@
   },
   "jest": {
     "setupFiles": [
-      "<rootDir>/config/polyfills.js"
     ],
     "testEnvironment": "jsdom",
     "testMatch": [
@@ -164,7 +162,7 @@
     }
   },
   "eslintConfig": {
-    "extends": "./config/eslint.js"
+    "extends": "./config/eslint.cjs"
   },
   "browserslist": [
     ">1%",
