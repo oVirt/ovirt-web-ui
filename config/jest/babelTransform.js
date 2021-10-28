@@ -1,7 +1,7 @@
 const babelJest = require('babel-jest')
 const chalk = require('chalk')
 
-module.exports = babelJest.createTransformer({
+module.exports = babelJest.default.createTransformer({
   babelrc: false,
   configFile: false,
 

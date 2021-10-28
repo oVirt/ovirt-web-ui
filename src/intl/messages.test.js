@@ -1,6 +1,6 @@
 /* eslint-env jest */
 
-import parser from '@formatjs/icu-messageformat-parser'
+import { parse } from '@formatjs/icu-messageformat-parser'
 import { messages as englishMessages } from './messages'
 import translatedMessages from './translated-messages.json'
 
@@ -35,7 +35,7 @@ function normalizeMessagesForDiff (messages) {
 
   // extract the format arguments from the messages
   Object.keys(normalForm).forEach(name => {
-    const parsed = normalForm[name].msg ? parser.parse(normalForm[name].msg) : { type: 'empty' }
+    const parsed = normalForm[name].msg ? parse(normalForm[name].msg, { ignoreTag: true }) : { type: 'empty' }
     const args = normalForm[name].args = {}
 
     if (parsed.type === 'messageFormatPattern') {

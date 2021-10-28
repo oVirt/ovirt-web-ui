@@ -102,9 +102,6 @@ const testConfigValues = Immutable.fromJS({
 export async function returnSaga (state, saga, ...args) {
   const dispatched = []
 
-  // TODO: `runSaga()` returns a Task object.  In the current redux-saga version, to get
-  //       the saga's return value, use `await runSaga(...).done`.  In future versions of
-  //       redux-saga, it will need to change to `await runSaga(...).toPromise()`.
   const result = await runSaga(
     {
       dispatch: (action) => dispatched.push(action),
@@ -112,7 +109,7 @@ export async function returnSaga (state, saga, ...args) {
     },
     saga,
     ...args
-  ).done
+  ).toPromise()
 
   return { dispatched, result }
 }
