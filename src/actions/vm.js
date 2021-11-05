@@ -171,7 +171,7 @@ export function setVmActionResult ({ vmId, correlationId, result }) {
 }
 
 // --- Internal State -------------------------
-export function loginSuccessful ({ username, domain, token, userId, sessionAgeInSecAtPageLoad }) {
+export function loginSuccessful ({ username, domain, token, userId, firstLogin }) {
   return {
     type: C.LOGIN_SUCCESSFUL,
     payload: {
@@ -179,7 +179,7 @@ export function loginSuccessful ({ username, domain, token, userId, sessionAgeIn
       domain,
       token,
       userId,
-      sessionAgeInSecAtPageLoad,
+      firstLogin,
     },
   }
 }

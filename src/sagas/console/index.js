@@ -268,22 +268,22 @@ function* autoconnect () {
 
   const {
     userId,
-    sessionAgeInSecAtPageLoad,
+    firstLogin,
     websocket,
     defaultVncMode,
     preferredConsole,
     autoconnectOption,
   } = yield select(({ config, options }) => ({
     userId: config.getIn(['user', 'id']),
-    sessionAgeInSecAtPageLoad: config.getIn(['user', 'sessionAgeInSecAtPageLoad'], 0),
+    firstLogin: config.getIn(['user', 'firstLogin'], true),
     websocket: config.get('websocket'),
     defaultVncMode: config.get('defaultVncMode'),
     preferredConsole: options.getIn(['remoteOptions', 'preferredConsole', 'content'], config.getIn(['defaultUiConsole'])),
     autoconnectOption: toJS(options.getIn(['remoteOptions', 'autoconnect'])),
   }))
 
-  if (sessionAgeInSecAtPageLoad > 15) {
-    console.warn(`Autoconnect aborted - based on the session age (${sessionAgeInSecAtPageLoad} sec) it's a page refresh not the first page load`)
+  if (!firstLogin) {
+    console.warn('Autoconnect aborted - page refresh detected')
     return
   }
 
