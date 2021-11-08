@@ -4,13 +4,11 @@ import url from 'url'
 import util from 'util'
 import webpack from 'webpack'
 
-import CaseSensitivePathsPlugin from 'case-sensitive-paths-webpack-plugin'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import InlineChunkHtmlPlugin from 'react-dev-utils/InlineChunkHtmlPlugin.js'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import ModuleNotFoundPlugin from 'react-dev-utils/ModuleNotFoundPlugin.js'
-import WatchMissingNodeModulesPlugin from 'react-dev-utils/WatchMissingNodeModulesPlugin.js'
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
 import TerserPlugin from 'terser-webpack-plugin'
 
@@ -29,9 +27,9 @@ const imageInlineSizeLimit = parseInt(process.env.IMAGE_INLINE_SIZE_LIMIT, 10) |
 // single-page apps that may serve index.html for nested URLs like /todos/42.
 // We can't use a relative path in HTML because we don't want to load something
 // like /todos/42/static/js/bundle.7289d.js. We have to know the root.
-function getPublicPath() {
+function getPublicPath () {
   const homepagePath = appPackageJson.productionHomepage
-  var publicPath = homepagePath ? url.parse(homepagePath).pathname : '/'
+  let publicPath = homepagePath ? new url.URL(homepagePath, 'foo:///').pathname : '/'
   if (!publicPath.endsWith('/')) {
     // If we don't do this, file assets will get incorrect paths.
     publicPath += '/'
@@ -82,8 +80,8 @@ export default (() => {
           vendor: {
             name: 'vendor',
             chunks: 'initial',
-            test: /[\\/]node_modules[\\/]/
-          }
+            test: /[\\/]node_modules[\\/]/,
+          },
         },
       },
 
@@ -139,7 +137,7 @@ export default (() => {
         // Support React Native Web
         // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
         'react-native': 'react-native-web',
-        '_': `${paths.appSrc}`,
+        _: `${paths.appSrc}`,
       },
     },
 
@@ -165,7 +163,7 @@ export default (() => {
                   configFile: false,
                   compact: true,
 
-                  presets: [ './config/babel.app.config.cjs' ],
+                  presets: ['./config/babel.app.config.cjs'],
 
                   // This is a feature of `babel-loader` for webpack (not Babel itself).
                   // It enables caching results in ./node_modules/.cache/babel-loader/
@@ -191,7 +189,7 @@ export default (() => {
                   configFile: false,
                   compact: false,
 
-                  presets: [ './config/babel.dep.config.js' ],
+                  presets: ['./config/babel.dep.config.js'],
 
                   cacheDirectory: true,
                   cacheCompression: false,
@@ -223,12 +221,12 @@ export default (() => {
             {
               test: fontsToEmbed = [
                 /\.woff2(\?v=[0-9].[0-9].[0-9])?$/,
-                /PatternFlyIcons-webfont\.ttf/
+                /PatternFlyIcons-webfont\.ttf/,
               ],
               use: {
                 loader: 'url-loader',
-                options: {}
-              }
+                options: {},
+              },
             },
             {
               test: /\.(ttf|eot|svg|woff(?!2))(\?v=[0-9].[0-9].[0-9])?$/,
@@ -236,9 +234,9 @@ export default (() => {
               use: {
                 loader: 'file-loader',
                 options: {
-                  name: 'static/fonts/[name].[hash:8].[ext]'
-                }
-              }
+                  name: 'static/fonts/[name].[hash:8].[ext]',
+                },
+              },
             },
 
             // A special case for favicon.ico to place it into build root directory.
@@ -296,7 +294,7 @@ export default (() => {
                       ],
                     },
                   },
-                }
+                },
               ],
             },
 
@@ -332,7 +330,7 @@ export default (() => {
                       ],
                     },
                   },
-                }
+                },
               ],
               // Don't consider CSS imports dead code (for tree shaking) even if the
               // containing package claims to have no side effects.

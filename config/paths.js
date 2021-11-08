@@ -3,7 +3,7 @@ import fs from 'fs'
 
 // Make sure any symlinks in the project folder are resolved:
 // https://github.com/facebookincubator/create-react-app/issues/637
-var appDirectory = fs.realpathSync(process.cwd())
+const appDirectory = fs.realpathSync(process.cwd())
 function resolveApp (relativePath) {
   return path.resolve(appDirectory, relativePath)
 }
@@ -25,7 +25,7 @@ const nodePaths = (process.env.NODE_PATH || '')
   .map(resolveApp)
 
 // Allow setting the branding to use by `BRANDING` var
-var brandingPath = undefined
+let brandingPath
 if (process.env.BRANDING && fs.existsSync(process.env.BRANDING)) {
   brandingPath = process.env.BRANDING
 }

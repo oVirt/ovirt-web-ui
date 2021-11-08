@@ -9,11 +9,11 @@ import util from 'util'
  * See: https://github.com/facebook/create-react-app/blob/master/packages/babel-preset-react-app
  */
 export default function (api, opts = {}) {
-  const env = process.env.BABEL_ENV || process.env.NODE_ENV;
+  const env = process.env.BABEL_ENV || process.env.NODE_ENV
   const verbose = process.env.V === '1'
-  const isEnvDevelopment = env === 'development';
-  const isEnvProduction = env === 'production';
-  const isEnvTest = env === 'test'; // for jest running tests on nodejs
+  const isEnvDevelopment = env === 'development'
+  const isEnvProduction = env === 'production'
+  const isEnvTest = env === 'test' // for jest running tests on nodejs
 
   const babelConfig = {
     // Babel assumes ES Modules, which isn't safe until CommonJS
@@ -35,7 +35,7 @@ export default function (api, opts = {}) {
         {
           useBuiltIns: 'usage',
           corejs: '3.12',
-          exclude: [ 'transform-typeof-symbol' ],
+          exclude: ['transform-typeof-symbol'],
         },
       ],
     ].filter(Boolean),

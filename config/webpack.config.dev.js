@@ -6,7 +6,6 @@ import webpack from 'webpack'
 import CaseSensitivePathsPlugin from 'case-sensitive-paths-webpack-plugin'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
-import InlineChunkHtmlPlugin from 'react-dev-utils/InlineChunkHtmlPlugin.js'
 import ModuleNotFoundPlugin from 'react-dev-utils/ModuleNotFoundPlugin.js'
 import WatchMissingNodeModulesPlugin from 'react-dev-utils/WatchMissingNodeModulesPlugin.js'
 import CleanTerminalPlugin from 'clean-terminal-webpack-plugin'
@@ -19,7 +18,6 @@ const require = createRequire(import.meta.url)
 const appPackageJson = require(paths.appPackageJson)
 
 const imageInlineSizeLimit = parseInt(process.env.IMAGE_INLINE_SIZE_LIMIT, 10) || 8192
-
 
 // This is the development configuration.
 // It is focused on developer experience and fast rebuilds.
@@ -46,21 +44,21 @@ export default ({
       port,
       https,
       historyApiFallback: {
-        index: publicPath
+        index: publicPath,
       },
       client: {
-         logging: 'info',
-         progress: true,
+        logging: 'info',
+        progress: true,
       },
       hot: true,
       open: browser !== 'none' && {
-         app: {
-            name: browser,
-          }
+        app: {
+          name: browser,
+        },
       },
-      proxy: [   
-        isClientDefaultAppConfig &&     
-        { 
+      proxy: [
+        isClientDefaultAppConfig &&
+        {
           /*
             Using client side defaults from src/config.js
             Note: fetching ovirt-web-ui.config relies on hardcoded path and will fail.
@@ -82,19 +80,18 @@ export default ({
           "applicationLogoutURL": "/ovirt-engine/web-ui/sso/logout",
         }
         */
-        context: ['/ovirt-engine'],
-        target: engineUrl,
-        changeOrigin: true,
-        secure: false,
-        // remove duplicated "ovirt-engine" section from path
-        pathRewrite: { '^/ovirt-engine': '' }  ,
-        logLevel: 'debug'
-      },
+          context: ['/ovirt-engine'],
+          target: engineUrl,
+          changeOrigin: true,
+          secure: false,
+          // remove duplicated "ovirt-engine" section from path
+          pathRewrite: { '^/ovirt-engine': '' },
+          logLevel: 'debug',
+        },
       ].filter(Boolean),
     },
     bail: true,
     devtool: 'eval-source-map',
-
 
     // These are the "entry points" to our application.
     // This means they will be the "root" imports that are included in JS bundle.
@@ -130,8 +127,8 @@ export default ({
           vendor: {
             name: 'vendor',
             chunks: 'initial',
-            test: /[\\/]node_modules[\\/]/
-          }
+            test: /[\\/]node_modules[\\/]/,
+          },
         },
       },
 
@@ -152,7 +149,7 @@ export default ({
         // Support React Native Web
         // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
         'react-native': 'react-native-web',
-        '_': `${paths.appSrc}`,
+        _: `${paths.appSrc}`,
       },
     },
 
@@ -178,7 +175,7 @@ export default ({
                   configFile: false,
                   compact: false,
 
-                  presets: [ './config/babel.app.config.cjs' ],
+                  presets: ['./config/babel.app.config.cjs'],
 
                   // This is a feature of `babel-loader` for webpack (not Babel itself).
                   // It enables caching results in ./node_modules/.cache/babel-loader/
@@ -206,7 +203,7 @@ export default ({
                   configFile: false,
                   compact: false,
 
-                  presets: [ './config/babel.dep.config.js' ],
+                  presets: ['./config/babel.dep.config.js'],
 
                   cacheDirectory: true,
                   cacheCompression: false,
@@ -238,12 +235,12 @@ export default ({
             {
               test: fontsToEmbed = [
                 /\.woff2(\?v=[0-9].[0-9].[0-9])?$/,
-                /PatternFlyIcons-webfont\.ttf/
+                /PatternFlyIcons-webfont\.ttf/,
               ],
               use: {
                 loader: 'url-loader',
-                options: {}
-              }
+                options: {},
+              },
             },
             {
               test: /\.(ttf|eot|svg|woff(?!2))(\?v=[0-9].[0-9].[0-9])?$/,
@@ -251,9 +248,9 @@ export default ({
               use: {
                 loader: 'file-loader',
                 options: {
-                  name: 'static/fonts/[name].[hash:8].[ext]'
-                }
-              }
+                  name: 'static/fonts/[name].[hash:8].[ext]',
+                },
+              },
             },
 
             // A special case for favicon.ico to place it into build root directory.
@@ -308,7 +305,7 @@ export default ({
                       ],
                     },
                   },
-                }
+                },
               ],
             },
 
@@ -341,7 +338,7 @@ export default ({
                       ],
                     },
                   },
-                }
+                },
               ],
               // Don't consider CSS imports dead code (for tree shaking) even if the
               // containing package claims to have no side effects.
@@ -410,11 +407,11 @@ export default ({
       // makes the discovery automatic so you don't have to restart.
       new WatchMissingNodeModulesPlugin(paths.appNodeModules),
 
-      new CleanTerminalPlugin({     
-          message: cleanTerminalMessage,
-          onlyInWatchMode: true,
-          skipFirstRun: true,
-          beforeCompile: true,
+      new CleanTerminalPlugin({
+        message: cleanTerminalMessage,
+        onlyInWatchMode: true,
+        skipFirstRun: true,
+        beforeCompile: true,
       }),
 
       // Integrate linting to the build and notify of errors but don't fail to run
@@ -441,7 +438,7 @@ export default ({
 
   if (process.env.V) {
     const colors = tty.isatty(1)
-    console.log(`Dev webpack configuration:`)
+    console.log('Dev webpack configuration:')
     console.log(util.inspect(theConfig, { compact: false, breakLength: 120, depth: null, colors }))
   }
   return theConfig

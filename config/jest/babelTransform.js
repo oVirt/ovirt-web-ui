@@ -6,7 +6,7 @@ export default babelJest.default.createTransformer({
   configFile: false,
 
   // This should match the paths.appSrc 'babel-loader' options.preset in webpack.config.dev.js
-  presets: [ './config/babel.app.config.cjs' ],
+  presets: ['./config/babel.app.config.cjs'],
 
   plugins: [
     // Enable fancy logging that uses chalk to make console output colorful
@@ -27,6 +27,6 @@ export default babelJest.default.createTransformer({
         ],
       },
     ],
-  ]
+  ],
 
 })
