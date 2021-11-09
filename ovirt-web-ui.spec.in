@@ -1,14 +1,12 @@
 # Used for rpm-packaging of pre-bundled application with already resolved JS dependencies
 %global product oVirt
-
-%global use_rhev %( test -z @RHEV@ && echo 1 || echo 0)
-%define debug_package %{nil}
-
 %global source_basename @PACKAGE_TARNAME@
+%define debug_package %{nil}
+%define offline_build @OFFLINE_BUILD@
 
 Name:           ovirt-web-ui
 Version:        @PACKAGE_RPM_VERSION@
-Release:        @PACKAGE_RPM_RELEASE@%{?release_suffix}%{?checkout}%{?dist}
+Release:        @PACKAGE_RPM_RELEASE@@PACKAGE_RPM_SUFFIX@%{?checkout}%{?dist}
 Summary:        VM Portal for %{product}
 License:        ASL 2.0
 URL:            https://github.com/oVirt/ovirt-web-ui
@@ -16,24 +14,31 @@ Source0:        %{source_basename}-%{version}.tar.gz
 
 BuildArch: noarch
 
+BuildRequires: autoconf
+BuildRequires: automake
+%if %{offline_build}
 # nodejs-modules embeds yarn and requires nodejs
-BuildRequires: ovirt-engine-nodejs-modules >= 2.0.60-1
+BuildRequires: ovirt-engine-nodejs-modules >= 2.1.1-1
+%else
+BuildRequires: nodejs >= 14.15
+BuildRequires: yarn >= 1.22
+%endif
 
 %description
 This package provides the VM Portal for %{product}.
 
 %prep
 %setup -q -n"%{source_basename}-%{version}"
-rpm -qa | grep ovirt-engine-nodejs
-
-echo "=== Workaround: 'yarn check' is recently failing on requiring webpack >= v2. Manually"
-echo "=== verified that this is ok for recent code base but may be a real failure in the"
-echo "=== future. Please watch carefully for other potential types of errors."
-IGNORE_YARN_CHECK=1 source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh
 
 %build
-export PATH="%{_datadir}/ovirt-engine-nodejs/bin:%{_datadir}/ovirt-engine-nodejs-modules/bin:${PATH}"
 %configure
+export SKIP_AUTOGEN=1
+%if %{offline_build}
+rpm -qa | grep ovirt-engine-nodejs
+source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh
+%else
+yarn install
+%endif
 make
 
 %install
