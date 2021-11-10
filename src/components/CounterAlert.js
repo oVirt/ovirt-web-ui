@@ -47,7 +47,6 @@ class CounterAlert extends React.Component {
     return this.state.showAlert && (
       <Alert
         variant={type}
-        onTimeout={this.handleDismiss}
         actionClose={<AlertActionCloseButton onClose={this.handleDismiss} />}
         className={style['text-align-left']}
         title={title}
