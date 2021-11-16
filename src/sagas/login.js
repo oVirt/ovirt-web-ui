@@ -45,8 +45,8 @@ import { loadFromLocalStorage, removeFromLocalStorage } from '_/storage'
 import { loadUserOptions } from './options'
 
 function isFirstLogin (sessionAgeInSecAtPageLoad) {
-  const threshold = AppConfiguration.sessionAgeFirstLoginThreshold
-  return !threshold || sessionAgeInSecAtPageLoad < threshold
+  const threshold = AppConfiguration.sessionAgeFirstLoginThresholdInSeconds
+  return !threshold || sessionAgeInSecAtPageLoad <= threshold
 }
 
 /**
