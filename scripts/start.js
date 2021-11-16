@@ -11,7 +11,7 @@ import fetch from 'node-fetch'
 import https from 'https'
 import fs from 'fs'
 import dotenv from 'dotenv'
-import paths from '../config/paths.js'
+import paths from '../config/paths.cjs'
 
 process.env.BABEL_ENV = 'development'
 process.env.NODE_ENV = 'development'

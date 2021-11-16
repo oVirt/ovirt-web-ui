@@ -1,5 +1,5 @@
 import * as babel from '@babel/core'
-import plugin from './fancy-console'
+import plugin from './fancy-console.cjs'
 
 // remove indentation from a string in a way similar to how babel does
 function deindent (strings, ...keys) {

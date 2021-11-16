@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import chalk from 'chalk'
-import paths from '../../config/paths.js'
+import paths from '../../config/paths.cjs'
 
 export default function checkRequiredFiles () {
   const filesPathToCheck = [paths.appHtml, paths.appIndexJs, paths.appVersionJs]

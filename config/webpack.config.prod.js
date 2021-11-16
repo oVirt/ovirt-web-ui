@@ -5,6 +5,7 @@ import util from 'util'
 import webpack from 'webpack'
 
 import CopyWebpackPlugin from 'copy-webpack-plugin'
+import ESLintPlugin from 'eslint-webpack-plugin'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import InlineChunkHtmlPlugin from 'react-dev-utils/InlineChunkHtmlPlugin.js'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
@@ -13,7 +14,7 @@ import CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
 import TerserPlugin from 'terser-webpack-plugin'
 
 import postcssPresetEnv from 'postcss-preset-env'
-import paths from './paths.js'
+import paths from './paths.cjs'
 import env from './env.js'
 import { createRequire } from 'module'
 const require = createRequire(import.meta.url)
@@ -408,8 +409,7 @@ export default (() => {
         chunkFilename: 'static/css/[name].[contenthash:8].chunk.css',
       }),
 
-      // Fail the build if the app sources have lint errors
-      // TODO: Add ESLintPlugin (https://github.com/webpack-contrib/eslint-webpack-plugin)
+      new ESLintPlugin(),
     ],
 
     // Some libraries import Node modules but don't use them in the browser.

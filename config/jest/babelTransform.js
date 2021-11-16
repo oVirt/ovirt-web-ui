@@ -11,7 +11,7 @@ export default babelJest.default.createTransformer({
   plugins: [
     // Enable fancy logging that uses chalk to make console output colorful
     [
-      './babel-plugin/fancy-console',
+      './babel-plugin/fancy-console.cjs',
       {
         loggers: [
           {

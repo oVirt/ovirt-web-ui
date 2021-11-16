@@ -1,5 +1,6 @@
 const tty = require('tty')
 const util = require('util')
+const paths = require('./paths.cjs')
 
 /*
  * The preset for ovirt-web-ui is based on the `babel-preset-react-app` package. We
@@ -76,7 +77,9 @@ module.exports = function (api, opts = {}) {
       //   },
       // ],
 
-      isEnvDevelopment && './babel-plugin/fancy-console',
+      // eslint-web-plugin loads this config from a different relative path
+      // than regular build script. Resolved path works for both cases.
+      isEnvDevelopment && paths.appFancyConsole,
 
     ].filter(Boolean),
 

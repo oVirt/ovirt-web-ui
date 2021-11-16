@@ -6,9 +6,6 @@
 //   - https://github.com/openshift/console/tree/master/frontend/packages/eslint-plugin-console
 
 //
-// TODO 1: Integrate eslint-webpack-plugin to the webpack build so errors and warnings are
-//         visible during development.
-//
 // TODO 2: Adopt `eslint-plugin-jest` and `eslint-plugin-testing-library` for tests with
 //         an overrides section entry:
 //           https://github.com/facebook/create-react-app/blob/master/packages/eslint-config-react-app/jest.js

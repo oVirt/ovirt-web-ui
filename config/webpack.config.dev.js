@@ -5,13 +5,14 @@ import webpack from 'webpack'
 
 import CaseSensitivePathsPlugin from 'case-sensitive-paths-webpack-plugin'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
+import ESLintPlugin from 'eslint-webpack-plugin'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import ModuleNotFoundPlugin from 'react-dev-utils/ModuleNotFoundPlugin.js'
 import WatchMissingNodeModulesPlugin from 'react-dev-utils/WatchMissingNodeModulesPlugin.js'
 import CleanTerminalPlugin from 'clean-terminal-webpack-plugin'
 
 import postcssPresetEnv from 'postcss-preset-env'
-import paths from './paths.js'
+import paths from './paths.cjs'
 import env from './env.js'
 import { createRequire } from 'module'
 const require = createRequire(import.meta.url)
@@ -414,8 +415,7 @@ export default ({
         beforeCompile: true,
       }),
 
-      // Integrate linting to the build and notify of errors but don't fail to run
-      // TODO: Add ESLintPlugin (https://github.com/webpack-contrib/eslint-webpack-plugin)
+      new ESLintPlugin(),
     ],
 
     // Some libraries import Node modules but don't use them in the browser.

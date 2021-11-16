@@ -1,5 +1,5 @@
-import path from 'path'
-import fs from 'fs'
+const path = require('path')
+const fs = require('fs')
 
 // Make sure any symlinks in the project folder are resolved:
 // https://github.com/facebookincubator/create-react-app/issues/637
@@ -32,7 +32,7 @@ if (process.env.BRANDING && fs.existsSync(process.env.BRANDING)) {
 
 // config after eject: we're in ./config/
 
-export default {
+module.exports = {
   appBranding: brandingPath || resolveApp('branding'),
   appBuild: resolveApp('build'),
   appHtml: resolveApp('static/index.hbs'),
@@ -43,4 +43,5 @@ export default {
   appSrc: resolveApp('src'),
   appVersionJs: resolveApp('src/version.js'),
   nodePaths,
+  appFancyConsole: resolveApp('babel-plugin/fancy-console.cjs'),
 }
