@@ -8,15 +8,15 @@
     "@babel/eslint-parser": "7.16.3",
     "@babel/eslint-plugin": "7.14.5",
     "@babel/node": "7.16.0",
-    "@babel/plugin-syntax-flow": "7.14.5",
+    "@babel/plugin-syntax-flow": "7.16.0",
     "@babel/plugin-transform-react-jsx": "7.16.0",
-    "@babel/preset-env": "7.16.0",
+    "@babel/preset-env": "7.16.4",
     "@babel/preset-flow": "7.16.0",
     "@babel/preset-react": "7.16.0",
     "@formatjs/icu-messageformat-parser": "2.0.14",
     "babel-jest": "27.3.1",
     "babel-loader": "8.2.3",
-    "camelcase": "6.2.0",
+    "camelcase": "6.2.1",
     "case-sensitive-paths-webpack-plugin": "2.4.0",
     "chalk": "4.1.2",
     "clean-terminal-webpack-plugin": "3.0.0",
@@ -38,7 +38,7 @@
     "eslint-webpack-plugin": "^2.6.0",
     "file-loader": "6.2.0",
     "filesize": "8.0.6",
-    "flow-bin": "0.163.0",
+    "flow-bin": "0.164.0",
     "flow-typed": "^3.3.1",
     "gzip-size": "6.0.0",
     "handlebars": "4.7.7",
@@ -61,7 +61,7 @@
     "url-loader": "4.1.1",
     "webpack": "^4.46.0",
     "webpack-cli": "4.9.1",
-    "webpack-dev-server": "4.4.0"
+    "webpack-dev-server": "4.5.0"
   },
   "dependencies": {
     "@closeio/use-infinite-scroll": "1.0.0",
@@ -102,13 +102,9 @@
   },
   "resolutions": {
     "bootstrap-select": ">=1.13.6",
-    "glob-parent": "^5.1.2",
-    "handlebars": ">=4.7.7",
-    "jquery": ">=3.5.1",
-    "immer": ">=9.0.6",
-    "js-yaml": "^3.13.1",
-    "lodash": ">=4.17.21",
-    "redux": ">=4.0.0"
+    "webpack/**/glob-parent": "^5.1.2",    
+    "patternfly/**/jquery": ">=3.5.1",
+    "immer": ">=9.0.6"
   },
   "scripts": {
     "preinstall": "test -e scripts/yarn-preinstall.sh && scripts/yarn-preinstall.sh || :",
