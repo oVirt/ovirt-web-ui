@@ -17,7 +17,7 @@ USER_PORTAL_DIR = $(datarootdir)/ovirt-web-ui
 OVIRT_ENGINE_DIR = $(datarootdir)/ovirt-engine
 
 SHELL := /bin/bash
-export PATH := /usr/share/ovirt-engine-nodejs/bin:../node_modules/.bin:$(PATH)
+export PATH := /usr/share/ovirt-engine-nodejs-modules/bin:$(PATH)
 
 EXTRA_DIST = \
 	autogen.sh \
@@ -65,13 +65,18 @@ RPMBUILD_ARGS :=
 RPMBUILD_ARGS += --define="_topdir `pwd`/$(TMPREPOS)"
 RPMBUILD_ARGS += $(if $(RELEASE_SUFFIX), --define="release_suffix $$RELEASE_SUFFIX")
 
-srpm:	dist
+srpm:	dist-gzip
 	rm -fr "$(TMPREPOS)"
 	mkdir -p $(TMPREPOS)/{SPECS,RPMS,SRPMS,SOURCES}
 	$(RPMBUILD) $(RPMBUILD_ARGS) -ts "$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz"
 	@echo
 	@echo "srpm available at '$(TMPREPOS)'"
 	@echo
+
+snapshot-srpm: SNAPSHOT_DATE = $(shell date --utc +%Y%m%d)
+snapshot-srpm: SNAPSHOT_COMMIT ?= $(shell git log -1 --pretty=format:%h)
+snapshot-srpm:
+	make srpm RELEASE_SUFFIX=".$(SNAPSHOT_DATE).git$(SNAPSHOT_COMMIT)"
 
 rpm:	srpm
 	$(RPMBUILD) $(RPMBUILD_ARGS) --rebuild "$(TMPREPOS)"/SRPMS/*.src.rpm
@@ -98,8 +103,8 @@ all: ovirt-web-ui
 
 ovirt-web-ui:
 	node --version
-	$(YARN) --version
-	NODE_OPTIONS=--max_old_space_size=4096 $(YARN) run build
+	yarn --version
+	NODE_OPTIONS=--max_old_space_size=4096 yarn run build
 	cp -rpv packaging/* build/
 	mv build/static build/index.jsp build/ovirt-web-ui.config build/ovirt-web-ui.war/
 
@@ -128,4 +133,4 @@ install-data-local:
 	cp -rpv build/etc/* "$(dest_etc)"
 
 check-local:
-	$(YARN) test
+	yarn test

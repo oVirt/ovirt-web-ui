@@ -125,7 +125,7 @@
     "ua-parser-js": "^0.7.22"
   },
   "scripts": {
-    "preinstall": "test -e ./autogen.sh && ./autogen.sh --prefix=/usr --datarootdir=/share || :",
+    "preinstall": "test -e scripts/yarn-preinstall.sh && scripts/yarn-preinstall.sh || :",
     "clean": "make distclean",
     "dev": "NODE_ENV=development V=1 webpack --progress --config config/webpack.config.dev.js",
     "start": "node scripts/start.js",
