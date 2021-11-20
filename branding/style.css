@@ -5,6 +5,6 @@ put anything here that should override styles
 from brand.css.
 *********************************************/
 
-#about-modal a {
+#about-modal a, #about-modal, #about-modal button {
     color: #ffffff;
 }

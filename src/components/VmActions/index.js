@@ -176,7 +176,7 @@ class VmActions extends React.Component {
         className: 'btn btn-default',
         id: `${idPrefix}-button-shutdown`,
         confirmation: (
-          <ConfirmationModal accessibleDescription='one'
+          <ConfirmationModal
             title={msg.shutdownVm()}
             body={msg.shutdownVmQuestion()}
             confirm={{ title: msg.yes(), onClick: () => onShutdown() }}

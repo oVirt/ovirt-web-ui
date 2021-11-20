@@ -5,7 +5,6 @@ import { connect } from 'react-redux'
 import { addVmSnapshot } from './actions'
 
 import {
-  Button,
   Col,
   Form,
   FormControl,
@@ -13,12 +12,15 @@ import {
   HelpBlock,
   Checkbox,
   Icon,
-  Modal,
   noop,
 } from 'patternfly-react'
-import { Alert } from '@patternfly/react-core'
+import {
+  Alert,
+  Button,
+  Modal,
+  ModalVariant,
+} from '@patternfly/react-core'
 import { withMsg } from '_/intl'
-import style from './style.css'
 
 class NewSnapshotModal extends Component {
   constructor (props) {
@@ -78,51 +80,59 @@ class NewSnapshotModal extends Component {
           { msg.createSnapshot() }
         </a>
 
-        <Modal show={this.state.showModal} onHide={this.close} dialogClassName={style['create-snapshot-container']} id={modalId}>
-          <Modal.Header>
-            <button
-              className='close'
+        <Modal
+          isOpen={this.state.showModal}
+          onClose={this.close}
+          id={modalId}
+          title={ msg.createSnapshot() }
+          variant={ModalVariant.small}
+          position='top'
+          actions={[
+            <Button key='save' variant='primary' onClick={this.handleSave} id={`${modalId}-create`}>
+              { msg.create() }
+            </Button>,
+            <Button
+              variant='link'
               onClick={this.close}
-              aria-hidden='true'
-              aria-label={msg.close()}
-              id={`${modalId}-close`}
+              id={`${modalId}-cancel`}
+              key='cancel'
             >
-              <Icon type='pf' name='close' />
-            </button>
-            <Modal.Title>{ msg.createSnapshot() }</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form onSubmit={this.handleSave} horizontal>
-              <Col sm={12}>
-                <Alert
-                  variant='info'
-                  isInline
-                  title={msg.details()}
-                  style={{ 'margin-bottom': '10px' }}
-                >
-                  {msg.snapshotInfo() }
-                </Alert>
-              </Col>
-              <FormGroup bsClass='form-group col-sm-12 required' validationState={this.state.emptyDescription ? 'error' : null}>
-                <label className='col-sm-3 control-label'>
-                  { msg.name() }
-                </label>
-                <div className='col-sm-9'>
-                  <FormControl
-                    type='text'
-                    value={this.state.description}
-                    onChange={this.handleDescriptionChange}
-                    id={`${modalId}-description-edit`}
-                  />
-                  {
+              { msg.cancel() }
+            </Button>,
+
+          ]}
+        >
+          <Form onSubmit={this.handleSave} horizontal>
+            <Col sm={12}>
+              <Alert
+                variant='info'
+                isInline
+                title={msg.details()}
+                style={{ 'margin-bottom': '10px' }}
+              >
+                {msg.snapshotInfo() }
+              </Alert>
+            </Col>
+            <FormGroup bsClass='form-group col-sm-12 required' validationState={this.state.emptyDescription ? 'error' : null}>
+              <label className='col-sm-3 control-label'>
+                { msg.name() }
+              </label>
+              <div className='col-sm-9'>
+                <FormControl
+                  type='text'
+                  value={this.state.description}
+                  onChange={this.handleDescriptionChange}
+                  id={`${modalId}-description-edit`}
+                />
+                {
                     this.state.emptyDescription && (
                       <HelpBlock>
                         {msg.emptySnapshotDescription()}
                       </HelpBlock>
                     )}
-                </div>
-              </FormGroup>
-              {
+              </div>
+            </FormGroup>
+            {
                 this.props.isVmRunning && (
                   <FormGroup bsClass='form-group col-sm-12'>
                     <label className='col-sm-3 control-label'>
@@ -137,21 +147,8 @@ class NewSnapshotModal extends Component {
                     </div>
                   </FormGroup>
                 )}
-            </Form>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button
-              bsStyle='default'
-              className='btn-cancel'
-              onClick={this.close}
-              id={`${modalId}-cancel`}
-            >
-              { msg.cancel() }
-            </Button>
-            <Button bsStyle='primary' onClick={this.handleSave} id={`${modalId}-create`}>
-              { msg.create() }
-            </Button>
-          </Modal.Footer>
+          </Form>
+
         </Modal>
       </div>
     )

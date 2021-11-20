@@ -64,6 +64,7 @@
 
 .section-list{
     list-style-type: disc;
+    padding-left: var(--pf-c-modal-box__body--PaddingLeft);;
 }
 
 .field-list{

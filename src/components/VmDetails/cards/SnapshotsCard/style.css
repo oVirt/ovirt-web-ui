@@ -131,17 +131,6 @@ div.popover {
   font-size: 14px;
 }
 
-.create-snapshot-container :global(.modal-body) {
-  padding: 0;
-}
-
-.create-snapshot-container :global(.alert) {
-  margin-top: 10px;
-  margin-bottom: 10px;
-  margin-left: 0;
-  margin-right: 0;
-}
-
 .no-nics, .no-disks {
   font-style: italic;
   color: rgba(0, 0, 0, 0.65);

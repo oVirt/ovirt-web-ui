@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import PropsTypes from 'prop-types'
-import { Modal, Icon } from 'patternfly-react'
+import { Modal, ModalVariant, Button } from '@patternfly/react-core'
 import { MsgContext } from '_/intl'
 
 const btnPropType = PropsTypes.shape({
@@ -8,45 +8,38 @@ const btnPropType = PropsTypes.shape({
   onClick: PropsTypes.func,
 })
 
-const ConfirmationModal = ({ show, title, confirm, body, subContent, onClose, extra, accessibleDescription }) => {
+const ConfirmationModal = ({ show, title, confirm, body, subContent, onClose, extra }) => {
   const { msg } = useContext(MsgContext)
   return (
-    <Modal onHide={onClose} show={show} className='message-dialog-pf' aria-describedby={accessibleDescription}>
-      <Modal.Header>
-        <button
-          className='close'
-          onClick={onClose}
-        >
-          <span className='pficon pficon-close' title='Close' />
-        </button>
-        <Modal.Title>{title}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        {
+    <Modal
+      title={title}
+      isOpen={show}
+      variant={ModalVariant.small}
+      titleIconVariant='warning'
+      position='top'
+      onClose={onClose}
+      actions={[
+        <Button key='confirm' variant={confirm.type || 'primary'} onClick={() => { confirm.onClick(); onClose() }}>{confirm.title}</Button>,
+        extra && <Button key='extra' variant='secondary' onClick={() => { extra.onClick(); onClose() }}>{extra.title}</Button>,
+        <Button key='cancel' variant='link' onClick={onClose}>{msg.cancel()}</Button>,
+      ].filter(Boolean)}
+    >
+      {
           typeof body === 'string'
             ? (
               <>
-                <Icon type='pf' name='warning-triangle-o' />
-                <div id={accessibleDescription}>
-                  <p className='lead'>
-                    { body }
-                  </p>
-                  {
+                <p className='lead'>
+                  { body }
+                </p>
+                {
                   subContent && typeof subContent === 'string'
                     ? <p>{ subContent }</p>
                     : subContent
                 }
-                </div>
               </>
             )
             : body
         }
-      </Modal.Body>
-      <Modal.Footer>
-        { extra && <button className='btn btn-info' onClick={() => { extra.onClick(); onClose() }}>{extra.title}</button> }
-        <button className={`btn ${confirm ? 'btn-default' : 'btn-info'}`} onClick={onClose}>{msg.cancel()}</button>
-        { confirm && <button className={`btn ${confirm.type ? `btn-${confirm.type}` : 'btn-info'}`} onClick={() => { confirm.onClick(); onClose() }}>{confirm.title}</button> }
-      </Modal.Footer>
     </Modal>
   )
 }
@@ -56,10 +49,9 @@ ConfirmationModal.propTypes = {
   title: PropsTypes.string.isRequired,
 
   onClose: PropsTypes.func,
-  accessibleDescription: PropsTypes.string,
   confirm: PropsTypes.shape({
     title: PropsTypes.string,
-    type: PropsTypes.oneOf(['primary', 'success', 'info', 'warning', 'danger']),
+    type: PropsTypes.oneOf(['primary' | 'secondary' | 'tertiary' | 'danger' | 'warning' | 'link' | 'plain' | 'control']),
     onClick: PropsTypes.func,
   }),
   extra: btnPropType,
