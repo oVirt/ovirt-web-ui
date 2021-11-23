@@ -30,7 +30,7 @@ module.exports = function (api, opts = {}) {
       (isEnvDevelopment || isEnvProduction) && [
         '@babel/preset-env',
         {
-          debug: isEnvDevelopment || verbose,
+          debug: verbose,
           useBuiltIns: 'usage',
           corejs: '3.13',
           exclude: ['transform-typeof-symbol'],
