@@ -132,35 +132,46 @@ This allows you to run VM Portal deployed directly in an ovirt-engine developmen
 
 
 ### Build RPM
-There are at least 4 ways to build the RPM for the project:
-  1. Manually with `make rpm`:
+There are at least 6 ways to build the RPM for the project:
+
+  1. Manual **offline** build with `make rpm`:
 
     source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh
     ./autogen.sh --prefix=/usr --datarootdir=/share
     make rpm
 
-  2. Use [mock_runner](https://ovirt-infra-docs.readthedocs.io/en/latest/CI/Using_mock_runner/index.html)
-     to run CI build artifacts locally (this method is cleanest since it runs in a chroot).
+  2. Manual **offline** build with `automation/build.sh`:
 
-  3. Each pull request push will automatically have RPMs built (the check-patch,
+    ./automation/build.sh
+
+  3. Manual **online** build with `automation/build.sh`:
+
+    OFFLINE_BUILD=0 ./automation/build.sh
+
+  4. Use oVirt STDCI [mock_runner](https://ovirt-infra-docs.readthedocs.io/en/latest/CI/Using_mock_runner/index.html)
+     to run CI build artifacts locally.  This method is cleanest since it runs in a chroot and
+     can build for a target that is different than your system (e.g. build for el8 on fedora34).
+
+  5. Each pull request push will automatically have RPMs built (the check-patch,
      check-merged, and build-artifact stages all use the same script: `automation/build.sh`)
      by [oVirt infra STDCI](https://ovirt-infra-docs.readthedocs.io/en/latest/CI/Build_and_test_standards/index.html).
      The most recent build on the master branch is available on
      [STDCI last successful build artifacts](https://jenkins.ovirt.org/job/oVirt_ovirt-web-ui_standard-on-ghpush/lastSuccessfulBuild/artifact/).
 
-  4. Post the comment "`ci build please`" to the GitHub Pull Request for an on-demand
-     CI build artifacts build. Reference
+  6. Post the comment "`ci build`" to the GitHub Pull Request for an on-demand
+     CI build artifacts build before merging a PR. Reference
      [manual functionality of the oVirt CI system](https://ovirt-infra-docs.readthedocs.io/en/latest/CI/Using_STDCI_with_GitHub/index.html#manual-functionality-of-the-ovirt-ci-system).
 
 
 ### RPM Installation
+
     yum install ovirt-web-ui
 
 Installs the app to `/usr/share/ovirt-web-ui`. A new **ovirt-web-ui.war** is added to the existing **ovirt-engine.ear**.
 
 You can access the application at: `https://[ENGINE_URL]/ovirt-engine/web-ui`
 
-The latest ovirt-web-ui RPM can be found in the [Copr build system](https://copr.fedorainfracloud.org/coprs/ovirtwebui/ovirt-web-ui/).
+The latest master branch ovirt-web-ui RPM can be found in the [Copr build system](https://copr.fedorainfracloud.org/coprs/ovirt/ovirt-master-snapshot).
 
 
 ## Browser Developer Tools
@@ -178,17 +189,7 @@ A pair of extensions are recommended to simplify debugging of the application:
 - fast UI responses and start-up
 - improved usability and look & feel
 - easy customization for your own oVirt UI implementation
-- can be deployed as a self-standing lightweight app (docker image)
-- integration with other components like Cockpit or ManageIQ
 - code reusability, extensibility, and simplicity
 - simplified maintenance and ongoing development
 
 For more info, see [doc/goals.md](https://github.com/oVirt/ovirt-web-ui/blob/master/doc/goals.md)
-
-
-## Author(s)
-- Marek Libra (mlibra@redhat.com)
-- Bohdan Iakymets (biakymet@redhat.com)
-- Jakub Niedermertl (jniederm@redhat.com)
-- Scott Dickerson (sdickers@redhat.com)
-- Greg Sheremeta (gshereme@redhat.com)

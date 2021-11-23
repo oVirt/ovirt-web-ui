@@ -51,10 +51,7 @@ else
   fi
 fi
 
-echo "PACKAGE_RPM_SUFFIX = \"$PACKAGE_RPM_SUFFIX\""
-
 # Run the build
-# PATH=/usr/share/ovirt-engine-nodejs-modules/bin:$PATH
 ./autogen.sh --prefix=/usr --datarootdir=/share
 if [[ $source_build -eq 1 ]] ; then
   make ${target_prefix}srpm
