@@ -66,7 +66,7 @@
   "dependencies": {
     "@closeio/use-infinite-scroll": "1.0.0",
     "@patternfly/react-charts": "6.21.8",
-    "@patternfly/react-console": "4.17.0",
+    "@patternfly/react-console": "^2.0.18",
     "@patternfly/react-core": "4.168.8",
     "bootstrap": "3.4.1",
     "bootstrap-select": "1.13.18",
@@ -104,7 +104,8 @@
     "bootstrap-select": ">=1.13.6",
     "webpack/**/glob-parent": "^5.1.2",    
     "patternfly/**/jquery": ">=3.5.1",
-    "immer": ">=9.0.6"
+    "immer": ">=9.0.6",
+    "@patternfly/react-console/**/@novnc/novnc": "1.1.0"
   },
   "scripts": {
     "preinstall": "test -e scripts/yarn-preinstall.sh && scripts/yarn-preinstall.sh || :",

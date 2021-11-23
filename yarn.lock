@@ -1390,10 +1390,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@novnc/novnc@^1.2.0":
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/@novnc/novnc/-/novnc-1.3.0.tgz#06db5ff55eae646a623d3717d8bffaf131ffb93a"
-  integrity sha512-tR87mY5ADtaELadmZfW937JO/p8fRdz3wkPoqwhqB/vY1XnTQeLSWwkp4yMlr4iIDY0iCficfzFYX5EHMh4MHw==
+"@novnc/novnc@1.1.0", "@novnc/novnc@^1.0.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@novnc/novnc/-/novnc-1.1.0.tgz#3827b623e9e201ee1e1c8a61d107c51cbfaeb871"
+  integrity sha512-W90Q79EuCYT++39aT/VKGyk7hUt2gPN3rN+ifPUvY4rdjgZlfwdCg9q7yzj04hke/zgdHsbXFfyFijBvrRuU5A==
 
 "@npmcli/fs@^1.0.0":
   version "1.0.0"
@@ -1518,11 +1518,6 @@
   dependencies:
     "@octokit/openapi-types" "^11.2.0"
 
-"@patternfly/patternfly@4.147.1":
-  version "4.147.1"
-  resolved "https://registry.yarnpkg.com/@patternfly/patternfly/-/patternfly-4.147.1.tgz#81a0ffb3a8e84153f7ae92afe118598cca6e255c"
-  integrity sha512-cTfV2kebOh41yWY3Np9AqpBG/RzILqSWm0sdijuV2BTMPVU38AQdx/727F8v7mUpKMnlCoEpxTQZL05rQ5MDZw==
-
 "@patternfly/react-charts@6.21.8":
   version "6.21.8"
   resolved "https://registry.yarnpkg.com/@patternfly/react-charts/-/react-charts-6.21.8.tgz#5dfd484605e0b5ab3db66adf1ab9ca04e73785d7"
@@ -1549,22 +1544,20 @@
     victory-voronoi-container "^35.9.1"
     victory-zoom-container "^35.9.0"
 
-"@patternfly/react-console@4.17.0":
-  version "4.17.0"
-  resolved "https://registry.yarnpkg.com/@patternfly/react-console/-/react-console-4.17.0.tgz#e80572747d26b593ce2d10416a00998455827b6d"
-  integrity sha512-4WBcw2lwyKBfnWMcTskflFJSEQhXpQL3KhL9Jr0px4yQIFeUBXANIFywynW4bFw1UJBNwVV/bPmBysXeLGPZjA==
+"@patternfly/react-console@^2.0.18":
+  version "2.0.18"
+  resolved "https://registry.yarnpkg.com/@patternfly/react-console/-/react-console-2.0.18.tgz#a75274dd8f44a3da79b5620b1285ae90cb13bd68"
+  integrity sha512-mz1e/C8XS+YQzg4Rf9RFlxCqAwWE6/u/JvoGvmYllDy2KeXCg++txCcJKKoVWjJDyA9Q5yJVyJ8JmJ8WizolTw==
   dependencies:
-    "@novnc/novnc" "^1.2.0"
-    "@patternfly/patternfly" "4.147.1"
-    "@patternfly/react-core" "^4.166.0"
+    "@novnc/novnc" "^1.0.0"
     "@spice-project/spice-html5" "^0.2.1"
-    "@types/file-saver" "^2.0.1"
+    blob-polyfill "^3.0.20180112"
+    classnames "^2.2.5"
     file-saver "^1.3.8"
-    tslib "^2.0.0"
-    xterm "^4.8.1"
+    xterm "^4.0.0"
     xterm-addon-fit "^0.2.1"
 
-"@patternfly/react-core@4.168.8", "@patternfly/react-core@^4.166.0":
+"@patternfly/react-core@4.168.8":
   version "4.168.8"
   resolved "https://registry.yarnpkg.com/@patternfly/react-core/-/react-core-4.168.8.tgz#6f200dba7bb83423144db34bbd2ffc833b097566"
   integrity sha512-wfG52saibeAXRoBYytzMgVGANoInbPuhUK0y6AynVp3/QKAPCKHpaI4nCh9ytNZ+UjiT2KGOcunhavsOw5+iMA==
@@ -2014,11 +2007,6 @@
   version "0.0.50"
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.50.tgz#1e0caa9364d3fccd2931c3ed96fdbeaa5d4cca83"
   integrity sha512-C6N5s2ZFtuZRj54k2/zyRhNDjJwwcViAM3Nbm8zjBpbqAdZ00mr0CFxvSKeO8Y/e03WVFLpQMdHYVfUd6SB+Hw==
-
-"@types/file-saver@^2.0.1":
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/@types/file-saver/-/file-saver-2.0.4.tgz#aaf9b96296150d737b2fefa535ced05ed8013d84"
-  integrity sha512-sPZYQEIF/SOnLAvaz9lTuydniP+afBMtElRTdYkeV1QtEgvtJ7qolCPjly6O32QI8CbEmP5O/fztMXEDWfEcrg==
 
 "@types/geojson@*":
   version "7946.0.8"
@@ -3091,6 +3079,11 @@ bindings@^1.5.0:
   integrity sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==
   dependencies:
     file-uri-to-path "1.0.0"
+
+blob-polyfill@^3.0.20180112:
+  version "3.0.20180112"
+  resolved "https://registry.yarnpkg.com/blob-polyfill/-/blob-polyfill-3.0.20180112.tgz#7f7c3e235ae298867f8c22b429d33aa9a7cc65b5"
+  integrity sha512-DX/47MXO+hNuEhuZRW9/yykNoCe7E/ywcPKtPVqGPRwLlowN811xi/3yVMQkE2fhTGHfrH8O9BMuhM7IdcRyew==
 
 bluebird@^3.5.1, bluebird@^3.5.3, bluebird@^3.5.5:
   version "3.7.2"
@@ -4847,7 +4840,7 @@ debug@^3.1.0, debug@^3.1.1, debug@^3.2.7:
   dependencies:
     ms "^2.1.1"
 
-debuglog@*, debuglog@^1.0.1:
+debuglog@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/debuglog/-/debuglog-1.0.1.tgz#aa24ffb9ac3df9a2351837cfb2d279360cd78492"
   integrity sha1-qiT/uaw9+aI1GDfPstJ5NgzXhJI=
@@ -7324,7 +7317,7 @@ import-local@^3.0.2:
     pkg-dir "^4.2.0"
     resolve-cwd "^3.0.0"
 
-imurmurhash@*, imurmurhash@^0.1.4:
+imurmurhash@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/imurmurhash/-/imurmurhash-0.1.4.tgz#9218b9b2b928a238b13dc4fb6b6d576f231453ea"
   integrity sha1-khi5srkoojixPcT7a21XbyMUU+o=
@@ -8904,11 +8897,6 @@ lockfile@^1.0.4:
   dependencies:
     signal-exit "^3.0.2"
 
-lodash._baseindexof@*:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/lodash._baseindexof/-/lodash._baseindexof-3.1.0.tgz#fe52b53a1c6761e42618d654e4a25789ed61822c"
-  integrity sha1-/lK1OhxnYeQmGNZU5KJXie1hgiw=
-
 lodash._baseuniq@~4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/lodash._baseuniq/-/lodash._baseuniq-4.6.0.tgz#0ebb44e456814af7905c6212fa2c9b2d51b841e8"
@@ -8917,32 +8905,10 @@ lodash._baseuniq@~4.6.0:
     lodash._createset "~4.0.0"
     lodash._root "~3.0.0"
 
-lodash._bindcallback@*:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/lodash._bindcallback/-/lodash._bindcallback-3.0.1.tgz#e531c27644cf8b57a99e17ed95b35c748789392e"
-  integrity sha1-5THCdkTPi1epnhftlbNcdIeJOS4=
-
-lodash._cacheindexof@*:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/lodash._cacheindexof/-/lodash._cacheindexof-3.0.2.tgz#3dc69ac82498d2ee5e3ce56091bafd2adc7bde92"
-  integrity sha1-PcaayCSY0u5ePOVgkbr9Ktx73pI=
-
-lodash._createcache@*:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/lodash._createcache/-/lodash._createcache-3.1.2.tgz#56d6a064017625e79ebca6b8018e17440bdcf093"
-  integrity sha1-VtagZAF2JeeevKa4AY4XRAvc8JM=
-  dependencies:
-    lodash._getnative "^3.0.0"
-
 lodash._createset@~4.0.0:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/lodash._createset/-/lodash._createset-4.0.3.tgz#0f4659fbb09d75194fa9e2b88a6644d363c9fe26"
   integrity sha1-D0ZZ+7CddRlPqeK4imZE02PJ/iY=
-
-lodash._getnative@*, lodash._getnative@^3.0.0:
-  version "3.9.1"
-  resolved "https://registry.yarnpkg.com/lodash._getnative/-/lodash._getnative-3.9.1.tgz#570bc7dede46d61cdcde687d65d3eecbaa3aaff5"
-  integrity sha1-VwvH3t5G1hzc3mh9ZdPuy6o6r/U=
 
 lodash._root@~3.0.0:
   version "3.0.1"
@@ -9008,11 +8974,6 @@ lodash.merge@^4.6.2:
   version "4.6.2"
   resolved "https://registry.yarnpkg.com/lodash.merge/-/lodash.merge-4.6.2.tgz#558aa53b43b661e1925a0afdfa36a9a1085fe57a"
   integrity sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==
-
-lodash.restparam@*:
-  version "3.6.1"
-  resolved "https://registry.yarnpkg.com/lodash.restparam/-/lodash.restparam-3.6.1.tgz#936a4e309ef330a7645ed4145986c85ae5b20805"
-  integrity sha1-k2pOMJ7zMKdkXtQUWYbIWuWyCAU=
 
 lodash.set@^4.3.2:
   version "4.3.2"
@@ -15065,7 +15026,7 @@ xterm-addon-fit@^0.2.1:
   resolved "https://registry.yarnpkg.com/xterm-addon-fit/-/xterm-addon-fit-0.2.1.tgz#353f43921eb78e3f9ad3f3afbb14e7ac183ca738"
   integrity sha512-BlR57O3t1/bmVcnS81bn9ZnNf+GiGNbeXdNUKSBa9tKEwNUMcU3S+KFLIRv7rm1Ty0D5pMOu0vbz/RDorKRwKQ==
 
-xterm@^4.8.1:
+xterm@^4.0.0:
   version "4.15.0"
   resolved "https://registry.yarnpkg.com/xterm/-/xterm-4.15.0.tgz#e52038507eba7e0d36d47f81e29fe548c82b9561"
   integrity sha512-Ik1GoSq1yqKZQ2LF37RPS01kX9t4TP8gpamUYblD09yvWX5mEYuMK4CcqH6+plgiNEZduhTz/UrcaWs97gOlOw==
