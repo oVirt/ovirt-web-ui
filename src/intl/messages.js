@@ -53,6 +53,7 @@ export const messages: { [messageId: string]: MessageType } = {
   areYouSureYouWantToDeleteNic: 'Are you sure you want to delete NIC {nicName}?',
   areYouSureYouWantToDeleteSnapshot: 'Are you sure you want to delete snapshot {snapshotName}?',
   areYouSureYouWantToRestoreSnapshot: 'Are you sure you want to restore snapshot {snapshotName}?',
+  attention: 'Attention!',
   authorizationExpired: 'Authorization expired. The page is going to be reloaded to re-login.',
   automaticPoolsNotEditable: 'The pool type of {poolName} is automatic so the details of this virtual machine are not editable.',
   availableVmsFromPool: 'Available VMs from this Pool',

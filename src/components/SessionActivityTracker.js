@@ -1,12 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { MessageDialog, Icon } from 'patternfly-react'
 
-import style from './sharedStyle.css'
 import { withMsg } from '_/intl'
 
 import { logout } from '_/actions'
+import ConfirmationModal from './VmActions/ConfirmationModal'
 
 const TIME_TO_DISPLAY_MODAL = 30 // 30 seconds
 
@@ -71,22 +70,22 @@ class SessionActivityTracker extends React.Component {
     const { config, onLogout, msg } = this.props
     if (this.state.showTimeoutModal) {
       return (
-        <MessageDialog
+        <ConfirmationModal
           show={this.state.counter > 0 && this.state.counter <= TIME_TO_DISPLAY_MODAL}
-          primaryAction={() => this.setState({ showTimeoutModal: false, counter: config.get('userSessionTimeoutInterval') })}
-          secondaryAction={onLogout}
-          onHide={onLogout}
-          primaryContent={<p className='lead'>{ msg.sessionExpired() }</p>}
-          secondaryContent={(
+          onClose={onLogout}
+          title={msg.attention()}
+          body={msg.sessionExpired() }
+          subContent={(
             <>
               <p>{ msg.logOutInSecondsSecondary({ seconds: this.state.counter }) }</p>
               <p>{ msg.continueSessionSecondary() }</p>
             </>
           )}
-          primaryActionButtonContent={msg.continueSessionBtn()}
-          secondaryActionButtonContent={msg.logOut()}
-          className={style['header-remover']}
-          icon={<Icon type='pf' name='warning-triangle-o' />}
+          closeTitle={msg.logOut()}
+          confirm={{
+            onClick: () => this.setState({ showTimeoutModal: false, counter: config.get('userSessionTimeoutInterval') }),
+            title: msg.continueSessionBtn(),
+          }}
         />
       )
     }

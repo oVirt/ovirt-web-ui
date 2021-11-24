@@ -3,10 +3,10 @@ import PropsTypes from 'prop-types'
 import { connect } from 'react-redux'
 import Immutable from 'immutable'
 
-import { Icon, MessageDialog } from 'patternfly-react'
 import { withMsg } from '_/intl'
 import { getMinimizedString, escapeHtml } from '_/components/utils'
 import { restoreVmSnapshot } from './actions'
+import ConfirmationModal from '_/components/VmActions/ConfirmationModal'
 
 const MAX_DESCRIPTION_SIZE = 150
 
@@ -35,38 +35,35 @@ class RestoreConfirmationModal extends React.Component {
   render () {
     const { snapshot, trigger, snapshots, id, msg } = this.props
 
-    const icon = <Icon type='pf' name='warning-triangle-o' />
     const snapshotsThatWillBeDeleted = snapshots.filter((s) => s.get('date') > snapshot.get('date'))
     const minDescription = escapeHtml(getMinimizedString(snapshot.get('description'), MAX_DESCRIPTION_SIZE))
 
     return (
       <>
         { trigger({ onClick: this.open })}
-        <MessageDialog
+        <ConfirmationModal
           id={id}
           show={this.state.showModal}
-          onHide={this.close}
-          primaryAction={this.handleRestore}
-          secondaryAction={this.close}
-          primaryActionButtonContent={msg.restore()}
-          secondaryActionButtonContent={msg.cancel()}
+          onClose={this.close}
           title={msg.confirmRestore()}
-          icon={icon}
-          primaryContent={(
-            <div
-              id={`${id}-lead`}
-              className='lead'
-              dangerouslySetInnerHTML={{
-                __html: msg.areYouSureYouWantToRestoreSnapshot({ snapshotName: `"<strong>${minDescription}</strong>"` }),
-              }}
-            />
+          body={(
+            <>
+              <div
+                id={`${id}-lead`}
+                className='lead'
+                dangerouslySetInnerHTML={{
+                  __html: msg.areYouSureYouWantToRestoreSnapshot({ snapshotName: `"<strong>${minDescription}</strong>"` }),
+                }}
+              />
+              { snapshotsThatWillBeDeleted.size > 0 && (
+                <div id={`${id}-secondary`}>
+                  {msg.nextSnapshotsWillBeDeleted()}
+                  {snapshotsThatWillBeDeleted.map((s) => <div key={s.get('date')}>{s.get('description')}</div>)}
+                </div>
+              )}
+            </>
           )}
-          secondaryContent={ snapshotsThatWillBeDeleted.size > 0 && (
-            <div id={`${id}-secondary`}>
-              {msg.nextSnapshotsWillBeDeleted()}
-              {snapshotsThatWillBeDeleted.map((s) => <div key={s.get('date')}>{s.get('description')}</div>)}
-            </div>
-          )}
+          confirm={{ onClick: this.handleRestore, title: msg.restore() }}
         />
       </>
     )

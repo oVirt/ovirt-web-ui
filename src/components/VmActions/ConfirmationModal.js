@@ -8,20 +8,20 @@ const btnPropType = PropsTypes.shape({
   onClick: PropsTypes.func,
 })
 
-const ConfirmationModal = ({ show, title, confirm, body, subContent, onClose, extra }) => {
+const ConfirmationModal = ({ show, title, confirm, body, subContent, onClose, extra, variant = 'warning', closeTitle }) => {
   const { msg } = useContext(MsgContext)
   return (
     <Modal
       title={title}
       isOpen={show}
       variant={ModalVariant.small}
-      titleIconVariant='warning'
+      titleIconVariant={variant}
       position='top'
       onClose={onClose}
       actions={[
         <Button key='confirm' variant={confirm.type || 'primary'} onClick={() => { confirm.onClick(); onClose() }}>{confirm.title}</Button>,
         extra && <Button key='extra' variant='secondary' onClick={() => { extra.onClick(); onClose() }}>{extra.title}</Button>,
-        <Button key='cancel' variant='link' onClick={onClose}>{msg.cancel()}</Button>,
+        <Button key='cancel' variant='link' onClick={onClose}>{closeTitle ?? msg.cancel()}</Button>,
       ].filter(Boolean)}
     >
       {
@@ -51,12 +51,14 @@ ConfirmationModal.propTypes = {
   onClose: PropsTypes.func,
   confirm: PropsTypes.shape({
     title: PropsTypes.string,
-    type: PropsTypes.oneOf(['primary' | 'secondary' | 'tertiary' | 'danger' | 'warning' | 'link' | 'plain' | 'control']),
+    type: PropsTypes.oneOf(['primary', 'secondary', 'tertiary', 'danger', 'warning', 'link', 'plain', 'control']),
     onClick: PropsTypes.func,
   }),
   extra: btnPropType,
+  closeTitle: PropsTypes.string,
   body: PropsTypes.oneOfType([PropsTypes.node, PropsTypes.string]).isRequired,
   subContent: PropsTypes.oneOfType([PropsTypes.node, PropsTypes.string]),
+  variant: PropsTypes.oneOf(['success', 'danger', 'warning', 'info', 'default']),
 }
 
 export default ConfirmationModal
