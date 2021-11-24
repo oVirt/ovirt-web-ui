@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Icon } from 'patternfly-react'
 
 import { withMsg } from '_/intl'
 import { addVmNic, deleteVmNic, editVmNic } from '_/actions'
@@ -16,6 +15,7 @@ import style from './style.css'
 import NicEditor from './NicEditor'
 import NicListItem from './NicListItem'
 import { localeCompare } from '_/helpers'
+import { PlusIcon, NetworkIcon } from '@patternfly/react-icons/dist/esm/icons'
 
 /*
  * Filter the set of vNIC profiles to display to the user such that:
@@ -128,7 +128,7 @@ class NicsCard extends React.Component {
 
     return (
       <BaseCard
-        icon={{ type: 'pf', name: 'network' }}
+        icon={NetworkIcon}
         title={msg.nic()}
         editTooltip={msg.edit()}
         editable={canEditTheCard}
@@ -152,7 +152,7 @@ class NicsCard extends React.Component {
                     trigger={({ onClick }) => (
                       <div className={itemStyle['create-block']}>
                         <a href='#' id={`${idPrefix}-new-button`} onClick={onClick}>
-                          <Icon className={itemStyle['create-icon']} type='fa' name='plus' />
+                          <PlusIcon className={itemStyle['create-icon']}/>
                           <span className={itemStyle['create-text']} >{msg.nicActionCreateNew()}</span>
                         </a>
                       </div>

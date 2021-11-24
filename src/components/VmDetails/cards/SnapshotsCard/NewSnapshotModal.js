@@ -5,22 +5,18 @@ import { connect } from 'react-redux'
 import { addVmSnapshot } from './actions'
 
 import {
-  Col,
-  Form,
-  FormControl,
-  FormGroup,
-  HelpBlock,
-  Checkbox,
-  Icon,
-  noop,
-} from 'patternfly-react'
-import {
-  Alert,
   Button,
+  Checkbox,
+  Form,
+  FormGroup,
+  Hint,
+  HintBody,
   Modal,
   ModalVariant,
+  TextInput,
 } from '@patternfly/react-core'
 import { withMsg } from '_/intl'
+import { PlusIcon } from '@patternfly/react-icons/dist/esm/icons'
 
 class NewSnapshotModal extends Component {
   constructor (props) {
@@ -46,12 +42,12 @@ class NewSnapshotModal extends Component {
     this.setState({ showModal: false, description: '', emptyDescription: false })
   }
 
-  handleDescriptionChange (e) {
-    this.setState({ description: e.target.value })
+  handleDescriptionChange (value) {
+    this.setState({ description: value })
   }
 
-  handleSaveMemoryChange (e) {
-    this.setState({ saveMemory: e.target.checked })
+  handleSaveMemoryChange (checked) {
+    this.setState({ saveMemory: checked })
   }
 
   handleSave (e) {
@@ -70,13 +66,12 @@ class NewSnapshotModal extends Component {
 
   render () {
     const { idPrefix, msg } = this.props
-
     const modalId = `${idPrefix}-modal`
 
     return (
       <div>
-        <a onClick={this.props.disabled ? noop : this.open} id={`${idPrefix}-button`} className={`${this.props.disabled && 'disabled'}`}>
-          <Icon type='fa' name='plus' />
+        <a onClick={this.props.disabled ? () => {} : this.open} id={`${idPrefix}-button`} className={`${this.props.disabled && 'disabled'}`}>
+          <PlusIcon/>
           { msg.createSnapshot() }
         </a>
 
@@ -102,49 +97,36 @@ class NewSnapshotModal extends Component {
 
           ]}
         >
-          <Form onSubmit={this.handleSave} horizontal>
-            <Col sm={12}>
-              <Alert
-                variant='info'
-                isInline
-                title={msg.details()}
-                style={{ marginBottom: '10px' }}
-              >
+          <Form onSubmit={this.handleSave} isHorizontal>
+            <Hint >
+              <HintBody>
                 {msg.snapshotInfo() }
-              </Alert>
-            </Col>
-            <FormGroup bsClass='form-group col-sm-12 required' validationState={this.state.emptyDescription ? 'error' : null}>
-              <label className='col-sm-3 control-label'>
-                { msg.name() }
-              </label>
-              <div className='col-sm-9'>
-                <FormControl
-                  type='text'
-                  value={this.state.description}
-                  onChange={this.handleDescriptionChange}
-                  id={`${modalId}-description-edit`}
-                />
-                {
-                    this.state.emptyDescription && (
-                      <HelpBlock>
-                        {msg.emptySnapshotDescription()}
-                      </HelpBlock>
-                    )}
-              </div>
+              </HintBody>
+            </Hint>
+            <FormGroup
+              label={ msg.name() }
+              validated={this.state.emptyDescription ? 'error' : null}
+              helperTextInvalid={msg.emptySnapshotDescription()}
+              fieldId={`${modalId}-description-edit`}
+            >
+              <TextInput
+                type='text'
+                value={this.state.description}
+                onChange={this.handleDescriptionChange}
+                id={`${modalId}-description-edit`}
+              />
             </FormGroup>
             {
                 this.props.isVmRunning && (
-                  <FormGroup bsClass='form-group col-sm-12'>
-                    <label className='col-sm-3 control-label'>
-                      {msg.saveMemory()}
-                    </label>
-                    <div className='col-sm-9'>
-                      <Checkbox
-                        id={`${idPrefix}-snapshot-save-memory`}
-                        checked={this.state.saveMemory}
-                        onChange={this.handleSaveMemoryChange}
-                      />
-                    </div>
+                  <FormGroup
+                    label={msg.saveMemory()}
+                    fieldId={`${idPrefix}-snapshot-save-memory`}
+                  >
+                    <Checkbox
+                      id={`${idPrefix}-snapshot-save-memory`}
+                      isChecked={this.state.saveMemory}
+                      onChange={this.handleSaveMemoryChange}
+                    />
                   </FormGroup>
                 )}
           </Form>

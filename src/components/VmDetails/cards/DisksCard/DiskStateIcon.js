@@ -1,48 +1,33 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 
-import { Icon } from 'patternfly-react'
-
 import { MsgContext } from '_/intl'
 import style from './style.css'
 import { Tooltip } from '_/components/tooltips'
+import { ArrowCircleUpIcon, ArrowCircleDownIcon, LockIcon, UnknownIcon } from '@patternfly/react-icons/dist/esm/icons'
 
 const diskStateSettings = (msg) => ({
-  active: {
-    type: 'fa',
-    name: 'arrow-circle-o-up',
-    className: style['state-icon-active'],
-    tooltip: msg.diskTooltipStatusMessage({ statusInfo: msg.diskStateActiveTooltip() }),
-  },
-  inactive: {
-    type: 'fa',
-    name: 'arrow-circle-o-down',
-    className: style['state-icon-inactive'],
-    tooltip: msg.diskTooltipStatusMessage({ statusInfo: msg.diskStateInactiveTooltip() }),
-  },
-  locked: {
-    type: 'pf',
-    name: 'locked',
-    className: style['state-icon-locked'],
-    tooltip: msg.diskTooltipStatusMessage({ statusInfo: msg.diskStateLockedTooltip() }),
-  },
+  active: msg.diskTooltipStatusMessage({ statusInfo: msg.diskStateActiveTooltip() }),
+  inactive: msg.diskTooltipStatusMessage({ statusInfo: msg.diskStateInactiveTooltip() }),
+  locked: msg.diskTooltipStatusMessage({ statusInfo: msg.diskStateLockedTooltip() }),
 })
 
 const DiskStateIcon = ({ idPrefix, diskState, showTooltip = true }) => {
   const { msg } = useContext(MsgContext)
-  const diskInfo = diskStateSettings(msg)[diskState]
-  const theIcon = (
-    <Icon
-      id={`${idPrefix}-state-icon`}
-      type={diskInfo.type}
-      name={diskInfo.name}
-      className={`${style['state-icon']} ${diskInfo.className}`}
-    />
-  )
+  const id = `${idPrefix}-state-icon`
+  const [Icon, iconStyle] = diskState === 'active'
+    ? [ArrowCircleUpIcon, style['state-icon-active']]
+    : diskState === 'inactive'
+      ? [ArrowCircleDownIcon, style['state-icon-inactive']]
+      : diskState === 'locked'
+        ? [LockIcon, style['state-icon-locked']]
+        : [UnknownIcon, '']
+
+  const theIcon = <Icon id={id} className={`${style['state-icon']} ${iconStyle}`}/>
 
   if (showTooltip) {
     return (
-      <Tooltip id={`${idPrefix}-state-icon-tooltip`} tooltip={diskInfo.tooltip}>
+      <Tooltip id={`${idPrefix}-state-icon-tooltip`} tooltip={diskStateSettings(msg)[diskState]}>
         {theIcon}
       </Tooltip>
     )

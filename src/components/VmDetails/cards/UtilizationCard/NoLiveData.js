@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
-import { Icon } from 'patternfly-react'
+import { ChartBarIcon } from '@patternfly/react-icons/dist/esm/icons'
 import { MsgContext } from '_/intl'
 
 import style from './style.css'
@@ -15,7 +15,7 @@ const NoLiveData = ({ title, message, id }) => {
   return (
     <div className={style['no-data-card-body']} id={id}>
       <div className={style['no-data-icon']}>
-        <Icon type='fa' name='bar-chart' />
+        <ChartBarIcon/>
       </div>
       <div className={style['no-data-title']}>
         { title || msg.utilizationNoDataAvailableTitle() }

@@ -43,19 +43,7 @@
   font-size: 75%;
 }
 
-/* for DiskImageEditor */
-.editor-field-help {
-  margin-right: -7px;
-}
-
 .editor-field-read-only {
   padding-top: 5px;
 }
 
-.editor-bootable-alert-container {
-  margin-top: -10px;
-}
-
-.editor-bootable-alert {
-  --pf-c-alert__title--FontSize: 15px;
-}

@@ -1,42 +1,20 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 
-import { Icon } from 'patternfly-react'
-
 import { MsgContext } from '_/intl'
 import style from './style.css'
 import { Tooltip } from '_/components/tooltips'
-
-const nicLinkInfoSettings = (msg) => ({
-  true: {
-    type: 'fa',
-    name: 'arrow-circle-o-up',
-    className: style['link-icon-up'],
-    tooltip: msg.nicLinkStatusUp(),
-  },
-  false: {
-    type: 'fa',
-    name: 'arrow-circle-o-down',
-    className: style['link-icon-down'],
-    tooltip: msg.nicLinkStatusDown(),
-  },
-})
+import { ArrowCircleUpIcon, ArrowCircleDownIcon } from '@patternfly/react-icons/dist/esm/icons'
 
 const NicLinkStateIcon = ({ linkState = false, showTooltip = true, idSuffix }) => {
   const { msg } = useContext(MsgContext)
-  const linkInfo = nicLinkInfoSettings(msg)[linkState]
-  const theIcon = (
-    <Icon
-      id={`nic-link-icon-${idSuffix || linkState}`}
-      type={linkInfo.type}
-      name={linkInfo.name}
-      className={`${style['link-icon']} ${linkInfo.className}`}
-    />
-  )
+  const id = `nic-link-icon-${idSuffix || linkState}`
+  const [Icon, iconStyle] = linkState ? [ArrowCircleUpIcon, style['link-icon-up']] : [ArrowCircleDownIcon, style['link-icon-down']]
+  const theIcon = <Icon id={id} className={`${style['link-icon']} ${iconStyle}`}/>
 
   if (showTooltip) {
     return (
-      <Tooltip id={`nic-link-icon-tooltip-${idSuffix || linkState}`} tooltip={linkInfo.tooltip}>
+      <Tooltip id={`nic-link-icon-tooltip-${idSuffix || linkState}`} tooltip={linkState ? msg.nicLinkStatusUp() : msg.nicLinkStatusDown() }>
         {theIcon}
       </Tooltip>
     )

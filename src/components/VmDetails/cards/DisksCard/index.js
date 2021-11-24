@@ -7,7 +7,6 @@ import { createDiskForVm, editDiskOnVm, removeDisk } from '_/actions'
 import { withMsg } from '_/intl'
 import { maskForElementId, suggestDiskName, sortDisksForDisplay } from '_/components/utils'
 
-import { Icon } from 'patternfly-react'
 import { Grid, Row, Col } from '_/components/Grid'
 import BaseCard from '../../BaseCard'
 import DiskImageEditor from './DiskImageEditor'
@@ -17,6 +16,7 @@ import itemStyle from '../../itemListStyle.css'
 import baseStyle from '../../style.css'
 import style from './style.css'
 import { localeCompare } from '_/helpers'
+import { PlusIcon, StorageDomainIcon } from '@patternfly/react-icons/dist/esm/icons'
 
 function filterStorageDomains (vm, clusters, storageDomains) {
   const clusterId = vm.getIn(['cluster', 'id'])
@@ -113,7 +113,7 @@ class DisksCard extends React.Component {
   }
 
   render () {
-    const { vm, onEditChange, msg, locale } = this.props
+    const { vm, onEditChange, msg, locale, className = '' } = this.props
     const { suggestedDiskName, suggestedStorageDomain, filteredStorageDomainList } = this.state
 
     const idPrefix = 'vmdetail-disks'
@@ -129,11 +129,11 @@ class DisksCard extends React.Component {
     return (
       <BaseCard
         idPrefix={idPrefix}
-        icon={{ type: 'pf', name: 'storage-domain' }}
+        icon={StorageDomainIcon}
         title={msg.disks()}
         editTooltip={msg.edit()}
         itemCount={diskList.size}
-        className={baseStyle['cell-card']}
+        className={`${baseStyle['cell-card']} ${className}`}
         editable={canEditTheCard}
         onStartEdit={() => { onEditChange(true) }}
         onCancel={() => { onEditChange(false) }}
@@ -154,7 +154,7 @@ class DisksCard extends React.Component {
                     trigger={({ onClick }) => (
                       <div className={itemStyle['create-block']}>
                         <a href='#' id={`${idPrefix}-new-disk-action`} onClick={onClick}>
-                          <Icon className={itemStyle['create-icon']} type='fa' name='plus' />
+                          <PlusIcon className={itemStyle['create-icon']}/>
                           <span className={itemStyle['create-text']} >{msg.diskActionCreateNew()}</span>
                         </a>
                       </div>
@@ -197,6 +197,7 @@ class DisksCard extends React.Component {
 }
 
 DisksCard.propTypes = {
+  className: PropTypes.string,
   vm: PropTypes.object.isRequired,
   onEditChange: PropTypes.func.isRequired,
 

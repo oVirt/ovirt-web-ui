@@ -17,8 +17,8 @@
   margin-top: 5px;
 }
 
-.field-row:global(.form-group) {
-  margin-bottom: 0;
+.field-row .col-label {
+  font-weight: 600;
 }
 
 .field-row-divide {
@@ -39,11 +39,6 @@
   vertical-align: top;
 }
 
-.col-label :global(.control-label) {
-  margin-bottom: 0;
-  vertical-align: top;
-}
-
 .col-label .tooltip {
   flex-grow: 0;
 }
@@ -59,8 +54,8 @@
 /*
  * For cloud-init and boot-menu on/off icons
  */
-.cloud-init-field > span:global(.pficon),
-.boot-menu-field > span:global(.pficon) {
+.cloud-init-field > svg,
+.boot-menu-field > svg {
   margin-right: 5px;
 }
 
@@ -76,15 +71,6 @@
   margin-top: 3px;
 }
 
-.memory-input {
-  width: 40%;
-  margin-right: 5px;
-  display: inline-block;
-}
-
-button.field-level-help:global(.popover-pf-info) {
-  flex-grow: 0;
-}
 
 /**
  * CPU tooltip list

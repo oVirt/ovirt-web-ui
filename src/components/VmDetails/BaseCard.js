@@ -4,18 +4,16 @@ import {
   Badge,
   Button,
   Card,
-  CardHeading,
+  CardHeader,
   CardTitle,
   CardBody,
   CardFooter,
-  Icon,
-  noop,
-  excludeKeys,
-} from 'patternfly-react'
+} from '@patternfly/react-core'
 
 import style from './style.css'
 import CardEditButton from './CardEditButton'
 import { Tooltip } from '_/components/tooltips'
+import { CheckIcon, TimesIcon } from '@patternfly/react-icons/dist/esm/icons'
 
 /**
  * Base VM details card.  Support common layouts and view vs edit modes.
@@ -76,7 +74,7 @@ class BaseCard extends React.Component {
   }
 
   renderChildren (childProps) {
-    const children = this.props.children || noop
+    const children = this.props.children || (() => {})
     return typeof children === 'function'
       ? children(childProps)
       : React.isValidElement(children)
@@ -87,7 +85,7 @@ class BaseCard extends React.Component {
   render () {
     const {
       title = undefined,
-      icon = undefined,
+      icon: TheIcon = undefined,
       itemCount = undefined,
       editMode = undefined,
       editable = true,
@@ -101,13 +99,18 @@ class BaseCard extends React.Component {
     const editing = editMode === undefined ? this.state.edit : editMode
     const hasHeading = !!title
     const hasBadge = itemCount !== undefined
-    const hasIcon = icon && icon.type && icon.name
 
     const RenderChildren = this.renderChildren
     return (
-      <Card className={`${style['base-card']} ${className}`} id={`${idPrefix}-card`} {...excludeKeys(this.props, this.propTypeKeys)}>
+      <Card className={`${style['base-card']} ${className}`} id={`${idPrefix}-card` } isCompact>
         {hasHeading && (
-          <CardHeading className={style['base-card-heading']}>
+          <CardHeader className={style['base-card-heading']}>
+
+            <CardTitle>
+              {TheIcon && <TheIcon className={style['base-card-title-icon']} />}
+              {title}
+              {hasBadge && <Badge isRead>{itemCount}</Badge>}
+            </CardTitle>
             <CardEditButton
               tooltip={editTooltip}
               editable={editable}
@@ -117,12 +120,7 @@ class BaseCard extends React.Component {
               id={`${idPrefix}-button-edit`}
               placement={editTooltipPlacement}
             />
-            <CardTitle>
-              {hasIcon && <Icon type={icon.type} name={icon.name} className={style['base-card-title-icon']} />}
-              {title}
-              {hasBadge && <Badge className={style['base-card-item-count-badge']}>{itemCount}</Badge>}
-            </CardTitle>
-          </CardHeading>
+          </CardHeader>
         )}
 
         <CardBody className={style['base-card-body']}>
@@ -143,10 +141,8 @@ class BaseCard extends React.Component {
 
         {editing && (
           <CardFooter className={style['base-card-footer']}>
-            <Button disabled={disableSaveButton} bsStyle='primary' onClick={this.clickSave} id={`${idPrefix}-button-save`}>
-              <Icon type='fa' name='check' />
-            </Button>
-            <Button onClick={this.clickCancel} id={`${idPrefix}-button-cancel`}><Icon type='pf' name='close' /></Button>
+            <Button isDisabled={disableSaveButton} onClick={this.clickSave} id={`${idPrefix}-button-save`} icon={<CheckIcon />}/>
+            <Button onClick={this.clickCancel} id={`${idPrefix}-button-cancel`} icon={<TimesIcon />} variant='link'/>
           </CardFooter>
         )}
       </Card>
@@ -155,10 +151,7 @@ class BaseCard extends React.Component {
 }
 BaseCard.propTypes = {
   title: PropTypes.string,
-  icon: PropTypes.shape({
-    type: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-  }),
+  icon: PropTypes.any,
   itemCount: PropTypes.number,
   idPrefix: PropTypes.string,
   className: PropTypes.string,
@@ -176,9 +169,9 @@ BaseCard.propTypes = {
   children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]).isRequired,
 }
 BaseCard.defaultProps = {
-  onStartEdit: noop,
-  onCancel: noop,
-  onSave: noop,
+  onStartEdit: () => {},
+  onCancel: () => {},
+  onSave: () => {},
 }
 
 export default BaseCard

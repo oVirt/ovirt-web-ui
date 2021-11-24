@@ -11,6 +11,7 @@
 
 .vm-info {
   padding: 15px;
+  flex-grow: 1
 }
 
 .vm-name {

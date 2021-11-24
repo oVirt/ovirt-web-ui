@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
-import { Icon } from 'patternfly-react'
+import { InfoCircleIcon } from '@patternfly/react-icons/dist/esm/icons'
 import { MsgContext } from '_/intl'
 
 import style from './style.css'
@@ -13,7 +13,7 @@ const NoHistoricData = ({ message, id }) => {
   return (
     <div className={style['no-history-chart']} id={id}>
       <div className={style['no-history-chart-icon']}>
-        <Icon type='pf' name='info' />
+        <InfoCircleIcon />
       </div>
       <div className={style['no-history-chart-message']}>
         { message || msg.utilizationNoHistoricData() }

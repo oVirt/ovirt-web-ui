@@ -1,3 +1,38 @@
+.utilization-card-details {
+    border-bottom: 1px solid #d1d1d1;
+    display: table;
+    margin: 12px 0 15px;
+    padding: 0 0 15px;
+    width: 100%; 
+}
+
+.utilization-card-details-count {
+    font-size: 26px;
+    font-weight: 300;
+    margin-right: 10px;
+    float: left;
+    line-height: 1;
+}
+
+.utilization-card-details-description {
+    float: left;
+    line-height: 1;
+}
+
+.utilization-card-details-line-1 {
+    font-size: 10px;
+    margin-bottom: 2px;
+    display: block;
+}
+
+.chart-card :global(.pf-c-card__body) {
+  padding: 0;
+  flex-grow: 1;
+
+  display: flex;
+  flex-direction: column;
+}
+
 .utilization-card .chart-card {
   box-shadow: none;
   margin-left: -20px;

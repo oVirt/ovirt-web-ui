@@ -3,19 +3,16 @@ import PropTypes from 'prop-types'
 
 import { Col } from '_/components/Grid'
 import { InfoTooltip, Tooltip } from '_/components/tooltips'
-import { FormGroup, ControlLabel } from 'patternfly-react'
+import { FormGroup } from '@patternfly/react-core'
 import classnames from 'classnames'
 
 import style from './style.css'
 import gridStyle from '_/components/Grid/style.css'
 
-const FieldRow = ({ label, children, id, tooltip, tooltipPosition, validationState = null }) => (
-  <FormGroup
-    className={classnames(gridStyle['grid-row'], style['field-row'])}
-    validationState={validationState}
-  >
+const FieldRow = ({ label, children, id, tooltip, tooltipPosition, validationState = 'default', useFormGroup }) => (
+  <div className={classnames(gridStyle['grid-row'], style['field-row'])}>
     <Col cols={5} className={style['col-label']}>
-      <ControlLabel>{label}</ControlLabel>
+      {label}
       {tooltip && (
         <span className={style.tooltip}>
           <InfoTooltip
@@ -26,8 +23,15 @@ const FieldRow = ({ label, children, id, tooltip, tooltipPosition, validationSta
         </span>
       )}
     </Col>
-    <Col cols={7} className={style['col-data']} id={id}>{children}</Col>
-  </FormGroup>
+    <Col cols={7} className={style['col-data']} id={id}>
+      {useFormGroup && (
+        <FormGroup validated={validationState}>
+          {children}
+        </FormGroup>
+      )}
+      {!useFormGroup && children}
+    </Col>
+  </div>
 )
 FieldRow.propTypes = {
   id: PropTypes.string.isRequired,
@@ -35,7 +39,8 @@ FieldRow.propTypes = {
   tooltip: PropTypes.oneOfType([Tooltip.propTypes.tooltip]),
   children: PropTypes.node.isRequired,
   tooltipPosition: Tooltip.propTypes.placement,
-  validationState: FormGroup.propTypes.validationState,
+  validationState: PropTypes.oneOf(['success', 'warning', 'error', 'default']),
+  useFormGroup: PropTypes.bool,
 }
 
 export default FieldRow

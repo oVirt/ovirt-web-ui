@@ -10,11 +10,12 @@ import { escapeHtml } from '../../../utils'
 import itemStyle from '../../itemListStyle.css'
 import style from './style.css'
 
-import { Icon, Label } from 'patternfly-react'
+import { Label } from '@patternfly/react-core'
 import DeleteConfirmationModal from '../../../VmModals/DeleteConfirmationModal'
 import DiskStateIcon from './DiskStateIcon'
 import DiskImageEditor from './DiskImageEditor'
 import { Tooltip } from '_/components/tooltips'
+import { PencilAltIcon, TrashIcon } from '@patternfly/react-icons/dist/esm/icons'
 
 function isDiskBeingDeleted (diskId, pendingTasks) {
   return !!pendingTasks.find(
@@ -78,7 +79,7 @@ const DiskListItem = ({
           ({view.size.value} {view.size.unit})
         </span>
         { view.bootable && (
-          <Label id={`${idPrefix}-bootable`} className={style['disk-label']} bsStyle='info'>
+          <Label id={`${idPrefix}-bootable`} className={style['disk-label']} color="blue">
             { msg.diskLabelBootable() }
           </Label>
         )}
@@ -97,7 +98,7 @@ const DiskListItem = ({
               trigger={({ onClick }) => (
                 <Tooltip id={`${idPrefix}-action-edit-tooltip`} tooltip={msg.diskEditTooltip()}>
                   <a id={`${idPrefix}-action-edit`} className={itemStyle['item-action']} onClick={onClick} >
-                    <Icon type='pf' name='edit' />
+                    <PencilAltIcon/>
                   </a>
                 </Tooltip>
               )}
@@ -105,9 +106,7 @@ const DiskListItem = ({
           )}
           { !canEdit && (
             <Tooltip id={`${idPrefix}-action-edit-tooltip-disabled`} tooltip={msg.diskEditDisabledTooltip()}>
-              <Icon
-                type='pf'
-                name='edit'
+              <PencilAltIcon
                 id={`${idPrefix}-action-edit-disabled`}
                 className={`${itemStyle['item-action']} ${itemStyle['item-action-disabled']}`}
               />
@@ -123,7 +122,7 @@ const DiskListItem = ({
               trigger={({ onClick }) => (
                 <Tooltip id={`${idPrefix}-action-delete-tooltip`} tooltip={msg.diskDeleteTooltip()}>
                   <a id={`${idPrefix}-action-delete`} className={itemStyle['item-action']} onClick={onClick}>
-                    <Icon type='pf' name='delete' />
+                    <TrashIcon style={{ color: 'red' }}/>
                   </a>
                 </Tooltip>
               )}
@@ -140,9 +139,7 @@ const DiskListItem = ({
           )}
           { !canDelete && (
             <Tooltip id={`${idPrefix}-action-delete-tooltip-disabled`} tooltip={msg.diskDeleteDisabledTooltip()}>
-              <Icon
-                type='pf'
-                name='delete'
+              <TrashIcon
                 id={`${idPrefix}-action-delete-disabled`}
                 className={`${itemStyle['item-action']} ${itemStyle['item-action-disabled']}`}
               />

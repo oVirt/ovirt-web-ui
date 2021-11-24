@@ -1,9 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-  Icon,
-  noop,
-} from 'patternfly-react'
+
+import { PencilAltIcon } from '@patternfly/react-icons/dist/esm/icons'
 
 import style from './style.css'
 
@@ -42,7 +40,7 @@ class CardEditButton extends React.Component {
     const { editEnabled } = this.state
 
     const classes = `${style['card-edit-button']} ${style[editEnabled ? 'card-edit-button-enabled' : 'card-edit-button-disabled']}`
-    const myClick = editEnabled ? noop : this.enableEditHandler
+    const myClick = editEnabled ? () => {} : this.enableEditHandler
 
     if (!editable && disableTooltip) {
       return (
@@ -52,7 +50,7 @@ class CardEditButton extends React.Component {
           id={`${id}-card-edit-button-tooltip`}
         >
           <a className={`${style['card-edit-button']} ${style['card-edit-button-disabled']}`} id={id}>
-            <Icon type='pf' name='edit' />
+            <PencilAltIcon/>
           </a>
         </Tooltip>
       )
@@ -64,7 +62,7 @@ class CardEditButton extends React.Component {
     return (
       <Tooltip id={`${id}-tooltip`} tooltip={tooltip} placement={placement}>
         <a id={id} className={classes} onClick={(e) => { e.preventDefault(); myClick() }}>
-          <Icon type='pf' name='edit' />
+          <PencilAltIcon/>
         </a>
       </Tooltip>
     )
@@ -82,7 +80,7 @@ CardEditButton.propTypes = {
 CardEditButton.defaultProps = {
   tooltip: '',
   editEnabled: false,
-  onClick: noop,
+  onClick: () => {},
 }
 
 export default CardEditButton

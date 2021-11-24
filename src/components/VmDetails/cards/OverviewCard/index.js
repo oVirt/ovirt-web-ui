@@ -9,8 +9,14 @@ import { generateUnique, buildMessageFromRecord } from '_/helpers'
 import { formatUptimeDuration } from '_/utils'
 import { editVm } from '_/actions'
 
-import { FormControl, FormGroup, HelpBlock, Checkbox } from 'patternfly-react'
-import { Alert } from '@patternfly/react-core'
+import {
+  Alert,
+  Checkbox,
+  Form,
+  FormGroup,
+  TextArea,
+  TextInput,
+} from '@patternfly/react-core'
 
 import BaseCard from '../../BaseCard'
 import VmIcon from '../../../VmIcon'
@@ -233,40 +239,43 @@ class OverviewCard extends React.Component {
 
               {isPoolVm && pool && <span className={style['pool-vm-label']} style={{ backgroundColor: pool.get('color') }}>{ pool.get('name') }</span>}
               <div className={style.container}>
-                <div className={style['os-icon']}>
-                  <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' />
-                </div>
+                {!isEditing && (
+                  <div className={style['os-icon']}>
+                    <VmIcon icon={icon} missingIconClassName='pficon pficon-virtual-machine' />
+                  </div>
+                )}
                 <div className={style['vm-info']}>
                   <div className={style['vm-name']}>
                     { !isEditing && <span id={`${idPrefix}-name`}>{vm.get('name')}</span> }
                     { isEditing && (
-                      <FormGroup controlId={`${idPrefix}-name-edit`} validationState={nameError ? 'error' : null}>
-                        <FormControl
-                          type='text'
-                          value={this.state.vm.get('name')}
-                          onChange={e => this.handleChange('name', e.target.value)}
-                        />
-                        { nameError && (
-                          <HelpBlock>
-                            {msg.pleaseEnterValidVmName()}
-                          </HelpBlock>
-                        )}
-                      </FormGroup>
+                      <Form>
+                        <FormGroup
+                          fieldId={`${idPrefix}-name-edit`}
+                          validated={nameError ? 'error' : null}
+                          helperTextInvalid={msg.pleaseEnterValidVmName()}
+                        >
+                          <TextInput
+                            id={`${idPrefix}-name-edit`}
+                            type='text'
+                            value={this.state.vm.get('name')}
+                            onChange={value => this.handleChange('name', value)}
+                            validated={nameError ? 'error' : null}
+                          />
+                        </FormGroup>
+                      </Form>
                     )}
                     {
                       showCloudInitCheckbox && (
                         <div className={style['vm-checkbox']}>
                           <Checkbox
                             id={`${idPrefix}-cloud-init`}
-                            checked={updateCloudInit}
-                            onChange={(e) => this.setState({ updateCloudInit: e.target.checked })}
-                            disabled={disableHostnameToggle}
-                          >
-                            { !disableHostnameToggle
+                            isChecked={updateCloudInit}
+                            onChange={value => this.setState({ updateCloudInit: value })}
+                            isDisabled={disableHostnameToggle}
+                            label={!disableHostnameToggle
                               ? msg.updateCloudInit()
-                              : msg.cannotUpdateCloudInitHostname()
-                          }
-                          </Checkbox>
+                              : msg.cannotUpdateCloudInitHostname()}
+                          />
                         </div>
                       )}
                   </div>
@@ -285,12 +294,11 @@ class OverviewCard extends React.Component {
                       <div id={`${idPrefix}-description`} className={style['vm-description']}>{vm.get('description')}</div>
                     }
                     { isEditing && (
-                      <FormControl
+                      <TextArea
                         id={`${idPrefix}-description-edit`}
-                        componentClass='textarea'
                         rows='5'
                         value={this.state.vm.get('description')}
-                        onChange={e => this.handleChange('description', e.target.value)}
+                        onChange={value => this.handleChange('description', value)}
                       />
                     )}
                   </div>

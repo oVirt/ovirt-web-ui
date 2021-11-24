@@ -4,11 +4,8 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import {
-  Icon,
-  OverlayTrigger,
   Tooltip as PFTooltip,
-  noop,
-} from 'patternfly-react'
+} from '@patternfly/react-core'
 
 import style from './style.css'
 
@@ -20,13 +17,14 @@ import { deleteVmSnapshot } from './actions'
 import { formatHowLongAgo } from '_/utils/format'
 import { getMinimizedString, escapeHtml } from '../../../utils'
 import { Tooltip, InfoTooltip } from '_/components/tooltips'
+import { CheckCircleIcon, EyeIcon, LockIcon, PlayIcon, TrashIcon } from '@patternfly/react-icons/dist/esm/icons'
 const MAX_DESCRIPTION_SIZE = 50
 
 const SnapshotAction = ({ children, className, disabled, id, onClick }) => {
   return (
     <a
       id={id}
-      onClick={disabled ? noop : onClick}
+      onClick={disabled ? () => {} : onClick}
       className={`${className} ${disabled && 'disabled'}`}
     >
       {children}
@@ -41,18 +39,19 @@ SnapshotAction.propTypes = {
   onClick: PropTypes.func,
 }
 
-const StatusTooltip = ({ icon, text, id, placement }) => {
+const StatusTooltip = ({ icon: TheIcon, text, id, placement, className }) => {
   return (
-    <OverlayTrigger overlay={<PFTooltip id={id}>{text}</PFTooltip>} placement={placement} trigger={['hover', 'focus']}>
-      <a>{icon}</a>
-    </OverlayTrigger>
+    <PFTooltip id={id} content={text} position={placement}>
+      <a className={className}><TheIcon/></a>
+    </PFTooltip>
   )
 }
 StatusTooltip.propTypes = {
-  icon: PropTypes.node.isRequired,
+  icon: PropTypes.func.isRequired,
   text: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
   placement: PropTypes.string.isRequired,
+  className: PropTypes.string,
 }
 
 class SnapshotItem extends React.Component {
@@ -108,29 +107,24 @@ class SnapshotItem extends React.Component {
     if (!this.props.snapshot.get('isActive')) {
       // Info popover
       buttons.push(
-        <OverlayTrigger
-          overlay={(
-            <SnapshotDetail key='detail'
-              id={`${this.props.id}-info-popover`}
-              snapshot={this.props.snapshot}
-              vmId={this.props.vmId}
-              isPoolVm={this.props.isPoolVm}
-              msg={msg}
-              locale={locale}
-            />
-          )}
-          placement={this.state.isMobile || this.state.isTablet ? 'top' : 'left'}
-          trigger='click'
-          rootClose
-          key='info'
+        <SnapshotDetail
+          key='detail'
+          id={`${this.props.id}-info-popover`}
+          snapshot={this.props.snapshot}
+          vmId={this.props.vmId}
+          isPoolVm={this.props.isPoolVm}
+          msg={msg}
+          locale={locale}
+          position={this.state.isMobile || this.state.isTablet ? 'top' : 'left'}
         >
           <a id={`${this.props.id}-info`}>
             <InfoTooltip
               id={`${this.props.id}-info-tt`}
               tooltip={msg.details()}
+              className={style.black}
             />
           </a>
-        </OverlayTrigger>
+        </SnapshotDetail >
       )
 
       if (!this.props.hideActions) {
@@ -144,7 +138,7 @@ class SnapshotItem extends React.Component {
             trigger={({ onClick }) => (
               <SnapshotAction key='restore' id={`${this.props.id}-restore`} onClick={onClick} disabled={isRestoreDisabled}>
                 <Tooltip id={`${this.props.id}-restore-tt`} tooltip={msg.snapshotRestore()}>
-                  <Icon type='fa' name='play-circle' />
+                  <PlayIcon className={isRestoreDisabled ? '' : style.black}/>
                 </Tooltip>
               </SnapshotAction>
             )}
@@ -162,7 +156,7 @@ class SnapshotItem extends React.Component {
             trigger={({ onClick }) => (
               <SnapshotAction key='delete' id={`${this.props.id}-delete`} disabled={isActionsDisabled} onClick={onClick}>
                 <Tooltip id={`${this.props.id}-delete-tt`} tooltip={msg.snapshotDelete()}>
-                  <Icon type='pf' name='delete' />
+                  <TrashIcon className={isActionsDisabled ? '' : style.red}/>
                 </Tooltip>
               </SnapshotAction>
             )}
@@ -185,13 +179,13 @@ class SnapshotItem extends React.Component {
       const status = `${msg.status()}:`
       switch (this.props.snapshot.get('status')) {
         case 'locked':
-          statusIcon = <StatusTooltip icon={<Icon type='pf' name='locked' />} text={`${status} ${msg.locked()}`} id={tooltipId} placement={tooltipPlacement} />
+          statusIcon = <StatusTooltip icon={LockIcon} text={`${status} ${msg.locked()}`} id={tooltipId} placement={tooltipPlacement} />
           break
         case 'in_preview':
-          statusIcon = <StatusTooltip icon={<Icon type='fa' name='eye' />} text={`${status} ${msg.inPreview()}`} id={tooltipId} placement={tooltipPlacement} />
+          statusIcon = <StatusTooltip icon={EyeIcon} text={`${status} ${msg.inPreview()}`} id={tooltipId} placement={tooltipPlacement} />
           break
         case 'ok':
-          statusIcon = <StatusTooltip icon={<Icon type='pf' name='ok' />} text={`${status} ${msg.ok()}`} id={tooltipId} placement={tooltipPlacement} />
+          statusIcon = <StatusTooltip icon={CheckCircleIcon} text={`${status} ${msg.ok()}`} className={style.green} id={tooltipId} placement={tooltipPlacement} />
           break
       }
     }

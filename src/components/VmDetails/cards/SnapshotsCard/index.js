@@ -10,6 +10,7 @@ import style from './style.css'
 import BaseCard from '../../BaseCard'
 import NewSnapshotModal from './NewSnapshotModal'
 import SnapshotItem from './SnapshotItem'
+import { VirtualMachineIcon } from '@patternfly/react-icons/dist/esm/icons'
 
 const DOWN_STATUS = 'down'
 const RUNNING_STATUS = 'up'
@@ -84,7 +85,7 @@ const SnapshotsCard = ({ vm }) => {
 
   return (
     <BaseCard
-      icon={{ type: 'pf', name: 'virtual-machine' }}
+      icon={VirtualMachineIcon}
       title={msg.snapshot()}
       itemCount={snapshots.size}
       idPrefix={idPrefix}

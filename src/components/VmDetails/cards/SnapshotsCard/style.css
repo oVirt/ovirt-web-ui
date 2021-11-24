@@ -67,10 +67,18 @@ div.popover {
 }
 
 .green {
-  color: #3B9D2E;
+  color: #3f9c35;
 }
 
-.status-icon span {
+.black {
+  color: black;
+}
+
+.red {
+  color: red;
+}
+
+.status-icon svg {
   margin-right: 5px;
 }
 
@@ -84,16 +92,7 @@ div.popover {
 
 .snapshot-item a {
   cursor: pointer;
-  color: black;
   font-size: 14px;
-}
-
-.snapshot-item a :global(.fa-play-circle) {
-  font-size: 16px;
-}
-
-.snapshot-item > a {
-  margin-right: 5px;
 }
 
 .snapshot-item-status {
@@ -122,7 +121,7 @@ div.popover {
   margin-left: 5px;
 }
 
-.snapshot-create a span {
+.snapshot-create a svg {
   margin-right: 5px;
 }
 

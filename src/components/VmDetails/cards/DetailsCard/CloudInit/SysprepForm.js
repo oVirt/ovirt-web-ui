@@ -2,10 +2,10 @@ import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import {
   Checkbox,
-  ControlLabel,
-  FormControl,
   FormGroup,
-} from 'patternfly-react'
+  TextArea,
+  TextInput,
+} from '@patternfly/react-core'
 import { MsgContext } from '_/intl'
 import SelectBox from '../../../../SelectBox'
 import timezones from '_/components/utils/timezones.json'
@@ -19,40 +19,41 @@ const SysprepForm = ({ idPrefix, vm, onChange, lastInitTimezone }) => {
 
   return (
     <>
-      <FormGroup controlId={`${idPrefix}-cloud-init-hostname`}>
-        <ControlLabel>
-          {msg.hostName()}
-        </ControlLabel>
-        <FormControl
+      <FormGroup
+        label={msg.hostName()}
+        fieldId={`${idPrefix}-sysprep-hostname`}
+      >
+        <TextInput
+          id={`${idPrefix}-sysprep-hostname`}
           type='text'
           value={cloudInitHostName}
-          onChange={e => onChange('cloudInitHostName', e.target.value)}
+          onChange={value => onChange('cloudInitHostName', value)}
         />
       </FormGroup>
-      <FormGroup controlId={`${idPrefix}-cloud-init-hostname`}>
-        <ControlLabel>
-          {msg.password()}
-        </ControlLabel>
-        <FormControl
+      <FormGroup
+        label={msg.password()}
+        fieldId={`${idPrefix}-sysprep-password`}
+      >
+        <TextInput
+          id={`${idPrefix}-sysprep-password`}
           type='password'
           value={cloudInitPassword}
-          onChange={e => onChange('cloudInitPassword', e.target.value)}
+          onChange={value => onChange('cloudInitPassword', value)}
         />
       </FormGroup>
 
       {/*  Configure Timezone checkbox */}
       <Checkbox
         id={`${idPrefix}-sysprep-timezone-config`}
-        checked={enableInitTimezone}
-        onChange={e => onChange('enableInitTimezone', e.target.checked)}
-      >
-        {msg.sysPrepTimezoneConfigure()}
-      </Checkbox>
+        label={msg.sysPrepTimezoneConfigure()}
+        isChecked={enableInitTimezone}
+        onChange={checked => onChange('enableInitTimezone', checked)}
+      />
 
-      <FormGroup controlId={`${idPrefix}-cloud-init-timezone`}>
-        <ControlLabel>
-          {msg.timezone()}
-        </ControlLabel>
+      <FormGroup
+        label={msg.timezone()}
+        fieldId={`${idPrefix}-sysprep-timezone-select`}
+      >
         <SelectBox
           id={`${idPrefix}-sysprep-timezone-select`}
           items={timezones}
@@ -61,14 +62,14 @@ const SysprepForm = ({ idPrefix, vm, onChange, lastInitTimezone }) => {
           disabled={!enableInitTimezone}
         />
       </FormGroup>
-      <FormGroup controlId={`${idPrefix}-sysprep-custom-script`}>
-        <ControlLabel>
-          {msg.customScript()}
-        </ControlLabel>
-        <FormControl
-          componentClass='textarea'
+      <FormGroup
+        label={msg.customScript()}
+        fieldId={`${idPrefix}-sysprep-custom-script`}
+      >
+        <TextArea
+          id={`${idPrefix}-sysprep-custom-script`}
           value={cloudInitCustomScript}
-          onChange={e => onChange('cloudInitCustomScript', e.target.value)}
+          onChange={value => onChange('cloudInitCustomScript', value)}
         />
       </FormGroup>
     </>

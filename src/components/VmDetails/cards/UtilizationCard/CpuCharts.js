@@ -1,15 +1,9 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import {
-  CardTitle,
+  Card,
   CardBody,
-  UtilizationCard,
-  UtilizationCardDetails,
-  UtilizationCardDetailsCount,
-  UtilizationCardDetailsDesc,
-  UtilizationCardDetailsLine1,
-  UtilizationCardDetailsLine2,
-} from 'patternfly-react'
+} from '@patternfly/react-core'
 import DonutChart from './UtilizationCharts/DonutChart'
 import AreaChart from './UtilizationCharts/AreaChart'
 
@@ -19,6 +13,7 @@ import style from './style.css'
 
 import NoHistoricData from './NoHistoricData'
 import NoLiveData from './NoLiveData'
+import UtilizationCardData from './UtilizationCardData'
 
 /**
  * Render current CPU % utilization as a donut chart and historic % utilization values
@@ -34,19 +29,18 @@ const CpuCharts = ({ cpuStats, isRunning, id, vcpus }) => {
   const history = ((cpuStats['usage.history'] && cpuStats['usage.history'].datum) || []).reverse()
 
   return (
-    <UtilizationCard className={style['chart-card']} id={id}>
-      <CardTitle>{msg.utilizationCardTitleCpu()}</CardTitle>
+    <Card className={style['chart-card']} id={id}>
       <CardBody>
+        {msg.utilizationCardTitleCpu()}
         { !isRunning && <NoLiveData id={`${id}-no-live-data`} /> }
         { isRunning && (
           <>
-            <UtilizationCardDetails>
-              <UtilizationCardDetailsCount id={`${id}-available`}>{cpuAvailable}%</UtilizationCardDetailsCount>
-              <UtilizationCardDetailsDesc>
-                <UtilizationCardDetailsLine1>{msg.utilizationCardAvailable()}</UtilizationCardDetailsLine1>
-                <UtilizationCardDetailsLine2 id={`${id}-total`}>{msg.utilizationCardOf100()}</UtilizationCardDetailsLine2>
-              </UtilizationCardDetailsDesc>
-            </UtilizationCardDetails>
+            <UtilizationCardData
+              available={`${cpuAvailable}%`}
+              line1={msg.utilizationCardAvailable()}
+              line2={msg.utilizationCardOf100()}
+              idPrefix={id}
+            />
 
             <DonutChart
               id={`${id}-donut-chart`}
@@ -77,7 +71,7 @@ const CpuCharts = ({ cpuStats, isRunning, id, vcpus }) => {
           </>
         )}
       </CardBody>
-    </UtilizationCard>
+    </Card>
   )
 }
 CpuCharts.propTypes = {

@@ -6,13 +6,13 @@ import { escapeHtml } from '../../../utils'
 import itemStyle from '../../itemListStyle.css'
 import style from './style.css'
 
-import { Icon } from 'patternfly-react'
 import { Grid, Row, Col } from '_/components/Grid'
 import DeleteConfirmationModal from '../../../VmModals/DeleteConfirmationModal'
 import NicEditor from './NicEditor'
 import NicLinkStateIcon from './NicLinkStateIcon'
 import { Tooltip } from '_/components/tooltips'
 import EllipsisValue from '_/components/EllipsisValue'
+import { PencilAltIcon, TrashIcon } from '@patternfly/react-icons/dist/esm/icons'
 
 /**
  * Render a single NIC in the list of Nics on the Nics Card.
@@ -88,7 +88,7 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEd
               trigger={({ onClick }) => (
                 <Tooltip id={`${idPrefix}-edit-tooltip`} tooltip={msg.nicEditTooltip()}>
                   <a id={`${idPrefix}-edit-action`} className={itemStyle['item-action']} onClick={onClick}>
-                    <Icon type='pf' name='edit' />
+                    <PencilAltIcon/>
                   </a>
                 </Tooltip>
               )}
@@ -96,9 +96,7 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEd
           )}
           { !canEdit && (
             <Tooltip id={`${idPrefix}-edit-tooltip-disabled`} tooltip={msg.nicEditDisabledTooltip()}>
-              <Icon
-                type='pf'
-                name='edit'
+              <PencilAltIcon
                 id={`${idPrefix}-edit-action-disabled`}
                 className={`${itemStyle['item-action']} ${itemStyle['item-action-disabled']}`}
               />
@@ -114,7 +112,7 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEd
               trigger={({ onClick }) => (
                 <Tooltip id={`${idPrefix}-delete-tooltip`} tooltip={msg.nicDeleteTooltip()}>
                   <a id={`${idPrefix}-delete-action`} className={itemStyle['item-action']} onClick={onClick}>
-                    <Icon type='pf' name='delete' />
+                    <TrashIcon style={{ color: 'red' }} />
                   </a>
                 </Tooltip>
               )}
@@ -130,9 +128,7 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEd
           )}
           { !canDelete && (
             <Tooltip id={`${idPrefix}-delete-tooltip-disabled`} tooltip={msg.nicDeleteDisabledTooltip()}>
-              <Icon
-                type='pf'
-                name='delete'
+              <TrashIcon
                 id={`${idPrefix}-delete-action-disabled`}
                 className={`${itemStyle['item-action']} ${itemStyle['item-action-disabled']}`}
               />
