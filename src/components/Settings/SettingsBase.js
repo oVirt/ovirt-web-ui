@@ -2,73 +2,54 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {
   Card,
-  Col,
-  ControlLabel,
+  CardBody,
+  CardTitle,
   FormGroup,
-} from 'patternfly-react'
+  Hint,
+  HintBody,
+} from '@patternfly/react-core'
 import { InfoTooltip } from '_/components/tooltips'
 
 import style from './style.css'
-import { Hint, HintBody } from '@patternfly/react-core'
 
-const LabelCol = ({ children, tooltip, fieldPath, ...props }) => {
-  return (
-    <Col componentClass={ControlLabel} {...props}>
-      { children } { tooltip && <InfoTooltip tooltip={tooltip} id={`${fieldPath}-info-tooltip`} /> }
-    </Col>
-  )
-}
-LabelCol.propTypes = {
-  children: PropTypes.node.isRequired,
-  tooltip: PropTypes.string,
-  fieldPath: PropTypes.string,
-}
-
-const Item = ({ title, isActive, onClick }) => {
-  return (
-    <li className={`list-group-item ${isActive && 'active'}`}>
-      <a href='#' onClick={(e) => { e.preventDefault(); onClick() }}>
-        <span className='list-group-item-value'>{title}</span>
-        <div className='badge-container-pf' />
-      </a>
-    </li>
-  )
-}
-
-Item.propTypes = {
-  title: PropTypes.string.isRequired,
-  isActive: PropTypes.bool,
-  onClick: PropTypes.func.isRequired,
-}
-
-const Section = ({ name, section }) => (
-  <>
-    <h3>
+const Section = ({ name, section, className }) => (
+  <Card className={className}>
+    <CardTitle>
       <a id={name} />
       {section.title}
       { section.tooltip && <InfoTooltip id={`${name}-info-tooltip`} tooltip={section.tooltip} /> }
-    </h3>
+    </CardTitle>
     { section.hint && (
-      <Hint>
-        <HintBody>{section.hint}</HintBody>
-      </Hint>
+      <CardBody key={`${name}-hint`}>
+        <Hint>
+          <HintBody>{section.hint}</HintBody>
+        </Hint>
+      </CardBody>
     )}
     { section.fields.map((field) => (
-      <FormGroup key={field.name} className={style['settings-field']}>
-        <LabelCol fieldPath={`${name}-${field.name}`} tooltip={field.tooltip} sm={3} className={style['field-label']}>
-          { field.title }
-        </LabelCol>
-        <Col sm={9}>
-          {field.body}
-        </Col>
-      </FormGroup>
+      <CardBody key={field.key}>
+        { field.title && (
+          <FormGroup
+            label={field.title}
+            labelIcon={field.tooltip && <InfoTooltip tooltip={field.tooltip} id={`${name}-${field.key}-info-tooltip`} /> }
+            fieldId={field.fieldId}
+          >
+            {field.body}
+          </FormGroup>
+        )}
+
+        {!field.title && field.body}
+
+        { !field.title && field.tooltip && <InfoTooltip tooltip={field.tooltip} id={`${name}-${field.key}-info-tooltip`} /> }
+      </CardBody>
     )) }
-  </>
+  </Card>
 )
 
 Section.propTypes = {
   name: PropTypes.string.isRequired,
   section: PropTypes.object.isRequired,
+  className: PropTypes.string,
 }
 
 const SettingsBase = ({ name, section }) => {
@@ -76,18 +57,36 @@ const SettingsBase = ({ name, section }) => {
   return (
     <div className={style['search-content-box']}>
       { sections.map(([name, section]) => (
-        <Card key={name} className={style['main-content']}>
-          <div className={style['main-content-container']}>
-            <Section name={name} section={section} />
-          </div>
-        </Card>
+        <Section key={name} name={name} section={section} className={style['main-content']}/>
       )
       )}
     </div>
   )
 }
 SettingsBase.propTypes = {
-  section: PropTypes.object.isRequired,
+  section: PropTypes.shape({
+    sections: PropTypes.objectOf(PropTypes.shape({
+      title: PropTypes.string,
+      tooltip: PropTypes.string,
+      fields: PropTypes.arrayOf(PropTypes.shape({
+        title: PropTypes.string,
+        tooltip: PropTypes.string,
+        key: PropTypes.string,
+        body: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+        fieldId: PropTypes.string,
+      })),
+    })),
+    title: PropTypes.string,
+    tooltip: PropTypes.string,
+    fields: PropTypes.arrayOf(PropTypes.shape({
+      title: PropTypes.string,
+      tooltip: PropTypes.string,
+      key: PropTypes.string,
+      body: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+      fieldId: PropTypes.string,
+    })),
+
+  }).isRequired,
   name: PropTypes.string.isRequired,
 }
 

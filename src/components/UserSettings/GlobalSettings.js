@@ -4,8 +4,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 import { saveGlobalOptions } from '_/actions'
-import { FormControl } from 'patternfly-react'
-import { Switch, Nav, NavItem, NavList, Split, SplitItem } from '@patternfly/react-core'
+import { Switch, Nav, NavItem, NavList, Split, SplitItem, TextArea } from '@patternfly/react-core'
 import { withMsg, localeWithFullName, DEFAULT_LOCALE } from '_/intl'
 import style from './style.css'
 
@@ -184,29 +183,30 @@ class GlobalSettings extends Component {
   buildSections (onChange) {
     const { draftValues } = this.state
     const { config, msg } = this.props
-    const idPrefix = 'global-user-settings'
+    const toId = (name) => `global-user-settings-${name}`
     return {
       [GENERAL_SECTION]: {
         title: msg.general(),
         fields: [
           ((name) => ({
             title: msg.username(),
-            name,
+            key: name,
             body: <span>{config[name]}</span>,
           }))('userName'),
           ((name) => ({
             title: msg.email(),
-            name,
+            key: name,
             body: <span>{config[name]}</span>,
           }))('email'),
           ((name) => ({
             title: msg.language(),
-            name,
+            key: name,
             tooltip: draftValues.persistLocale ? undefined : msg.optionIsNotSavedOnTheServer({ persistenceReEnableHowTo: msg.persistenceReEnableHowTo({ advancedOptions: msg.advancedOptions() }) }),
+            fieldId: toId(name),
             body: (
               <div className={style['half-width']}>
                 <SelectBox
-                  id={`${idPrefix}-${name}`}
+                  id={toId(name)}
                   items={Object.entries(localeWithFullName).map(([id, value]) => ({ id, value, isDefault: id === DEFAULT_LOCALE }))}
                   selected={draftValues[name]}
                   onChange={onChange(name)}
@@ -222,11 +222,12 @@ class GlobalSettings extends Component {
         fields: [
           ((name) => ({
             title: msg.uiRefresh(),
-            name,
+            key: name,
+            fieldId: toId(name),
             body: (
               <div className={style['half-width']}>
                 <SelectBox
-                  id={`${idPrefix}-${name}`}
+                  id={toId(name)}
                   items={this.refreshIntervalList(msg)
                     .map(({ id, value }) => ({ id, value, isDefault: id === AppConfiguration.schedulerFixedDelayInSeconds }))}
                   selected={draftValues[name]}
@@ -242,12 +243,12 @@ class GlobalSettings extends Component {
         hint: msg.notificationSettingsAffectAllNotifications(),
         fields: [
           ((name) => ({
-            title: msg.dontDisturb(),
-            name,
+            key: name,
+            confirmationLabel: msg.dontDisturb(),
             body: (
               <Switch
-                id={`${idPrefix}-${name}`}
-                aria-label={msg.dontDisturb()}
+                id={toId(name)}
+                label={msg.dontDisturb()}
                 isChecked={!draftValues[name]}
                 onChange={(dontDisturb) => {
                   onChange(name)(!dontDisturb)
@@ -257,11 +258,12 @@ class GlobalSettings extends Component {
           }))('showNotifications'),
           ((name) => ({
             title: msg.dontDisturbFor(),
-            name,
+            key: name,
+            fieldId: toId(name),
             body: (
               <div className={style['half-width']}>
                 <SelectBox
-                  id={`${idPrefix}-${name}`}
+                  id={toId(name)}
                   items={this.dontDisturbList(msg)
                     .map(({ id, value }) => ({ id, value, isDefault: id === AppConfiguration.notificationSnoozeDurationInMinutes }))}
                   selected={draftValues[name]}
@@ -288,11 +290,12 @@ class GlobalSettings extends Component {
               ((name) => ({
                 title: msg.preferredConsole(),
                 tooltip: msg.preferredConsoleTooltip(),
-                name,
+                key: name,
+                fieldId: toId(name),
                 body: (
                   <div className={style['half-width']}>
                     <SelectBox
-                      id={`${idPrefix}-${name}`}
+                      id={toId(name)}
                       items={this.preferredConsoleList(msg)
                         .map(({ id, value }) => ({
                           id,
@@ -309,10 +312,12 @@ class GlobalSettings extends Component {
               ((name) => ({
                 title: msg.connectAutomatically(),
                 tooltip: msg.connectAutomaticallyTooltip(),
-                name,
+                key: name,
+                fieldId: toId(name),
                 body: (
                   <div className={style['half-width']}>
                     <VmSelect
+                      id={toId(name)}
                       selected={draftValues[name]}
                       onChange={vmId => onChange(name)(vmId)}
                     />
@@ -325,12 +330,12 @@ class GlobalSettings extends Component {
             title: msg.vncOptions(),
             fields: [
               ((name) => ({
-                title: msg.fullScreenMode(),
-                name,
+                key: name,
+                confirmationLabel: msg.fullScreenMode(),
                 body: (
                   <Switch
-                    id={`${idPrefix}-${name}`}
-                    aria-label={msg.fullScreenMode()}
+                    id={toId(name)}
+                    label={msg.fullScreenMode()}
                     isChecked={draftValues[name]}
                     onChange={(fullScreen) => {
                       onChange(name)(fullScreen)
@@ -339,13 +344,13 @@ class GlobalSettings extends Component {
                 ),
               }))('fullScreenVnc'),
               ((name) => ({
-                title: msg.ctrlAltEnd(),
                 tooltip: msg.remapCtrlAltDelete(),
-                name,
+                key: name,
+                confirmationLabel: msg.ctrlAltEnd(),
                 body: (
                   <Switch
-                    id={`${idPrefix}-${name}`}
-                    aria-label={msg.ctrlAltEnd()}
+                    id={toId(name)}
+                    label={msg.ctrlAltEnd()}
                     isChecked={draftValues[name]}
                     onChange={(ctrlAltEnd) => {
                       onChange(name)(ctrlAltEnd)
@@ -359,12 +364,12 @@ class GlobalSettings extends Component {
             title: msg.noVncOptions(),
             fields: [
               ((name) => ({
-                title: msg.fullScreenMode(),
-                name,
+                key: name,
+                confirmationLabel: msg.fullScreenMode(),
                 body: (
                   <Switch
-                    id={`${idPrefix}-${name}`}
-                    aria-label={msg.fullScreenMode()}
+                    id={toId(name)}
+                    label={msg.fullScreenMode()}
                     isChecked={draftValues[name]}
                     onChange={(fullScreen) => {
                       onChange(name)(fullScreen)
@@ -378,12 +383,12 @@ class GlobalSettings extends Component {
             title: msg.spiceOptions(),
             fields: [
               ((name) => ({
-                title: msg.fullScreenMode(),
-                name,
+                key: name,
+                confirmationLabel: msg.fullScreenMode(),
                 body: (
                   <Switch
-                    id={`${idPrefix}-${name}`}
-                    aria-label={msg.fullScreenMode()}
+                    id={toId(name)}
+                    label={msg.fullScreenMode()}
                     isChecked={draftValues[name]}
                     onChange={(fullScreen) => {
                       onChange(name)(fullScreen)
@@ -392,13 +397,13 @@ class GlobalSettings extends Component {
                 ),
               }))('fullScreenSpice'),
               ((name) => ({
-                title: msg.ctrlAltEnd(),
                 tooltip: msg.remapCtrlAltDelete(),
-                name,
+                key: name,
+                confirmationLabel: msg.ctrlAltEnd(),
                 body: (
                   <Switch
-                    id={`${idPrefix}-${name}`}
-                    aria-label={msg.ctrlAltEnd()}
+                    id={toId(name)}
+                    label={msg.ctrlAltEnd()}
                     isChecked={draftValues[name]}
                     onChange={(ctrlAltEnd) => {
                       onChange(name)(ctrlAltEnd)
@@ -407,13 +412,13 @@ class GlobalSettings extends Component {
                 ),
               }))('ctrlAltEndSpice'),
               ((name) => ({
-                title: msg.smartcard(),
                 tooltip: msg.smartcardTooltip(),
-                name,
+                key: name,
+                confirmationLabel: msg.smartcard(),
                 body: (
                   <Switch
-                    id={`${idPrefix}-${name}`}
-                    aria-label={msg.smartcard()}
+                    id={toId(name)}
+                    label={msg.smartcard()}
                     isChecked={draftValues[name]}
                     onChange={(smartcard) => {
                       onChange(name)(smartcard)
@@ -429,17 +434,17 @@ class GlobalSettings extends Component {
               ((name) => ({
                 title: msg.sshKey(),
                 tooltip: msg.sshKeyTooltip(),
-                name,
+                key: name,
+                fieldId: toId(name),
                 body: (
-                  <div className={style['half-width']}>
-                    <FormControl
-                      id={`${idPrefix}-${name}`}
-                      componentClass='textarea'
-                      onChange={e => onChange(name)(e.target.value)}
-                      value={draftValues[name] || ''}
-                      rows={8}
-                    />
-                  </div>
+                  <TextArea
+                    id={toId(name)}
+                    onChange={value => onChange(name)(value)}
+                    value={draftValues[name] || ''}
+                    rows={8}
+                    resizeOrientation='vertical'
+                    aria-label={msg.sshKey()}
+                  />
                 ),
               }))('sshKey'),
             ],
@@ -451,12 +456,12 @@ class GlobalSettings extends Component {
         title: msg.advancedOptions(),
         fields: [
           ((name) => ({
-            title: msg.persistLanguage(),
-            name,
+            key: name,
             tooltip: msg.persistLanguageTooltip(),
+            confirmationLabel: msg.persistLanguage(),
             body: (<Switch
-              id={`${idPrefix}-${name}`}
-              aria-label={msg.persistLanguage()}
+              id={toId(name)}
+              label={msg.persistLanguage()}
               isChecked={draftValues[name]}
               onChange={(persist) => onChange(name)(persist)}
             />),
@@ -480,7 +485,11 @@ class GlobalSettings extends Component {
       .flatMap(section => section.sections ? Object.values(section.sections) : section)
       .flatMap(({ title: sectionTitle, fields }) =>
         // assume global uniqueness of: fieldName, sectionTitle
-        fields.map(({ name: fieldName, title: fieldTitle }) => ({ sectionTitle, fieldTitle, fieldName }))
+        fields.map(({ key: fieldName, title: fieldTitle, confirmationLabel }) => ({
+          sectionTitle,
+          fieldTitle: fieldTitle || confirmationLabel,
+          fieldName,
+        }))
       )
 
     const onSelect = result => {
