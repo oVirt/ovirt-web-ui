@@ -1,7 +1,7 @@
 import AppConfiguration from '_/config'
 import * as C from '_/constants'
 
-export function login ({ username, domain, token, userId }) {
+export function login ({ username, domain, token, userId, sessionAgeInSecAtPageLoad }) {
   return {
     type: C.LOGIN,
     payload: {
@@ -9,6 +9,7 @@ export function login ({ username, domain, token, userId }) {
       domain,
       token,
       userId,
+      sessionAgeInSecAtPageLoad,
     },
   }
 }
@@ -170,7 +171,7 @@ export function setVmActionResult ({ vmId, correlationId, result }) {
 }
 
 // --- Internal State -------------------------
-export function loginSuccessful ({ username, domain, token, userId }) {
+export function loginSuccessful ({ username, domain, token, userId, firstLogin }) {
   return {
     type: C.LOGIN_SUCCESSFUL,
     payload: {
@@ -178,6 +179,7 @@ export function loginSuccessful ({ username, domain, token, userId }) {
       domain,
       token,
       userId,
+      firstLogin,
     },
   }
 }

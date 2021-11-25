@@ -44,11 +44,16 @@ import { loadIconsFromLocalStorage } from './osIcons'
 import { loadFromLocalStorage, removeFromLocalStorage } from '_/storage'
 import { loadUserOptions } from './options'
 
+function isFirstLogin (sessionAgeInSecAtPageLoad) {
+  const threshold = AppConfiguration.sessionAgeFirstLoginThresholdInSeconds
+  return !threshold || sessionAgeInSecAtPageLoad <= threshold
+}
+
 /**
  * Perform login checks, and if they pass, perform initial data loading
  */
 function* login (action) {
-  const { payload: { token, userId, username, domain } } = action
+  const { payload: { token, userId, username, domain, sessionAgeInSecAtPageLoad } } = action
   console.group('Login Verification')
 
   // Verify a SSO token exists
@@ -60,7 +65,9 @@ function* login (action) {
     return
   }
 
-  yield put(loginSuccessful({ token, userId, username, domain }))
+  const firstLogin = isFirstLogin(sessionAgeInSecAtPageLoad)
+
+  yield put(loginSuccessful({ token, userId, username, domain, firstLogin }))
 
   // Verify the API (exists and is the correct version)
   const oVirtMeta = yield callExternalAction(Api.getOvirtApiMeta, action)

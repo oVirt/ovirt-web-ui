@@ -268,17 +268,24 @@ function* autoconnect () {
 
   const {
     userId,
+    firstLogin,
     websocket,
     defaultVncMode,
     preferredConsole,
     autoconnectOption,
   } = yield select(({ config, options }) => ({
     userId: config.getIn(['user', 'id']),
+    firstLogin: config.getIn(['user', 'firstLogin'], true),
     websocket: config.get('websocket'),
     defaultVncMode: config.get('defaultVncMode'),
     preferredConsole: options.getIn(['remoteOptions', 'preferredConsole', 'content'], config.getIn(['defaultUiConsole'])),
     autoconnectOption: toJS(options.getIn(['remoteOptions', 'autoconnect'])),
   }))
+
+  if (!firstLogin) {
+    console.warn('Autoconnect aborted - page refresh detected')
+    return
+  }
 
   const { content: vmId, id: optionId } = autoconnectOption || {}
 

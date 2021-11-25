@@ -86,12 +86,13 @@ const initialState = Immutable.fromJS({
 })
 
 const config = actionReducer(initialState, {
-  [LOGIN_SUCCESSFUL] (state, { payload: { username, domain, token, userId } }) {
+  [LOGIN_SUCCESSFUL] (state, { payload: { username, domain, token, userId, firstLogin } }) {
     return state.merge({
       loginToken: token,
       user: {
         name: username,
         id: userId,
+        firstLogin,
       },
       domain,
     })
