@@ -8,7 +8,11 @@ import { SortFields } from '_/utils'
 const initialState = Immutable.fromJS({
   vms: {},
   pools: {},
-  filters: {},
+  filters: {
+    os: [],
+    status: [],
+    name: [],
+  },
   sort: { ...SortFields.NAME, isAsc: true },
 
   missedVms: Immutable.Set(),

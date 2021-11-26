@@ -2,14 +2,16 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import { Toolbar } from 'patternfly-react'
-import style from './style.css'
+import {
+  Toolbar,
+  ToolbarContent,
+  ToolbarGroup,
+} from '@patternfly/react-core'
 import { RouterPropTypeShapes } from '_/propTypeShapes'
 import VmActions from '../VmActions'
 import VmConsoleSelector from '../VmConsole/VmConsoleSelector'
 import VmConsoleInstructionsModal from '../VmConsole/VmConsoleInstructionsModal'
 import VmsListToolbar from './VmsListToolbar'
-
 import { NATIVE_VNC, SPICE } from '_/constants'
 
 const VmDetailToolbar = ({ match, vms }) => {
@@ -17,10 +19,12 @@ const VmDetailToolbar = ({ match, vms }) => {
     const poolId = vms.getIn(['vms', match.params.id, 'pool', 'id'])
     const pool = vms.getIn(['pools', poolId])
     return (
-      <Toolbar className={style['full-width']}>
-        <Toolbar.RightContent>
-          <VmActions vm={vms.getIn(['vms', match.params.id])} pool={pool} />
-        </Toolbar.RightContent>
+      <Toolbar>
+        <ToolbarContent >
+          <ToolbarGroup alignment={{ default: 'alignRight' }}>
+            <VmActions vm={vms.getIn(['vms', match.params.id])} pool={pool} />
+          </ToolbarGroup>
+        </ToolbarContent>
       </Toolbar>
     )
   }
@@ -40,10 +44,14 @@ const VmDetailToolbarConnected = connect(
 )(VmDetailToolbar)
 
 const VmConsoleToolbar = ({ match: { params: { id, consoleType } } = {}, vms }) => {
-  if (vms.getIn(['vms', id])) {
-    return (
-      <div className={`${style['console-toolbar']} container-fluid`}>
-        <div className={style['console-toolbar-actions']} style={{ marginRight: 'auto' }}>
+  if (!vms.getIn(['vms', id])) {
+    return <Toolbar/>
+  }
+
+  return (
+    <Toolbar>
+      <ToolbarContent >
+        <ToolbarGroup variant="button-group">
           <VmConsoleSelector
             vmId={id}
             consoleType={consoleType}
@@ -52,14 +60,13 @@ const VmConsoleToolbar = ({ match: { params: { id, consoleType } } = {}, vms }) 
           <VmConsoleInstructionsModal
             disabled={![NATIVE_VNC, SPICE].includes(consoleType)}
           />
-        </div>
-        <div className={style['console-toolbar-actions']}>
+        </ToolbarGroup>
+        <ToolbarGroup variant="button-group" alignment={{ default: 'alignRight' }}>
           <div id='vm-console-toolbar-sendkeys' />
-        </div>
-      </div>
-    )
-  }
-  return <div />
+        </ToolbarGroup>
+      </ToolbarContent>
+    </Toolbar>
+  )
 }
 
 VmConsoleToolbar.propTypes = {

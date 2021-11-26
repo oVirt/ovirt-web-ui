@@ -2,15 +2,16 @@ import React, { useContext } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 
-import { DropdownButton } from 'patternfly-react'
-import { MenuItemAction } from '../VmActions/Action'
 import { getConsoleActions } from '../VmActions'
 import { MsgContext } from '_/intl'
 import { openConsole } from '_/actions'
-import style from './style.css'
+import SelectBox from '../SelectBox'
+import {
+  ToolbarItem,
+} from '@patternfly/react-core'
 
 const VmConsoleSelector = ({ vmId, vm, config, consoleType, isConsolePage, onOpenConsole, preferredConsole }) => {
-  const { msg } = useContext(MsgContext)
+  const { msg, locale } = useContext(MsgContext)
   const actions = getConsoleActions({
     vm,
     msg,
@@ -24,30 +25,27 @@ const VmConsoleSelector = ({ vmId, vm, config, consoleType, isConsolePage, onOpe
     return <div />
   }
 
-  const consoleItems = actions.map(({ id, consoleType, onClick, icon, shortTitle }) => (
-    <MenuItemAction
-      id={id}
-      key={consoleType}
-      onClick={onClick}
-      shortTitle={shortTitle}
-      icon={icon}
-    />
-  ))
+  const consoleItems = actions.map(({ id, consoleType, onClick, icon, shortTitle }) => ({
+    id: consoleType,
+    key: consoleType,
+    value: shortTitle,
+  }))
 
-  const { shortTitle: activeConsole = '' } = actions.find(a => a.consoleType === consoleType) || {}
-
-  return (
-    <div className={style['console-dropdown-box']}>
-      <span className={style['console-dropdown-label']}>{`${msg.console()}:`}</span>
-      <DropdownButton
-        title={activeConsole}
-        bsStyle='default'
+  return [
+    <ToolbarItem key="label" variant="label" >
+      {msg.console()}
+    </ToolbarItem>,
+    <ToolbarItem key="console-selector">
+      <SelectBox
+        selected={consoleType}
+        items={consoleItems}
+        onChange={(consoleType) => actions.find(({ consoleType: type }) => type === consoleType)?.onClick()}
         id='console-selector'
-      >
-        { consoleItems }
-      </DropdownButton>
-    </div>
-  )
+        msg={msg}
+        locale={locale}
+      />
+    </ToolbarItem>,
+  ]
 }
 
 VmConsoleSelector.propTypes = {

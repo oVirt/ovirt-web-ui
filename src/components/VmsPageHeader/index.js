@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Icon } from 'patternfly-react'
 
 import VmUserMessages from '../VmUserMessages'
 import Bellicon from '../VmUserMessages/Bellicon'
@@ -14,6 +13,7 @@ import { hrefWithoutHistory } from '_/helpers'
 import { manualRefresh } from '_/actions'
 import { MsgContext } from '_/intl'
 import { Tooltip } from '../tooltips'
+import { CogIcon, SyncAltIcon } from '@patternfly/react-icons/dist/esm/icons'
 
 /**
  * Main application header on top of the page
@@ -32,7 +32,7 @@ const VmsPageHeader = ({ appReady, onRefresh }) => {
             <li>
               <Tooltip id={`${idPrefix}-tooltip`} tooltip={msg.refresh()} placement='bottom'>
                 <a href='#' className='nav-item-iconic' onClick={hrefWithoutHistory(() => onRefresh())} id={`${idPrefix}-refresh`}>
-                  <i className='fa fa-refresh' />
+                  <SyncAltIcon />
                 </a>
               </Tooltip>
             </li>
@@ -41,10 +41,7 @@ const VmsPageHeader = ({ appReady, onRefresh }) => {
             <li>
               <Tooltip id={`${idPrefix}-tooltip`} tooltip={msg.accountSettings()} placement='bottom'>
                 <Link to='/settings' className='nav-item-iconic'>
-                  <Icon
-                    name='cog'
-                    type='fa'
-                  />
+                  <CogIcon />
                 </Link>
               </Tooltip>
             </li>

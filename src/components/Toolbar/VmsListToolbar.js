@@ -1,123 +1,75 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
-import { List } from 'immutable'
 import { connect } from 'react-redux'
 
 import { saveVmsFilters } from '_/actions'
-import { MsgContext } from '_/intl'
+import { withMsg } from '_/intl'
 import { RouterPropTypeShapes } from '_/propTypeShapes'
-import { filterVms, mapFilterValues } from '_/utils'
+import { filterVms } from '_/utils'
 
-import { Toolbar, Filter } from 'patternfly-react'
+import {
+  Toolbar,
+  ToolbarItem,
+  ToolbarContent,
+} from '@patternfly/react-core'
 import { AddVmButton } from '_/components/CreateVmWizard'
-import VmFilter from './VmFilters'
+import VmFilters from './VmFilters'
 import VmSort from './VmSort'
-import style from './style.css'
 
-const VmsListToolbar = ({ match, vms, onRemoveFilter, onClearFilters }) => {
-  const { msg } = useContext(MsgContext)
-  const filters = vms.get('filters').toJS()
+import { toJS } from '_/helpers'
 
-  const removeFilter = (filter) => {
-    let filters = vms.get('filters')
-    const filterValue = filters.get(filter.id)
-    if (filterValue) {
-      if (List.isList(filterValue)) {
-        filters = filters.update(filter.id, (v) => v.delete(v.findIndex(v2 => filter.value === v2)))
-        if (filters.get(filter.id).size === 0) {
-          filters = filters.delete(filter.id)
-        }
-      } else {
-        filters = filters.delete(filter.id)
-      }
-      onRemoveFilter(filters.toJS())
-    }
-  }
+const VmsListToolbar = ({ match, vms, pools, filters = {}, onClearFilters, msg }) => {
+  const { name, status, os } = filters
+  const hasFilters = name?.length || status?.length || os?.length
 
-  const mapLabels = (item, index) => {
-    const labels = []
-    if (List.isList(item)) {
-      item.forEach((t, i) => {
-        labels.push(
-          <Filter.Item
-            key={i}
-            onRemove={removeFilter}
-            filterData={{ value: t, id: index }}
-          >
-            {msg[index]()}: {mapFilterValues[index](t)}
-          </Filter.Item>
-        )
-      })
-    } else {
-      labels.push(
-        <Filter.Item
-          key={index}
-          onRemove={removeFilter}
-          filterData={{ value: item, id: index }}
-        >
-          {msg[index]()}: {mapFilterValues[index](item)}
-        </Filter.Item>
-      )
-    }
-    return labels
-  }
-
-  const total = vms.get('vms').size + vms.get('pools').size
-  const available = vms.get('filters').size &&
-    vms.get('vms').filter(vm => filterVms(vm, filters, msg)).size +
-    vms.get('pools').filter(vm => filterVms(vm, filters, msg)).size
+  const total = vms.size + pools.size
+  const available = vms.filter(vm => filterVms(vm, filters)).size +
+    pools.filter(vm => filterVms(vm, filters)).size
 
   return (
-    <Toolbar className={style['full-width']}>
-      <VmFilter />
-      <VmSort />
-      <Toolbar.RightContent>
-        <AddVmButton key='addbutton' id='route-add-vm' />
-      </Toolbar.RightContent>
-      <Toolbar.Results>
-        <h5>
-          {
-            vms.get('filters').size
+    <>
+      <Toolbar className='vm-list-toolbar' clearAllFilters={onClearFilters}>
+        <ToolbarContent>
+          <VmFilters/>
+          <ToolbarItem>
+            <VmSort />
+          </ToolbarItem>
+          <ToolbarItem>
+            <h5>
+              {
+            hasFilters
               ? msg.resultsOf({ total, available })
               : msg.results({ total })
           }
-        </h5>
-        { vms.get('filters').size > 0 && (
-          <>
-            <Filter.ActiveLabel>{msg.activeFilters()}</Filter.ActiveLabel>
-            <Filter.List>
-              {[].concat(...vms.get('filters').map(mapLabels).toList().toJS())}
-            </Filter.List>
-            <a
-              href='#'
-              onClick={e => {
-                e.preventDefault()
-                onClearFilters()
-              }}
-            >
-              {msg.clearAllFilters()}
-            </a>
-          </>
-        )}
-      </Toolbar.Results>
-    </Toolbar>
+            </h5>
+          </ToolbarItem>
+          <ToolbarItem alignment={{ default: 'alignRight' }}>
+            <AddVmButton key='addbutton' id='route-add-vm' />
+          </ToolbarItem>
+        </ToolbarContent>
+      </Toolbar>
+    </>
   )
 }
 
 VmsListToolbar.propTypes = {
   vms: PropTypes.object.isRequired,
+  pools: PropTypes.object.isRequired,
+  filters: PropTypes.object.isRequired,
 
   match: RouterPropTypeShapes.match.isRequired,
-  onRemoveFilter: PropTypes.func.isRequired,
   onClearFilters: PropTypes.func.isRequired,
+  msg: PropTypes.object.isRequired,
 }
 
 export default connect(
-  (state) => ({
-    vms: state.vms,
+  ({ vms }) => ({
+    vms: vms.get('vms'),
+    pools: vms.get('pools'),
+    filters: toJS(vms.get('filters')),
   }),
+
   (dispatch) => ({
-    onRemoveFilter: (filters) => dispatch(saveVmsFilters({ filters })),
     onClearFilters: () => dispatch(saveVmsFilters({ filters: {} })),
   })
-)(VmsListToolbar)
+)(withMsg(VmsListToolbar))

@@ -44,7 +44,7 @@ export const statusToTooltipId = {
   powering_up       : { id: 'vmStatusIconTooltipPoweringUp' },
   down              : { id: 'vmStatusIconTooltipDown' },
   paused            : { id: 'vmStatusIconTooltipPaused' },
-  suspended         : { id: 'vmStatusIconTooltipSuspended(' },
+  suspended         : { id: 'vmStatusIconTooltipSuspended' },
   powering_down     : { id: 'vmStatusIconTooltipPoweringDown' },
   not_responding    : { id: 'vmStatusIconTooltipNotResponding' },
   unknown           : { id: 'vmStatusIconTooltipUnknown' },

@@ -1,63 +1,63 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Sort } from 'patternfly-react'
 
 import { setVmSort } from '_/actions'
 import { SortFields } from '_/utils'
-import { Tooltip } from '_/components/tooltips'
 import { withMsg } from '_/intl'
 import { translate } from '_/helpers'
+import {
+  OptionsMenu,
+  OptionsMenuItemGroup,
+  OptionsMenuSeparator,
+  OptionsMenuItem,
+  OptionsMenuToggle,
+} from '@patternfly/react-core'
+import { SortAmountDownIcon, SortAmountDownAltIcon } from '@patternfly/react-icons/dist/esm/icons'
 
-class VmSort extends React.Component {
-  constructor (props) {
-    super(props)
-    this.updateCurrentSortType = this.updateCurrentSortType.bind(this)
-    this.toggleCurrentSortDirection = this.toggleCurrentSortDirection.bind(this)
-    this.getSortTooltipMessage = this.getSortTooltipMessage.bind(this)
-  }
+const VmSort = ({ sort, msg, onSortChange }) => {
+  const { id: enabledSortId, isAsc } = sort
+  const [expanded, setExpanded] = useState(false)
 
-  updateCurrentSortType (sortType) {
-    this.props.onSortChange({ ...sortType, isAsc: this.props.sort.isAsc })
-  }
+  const menuItems = [
+    <OptionsMenuItemGroup key="first group" aria-label={msg.sortColumn()}>
+      {Object.values(SortFields)
+        .map(type => ({ ...type, title: translate({ ...type.messageDescriptor, msg }) }))
+        .map(({ title, id, messageDescriptor }) => (
+          <OptionsMenuItem
+            id={id}
+            key={id}
+            isSelected={id === enabledSortId}
+            onSelect={() => onSortChange({ ...sort, id, messageDescriptor })}
+          >
+            {title}
+          </OptionsMenuItem>
+        ))
+    }
+    </OptionsMenuItemGroup>,
+    <OptionsMenuSeparator key="separator"/>,
+    <OptionsMenuItemGroup key="second group" aria-label={msg.sortDirection()}>
+      <OptionsMenuItem onSelect={() => onSortChange({ ...sort, isAsc: true })} isSelected={isAsc} id="ascending" key="ascending">{msg.ascending()}</OptionsMenuItem>
+      <OptionsMenuItem onSelect={() => onSortChange({ ...sort, isAsc: false })} isSelected={!isAsc} id="descending" key="descending">{msg.descending()}</OptionsMenuItem>
+    </OptionsMenuItemGroup>,
+  ]
 
-  toggleCurrentSortDirection () {
-    const sort = this.props.sort
-    this.props.onSortChange({ ...sort, isAsc: !sort.isAsc })
-  }
-
-  getSortTooltipMessage () {
-    const { msg } = this.props
-    const { sort: { id, isAsc } } = this.props
-    return id === 'os' || id === 'name'
-      ? (isAsc ? msg.sortAToZ() : msg.sortZToA())
-      : (isAsc ? msg.sortOffFirst() : msg.sortRunningFirst())
-  }
-
-  render () {
-    const { sort, msg } = this.props
-
-    return (
-      <Sort>
-        <Sort.TypeSelector
-          sortTypes={Object.values(SortFields).map(type => ({ ...type, title: translate({ ...type.messageDescriptor, msg }) }))}
-          currentSortType={sort && { ...sort, title: translate({ ...sort.messageDescriptor, msg }) }}
-          onSortTypeSelected={this.updateCurrentSortType}
+  return [
+    <OptionsMenu
+      id="options-menu-multiple-options-example"
+      key='menu'
+      menuItems={menuItems}
+      isOpen={expanded}
+      toggle={(
+        <OptionsMenuToggle
+          onToggle={() => setExpanded(!expanded)}
+          toggleTemplate={msg.sortBy()}
         />
-        <Tooltip
-          id={'sort-tooltip'}
-          tooltip={this.getSortTooltipMessage()}
-          placement={'bottom'}
-        >
-          <Sort.DirectionSelector
-            isAscending={sort.isAsc}
-            isNumeric={sort.isNumeric}
-            onClick={this.toggleCurrentSortDirection}
-          />
-        </Tooltip>
-      </Sort>
-    )
-  }
+      )}
+      isGrouped
+    />,
+    isAsc ? <SortAmountDownAltIcon key='altIcon'/> : <SortAmountDownIcon key='icon'/>,
+  ]
 }
 
 VmSort.propTypes = {

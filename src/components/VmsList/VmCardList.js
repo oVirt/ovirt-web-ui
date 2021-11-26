@@ -10,6 +10,7 @@ import Vm from './Vm'
 import Pool from './Pool'
 
 import style from './style.css'
+import { Gallery, GalleryItem } from '@patternfly/react-core'
 
 /**
  * Use Patternfly 'Single Select Card View' pattern to show every VM and Pool
@@ -26,7 +27,7 @@ const VmCardList = ({ vms, alwaysShowPoolCard, fetchMoreVmsAndPools }) => {
 
   // Filter the VMs (1. apply the filter bar criteria, 2. only show Pool VMs if the Pool exists)
   const filteredVms = vms.get('vms')
-    .filter(vm => filterVms(vm, filters, msg))
+    .filter(vm => filterVms(vm, filters))
     .filter(vm => vm.getIn(['pool', 'id'], false) ? !!vms.getIn(['pools', vm.getIn(['pool', 'id'])], false) : true)
     .toList()
     .map(vm => vm.set('isVm', true))
@@ -35,7 +36,7 @@ const VmCardList = ({ vms, alwaysShowPoolCard, fetchMoreVmsAndPools }) => {
   const filteredPools = vms.get('pools')
     .filter(pool =>
       (alwaysShowPoolCard || (pool.get('vmsCount') < pool.get('maxUserVms') && pool.get('size') > 0)) &&
-      filterVms(pool, filters, msg)
+      filterVms(pool, filters)
     )
     .toList()
 
@@ -80,14 +81,16 @@ const VmCardList = ({ vms, alwaysShowPoolCard, fetchMoreVmsAndPools }) => {
 
   return (
     <div className={style['scroll-container-wrapper']}>
-      <div ref={scrollerRef} className={`container-fluid container-cards-pf ${style['scroll-container']}`}>
-        <div className={`row row-cards-pf ${style['cards-container']}`}>
-          {vmsAndPools.map(entity =>
+      <div ref={scrollerRef} className={`${style['scroll-container']}`}>
+        <Gallery hasGutter>
+          {vmsAndPools.map(entity => (
+            <GalleryItem key={entity.get('id')}>{
             entity.get('isVm')
-              ? <Vm vm={entity} key={entity.get('id')} />
-              : <Pool pool={entity} key={entity.get('id')} />
-          )}
-        </div>
+              ? <Vm vm={entity} />
+              : <Pool pool={entity} />}
+            </GalleryItem>
+          ))}
+        </Gallery>
         {hasMore && <div ref={sentinelRef} className={style['infinite-scroll-sentinel']}>{msg.loadingTripleDot()}</div>}
       </div>
     </div>

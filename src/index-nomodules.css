@@ -45,6 +45,8 @@ body {
   flex-direction: column;
   background: #f5f5f5;
   overflow: auto;
+  border-top-style: inset;
+  border-width: thin;
 }
 
 #page-router-render-component > *:last-child {

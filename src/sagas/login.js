@@ -187,8 +187,13 @@ function* checkUserFilterPermissions () {
 
 function* loadFilters () {
   const userId = yield select(state => state.config.getIn(['user', 'id']))
-  const filters = JSON.parse(loadFromLocalStorage(`vmFilters-${userId}`)) || {}
-  yield put(saveVmsFilters({ filters }))
+  const { os, name, status } = JSON.parse(loadFromLocalStorage(`vmFilters-${userId}`)) || {}
+  // discard legacy format used for "os" and "status"
+  // example:
+  // {"os":"FreeBSD 9.2","status":"Not responding","name":["asd","qwert","gdfgdfg"]}
+  // problems: translated labels used, single filter per category
+  const toArray = (prop) => Array.isArray(prop) ? prop : []
+  yield put(saveVmsFilters({ filters: { os: toArray(os), status: toArray(status), name } }))
 }
 
 function* initialLoad () {

@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import { hrefWithoutHistory } from '_/helpers'
 import { MsgContext } from '_/intl'
 import { Tooltip } from '../tooltips'
+import { BellIcon } from '@patternfly/react-icons/dist/esm/icons'
 
 const Bellicon = ({ userMessages, handleclick }) => {
   const { msg } = useContext(MsgContext)
@@ -18,7 +19,7 @@ const Bellicon = ({ userMessages, handleclick }) => {
     <li>
       <Tooltip id={`${idPrefix}-tooltip`} tooltip={msg.notifications()} placement='bottom'>
         <a className='dropdown-toggle nav-item-iconic' href='#' onClick={hrefWithoutHistory(handleclick)} id={`${idPrefix}-toggle`}>
-          <i className='fa fa-bell' />
+          <BellIcon />
           {badgeElement}
           <span className='caret' id={`${idPrefix}-caret`} />
         </a>

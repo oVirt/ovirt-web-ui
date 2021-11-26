@@ -7,6 +7,7 @@ import { logout } from '_/actions'
 import { MsgContext } from '_/intl'
 import AboutDialog from '_/components/About'
 import { Tooltip } from '_/components/tooltips'
+import { UserIcon } from '@patternfly/react-icons/dist/esm/icons'
 
 const UserMenu = ({ config, onLogout }) => {
   const { msg } = useContext(MsgContext)
@@ -15,7 +16,7 @@ const UserMenu = ({ config, onLogout }) => {
     <li className='dropdown'>
       <Tooltip id={`${idPrefix}-tooltip`} tooltip={config.getIn(['user', 'name'])} placement='bottom'>
         <a className='dropdown-toggle nav-item-iconic' href='#' data-toggle='dropdown' id={`${idPrefix}-user`}>
-          <i className='fa fa-user' /><span className='caret' />
+          <UserIcon /><span className='caret' />
         </a>
       </Tooltip>
       <ul className='dropdown-menu'>

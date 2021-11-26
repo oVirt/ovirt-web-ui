@@ -1,215 +1,262 @@
-import React from 'react'
+import React, { useState, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Filter, FormControl } from 'patternfly-react'
 import { enumMsg, withMsg } from '_/intl'
 import { saveVmsFilters } from '_/actions'
-import { localeCompare } from '_/helpers'
+import { localeCompare, toJS } from '_/helpers'
+import {
+  Button,
+  ButtonVariant,
+  Dropdown,
+  DropdownItem,
+  DropdownPosition,
+  DropdownToggle,
+  InputGroup,
+  Select,
+  SelectOption,
+  SelectVariant,
+  TextInput,
+  ToolbarGroup,
+  ToolbarFilter,
+  ToolbarItem,
+  ToolbarToggleGroup,
+} from '@patternfly/react-core'
 
-import style from './style.css'
+import { FilterIcon, SearchIcon } from '@patternfly/react-icons/dist/esm/icons'
 
-class VmFilters extends React.Component {
-  constructor (props) {
-    super(props)
+const STATUS = 'status'
+const OS = 'os'
+const NAME = 'name'
 
-    this.composeFilterTypes = this.composeFilterTypes.bind(this)
-    this.filterAdded = this.filterAdded.bind(this)
-    this.selectFilterType = this.selectFilterType.bind(this)
-    this.filterValueSelected = this.filterValueSelected.bind(this)
-    this.updateCurrentValue = this.updateCurrentValue.bind(this)
-    this.onValueKeyPress = this.onValueKeyPress.bind(this)
-    this.filterExists = this.filterExists.bind(this)
-    this.getFilterValue = this.getFilterValue.bind(this)
-    this.renderInput = this.renderInput.bind(this)
+const composeStatus = (msg, locale) => {
+  const statuses = [
+    'up',
+    'powering_up',
+    'down',
+    'paused',
+    'suspended',
+    'powering_down',
+    'not_responding',
+    'unknown',
+    'unassigned',
+    'migrating',
+    'wait_for_launch',
+    'reboot_in_progress',
+    'saving_state',
+    'restoring_state',
+    'image_locked',
+  ]
+  return {
+    id: STATUS,
+    title: msg.status(),
+    placeholder: msg.vmFilterTypePlaceholderStatus(),
+    filterValues: Object.entries(statuses
+      .map((status) => ({ title: enumMsg('VmStatus', status, msg), id: status }))
+      .reduce((acc, { title, id }) => {
+        acc[title] = { ...acc[title], [id]: id }
+        return acc
+      }, {}))
+      .map(([title, ids]) => ({ title, ids }))
+      .sort((a, b) => localeCompare(a.title, b.title, locale)),
+  }
+}
 
-    const filterTypes = this.composeFilterTypes()
-    this.state = {
-      currentFilterType: filterTypes[0],
-      activeFilters: {},
-      currentValue: '',
+const composeOs = (msg, locale, operatingSystems) => {
+  return ({
+    id: OS,
+    title: msg.operatingSystem(),
+    placeholder: msg.vmFilterTypePlaceholderOS(),
+    filterValues: Object.entries(operatingSystems
+      .toList().toJS()
+    // { name: 'other_linux_ppc64', description: 'Linux'},  {description: 'Linux', name: 'other_linux'}
+    // {title: 'Linux', ids: {'other_linux_ppc64', 'other_linux'}
+      .reduce((acc, { name, description }) => {
+        acc[description] = { ...acc[description], [name]: name }
+        return acc
+      }, {}))
+      .map(([description, ids]) => ({ title: description, ids }))
+      .sort((a, b) => localeCompare(a.title, b.title, locale)),
+  })
+}
+
+const Filter = ({ filterIds = [], setFilters, allSupportedFilters = [], title, filterColumnId, showToolbarItem }) => {
+  const [isExpanded, setExpanded] = useState(false)
+
+  // one label can map to many IDs so it's easier work with labels
+  // and reverse map label-to-IDs on save
+  const toChip = ({ title }) => title
+  const toOption = ({ title }) => title
+  const toOptionNode = ({ title }) =>
+    <SelectOption key={ title} value={title}/>
+
+  // titles are guaranteed to be unique
+  // return first filter with matching title
+  const labelToIds = (title) => {
+    const [{ ids = {} } = {}] = allSupportedFilters.filter(filter => filter.title === title) || []
+    return ids
+  }
+  const selectedFilters = allSupportedFilters.filter(({ ids }) => filterIds.find(id => ids[id]))
+  const deleteFilter = (title) => {
+    const ids = labelToIds(title)
+    // delete all filter IDs linked to provided title
+    setFilters(filterIds.filter(id => !ids[id]))
+  }
+
+  const addFilter = (title) => {
+    const ids = labelToIds(title)
+    // add all filter IDs linked
+    setFilters([...filterIds, ...Object.keys(ids)])
+  }
+  return (
+    <ToolbarFilter
+      key={filterColumnId}
+      chips={selectedFilters.map(toChip)}
+      deleteChip={(category, option) => deleteFilter(option)}
+      deleteChipGroup={() => setFilters([])}
+      categoryName={filterColumnId}
+      showToolbarItem={showToolbarItem}
+    >
+      <Select
+        variant={SelectVariant.checkbox}
+        aria-label={title}
+        onSelect={(e, option, isPlaceholder) => {
+          if (isPlaceholder) {
+            return
+          }
+          event?.target?.checked
+            ? addFilter(option)
+            : deleteFilter(option)
+        } }
+        selections={selectedFilters.map(toOption)}
+        placeholderText={title}
+        isOpen={isExpanded}
+        onToggle={setExpanded}
+      >
+        {allSupportedFilters.map(toOptionNode)}
+      </Select>
+    </ToolbarFilter>
+  )
+}
+
+Filter.propTypes = {
+  filterIds: PropTypes.array.isRequired,
+  allSupportedFilters: PropTypes.array.isRequired,
+  setFilters: PropTypes.func.isRequired,
+  title: PropTypes.string.isRequired,
+  filterColumnId: PropTypes.string.isRequired,
+  showToolbarItem: PropTypes.bool.isRequired,
+}
+
+const VmFilters = ({ msg, locale, operatingSystems, selectedFilters, onFilterUpdate }) => {
+  const filterTypes = useMemo(() => [
+    {
+      id: NAME,
+      title: msg.name(),
+      placeholder: msg.vmFilterTypePlaceholderName(),
+    },
+    composeStatus(msg, locale),
+    composeOs(msg, locale, operatingSystems),
+  ], [msg, locale, operatingSystems])
+  const [currentFilterType, setCurrentFilterType] = useState(filterTypes[0])
+  const [expanded, setExpanded] = useState(false)
+  const [inputValue, setInputValue] = useState('')
+
+  const nameFilter = filterTypes.find(({ id }) => id === NAME)
+  const labelToFilter = (label) => filterTypes.find(({ title }) => title === label) ?? currentFilterType
+
+  const onFilterTypeSelect = (event) => {
+    setCurrentFilterType(labelToFilter(event?.target?.innerText))
+    setExpanded(!expanded)
+  }
+  const onFilterTypeToggle = () => setExpanded(!expanded)
+  const onNameInput = (event) => {
+    if ((event.key && event.key !== 'Enter') ||
+     !inputValue ||
+      selectedFilters?.[NAME]?.includes(inputValue)) {
+      return
     }
+    onFilterUpdate({ ...selectedFilters, [NAME]: [...(selectedFilters?.[NAME] ?? []), inputValue] })
+    setInputValue('')
   }
 
-  composeFilterTypes () {
-    const { msg, locale } = this.props
-    const statuses = [
-      'up',
-      'powering_up',
-      'down',
-      'paused',
-      'suspended',
-      'powering_down',
-      'not_responding',
-      'unknown',
-      'unassigned',
-      'migrating',
-      'wait_for_launch',
-      'reboot_in_progress',
-      'saving_state',
-      'restoring_state',
-      'image_locked',
-    ]
-    const filterTypes = [
-      {
-        id: 'name',
-        title: msg.name(),
-        placeholder: msg.vmFilterTypePlaceholderName(),
-        filterType: 'text',
-      },
-      {
-        id: 'status',
-        title: msg.status(),
-        placeholder: msg.vmFilterTypePlaceholderStatus(),
-        filterType: 'select',
-        filterValues: statuses
-          .map((status) => ({ title: enumMsg('VmStatus', status, msg), id: status }))
-          .sort((a, b) => localeCompare(a.title, b.title, locale)),
-      },
-      {
-        id: 'os',
-        title: msg.operatingSystem(),
-        placeholder: msg.vmFilterTypePlaceholderOS(),
-        filterType: 'select',
-        filterValues: Array.from(this.props.operatingSystems
-          .toList()
-          .reduce((acc, item) => (
-            acc.add(item.get('description'))
-          ), new Set()))
-          .map(item => ({ title: item, id: item }))
-          .sort((a, b) => localeCompare(a.title, b.title, locale)),
-      },
-    ]
-    return filterTypes
-  }
-
-  filterAdded (field, value) {
-    const activeFilters = { ...this.props.vms.get('filters').toJS() }
-    if ((field.filterType === 'select')) {
-      activeFilters[field.id] = value.title
-    } else {
-      if (!activeFilters[field.id]) {
-        activeFilters[field.id] = []
-      }
-      activeFilters[field.id].push(value)
-    }
-    this.props.onFilterUpdate(activeFilters)
-  };
-
-  selectFilterType (filterType) {
-    const { currentFilterType } = this.state
-    if (currentFilterType !== filterType) {
-      let newCurrentValue = ''
-      if (filterType.filterType === 'select') {
-        if (this.filterExists(filterType.id)) {
-          const filterValue = this.getFilterValue(filterType.id)
-          newCurrentValue = filterValue
-        }
-      }
-      this.setState({
-        currentFilterType: filterType,
-        currentValue: newCurrentValue,
-      })
-    }
-  }
-
-  filterValueSelected (filterValue) {
-    const { currentFilterType, currentValue } = this.state
-
-    if (filterValue !== currentValue) {
-      this.setState({ currentValue: filterValue })
-      if (filterValue) {
-        this.filterAdded(currentFilterType, filterValue)
-      }
-    }
-  }
-
-  updateCurrentValue (event) {
-    this.setState({ currentValue: event.target.value })
-  }
-
-  onValueKeyPress (keyEvent) {
-    const { currentValue, currentFilterType } = this.state
-
-    if (keyEvent.key === 'Enter' && currentValue && currentValue.length > 0) {
-      this.setState({ currentValue: '' })
-      this.filterAdded(currentFilterType, currentValue)
-      keyEvent.stopPropagation()
-      keyEvent.preventDefault()
-    }
-  }
-
-  filterExists (fieldId) {
-    return !!this.props.vms.getIn(['filters', fieldId])
-  };
-
-  getFilterValue (fieldId) {
-    return this.props.vms.getIn(['filters', fieldId])
-  };
-
-  renderInput () {
-    const { currentFilterType, currentValue, filterCategory } = this.state
-    if (!currentFilterType) {
-      return null
-    }
-
-    if (currentFilterType.filterType === 'select') {
-      if (currentValue !== '' && !this.filterExists(currentFilterType.id)) {
-        this.setState({
-          currentValue: '',
-          filterCategory,
-        })
-      }
-      return (
-        <Filter.ValueSelector
-          filterValues={currentFilterType.filterValues}
-          placeholder={currentFilterType.placeholder}
-          currentValue={currentValue}
-          onFilterValueSelected={this.filterValueSelected}
-          className={style['selector-overflow']}
-        />
-      )
-    }
-    return (
-      <FormControl
-        type={currentFilterType.filterType}
-        value={currentValue}
-        placeholder={currentFilterType.placeholder}
-        onChange={e => this.updateCurrentValue(e)}
-        onKeyPress={e => this.onValueKeyPress(e)}
-      />
-    )
-  }
-
-  render () {
-    const { currentFilterType } = this.state
-
-    const filterTypes = this.composeFilterTypes()
-
-    return (
-      <Filter>
-        <Filter.TypeSelector
-          filterTypes={filterTypes}
-          currentFilterType={currentFilterType}
-          onFilterTypeSelected={this.selectFilterType}
-        />
-        {this.renderInput()}
-      </Filter>
-    )
-  }
+  return (
+    <ToolbarToggleGroup toggleIcon={<FilterIcon />} breakpoint="xl">
+      <ToolbarGroup variant="filter-group">
+        <ToolbarItem>
+          <Dropdown
+            onSelect={onFilterTypeSelect}
+            position={DropdownPosition.left}
+            toggle={(
+              <DropdownToggle onToggle={onFilterTypeToggle} style={{ width: '100%' }}>
+                <FilterIcon /> {currentFilterType.title}
+              </DropdownToggle>
+            )}
+            isOpen={expanded}
+            style={{ width: '100%' }}
+            dropdownItems={
+          filterTypes.map(({ id, title }) =>
+            <DropdownItem key={id}>{title}</DropdownItem>)
+          }
+          />
+        </ToolbarItem>
+        <ToolbarFilter
+          key={NAME}
+          chips={selectedFilters?.[NAME] ?? [] }
+          deleteChip={(category, option) => onFilterUpdate({
+            ...selectedFilters,
+            [NAME]: selectedFilters?.[NAME]?.filter?.(value => value !== option) ?? [],
+          })}
+          deleteChipGroup={() => onFilterUpdate({ ...selectedFilters, [NAME]: [] })}
+          categoryName={NAME}
+          showToolbarItem={currentFilterType.id === NAME}
+        >
+          <InputGroup>
+            <TextInput
+              id="name"
+              type="search"
+              onChange={setInputValue}
+              value={inputValue}
+              placeholder={nameFilter.placeholder}
+              onKeyDown={onNameInput}
+            />
+            <Button
+              variant={ButtonVariant.control}
+              aria-label={msg.vmFilterTypePlaceholderName()}
+              onClick={onNameInput}
+            >
+              <SearchIcon />
+            </Button>
+          </InputGroup>
+        </ToolbarFilter>
+        {filterTypes.filter(({ id }) => id !== NAME)?.map(({ id, filterValues, placeholder }) => (
+          <Filter
+            key={id}
+            filterColumnId={id}
+            showToolbarItem={currentFilterType.id === id}
+            filterIds={selectedFilters[id] ?? []}
+            allSupportedFilters={filterValues}
+            setFilters={(filtersToSave) => onFilterUpdate({ ...selectedFilters, [id]: filtersToSave })}
+            title={placeholder}
+          />
+        )
+        )}
+      </ToolbarGroup>
+    </ToolbarToggleGroup>
+  )
 }
 
 VmFilters.propTypes = {
   operatingSystems: PropTypes.object.isRequired,
-  vms: PropTypes.object.isRequired,
+  selectedFilters: PropTypes.object.isRequired,
   onFilterUpdate: PropTypes.func.isRequired,
   msg: PropTypes.object.isRequired,
   locale: PropTypes.string.isRequired,
 }
 
 export default connect(
-  (state) => ({
-    operatingSystems: state.operatingSystems,
-    vms: state.vms,
+  ({ operatingSystems, vms }) => ({
+    operatingSystems,
+    selectedFilters: toJS(vms.get('filters')),
   }),
   (dispatch) => ({
     onFilterUpdate: (filters) => dispatch(saveVmsFilters({ filters })),
