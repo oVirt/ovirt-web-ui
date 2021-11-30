@@ -46,7 +46,7 @@ const vms = actionReducer(initialState, {
       state = updatePools(state, pools)
     }
 
-    if (removePoolIds && removePoolIds > 0) {
+    if (removePoolIds && removePoolIds.length > 0) {
       state = removePools(state, removePoolIds)
     }
 
