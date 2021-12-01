@@ -723,8 +723,16 @@ export const messages: { [messageId: string]: MessageType } = {
   },
   utilizationCardLegendAvailable: 'Available',
   utilizationCardLegendAvailableP: '% Available',
+  utilizationCardLegendAvailableWithDetails: {
+    message: 'Available {value}% ({diskPath})',
+    description: 'Details about free disk space. Example: Available 75% (/boot)',
+  },
   utilizationCardLegendUsed: 'Used',
   utilizationCardLegendUsedP: '% Used',
+  utilizationCardLegendUsedWithDetails: {
+    message: 'Used {value}% ({diskPath})',
+    description: 'Details about disk usage. Example: Used 25% (/boot)',
+  },
   utilizationCardNoGuestAgent: 'It looks like no guest agent is configured on the VM.',
   utilizationCardNoAttachedDisks: 'It looks like no disk is attached to VM.',
   utilizationCardTitleCpu: 'CPU',

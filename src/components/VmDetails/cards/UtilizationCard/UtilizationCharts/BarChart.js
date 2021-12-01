@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { withMsg } from '_/intl'
 
 import { ChartBar, Chart, ChartAxis, ChartTooltip, ChartStack, ChartLabel } from '@patternfly/react-charts'
 
@@ -8,7 +9,7 @@ const CustomLabel = ({ label, offsetX, text, ...rest }) => {
   return (
     <g>
       <ChartLabel {...rest} x={offsetX} dy={40} style={{ fontSize: 20 }} text={t} />
-      <ChartTooltip {...rest} text={text} style={{ fontSize: 18 }} />
+      <ChartTooltip {...rest} text={text} style={{ fontSize: 18 }} orientation='top' dx={-5} dy={-20}/>
     </g>
   )
 }
@@ -20,10 +21,9 @@ CustomLabel.propTypes = {
   offsetX: PropTypes.number,
 }
 
-const BarChart = ({ data, additionalLabel, thresholdWarning, thresholdError, id, ...rest }) => {
-  const availableInPercent = data.map((datum) => ({ x: datum.x, y: 100 - datum.y }))
-  const maxLength = Math.max(...data.map((datum) => datum.x.length))
-  const offsetX = maxLength * 14
+const BarChart = ({ data, additionalLabel, thresholdWarning, thresholdError, id, msg }) => {
+  const availableInPercent = data.map(({ x, y }) => ({ x, y: 100 - y }))
+  const offsetX = 0
 
   return (
     <div id={id}>
@@ -41,13 +41,13 @@ const BarChart = ({ data, additionalLabel, thresholdWarning, thresholdError, id,
             }}
             labelComponent={<CustomLabel offsetX={offsetX} label={additionalLabel} />}
             data={data}
-            {...rest}
+            labels={({ datum }) => msg.utilizationCardLegendUsedWithDetails({ value: datum.y, diskPath: datum.x }) }
           />
           <ChartBar barWidth={40} domain={{ y: [0, 100] }}
-            labelComponent={<ChartTooltip style={{ fontSize: 18 }} />}
+            labelComponent={<ChartTooltip style={{ fontSize: 18 }} orientation='top' dx={-5} dy={-20} />}
             style={{ parent: { border: '0px' } }}
             data={availableInPercent}
-            {...rest}
+            labels={({ datum }) => msg.utilizationCardLegendAvailableWithDetails({ value: datum.y, diskPath: datum.x }) }
           />
         </ChartStack>
         <ChartAxis
@@ -68,6 +68,7 @@ BarChart.propTypes = {
   thresholdWarning: PropTypes.number,
   thresholdError: PropTypes.number,
   additionalLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  msg: PropTypes.object.isRequired,
 }
 
-export default BarChart
+export default withMsg(BarChart)
