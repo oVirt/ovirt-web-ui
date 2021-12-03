@@ -975,6 +975,7 @@ class DetailsCard extends React.Component {
                             <FieldRow label={msg.bootMenu()} id={`${idPrefix}-boot-menu`}>
                               <Switch
                                 id={`${idPrefix}-boot-menu-edit`}
+                                aria-label={msg.bootMenu()}
                                 isChecked={bootMenuEnabled}
                                 onChange={state => this.handleChange('bootMenuEnabled', state)}
                               />

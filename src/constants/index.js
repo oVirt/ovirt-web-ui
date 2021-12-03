@@ -1,3 +1,4 @@
+// @flow
 // Keep alphabetically sorted
 
 export const ACTION_IN_PROGRESS_START = 'ACTION_IN_PROGRESS_START'
@@ -44,7 +45,7 @@ export const GET_POOLS = 'GET_POOLS'
 export const GET_VM = 'GET_VM'
 export const GET_VM_CDROM = 'GET_VM_CDROM'
 export const GET_VMS = 'GET_VMS'
-export const LOAD_USER_OPTIONS = 'LOAD_USER_OPTIONS'
+export const LOAD_USER_OPTIONS: 'LOAD_USER_OPTIONS' = 'LOAD_USER_OPTIONS'
 export const LOGIN = 'LOGIN'
 export const LOGIN_FAILED = 'LOGIN_FAILED'
 export const LOGIN_SUCCESSFUL = 'LOGIN_SUCCESSFUL'
@@ -66,7 +67,7 @@ export const REMOVE_VM = 'REMOVE_VM'
 export const RESTART_VM = 'RESTART_VM'
 export const SAVE_CONSOLE_OPTIONS = 'SAVE_CONSOLE_OPTIONS'
 export const SAVE_FILTERS = 'SAVE_FILTERS'
-export const SAVE_GLOBAL_OPTIONS = 'SAVE_GLOBAL_OPTIONS'
+export const SAVE_GLOBAL_OPTIONS: 'SAVE_GLOBAL_OPTIONS' = 'SAVE_GLOBAL_OPTIONS'
 export const SAVE_SSH_KEY = 'SAVE_SSH_KEY'
 export const SET_ADMINISTRATOR = 'SET_ADMINISTRATOR'
 export const SET_CHANGED = 'SET_CHANGED'

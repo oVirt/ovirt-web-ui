@@ -55,14 +55,14 @@ function reportDuplicateValues (englishMessages, translatedMessagesPerLocale) {
             })
             return chalk`{yellow ${localesWithKey.length}}: ${localesWithKey.join(', ')}`
           })
-          .join('\n')
+          .join('\n'),
 
-        ])
+      ])
     }
   })
 
   if (report.length > 0) {
-    console.log(table([ ['Text', 'Key', 'Locales With Key', 'Locales w/o Key'], ...report ]))
+    console.log(table([['Text', 'Key', 'Locales With Key', 'Locales w/o Key'], ...report]))
   } else {
     console.log('No keys with duplicate values!')
   }
@@ -92,18 +92,18 @@ function reportUntranslatedKeys (englishMessages, translatedMessagesPerLocale) {
         chalk.magenta(`${untranslatedPercent}%`),
         untranslatedPercent > 20.0
           ? chalk.red(`>20% of keys are untranslated [${untranslated[locale].length}/${messagesKeyCount}]`)
-          : untranslated[locale].sort().join('\n')
+          : untranslated[locale].sort().join('\n'),
       ])
     })
 
   if (untranslatedReport.length === 0) {
     console.log(chalk`{green All keys for all locales are translated!}`)
   } else {
-    console.log(table([ ['locale', '% untranslated', 'keys'], ...untranslatedReport ]))
+    console.log(table([['locale', '% untranslated', 'keys'], ...untranslatedReport]))
   }
 }
 
-function reportCoverage(englishMessages, translatedMessagesPerLocale) {
+function reportCoverage (englishMessages, translatedMessagesPerLocale) {
   const messagesKeyCount = Object.keys(englishMessages).length
 
   const report = []
@@ -120,11 +120,11 @@ function reportCoverage(englishMessages, translatedMessagesPerLocale) {
   )
   console.log(table([['locale', 'keys', 'percent'], ...report], {
     columns: {
-      '0': {},
-      '1': { alignment: 'right' },
-      '2': { alignment: 'right' }
+      0: {},
+      1: { alignment: 'right' },
+      2: { alignment: 'right' },
     },
-    drawHorizontalLine: (index, size) => index === 0 || index === 1 || index === size
+    drawHorizontalLine: (index, size) => index === 0 || index === 1 || index === size,
   }))
 }
 

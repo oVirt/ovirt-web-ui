@@ -8,14 +8,6 @@ import { withMsg } from '_/intl'
 
 const NOBREAK_SPACE = '\u00A0'
 
-function getSelectedId (props) {
-  return props.selected == null ? (props.items.length > 0 ? props.items[0].id : null) : props.selected
-}
-
-function getItems ({ sort, items, locale }) {
-  return sort ? sortedBy(items, 'value', locale) : items
-}
-
 const MarkAsDefault = withMsg(({ msg, value, isDefault }) => {
   if (!isDefault) {
     return value
@@ -29,80 +21,43 @@ const MarkAsDefault = withMsg(({ msg, value, isDefault }) => {
  *       __DropdownButton__ with a set of scrolling __MenuItem__s.
  */
 
-class SelectBox extends React.Component {
-  constructor (props) {
-    super(props)
-    const { sort, items, locale } = this.props
-    this.state = {
-      selected: getSelectedId(props),
-      items: getItems({ sort, items, locale }),
-    }
-    this.handleChange = this.handleChange.bind(this)
-    this.getValidationClass = this.getValidationClass.bind(this)
+const SelectBox = ({ sort, items = [], locale, selected, onChange, validationState, id, disabled }) => {
+  if (sort) {
+    sortedBy(items, 'value', locale)
   }
+  const selectedId = selected ?? items?.[0]?.id ?? null
+  const validationClass = validationState === 'error' ? style['selectBox-has-error'] : ''
+  const selectedItem = items.find(item => item.id === selectedId)
 
-  componentWillReceiveProps (nextProps) {
-    const { sort, items, locale } = nextProps
-    const nextState = { items: getItems({ sort, items, locale }) }
-    if (this.props.selected !== nextProps.selected) {
-      nextState.selected = getSelectedId(nextProps)
-    }
-    this.setState(nextState)
-  }
-
-  handleChange (id) {
-    return () => {
-      this.setState({ selected: id })
-      this.props.onChange(id)
-    }
-  }
-
-  getValidationClass () {
-    const { validationState } = this.props
-    switch (validationState) {
-      case 'error':
-        return style['selectBox-has-error']
-      default:
-        return ''
-    }
-  }
-
-  render () {
-    const { id, disabled } = this.props
-
-    const selectedItem = this.state.items.find(item => item.id === this.state.selected)
-    const validationClass = this.getValidationClass()
-
-    return (
-      <div style={{ width: '100%' }} id={id}>
-        <div className='dropdown'>
-          <Tooltip id={`${id}-selectbox-tooltip`} placement={'bottom'} tooltip={selectedItem ? selectedItem.value : ''}>
-            <button
-              className={`btn btn-default dropdown-toggle ${style['dropdown-button']} ${validationClass}`}
-              type='button'
-              data-toggle='dropdown'
-              id={`${id}-button-toggle`}
-              disabled={disabled}
-            >
-              <span className={style['dropdown-button-text']} id={`${id}-button-text`} >
-                {selectedItem ? <MarkAsDefault {...selectedItem} /> : NOBREAK_SPACE}
-              </span>
-              <span className='caret' id={`${id}-button-caret`} />
-            </button>
-          </Tooltip>
-          <ul className={`dropdown-menu ${style.dropdown}`} role='menu'>
-            {this.state.items.map(item => (
-              <li role='presentation' className={item.id === this.state.selected ? 'selected' : ''} key={item.id}>
-                <a role='menuitem' tabIndex='-1' onClick={this.handleChange(item.id)} id={`${id}-item-${item.value}`}>
-                  {<MarkAsDefault {...item} />}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
+  return (
+    <div style={{ width: '100%' }} id={id}>
+      <div className='dropdown'>
+        <Tooltip id={`${id}-selectbox-tooltip`} placement={'bottom'} tooltip={selectedItem ? selectedItem.value : ''}>
+          <button
+            className={`btn btn-default dropdown-toggle ${style['dropdown-button']} ${validationClass}`}
+            type='button'
+            data-toggle='dropdown'
+            id={`${id}-button-toggle`}
+            disabled={disabled}
+          >
+            <span className={style['dropdown-button-text']} id={`${id}-button-text`} >
+              {selectedItem ? <MarkAsDefault {...selectedItem} /> : NOBREAK_SPACE}
+            </span>
+            <span className='caret' id={`${id}-button-caret`} />
+          </button>
+        </Tooltip>
+        <ul className={`dropdown-menu ${style.dropdown}`} role='menu'>
+          {items.map(item => (
+            <li role='presentation' className={item.id === selectedId ? 'selected' : ''} key={item.id}>
+              <a role='menuitem' tabIndex='-1' onClick={() => onChange(item.id)} id={`${id}-item-${item.value}`}>
+                {<MarkAsDefault {...item} />}
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
-    )
-  }
+    </div>
+  )
 }
 
 SelectBox.propTypes = {

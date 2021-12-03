@@ -10,7 +10,7 @@ import { messages as englishMessages } from '../../src/intl/messages'
 
 const TRANSLATED_MESSAGES = path.join('src', 'intl', 'translated-messages.json')
 
-function main() {
+function main () {
   const stringContent = fs.readFileSync(TRANSLATED_MESSAGES, { encoding: 'utf8' })
   const parsedContent = JSON.parse(stringContent)
   removeNotExistedMessages(parsedContent)
@@ -27,7 +27,7 @@ function main() {
  *
  * @param translations object
  */
-function removeNotExistedMessages(translations) {
+function removeNotExistedMessages (translations: any) {
   Object.keys(translations).forEach(langKey => {
     const languageMessages = translations[langKey]
     console.log(chalk.green(`[sync-messages.js] Checking language '${langKey}'`))

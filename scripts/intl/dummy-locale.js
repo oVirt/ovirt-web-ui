@@ -6,7 +6,7 @@ import stableStringify from 'json-stable-stringify-without-jsonify'
 
 const DUMMY_LOCALE = 'aa'
 
-function insertDummyLocaleAndSave(messages, destination) {
+function insertDummyLocaleAndSave (messages, destination) {
   const dummyMessages = {}
   Object.keys(messages).forEach(key => {
     const message = messages[key].message ? messages[key].message : messages[key]

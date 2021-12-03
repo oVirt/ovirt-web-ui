@@ -1,31 +1,31 @@
-var rl = require('readline');
+import rl from 'readline'
 
 // Convention: "no" should be the conservative choice.
 // If you mistype the answer, we'll always take it as a "no".
 // You can control the behavior on <Enter> with `isYesDefault`.
-module.exports = function (question, isYesDefault) {
+export default function (question, isYesDefault) {
   if (typeof isYesDefault !== 'boolean') {
-    throw new Error('Provide explicit boolean isYesDefault as second argument.');
+    throw new Error('Provide explicit boolean isYesDefault as second argument.')
   }
   return new Promise(resolve => {
-    var rlInterface = rl.createInterface({
+    const rlInterface = rl.createInterface({
       input: process.stdin,
       output: process.stdout,
-    });
+    })
 
-    var hint = isYesDefault === true ? '[Y/n]' : '[y/N]';
-    var message = question + ' ' + hint + '\n';
+    const hint = isYesDefault === true ? '[Y/n]' : '[y/N]'
+    const message = question + ' ' + hint + '\n'
 
-    rlInterface.question(message, function(answer) {
-      rlInterface.close();
+    rlInterface.question(message, function (answer) {
+      rlInterface.close()
 
-      var useDefault = answer.trim().length === 0;
+      const useDefault = answer.trim().length === 0
       if (useDefault) {
-        return resolve(isYesDefault);
+        return resolve(isYesDefault)
       }
 
-      var isYes = answer.match(/^(yes|y)$/i);
-      return resolve(isYes);
-    });
-  });
-};
+      const isYes = answer.match(/^(yes|y)$/i)
+      return resolve(isYes)
+    })
+  })
+}

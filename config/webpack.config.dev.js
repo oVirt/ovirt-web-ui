@@ -1,56 +1,102 @@
-const path = require('path')
-const tty = require('tty')
-const util = require('util')
-const webpack = require('webpack')
+import path from 'path'
+import tty from 'tty'
+import util from 'util'
+import webpack from 'webpack'
 
-const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const InlineChunkHtmlPlugin = require('react-dev-utils/InlineChunkHtmlPlugin')
-const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin')
-const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin')
+import CaseSensitivePathsPlugin from 'case-sensitive-paths-webpack-plugin'
+import CopyWebpackPlugin from 'copy-webpack-plugin'
+import ESLintPlugin from 'eslint-webpack-plugin'
+import HtmlWebpackPlugin from 'html-webpack-plugin'
+import ModuleNotFoundPlugin from 'react-dev-utils/ModuleNotFoundPlugin.js'
+import WatchMissingNodeModulesPlugin from 'react-dev-utils/WatchMissingNodeModulesPlugin.js'
+import CleanTerminalPlugin from 'clean-terminal-webpack-plugin'
 
-const postcssPresetEnv = require('postcss-preset-env')
-const paths = require('./paths')
-const env = require('./env')
+import postcssPresetEnv from 'postcss-preset-env'
+import paths from './paths.cjs'
+import env from './env.js'
+import { createRequire } from 'module'
+const require = createRequire(import.meta.url)
 const appPackageJson = require(paths.appPackageJson)
 
 const imageInlineSizeLimit = parseInt(process.env.IMAGE_INLINE_SIZE_LIMIT, 10) || 8192
 
-var publicPath = '/'
-
 // This is the development configuration.
 // It is focused on developer experience and fast rebuilds.
-module.exports = ((webpackEnv) => {
-  const isEnvDevelopment = webpackEnv === 'development'
-  const isEnvProduction = webpackEnv === 'production'
+export default ({
+  userInfo = {},
+  publicPath = '/',
+  browser = 'chromium-browser',
+  engineUrl = 'http://localhost:8080',
+  port = 3000,
+  host = 'localhost',
+  https = false,
+  cleanTerminalMessage = 'Dev server running...',
+} = {}) => {
+  const isClientDefaultAppConfig = publicPath === '/'
+  const isServerDefaultAppConfig = publicPath === '/ovirt-engine/web-ui/'
+
   let fontsToEmbed
 
   const theConfig = {
     mode: 'development',
+    stats: 'minimal',
+    devServer: {
+      host,
+      port,
+      https,
+      historyApiFallback: {
+        index: publicPath,
+      },
+      client: {
+        logging: 'info',
+        progress: true,
+      },
+      hot: true,
+      open: browser !== 'none' && {
+        app: {
+          name: browser,
+        },
+      },
+      proxy: [
+        isClientDefaultAppConfig &&
+        {
+          /*
+            Using client side defaults from src/config.js
+            Note: fetching ovirt-web-ui.config relies on hardcoded path and will fail.
+           */
+          context: ['/auth', '/api', '/services', '/web-ui'],
+          target: engineUrl,
+          changeOrigin: true,
+          secure: false,
+          logLevel: 'debug',
+        },
+        isServerDefaultAppConfig && {
+          /*
+          Assumptions:
+          1. standard ENGINE_URL: host:port/ovirt-engine
+          2. standard ovirt-engine/web-ui/ovirt-web-ui.config
+        {
+          "applicationContext": "/ovirt-engine",
+          "applicationURL": "/ovirt-engine/web-ui", with content:
+          "applicationLogoutURL": "/ovirt-engine/web-ui/sso/logout",
+        }
+        */
+          context: ['/ovirt-engine'],
+          target: engineUrl,
+          changeOrigin: true,
+          secure: false,
+          // remove duplicated "ovirt-engine" section from path
+          pathRewrite: { '^/ovirt-engine': '' },
+          logLevel: 'debug',
+        },
+      ].filter(Boolean),
+    },
     bail: true,
-    devtool: isEnvDevelopment ? 'eval-source-map' : 'source-map',
+    devtool: 'eval-source-map',
 
     // These are the "entry points" to our application.
     // This means they will be the "root" imports that are included in JS bundle.
     entry: [
-      // Include an alternative client for WebpackDevServer. A client's job is to
-      // connect to WebpackDevServer by a socket and get notified about changes.
-      // When you save a file, the client will either apply hot updates (in case
-      // of CSS changes), or refresh the page (in case of JS changes). When you
-      // make a syntax error, this client will display a syntax error overlay.
-      // Note: instead of the default WebpackDevServer client, we use a custom one
-      // to bring better experience for Create React App users. You can replace
-      // the line below with these two lines if you prefer the stock client:
-      require.resolve('webpack-dev-server/client') + '?/',
-      require.resolve('webpack/hot/dev-server'),
-      // When using the experimental react-refresh integration,
-      // the webpack plugin takes care of injecting the dev client for us.
-      // webpackDevClientEntry,
-
-      // Polyfill and app code goes last so the dev server can stay running if
-      // polyfill or app code is broken
-      require.resolve('./polyfills'),
       paths.appIndexJs,
     ],
 
@@ -58,7 +104,7 @@ module.exports = ((webpackEnv) => {
       // Next line is not used in dev but WebpackDevServer crashes without it:
       path: paths.appBuild,
       // Add /* filename */ comments to generated require()s in the output.
-      pathinfo: isEnvDevelopment,
+      pathinfo: true,
       // This does not produce a real file. It's just the virtual path that is
       // served by WebpackDevServer in development. This is the JS bundle
       // containing code from all our entry points, and the Webpack runtime.
@@ -75,14 +121,15 @@ module.exports = ((webpackEnv) => {
     },
 
     optimization: {
+      moduleIds: 'named',
       // Automatically split vendor and commons
       splitChunks: {
         cacheGroups: {
           vendor: {
             name: 'vendor',
             chunks: 'initial',
-            test: /[\\/]node_modules[\\/]/
-          }
+            test: /[\\/]node_modules[\\/]/,
+          },
         },
       },
 
@@ -103,7 +150,7 @@ module.exports = ((webpackEnv) => {
         // Support React Native Web
         // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
         'react-native': 'react-native-web',
-        '_': `${paths.appSrc}`,
+        _: `${paths.appSrc}`,
       },
     },
 
@@ -127,9 +174,9 @@ module.exports = ((webpackEnv) => {
                 options: {
                   babelrc: false,
                   configFile: false,
-                  compact: isEnvProduction,
+                  compact: false,
 
-                  presets: [ './config/babel.app.config.js' ],
+                  presets: ['./config/babel.app.config.cjs'],
 
                   // This is a feature of `babel-loader` for webpack (not Babel itself).
                   // It enables caching results in ./node_modules/.cache/babel-loader/
@@ -157,7 +204,7 @@ module.exports = ((webpackEnv) => {
                   configFile: false,
                   compact: false,
 
-                  presets: [ './config/babel.dep.config.js' ],
+                  presets: ['./config/babel.dep.config.js'],
 
                   cacheDirectory: true,
                   cacheCompression: false,
@@ -189,12 +236,12 @@ module.exports = ((webpackEnv) => {
             {
               test: fontsToEmbed = [
                 /\.woff2(\?v=[0-9].[0-9].[0-9])?$/,
-                /PatternFlyIcons-webfont\.ttf/
+                /PatternFlyIcons-webfont\.ttf/,
               ],
               use: {
                 loader: 'url-loader',
-                options: {}
-              }
+                options: {},
+              },
             },
             {
               test: /\.(ttf|eot|svg|woff(?!2))(\?v=[0-9].[0-9].[0-9])?$/,
@@ -202,9 +249,9 @@ module.exports = ((webpackEnv) => {
               use: {
                 loader: 'file-loader',
                 options: {
-                  name: 'static/fonts/[name].[hash:8].[ext]'
-                }
-              }
+                  name: 'static/fonts/[name].[hash:8].[ext]',
+                },
+              },
             },
 
             // A special case for favicon.ico to place it into build root directory.
@@ -259,7 +306,7 @@ module.exports = ((webpackEnv) => {
                       ],
                     },
                   },
-                }
+                },
               ],
             },
 
@@ -292,7 +339,7 @@ module.exports = ((webpackEnv) => {
                       ],
                     },
                   },
-                }
+                },
               ],
               // Don't consider CSS imports dead code (for tree shaking) even if the
               // containing package claims to have no side effects.
@@ -342,6 +389,7 @@ module.exports = ((webpackEnv) => {
         template: `!!handlebars-loader!${paths.appHtml}`,
         publicPath,
         jspSSO: false,
+        userInfo: JSON.stringify(userInfo),
       }),
 
       // This gives some necessary context to module not found errors, such as the requesting resource.
@@ -351,29 +399,24 @@ module.exports = ((webpackEnv) => {
       // if (process.env.NODE_ENV === 'development') { ... }. See `env.js`.
       new webpack.DefinePlugin(env),
 
-      // Embed the small webpack runtime script in index.html
-      isEnvProduction && new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/runtime-.+[.]js/]),
-
-      // Keep the chunk id stable as long as the contents of the chunks stay the same (i.e. no new modules are used)
-      isEnvProduction && new webpack.HashedModuleIdsPlugin(),
-
-      // This is necessary to emit hot updates (CSS and Fast Refresh):
-      isEnvDevelopment && new webpack.HotModuleReplacementPlugin(),
-
-      // Could do `ReactRefreshWebpackPlugin` here in future to support react-refresh
-
       // Watcher doesn't work well if you mistype casing in a path so we use
       // a plugin that prints an error when you attempt to do this.
-      isEnvDevelopment && new CaseSensitivePathsPlugin(),
+      new CaseSensitivePathsPlugin(),
 
       // If you require a missing module and then `npm install` it, you still have
       // to restart the development server for Webpack to discover it. This plugin
       // makes the discovery automatic so you don't have to restart.
-      isEnvDevelopment && new WatchMissingNodeModulesPlugin(paths.appNodeModules),
+      new WatchMissingNodeModulesPlugin(paths.appNodeModules),
 
-      // Integrate linting to the build and notify of errors but don't fail to run
-      // TODO: Add ESLintPlugin (https://github.com/webpack-contrib/eslint-webpack-plugin)
-    ].filter(Boolean),
+      new CleanTerminalPlugin({
+        message: cleanTerminalMessage,
+        onlyInWatchMode: true,
+        skipFirstRun: true,
+        beforeCompile: true,
+      }),
+
+      new ESLintPlugin(),
+    ],
 
     // Some libraries import Node modules but don't use them in the browser.
     // Tell webpack to provide empty mocks for them so importing them works.
@@ -395,8 +438,8 @@ module.exports = ((webpackEnv) => {
 
   if (process.env.V) {
     const colors = tty.isatty(1)
-    console.log(`${webpackEnv} webpack configuration:`)
+    console.log('Dev webpack configuration:')
     console.log(util.inspect(theConfig, { compact: false, breakLength: 120, depth: null, colors }))
   }
   return theConfig
-})('development')
+}

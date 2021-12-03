@@ -1,23 +1,23 @@
-const path = require('path')
-const tty = require('tty')
-const url = require('url')
-const util = require('util')
-const webpack = require('webpack')
+import path from 'path'
+import tty from 'tty'
+import url from 'url'
+import util from 'util'
+import webpack from 'webpack'
 
-const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const InlineChunkHtmlPlugin = require('react-dev-utils/InlineChunkHtmlPlugin')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin')
-const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin')
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
-const TerserPlugin = require('terser-webpack-plugin')
-const safePostCssParser = require('postcss-safe-parser')
+import CopyWebpackPlugin from 'copy-webpack-plugin'
+import ESLintPlugin from 'eslint-webpack-plugin'
+import HtmlWebpackPlugin from 'html-webpack-plugin'
+import InlineChunkHtmlPlugin from 'react-dev-utils/InlineChunkHtmlPlugin.js'
+import MiniCssExtractPlugin from 'mini-css-extract-plugin'
+import ModuleNotFoundPlugin from 'react-dev-utils/ModuleNotFoundPlugin.js'
+import CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
+import TerserPlugin from 'terser-webpack-plugin'
 
-const postcssPresetEnv = require('postcss-preset-env')
-const paths = require('./paths')
-const env = require('./env')
+import postcssPresetEnv from 'postcss-preset-env'
+import paths from './paths.cjs'
+import env from './env.js'
+import { createRequire } from 'module'
+const require = createRequire(import.meta.url)
 const appPackageJson = require(paths.appPackageJson)
 
 const imageInlineSizeLimit = parseInt(process.env.IMAGE_INLINE_SIZE_LIMIT, 10) || 8192
@@ -28,31 +28,29 @@ const imageInlineSizeLimit = parseInt(process.env.IMAGE_INLINE_SIZE_LIMIT, 10) |
 // single-page apps that may serve index.html for nested URLs like /todos/42.
 // We can't use a relative path in HTML because we don't want to load something
 // like /todos/42/static/js/bundle.7289d.js. We have to know the root.
-var homepagePath = require(paths.appPackageJson).productionHomepage
-console.log('Building with homepagePath: ' + homepagePath)
-var publicPath = homepagePath ? url.parse(homepagePath).pathname : '/'
-if (!publicPath.endsWith('/')) {
-  // If we don't do this, file assets will get incorrect paths.
-  publicPath += '/'
+function getPublicPath () {
+  const homepagePath = appPackageJson.productionHomepage
+  let publicPath = homepagePath ? new url.URL(homepagePath, 'foo:///').pathname : '/'
+  if (!publicPath.endsWith('/')) {
+    // If we don't do this, file assets will get incorrect paths.
+    publicPath += '/'
+  }
+  return publicPath
 }
 
 // This is the production configuration.
 // It compiles slowly and is focused on producing a fast and minimal bundle.
-module.exports = ((webpackEnv) => {
-  const isEnvDevelopment = webpackEnv === 'development'
-  const isEnvProduction = webpackEnv === 'production'
+export default (() => {
   let fontsToEmbed
 
   const theConfig = {
     mode: 'production',
     bail: true,
-    devtool: isEnvDevelopment ? 'eval-source-map' : 'source-map',
+    devtool: 'source-map',
 
     // These are the "entry points" to our application.
     // This means they will be the "root" imports that are included in JS bundle.
     entry: [
-      // In production, we only want to load the polyfills and the app code.
-      require.resolve('./polyfills'),
       paths.appIndexJs,
     ],
 
@@ -60,14 +58,14 @@ module.exports = ((webpackEnv) => {
       // The build folder.
       path: paths.appBuild,
       // Add /* filename */ comments to generated require()s in the output.
-      pathinfo: isEnvDevelopment,
+      pathinfo: false,
       // Generated JS file names (with nested folders).
       // There will be one main bundle, and one file per asynchronous chunk.
       // We don't currently advertise code splitting but Webpack supports it.
       filename: 'static/js/[name].[chunkhash:8].js',
       chunkFilename: 'static/js/[name].[chunkhash:8].chunk.js',
       // We already inferred the "public path"
-      publicPath: publicPath,
+      publicPath: getPublicPath(),
       // Prevents conflicts when multiple webpack runtimes (from different apps)
       // are used on the same page.
       jsonpFunction: `webpackJsonp${appPackageJson.name}`,
@@ -83,8 +81,8 @@ module.exports = ((webpackEnv) => {
           vendor: {
             name: 'vendor',
             chunks: 'initial',
-            test: /[\\/]node_modules[\\/]/
-          }
+            test: /[\\/]node_modules[\\/]/,
+          },
         },
       },
 
@@ -93,7 +91,7 @@ module.exports = ((webpackEnv) => {
         name: entrypoint => `runtime-${entrypoint.name}`,
       },
 
-      minimize: isEnvProduction,
+      minimize: true,
       minimizer: [
         new TerserPlugin({ // minify JS with source maps
           cache: true,
@@ -125,12 +123,7 @@ module.exports = ((webpackEnv) => {
             },
           },
         }),
-        new OptimizeCSSAssetsPlugin({ // minify CSS with source maps
-          cssProcessorOptions: {
-            parser: safePostCssParser,
-            map: { inline: false, annotation: true },
-          }
-        })
+        new CssMinimizerPlugin(),
       ],
     },
 
@@ -145,7 +138,7 @@ module.exports = ((webpackEnv) => {
         // Support React Native Web
         // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
         'react-native': 'react-native-web',
-        '_': `${paths.appSrc}`,
+        _: `${paths.appSrc}`,
       },
     },
 
@@ -169,9 +162,9 @@ module.exports = ((webpackEnv) => {
                 options: {
                   babelrc: false,
                   configFile: false,
-                  compact: isEnvProduction,
+                  compact: true,
 
-                  presets: [ './config/babel.app.config.js' ],
+                  presets: ['./config/babel.app.config.cjs'],
 
                   // This is a feature of `babel-loader` for webpack (not Babel itself).
                   // It enables caching results in ./node_modules/.cache/babel-loader/
@@ -197,7 +190,7 @@ module.exports = ((webpackEnv) => {
                   configFile: false,
                   compact: false,
 
-                  presets: [ './config/babel.dep.config.js' ],
+                  presets: ['./config/babel.dep.config.js'],
 
                   cacheDirectory: true,
                   cacheCompression: false,
@@ -229,12 +222,12 @@ module.exports = ((webpackEnv) => {
             {
               test: fontsToEmbed = [
                 /\.woff2(\?v=[0-9].[0-9].[0-9])?$/,
-                /PatternFlyIcons-webfont\.ttf/
+                /PatternFlyIcons-webfont\.ttf/,
               ],
               use: {
                 loader: 'url-loader',
-                options: {}
-              }
+                options: {},
+              },
             },
             {
               test: /\.(ttf|eot|svg|woff(?!2))(\?v=[0-9].[0-9].[0-9])?$/,
@@ -242,9 +235,9 @@ module.exports = ((webpackEnv) => {
               use: {
                 loader: 'file-loader',
                 options: {
-                  name: 'static/fonts/[name].[hash:8].[ext]'
-                }
-              }
+                  name: 'static/fonts/[name].[hash:8].[ext]',
+                },
+              },
             },
 
             // A special case for favicon.ico to place it into build root directory.
@@ -302,7 +295,7 @@ module.exports = ((webpackEnv) => {
                       ],
                     },
                   },
-                }
+                },
               ],
             },
 
@@ -338,7 +331,7 @@ module.exports = ((webpackEnv) => {
                       ],
                     },
                   },
-                }
+                },
               ],
               // Don't consider CSS imports dead code (for tree shaking) even if the
               // containing package claims to have no side effects.
@@ -386,7 +379,7 @@ module.exports = ((webpackEnv) => {
         filename: 'index.jsp',
         inject: true,
         template: `!!handlebars-loader!${paths.appHtml}`,
-        publicPath,
+        publicPath: getPublicPath(),
         jspSSO: true,
         minify: {
           collapseWhitespace: false,
@@ -405,32 +398,19 @@ module.exports = ((webpackEnv) => {
       new webpack.DefinePlugin(env),
 
       // Embed the small webpack runtime script in index.html
-      isEnvProduction && new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/runtime-.+[.]js/]),
+      new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/runtime-.+[.]js/]),
 
       // Keep the chunk id stable as long as the contents of the chunks stay the same (i.e. no new modules are used)
-      isEnvProduction && new webpack.HashedModuleIdsPlugin(),
+      new webpack.HashedModuleIdsPlugin(),
 
       // Extract CSS to files - style-loader leaves them embedded in the JS bundle
-      isEnvProduction && new MiniCssExtractPlugin({
+      new MiniCssExtractPlugin({
         filename: 'static/css/[name].[contenthash:8].css',
         chunkFilename: 'static/css/[name].[contenthash:8].chunk.css',
       }),
 
-      // This is necessary to emit hot updates (CSS and Fast Refresh):
-      isEnvDevelopment && new webpack.HotModuleReplacementPlugin(),
-
-      // Watcher doesn't work well if you mistype casing in a path so we use
-      // a plugin that prints an error when you attempt to do this.
-      isEnvDevelopment && new CaseSensitivePathsPlugin(),
-
-      // If you require a missing module and then `npm install` it, you still have
-      // to restart the development server for Webpack to discover it. This plugin
-      // makes the discovery automatic so you don't have to restart.
-      isEnvDevelopment && new WatchMissingNodeModulesPlugin(paths.appNodeModules),
-
-      // Fail the build if the app sources have lint errors
-      // TODO: Add ESLintPlugin (https://github.com/webpack-contrib/eslint-webpack-plugin)
-    ].filter(Boolean),
+      new ESLintPlugin(),
+    ],
 
     // Some libraries import Node modules but don't use them in the browser.
     // Tell webpack to provide empty mocks for them so importing them works.
@@ -452,8 +432,8 @@ module.exports = ((webpackEnv) => {
 
   if (process.env.V) {
     const colors = tty.isatty(1)
-    console.log(`${webpackEnv} webpack configuration:`)
+    console.log('Production webpack configuration:')
     console.log(util.inspect(theConfig, { compact: false, breakLength: 120, depth: null, colors }))
   }
   return theConfig
-})('production')
+})()

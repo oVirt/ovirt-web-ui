@@ -209,7 +209,7 @@ export function* mapCpuOptions (version, architecture) {
       config.getIn(['cpuOptions', 'maxNumOfVmCpusPerArch']),
     ])
 
-  const maxNumOfVmCpusPerArch_ = maxNumOfVmCpusPerArch.get(version) || maxNumOfVmCpusPerArch.get(DEFAULT_ENGINE_OPTION_VERSION)
+  const maxNumOfVmCpusPerArch_ = toJS(maxNumOfVmCpusPerArch.get(version) || maxNumOfVmCpusPerArch.get(DEFAULT_ENGINE_OPTION_VERSION))
 
   return {
     maxNumOfSockets: maxNumSockets.get(version) || maxNumSockets.get(DEFAULT_ENGINE_OPTION_VERSION),

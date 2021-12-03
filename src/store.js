@@ -1,8 +1,8 @@
 // @flow
-import { createStore, applyMiddleware, compose, type History, type StoreCreator } from 'redux'
+import { createStore, applyMiddleware, compose, type Store, combineReducers } from 'redux'
 import createSagaMiddleware, { type SagaMiddleware, type Task } from 'redux-saga'
 import { connectRouter, routerMiddleware } from 'connected-react-router'
-import { createBrowserHistory } from 'history'
+import { createBrowserHistory, type History } from 'history'
 
 import AppConfiguration from '_/config'
 import OvirtApi from '_/ovirtapi'
@@ -21,7 +21,7 @@ const composeEnhancers: any =
    })) ||
   compose
 
-function initializeApiTransportListener (store: StoreCreator) {
+function initializeApiTransportListener (store: Store<any, any>) {
   OvirtApi.addHttpListener((requestTracker, eventType) => {
     switch (eventType) {
       case 'START':
@@ -39,20 +39,23 @@ function initializeApiTransportListener (store: StoreCreator) {
  * Configure the app's redux store with saga middleware, connected react-router,
  * and connected to the OvirtApi listeners.
  */
-export default function configureStore (): StoreCreator & { rootTask: Task, history: History } {
-  const sagaMiddleware: SagaMiddleware = createSagaMiddleware({
+export default function configureStore (): Store<any, any> & { rootTask: Task<any>, history: History<> } {
+  const sagaMiddleware: SagaMiddleware<any> = createSagaMiddleware({
     onError (error: Error) {
       console.error('Uncaught saga error (store.js): ', error)
     },
   })
 
   // history to use for the connected react-router
-  const history: History = createBrowserHistory({
+  const history: History<> = createBrowserHistory({
     basename: AppConfiguration.applicationURL,
   })
 
-  const store: StoreCreator = createStore(
-    connectRouter(history)(reducers),
+  const store: Store<any, any> = createStore(
+    combineReducers({
+      router: connectRouter(history),
+      ...reducers,
+    }),
     composeEnhancers(
       applyMiddleware(
         routerMiddleware(history),
@@ -62,7 +65,7 @@ export default function configureStore (): StoreCreator & { rootTask: Task, hist
   )
 
   initializeApiTransportListener(store)
-  const rootTask: Task = sagaMiddleware.run(rootSaga)
+  const rootTask: Task<any> = sagaMiddleware.run(rootSaga)
 
   return {
     ...store,

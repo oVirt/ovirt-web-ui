@@ -1,3 +1,3 @@
-var checkRequiredFiles = require('./utils/checkRequiredFiles');
+import checkRequiredFiles from './utils/checkRequiredFiles.js'
 
-checkRequiredFiles();
+checkRequiredFiles()

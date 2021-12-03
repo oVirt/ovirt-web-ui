@@ -94,7 +94,7 @@ function addLinkElement (id: string, rel: string, href: string) {
   }
 }
 
-function SagaErrorBridge (storeRootTask: Task) {
+function SagaErrorBridge (storeRootTask: Task<any>) {
   let handler = null
 
   this.setErrorHandler = (errorHandler) => {
@@ -107,7 +107,7 @@ function SagaErrorBridge (storeRootTask: Task) {
     }
   }
 
-  storeRootTask.done.catch(err => this.throw(err))
+  storeRootTask.toPromise().catch(err => this.throw(err))
 }
 
 function onResourcesLoaded () {

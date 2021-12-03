@@ -1,17 +1,17 @@
-const babelJest = require('babel-jest')
-const chalk = require('chalk')
+import babelJest from 'babel-jest'
+import chalk from 'chalk'
 
-module.exports = babelJest.createTransformer({
+export default babelJest.default.createTransformer({
   babelrc: false,
   configFile: false,
 
   // This should match the paths.appSrc 'babel-loader' options.preset in webpack.config.dev.js
-  presets: [ './config/babel.app.config.js' ],
+  presets: ['./config/babel.app.config.cjs'],
 
   plugins: [
     // Enable fancy logging that uses chalk to make console output colorful
     [
-      './babel-plugin/fancy-console',
+      './babel-plugin/fancy-console.cjs',
       {
         loggers: [
           {
@@ -27,6 +27,6 @@ module.exports = babelJest.createTransformer({
         ],
       },
     ],
-  ]
+  ],
 
 })

@@ -1,0 +1,11 @@
+{
+    "name": "config_package",
+    "version": "0.0.1",
+    "type": "module",
+    "eslintConfig": {
+        "env": {
+            "node": true
+        },
+        "extends": "./eslint.cjs"
+    }
+}

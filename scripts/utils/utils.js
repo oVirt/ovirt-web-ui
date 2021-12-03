@@ -1,9 +1,9 @@
-var friendlySyntaxErrorLabel = 'Syntax error:';
+const friendlySyntaxErrorLabel = 'Syntax error:'
 
 // Some custom utilities to prettify Webpack output.
 // This is a little hacky.
 // It would be easier if webpack provided a rich error object.
-function formatMessage(message) {
+export function formatMessage (message) {
   return message
     // Make some common errors shorter:
     .replace(
@@ -17,16 +17,11 @@ function formatMessage(message) {
       'Module not found:'
     )
     // Internal stacks are generally useless so we strip them
-    .replace(/^\s*at\s.*:\d+:\d+[\s\)]*\n/gm, '') // at ... ...:x:y
+    .replace(/^\s*at\s.*:\d+:\d+[\s)]*\n/gm, '') // at ... ...:x:y
     // Webpack loader names obscure CSS filenames
-    .replace('./~/css-loader!./~/postcss-loader!', '');
+    .replace('./~/css-loader!./~/postcss-loader!', '')
 }
 
-function isLikelyASyntaxError(message) {
-  return message.indexOf(friendlySyntaxErrorLabel) !== -1;
+export function isLikelyASyntaxError (message) {
+  return message.indexOf(friendlySyntaxErrorLabel) !== -1
 }
-
-module.exports = {
-  formatMessage: formatMessage,
-  isLikelyASyntaxError: isLikelyASyntaxError
-};

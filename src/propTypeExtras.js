@@ -1,6 +1,6 @@
 // @flow
 
-import PropTypes from 'prop-types'
+type ValidatorType = (props: Object, propName: string, componentName: string, ...rest: Array<any>) => Error | null
 
 /**
  * Validate the property by verifying the _xorPropName_ existence matches this prop's
@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
  * Use this to ensure that both properties must be present or missing.
  */
 const xor =
-  (baseValidator: PropTypes.Validator, xorPropName: string) =>
+  (baseValidator: ValidatorType, xorPropName: string): ValidatorType =>
     (props: Object, propName: string, componentName: string, ...rest: Array<any>): Error | null => {
       if ((props[propName] && !props[xorPropName]) || (!props[propName] && props[xorPropName])) {
         return new Error(`Props '${propName}' and '${xorPropName}' are both required for component '${componentName}'`)

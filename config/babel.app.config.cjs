@@ -1,5 +1,6 @@
 const tty = require('tty')
 const util = require('util')
+const paths = require('./paths.cjs')
 
 /*
  * The preset for ovirt-web-ui is based on the `babel-preset-react-app` package. We
@@ -11,11 +12,11 @@ const util = require('util')
 module.exports = function (api, opts = {}) {
   api.cache(true)
 
-  const env = process.env.BABEL_ENV || process.env.NODE_ENV;
+  const env = process.env.BABEL_ENV || process.env.NODE_ENV
   const verbose = process.env.V === '1'
-  const isEnvDevelopment = env === 'development';
-  const isEnvProduction = env === 'production';
-  const isEnvTest = env === 'test'; // for jest running tests on nodejs
+  const isEnvDevelopment = env === 'development'
+  const isEnvProduction = env === 'production'
+  const isEnvTest = env === 'test' // for jest running tests on nodejs
 
   const babelConfig = {
     presets: [
@@ -29,10 +30,10 @@ module.exports = function (api, opts = {}) {
       (isEnvDevelopment || isEnvProduction) && [
         '@babel/preset-env',
         {
-          debug: isEnvDevelopment || verbose,
+          debug: verbose,
           useBuiltIns: 'usage',
           corejs: '3.13',
-          exclude: [ 'transform-typeof-symbol' ],
+          exclude: ['transform-typeof-symbol'],
         },
       ],
 
@@ -76,7 +77,9 @@ module.exports = function (api, opts = {}) {
       //   },
       // ],
 
-      isEnvDevelopment && './babel-plugin/fancy-console',
+      // eslint-web-plugin loads this config from a different relative path
+      // than regular build script. Resolved path works for both cases.
+      isEnvDevelopment && paths.appFancyConsole,
 
     ].filter(Boolean),
 

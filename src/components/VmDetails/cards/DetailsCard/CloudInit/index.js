@@ -9,11 +9,13 @@ import SysprepForm from './SysprepForm'
 const CloudInit = ({ idPrefix, vm, isWindows, onChange, lastInitTimezone }) => {
   const { msg } = useContext(MsgContext)
   const cloudInitEnabled = vm.getIn(['cloudInit', 'enabled'])
+  const label = isWindows ? msg.sysprep() : msg.cloudInit()
   return (
     <>
-      <FieldRow label={isWindows ? msg.sysprep() : msg.cloudInit()} id={`${idPrefix}-cloud-init`}>
+      <FieldRow label={label} id={`${idPrefix}-cloud-init`}>
         <Switch
           id={`${idPrefix}-cloud-init-edit`}
+          aria-label={label}
           isChecked={cloudInitEnabled}
           onChange={state => onChange('cloudInitEnabled', state)}
         />

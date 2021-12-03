@@ -162,7 +162,7 @@ function* saveRemoteOption ([name, value]: any): any | ResultType {
   })
 }
 
-function* saveLocale ([localePropName, submittedLocale]: any, persistLocale: boolean): any | ResultType {
+function* saveLocale ([localePropName, submittedLocale]: any, persistLocale: ?boolean): any | ResultType {
   const currentPersistLocale = yield select(state => state.options.getIn(['remoteOptions', 'persistLocale', 'content']))
   const enableLocaleChange = persistLocale || (persistLocale === undefined && currentPersistLocale)
 
@@ -314,11 +314,11 @@ export function* loadUserOptions ({ isLogin = false }: any = {}): any {
   yield put(A.fetchUserOptions({ userId, isLogin }))
 }
 
-export default [
+export default ([
   takeLatest(C.SAVE_SSH_KEY, saveSSHKey),
   takeLatest(C.SAVE_GLOBAL_OPTIONS, saveGlobalOptions),
   takeLatest(C.GET_SSH_KEY, fetchSSHKey),
   takeLatest(C.FETCH_OPTIONS, fetchUserOptions),
   takeLatest(C.EXPORT_LOCALE, exportInferredLocale),
   takeEvery(C.DELETE_USER_OPTION, deleteRemoteUserOption),
-]
+]: Array<any>)

@@ -247,6 +247,7 @@ class GlobalSettings extends Component {
             body: (
               <Switch
                 id={`${idPrefix}-${name}`}
+                aria-label={msg.dontDisturb()}
                 isChecked={!draftValues[name]}
                 onChange={(dontDisturb) => {
                   onChange(name)(!dontDisturb)
@@ -329,6 +330,7 @@ class GlobalSettings extends Component {
                 body: (
                   <Switch
                     id={`${idPrefix}-${name}`}
+                    aria-label={msg.fullScreenMode()}
                     isChecked={draftValues[name]}
                     onChange={(fullScreen) => {
                       onChange(name)(fullScreen)
@@ -343,7 +345,7 @@ class GlobalSettings extends Component {
                 body: (
                   <Switch
                     id={`${idPrefix}-${name}`}
-
+                    aria-label={msg.ctrlAltEnd()}
                     isChecked={draftValues[name]}
                     onChange={(ctrlAltEnd) => {
                       onChange(name)(ctrlAltEnd)
@@ -362,6 +364,7 @@ class GlobalSettings extends Component {
                 body: (
                   <Switch
                     id={`${idPrefix}-${name}`}
+                    aria-label={msg.fullScreenMode()}
                     isChecked={draftValues[name]}
                     onChange={(fullScreen) => {
                       onChange(name)(fullScreen)
@@ -380,6 +383,7 @@ class GlobalSettings extends Component {
                 body: (
                   <Switch
                     id={`${idPrefix}-${name}`}
+                    aria-label={msg.fullScreenMode()}
                     isChecked={draftValues[name]}
                     onChange={(fullScreen) => {
                       onChange(name)(fullScreen)
@@ -394,6 +398,7 @@ class GlobalSettings extends Component {
                 body: (
                   <Switch
                     id={`${idPrefix}-${name}`}
+                    aria-label={msg.ctrlAltEnd()}
                     isChecked={draftValues[name]}
                     onChange={(ctrlAltEnd) => {
                       onChange(name)(ctrlAltEnd)
@@ -408,6 +413,7 @@ class GlobalSettings extends Component {
                 body: (
                   <Switch
                     id={`${idPrefix}-${name}`}
+                    aria-label={msg.smartcard()}
                     isChecked={draftValues[name]}
                     onChange={(smartcard) => {
                       onChange(name)(smartcard)
@@ -450,6 +456,7 @@ class GlobalSettings extends Component {
             tooltip: msg.persistLanguageTooltip(),
             body: (<Switch
               id={`${idPrefix}-${name}`}
+              aria-label={msg.persistLanguage()}
               isChecked={draftValues[name]}
               onChange={(persist) => onChange(name)(persist)}
             />),

@@ -3,7 +3,7 @@ import * as C from '_/constants/console'
 import { toJS, isWindows } from '_/helpers'
 import type { UiConsoleType } from '_/ovirtapi/types'
 
-export function idFromType ({ vm, consoleType }: {vm: any, consoleType: UiConsoleType}) {
+export function idFromType ({ vm, consoleType }: {vm: any, consoleType: UiConsoleType}): ?string {
   // consoleId can be retrieved based on consoleType but not the opposite
   const {
     [C.VNC]: vncId,
@@ -23,9 +23,9 @@ export function idFromType ({ vm, consoleType }: {vm: any, consoleType: UiConsol
   }
 }
 
-export const toUiConsole = (vncMode: typeof C.NO_VNC | typeof C.NATIVE, protocol: typeof C.VNC | typeof C.SPICE) => {
-  if (protocol !== C.VNC) {
-    return protocol
+export const toUiConsole = (vncMode: typeof C.NO_VNC | typeof C.NATIVE, protocol: typeof C.VNC | typeof C.SPICE): UiConsoleType => {
+  if (protocol === C.SPICE) {
+    return C.SPICE
   }
   return vncMode === C.NATIVE ? C.NATIVE_VNC : C.BROWSER_VNC
 }

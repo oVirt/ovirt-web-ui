@@ -26,7 +26,7 @@ function buildBaseLocale (): {[string]: string} {
   }
 }
 
-export const localeWithFullName = buildBaseLocale()
+export const localeWithFullName: {[string]: string} = buildBaseLocale()
 export const BASE_LOCALE_SET: Set<string> = new Set(Object.keys(localeWithFullName))
 
 /**
@@ -59,12 +59,12 @@ function getMessageForLocale (id: MessageIdType, targetLocale: string): ?string 
   return null
 }
 
-const messageFormatCache: {[MessageIdType]: IntlMessageFormat} = {}
+const messageFormatCache: {[MessageIdType]: typeof IntlMessageFormat} = {}
 
 function formatMessage (id: MessageIdType, values: ?Object, targetLocale: string): string {
   let messageFormat = messageFormatCache[id]
   if (!messageFormat) {
-    messageFormat = new IntlMessageFormat(getMessage(id, targetLocale), targetLocale)
+    messageFormat = new IntlMessageFormat(getMessage(id, targetLocale), targetLocale, {}, { ignoreTag: true })
     messageFormatCache[id] = messageFormat
   }
   return messageFormat.format(values)
