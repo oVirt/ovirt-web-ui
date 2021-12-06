@@ -203,32 +203,31 @@ export function* fetchSingleVm (action) {
 
   action.payload.additional = shallowFetch ? VM_FETCH_ADDITIONAL_SHALLOW : VM_FETCH_ADDITIONAL_DEEP
   const vm = yield callExternalAction(Api.getVm, action, true)
-  const error = vm.error ? vm.error.status ?? 'fetch-error' : null
-
-  let internalVm = null
-  if (vm?.id) {
-    internalVm = yield transformAndPermitVm(vm)
-
-    // If the VM is running, we want to display the current=true cdrom info. Due
-    // to an API restriction, current=true cdrom info cannot currently (Aug-2018)
-    // be accessed via the additional fetch list on the VM. Fetch it directly.
-    if (!shallowFetch && internalVm.status === 'up') {
-      internalVm.cdrom = yield fetchVmCdRom({ vmId: internalVm.id, current: true })
-    }
-
-    if (!shallowFetch) {
-      yield parallelFetchAndPopulateSnapshotDisksAndNics(internalVm.id, internalVm.snapshots)
-    }
+  if (vm?.error) {
+    return { vmId, error: vm.error }
   }
 
-  return { vmId, internalVm, error }
+  const internalVm = yield transformAndPermitVm(vm)
+
+  // If the VM is running, we want to display the current=true cdrom info. Due
+  // to an API restriction, current=true cdrom info cannot currently (Aug-2018)
+  // be accessed via the additional fetch list on the VM. Fetch it directly.
+  if (!shallowFetch && internalVm.status === 'up') {
+    internalVm.cdrom = yield fetchVmCdRom({ vmId: internalVm.id, current: true })
+  }
+
+  if (!shallowFetch) {
+    yield parallelFetchAndPopulateSnapshotDisksAndNics(internalVm.id, internalVm.snapshots)
+  }
+
+  return { vmId, internalVm }
 }
 
 export function* fetchAndPutSingleVm (action) {
   const { internalVm, error } = yield fetchSingleVm(action)
 
   if (error) {
-    if (error === 404) {
+    if (error?.status === 404) {
       yield put(updateVms({ removeVmIds: [action.payload.vmId] }))
     }
   } else {
@@ -258,18 +257,20 @@ function* fetchAndPutPools (action) {
 
 export function* fetchSinglePool (action) {
   const pool = yield callExternalAction(Api.getPool, action, true)
+  if (pool?.error) {
+    return { poolId: action.payload.poolId, error: pool.error }
+  }
 
-  const internalPool = pool.id ? Transforms.Pool.toInternal({ pool }) : null
-  const error = pool.error ? pool.error.status ?? 'fetch-error' : null
+  const internalPool = Transforms.Pool.toInternal({ pool })
 
-  return { poolId: action.payload.poolId, internalPool, error }
+  return { poolId: action.payload.poolId, internalPool }
 }
 
 function* fetchAndPutSinglePool (action) {
   const { internalPool, error } = yield fetchSinglePool(action)
 
   if (error) {
-    if (error === 404) {
+    if (error?.status === 404) {
       yield put(updateVms({ removePoolIds: [action.payload.poolId] }))
     }
   } else {

@@ -138,6 +138,30 @@ function* refreshListPage () {
     return
   }
 
+  const filterAndFetchMissing = function* ({ expected, existingIds, fetchForId, mapResult, mapId }) {
+    // if any existing VMs/pools are not in expectedVms, fetch them individually
+    // however if main query failed (expectedVms == null) then it makes no sense
+    // to fetch vms one-by-one
+    const expectedIds = new Set(expected ? expected.map(({ id }) => id) : [])
+    const unexpected = expected
+      ? yield all(
+        existingIds
+          .filter(id => !expectedIds.has(id))
+          .map(fetchForId)
+      )
+      : []
+
+    return {
+      refreshed: [
+        ...(expected || []),
+        ...unexpected.filter(result => !result.error).map(mapResult),
+      ],
+      // remove VM/pool only if the server reported 404 otherwise a temporary network error
+      // causes VM/pool to disappear from the dashboard
+      missedIds: unexpected.filter(({ error, poolId, vmId }) => error?.status === 404).map(mapId),
+    }
+  }
+
   const [vmsResults, poolsResults] = yield all([
     call(function* () {
       // fetch the VMs we are expecting to be in the pages we have fetched
@@ -145,21 +169,13 @@ function* refreshListPage () {
         count: vmsPage * AppConfiguration.pageLimit,
       }))
 
-      // if any existing VMs are not in expectedVms, fetch them individually
-      const expectedVmIds = new Set(expectedVms ? expectedVms.map(vm => vm.id) : [])
-      const unexpectedVms = yield all(
-        existingVmIds
-          .filter(vmId => !expectedVmIds.has(vmId))
-          .map(vmId => call(fetchSingleVm, Actions.getSingleVm({ vmId, shallowFetch: true })))
-      )
-
-      return {
-        refreshedVms: [
-          ...(expectedVms || []),
-          ...unexpectedVms.filter(result => !result.error).map(result => result.internalVm),
-        ],
-        missedVmIds: unexpectedVms.filter(result => result.error).map(result => result.vmId),
-      }
+      return yield filterAndFetchMissing({
+        expected: expectedVms,
+        existingIds: existingVmIds,
+        fetchForId: vmId => call(fetchSingleVm, Actions.getSingleVm({ vmId, shallowFetch: true })),
+        mapResult: result => result.internalVm,
+        mapId: result => result.vmId,
+      })
     }),
 
     call(function* () {
@@ -168,34 +184,26 @@ function* refreshListPage () {
         count: poolsPage * AppConfiguration.pageLimit,
       }))
 
-      // if any existing VMs are not in expectedVms, fetch them individually
-      const expectedPoolIds = new Set(expectedPools ? expectedPools.map(pool => pool.id) : [])
-      const unexpectedPools = yield all(
-        existingPoolIds
-          .filter(poolId => !expectedPoolIds.has(poolId))
-          .map(poolId => call(fetchSinglePool, Actions.getSinglePool({ poolId })))
-      )
-
-      return {
-        refreshedPools: [
-          ...(expectedPools || []),
-          ...unexpectedPools.filter(result => !result.error).map(result => result.internalPool),
-        ],
-        missedPoolIds: unexpectedPools.filter(result => result.error).map(result => result.poolId),
-      }
+      return yield filterAndFetchMissing({
+        expected: expectedPools,
+        existingIds: existingPoolIds,
+        fetchForId: poolId => call(fetchSinglePool, Actions.getSinglePool({ poolId })),
+        mapResult: result => result.internalPool,
+        mapId: result => result.poolId,
+      })
     }),
   ])
 
   // Put the refreshed VMs and pools to the store
   yield put(Actions.updateVms({
     keepSubResources: true,
-    vms: vmsResults.refreshedVms,
-    removeVmIds: vmsResults.missedVmIds,
+    vms: vmsResults.refreshed,
+    removeVmIds: vmsResults.missedIds,
 
-    pools: poolsResults.refreshedPools,
-    removePoolIds: poolsResults.missedPoolIds,
+    pools: poolsResults.refreshed,
+    removePoolIds: poolsResults.missedIds,
   }))
-  yield fetchUnknownIcons({ vms: vmsResults.refreshedVms })
+  yield fetchUnknownIcons({ vms: vmsResults.refreshed })
 }
 
 function* refreshDetailPage ({ id: vmId, manualRefresh }) {

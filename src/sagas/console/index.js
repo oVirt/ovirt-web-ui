@@ -294,7 +294,7 @@ function* autoconnect () {
   }
 
   const { internalVm: vm, error } = yield call(fetchAndPutSingleVm, Actions.getSingleVm({ vmId, shallowFetch: true }))
-  if (error === 404) {
+  if (error?.status === 404) {
     yield put(Actions.deleteUserOption({ optionId, userId }))
     yield put(Actions.addUserMessage({ messageDescriptor: { id: 'clearAutoconnectVmNotAvailable' }, type: 'INFO' }))
     return
