@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Wizard, Button, Icon } from 'patternfly-react'
+import { Wizard } from '@patternfly/react-core'
 import produce from 'immer'
 import { List } from 'immutable'
 
@@ -17,12 +17,17 @@ import BasicSettings from './steps/BasicSettings'
 import Networking from './steps/Networking'
 import Storage from './steps/Storage'
 import SummaryReview from './steps/SummaryReview'
+import FinishedStep from './steps/FinishedStep'
 
 const DEFAULT_STATE = {
   activeStepIndex: 0,
+  // each time the wizard is opened it should have new key prop
+  // this forces component re-creation which clears internal state
+  wizardKey: 1,
 
   steps: {
     basic: {
+      name: '',
       operatingSystemId: '0', // "Other OS"
       memory: 1024, // MiB
       cpus: 1,
@@ -181,22 +186,18 @@ class CreateVmWizard extends React.Component {
     this.handleBasicOnExit = this.handleBasicOnExit.bind(this)
     this.handleListOnUpdate = this.handleListOnUpdate.bind(this)
     this.handleCreateVm = this.handleCreateVm.bind(this)
-    this.wizardAllowGoToStepFromActiveStep = this.wizardAllowGoToStepFromActiveStep.bind(this)
-    this.wizardAllowClickBack = this.wizardAllowClickBack.bind(this)
-    this.wizardAllowClickNext = this.wizardAllowClickNext.bind(this)
-    this.wizardGoToStep = this.wizardGoToStep.bind(this)
-    this.wizardClickBack = this.wizardClickBack.bind(this)
-    this.wizardClickNext = this.wizardClickNext.bind(this)
     this.hideCloseWizardDialog = this.hideCloseWizardDialog.bind(this)
     this.showCloseWizardDialog = this.showCloseWizardDialog.bind(this)
-    const { msg } = this.props
+    this.createSteps = this.createSteps.bind(this)
+  }
 
-    this.wizardSteps = [
+  createSteps (msg, vmCreateStarted) {
+    return [
       {
         id: 'basic',
-        title: msg.createVmWizardStepTitleBasic(),
+        name: msg.createVmWizardStepTitleBasic(),
 
-        render: (activeStepIndex, title) => (
+        component: (
           <BasicSettings
             id='create-vm-wizard-basic'
             data={this.state.steps.basic}
@@ -210,14 +211,17 @@ class CreateVmWizard extends React.Component {
             }}
           />
         ),
+        hideBackButton: true,
+        enableNext: this.state.stepNavigation.basic.valid,
         onExit: this.handleBasicOnExit,
+        canJumpTo: true,
       },
 
       {
         id: 'network',
-        title: msg.createVmWizardStepTitleNetwork(),
+        name: msg.createVmWizardStepTitleNetwork(),
 
-        render: () => (
+        component: (
           <Networking
             id='create-vm-wizards-net'
             dataCenterId={this.state.steps.basic.dataCenterId}
@@ -232,13 +236,15 @@ class CreateVmWizard extends React.Component {
             }}
           />
         ),
+        enableNext: this.state.stepNavigation.network.valid,
+        canJumpTo: this.state.stepNavigation.basic.valid,
       },
 
       {
         id: 'storage',
-        title: msg.createVmWizardStepTitleStorage(),
+        name: msg.createVmWizardStepTitleStorage(),
 
-        render: () => (
+        component: (
           <Storage
             id='create-vm-wizards-storage'
             vmName={this.state.steps.basic.name}
@@ -255,13 +261,31 @@ class CreateVmWizard extends React.Component {
             }}
           />
         ),
+        enableNext: this.state.stepNavigation.storage.valid,
+        canJumpTo: this.state.stepNavigation.basic.valid && this.state.stepNavigation.network.valid,
       },
-
       {
         id: 'review',
-        title: msg.createVmWizardStepTitleReview(),
+        name: msg.createVmWizardStepTitleReview(),
 
-        render: () => {
+        component: (
+          <SummaryReview
+            id='create-vm-wizard-review'
+            basic={this.state.steps.basic}
+            network={this.state.steps.network.nics}
+            storage={this.state.steps.storage.disks}
+          />
+        ),
+        onExit: () => this.handleCreateVm(),
+        enableNext: true,
+        canJumpTo: this.state.stepNavigation.basic.valid && this.state.stepNavigation.network.valid && this.state.stepNavigation.storage.valid,
+        nextButtonText: msg.createVmWizardButtonCreate(),
+
+      },
+      {
+        id: 'finish',
+        name: 'Finished',
+        component: (() => {
           const { correlationId } = this.state
           const inProgress = correlationId !== null && !this.props.actionResults.has(correlationId)
 
@@ -281,11 +305,9 @@ class CreateVmWizard extends React.Component {
               .toJS()
 
           return (
-            <SummaryReview
-              id='create-vm-wizard-review'
-              basic={this.state.steps.basic}
-              network={this.state.steps.network.nics}
-              storage={this.state.steps.storage.disks}
+            <FinishedStep
+              hideAndNavigate={this.hideAndNavigate}
+              hideAndResetState={this.hideAndResetState}
               progress={{
                 inProgress,
                 result: correlatedResult, // undefined (no result yet) | 'success' | 'error'
@@ -293,10 +315,8 @@ class CreateVmWizard extends React.Component {
               }}
             />
           )
-        },
-        onExit: () => {
-          this.setState(produce(draft => { draft.correlationId = null }))
-        },
+        })(),
+        isFinishedStep: true,
       },
     ]
   }
@@ -315,7 +335,10 @@ class CreateVmWizard extends React.Component {
   }
 
   hideAndResetState () {
-    this.setState(getInitialState(this.props))
+    this.setState({
+      ...getInitialState(this.props),
+      wizardKey: this.state.wizardKey + 1,
+    })
     this.props.onHide()
   }
 
@@ -424,8 +447,22 @@ class CreateVmWizard extends React.Component {
                     isFromTemplate: true,
                   }
                 })
+                .map(disk =>
+                  // all template disks with invalid storage domain
+                  // need to moved to edit mode
+                  disk.canUserUseStorageDomain
+                    ? disk
+                    : {
+                      ...disk,
+                      underConstruction: {
+                        ...disk,
+                        storageDomainId: '_',
+                      },
+                    })
                 .toJS(),
           }
+
+          draft.stepNavigation.storage.valid = !draft.steps.storage.disks.find(({ underConstruction }) => underConstruction)
         }
       }))
     }
@@ -469,126 +506,33 @@ class CreateVmWizard extends React.Component {
     this.props.onCreate(basic, nics, disks, correlationId)
   }
 
-  wizardAllowGoToStepFromActiveStep (newStepIndex) {
-    if (newStepIndex < 0 || newStepIndex >= this.wizardSteps.length) {
-      return false
-    }
-
-    const { activeStepIndex, stepNavigation } = this.state
-    const newStep = this.wizardSteps[newStepIndex]
-
-    // Direction >0 is forward, <0 is backward
-    //   Forward ok if ... can enter the new step and each step between active and new is valid
-    //   Backward ok if ... can enter the new step
-    const direction = newStepIndex - activeStepIndex
-    if (direction > 0) {
-      return !stepNavigation[newStep.id].preventEnter &&
-        this.wizardSteps.slice(activeStepIndex, newStepIndex).every(step => stepNavigation[step.id].valid)
-    } else if (direction < 0) {
-      return !stepNavigation[newStep.id].preventEnter
-    }
-
-    return false
-  }
-
-  wizardAllowClickBack () {
-    return this.wizardAllowGoToStepFromActiveStep(Math.max(this.state.activeStepIndex - 1, 0))
-  }
-
-  wizardAllowClickNext () {
-    return this.wizardAllowGoToStepFromActiveStep(Math.min(this.state.activeStepIndex + 1, this.wizardSteps.length - 1))
-  }
-
-  wizardGoToStep (newStepIndex) {
-    const { activeStepIndex } = this.state
-    const activeStep = this.wizardSteps[activeStepIndex]
-
-    // make sure we can leave the current step and enter the new step
-    if (!this.wizardAllowGoToStepFromActiveStep(newStepIndex)) {
-      return
-    }
-
-    // run and the current step's `onExit()`
-    if (activeStep.onExit) {
-      activeStep.onExit()
-    }
-
-    this.setState(produce(draft => { draft.activeStepIndex = newStepIndex }))
-  }
-
-  wizardClickBack () {
-    this.wizardGoToStep(Math.max(this.state.activeStepIndex - 1, 0))
-  }
-
-  wizardClickNext () {
-    this.wizardGoToStep(Math.min(this.state.activeStepIndex + 1, this.wizardSteps.length - 1))
-  }
-
   render () {
-    const { msg } = this.props
-    const { activeStepIndex, correlationId, showCloseWizardDialog } = this.state
-    const vmCreateWorking = correlationId !== null && !this.props.actionResults.has(correlationId)
-    const vmCreateStarted = correlationId !== null && !!this.props.actionResults.get(correlationId)
+    const { msg, show, actionResults } = this.props
+    const { correlationId, showCloseWizardDialog, wizardKey } = this.state
+    const vmCreateStarted = correlationId !== null && !!actionResults?.get(correlationId)
 
-    const isReviewStep = this.wizardSteps[activeStepIndex].id === 'review'
-    const isPrimaryNext = !isReviewStep
-    const isPrimaryCreate = isReviewStep && !vmCreateStarted
-    const isPrimaryClose = isReviewStep && vmCreateStarted
+    const wizardSteps = this.createSteps(msg, vmCreateStarted)
 
-    const enableGoBack = activeStepIndex > 0 && !isPrimaryClose && this.wizardAllowClickBack()
-    const enableGoForward = (isReviewStep && !vmCreateWorking) || this.wizardAllowClickNext()
+    const onMove = ({ id: newStepId }, { prevId: oldStepId }) => {
+      const oldStep = wizardSteps.find(({ id }) => id === oldStepId)
+      oldStep?.onExit?.()
+    }
 
     return (
       <>
         {!showCloseWizardDialog && (
           <Wizard
-            dialogClassName='modal-lg wizard-pf'
-            show={this.props.show}
-          >
-            <Wizard.Header onClose={this.showCloseWizardDialog} title={msg.addNewVm()} />
-            <Wizard.Body>
-              <Wizard.Pattern.Body
-                steps={this.wizardSteps}
-                activeStepIndex={activeStepIndex}
-                activeStepStr={(activeStepIndex + 1).toString()}
-                goToStep={this.wizardGoToStep}
-              />
-            </Wizard.Body>
-            <Wizard.Footer>
-              <Button bsStyle='default' onClick={this.showCloseWizardDialog}>
-                { msg.createVmWizardButtonCancel() }
-              </Button>
-              <Button
-                bsStyle='default'
-                onClick={this.wizardClickBack}
-                disabled={!enableGoBack}
-              >
-                <Icon type='fa' name='angle-left' />
-                { msg.createVmWizardButtonBack() }
-              </Button>
-              { isPrimaryClose && (
-                <Button onClick={this.hideAndResetState}>
-                  { msg.createVmWizardButtonClose() }
-                </Button>
-              )}
-              <Button
-                bsStyle='primary'
-                onClick={
-                  isPrimaryNext
-                    ? this.wizardClickNext
-                    : isPrimaryCreate
-                      ? this.handleCreateVm
-                      : this.hideAndNavigate
-                }
-                disabled={!enableGoForward}
-              >
-                { isPrimaryNext && msg.createVmWizardButtonNext() }
-                { isPrimaryCreate && msg.createVmWizardButtonCreate() }
-                { isPrimaryClose && msg.createVmWizardButtonCloseAndNavigate() }
-                <Icon type='fa' name='angle-right' />
-              </Button>
-            </Wizard.Footer>
-          </Wizard>
+            key={wizardKey}
+            isOpen={show}
+            title={msg.addNewVm()}
+            onClose={this.showCloseWizardDialog}
+            steps={wizardSteps}
+            cancelButtonText={msg.createVmWizardButtonCancel()}
+            backButtonText={msg.createVmWizardButtonBack()}
+            nextButtonText={ msg.createVmWizardButtonNext()}
+            onNext={onMove}
+            onGoToStep={onMove}
+          />
         )
       }
         <NavigationConfirmationModal

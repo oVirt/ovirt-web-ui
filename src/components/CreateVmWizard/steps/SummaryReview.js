@@ -1,8 +1,7 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Icon, Spinner, Label } from 'patternfly-react'
-import { Alert } from '@patternfly/react-core'
+import { Label } from '@patternfly/react-core'
 import { InfoCircleIcon } from '@patternfly/react-icons'
 
 import { MsgContext, enumMsg } from '_/intl'
@@ -13,8 +12,8 @@ import { sortNicsDisks } from '_/components/utils'
 
 import { BASIC_DATA_SHAPE, NIC_SHAPE, STORAGE_SHAPE } from '../dataPropTypes'
 import { optimizedForMap } from './BasicSettings'
-import { NicNameWithLabels } from './Networking'
-import { DiskNameWithLabels } from './Storage'
+import NicNameWithLabels from './NicNameWithLabels'
+import DiskNameWithLabels from './DiskNameWithLabels'
 import style from './style.css'
 import { EMPTY_VNIC_PROFILE_ID } from '_/constants'
 
@@ -56,7 +55,7 @@ const ReviewBasic = ({ id, dataCenters, clusters, isos, templates, operatingSyst
           <Item id={`${id}-template`} label={msg.template()}>
             { templateNameRenderer(templates.get(basic.templateId)) }
             { basic.templateClone &&
-              <Label id={`${id}-template-clone`} bsStyle='info'>clone</Label>
+              <Label id={`${id}-template-clone`} color="blue">clone</Label>
           }
           </Item>
         </>
@@ -244,7 +243,6 @@ const SummaryReview = ({
   id: propsId,
   network,
   storage,
-  progress = { inProgress: false },
   dataCenters,
   clusters,
   templates,
@@ -254,7 +252,7 @@ const SummaryReview = ({
   vnicProfiles,
   storageDomains,
 }) => {
-  const { msg, locale } = useContext(MsgContext)
+  const { locale } = useContext(MsgContext)
   const id = propsId ? `${propsId}-review` : 'create-vm-wizard-review'
 
   const disksList = sortNicsDisks([...storage], locale) // Sort the template based ones first, then by name
@@ -262,67 +260,6 @@ const SummaryReview = ({
 
   return (
     <div className={style['review-content']}>
-      { (!progress.inProgress && !progress.result) && (
-        <div id={`${id}-progress-review-and-confirm`} className={style['review-progress']}>
-          <div className={style['review-icon-container']}>
-            <Icon className={style['review-icon']} type='pf' name='virtual-machine' />
-          </div>
-          <div className={style['review-text']}>
-            {msg.createVmWizardReviewConfirm()}
-          </div>
-        </div>
-      )}
-      { progress.inProgress && (
-        <div id={`${id}-progress-in-progress`} className={style['review-progress']}>
-          <div className={style['review-icon-container']}>
-            <Spinner className={style['review-spinner']} loading size='lg' />
-          </div>
-          <div className={style['review-text']}>
-            {msg.createVmWizardReviewInProgress()}
-          </div>
-        </div>
-      )}
-      { progress.result === 'success' && (
-        <div id={`${id}-progress-success`} className={style['review-progress']}>
-          <div className={style['review-icon-container']}>
-            <Icon className={style['review-icon']} type='pf' name='ok' />
-          </div>
-          <div className={style['review-text']}>
-            {msg.createVmWizardReviewSuccess()}
-          </div>
-          { progress.messages && progress.messages.length > 0 && (
-            <Alert variant='success' isInline title={msg.messages()}>{
-                progress.messages.map((message, index) => (
-                  <div key={`message-${index}`}>
-                    { message }
-                  </div>
-                ))
-              }
-            </Alert>
-          )}
-        </div>
-      )}
-      { progress.result === 'error' && (
-        <div id={`${id}-progress-error`} className={style['review-progress']}>
-          <div className={style['review-icon-container']}>
-            <Icon className={style['review-icon']} type='pf' name='error-circle-o' />
-          </div>
-          <div className={style['review-text']}>
-            {msg.createVmWizardReviewError()}
-          </div>
-          { progress.messages && progress.messages.length > 0 && (
-            <Alert variant='danger' isInline title={msg.messages()}>{
-                progress.messages.map((message, index) => (
-                  <div key={`message-${index}`}>
-                    { message }
-                  </div>
-                ))
-              }
-            </Alert>
-          )}
-        </div>
-      )}
-
       <Grid>
         <Row>
           <Col>
@@ -364,12 +301,6 @@ SummaryReview.propTypes = {
   basic: PropTypes.shape(BASIC_DATA_SHAPE).isRequired,
   network: PropTypes.arrayOf(PropTypes.shape(NIC_SHAPE)).isRequired,
   storage: PropTypes.arrayOf(PropTypes.shape(STORAGE_SHAPE)).isRequired,
-
-  progress: PropTypes.shape({
-    inProgress: PropTypes.bool.isRequired,
-    result: PropTypes.oneOf(['success', 'error']),
-    messages: PropTypes.arrayOf(PropTypes.string),
-  }),
 
   clusters: PropTypes.object,
   dataCenters: PropTypes.object,

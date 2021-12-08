@@ -5,13 +5,12 @@ import { sortedBy } from '_/helpers'
 import { withMsg } from '_/intl'
 import { Select, SelectOption, SelectVariant } from '@patternfly/react-core'
 
-const SelectBox = ({ msg, sort, items = [], locale, selected, onChange, validationState, id, disabled }) => {
+const SelectBox = ({ msg, sort, items = [], locale, selected: selectedId, onChange, validationState, id, disabled, placeholderText, width }) => {
   const [open, setOpen] = useState(false)
   if (sort) {
     sortedBy(items, 'value', locale)
   }
-  const options = items.map(({ id, value: name, isDefault }) => ({ id, name, isDefault, toString: () => name }))
-  const selectedId = selected ?? items?.[0]?.id ?? null
+  const options = items.map(({ value, ...rest }) => ({ value, ...rest, toString: () => value }))
   const selectedOption = options.find(option => option.id === selectedId)
 
   const onSelect = (event, { id = '' } = {}, isPlaceholder) => {
@@ -23,6 +22,7 @@ const SelectBox = ({ msg, sort, items = [], locale, selected, onChange, validati
   return (
     <Select
       id={id}
+      width={width}
       variant={SelectVariant.single}
       onToggle={setOpen}
       onSelect={onSelect}
@@ -30,12 +30,14 @@ const SelectBox = ({ msg, sort, items = [], locale, selected, onChange, validati
       isOpen={open}
       isDisabled={disabled}
       validated={validationState}
+      placeholderText={placeholderText}
+      hasPlaceholderStyle={!!placeholderText}
     >
       {options.map((option) => (
         <SelectOption
           key={option.id}
           value={option}
-          description={option.isDefault ? msg.defaultOption() : undefined}
+          description={option.description ?? (option.isDefault ? msg.defaultOption() : undefined)}
         />
       ))}
     </Select>
@@ -48,12 +50,15 @@ SelectBox.propTypes = {
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     value: PropTypes.string,
     isDefault: PropTypes.bool,
+    description: PropTypes.string,
   })).isRequired, // Array<{ id: string, value: string }>, order matters if sort is false-ish
   sort: PropTypes.bool, // sorted alphabetically by current locale with { numeric: true } if true
   onChange: PropTypes.func.isRequired, // (selectedId: string) => any
   id: PropTypes.string,
   validationState: PropTypes.oneOf([false, 'default', 'error']),
   disabled: PropTypes.bool,
+  placeholderText: PropTypes.string,
+  width: PropTypes.string,
   locale: PropTypes.string.isRequired,
   msg: PropTypes.object.isRequired,
 }

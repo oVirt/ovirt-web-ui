@@ -27,12 +27,16 @@ import {
 } from '_/components/utils'
 
 import {
-  ExpandCollapse,
-  Form,
-  FormControl,
-  HelpBlock,
   Checkbox,
-} from 'patternfly-react'
+  ExpandableSection,
+  Form,
+  HelperText,
+  HelperTextItem,
+  NumberInput,
+  TextInput,
+  TextArea,
+} from '@patternfly/react-core'
+
 import { Grid, Row, Col } from '_/components/Grid'
 import SelectBox from '_/components/SelectBox'
 
@@ -72,9 +76,13 @@ const FieldRow = ({
             {label}
           </div>
           <div>{children}</div>
-          {(validationState && errorMessage) &&
-            <HelpBlock>{errorMessage}</HelpBlock>
-          }
+          {(validationState && errorMessage) && (
+            <HelperText>
+              <HelperTextItem variant='error'>
+                {errorMessage}
+              </HelperTextItem>
+            </HelperText>
+          )}
         </Col>
       </>
     )}
@@ -91,9 +99,13 @@ const FieldRow = ({
         </Col>
         <Col cols={fieldCols} className={style['col-data']} id={id}>
           {children}
-          {(validationState && errorMessage) &&
-            <HelpBlock>{errorMessage}</HelpBlock>
-          }
+          {(validationState && errorMessage) && (
+            <HelperText>
+              <HelperTextItem variant='error'>
+                {errorMessage}
+              </HelperTextItem>
+            </HelperText>
+          )}
         </Col>
       </>
     )}
@@ -499,26 +511,25 @@ class BasicSettings extends React.Component {
 
     // ----- RENDER -----
     return (
-      <Form horizontal id={idPrefix}>
+      <Form isHorizontal id={idPrefix}>
         <Grid className={style['settings-container']}>
           {/* -- VM name and where it will live -- */}
           <FieldRow label={msg.name()} id={`${idPrefix}-name`} required validationState={indicators.name} errorMessage={data.name ? msg.pleaseEnterValidVmName() : ''}>
-            <FormControl
+            <TextInput
               id={`${idPrefix}-name-edit`}
               autoFocus
               autoComplete='off'
               type='text'
-              defaultValue={data.name}
-              onChange={e => this.handleChange('name', e.target.value)}
+              value={data.name}
+              onChange={value => this.handleChange('name', value)}
             />
           </FieldRow>
 
           <FieldRow label={msg.description()} id={`${idPrefix}-description`}>
-            <FormControl
+            <TextArea
               id={`${idPrefix}-description-edit`}
-              componentClass='textarea'
-              defaultValue={data.description}
-              onChange={e => this.handleChange('description', e.target.value)}
+              value={data.description}
+              onChange={value => this.handleChange('description', value)}
             />
           </FieldRow>
 
@@ -579,12 +590,15 @@ class BasicSettings extends React.Component {
           </FieldRow>
 
           <FieldRow label={`${msg.memory()} (MiB)`} id={`${idPrefix}-memory`} required>
-            <FormControl
+            <NumberInput
               id={`${idPrefix}-memory-edit`}
               className={style['memory-input']}
-              type='number'
               value={data.memory}
-              onChange={e => this.handleChange('memory', e.target.value)}
+              onChange={value => this.handleChange('memory', value)}
+              min={0}
+              onMinus={() => this.handleChange('memory', data.memory - 1) }
+              onPlus={() => this.handleChange('memory', data.memory + 1) }
+              widthChars={10}
             />
           </FieldRow>
 
@@ -595,12 +609,15 @@ class BasicSettings extends React.Component {
             validationState={indicators.cpu || indicators.topology}
             errorMessage={!vCpuCountIsFactored ? msg.cpusBadTopology() : ''}
           >
-            <FormControl
+            <NumberInput
               id={`${idPrefix}-cpus-edit`}
               className={style['cpus-input']}
-              type='number'
               value={data.cpus}
-              onChange={e => this.handleChange('cpus', e.target.value)}
+              onChange={value => this.handleChange('cpus', value)}
+              min={0}
+              onMinus={() => this.handleChange('cpus', data.cpus - 1)}
+              onPlus={() => this.handleChange('cpus', data.cpus + 1)}
+              widthChars={10}
             />
           </FieldRow>
 
@@ -616,22 +633,20 @@ class BasicSettings extends React.Component {
           <FieldRow id={`${idPrefix}-startOnCreation`}>
             <Checkbox
               id={`${idPrefix}-startOnCreation-edit`}
-              checked={!!data.startOnCreation}
-              onChange={e => this.handleChange('startOnCreation', e.target.checked)}
-            >
-              {msg.startVmOnCreation()}
-            </Checkbox>
+              isChecked={!!data.startOnCreation}
+              onChange={checked => this.handleChange('startOnCreation', checked)}
+              label={msg.startVmOnCreation()}
+            />
           </FieldRow>
 
           {/* -- Cloud-Init -- */}
           <FieldRow id={`${idPrefix}-cloudInitEnabled`} rowClassName={style['cloud-init']}>
             <Checkbox
               id={`${idPrefix}-cloudInitEnabled-edit`}
-              checked={!!data.cloudInitEnabled}
-              onChange={e => this.handleChange('cloudInitEnabled', e.target.checked)}
-            >
-              {msg.cloudInitEnable()}
-            </Checkbox>
+              isChecked={!!data.cloudInitEnabled}
+              onChange={checked => this.handleChange('cloudInitEnabled', checked)}
+              label={msg.cloudInitEnable()}
+            />
           </FieldRow>
 
           { enableCloudInit && (
@@ -645,21 +660,20 @@ class BasicSettings extends React.Component {
                 validationState={data.initHostname && indicators.hostName ? 'error' : undefined}
                 errorMessage={msg.pleaseEnterValidHostName()}
               >
-                <FormControl
+                <TextInput
                   id={`${idPrefix}-cloudInitHostname-edit`}
                   type='text'
-                  defaultValue={data.initHostname}
-                  onChange={e => this.handleChange('initHostname', e.target.value)}
+                  value={data.initHostname}
+                  onChange={value => this.handleChange('initHostname', value)}
                 />
               </FieldRow>
 
               <FieldRow label={msg.sshAuthorizedKeys()} id={`${idPrefix}-cloudInitSshKeys`} vertical>
-                <FormControl
+                <TextArea
                   id={`${idPrefix}-cloudInitSshKeys-edit`}
-                  componentClass='textarea'
                   rows={5}
-                  defaultValue={data.initSshKeys}
-                  onChange={e => this.handleChange('initSshKeys', e.target.value)}
+                  value={data.initSshKeys}
+                  onChange={value => this.handleChange('initSshKeys', value)}
                 />
               </FieldRow>
             </>
@@ -676,11 +690,11 @@ class BasicSettings extends React.Component {
                 validationState={data.initHostname && indicators.hostName ? 'error' : undefined}
                 errorMessage={msg.pleaseEnterValidHostName()}
               >
-                <FormControl
+                <TextInput
                   id={`${idPrefix}-sysPrepHostname-edit`}
                   type='text'
-                  defaultValue={data.initHostname}
-                  onChange={e => this.handleChange('initHostname', e.target.value)}
+                  value={data.initHostname}
+                  onChange={value => this.handleChange('initHostname', value)}
                 />
               </FieldRow>
 
@@ -688,11 +702,10 @@ class BasicSettings extends React.Component {
               <FieldRow id={`${idPrefix}-sysPrepTimezone-configure`} vertical>
                 <Checkbox
                   id={`${idPrefix}-sysprep-timezone-config`}
-                  checked={data.enableInitTimezone}
-                  onChange={e => this.handleChange('enableInitTimezone', e.target.checked)}
-                >
-                  {msg.sysPrepTimezoneConfigure()}
-                </Checkbox>
+                  isChecked={data.enableInitTimezone}
+                  onChange={checked => this.handleChange('enableInitTimezone', checked)}
+                  label={msg.sysPrepTimezoneConfigure()}
+                />
               </FieldRow>
 
               <FieldRow label={msg.sysPrepTimezone()} id={`${idPrefix}-sysPrepTimezone`} vertical>
@@ -706,21 +719,20 @@ class BasicSettings extends React.Component {
               </FieldRow>
 
               <FieldRow label={msg.sysPrepAdministratorPassword()} id={`${idPrefix}-sysPrepAdminPassword`} vertical>
-                <FormControl
+                <TextInput
                   id={`${idPrefix}-sysPrepAdminPassword-edit`}
                   type='password'
-                  defaultValue={data.initAdminPassword}
-                  onChange={e => this.handleChange('initAdminPassword', e.target.value)}
+                  value={data.initAdminPassword}
+                  onChange={value => this.handleChange('initAdminPassword', value)}
                 />
               </FieldRow>
 
               <FieldRow label={msg.sysPrepCustomScript()} id={`${idPrefix}-sysPrepCustomScript`} vertical>
-                <FormControl
+                <TextArea
                   id={`${idPrefix}-sysPrepCustomScript-edit`}
-                  componentClass='textarea'
                   rows={5}
-                  defaultValue={data.initCustomScript}
-                  onChange={e => this.handleChange('initCustomScript', e.target.value)}
+                  value={data.initCustomScript}
+                  onChange={value => this.handleChange('initCustomScript', value)}
                 />
               </FieldRow>
             </>
@@ -728,7 +740,7 @@ class BasicSettings extends React.Component {
         </Grid>
 
         {/* Advanced CPU Topology Options */}
-        <ExpandCollapse id={`${idPrefix}-advanced-options`} textCollapsed={msg.advancedCpuTopologyOptions()} textExpanded={msg.advancedCpuTopologyOptions()}>
+        <ExpandableSection id={`${idPrefix}-advanced-options`} toggleText={msg.advancedCpuTopologyOptions()}>
           <Grid className={style['settings-container']}>
             <FieldRow
               fieldCols={3}
@@ -776,7 +788,7 @@ class BasicSettings extends React.Component {
               />
             </FieldRow>
           </Grid>
-        </ExpandCollapse>
+        </ExpandableSection>
       </Form>
     )
   }

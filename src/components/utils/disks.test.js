@@ -1,6 +1,6 @@
 /* eslint-env jest */
 
-import { sortDisksForDisplay } from './disks'
+import { sortDisksForDisplay, sortNicsDisks } from './disks'
 import { fromJS } from 'immutable'
 
 const samples = [
@@ -116,5 +116,25 @@ describe('disk sorting', () => {
 
   test('invalid locale should fail', () => {
     expect(() => sortDisksForDisplay(samples[0].test, 'BadLocale')).toThrow()
+  })
+
+  test('undefined(falsy) names go last', () => {
+    expect(sortNicsDisks([{ name: undefined }, { name: 'b' }, { name: undefined }, { name: 'a' }], 'en'))
+      .toEqual([{ name: 'a' }, { name: 'b' }, { name: undefined }, { name: undefined }])
+  })
+
+  test('templates go before string comparison on names', () => {
+    expect(sortNicsDisks([
+      { name: undefined, isFromTemplate: true },
+      { name: 'b', isFromTemplate: true },
+      { name: undefined },
+      { name: 'a' },
+    ], 'en'))
+      .toEqual([
+        { name: 'b', isFromTemplate: true },
+        { name: 'a' },
+        { name: undefined, isFromTemplate: true },
+        { name: undefined },
+      ])
   })
 })

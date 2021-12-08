@@ -110,11 +110,13 @@ function createStorageDomainList ({ storageDomains, dataCenterId = null, include
       )
       .map(sd => {
         const avail = convertValue('B', sd.get('availableSpace', 0))
+        const usage = msg.storageDomainFreeSpace({ size: avail.value, unit: avail.unit })
         return {
           id: sd.get('id'),
           value:
             sd.get('name') +
-            (includeUsage ? ' ' + msg.storageDomainFreeSpace({ size: avail.value, unit: avail.unit }) : ''),
+            (includeUsage ? ' ' + usage : ''),
+          usage,
         }
       })
       .sort((a, b) => localeCompare(a.value, b.value, locale))

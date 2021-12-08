@@ -66,9 +66,11 @@
   },
   "dependencies": {
     "@closeio/use-infinite-scroll": "1.0.0",
-    "@patternfly/react-charts": "6.21.8",
+    "@patternfly/react-charts": "6.34.1",
     "@patternfly/react-console": "^2.0.18",
-    "@patternfly/react-core": "4.168.8",
+    "@patternfly/react-core": "4.181.1",
+    "@patternfly/react-icons": "4.32.1",
+    "@patternfly/react-table": "4.50.1",
     "bootstrap": "3.4.1",
     "bootstrap-select": "1.13.18",
     "bootstrap-switch": "3.3.4",
