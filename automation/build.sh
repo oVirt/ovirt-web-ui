@@ -2,11 +2,12 @@
 
 [[ "${1:-foo}" == "copr" ]] && source_build=1 || source_build=0
 [[ ${OFFLINE_BUILD:-1} -eq 1 ]] && use_nodejs_modules=1 || use_nodejs_modules=0
+[[ ${MOVE_ARTIFACTS:-1} -eq 1 ]] && use_exported_artifacts=1 || use_exported_artifacts=0
 
 if [[ $source_build -eq 0 && $use_nodejs_modules -eq 1 ]] ; then
   # Force updating nodejs-modules so any pre-seed update to rpm wait is minimized
-  PACKAGER=$(command -v dnf >/dev/null 2>&1 && echo 'dnf' || echo 'yum')
-  REPOS=$(sed -e '/^#/d' -e '/^[ \t]*$/d' automation/build.repos | cut -f 1 -d ',' | paste -s -d,)
+  PACKAGER=dnf
+  REPOS=$(dnf repolist | grep ovirt | cut -f 1 -d ' ' | paste -s -d,)
 
   ${PACKAGER} --disablerepo='*' --enablerepo="${REPOS}" clean metadata
   ${PACKAGER} -y install ovirt-engine-nodejs-modules
@@ -14,11 +15,11 @@ fi
 
 # Clean the artifacts directory:
 test -d exported-artifacts && rm -rf exported-artifacts || :
+rm -rf tmp.repos
+rm -f ./*tar.gz
 
 # Create the artifacts directory:
 mkdir -p exported-artifacts
-rm -rf tmp.repos
-rm -f ./*tar.gz
 
 # If version_release is 0, consider the build to be a snapshot build
 version_release="$(grep -m1 VERSION_RELEASE configure.ac | cut -d ' ' -f2 | sed 's/[][)]//g')"
@@ -60,6 +61,8 @@ else
 fi
 
 # Store any relevant artifacts in exported-artifacts for the ci system to archive
-[[ -d exported-artifacts ]] || mkdir -p exported-artifacts
-find tmp.repos -iname \*rpm -exec mv "{}" exported-artifacts/ \;
-mv ./*tar.gz exported-artifacts/
+if [[ $use_exported_artifacts -eq 1 ]] ; then
+  [[ -d exported-artifacts ]] || mkdir -p exported-artifacts
+  find tmp.repos -iname \*rpm -exec mv "{}" exported-artifacts/ \;
+  mv ./*tar.gz exported-artifacts/
+fi

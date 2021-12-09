@@ -33,6 +33,8 @@ AM_INIT_AUTOMAKE([-Wall -Werror foreign -Wno-portability tar-pax])
 AC_ARG_VAR([RPMBUILD], [path to rpmbuild utility])
 AC_CHECK_PROGS([RPMBUILD], [rpmbuild])
 
+dnl TODO: Fail if rpmbuild is not present
+
 PACKAGE_RPM_SUFFIX=${PACKAGE_RPM_SUFFIX:-"%{?release_suffix}"}
 AC_ARG_VAR([PACKAGE_RPM_SUFFIX], [suffix to use on the rpm's release string])
 
