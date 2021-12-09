@@ -118,9 +118,11 @@ async function getUserInfo () {
 
   console.log('Connecting using provided credentials...')
 
-  const httpsAgent = new https.Agent({
-    rejectUnauthorized: false,
-  })
+  const httpsAgent = engineUrl.startsWith('https')
+    ? new https.Agent({
+      rejectUnauthorized: false,
+    })
+    : undefined
 
   const { access_token: ssoToken } = await fetch(
     `${engineUrl}/sso/oauth/token?grant_type=urn:ovirt:params:oauth:grant-type:http&scope=ovirt-app-api`,
