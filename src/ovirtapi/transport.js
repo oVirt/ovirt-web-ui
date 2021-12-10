@@ -69,6 +69,21 @@ type DeleteRequestType = { url: string, custHeaders?: Object }
 
 const logHeaders = (headers) => JSON.stringify({ ...headers, Authorization: '*****' })
 
+function removeNullish (obj: any): any {
+  if (typeof obj !== 'object' || obj === null || obj === undefined) {
+    return obj
+  }
+  if (Array.isArray(obj)) {
+    return obj.filter(item => item !== null && item !== undefined).map(removeNullish)
+  }
+
+  return Object.fromEntries(
+    Object.entries(obj)
+      .filter(([name, value]) => value !== null && value !== undefined)
+      .map(([name, value]) => [name, removeNullish(value)])
+  )
+}
+
 function httpGet ({ url, custHeaders = {} }: GetRequestType): Promise<Object> {
   const requestTracker = notifyStart('GET', url)
   const headers = {
@@ -86,8 +101,9 @@ function httpGet ({ url, custHeaders = {} }: GetRequestType): Promise<Object> {
   })
     .then((data: Object): Object => {
       notifyStop(requestTracker)
-      console.log(`http GET[${requestTracker.uid}] 🡐 data:`, data)
-      return data
+      const sanitizedData = removeNullish(data)
+      console.log(`http GET[${requestTracker.uid}] 🡐 data:`, data, sanitizedData)
+      return sanitizedData
     })
     .catch((data: Object): Promise<Object> => {
       console.log(`Ajax GET failed: ${JSON.stringify(data)}`)
