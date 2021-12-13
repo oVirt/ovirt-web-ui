@@ -877,7 +877,7 @@ const Cluster = {
 //
 const Nic = {
   toInternal ({ nic }: { nic: ApiNicType }): NicType {
-    const { mac: { address: nicMacAddress = '' } = {} } = nic
+    const nicMacAddress = nic?.mac?.address ?? ''
     const ips =
       nic.reported_devices && nic.reported_devices.reported_device
         ? nic.reported_devices.reported_device
