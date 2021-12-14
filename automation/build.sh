@@ -6,11 +6,9 @@
 
 if [[ $source_build -eq 0 && $use_nodejs_modules -eq 1 ]] ; then
   # Force updating nodejs-modules so any pre-seed update to rpm wait is minimized
-  PACKAGER=dnf
   REPOS=$(dnf repolist | grep ovirt | cut -f 1 -d ' ' | paste -s -d,)
-
-  ${PACKAGER} --disablerepo='*' --enablerepo="${REPOS}" clean metadata
-  ${PACKAGER} -y install ovirt-engine-nodejs-modules
+  dnf --disablerepo='*' --enablerepo="${REPOS}" clean metadata
+  dnf -y install ovirt-engine-nodejs-modules
 fi
 
 # Clean the artifacts directory:
