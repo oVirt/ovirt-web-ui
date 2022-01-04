@@ -4,10 +4,16 @@
 [[ ${OFFLINE_BUILD:-1} -eq 1 ]] && use_nodejs_modules=1 || use_nodejs_modules=0
 [[ ${MOVE_ARTIFACTS:-1} -eq 1 ]] && use_exported_artifacts=1 || use_exported_artifacts=0
 
+# During a full, offline build, install build dependencies
 if [[ $source_build -eq 0 && $use_nodejs_modules -eq 1 ]] ; then
-  # Force updating nodejs-modules so any pre-seed update to rpm wait is minimized
+  # To ensure the most currently available nodejs-modules is installed, clean the ovirt
+  # repo metadata so repo data cached on the build host doesn't cause problems (this is
+  # useful mostly for STD-CI)
+  # Note: When the project drops STD-CI (automation.yaml) support, the `clean metadata`
+  #       commands may be removed.
   REPOS=$(dnf repolist | grep ovirt | cut -f 1 -d ' ' | paste -s -d,)
   dnf --disablerepo='*' --enablerepo="${REPOS}" clean metadata
+
   dnf -y install ovirt-engine-nodejs-modules
 fi
 

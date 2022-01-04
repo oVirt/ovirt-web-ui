@@ -23,14 +23,14 @@ jobs:
           dnf -y copr enable ovirt/ovirt-master-snapshot centos-stream-8
           dnf -y module enable nodejs:14
 
-      - name: Install build.sh required packages
+      - name: Install the base build.sh required packages
         run: |
           dnf -y install git make autoconf automake rpm-build
 
       - name: Checkout sources
         uses: actions/checkout@v2
 
-      - name: Run automation/build.sh
+      - name: Run automation/build.sh (installs build dependencies as necessary)
         run: ./automation/build.sh
 
       - name: Upload artifacts
@@ -58,7 +58,7 @@ jobs:
           dnf -y config-manager --add-repo https://dl.yarnpkg.com/rpm/yarn.repo
           dnf -y module enable nodejs:14
 
-      - name: Install build.sh required packages
+      - name: Install the base build.sh required packages
         run: |
           dnf -y install git make autoconf automake rpm-build
 
