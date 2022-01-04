@@ -6,7 +6,7 @@ VM Portal is a modern lightweight UI for oVirt that allows oVirt users to create
 ![Dashboard](https://github.com/oVirt/ovirt-web-ui/raw/master/doc/screenshots/v1.5.0_2019-Feb/01_vm_dashboard.png)
 
 ## Installation
-VM Portal is installed automatically when you [install oVirt using Cockpit](https://ovirt.org/download). Once oVirt is installed,
+VM Portal is installed automatically when you [install oVirt using the command line](https://ovirt.org/download). Once oVirt is installed,
 navigate to https://[ENGINE_FQDN]/ovirt-engine and click VM Portal.
 
 ## Bugs and Enhancements
