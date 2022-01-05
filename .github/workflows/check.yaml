@@ -1,0 +1,92 @@
+#
+# CI for this project needs to do two things:
+#   1. Setup the environment for and run `yarn build`
+#   2. Build the distribution rpm for use in QE/OST/Integration testing
+#
+name: run CI on PRs
+on:
+  pull_request:
+
+jobs:
+  test_el8_offline:
+    name: EL8 - Check the PR (offline build)
+    env:
+      OFFLINE_BUILD: 1
+
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/centos/centos:stream8
+
+    steps:
+      - name: Enable repos and choose module versions
+        run: |
+          dnf -y copr enable ovirt/ovirt-master-snapshot centos-stream-8
+          dnf -y module enable nodejs:14
+
+      - name: Install the base build.sh required packages
+        run: |
+          dnf -y install git make autoconf automake rpm-build
+
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Run automation/build.sh (installs build dependencies as necessary)
+        run: ./automation/build.sh
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifacts
+          path: exported-artifacts/
+
+
+  test_el8_online:
+    name: EL8 - Check the PR (online build)
+    env:
+      OFFLINE_BUILD: 0
+      MOVE_ARTIFACTS: 0
+      SRPM_PATH: tmp.repos/SRPMS
+
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/centos/centos:stream8
+
+    steps:
+      - name: Enable repos and choose module versions
+        run: |
+          dnf -y copr enable ovirt/ovirt-master-snapshot centos-stream-8
+          dnf -y config-manager --add-repo https://dl.yarnpkg.com/rpm/yarn.repo
+          dnf -y module enable nodejs:14
+
+      - name: Install the base build.sh required packages
+        run: |
+          dnf -y install git make autoconf automake rpm-build
+
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Build srpm
+        run: |
+          ./automation/build.sh copr
+
+      - name: Install build dependencies from srpm
+        run: |
+          dnf -y builddep ${{ env.SRPM_PATH }}/ovirt-web-ui*.src.rpm
+
+      - name: Build rpm directly from srpm
+        run: |
+          rpmbuild \
+            --define="_topdir `pwd`/tmp.repos" \
+            --rebuild ${{ env.SRPM_PATH }}/ovirt-web-ui*.src.rpm
+
+      - name: Collect artifacts
+        run: |
+          [[ -d exported-artifacts ]] || mkdir -p exported-artifacts
+          find tmp.repos -iname \*rpm -exec mv "{}" exported-artifacts/ \;
+          mv ./*tar.gz exported-artifacts/
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifacts (online build)
+          path: exported-artifacts/
