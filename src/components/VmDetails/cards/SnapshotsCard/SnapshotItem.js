@@ -114,7 +114,6 @@ class SnapshotItem extends React.Component {
               id={`${this.props.id}-info-popover`}
               snapshot={this.props.snapshot}
               vmId={this.props.vmId}
-              restoreDisabled={isRestoreDisabled}
               isPoolVm={this.props.isPoolVm}
               msg={msg}
               locale={locale}

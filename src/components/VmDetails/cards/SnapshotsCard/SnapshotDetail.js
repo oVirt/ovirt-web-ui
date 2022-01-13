@@ -4,7 +4,6 @@ import PropTypes from 'prop-types'
 import {
   Popover,
   Icon,
-  Button,
   OverlayTrigger,
   Tooltip,
 } from 'patternfly-react'
@@ -17,8 +16,6 @@ import { withMsg } from '_/intl'
 import Selectors from '_/selectors'
 import { templateNameRenderer, getFormatedDateTime, userFormatOfBytes, localeCompare } from '_/helpers'
 import { getOsHumanName, sortDisksForDisplay } from '_/components/utils'
-
-import RestoreConfirmationModal from './RestoreConfirmationModal'
 
 const Status = ({ status, msg }) => {
   return status
@@ -55,7 +52,7 @@ const statusMap = (msg) => ({
   ok: msg.ok(),
 })
 
-const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, id, isPoolVm, msg, locale, ...otherProps }) => {
+const SnapshotDetail = ({ snapshot, vmId, id, isPoolVm, msg, locale, ...otherProps }) => {
   const template = Selectors.getTemplateById(snapshot.getIn(['vm', 'template', 'id']))
   const time = getFormatedDateTime(snapshot.get('date'))
 
@@ -207,29 +204,6 @@ const SnapshotDetail = ({ snapshot, vmId, restoreDisabled, id, isPoolVm, msg, lo
           </dd>
         </dl>
       </div>
-      <div style={{ textAlign: 'left' }}>
-        <RestoreConfirmationModal
-          id={`${id}-restore-modal`}
-          snapshot={snapshot}
-          vmId={vmId}
-          msg={msg}
-          trigger={({ onClick }) => (
-            isPoolVm
-              ? (
-                <OverlayTrigger placement='top' overlay={<Tooltip id={`${id}-restore-tt`}>{ msg.vmPoolSnapshotRestoreUnavailable() }</Tooltip>}>
-                  <span>
-                    <Button bsStyle='default' id={`${id}-restore`} disabled style={{ pointerEvents: 'none' }}>{ msg.snapshotRestore() }</Button>
-                  </span>
-                </OverlayTrigger>
-              )
-              : (
-                <Button bsStyle='default' id={`${id}-restore`} onClick={onClick} disabled={restoreDisabled}>
-                  { msg.snapshotRestore() }
-                </Button>
-              )
-          )}
-        />
-      </div>
     </Popover>
   )
 }
@@ -238,7 +212,6 @@ SnapshotDetail.propTypes = {
   id: PropTypes.string.isRequired,
   snapshot: PropTypes.object.isRequired,
   vmId: PropTypes.string.isRequired,
-  restoreDisabled: PropTypes.bool,
   isPoolVm: PropTypes.bool,
   msg: PropTypes.object.isRequired,
   locale: PropTypes.string.isRequired,
