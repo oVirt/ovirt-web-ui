@@ -1,12 +1,11 @@
-// @flow
-
 import fs from 'fs'
 import path from 'path'
 
 import chalk from 'chalk'
 import stableStringify from 'json-stable-stringify-without-jsonify'
 
-import { messages as englishMessages } from '../../src/intl/messages'
+import messages from '../../src/intl/messages.js'
+const englishMessages = messages.messages
 
 const TRANSLATED_MESSAGES = path.join('src', 'intl', 'translated-messages.json')
 
@@ -27,7 +26,7 @@ function main () {
  *
  * @param translations object
  */
-function removeNotExistedMessages (translations: any) {
+function removeNotExistedMessages (translations) {
   Object.keys(translations).forEach(langKey => {
     const languageMessages = translations[langKey]
     console.log(chalk.green(`[sync-messages.js] Checking language '${langKey}'`))

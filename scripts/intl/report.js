@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import chalk from 'chalk'
 import { table } from 'table'
-import { messages as englishMessages } from '../../src/intl/messages'
+import messages from '../../src/intl/messages.js'
 
 function round (number, precision = 0) {
   const factor = Math.pow(10, precision)
@@ -133,6 +133,7 @@ function reportCoverage (englishMessages, translatedMessagesPerLocale) {
 //
 const TRANSLATED = path.join('src', 'intl', 'translated-messages.json')
 const translatedMessagesPerLocale = JSON.parse(fs.readFileSync(TRANSLATED, 'utf8'))
+const englishMessages = messages.messages
 
 console.log(chalk`English key count: {yellow ${Object.keys(englishMessages).length}}`)
 console.log()

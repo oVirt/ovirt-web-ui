@@ -1,7 +1,10 @@
 import fs from 'fs'
 import path from 'path'
-import { sync as mkdirpSync } from 'mkdirp'
 import chalk from 'chalk'
+import mkdirp from 'mkdirp'
+
+import messages from '../../src/intl/messages.js'
+import timeDurations from '../../src/intl/time-durations.js'
 
 function normalizeMessages (messages) {
   return Object.keys(messages)
@@ -33,19 +36,19 @@ function toReactIntlMessageDescriptor (messageId, messageValue) {
 function extractMessages (messages, destDir, destFile) {
   console.log(chalk.green(`> [extract-messages.js] write file -> ${destFile} ✔️`))
   const json2poMessages = normalizeMessages(messages)
-  mkdirpSync(destDir)
+  mkdirp.sync(destDir)
   fs.writeFileSync(destFile, JSON.stringify(json2poMessages, null, 4))
   console.log()
 }
 
 extractMessages(
-  require('../../src/intl/messages').messages,
+  messages.messages,
   path.join('extra', 'to-zanata'),
   path.join('extra', 'to-zanata', 'messages.json')
 )
 
 extractMessages(
-  require('../../src/intl/time-durations').timeDurations,
+  timeDurations.timeDurations,
   path.join('extra', 'to-zanata'),
   path.join('extra', 'to-zanata', 'time-durations.json')
 )
