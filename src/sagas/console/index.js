@@ -36,12 +36,12 @@ function* downloadOrOpenVmConsole ({
   consoleId,
   usbAutoshare,
   usbFilter,
-  hasGuestAgent,
+  attemptSsoOnOpenConsole,
   skipSSO,
   openInPage,
   logoutOtherUsers,
 }) {
-  if (hasGuestAgent && !skipSSO) {
+  if (attemptSsoOnOpenConsole && !skipSSO) {
     const result = yield callExternalAction(Api.vmLogon, { payload: { vmId } }, true)
     if (!result || result.status !== 'complete') {
       const message = result?.error?.responseJSON?.fault?.detail ?? ''
@@ -173,7 +173,7 @@ export function* openConsole ({
     usbAutoshare,
     usbFilter,
     vmName,
-    hasGuestAgent,
+    attemptSsoOnOpenConsole,
     consoleId,
     fqdn,
     domain,
@@ -185,7 +185,7 @@ export function* openConsole ({
     domain: config.get('domain'),
     username: config.getIn(['user', 'name']),
     vmName: vms.getIn(['vms', vmId, 'name']),
-    hasGuestAgent: vms.getIn(['vms', vmId, 'ssoGuestAgent']),
+    attemptSsoOnOpenConsole: vms.getIn(['vms', vmId, 'attemptSsoOnOpenConsole']),
     consoleId: idFromType({ consoleType, vm: vms.getIn(['vms', vmId]) }),
     fqdn: vms.getIn(['vms', vmId, 'fqdn']),
   }))
@@ -223,7 +223,7 @@ export function* openConsole ({
       vmId,
       usbAutoshare,
       usbFilter,
-      hasGuestAgent,
+      attemptSsoOnOpenConsole,
       consoleId,
       openInPage,
       skipSSO: skipSSO || doesVmSessionExistForUserId(sessionsInternal, userId),
