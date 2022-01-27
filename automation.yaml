@@ -1,5 +1,0 @@
----
-distros:
-  - el8
-release_branches:
-  master: [ovirt-master, ovirt-4.4]

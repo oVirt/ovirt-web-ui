@@ -1,5 +1,0 @@
-# normally ovirt "tested" repo is enough as we want packages pass through OST
-ovirt-tested,https://resources.ovirt.org/repos/ovirt/tested/master/rpm/$distro/
-
-# but we keep requiring latest jenkins build of ovirt-node-js-modules since we build in a lock-step
-ovirt-engine-nodejs-modules_master,https://jenkins.ovirt.org/job/ovirt-engine-nodejs-modules_standard-on-merge/lastSuccessfulBuild/artifact/build-artifacts.$distro.x86_64
