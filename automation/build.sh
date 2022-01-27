@@ -6,14 +6,6 @@
 
 # During a full, offline build, install build dependencies
 if [[ $source_build -eq 0 && $use_nodejs_modules -eq 1 ]] ; then
-  # To ensure the most currently available nodejs-modules is installed, clean the ovirt
-  # repo metadata so repo data cached on the build host doesn't cause problems (this is
-  # useful mostly for STD-CI)
-  # Note: When the project drops STD-CI (automation.yaml) support, the `clean metadata`
-  #       commands may be removed.
-  REPOS=$(dnf repolist | grep ovirt | cut -f 1 -d ' ' | paste -s -d,)
-  dnf --disablerepo='*' --enablerepo="${REPOS}" clean metadata
-
   dnf -y install ovirt-engine-nodejs-modules
 fi
 
@@ -42,7 +34,7 @@ if [[ "${version_release}" == "0" ]]; then
 
   # For a source only build, setup PACKAGE_RPM_SUFFIX for configure.ac to directly embed
   # the snapshot suffix in the spec file.  This is necessary when the suffix info cannot
-  # be passed via commandline, specifically during a copr style pure chroot rpmbuild srpm
+  # be passed via command line, specifically during a copr style pure chroot rpmbuild srpm
   # and rpm rebuild.
   if [[ $source_build -eq 1 ]] ; then
     export SNAPSHOT_DATE=$(date --utc +%Y%m%d)
