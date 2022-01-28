@@ -4,6 +4,9 @@ import path from 'path'
 import chalk from 'chalk'
 import stableStringify from 'json-stable-stringify-without-jsonify'
 
+import messages from '../../src/intl/messages.js'
+import timeDurations from '../../src/intl/time-durations.js'
+
 const DUMMY_LOCALE = 'aa'
 
 function insertDummyLocaleAndSave (messages, destination) {
@@ -22,11 +25,11 @@ function insertDummyLocaleAndSave (messages, destination) {
 }
 
 insertDummyLocaleAndSave(
-  require('../../src/intl/messages').messages,
+  messages.messages,
   path.join('src', 'intl', 'translated-messages.json')
 )
 
 insertDummyLocaleAndSave(
-  require('../../src/intl/time-durations').timeDurations,
+  timeDurations.timeDurations,
   path.join('src', 'intl', 'translated-time-durations.json')
 )

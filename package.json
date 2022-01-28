@@ -47,6 +47,7 @@
     "jest": "27.3.1",
     "json-stable-stringify-without-jsonify": "1.0.1",
     "mini-css-extract-plugin": "^1.6.2",
+    "mkdirp": "1.0.4",
     "postcss": "8.3.11",
     "postcss-loader": "^4.3.0",
     "postcss-preset-env": "6.7.0",
@@ -102,7 +103,7 @@
   },
   "resolutions": {
     "bootstrap-select": ">=1.13.6",
-    "webpack/**/glob-parent": "^5.1.2",    
+    "webpack/**/glob-parent": "^5.1.2",
     "patternfly/**/jquery": ">=3.5.1",
     "immer": ">=9.0.6",
     "@patternfly/react-console/**/@novnc/novnc": "1.1.0"
@@ -129,8 +130,7 @@
     "intl:check-use": "scripts/intl/check-message-use.sh"
   },
   "jest": {
-    "setupFiles": [
-    ],
+    "setupFiles": [],
     "testEnvironment": "jsdom",
     "testMatch": [
       "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
