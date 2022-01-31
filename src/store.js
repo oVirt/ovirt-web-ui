@@ -1,8 +1,9 @@
 // @flow
-import { createStore, applyMiddleware, compose, type Store, combineReducers } from 'redux'
+import { createStore, applyMiddleware, type Store, combineReducers } from 'redux'
 import createSagaMiddleware, { type SagaMiddleware, type Task } from 'redux-saga'
 import { connectRouter, routerMiddleware } from 'connected-react-router'
 import { createBrowserHistory, type History } from 'history'
+import { composeWithDevToolsDevelopmentOnly } from '@redux-devtools/extension'
 
 import AppConfiguration from '_/config'
 import OvirtApi from '_/ovirtapi'
@@ -11,15 +12,10 @@ import { rootSaga } from '_/sagas'
 
 import { addActiveRequest, delayedRemoveActiveRequest } from '_/actions'
 
-const composeEnhancers: any =
-  (process.env.NODE_ENV !== 'production' &&
-   window &&
-   typeof window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ === 'function' &&
-   window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
-     actionsBlacklist: ['ADD_ACTIVE_REQUEST', 'REMOVE_ACTIVE_REQUEST', 'DELAYED_REMOVE_ACTIVE_REQUEST'],
-     maxAge: 100,
-   })) ||
-  compose
+const composeEnhancers: any = composeWithDevToolsDevelopmentOnly({
+  actionsDenylist: ['ADD_ACTIVE_REQUEST', 'REMOVE_ACTIVE_REQUEST', 'DELAYED_REMOVE_ACTIVE_REQUEST'],
+  maxAge: 100,
+})
 
 function initializeApiTransportListener (store: Store<any, any>) {
   OvirtApi.addHttpListener((requestTracker, eventType) => {
