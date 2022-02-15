@@ -9,24 +9,20 @@ on:
 
 jobs:
   test_el8_offline:
-    name: EL8 - Test, build and publish rpm repo for the PR (ovirt-engine-nodejs-modules build)
+    name: EL8 - test, build and publish rpm repo for the PR (ovirt-engine-nodejs-modules build)
     env:
       OFFLINE_BUILD: 1
 
     runs-on: ubuntu-latest
     container:
-      image: quay.io/centos/centos:stream8
+      #
+      # Note: The ovirt build container will have all of the spec's `BuildRequires`
+      #       packages already installed.  Therefore, no additional contianer setup
+      #       is needed.
+      #
+      image: quay.io/ovirt/buildcontainer:el8stream
 
     steps:
-      - name: Enable repos and choose module versions
-        run: |
-          dnf -y copr enable ovirt/ovirt-master-snapshot centos-stream-8
-          dnf -y module enable nodejs:14
-
-      - name: Install the base build.sh required packages
-        run: |
-          dnf -y install git make autoconf automake rpm-build
-
       - name: Checkout sources
         uses: actions/checkout@v2
 
@@ -39,40 +35,28 @@ jobs:
           directory: exported-artifacts/
 
   test_el8_online:
-    name: EL8 - Test and build the PR (online build)
-    env:
-      OFFLINE_BUILD: 0
-      MOVE_ARTIFACTS: 0
-      SRPM_PATH: tmp.repos/SRPMS
+    name: EL8 - test and build the PR, but skip the rpm builds (online build)
 
     runs-on: ubuntu-latest
     container:
-      image: quay.io/centos/centos:stream8
+      image: quay.io/ovirt/buildcontainer:el8stream
 
     steps:
-      - name: Enable repos and choose module versions
+      - name: Install yarn (online mode does not use ovirt-engine-nodejs-modules so yarn isn't installed)
         run: |
-          dnf -y copr enable ovirt/ovirt-master-snapshot centos-stream-8
           dnf -y config-manager --add-repo https://dl.yarnpkg.com/rpm/yarn.repo
-          dnf -y module enable nodejs:14
-
-      - name: Install the base build.sh required packages
-        run: |
-          dnf -y install git make autoconf automake rpm-build
+          dnf -y --disablerepo='*' --enablerepo='yarn*' install yarn
 
       - name: Checkout sources
         uses: actions/checkout@v2
 
-      - name: Build srpm
+      - name: Run 'yarn install' and 'yarn build' (like a developer would)
         run: |
-          ./automation/build.sh copr
+          yarn install
+          yarn build
 
-      - name: Install build dependencies from srpm
-        run: |
-          dnf -y builddep ${{ env.SRPM_PATH }}/ovirt-web-ui*.src.rpm
-
-      - name: Build rpm directly from srpm
-        run: |
-          rpmbuild \
-            --define="_topdir `pwd`/tmp.repos" \
-            --rebuild ${{ env.SRPM_PATH }}/ovirt-web-ui*.src.rpm
+      #
+      # Note: The source tar, srpm and rpm are not needed for the online build.  We only
+      #       need 1 rpm repo artifact per distro.  The rpm repo is generated from the
+      #       offline build.
+      #
