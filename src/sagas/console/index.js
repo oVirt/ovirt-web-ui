@@ -45,10 +45,7 @@ function* downloadOrOpenVmConsole ({
     const result = yield callExternalAction(Api.vmLogon, { payload: { vmId } }, true)
     if (!result || result.status !== 'complete') {
       const message = result?.error?.responseJSON?.fault?.detail ?? ''
-      if (message) {
-        yield put(Actions.addUserMessage({ messageDescriptor: { id: 'cantOpenConsole', params: { message } }, type: 'warning' }))
-      }
-      yield put(Actions.addUserMessage({ messageDescriptor: { id: 'cantLogonToConsole' }, type: 'warning' }))
+      yield put(Actions.addUserMessage({ messageDescriptor: { id: 'cantLogonToConsole', params: { message } }, type: 'warning' }))
     }
   }
 
