@@ -9,7 +9,6 @@ import * as Actions from '_/actions/console'
 
 import {
   CONSOLE_IN_USE,
-  CONSOLE_LOGON,
 } from '_/constants'
 
 import {
@@ -42,24 +41,6 @@ const ConsoleNotificationsDialog = ({
   }
 
   switch (status) {
-    case CONSOLE_LOGON:
-      return (
-        <ConfirmationModal
-          show={true}
-          onClose={onClose}
-          title={getTitle()}
-          body={msg.cantLogonToConsole()}
-          confirm={{
-            title: msg.yes(),
-            onClick: () => openConsole({
-              skipSSO: true,
-              logoutOtherUsers,
-              vmId,
-              consoleType,
-            }),
-          }}
-        />
-      )
     case CONSOLE_IN_USE:
       return (
         <ConfirmationModal

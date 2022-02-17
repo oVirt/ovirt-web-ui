@@ -196,7 +196,13 @@ const VM = {
       nics: [],
       statistics: [],
 
-      ssoGuestAgent: vm.sso.methods && vm.sso.methods.method && vm.sso.methods.method.length > 0 && vm.sso.methods.method.findIndex(method => method.id === 'guest_agent') > -1,
+      /**
+       * console SSO logon is deprecated as it relies on deprecated ovirtGuestAgentChannel (by default not supported i.e. for RHEL 8+)
+       * 1. it may still be in use by older or custom OS
+       * 2. the flag may be left enabled after upgrade (it's admin responsibility to fix configuration)
+       * 3. flag can be enabled any time by the admin (even if not supported by the OS)
+       */
+      attemptSsoOnOpenConsole: vm.sso.methods && vm.sso.methods.method && vm.sso.methods.method.length > 0 && vm.sso.methods.method.findIndex(method => method.id === 'guest_agent') > -1,
       display: {
         smartcardEnabled: vm.display && vm.display.smartcard_enabled && convertBool(vm.display.smartcard_enabled),
       },

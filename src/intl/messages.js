@@ -64,7 +64,7 @@ export const messages: { [messageId: string]: MessageType } = {
   bootSequence: 'Boot Sequence',
   cancel: 'Cancel',
   cannotUpdateCloudInitHostname: 'Host name cannot be synchronized with VM name because the VM name is not a valid host name.',
-  cantLogonToConsole: 'Single sign on failed. Please check to see if the guest agent is running on your virtual machine. Contact your administrator if the problem continues.',
+  cantLogonToConsole: 'Single sign on failed. Please check to see if the guest agent is running on your virtual machine. Error message: {message}',
   cantOpenConsole: 'Can\'t open console: {message}',
   cardTitleDetails: 'Details',
   cd: 'CD',
