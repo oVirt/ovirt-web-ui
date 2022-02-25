@@ -1,37 +1,40 @@
 # Release How To
 ## Versions ovirt-web-ui-X.Y.Z-R
 
-- **X** to be **0 or 1**, higher numbers reserved for future incompatible changes
+- **X** to be **1**, higher numbers reserved for future incompatible changes
 - **Y** important bigger changes in functionality
-- **Z** bi-weekly sprint releases, bug fixes, and minor changes
+- **Z** sprint releases, bug fixes, and minor changes
 - **R** release only, reserved for RPM rebuilds (source doesn't change)
 
 ## Procedure
+
 **Please replace 1.5.2 with intended version number**
-**
+
 From most recent `master`:
 
-- update translations as a separate PR (only if there are translations to insert, e.g. GA time)
-  - https://github.com/oVirt/ovirt-web-ui/wiki/Internationalization#how-to
-  - yarn run intl:extract && yarn run intl:pull && yarn run intl:apply
+- Update translations as a separate PR (only if there are translations to insert, e.g. GA time)
+  - See [Internationalization How-To](https://github.com/oVirt/ovirt-web-ui/wiki/Internationalization#how-to)
+  - Example PR: https://github.com/oVirt/ovirt-web-ui/pull/1433
+  - To update translations: `yarn intl:extract && yarn intl:pull && yarn intl:apply`
 
-- git checkout -b release-1.5.2
+- Prepare the pull request:
+  - make a new branch: `git checkout -b release-1.5.2 -t upstream/master`
   - edit `configure.ac`
   - edit `ovirt-web-ui.spec.in`
-    - summarize what changed. You can reference all issues in the release.
+    - Update the change log.  Reference all issues in the release.
 
-  - git add -u
-  - git commit
-    - "ovirt-web-ui 1.5.2"
-  - git push --set-upstream origin release-1.5.2
-- open pull request, wait for CI, merge it
+  - stage changes: `git add -u`
+  - commit changes: `git commit -m "release ovirt-web-ui 1.5.2"`
+  - push to your fork: `git push origin release-1.5.2`
 
-- at https://github.com/oVirt/ovirt-web-ui/releases create new release:
+- Open pull request from your new branch, wait for CI, merge it
+
+- At https://github.com/oVirt/ovirt-web-ui/releases create new release:
   - release name (tag): 1.5.2
   - title: ovirt-web-ui-1.5.2 (27-Mar-2019)
   - description: copy & paste from spec file
 
-- create releng-tools patch for ovirt compose. Example: https://gerrit.ovirt.org/#/c/90640/
+- Update oVirt compose with the new release
 
 - Docker builds
     - go to Docker Hub project, https://cloud.docker.com/u/ovirtwebui/repository/docker/ovirtwebui/ovirt-web-ui
