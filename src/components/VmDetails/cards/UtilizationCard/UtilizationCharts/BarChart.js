@@ -32,9 +32,9 @@ const BarChart = ({ data, additionalLabel, thresholdWarning, thresholdError, id,
           <ChartBar barWidth={40} domain={{ y: [0, 100] }}
             style={{
               data: {
-                fill: (d) => thresholdError && d.y >= thresholdError
+                fill: ({ datum }) => thresholdError && datum.y >= thresholdError
                   ? '#cc0000'
-                  : thresholdWarning && d.y >= thresholdWarning
+                  : thresholdWarning && datum.y >= thresholdWarning
                     ? '#ec7a08'
                     : '#3f9c35',
               },
