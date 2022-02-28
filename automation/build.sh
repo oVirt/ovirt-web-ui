@@ -48,8 +48,19 @@ else
   fi
 fi
 
-# Run the build
+# Configure the build
 ./autogen.sh --prefix=/usr --datarootdir=/share
+
+# Make sure the rpmspec file is valid (specifically that the changelog dates won't kill the build)
+spec_file=ovirt-web-ui.spec
+SPECLINT=$(rpmlint ${spec_file} 2>&1) || linterror=$?
+if [[ $linterror -ne 0 ]]; then
+    echo "Error or warning in '${spec_file}':"
+    echo "$SPECLINT"
+    exit 6
+fi
+
+# Run the build
 if [[ $source_build -eq 1 ]] ; then
   make ${target_prefix}srpm
 else

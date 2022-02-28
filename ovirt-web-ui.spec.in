@@ -14,6 +14,13 @@ Source0:        %{source_basename}-%{version}.tar.gz
 
 BuildArch: noarch
 
+# requirements for automation/build.sh (to be included in the build container)
+BuildRequires: git
+BuildRequires: jq
+BuildRequires: rpmlint
+BuildRequires: rpm-build
+
+# requirements for building the rpm from src.rpm
 BuildRequires: autoconf
 BuildRequires: automake
 %if %{offline_build}
