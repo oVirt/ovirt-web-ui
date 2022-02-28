@@ -124,7 +124,7 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
                       storageUnits: unit,
                     })
                   }}
-                  labels={datum => datum ? `${msg.utilizationCardLegendUsed()} ${datum.y}%` : null}
+
                   thresholdWarning={70}
                   thresholdError={90}
                 />
