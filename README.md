@@ -6,8 +6,8 @@ VM Portal is a modern lightweight UI for oVirt that allows oVirt users to create
 ![Dashboard](https://github.com/oVirt/ovirt-web-ui/raw/master/doc/screenshots/v1.5.0_2019-Feb/01_vm_dashboard.png)
 
 ## Installation
-VM Portal is installed automatically when you [install oVirt using the command line](https://ovirt.org/download). Once oVirt is installed,
-navigate to https://[ENGINE_FQDN]/ovirt-engine and click VM Portal.
+VM Portal is installed automatically when you [install oVirt using the command line](https://ovirt.org/download).
+Once oVirt is installed, navigate to the welcome page `https://[ENGINE_FQDN]/ovirt-engine` and click VM Portal.
 
 ## Bugs and Enhancements
 Please report bugs and feature requests to the [GitHub issue tracker](https://github.com/oVirt/ovirt-web-ui/issues).
@@ -16,9 +16,9 @@ Please report bugs and feature requests to the [GitHub issue tracker](https://gi
 Use the [oVirt Users forum / mailing list](https://lists.ovirt.org/archives/list/users@ovirt.org/) for general discussion or help.
 
 ## Technical Details
-- based on React, Redux, Redux-Saga, and PatternFly
-- bootstrapped with [create-react-app](https://facebook.github.io/react/blog/2016/07/22/create-apps-with-no-configuration.html)
-- [Developer information](DEVELOPERS.md)
+- [Developer Information](DEVELOPERS.md)
+- The project is based on React, Redux, Redux-Saga, and PatternFly
+- It was bootstrapped with [create-react-app](https://facebook.github.io/react/blog/2016/07/22/create-apps-with-no-configuration.html)
 - For more screenshots, see the [doc/screenshots](https://github.com/oVirt/ovirt-web-ui/blob/master/doc/screenshots) directory.
 
 ## Author(s)

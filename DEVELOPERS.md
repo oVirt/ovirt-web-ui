@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/oVirt/ovirt-web-ui.svg?branch=master)](https://travis-ci.org/oVirt/ovirt-web-ui)
+[![Copr build status](https://copr.fedorainfracloud.org/coprs/ovirt/ovirt-master-snapshot/package/ovirt-web-ui/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/ovirt/ovirt-master-snapshot/package/ovirt-web-ui/)
 
 # VM Portal - Developer information
 
@@ -15,38 +15,49 @@ Please report bugs and feature requests to the [GitHub issue tracker](https://gi
 ## Development setup
 
 ### Prerequisites
-  - Have the **oVirt engine running** at https://[ENGINE_URL]
-    - example: https://engine.local/ovirt-engine
-  - Have packages `autoconf`, `automake` and `libtool` installed
-  - Have `yarn` installed
-  - Not strictly required but **suggested**, use the `ovirt-engine-nodejs-modules` package
+  - Have a **oVirt engine running** at `[http scheme]://[ENGINE_FQDN]:[port]`
+    - example: `https://engine.local:8443/ovirt-engine`
+  - Base required packages: `autoconf`, `automake` and `libtool`
+  - For online builds: `nodejs`, `yarn`
+  - Enable `nodejs` at least version 14
+  - For offline builds (not strictly required but **suggested**): `ovirt-engine-nodejs-modules`
   - `git clone` the repository
 
 
 #### ovirt-engine packages
-Install `ovirt-engine-nodejs-modules` from the `ovirt/tested` yum repo for your platform
-to use the same packages that will be used by CI to build the app.
+Install `ovirt-engine-nodejs-modules` from the [ovirt/ovirt-master-snapshot copr repo](https://copr.fedorainfracloud.org/coprs/ovirt/ovirt-master-snapshot/)
+for your platform to use the same packages that will be used by CI to build the app.
 
-    REPO=fc30 # or the appropriate release and version for you
-    dnf config-manager --add-repo http://resources.ovirt.org/repos/ovirt/tested/master/rpm/$REPO
-    dnf install ovirt-engine-nodejs-modules
+For CentOS stream 9:
 
-To set PATH and use yarn, the yarn offline cache provided by `ovirt-engine-nodejs-modules`
-and use these packages for development or building use:
+    dnf copr enable -y ovirt/ovirt-master-snapshot
+    dnf install -y ovirt-engine-nodejs-modules
+
+**Note**: The project will not currently build on CentOS stream 9.  See
+[issue 1568: EL9 build fails](https://github.com/oVirt/ovirt-web-ui/issues/1568) and
+[pull request 1563: add CI build for EL9](https://github.com/oVirt/ovirt-web-ui/pull/1563)
+for more information.
+
+For CentOS Stream 8 you need to run:
+
+    dnf copr enable -y ovirt/ovirt-master-snapshot centos-stream-8
+    dnf install -y ovirt-engine-nodejs-modules
+
+After installing, the package may be for development or building.  It provides `yarn` itself
+and a yarn offline cache.  Setup your shell to use it with the following:
 
     source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh
 
-If you want to stop using `yarn` offline, `yarn` will need to be reconfigured to remove
-the offline mirror added by `setup-env.sh`:
+If you want to stop using the `yarn` offline cache, `yarn` will need to be reconfigured to
+remove the offline mirror added by `setup-env.sh`:
 
     yarn config delete yarn-offline-mirror
 
-
 **NOTE:** During development it is not necessary to limit your environment to the offline
 yarn repo provided by `ovirt-engine-nodejs-modules`.  However, it is recommended to run a
-full build to verify no dependency errors will be introduced by your change.  oVirt
-STDCI will fail if `ovirt-engine-nodejs-modules` needs to be updated with changes made
-to `package.json` or `yarn.lock` in a new pull request.
+full build to verify no dependency errors will be introduced by your change.  The offline
+build GitHub action checks will fail if `ovirt-engine-nodejs-modules` needs to be updated
+with changes made to `package.json` or `yarn.lock` in a new pull request.
 
 
 ### Development mode
@@ -54,26 +65,39 @@ A primary goal of VM Portal is a quick development cycle (change-build-deploy-ch
 project uses [webpack-dev-server](http://webpack.github.io/docs/webpack-dev-server.html)
 to accomplish this. To start the server:
 
-    ENGINE_URL=https://my.ovirt.instance/ovirt-engine/ yarn start
+    ENGINE_URL=https://my.ovirt.instance:8443/ovirt-engine/ yarn start
 
 When asked, provide a valid user name (in the form of `user@profile`) and password so
 the application can start in the context of a logged in user.
 
-#### .env.* files
 
-You can group environment variables using `.env.envname` files. For example, for environment `foo`
-create a file `.env.foo` in the root of the project cotaining all related variables.
+#### Specifying environment variables via `.env.*` files
+You can group environment variables using `.env.envname` files. For example, place a
+a file `.env.local-dev` in the root of the project containing all related variables
+for your local development target:
+
+
+    ENGINE_URL=http://engine.local:8080/ovirt-engine
+    BROWSER=none
+    KEEP_ALIVE=30
+
+    ENGINE_USER=admin@internal
+    ENGINE_PASSWORD=password
+    ENGINE_DOMAIN=internal-authz
+
 The file should follow [dotenv](https://github.com/motdotla/dotenv) convention.
 Then start the server with:
 
-    ENGINE_ENV=foo yarn start
+    ENGINE_ENV=local-dev yarn start
+
 
 #### Credentials
-User name and password can also be provided via shell variables:
+User name and password can also be provided via shell variables or in the `dotenv` files:
 
     ENGINE_USER=user@profile
     ENGINE_PASSWORD=password
     ENGINE_DOMAIN=domain
+
 
 #### Auto-Open browser
 When the dev server is started, it will attempt to open a new browser window/tab on
@@ -86,6 +110,7 @@ by specifying the `BROWSER` environment variable.  Possible values are:
     BROWSER=chrome             # open a new tab in chrome on Windows
     BROWSER=firefox            # open a new tab in firefox on Linux
 
+
 #### Alternative Branding
 To test an alternative branding, the dev server may be started with the `BRANDING`
 environment variable.  This variable allows specifying a location where alternative
@@ -96,6 +121,7 @@ at `$HOME/new-branding`, start the dev server like this:
     BRANDING=$HOME/new-branding \
     yarn start
 
+
 #### Keep-alive
 Under normal circumstances, the token generated when the dev server starts will
 expire after non-use.  That interval is determined by setting on the ovirt-engine.  If
@@ -105,39 +131,47 @@ server's session alive by pining the rest api at the specified minute interval. 
 example, running the dev server like this will have it ping the rest api every 20 minutes,
 keeping the session alive even if the UI is logged out or closed:
 
-    ENGINE_URL=https://my.ovirt.instance/ovirt-engine \
+    ENGINE_URL=http://my.ovirt.instance:8080/ovirt-engine \
     KEEP_ALIVE=20 \
     yarn start
 
+
 ## Production Builds
+All of the builds can either run offline, via `ovirt-engine-nodejs-modules` or can run
+in an online mode downloading new packages as needed.  For offline builds, use this
+command:
+
+    source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh
+
+for online builds, use this command:
+
+    yarn install
+
+The examples below, substitute `$YARN_INSTALL` with one of the commands given above.
+
 
 ### Build static assets
 You can build the static assets from source by:
 
-    # skip if you don't want to use offline mode
-    source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh
-
-    ./autogen.sh
+    $YARN_INSTALL
     make
+
+The outcome of the build will be in `build/`.
 
 
 ### Build and install to a local development ovirt-engine
 This allows you to run VM Portal deployed directly in an ovirt-engine development installation.
 
-    # skip if you don't want to use offline mode
-    source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh
-
-    ./autogen.sh --prefix=/usr --datarootdir=/share
+    $YARN_INSTALL
     make all install-data-local DESTDIR=<path_to_engine_development_prefix>
 
 
 ### Build RPM
-There are at least 6 ways to build the RPM for the project:
+There are a number of different ways to build the RPM for the project:
 
   1. Manual **offline** build with `make rpm`:
 
     source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh
-    ./autogen.sh --prefix=/usr --datarootdir=/share
     make rpm
 
   2. Manual **offline** build with `automation/build.sh`:
@@ -148,41 +182,28 @@ There are at least 6 ways to build the RPM for the project:
 
     OFFLINE_BUILD=0 ./automation/build.sh
 
-  4. Use oVirt STDCI [mock_runner](https://ovirt-infra-docs.readthedocs.io/en/latest/CI/Using_mock_runner/index.html)
-     to run CI build artifacts locally.  This method is cleanest since it runs in a chroot and
-     can build for a target that is different than your system (e.g. build for el8 on fedora34).
-
-  5. Each pull request push will automatically have RPMs built (the check-patch,
-     check-merged, and build-artifact stages all use the same script: `automation/build.sh`)
-     by [oVirt infra STDCI](https://ovirt-infra-docs.readthedocs.io/en/latest/CI/Build_and_test_standards/index.html).
-     The most recent build on the master branch is available on
-     [STDCI last successful build artifacts](https://jenkins.ovirt.org/job/oVirt_ovirt-web-ui_standard-on-ghpush/lastSuccessfulBuild/artifact/).
-
-  6. Post the comment "`ci build`" to the GitHub Pull Request for an on-demand
-     CI build artifacts build before merging a PR. Reference
-     [manual functionality of the oVirt CI system](https://ovirt-infra-docs.readthedocs.io/en/latest/CI/Using_STDCI_with_GitHub/index.html#manual-functionality-of-the-ovirt-ci-system).
+  4. Each pull request push will automatically have RPMs built as part of the GitHub action
+     checks "run CI on PRs" job "test_el8_offline".  The generated artifact zip file will be
+     accessible on the action run's summary page.
 
 
 ### RPM Installation
 
-    yum install ovirt-web-ui
+    dnf install ovirt-web-ui
 
-Installs the app to `/usr/share/ovirt-web-ui`. A new **ovirt-web-ui.war** is added to the existing **ovirt-engine.ear**.
+Installs the app to `/usr/share/ovirt-web-ui`. A new **ovirt-web-ui.war** is added to the
+existing **ovirt-engine.ear**.
 
-You can access the application at: `https://[ENGINE_URL]/ovirt-engine/web-ui`
+You can access the application at: `https://[ENGINE_FQDN]/ovirt-engine/web-ui`
 
-The latest master branch ovirt-web-ui RPM can be found in the [Copr build system](https://copr.fedorainfracloud.org/coprs/ovirt/ovirt-master-snapshot).
+The latest master branch RPM can be found in the [ovirt/ovirt-master-snapshot
+copr repository](https://copr.fedorainfracloud.org/coprs/ovirt/ovirt-master-snapshot).
 
 
 ## Browser Developer Tools
 A pair of extensions are recommended to simplify debugging of the application:
   - [Redux DevTools Extension](http://extension.remotedev.io/)
   - [React Developer Tools](https://github.com/facebook/react-devtools)
-
-
-## Technical Details
-- based on React, Patternfly, Redux, Redux-Saga
-- based on ejected [create-react-app](https://facebook.github.io/react/blog/2016/07/22/create-apps-with-no-configuration.html)
 
 
 ## Goals
