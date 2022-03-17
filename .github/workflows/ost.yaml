@@ -1,0 +1,9 @@
+name: OST trigger
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  trigger-ost:
+    uses: oVirt/ovirt-system-tests/.github/workflows/ost.yaml@master
