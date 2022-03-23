@@ -171,20 +171,26 @@ export function* fetchVms ({ payload: { count, page, shallowFetch = true } }) {
   const additional = shallowFetch ? VM_FETCH_ADDITIONAL_SHALLOW : VM_FETCH_ADDITIONAL_DEEP
   const apiVms = yield callExternalAction(Api.getVms, { payload: { count, page, additional } })
 
-  let internalVms = null
-  if (apiVms?.vm) {
-    internalVms = []
-    for (const apiVm of apiVms.vm) {
-      const internalVm = yield transformAndPermitVm(apiVm)
-      internalVms.push(internalVm)
-    }
-
-    // NOTE: No need to fetch the current=true cdrom info at this point. The cdrom info
-    //       is needed on the VM details page and `fetchSingleVm` is called upon entry
-    //       to the details page. The `fetchSingleVm` fetch includes loading the
-    //       appropriate cdrom info based on the VM's state. See `fetchSingleVm` for more
-    //       details.
+  if (!apiVms || apiVms.error) {
+    return { internalVms: null }
   }
+
+  if (!apiVms.vm) {
+    // no VMs
+    return { internalVms: [] }
+  }
+
+  const internalVms = []
+  for (const apiVm of apiVms.vm) {
+    const internalVm = yield transformAndPermitVm(apiVm)
+    internalVms.push(internalVm)
+  }
+
+  // NOTE: No need to fetch the current=true cdrom info at this point. The cdrom info
+  //       is needed on the VM details page and `fetchSingleVm` is called upon entry
+  //       to the details page. The `fetchSingleVm` fetch includes loading the
+  //       appropriate cdrom info based on the VM's state. See `fetchSingleVm` for more
+  //       details.
 
   return { internalVms }
 }
@@ -240,11 +246,16 @@ export function* fetchAndPutSingleVm (action) {
 export function* fetchPools (action) {
   const apiPools = yield callExternalAction(Api.getPools, action)
 
-  const internalPools = apiPools?.vm_pool
-    ? apiPools.vm_pool.map(pool => Transforms.Pool.toInternal({ pool }))
-    : null
+  if (!apiPools || apiPools.error) {
+    return { internalPools: null }
+  }
 
-  return { internalPools }
+  if (!apiPools.vm_pool) {
+    // no pools
+    return { internalPools: [] }
+  }
+
+  return { internalPools: apiPools.vm_pool.map(pool => Transforms.Pool.toInternal({ pool })) }
 }
 
 function* fetchAndPutPools (action) {
