@@ -239,7 +239,7 @@ class GlobalSettings extends Component {
       },
       notifications: {
         title: msg.notifications(),
-        tooltip: msg.notificationSettingsAffectAllNotifications(),
+        hint: msg.notificationSettingsAffectAllNotifications(),
         fields: [
           ((name) => ({
             title: msg.dontDisturb(),

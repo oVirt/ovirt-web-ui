@@ -9,6 +9,7 @@ import {
 import { InfoTooltip } from '_/components/tooltips'
 
 import style from './style.css'
+import { Hint, HintBody } from '@patternfly/react-core'
 
 const LabelCol = ({ children, tooltip, fieldPath, ...props }) => {
   return (
@@ -47,6 +48,11 @@ const Section = ({ name, section }) => (
       {section.title}
       { section.tooltip && <InfoTooltip id={`${name}-info-tooltip`} tooltip={section.tooltip} /> }
     </h3>
+    { section.hint && (
+      <Hint>
+        <HintBody>{section.hint}</HintBody>
+      </Hint>
+    )}
     { section.fields.map((field) => (
       <FormGroup key={field.name} className={style['settings-field']}>
         <LabelCol fieldPath={`${name}-${field.name}`} tooltip={field.tooltip} sm={3} className={style['field-label']}>
