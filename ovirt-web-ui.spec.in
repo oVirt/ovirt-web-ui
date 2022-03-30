@@ -60,6 +60,10 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Wed Mar 30 2022 Sharon Gratch <sgratch@redhat.com> - 1.8.1-1
+ - fix a bug for removing deleted pool entities from VMs dashbord after refresh for the last pool
+ - add an option to trigger ost run with "/ost" via Github
+
 * Tue Mar 15 2022 Sharon Gratch <sgratch@redhat.com> - 1.8.0-1
  - user/account settings - support auto connect for a VM
  - user/account settings -  support setting a full screen mode for the noVnc console
