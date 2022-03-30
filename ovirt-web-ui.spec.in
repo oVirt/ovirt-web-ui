@@ -61,7 +61,7 @@ make install DESTDIR=%{buildroot}
 
 %changelog
 * Wed Mar 30 2022 Sharon Gratch <sgratch@redhat.com> - 1.8.1-1
- - fix a bug for removing deleted pool entities from VMs dashbord after refresh for the last pool
+ - fix a bug for removing deleted pool entities from VMs dashboard after refresh for the last pool
  - add an option to trigger ost run with "/ost" via Github
 
 * Tue Mar 15 2022 Sharon Gratch <sgratch@redhat.com> - 1.8.0-1
@@ -72,7 +72,7 @@ make install DESTDIR=%{buildroot}
  - VM details - fix a bug of displaying the correct values of VM's utilization disk charts in case of more than one reported file system
  - VM details - fix VM's utilization disk charts colors to be based on thresholds
  - VM details - remove 'restore snapshot' button from snapshot details dialog since it duplicates the functionality located on the card
- - fix a bug for removing deleted pool entities from VMs dashbord after refresh
+ - fix a bug for removing deleted pool entities from VMs dashboard after refresh
  - fix a bug of VM Portal crashes at login time when nic.mac is fetched as null
  - fix a bug to enable assignment of user quota when creating a VM from a non-blank template
  - handle SSO deprecation by removing the default attempt to use SSO
@@ -84,9 +84,9 @@ make install DESTDIR=%{buildroot}
 
 * Mon Oct 11 2021 Sharon Gratch <sgratch@redhat.com> - 1.7.2-1
  - fix disks creation by correctly handling disk format and sparse attributes based on the target storage domain and
-   also based on the template's disk format for server/high performace/desktop VM types
+   also based on the template's disk format for server/high performance/desktop VM types
  - display error messages when VM's virtual CPU topology is set to invalid values
- - fix downloading Remote Destop file for Firefox browser with the correct .rdp file extension instead of .vv extension
+ - fix downloading Remote Desktop file for Firefox browser with the correct .rdp file extension instead of .vv extension
  - push master builds to ovirt-4.4 branch as well
  - update dependencies of immer, ua-parser-js and glob-parent packages
 
