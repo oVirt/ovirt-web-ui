@@ -45,7 +45,7 @@ function* deleteVmSnapshot (action) {
   yield put(addSnapshotRemovalPendingTask(snapshotId))
   let snapshotRemoved = false
   yield fetchVmSnapshots({ vmId })
-  for (const delaySec of delayInMsSteps()) {
+  for (const delayMsSec of delayInMsSteps()) {
     const snapshot = yield callExternalAction(Api.snapshot, { payload: { snapshotId, vmId } }, true)
     if (snapshot.error && snapshot.error.status === 404) {
       snapshotRemoved = true
@@ -54,7 +54,7 @@ function* deleteVmSnapshot (action) {
       const snapshotInternal = Transforms.Snapshot.toInternal({ snapshot })
       yield put(updateVmSnapshot({ vmId, snapshot: snapshotInternal }))
     }
-    yield delay(delaySec * 1000)
+    yield delay(delayMsSec)
   }
   if (snapshotRemoved) {
     yield fetchVmSnapshots({ vmId })
