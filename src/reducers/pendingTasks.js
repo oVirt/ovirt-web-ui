@@ -51,43 +51,75 @@ export default actionReducer(initialState, {
     return pendingTasks.delete(index)
   },
 
-  [ADD_SNAPSHOT_REMOVAL_PENDING_TASK] (pendingTasks, { payload }) {
+  [ADD_SNAPSHOT_REMOVAL_PENDING_TASK] (pendingTasks, { payload: { vmId, snapshotId } }) {
     const existingTask = pendingTasks.find(task =>
-      task.type === PendingTaskTypes.SNAPSHOT_REMOVAL && task.snapshotId === payload)
+      task.type === PendingTaskTypes.SNAPSHOT_REMOVAL &&
+      task.vmId === vmId &&
+      task.snapshotId === snapshotId
+    )
     if (existingTask) {
       return pendingTasks
     }
-    return pendingTasks.push(payload)
+    return pendingTasks.push({
+      type: PendingTaskTypes.SNAPSHOT_REMOVAL,
+      started: new Date(),
+      vmId,
+      snapshotId,
+    })
   },
-  [REMOVE_SNAPSHOT_REMOVAL_PENDING_TASK] (pendingTasks, { payload }) {
-    const index = pendingTasks.findKey(
-      task => task.type === PendingTaskTypes.SNAPSHOT_REMOVAL && task.snapshotId === payload.snapshotId)
+  [REMOVE_SNAPSHOT_REMOVAL_PENDING_TASK] (pendingTasks, { payload: { vmId, snapshotId } }) {
+    const index = pendingTasks.findKey(task =>
+      task.type === PendingTaskTypes.SNAPSHOT_REMOVAL &&
+      task.vmId === vmId &&
+      task.snapshotId === snapshotId
+    )
     return pendingTasks.delete(index)
   },
-  [ADD_SNAPSHOT_RESTORE_PENDING_TASK] (pendingTasks, { payload }) {
+
+  [ADD_SNAPSHOT_RESTORE_PENDING_TASK] (pendingTasks, { payload: { vmId, snapshotId } }) {
     const existingTask = pendingTasks.find(task =>
-      task.type === PendingTaskTypes.SNAPSHOT_RESTORE)
+      task.type === PendingTaskTypes.SNAPSHOT_RESTORE &&
+      task.vmId === vmId &&
+      task.snapshotId === snapshotId
+    )
     if (existingTask) {
       return pendingTasks
     }
-    return pendingTasks.push(payload)
+    return pendingTasks.push({
+      type: PendingTaskTypes.SNAPSHOT_RESTORE,
+      started: new Date(),
+      vmId,
+      snapshotId,
+    })
   },
-  [REMOVE_SNAPSHOT_RESTORE_PENDING_TASK] (pendingTasks, { payload }) {
-    const index = pendingTasks.findKey(
-      task => task.type === PendingTaskTypes.SNAPSHOT_RESTORE)
+  [REMOVE_SNAPSHOT_RESTORE_PENDING_TASK] (pendingTasks, { payload: { vmId, snapshotId } }) {
+    const index = pendingTasks.findKey(task =>
+      task.type === PendingTaskTypes.SNAPSHOT_RESTORE &&
+      task.vmId === vmId &&
+      task.snapshotId === snapshotId
+    )
     return pendingTasks.delete(index)
   },
-  [ADD_SNAPSHOT_ADD_PENDING_TASK] (pendingTasks, { payload }) {
+
+  [ADD_SNAPSHOT_ADD_PENDING_TASK] (pendingTasks, { payload: { vmId } }) {
     const existingTask = pendingTasks.find(task =>
-      task.type === PendingTaskTypes.SNAPSHOT_ADD)
+      task.type === PendingTaskTypes.SNAPSHOT_ADD &&
+      task.vmId === vmId
+    )
     if (existingTask) {
       return pendingTasks
     }
-    return pendingTasks.push(payload)
+    return pendingTasks.push({
+      type: PendingTaskTypes.SNAPSHOT_ADD,
+      started: new Date(),
+      vmId,
+    })
   },
-  [REMOVE_SNAPSHOT_ADD_PENDING_TASK] (pendingTasks, { payload }) {
-    const index = pendingTasks.findKey(
-      task => task.type === PendingTaskTypes.SNAPSHOT_ADD)
+  [REMOVE_SNAPSHOT_ADD_PENDING_TASK] (pendingTasks, { payload: { vmId } }) {
+    const index = pendingTasks.findKey(task =>
+      task.type === PendingTaskTypes.SNAPSHOT_ADD &&
+      task.vmId === vmId
+    )
     return pendingTasks.delete(index)
   },
 })

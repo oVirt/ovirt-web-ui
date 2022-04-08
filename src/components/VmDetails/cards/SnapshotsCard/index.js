@@ -3,12 +3,13 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import { MsgContext } from '_/intl'
-import BaseCard from '../../BaseCard'
+import { PendingTaskTypes } from '_/reducers/pendingTasks'
+
 import style from './style.css'
 
+import BaseCard from '../../BaseCard'
 import NewSnapshotModal from './NewSnapshotModal'
 import SnapshotItem from './SnapshotItem'
-import { PendingTaskTypes } from '_/reducers/pendingTasks'
 
 const DOWN_STATUS = 'down'
 const RUNNING_STATUS = 'up'
@@ -63,11 +64,14 @@ Snapshots.propTypes = {
 }
 
 const ConnectedSnapshots = connect(
-  (state) => ({
-    beingCreated: !!state.pendingTasks.find(t => t.type === PendingTaskTypes.SNAPSHOT_ADD),
-    beingRestored: !!state.pendingTasks.find(task => task.type === PendingTaskTypes.SNAPSHOT_RESTORE),
-    beingDeleted: !!state.pendingTasks.find(task => task.type === PendingTaskTypes.SNAPSHOT_REMOVAL),
-  })
+  ({ pendingTasks }, { vmId }) => {
+    const vmTasks = pendingTasks.filter(task => task?.vmId === vmId)
+    return {
+      beingCreated: !!vmTasks.find(task => task.type === PendingTaskTypes.SNAPSHOT_ADD),
+      beingRestored: !!vmTasks.find(task => task.type === PendingTaskTypes.SNAPSHOT_RESTORE),
+      beingDeleted: !!vmTasks.find(task => task.type === PendingTaskTypes.SNAPSHOT_REMOVAL),
+    }
+  }
 )(Snapshots)
 
 /**
