@@ -40,6 +40,39 @@ export function buildMessageFromRecord ({ messageDescriptor: { id, params } = {}
   return `${translate({ id, params, msg })}\n${message}`
 }
 
+export function normalizeNotificationType (theType) {
+  theType = String(theType).toLowerCase()
+  // PF4 statuses
+  if (['default', 'warning', 'success', 'info', 'danger'].includes(theType)) {
+    return theType
+  }
+
+  // 'error' (used in PF3) was replaced by 'danger'
+  return theType === 'error' ? 'danger' : 'warning'
+}
+
+export function buildNotificationTitle ({ id, params } = {}, msg, type) {
+  if (!id) {
+    // no title provide - generate one based on type
+    return mapNotificationTypeToTitle(msg, type)
+  }
+  return translate({ id, params, msg })
+}
+
+function mapNotificationTypeToTitle (msg, type) {
+  switch (type) {
+    case 'warning':
+      return msg.warning()
+    case 'danger':
+      return msg.error()
+    case 'success':
+      return msg.success()
+    case 'info':
+    default:
+      return msg.info()
+  }
+}
+
 // "payload":{"message":"Not Found","messageDescriptor":{"id": "loginFailed"},"type":404,"action":{"type":"LOGIN","payload":{"credentials":{"username":"admin@internal","password":"admi"}}}}}
 export function hidePassword ({ action, param }) {
   if (action) {

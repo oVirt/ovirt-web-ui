@@ -1,17 +1,26 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { resourcesUrls } from '_/branding'
+import {
+  Brand,
+  Masthead,
+  MastheadBrand,
+  MastheadContent,
+  MastheadMain,
+} from '@patternfly/react-core'
 
 const Header = ({ children }) => {
   return (
-    <nav className='navbar navbar-pf-vertical obrand_masthead' role='navigation'>
-      <div className='navbar-header'>
-        <a href='/' className='navbar-brand obrand_headerLogoLink' id='pageheader-logo'>
-          <img className='obrand_mastheadLogo' src={resourcesUrls.clearGif} />
-        </a>
-      </div>
-      {children}
-    </nav>
+    <Masthead className='obrand_masthead' display={{ default: 'inline' }}>
+      <MastheadMain>
+        <MastheadBrand className='obrand_headerLogoLink' id='pageheader-logo'>
+          <Brand className='obrand_mastheadLogo' src={resourcesUrls.clearGif}/>
+        </MastheadBrand>
+      </MastheadMain>
+      <MastheadContent>
+        {children}
+      </MastheadContent>
+    </Masthead>
   )
 }
 

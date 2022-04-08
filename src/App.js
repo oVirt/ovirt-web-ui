@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
@@ -12,11 +12,18 @@ import RefreshIntervalChangeHandler from '_/components/RefreshIntervalChangeHand
 import SessionActivityTracker from '_/components/SessionActivityTracker'
 import ToastNotifications from '_/components/ToastNotifications'
 import VmsPageHeader from '_/components/VmsPageHeader'
+import VmUserMessages from '_/components/VmUserMessages'
 import ConsoleNotificationsDialog from '_/components/VmActions/ConsoleNotificationsDialog'
 
 import getRoutes from '_/routes'
 import { fixedStrings } from '_/branding'
 import { MsgContext } from '_/intl'
+
+import {
+  Page,
+} from '@patternfly/react-core'
+
+import Header from './components/Header'
 
 function isLoginMissing (config) {
   return !config.get('loginToken') || config.get('isTokenExpired')
@@ -56,6 +63,9 @@ function isBrowserUnsupported () {
  */
 const App = ({ history, config, appReady, activateSessionTracker }) => {
   const { msg } = useContext(MsgContext)
+  const [isDrawerExpanded, setDrawerExpanded] = useState(false)
+  const toggleNotificationDrawer = () => setDrawerExpanded(!isDrawerExpanded)
+
   if (isBrowserUnsupported()) {
     return <UnsupportedBrowser />
   }
@@ -66,16 +76,28 @@ const App = ({ history, config, appReady, activateSessionTracker }) => {
 
   return (
     <ConnectedRouter history={history}>
-      <div id='app-container'>
-        <VmsPageHeader title={fixedStrings.BRAND_NAME + ' ' + msg.vmPortal()} />
-        <OvirtApiCheckFailed />
-        <LoadingData />
-        <ToastNotifications />
-        <ConsoleNotificationsDialog/>
-        { appReady && activateSessionTracker && <SessionActivityTracker /> }
+
+      <OvirtApiCheckFailed />
+      <LoadingData />
+      <ToastNotifications />
+      <ConsoleNotificationsDialog/>
+      { appReady && activateSessionTracker && <SessionActivityTracker /> }
+      { appReady && <RefreshIntervalChangeHandler /> }
+      <Page
+        header={(
+          <Header>
+            <VmsPageHeader
+              title={fixedStrings.BRAND_NAME + ' ' + msg.vmPortal()}
+              onCloseNotificationDrawer={toggleNotificationDrawer}
+              isDrawerExpanded={isDrawerExpanded}
+            />
+          </Header>
+        )}
+        notificationDrawer={<VmUserMessages onClose={toggleNotificationDrawer} />}
+        isNotificationDrawerExpanded={isDrawerExpanded}
+      >
         { appReady && renderRoutes(getRoutes()) }
-        { appReady && <RefreshIntervalChangeHandler /> }
-      </div>
+      </Page>
     </ConnectedRouter>
   )
 }
