@@ -11,8 +11,6 @@ import {
   REMOVE_SNAPSHOT_RESTORE_PENDING_TASK,
 } from '_/constants'
 
-import { PendingTaskTypes } from '_/reducers/pendingTasks'
-
 export function addDiskRemovalPendingTask (diskId: string): any {
   return {
     type: ADD_DISK_REMOVAL_PENDING_TASK,
@@ -31,48 +29,60 @@ export function removeDiskRemovalPendingTask (diskId: string): any {
   }
 }
 
-export function addSnapshotRemovalPendingTask (snapshotId: string): any {
+export function addSnapshotRemovalPendingTask (vmId: string, snapshotId: string): any {
   return {
     type: ADD_SNAPSHOT_REMOVAL_PENDING_TASK,
     payload: {
-      type: PendingTaskTypes.SNAPSHOT_REMOVAL,
-      started: new Date(),
+      vmId,
       snapshotId,
     },
   }
 }
 
-export function removeSnapshotRemovalPendingTask (snapshotId: string): any {
+export function removeSnapshotRemovalPendingTask (vmId: string, snapshotId: string): any {
   return {
     type: REMOVE_SNAPSHOT_REMOVAL_PENDING_TASK,
-    payload: { snapshotId },
+    payload: {
+      vmId,
+      snapshotId,
+    },
   }
 }
 
-export function addSnapshotRestorePendingTask (): any {
+export function addSnapshotRestorePendingTask (vmId: string, snapshotId: string): any {
   return {
     type: ADD_SNAPSHOT_RESTORE_PENDING_TASK,
     payload: {
-      type: PendingTaskTypes.SNAPSHOT_RESTORE,
-      started: new Date(),
+      vmId,
+      snapshotId,
     },
   }
 }
 
-export function removeSnapshotRestorePendingTask (): any {
-  return { type: REMOVE_SNAPSHOT_RESTORE_PENDING_TASK }
+export function removeSnapshotRestorePendingTask (vmId: string, snapshotId: string): any {
+  return {
+    type: REMOVE_SNAPSHOT_RESTORE_PENDING_TASK,
+    payload: {
+      vmId,
+      snapshotId,
+    },
+  }
 }
 
-export function addSnapshotAddPendingTask (): any {
+export function addSnapshotAddPendingTask (vmId: string): any {
   return {
     type: ADD_SNAPSHOT_ADD_PENDING_TASK,
     payload: {
-      type: PendingTaskTypes.SNAPSHOT_ADD,
-      started: new Date(),
+      vmId,
     },
   }
 }
 
-export function removeSnapshotAddPendingTask (): any {
-  return { type: REMOVE_SNAPSHOT_ADD_PENDING_TASK }
+export function removeSnapshotAddPendingTask (vmId: string): any {
+  return {
+    type: REMOVE_SNAPSHOT_ADD_PENDING_TASK,
+    payload: {
+      vmId,
+    },
+  }
 }
