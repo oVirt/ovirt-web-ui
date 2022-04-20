@@ -231,7 +231,7 @@ function* refreshCreatePage ({ id: vmId, manualRefresh }) {
 
 function* refreshConsolePage ({ id: vmId }) {
   if (vmId) {
-    yield fetchAndPutSingleVm(Actions.getSingleVm({ vmId }))
+    yield fetchAndPutSingleVm(Actions.getSingleVm({ vmId, shallowFetch: true }))
   }
 }
 

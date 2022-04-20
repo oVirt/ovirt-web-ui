@@ -75,6 +75,18 @@ body {
   padding-top: 20px;
 }
 
+#page-router-render-component .pf-c-console {
+    grid-template-rows: min-content 1fr;
+}
+
+.pf-c-console  .pf-c-console__actions-vnc {
+  padding-right: 5px;
+}
+
+.pf-c-console .pf-c-console__vnc{
+    position: relative;
+}
+
 a.disabled {
   color: #8b8d8f !important;
   cursor: not-allowed !important;

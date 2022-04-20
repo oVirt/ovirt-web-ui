@@ -1,22 +1,30 @@
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useRef, useState, useEffect, useCallback } from 'react'
 
 import PropTypes from 'prop-types'
-import { css } from '@patternfly/react-styles'
-import { Button, EmptyState, EmptyStateBody, EmptyStateIcon, Spinner } from '@patternfly/react-core'
+
+import {
+  Button,
+  EmptyState,
+  EmptyStateBody,
+  EmptyStateIcon,
+  Spinner,
+} from '@patternfly/react-core'
 
 import { initLogging } from '@novnc/novnc/core/util/logging'
 import RFB from '@novnc/novnc/core/rfb'
 
 import {
-  VncActions,
   constants,
 } from '@patternfly/react-console'
 
-import styles from '@patternfly/react-styles/css/components/Consoles/VncConsole'
-import '@patternfly/react-styles/css/components/Consoles/VncConsole.css'
+import { VncActions } from '@patternfly/react-console/dist/esm/components/VncConsole/VncActions'
 
 const { CONNECTED, CONNECTING, DISCONNECTED } = constants
 
+/**
+ * Adapted from @patternfly/react-console/src/components/VncConsole/VncConsole.tsx
+ * Commit: e0240737eb6abb091c3ac83c3de8fb68420d7578
+ */
 const VncConsole = ({
   children,
   host,
@@ -33,146 +41,163 @@ const VncConsole = ({
   consoleContainerId,
   additionalButtons = [],
   onDisconnected = () => {},
-  onInitFailed,
-  onSecurityFailure,
+  onInitFailed = () => {},
+  onSecurityFailure = () => {},
   textConnect = 'Connect',
   textConnecting = 'Connecting',
   textDisconnected = 'Click Connect to open the VNC console.',
   textDisconnect = 'Disconnect',
   textSendShortcut,
   textCtrlAltDel,
+  wsProtocols = [],
+  className,
+  onConnected = () => {},
 }) => {
   const rfb = useRef()
-  let novncStaticComponent
-  let novncElem
-
+  const novncElem = useRef(null)
+  // auto-connect when entering the page
   const [status, setStatus] = useState(CONNECTING)
 
-  const addEventListeners = () => {
-    if (rfb.current) {
-      rfb.current?.addEventListener('connect', onConnected)
-      rfb.current?.addEventListener('disconnect', _onDisconnected)
-      rfb.current?.addEventListener('securityfailure', _onSecurityFailure)
-    }
-  }
+  const setStatusConnected = useCallback(() => {
+    setStatus(CONNECTED)
+    onConnected()
+  }, [setStatus, onConnected])
 
-  const removeEventListeners = () => {
-    if (rfb.current) {
-      rfb.current.removeEventListener('connect', onConnected)
-      rfb.current.removeEventListener('disconnect', _onDisconnected)
-      rfb.current.removeEventListener('securityfailure', _onSecurityFailure)
-    }
-  }
+  const setStatusDisconnected = useCallback((e) => {
+    setStatus(DISCONNECTED)
+    onDisconnected(e)
+  }, [setStatus, onDisconnected])
 
-  const connect = () => {
-    const protocol = encrypt ? 'wss' : 'ws'
-    const url = `${protocol}://${host}:${port}/${path}`
+  const setStatusDisconnectedSecurityFailure = useCallback((e) => {
+    setStatus(DISCONNECTED)
+    onSecurityFailure(e)
+  }, [setStatus, onSecurityFailure])
 
-    const options = {
-      repeaterID,
-      shared,
-      credentials,
+  const setStatusDisconnectedInitFailure = useCallback((e) => {
+    setStatus(DISCONNECTED)
+    onInitFailed(e)
+  }, [setStatus, onInitFailed])
+
+  const addEventListeners = useCallback(() => {
+    rfb.current?.addEventListener('connect', setStatusConnected)
+    rfb.current?.addEventListener('disconnect', setStatusDisconnected)
+    rfb.current?.addEventListener('securityfailure', setStatusDisconnectedSecurityFailure)
+  }, [setStatusConnected, setStatusDisconnected, setStatusDisconnectedSecurityFailure])
+
+  const removeEventListeners = useCallback(() => {
+    rfb.current?.removeEventListener('connect', setStatusConnected)
+    rfb.current?.removeEventListener('disconnect', setStatusDisconnected)
+    rfb.current?.removeEventListener('securityfailure', setStatusDisconnectedSecurityFailure)
+  }, [setStatusConnected, setStatusDisconnected, setStatusDisconnectedSecurityFailure])
+
+  const connect = useCallback(() => {
+    try {
+      const protocol = encrypt ? 'wss' : 'ws'
+      const url = `${protocol}://${host}:${port}/${path}`
+
+      const options = {
+        repeaterID,
+        shared,
+        credentials,
+        wsProtocols,
+      }
+      rfb.current = new RFB(novncElem.current, url, options)
+      addEventListeners()
+      rfb.current.viewOnly = viewOnly
+      rfb.current.scaleViewport = scaleViewport
+      rfb.current.resizeSession = resizeSession
+    } catch (e) {
+      rfb.current = undefined
+      setStatusDisconnectedInitFailure(e)
     }
-    rfb.current = new RFB(novncElem, url, options)
-    addEventListeners()
-    rfb.current.viewOnly = viewOnly
-    rfb.current.scaleViewport = scaleViewport
-    rfb.current.resizeSession = resizeSession
-  }
+  }, [
+    encrypt,
+    host,
+    port,
+    path,
+    repeaterID,
+    shared,
+    credentials,
+    viewOnly,
+    scaleViewport,
+    resizeSession,
+    wsProtocols,
+    addEventListeners,
+    setStatusDisconnectedInitFailure,
+  ])
+
+  useEffect(() => initLogging(vncLogging), [vncLogging])
 
   useEffect(() => {
-    initLogging(vncLogging)
-    try {
+    // side effect for CONNECTING state
+    if (status === CONNECTING && !rfb.current) {
       connect()
-    } catch (e) {
-      onInitFailed && onInitFailed(e)
-      rfb.current = undefined
     }
+  }, [status, connect])
 
-    return () => {
-      disconnect()
+  useEffect(() => {
+    // side effect for DISCONNECTED state
+    if (status === DISCONNECTED && rfb.current) {
       removeEventListeners()
       rfb.current = undefined
     }
-  }, [connect, onInitFailed, removeEventListeners, vncLogging])
+  }, [status, removeEventListeners])
 
-  const disconnect = () => {
-    if (!rfb.current) {
-      return
-    }
-    rfb.current.disconnect()
-  }
+  useEffect(() => {
+    // reload listeners on any listener change (required because RFB uses Set to store callbacks)
+    // cleanup listeners when leaving the page (in CONNECTED state rfb.current reference exists)
+    addEventListeners()
+    return () => removeEventListeners()
+  }, [addEventListeners, removeEventListeners])
 
-  const onConnected = () => {
-    setStatus(CONNECTED)
-  }
+  useEffect(() => {
+    // should be placed in the code after the effect that reloads listeners
+    // cleanup when leaving the page (in CONNECTED state rfb.current reference exists)
+    return () => rfb.current?.disconnect()
+  }, [])
 
-  const _onDisconnected = (e) => {
-    setStatus(DISCONNECTED)
-    onDisconnected(e)
-  }
+  // buttons are visible only in CONNECTED state
+  const onCtrlAltDel = () => rfb.current?.sendCtrlAltDel()
+  const disconnect = () => rfb.current?.disconnect() // callback will trigger state change
 
-  const _onSecurityFailure = (e) => {
-    setStatus(DISCONNECTED)
-    onSecurityFailure(e)
-  }
+  const rightContent = (
+    <VncActions
+      onCtrlAltDel={onCtrlAltDel}
+      textSendShortcut={textSendShortcut}
+      textCtrlAltDel={textCtrlAltDel}
+      textDisconnect={textDisconnect}
+      onDisconnect={disconnect}
+      additionalButtons={additionalButtons}
+    />
+  )
 
-  const onCtrlAltDel = () => {
-    if (rfb.current) {
-      rfb?.current?.sendCtrlAltDel()
-    }
-  }
+  const emptyStateDisconnected = (
+    <EmptyState>
+      <EmptyStateBody>{textDisconnected}</EmptyStateBody>
+      <Button
+        variant="primary"
+        onClick={ () => setStatus(CONNECTING)}
+      >
+        {textConnect}
+      </Button>
+    </EmptyState>
+  )
 
-  let rightContent
-  let emptyState
-  switch (status) {
-    case CONNECTED:
-      rightContent = (
-        <VncActions
-          onCtrlAltDel={onCtrlAltDel}
-          textSendShortcut={textSendShortcut}
-          textCtrlAltDel={textCtrlAltDel}
-          textDisconnect={textDisconnect}
-          onDisconnect={disconnect}
-          additionalButtons={additionalButtons}
-        />
-      )
-      break
-    case DISCONNECTED:
-      emptyState = (
-        <EmptyState>
-          <EmptyStateBody>{textDisconnected}</EmptyStateBody>
-          <Button variant="primary" onClick={connect}>
-            {textConnect}
-          </Button>
-        </EmptyState>
-      )
-      break
-    case CONNECTING:
-    default:
-      emptyState = (
-        <EmptyState>
-          <EmptyStateIcon variant="container" component={Spinner} />
-          <EmptyStateBody>{textConnecting}</EmptyStateBody>
-        </EmptyState>
-      )
-  }
-
-  if (!novncStaticComponent) {
-    novncStaticComponent = <div id={consoleContainerId} ref={e => (novncElem = e)} />
-  }
+  const emptyStateConnecting = (
+    <EmptyState>
+      <EmptyStateIcon variant="container" component={Spinner} />
+      <EmptyStateBody>{textConnecting}</EmptyStateBody>
+    </EmptyState>
+  )
 
   return (
     <>
-      {rightContent}
-      <div className={css(styles.consoleVnc)}>
+      {status === CONNECTED && rightContent}
+      <div className={`pf-c-console__vnc ${className}`}>
         {children}
-        <>
-          <div>
-            {emptyState}
-            {novncStaticComponent}
-          </div>
-        </>
+        {status === DISCONNECTED && emptyStateDisconnected}
+        {status === CONNECTING && emptyStateConnecting}
+        {status !== DISCONNECTED && <div id={consoleContainerId} ref={novncElem} />}
       </div>
     </>
   )
@@ -228,6 +253,17 @@ VncConsole.propTypes = {
   textSendShortcut: PropTypes.string,
   /** Text content rendered inside the Ctrl-Alt-Delete dropdown entry */
   textCtrlAltDel: PropTypes.string,
+
+  /** Properties not present in original @patternfly/react-console component */
+
+  /** allows to re-enable legacy defaults: the non-standard 'binary' protocol required by Qemu < 5.0.0
+   *  see https://github.com/novnc/noVNC/commit/c912230309806aacbae4295faf7ad6406da97617
+  */
+  wsProtocols: PropTypes.array,
+  /** styling for the console placeholder - used to toggle fullscreen mode */
+  className: PropTypes.string,
+  /** Callback removed in PF4 version - used to move focus */
+  onConnected: PropTypes.func,
 }
 
 export default VncConsole

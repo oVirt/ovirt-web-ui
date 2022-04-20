@@ -7,7 +7,6 @@ import { HomeIcon } from '@patternfly/react-icons'
 import Handler404 from './Handler404'
 import {
   VmDetailToolbar,
-  VmConsoleToolbar,
   VmsListToolbar,
   SettingsToolbar,
 } from './components/Toolbar'
@@ -61,7 +60,8 @@ export default function getRoutes () {
                 title: ({ msg }) => msg.console(),
                 component: VmConsolePage,
                 closeable: true,
-                toolbars: (match) => (<VmConsoleToolbar match={match} key='vmconsole' />),
+                // console page has embeded toolbar
+                toolbars: (match) => null,
                 isToolbarFullWidth: true,
                 type: CONSOLE_PAGE_TYPE,
               },

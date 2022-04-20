@@ -77,6 +77,14 @@
     height: 100%;
 }
 
+.in-page :global(#novnc-console-container) {
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    position: absolute;
+}
+
 .toast-message {
   text-align: center;
   align-content: center;
