@@ -242,6 +242,10 @@ function createNicInterfacesList (msg) {
       id: 'e1000',
       value: enumMsg('NicInterface', 'e1000', msg),
     },
+    {
+      id: 'e1000e',
+      value: enumMsg('NicInterface', 'e1000e', msg),
+    },
   ]
 }
 

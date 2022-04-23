@@ -43,7 +43,7 @@ LabelCol.propTypes = {
  *   - VNIC Profile (which includes the network) <-- needs to be on same DC and the VM
  *
  * Optional data:
- *   - Network Type (dual mode virtio and rtl8139, virtio, rtl8139, e1000)
+ *   - Network Type (dual mode virtio and rtl8139, virtio, rtl8139, e1000, e1000e)
  *     - NOTE: can only be changed if VM is down or Nic (card) is unplugged
  *   - Link State (Up = connected, Down = cable unplugged)
  */

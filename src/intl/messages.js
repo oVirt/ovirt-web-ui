@@ -267,6 +267,10 @@ export const messages: { [messageId: string]: MessageType } = {
     message: 'e1000',
     description: 'Display name of a NIC that provides an E1000 based interface to the VM',
   },
+  enum_NicInterface_e1000e: {
+    message: 'e1000e',
+    description: 'Display name of a NIC that provides an E1000E based interface to the VM',
+  },
   enum_NicInterface_rtl8139: {
     message: 'rtl8139',
     description: 'Display name of a NIC that provides a Realtek RTL8139 interface to the VM',

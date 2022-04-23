@@ -37,7 +37,7 @@ export const NIC_SHAPE = {
   id: PropTypes.string,
   name: PropTypes.string,
   vnicProfileId: PropTypes.string,
-  deviceType: PropTypes.string, // interface: [ virtio | rtl8139 | e1000 ]
+  deviceType: PropTypes.string, // interface: [ virtio | rtl8139 | e1000 | e1000e ]
   isFromTemplate: PropTypes.bool,
 }
 
