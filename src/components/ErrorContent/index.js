@@ -1,46 +1,43 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import {
+  Button,
+  EmptyState,
+  EmptyStateIcon,
+  EmptyStateBody,
+  EmptyStateSecondaryActions,
+  Title,
+} from '@patternfly/react-core'
 import * as branding from '_/branding'
-import styles from './style.css'
 
 const ErrorContent = ({ title, description, leftButton, rightButton }) => (
-  <div>
-    <div className={`container text-center ${styles.errorContentContainer}`}>
-      <img src={branding.resourcesUrls.errorImg} />
-      <h1 className='bolder'>{title}</h1>
-      <p className='h4' dangerouslySetInnerHTML={{ __html: description }} />
-      <div>
-        <a
-          href={leftButton.href}
-          className='btn'
-          onClick={
-            leftButton.onClick
-              ? e => {
-                e.preventDefault()
-                leftButton.onClick()
-              }
-              : null
-          }
-        >
-          {leftButton.title}
-        </a>
-        <a
-          href={rightButton.href}
-          className='btn-primary btn'
-          onClick={
-            rightButton.onClick
-              ? e => {
-                e.preventDefault()
-                rightButton.onClick()
-              }
-              : null
-          }
-        >
-          {rightButton.title}
-        </a>
-      </div>
-    </div>
-  </div>
+  <EmptyState>
+    <EmptyStateIcon icon={() => <img src={branding.resourcesUrls.errorImg} />} />
+    <Title headingLevel="h4" size="lg">
+      {title}
+    </Title>
+    <EmptyStateBody>
+      {description}
+    </EmptyStateBody>
+    <EmptyStateSecondaryActions>
+      <Button
+        component='a'
+        href={leftButton.href}
+        onClick={leftButton.onClick}
+        variant='secondary'
+      >
+        {leftButton.title}
+      </Button>
+      <Button
+        component='a'
+        href={rightButton.href}
+        onClick={rightButton.onClick}
+        variant='primary'
+      >
+        {rightButton.title}
+      </Button>
+    </EmptyStateSecondaryActions>
+  </EmptyState>
 )
 
 const buttonType = PropTypes.shape({
@@ -51,7 +48,7 @@ const buttonType = PropTypes.shape({
 
 ErrorContent.propTypes = {
   title: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
+  description: PropTypes.node.isRequired,
   leftButton: buttonType,
   rightButton: buttonType,
 }

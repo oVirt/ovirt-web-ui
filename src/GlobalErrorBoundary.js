@@ -4,6 +4,8 @@ import { msg, MsgContext, createMessages, locale } from './intl'
 import { logout } from '_/actions'
 import AppConfiguration from '_/config'
 import ErrorContent from '_/components/ErrorContent'
+import Header from './components/Header'
+import { Page } from '@patternfly/react-core'
 import * as branding from '_/branding'
 
 class GlobalErrorBoundary extends React.Component {
@@ -60,33 +62,33 @@ class GlobalErrorBoundary extends React.Component {
     const { hasError, msgContextState: { msg } } = this.state
     const trackText = branding.fixedStrings.ISSUES_TRACKER_TEXT || 'Github Issue Tracker'
     const trackUrl = branding.fixedStrings.ISSUES_TRACKER_URL || 'https://github.com/oVirt/ovirt-web-ui/issues'
-    const descr = msg.globalErrorBoundaryDescription({
-      bugUrl: `<a href='${trackUrl}'>${trackText}</a>`,
-    })
+    const descr = (
+      <p dangerouslySetInnerHTML={{
+        __html: msg.globalErrorBoundaryDescription({
+          bugUrl: `<a href='${trackUrl}'>${trackText}</a>`,
+        }),
+      }}
+      />
+    )
 
     if (hasError) {
       return (
-        <div>
-          <nav className='navbar navbar-pf-vertical obrand_masthead'>
-            <div className='navbar-header'>
-              <a href='/' className='navbar-brand obrand_headerLogoLink' id='pageheader-logo'>
-                <img className='obrand_mastheadLogo' src={branding.resourcesUrls.clearGif} />
-              </a>
-            </div>
-          </nav>
-          <ErrorContent
-            title={msg.globalErrorBoundaryTitle()}
-            description={descr}
-            leftButton={{
-              href: '#',
-              onClick: this.doLogout,
-              title: msg.logOut(),
-            }}
-            rightButton={{
-              href: AppConfiguration.applicationURL,
-              title: msg.refresh(),
-            }}
-          />
+        <div id="app-container">
+          <Page header={<Header/>}>
+            <ErrorContent
+              title={msg.globalErrorBoundaryTitle()}
+              description={descr}
+              leftButton={{
+                href: '#',
+                onClick: this.doLogout,
+                title: msg.logOut(),
+              }}
+              rightButton={{
+                href: AppConfiguration.applicationURL,
+                title: msg.refresh(),
+              }}
+            />
+          </Page>
         </div>
       )
     }

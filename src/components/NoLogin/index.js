@@ -1,7 +1,14 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 
-import { Button } from '@patternfly/react-core'
+import {
+  Button,
+  EmptyState,
+  EmptyStateIcon,
+  EmptyStateBody,
+  Page,
+  Title,
+} from '@patternfly/react-core'
 import { MsgContext } from '_/intl'
 import AppConfiguration from '_/config'
 import Header from '../Header'
@@ -14,29 +21,31 @@ import style from './style.css'
 const NoLogin = ({ logoutWasManual = false, isTokenExpired = false }) => {
   const { msg } = useContext(MsgContext)
   return (
-    <div>
-      <Header />
-      <div className={`container text-center ${style['logout-container']}`}>
-        <img src={signOutIcon} className={style['logout-icon']} />
-        <h1>{msg.loggedOut()}</h1>
-        <div className={style['logout-description']}>
+    <Page header={<Header/>} >
+      <EmptyState>
+        <EmptyStateIcon icon={() => <img src={signOutIcon} className={style['logout-icon']} />} />
+        <Title headingLevel="h4" size="lg">
+          {msg.loggedOut()}
+        </Title>
+        <EmptyStateBody>
           { window.DEVELOPMENT && isTokenExpired && msg.logoutTokenExpiredMessage() }
           { window.DEVELOPMENT && !isTokenExpired && msg.logoutDeveloperMessage() }
           { !window.DEVELOPMENT && msg.logoutRedirected() }
-        </div>
-        <div>
-          <Button
-            component='a'
-            href={AppConfiguration.applicationURL}
-            variant='primary'
-          >
-            {msg.logBackIn()}
-          </Button>
-        </div>
-      </div>
-    </div>
+        </EmptyStateBody>
+
+        <Button
+          component='a'
+          href={AppConfiguration.applicationURL}
+          variant='primary'
+        >
+          {msg.logBackIn()}
+        </Button>
+      </EmptyState>
+
+    </Page>
   )
 }
+
 NoLogin.propTypes = {
   logoutWasManual: PropTypes.bool.isRequired,
   isTokenExpired: PropTypes.bool,

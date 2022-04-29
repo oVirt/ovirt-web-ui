@@ -71,7 +71,7 @@ const App = ({ history, config, appReady, activateSessionTracker }) => {
   }
 
   if (isLoginMissing(config)) {
-    return <NoLogin logoutWasManual={config.get('logoutWasManual')} isTokenExpired={config.get('isTokenExpired')} />
+    return <div id='app-container'><NoLogin logoutWasManual={config.get('logoutWasManual')} isTokenExpired={config.get('isTokenExpired')} /></div>
   }
 
   return (
