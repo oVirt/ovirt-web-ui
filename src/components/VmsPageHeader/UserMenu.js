@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { logout } from '_/actions'
 
 import { MsgContext } from '_/intl'
-import AboutDialog from '../About'
+import AboutDialog from '_/components/About'
 import { Tooltip } from '_/components/tooltips'
 
 const UserMenu = ({ config, onLogout }) => {

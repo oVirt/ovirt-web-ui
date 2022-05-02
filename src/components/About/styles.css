@@ -1,0 +1,37 @@
+/** based on PF3 about-modal-pf **/
+.about-modal {
+    color: #fff;
+    padding-bottom: 16px;
+    padding-top: 16px;
+    padding-left: 40px;
+    padding-right: 40px;
+}
+
+/** based on PF3 product-versions-pf **/
+.product-versions {
+    margin-bottom: 30px;
+    margin-top: 30px;
+}
+
+/** based on PF3 list-unstyled **/
+.list-unstyled {
+    padding-left: 0;
+    list-style: none;
+}
+
+
+.about-modal a {
+    color: #ffffff;
+}
+
+/** close button styling */
+.about-modal :global(.pf-c-button.pf-m-plain:hover) {
+    color:#fff;
+}
+
+.about-modal :global(.pf-c-button.pf-m-plain) {
+    color:darkgrey
+}
+
+
+

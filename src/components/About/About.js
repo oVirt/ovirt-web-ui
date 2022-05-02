@@ -4,8 +4,9 @@ import { connect } from 'react-redux'
 import { withMsg } from '_/intl'
 
 import { Modal, ModalVariant } from '@patternfly/react-core'
-import Product from '../version'
-import { fixedStrings } from '../branding'
+import Product from '../../version'
+import { fixedStrings } from '../../branding'
+import styles from './styles.css'
 
 const LegalInfo = () => {
   const idPrefix = 'about-legal'
@@ -65,7 +66,7 @@ class AboutDialog extends React.Component {
           <Modal
             id={`${idPrefix}-modal`}
             onClose={closeModal}
-            className='about-modal-pf obrand_aboutBackground'
+            className={`${styles['about-modal']} obrand_aboutBackground`}
             variant={ModalVariant.medium}
             position='top'
             isOpen={true}
@@ -73,8 +74,8 @@ class AboutDialog extends React.Component {
           >
 
             <h1 id={`${idPrefix}-title`}>{fixedStrings.BRAND_NAME} {msg.vmPortal()}</h1>
-            <div className='product-versions-pf'>
-              <ul className='list-unstyled'>
+            <div className={styles['product-versions']}>
+              <ul className={styles['list-unstyled']}>
                 <li id={`${idPrefix}-version`}>
                   <div dangerouslySetInnerHTML={{ __html: webUiVersionText }} />
                 </li>
