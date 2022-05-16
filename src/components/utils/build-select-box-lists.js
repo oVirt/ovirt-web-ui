@@ -46,7 +46,7 @@ function createIsoList (storageDomains, dataCenterId = null) {
     .toList()
     .filter(storageDomain =>
       storageDomain.has('files') &&
-      storageDomain.get('canUserUseDomain') &&
+      storageDomain.get('canUserUseIsoImages') &&
       (dataCenterId === null
         ? true
         : storageDomain.getIn(['statusPerDataCenter', dataCenterId]) === 'active')

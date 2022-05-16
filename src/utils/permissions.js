@@ -42,6 +42,10 @@ export function canUserUseStorageDomain (permits: Array<string>): boolean {
   return checkUserPermit(['create_disk', 'attach_disk_profile'], permits)
 }
 
+export function canUserUseIsoImages (permits: Array<string>): boolean {
+  return checkUserPermit(['attach_disk_profile'], permits)
+}
+
 export function canUserEditVmStorage (permits: Array<string>): boolean {
   return checkUserPermit('configure_vm_storage', permits)
 }

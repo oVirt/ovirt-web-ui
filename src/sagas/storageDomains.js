@@ -2,7 +2,7 @@ import Api, { Transforms } from '_/ovirtapi'
 import { all, call, put, select } from 'redux-saga/effects'
 
 import { callExternalAction, entityPermissionsToUserPermits } from './utils'
-import { canUserUseStorageDomain } from '_/utils'
+import { canUserUseStorageDomain, canUserUseIsoImages } from '_/utils'
 
 import {
   setDataCenters,
@@ -72,6 +72,7 @@ function* fetchDataAndIsoStorageDomains () {
     for (const storageDomain of storageDomainsInternal) {
       storageDomain.userPermits = yield entityPermissionsToUserPermits(storageDomain)
       storageDomain.canUserUseDomain = canUserUseStorageDomain(storageDomain.userPermits)
+      storageDomain.canUserUseIsoImages = canUserUseIsoImages(storageDomain.userPermits)
     }
 
     return storageDomainsInternal

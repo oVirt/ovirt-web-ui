@@ -790,6 +790,7 @@ const StorageDomain = {
       permissions,
       userPermits: new Set(),
       canUserUseDomain: false,
+      canUserUseIsoImages: false,
     }
   },
 
