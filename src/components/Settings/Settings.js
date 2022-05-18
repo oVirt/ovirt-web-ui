@@ -130,7 +130,7 @@ const Settings = ({
         { partialSave.show && (
           <CounterAlert
             timeout={10}
-            type='danger'
+            type='error'
             title={<p>{msg.failedToSaveChangesToFields()}</p>}
             onDismiss={() => resetNotifications(setShowPartialSave, { show: false, fields: [] })}
           >
@@ -140,7 +140,7 @@ const Settings = ({
         { showCompleteFailure && (
           <CounterAlert
             timeout={10}
-            type='danger'
+            type='error'
             title={msg.failedToSaveChanges()}
             onDismiss={() => resetNotifications(setShowCompleteFailure, false)}
           />

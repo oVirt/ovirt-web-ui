@@ -9,8 +9,7 @@ import { generateUnique, buildMessageFromRecord } from '_/helpers'
 import { formatUptimeDuration } from '_/utils'
 import { editVm } from '_/actions'
 
-import { FormControl, FormGroup, HelpBlock, Checkbox } from 'patternfly-react'
-import { Alert } from '@patternfly/react-core'
+import { FormControl, FormGroup, HelpBlock, Alert, Checkbox } from 'patternfly-react'
 
 import BaseCard from '../../BaseCard'
 import VmIcon from '../../../VmIcon'
@@ -299,14 +298,9 @@ class OverviewCard extends React.Component {
 
               { correlatedMessages && correlatedMessages.size > 0 &&
                 correlatedMessages.map((message, key) => (
-                  <Alert
-                    key={`user-message-${key}`}
-                    variant='danger'
-                    isInline
-                    style={{ margin: '5px 0 0 0' }}
-                    id={`${idPrefix}-alert`}
-                    title={buildMessageFromRecord(message.toJS(), msg)}
-                  />
+                  <Alert key={`user-message-${key}`} type='error' style={{ margin: '5px 0 0 0' }} id={`${idPrefix}-alert`}>
+                    {buildMessageFromRecord(message.toJS(), msg)}
+                  </Alert>
                 )
                 )
               }

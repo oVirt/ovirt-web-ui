@@ -2,7 +2,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { Alert, AlertActionCloseButton } from '@patternfly/react-core'
+import { Alert } from 'patternfly-react'
 import style from './sharedStyle.css'
 
 class CounterAlert extends React.Component {
@@ -45,13 +45,10 @@ class CounterAlert extends React.Component {
   render () {
     const { title, type, children } = this.props
     return this.state.showAlert && (
-      <Alert
-        variant={type}
-        actionClose={<AlertActionCloseButton onClose={this.handleDismiss} />}
-        className={style['text-align-left']}
-        title={title}
-        children={children}
-      />
+      <Alert type={type} onDismiss={this.handleDismiss} className={style['text-align-left']}>
+        {title}
+        {children}
+      </Alert>
     )
   }
 }

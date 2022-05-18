@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import { addVmSnapshot } from './actions'
 
 import {
+  Alert,
   Button,
   Col,
   Form,
@@ -16,7 +17,6 @@ import {
   Modal,
   noop,
 } from 'patternfly-react'
-import { Alert } from '@patternfly/react-core'
 import { withMsg } from '_/intl'
 import style from './style.css'
 
@@ -94,13 +94,8 @@ class NewSnapshotModal extends Component {
           <Modal.Body>
             <Form onSubmit={this.handleSave} horizontal>
               <Col sm={12}>
-                <Alert
-                  variant='info'
-                  isInline
-                  title={msg.details()}
-                  style={{ 'margin-bottom': '10px' }}
-                >
-                  {msg.snapshotInfo() }
+                <Alert type='info'>
+                  { msg.snapshotInfo() }
                 </Alert>
               </Col>
               <FormGroup bsClass='form-group col-sm-12 required' validationState={this.state.emptyDescription ? 'error' : null}>
