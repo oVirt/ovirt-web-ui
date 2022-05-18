@@ -13,7 +13,7 @@ export function extractErrorText (exception: Object): string {
     : (exception.statusText || 'UNKNOWN')
 }
 
-export function failedExternalAction ({ message, messageDescriptor, exception, failedAction }: FailedExternalActionInputType): FailedExternalActionType {
+export function failedExternalAction ({ message, titleDescriptor, messageDescriptor, exception, failedAction }: FailedExternalActionInputType): FailedExternalActionType {
   if (exception) {
     message = message || extractErrorText(exception)
     message = customizeErrorMessage(message)
@@ -25,6 +25,7 @@ export function failedExternalAction ({ message, messageDescriptor, exception, f
       payload: {
         message,
         messageDescriptor,
+        titleDescriptor,
         type,
         failedAction,
       },
@@ -34,8 +35,9 @@ export function failedExternalAction ({ message, messageDescriptor, exception, f
   return {
     type: FAILED_EXTERNAL_ACTION,
     payload: {
-      messageDescriptor,
       message,
+      messageDescriptor,
+      titleDescriptor,
       failedAction,
     },
   }
