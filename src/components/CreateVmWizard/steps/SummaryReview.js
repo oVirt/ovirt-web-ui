@@ -1,8 +1,7 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Icon, Spinner, Label } from 'patternfly-react'
-import { Alert } from '@patternfly/react-core'
+import { Alert, Icon, Spinner, Label } from 'patternfly-react'
 import { InfoCircleIcon } from '@patternfly/react-icons'
 
 import { MsgContext, enumMsg } from '_/intl'
@@ -291,13 +290,13 @@ const SummaryReview = ({
             {msg.createVmWizardReviewSuccess()}
           </div>
           { progress.messages && progress.messages.length > 0 && (
-            <Alert variant='success' isInline title={msg.messages()}>{
-                progress.messages.map((message, index) => (
-                  <div key={`message-${index}`}>
-                    { message }
-                  </div>
-                ))
-              }
+            <Alert type='success' >
+              {progress.messages.map((message, index) => (
+                <div key={`message-${index}`}>
+                  { message }
+                </div>
+              )
+              )}
             </Alert>
           )}
         </div>
@@ -311,13 +310,13 @@ const SummaryReview = ({
             {msg.createVmWizardReviewError()}
           </div>
           { progress.messages && progress.messages.length > 0 && (
-            <Alert variant='danger' isInline title={msg.messages()}>{
-                progress.messages.map((message, index) => (
-                  <div key={`message-${index}`}>
-                    { message }
-                  </div>
-                ))
-              }
+            <Alert type='error' >
+              {progress.messages.map((message, index) => (
+                <div key={`message-${index}`}>
+                  { message }
+                </div>
+              )
+              )}
             </Alert>
           )}
         </div>

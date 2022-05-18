@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Card, CardBody } from 'patternfly-react'
-import { Alert } from '@patternfly/react-core'
+import { Alert, Card, CardBody } from 'patternfly-react'
 import { withMsg } from '_/intl'
 
 import styles from './style.css'
@@ -64,7 +63,7 @@ class VmDetailsContainer extends React.Component {
             <Col>
               <Card>
                 <CardBody>
-                  <Alert variant='info' isInline title={msg.vmHasPendingConfigurationChanges()}/>
+                  <Alert type='info' style={{ margin: '0' }}>{msg.vmHasPendingConfigurationChanges()}</Alert>
                 </CardBody>
               </Card>
             </Col>

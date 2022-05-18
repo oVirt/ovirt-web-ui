@@ -77,15 +77,15 @@ export function* callExternalAction (method, action = {}, canBeMissing = false) 
         yield put(checkTokenExpired())
       }
 
-      let titleDescriptor = shortErrorMessage({ action })
+      let messageDescriptor = shortErrorMessage({ action })
       if (e.status === 0 && e.statusText === 'error') { // special case, mixing https and http
-        titleDescriptor = { id: 'apiConnectionFailed' }
+        messageDescriptor = { id: 'apiConnectionFailed' }
         e.statusText = 'Unable to connect to oVirt REST API. Please check URL and protocol (https).'
       }
 
       yield put(failedExternalAction({
         exception: e,
-        titleDescriptor,
+        messageDescriptor,
         failedAction: action,
       }))
     }

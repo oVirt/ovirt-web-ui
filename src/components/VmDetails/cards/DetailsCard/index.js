@@ -34,12 +34,13 @@ import {
 } from '_/components/utils'
 
 import {
+  Alert,
   ExpandCollapse,
   FormControl,
   Icon,
 } from 'patternfly-react'
 
-import { Switch, Alert } from '@patternfly/react-core'
+import { Switch } from '@patternfly/react-core'
 
 import SelectBox from '_/components/SelectBox'
 import BaseCard from '../../BaseCard'
@@ -1093,13 +1094,9 @@ class DetailsCard extends React.Component {
                 ) }
 
                 { correlatedMessages && correlatedMessages.size > 0 && correlatedMessages.map((message, key) => (
-                  <Alert
-                    key={`user-message-${key}`}
-                    variant='danger'
-                    isInline
-                    style={{ margin: '5px 0 0 0' }}
-                    title={buildMessageFromRecord(message.toJS(), msg)}
-                  />
+                  <Alert key={`user-message-${key}`} type='error' style={{ margin: '5px 0 0 0' }}>
+                    {buildMessageFromRecord(message.toJS(), msg)}
+                  </Alert>
                 ))}
               </>
             )

@@ -38,7 +38,6 @@ export type MessageDescriptorType = {
 export type FailedExternalActionInputType = {
   message: string,
   messageDescriptor: ?MessageDescriptorType,
-  titleDescriptor: ?MessageDescriptorType,
   exception?: Object,
   failedAction?: Object
 }
@@ -49,7 +48,6 @@ export type FailedExternalActionType = {
     message: string,
     failedAction?: Object,
     messageDescriptor: ?MessageDescriptorType,
-    titleDescriptor: ?MessageDescriptorType,
     type?: number | 'ERROR'
   }
 }
