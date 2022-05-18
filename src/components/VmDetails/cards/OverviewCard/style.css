@@ -2,6 +2,28 @@
  * Styles for the Overview Card
  */
 
+.bold {
+   font-weight: var(--pf-global--FontWeight--bold);
+ }
+
+ .fullWidth {
+  width: 100%;
+}
+
+.event {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+
+.event :global(.pf-c-label) {
+  margin-right: 5px;
+  /* width: 100%; */
+}
+
 .operating-system-label {
   position: absolute;
   top: 0;
@@ -11,7 +33,9 @@
 
 .vm-info {
   padding: 15px;
-  flex-grow: 1
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .vm-name {
@@ -57,13 +81,13 @@
 }
 
 .os-icon {
-  padding: 15px;
+    padding: 15px;
 }
 
 .container {
   display: flex;
   overflow: visible;
-  flex-flow: row wrap;
+  flex-flow: row nowrap;
 }
 
 .pool-vm-label {

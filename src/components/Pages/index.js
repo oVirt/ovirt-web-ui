@@ -10,7 +10,7 @@ import VmDetails from '../VmDetails'
 import VmConsole from '../VmConsole'
 import Handler404 from '_/Handler404'
 import { GlobalSettings } from '../UserSettings'
-
+import { EventsTable } from '_/components/Events'
 /**
  * Route component (for PageRouter) to view the list of VMs and Pools
  */
@@ -106,9 +106,18 @@ const VmConsolePageConnected = connect(
   (dispatch) => ({})
 )(VmConsolePage)
 
+const VmEventsPage = ({ match }) => {
+  return <EventsTable vmId={match?.params?.id}/>
+}
+
+VmEventsPage.propTypes = {
+  match: RouterPropTypeShapes.match.isRequired,
+}
+
 export {
   VmConsolePageConnected as VmConsolePage,
   VmDetailsPageConnected as VmDetailsPage,
   VmsListPage,
   GlobalSettingsPage,
+  VmEventsPage,
 }

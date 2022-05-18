@@ -1,13 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import { push } from 'connected-react-router'
 
 import sharedStyle from '../../../sharedStyle.css'
 import { getOsHumanName, getVmIcon, isVmNameValid, isHostNameValid } from '_/components/utils'
 import { enumMsg, withMsg } from '_/intl'
-import { generateUnique, buildMessageFromRecord } from '_/helpers'
+import { generateUnique, buildMessageFromRecord, toJS } from '_/helpers'
 import { formatUptimeDuration } from '_/utils'
 import { editVm } from '_/actions'
+import { formatHowLongAgo } from '_/utils/format'
 
 import {
   Alert,
@@ -16,12 +18,19 @@ import {
   FormGroup,
   TextArea,
   TextInput,
+  List,
+  ListItem,
+  Button,
+  Label,
+  Tooltip,
 } from '@patternfly/react-core'
 
 import BaseCard from '../../BaseCard'
 import VmIcon from '../../../VmIcon'
 import VmStatusIcon from '../../../VmStatusIcon'
+import { EventStatus } from '_/components/Events'
 import style from './style.css'
+import itemListStyle from '../../itemListStyle.css'
 
 /**
  * Overview of the VM (icon, OS type, name, state, description)
@@ -196,7 +205,7 @@ class OverviewCard extends React.Component {
   }
 
   render () {
-    const { vm, icons, vms, operatingSystems, isEditable, msg } = this.props
+    const { vm, icons, vms, operatingSystems, isEditable, msg, locale, lastEvents, goToEventsPage } = this.props
     const { isEditing, correlatedMessages, nameError, updateCloudInit, disableHostnameToggle } = this.state
 
     const elapsedUptime = vm.getIn(['statistics', 'elapsedUptime', 'firstDatum'], 0)
@@ -232,7 +241,7 @@ class OverviewCard extends React.Component {
       >
         {({ isEditing }) => {
           return (
-            <div>
+            <>
               <div id={`${idPrefix}-os-label`} className={`${sharedStyle['operating-system-label']} ${style['operating-system-label']}`}>
                 {getOsHumanName(vm.getIn(['os', 'type']))}
               </div>
@@ -318,7 +327,26 @@ class OverviewCard extends React.Component {
                 )
                 )
               }
-            </div>
+
+              { !isEditing && (
+                <>
+                  <label className={style.bold} >{msg.lastEvents()}</label>
+                  <Button isSmall variant='link' onClick={goToEventsPage}> {msg.viewAll()}</Button>
+                  <List isPlain>
+                    { lastEvents.length === 0 && <ListItem className={itemListStyle['no-items']}>{msg.noEventsFound()}</ListItem>}
+                    { lastEvents.map(({ id, time, description, severity }) => (
+                      <Tooltip key={id} content={<span>{new Date(time).toLocaleString(locale)} {description}</span>}>
+                        <ListItem className={style.event}>
+                          <Label icon={<EventStatus severity={severity}/>}>{formatHowLongAgo(time)}</Label>
+                          {description}
+                        </ListItem>
+                      </Tooltip>
+                    ))
+                    }
+                  </List>
+                </>
+              )}
+            </>
           )
         }}
       </BaseCard>
@@ -336,10 +364,13 @@ OverviewCard.propTypes = {
   operatingSystems: PropTypes.object.isRequired, // deep immutable, {[id: string]: OperatingSystem}
   userMessages: PropTypes.object.isRequired,
   templates: PropTypes.object.isRequired,
+  lastEvents: PropTypes.array,
 
   saveChanges: PropTypes.func.isRequired,
+  goToEventsPage: PropTypes.func.isRequired,
 
   msg: PropTypes.object.isRequired,
+  locale: PropTypes.string.isRequired,
 }
 
 export default connect(
@@ -350,8 +381,10 @@ export default connect(
     userMessages: state.userMessages,
     templates: state.templates,
     isEditable: vm.get('canUserEditVm'),
+    lastEvents: toJS(state.userMessages.getIn(['lastEvents', vm.get('id')], [])),
   }),
-  (dispatch) => ({
+  (dispatch, { vm }) => ({
     saveChanges: (minimalVmChanges, correlationId) => dispatch(editVm({ vm: minimalVmChanges }, { correlationId })),
+    goToEventsPage: () => dispatch(push(`/vm/${vm.get('id')}/events`)),
   })
 )(withMsg(OverviewCard))
