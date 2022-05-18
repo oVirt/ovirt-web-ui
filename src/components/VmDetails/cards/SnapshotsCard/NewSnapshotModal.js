@@ -108,7 +108,7 @@ class NewSnapshotModal extends Component {
                 variant='info'
                 isInline
                 title={msg.details()}
-                style={{ 'margin-bottom': '10px' }}
+                style={{ marginBottom: '10px' }}
               >
                 {msg.snapshotInfo() }
               </Alert>

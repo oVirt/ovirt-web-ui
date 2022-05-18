@@ -28,7 +28,7 @@ const ConfirmationModal = ({ show, title, confirm, body, subContent, onClose, ex
           typeof body === 'string'
             ? (
               <>
-                <p className='lead'>
+                <p>
                   { body }
                 </p>
                 {

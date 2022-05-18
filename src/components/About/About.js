@@ -4,8 +4,8 @@ import { connect } from 'react-redux'
 import { withMsg } from '_/intl'
 
 import { Modal, ModalVariant } from '@patternfly/react-core'
-import Product from '../../version'
-import { fixedStrings } from '../../branding'
+import Product from '_/version'
+import { fixedStrings } from '_/branding'
 import styles from './styles.css'
 
 const LegalInfo = () => {
@@ -58,10 +58,11 @@ class AboutDialog extends React.Component {
       link: `<a href='${fixedStrings.DOCUMENTATION_LINK}' target='_blank' id='${idPrefix}-documentation-link'><strong>${msg.aboutDialogDocumentationText()}</strong></a>`,
     })
     const closeModal = () => this.setState({ openModal: false })
+    const openModal = () => this.setState({ openModal: true })
 
     return (
       <>
-        <a href='#' id='about-modal-link' onClick={() => this.setState({ openModal: true })}>{msg.about()}</a>
+        <a href='#' id='about-modal-link' onClick={openModal}>{msg.about()}</a>
         { this.state.openModal && (
           <Modal
             id={`${idPrefix}-modal`}

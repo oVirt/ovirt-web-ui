@@ -9,10 +9,9 @@ const HotPlugChangeConfirmationModal = ({ show, onCancel, onApplyLater, onApplyN
     <ConfirmationModal
       show={show}
       onClose={onCancel}
-      title={msg.hotPlugConfirmTitle()}
+      title={msg.hotPlugConfirmContent()}
 
-      body={msg.hotPlugConfirmContent()}
-      subContent={msg.hotPlugConfirmContentDetail()}
+      body={msg.hotPlugConfirmContentDetail()}
 
       confirm={{ title: msg.hotPlugConfirmApplyNow(), onClick: onApplyNow }}
       extra={{ title: msg.hotPlugConfirmApplyAfterRestart(), onClick: onApplyLater }}

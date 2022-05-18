@@ -10,7 +10,7 @@ const NavigationConfirmationModal = ({ show, onYes, onNo, additionalNote }) => {
   return (
     <Modal
       isOpen={show}
-      title={msg.unsavedChangesTitle()}
+      title={msg.unsavedChangesConfirmMessage()}
       titleIconVariant='warning'
       variant={ModalVariant.small}
       onClose={onNo}
@@ -24,7 +24,7 @@ const NavigationConfirmationModal = ({ show, onYes, onNo, additionalNote }) => {
         </Button>,
       ]}
     >
-      <p className='lead'>{msg.unsavedChangesConfirmMessage()}</p>
+      <p>{msg.allUnsavedWillBeLost()}</p>
       <p>{additionalNote}</p>
     </Modal>
   )

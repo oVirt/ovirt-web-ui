@@ -117,6 +117,7 @@ const DiskListItem = ({
           { canDelete && (
             <DeleteConfirmationModal
               id={`${idPrefix}-delete-modal`}
+              title={msg.permanentlyDeleteDisk()}
               severity='danger'
               onDelete={() => { onDelete(vm.get('id'), view.id) }}
               trigger={({ onClick }) => (

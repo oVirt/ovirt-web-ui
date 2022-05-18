@@ -45,7 +45,7 @@ class RestoreConfirmationModal extends React.Component {
           id={id}
           show={this.state.showModal}
           onClose={this.close}
-          title={msg.confirmRestore()}
+          title={msg.restoreSnapshot()}
           body={(
             <>
               <div

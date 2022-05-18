@@ -33,6 +33,7 @@ class DeleteConfirmationModal extends React.Component {
       trigger,
       id,
       severity = 'normal',
+      title,
       msg,
     } = this.props
 
@@ -45,10 +46,10 @@ class DeleteConfirmationModal extends React.Component {
           id={id}
           show={this.state.show}
           onClose={this.handleClose}
-          title={msg.confirmDelete()}
+          title={title || msg.confirmDelete()}
           body={children}
           variant={variant}
-          confirm={{ onClick: this.handleDelete, title: msg.delete() }}
+          confirm={{ onClick: this.handleDelete, title: msg.delete(), type: variant }}
         />
       </>
     )
@@ -62,6 +63,7 @@ DeleteConfirmationModal.propTypes = {
   onDelete: PropTypes.func.isRequired,
   onClose: PropTypes.func,
   severity: PropTypes.oneOf(['normal', 'danger']),
+  title: PropTypes.string,
   msg: PropTypes.object.isRequired,
 }
 

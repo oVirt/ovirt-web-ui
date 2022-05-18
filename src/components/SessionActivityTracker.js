@@ -73,7 +73,7 @@ class SessionActivityTracker extends React.Component {
         <ConfirmationModal
           show={this.state.counter > 0 && this.state.counter <= TIME_TO_DISPLAY_MODAL}
           onClose={onLogout}
-          title={msg.attention()}
+          title={msg.continueWithSession()}
           body={msg.sessionExpired() }
           subContent={(
             <>

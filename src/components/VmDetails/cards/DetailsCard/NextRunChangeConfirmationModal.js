@@ -11,8 +11,7 @@ const NextRunChangeConfirmationModal = ({ show, onCancel, onSave, onSaveAndResta
       onClose={onCancel}
       title={msg.nextRunConfirmTitle()}
 
-      body={msg.nextRunConfirmContent()}
-      subContent={msg.nextRunConfirmContentDetail()}
+      body={msg.nextRunConfirmContentDetail()}
 
       extra={{ onClick: onSave, title: msg.nextRunConfirmActionSave() }}
       confirm={{ onClick: onSaveAndRestart, title: msg.nextRunConfrimActionSaveRestart() }}

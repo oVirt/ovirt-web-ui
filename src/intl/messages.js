@@ -46,6 +46,7 @@ export const messages: { [messageId: string]: MessageType } = {
     description: 'In sense of "human friendly name"',
   },
   allocatedVms: 'Allocated VMs',
+  allUnsavedWillBeLost: 'The page contains unsaved changes. All unsaved information will be lost.',
   allTabs: 'This action is applied to all tabs.',
   apiConnectionFailed: 'oVirt API connection failed',
   apiVersionCheckFailed: 'oVirt API version check failed',
@@ -53,7 +54,6 @@ export const messages: { [messageId: string]: MessageType } = {
   areYouSureYouWantToDeleteNic: 'Are you sure you want to delete NIC {nicName}?',
   areYouSureYouWantToDeleteSnapshot: 'Are you sure you want to delete snapshot {snapshotName}?',
   areYouSureYouWantToRestoreSnapshot: 'Are you sure you want to restore snapshot {snapshotName}?',
-  attention: 'Attention!',
   authorizationExpired: 'Authorization expired. The page is going to be reloaded to re-login.',
   automaticPoolsNotEditable: 'The pool type of {poolName} is automatic so the details of this virtual machine are not editable.',
   availableVmsFromPool: 'Available VMs from this Pool',
@@ -96,7 +96,6 @@ export const messages: { [messageId: string]: MessageType } = {
   cluster: 'Cluster',
   clusterCanOnlyChangeWhenVmStopped: 'Cluster can only be changed when the VM is stopped.',
   confirmDelete: 'Confirm Delete',
-  confirmRestore: 'Confirm Restore',
   connect: {
     message: 'Connect',
     description: 'Connect button for SSO authorization modal dialog.',
@@ -122,6 +121,7 @@ export const messages: { [messageId: string]: MessageType } = {
     message: 'Continue',
     description: 'Button to continue user session in SessionTimeout modal component.',
   },
+  continueWithSession: 'Continue with your session?',
   coresPerSockets: 'Cores per Virtual Socket',
   cpus: 'Total Virtual CPUs',
   cpusBadTopology: 'No valid CPU topology exists for this total Virtual CPUs count.',
@@ -402,11 +402,10 @@ export const messages: { [messageId: string]: MessageType } = {
   hostNameTooltip: 'Virtual Machine hostname.',
   hotPlugConfirmApplyAfterRestart: 'Apply after Restart',
   hotPlugConfirmApplyNow: 'Apply Changes Now',
-  hotPlugConfirmContent: 'Apply Changes Now with Hot Plug',
+  hotPlugConfirmContent: 'Apply Changes Now with Hot Plug?',
   hotPlugConfirmContentDetail:
   'Applying the changes to CPU and/or Memory can be done right now but it requires ' +
   'doing a hot plug.  You can choose to apply these changes after a restart instead.',
-  hotPlugConfirmTitle: 'Apply Changes',
   htmlPleaseReferToDocumentationForMoreInformation: 'Please refer to <a href="{documentationUrl}" target="_blank">documentation</a> for more information.',
   htmlUnsupportedOvirtVersionFoundButVersionAtLeastRequired: '<strong>Unsupported {version} {productName} version</strong> found, but at least version {requiredVersion} is required.',
   icon: 'Icon',
@@ -467,12 +466,11 @@ export const messages: { [messageId: string]: MessageType } = {
   newSnapshot: 'New snapshot',
   nextRunConfirmActionSave: 'Save Changes',
   nextRunConfrimActionSaveRestart: 'Save Changes and Restart',
-  nextRunConfirmContent: 'Some Configuration Changes Will Be Applied on Restart',
   nextRunConfirmContentDetail:
     'Some configuration changes will not be able to take effect until the ' +
     'Virtual Machine is restarted next.  A power cycle needs to take place to ' +
     'pick up this new configuration.',
-  nextRunConfirmTitle: 'Configuration Change on Restart',
+  nextRunConfirmTitle: 'Restart required',
   nextSnapshotsWillBeDeleted: 'Restoring this snapshot will also delete newer snapshots:',
   nic: 'Network interfaces',
   nicActionCreateNew: 'Create NIC',
@@ -539,6 +537,9 @@ export const messages: { [messageId: string]: MessageType } = {
   permissionsNoEditVm: 'You do not have the required permissions to edit a VM.',
   permissionsNoEditThisVm: 'You do not have permissions to edit VM {name} / {vmId}',
   pendingChanges: 'Pending Changes',
+  permanentlyDeleteDisk: 'Permanently delete Disk?',
+  permanentlyDeleteNic: 'Permanently delete Nic?',
+  permanentlyDeleteSnapshot: 'Permanently delete Snapshot?',
   persistenceReEnableHowTo: {
     message: 'To re-enable server-side persistence go to {advancedOptions}.',
     description: 'Instruction for the user how to re-enable server side persistence. Parameter advancedOptions is the translated label for Advanced Options section in Account Setttings',
@@ -592,6 +593,7 @@ export const messages: { [messageId: string]: MessageType } = {
     message: 'Restore',
     description: 'Confirmation modal action button label for a Restore operation',
   },
+  restoreSnapshot: 'Restore Snapshot?',
   results: {
     message: '{total} Results',
     description: 'Number of filtered fetched VMs (including pools)',
@@ -693,12 +695,8 @@ export const messages: { [messageId: string]: MessageType } = {
     description: 'unknown data center',
   },
   unsavedChangesConfirmMessage: {
-    message: 'Are you sure you want to drop your changes?',
-    description: 'Message in the modal dialog opened when a user tried to navigate off an editor page after changes have been made.',
-  },
-  unsavedChangesTitle: {
-    message: 'Dialog contains unsaved changes',
-    description: 'Title of modal dialog opened when a user tried to navigate off an editor page after changes have been made.',
+    message: 'Drop your changes?',
+    description: 'Title of a modal dialog opened when a user tried to navigate off an editor page after changes have been made.',
   },
   untilNextPageReload: {
     message: 'until next page reload',
