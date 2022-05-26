@@ -16,13 +16,14 @@ import uniqueId from 'lodash/uniqueId'
 
 import type { FailedExternalActionType } from '_/actions/types'
 
-function addLogEntry ({ state, message, type = 'ERROR', failedAction, messageDescriptor }: any): any {
+function addLogEntry ({ state, message, type = 'ERROR', failedAction, messageDescriptor, titleDescriptor }: any): any {
   // TODO: use seq
   return state
     .update('records', records => records.unshift(Immutable.fromJS({
       id: uniqueId(),
       message,
       messageDescriptor,
+      titleDescriptor,
       type,
       failedAction,
       time: Date.now(),
@@ -42,11 +43,12 @@ const initialState = Immutable.fromJS({
 
 const userMessages: any = actionReducer(initialState, {
   // Log external action failures (i.e. AJAX calls) as user messages
-  [FAILED_EXTERNAL_ACTION] (state: any, { payload: { message, messageDescriptor, type, failedAction } }: FailedExternalActionType): any {
+  [FAILED_EXTERNAL_ACTION] (state: any, { payload: { message, messageDescriptor, titleDescriptor, type, failedAction } }: FailedExternalActionType): any {
     return addLogEntry({
       state,
       message,
       messageDescriptor,
+      titleDescriptor,
       type,
       failedAction,
     })
