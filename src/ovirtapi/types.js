@@ -185,7 +185,7 @@ export type StorageDomainFileType = Object
 export type ApiClusterType = Object
 export type ClusterType = Object
 
-type NicInterfaceType = 'e1000' | 'pci_passthrough' | 'rtl8139' | 'rtl8139_virtio' | 'virtio'
+type NicInterfaceType = 'e1000' | 'e1000e' | 'pci_passthrough' | 'rtl8139' | 'rtl8139_virtio' | 'virtio'
 
 type IpType = {
   address: string,
