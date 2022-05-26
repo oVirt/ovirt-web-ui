@@ -596,6 +596,7 @@ export const messages: { [messageId: string]: MessageType } = {
     description: 'Confirmation modal action button label for a Restore operation',
   },
   restoreSnapshot: 'Restore Snapshot?',
+  restoredSnapshot: 'Finished restoring snapshot {snapshotName} of VM {vmName}.',
   results: {
     message: '{total} Results',
     description: 'Number of filtered fetched VMs (including pools)',
