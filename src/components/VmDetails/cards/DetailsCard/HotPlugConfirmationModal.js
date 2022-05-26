@@ -1,37 +1,20 @@
 import React, { useContext } from 'react'
 import PropsTypes from 'prop-types'
-import {
-  MessageDialog,
-  Button,
-  Icon,
-  noop,
-} from 'patternfly-react'
 import { MsgContext } from '_/intl'
+import ConfirmationModal from '_/components/VmActions/ConfirmationModal'
 
 const HotPlugChangeConfirmationModal = ({ show, onCancel, onApplyLater, onApplyNow }) => {
   const { msg } = useContext(MsgContext)
   return (
-    <MessageDialog
+    <ConfirmationModal
       show={show}
-      onHide={onCancel}
-      title={msg.hotPlugConfirmTitle()}
-      icon={<Icon type='pf' name='warning-triangle-o' />}
+      onClose={onCancel}
+      title={msg.hotPlugConfirmContent()}
 
-      primaryContent={<div className='lead'>{msg.hotPlugConfirmContent()}</div>}
-      secondaryContent={<div>{msg.hotPlugConfirmContentDetail()}</div>}
+      body={msg.hotPlugConfirmContentDetail()}
 
-      accessibleName='prompt-hot-plug'
-      accessibleDescription='hot-plug-configuration-change-will-be-applied-now'
-
-      primaryAction={noop}
-      primaryActionButtonContent=''
-      footer={(
-        <>
-          <Button onClick={onCancel}>{msg.cancel()}</Button>
-          <Button onClick={onApplyLater}>{msg.hotPlugConfirmApplyAfterRestart()}</Button>
-          <Button bsStyle='primary' onClick={onApplyNow}>{msg.hotPlugConfirmApplyNow()}</Button>
-        </>
-      )}
+      confirm={{ title: msg.hotPlugConfirmApplyNow(), onClick: onApplyNow }}
+      extra={{ title: msg.hotPlugConfirmApplyAfterRestart(), onClick: onApplyLater }}
     />
   )
 }

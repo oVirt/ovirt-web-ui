@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { MessageDialog, Icon } from 'patternfly-react'
 import { withMsg } from '_/intl'
+import ConfirmationModal from '../VmActions/ConfirmationModal'
 
 class DeleteConfirmationModal extends React.Component {
   constructor (props) {
@@ -33,33 +33,23 @@ class DeleteConfirmationModal extends React.Component {
       trigger,
       id,
       severity = 'normal',
+      title,
       msg,
     } = this.props
 
-    const primary = Array.isArray(children) ? children[0] : children
-    const secondary = Array.isArray(children) ? children.slice(1) : undefined
-
-    const icon = severity === 'normal'
-      ? <Icon type='pf' name='warning-triangle-o' />
-      : <Icon type='pf' name='error-circle-o' />
-    const primaryButtonStyle = severity === 'normal' ? 'primary' : 'danger'
+    const variant = severity === 'normal' ? 'warning' : 'danger'
 
     return (
       <>
         { trigger({ onClick: this.handleTriggerClick }) }
-        <MessageDialog
+        <ConfirmationModal
           id={id}
           show={this.state.show}
-          onHide={this.handleClose}
-          primaryAction={this.handleDelete}
-          secondaryAction={this.handleClose}
-          primaryActionButtonBsStyle={primaryButtonStyle}
-          primaryActionButtonContent={msg.delete()}
-          secondaryActionButtonContent={msg.cancel()}
-          title={msg.confirmDelete()}
-          icon={icon}
-          primaryContent={<div id={`${id}-lead`} className='lead'>{primary}</div>}
-          secondaryContent={secondary}
+          onClose={this.handleClose}
+          title={title || msg.confirmDelete()}
+          body={children}
+          variant={variant}
+          confirm={{ onClick: this.handleDelete, title: msg.delete(), type: variant }}
         />
       </>
     )
@@ -73,6 +63,7 @@ DeleteConfirmationModal.propTypes = {
   onDelete: PropTypes.func.isRequired,
   onClose: PropTypes.func,
   severity: PropTypes.oneOf(['normal', 'danger']),
+  title: PropTypes.string,
   msg: PropTypes.object.isRequired,
 }
 

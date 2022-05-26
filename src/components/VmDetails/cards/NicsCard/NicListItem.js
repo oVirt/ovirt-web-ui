@@ -108,6 +108,8 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEd
           { canDelete && (
             <DeleteConfirmationModal
               id={`${idPrefix}-delete-modal`}
+              severity='danger'
+              title={msg.permanentlyDeleteNic()}
               onDelete={() => { onDelete(nic.id) }}
               trigger={({ onClick }) => (
                 <Tooltip id={`${idPrefix}-delete-tooltip`} tooltip={msg.nicDeleteTooltip()}>

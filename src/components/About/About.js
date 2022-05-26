@@ -3,9 +3,10 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withMsg } from '_/intl'
 
-import { Modal } from 'patternfly-react'
-import Product from '../version'
-import { fixedStrings } from '../branding'
+import { Modal, ModalVariant } from '@patternfly/react-core'
+import Product from '_/version'
+import { fixedStrings } from '_/branding'
+import styles from './styles.css'
 
 const LegalInfo = () => {
   const idPrefix = 'about-legal'
@@ -56,41 +57,46 @@ class AboutDialog extends React.Component {
     const docLink = msg.aboutDialogDocumentationLink({
       link: `<a href='${fixedStrings.DOCUMENTATION_LINK}' target='_blank' id='${idPrefix}-documentation-link'><strong>${msg.aboutDialogDocumentationText()}</strong></a>`,
     })
+    const closeModal = () => this.setState({ openModal: false })
+    const openModal = () => this.setState({ openModal: true })
 
     return (
       <>
-        <a href='#' id='about-modal' onClick={() => this.setState({ openModal: true })}>{msg.about()}</a>
+        <a href='#' id='about-modal-link' onClick={openModal}>{msg.about()}</a>
         { this.state.openModal && (
-          <Modal id={`${idPrefix}-modal`} contentClassName='about-modal-pf obrand_aboutBackground' onHide={() => this.setState({ openModal: false })} show>
-            <Modal.Header>
-              <Modal.CloseButton onClick={() => this.setState({ openModal: false })} />
-            </Modal.Header>
-            <Modal.Body>
-              <h1 id={`${idPrefix}-title`}>{fixedStrings.BRAND_NAME} {msg.vmPortal()}</h1>
-              <div className='product-versions-pf'>
-                <ul className='list-unstyled'>
-                  <li id={`${idPrefix}-version`}>
-                    <div dangerouslySetInnerHTML={{ __html: webUiVersionText }} />
-                  </li>
-                  <li id={`${idPrefix}-apiversion`}>
-                    <div dangerouslySetInnerHTML={{ __html: apiVersionText }} />
-                  </li>
-                  {fixedStrings.DOCUMENTATION_LINK && (
-                    <li id={`${idPrefix}-documentation`}>
-                      <span dangerouslySetInnerHTML={{ __html: docLink }} />
-                    </li>
-                  )}
-                  <li id={`${idPrefix}-issues`}>
-                    <div dangerouslySetInnerHTML={{ __html: reportLink }} />
-                  </li>
-                </ul>
-              </div>
+          <Modal
+            id={`${idPrefix}-modal`}
+            onClose={closeModal}
+            className={`${styles['about-modal']} obrand_aboutBackground`}
+            variant={ModalVariant.medium}
+            position='top'
+            isOpen={true}
 
-              <LegalInfo />
-            </Modal.Body>
-            <Modal.Footer>
-              <div className='obrand_aboutApplicationLogo' id={`${idPrefix}-applogo`} />
-            </Modal.Footer>
+          >
+
+            <h1 id={`${idPrefix}-title`}>{fixedStrings.BRAND_NAME} {msg.vmPortal()}</h1>
+            <div className={styles['product-versions']}>
+              <ul className={styles['list-unstyled']}>
+                <li id={`${idPrefix}-version`}>
+                  <div dangerouslySetInnerHTML={{ __html: webUiVersionText }} />
+                </li>
+                <li id={`${idPrefix}-apiversion`}>
+                  <div dangerouslySetInnerHTML={{ __html: apiVersionText }} />
+                </li>
+                {fixedStrings.DOCUMENTATION_LINK && (
+                  <li id={`${idPrefix}-documentation`}>
+                    <span dangerouslySetInnerHTML={{ __html: docLink }} />
+                  </li>
+                )}
+                <li id={`${idPrefix}-issues`}>
+                  <div dangerouslySetInnerHTML={{ __html: reportLink }} />
+                </li>
+              </ul>
+            </div>
+
+            <LegalInfo />
+            <div className='obrand_aboutApplicationLogo' id={`${idPrefix}-applogo`} />
+
           </Modal>
         )}
       </>

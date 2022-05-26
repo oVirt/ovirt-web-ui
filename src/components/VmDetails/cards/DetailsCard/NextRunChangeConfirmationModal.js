@@ -1,39 +1,20 @@
 import React, { useContext } from 'react'
 import PropsTypes from 'prop-types'
-import {
-  MessageDialog,
-  Button,
-  Icon,
-  noop,
-} from 'patternfly-react'
 import { MsgContext } from '_/intl'
+import ConfirmationModal from '_/components/VmActions/ConfirmationModal'
 
 const NextRunChangeConfirmationModal = ({ show, onCancel, onSave, onSaveAndRestart }) => {
   const { msg } = useContext(MsgContext)
   return (
-    <MessageDialog
+    <ConfirmationModal
       show={show}
-      onHide={onCancel}
+      onClose={onCancel}
       title={msg.nextRunConfirmTitle()}
-      icon={<Icon type='pf' name='warning-triangle-o' />}
 
-      primaryContent={<div className='lead'>{msg.nextRunConfirmContent()}</div>}
-      secondaryContent={<div>{msg.nextRunConfirmContentDetail()}</div>}
+      body={msg.nextRunConfirmContentDetail()}
 
-      accessibleName='prompt-next-run'
-      accessibleDescription='next-run-configuration-change-will-be-applied-on-restart'
-
-      primaryAction={noop}
-      primaryActionButtonContent=''
-      footer={(
-        <>
-          <Button onClick={onCancel}>{msg.cancel()}</Button>
-          <Button onClick={onSave}>{msg.nextRunConfirmActionSave()}</Button>
-          <Button bsStyle='primary' onClick={onSaveAndRestart}>
-            {msg.nextRunConfrimActionSaveRestart()}
-          </Button>
-        </>
-      )}
+      extra={{ onClick: onSave, title: msg.nextRunConfirmActionSave() }}
+      confirm={{ onClick: onSaveAndRestart, title: msg.nextRunConfrimActionSaveRestart() }}
     />
   )
 }

@@ -156,6 +156,8 @@ class SnapshotItem extends React.Component {
           <DeleteConfirmationModal
             key='delete'
             id={`${this.props.id}-delete-modal`}
+            severity='danger'
+            title={msg.permanentlyDeleteSnapshot()}
             onDelete={this.props.onSnapshotDelete}
             trigger={({ onClick }) => (
               <SnapshotAction key='delete' id={`${this.props.id}-delete`} disabled={isActionsDisabled} onClick={onClick}>

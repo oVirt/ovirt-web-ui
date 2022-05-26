@@ -1,7 +1,6 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
-import { Modal, Button } from 'patternfly-react'
-import { Alert } from '@patternfly/react-core'
+import { Modal, ModalVariant, Button } from '@patternfly/react-core'
 import { MsgContext } from '_/intl'
 
 const NavigationConfirmationModal = ({ show, onYes, onNo, additionalNote }) => {
@@ -9,25 +8,24 @@ const NavigationConfirmationModal = ({ show, onYes, onNo, additionalNote }) => {
   const idPrefix = 'close-dialog-confim'
 
   return (
-    <Modal show={show}>
-      <Modal.Header>
-        <Modal.Title id={`${idPrefix}-title`}>{msg.unsavedChangesTitle()}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Alert
-          variant='warning'
-          isInline
-          isPlain
-          id={`${idPrefix}-body-text`}
-          title={msg.unsavedChangesConfirmMessage()}
-        >
-          {additionalNote}
-        </Alert>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button id={`${idPrefix}-button-no`} onClick={onNo} bsStyle='default'>{msg.no()}</Button>
-        <Button id={`${idPrefix}-button-yes`} onClick={onYes} bsStyle='primary'>{msg.yes()}</Button>
-      </Modal.Footer>
+    <Modal
+      isOpen={show}
+      title={msg.unsavedChangesConfirmMessage()}
+      titleIconVariant='warning'
+      variant={ModalVariant.small}
+      onClose={onNo}
+      position='top'
+      actions={[
+        <Button id={`${idPrefix}-button-yes`} key="confirm" variant="primary" onClick={onYes}>
+          {msg.yes()}
+        </Button>,
+        <Button id={`${idPrefix}-button-no`} key="cancel" variant="link" onClick={onNo}>
+          {msg.no()}
+        </Button>,
+      ]}
+    >
+      <p>{msg.allUnsavedWillBeLost()}</p>
+      <p>{additionalNote}</p>
     </Modal>
   )
 }
