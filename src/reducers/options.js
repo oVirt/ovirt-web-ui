@@ -13,6 +13,7 @@ const defaultOptions: UserOptionsType = {
   localOptions: {
     showNotifications: true,
     notificationSnoozeDuration: AppConfiguration.notificationSnoozeDurationInMinutes,
+    tableView: false,
   },
   remoteOptions: {
     autoconnect: {
@@ -54,6 +55,10 @@ const defaultOptions: UserOptionsType = {
     smartcardSpice: {
       id: undefined,
       content: AppConfiguration.smartcardSpice,
+    },
+    viewForVirtualMachines: {
+      id: undefined,
+      content: 'card',
     },
   },
   ssh: undefined,

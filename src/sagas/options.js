@@ -135,7 +135,11 @@ function* saveRemoteOption ([name, value]: any): any | ResultType {
   if (value === currentValue && optionId) {
     return toResult({ change: name, sameAsCurrent: true })
   }
+  const result = yield commitSaveRemoteOption({ name, value, userId, currentValue, optionId })
+  return result
+}
 
+function* commitSaveRemoteOption ({ name, value, userId, currentValue, optionId }: any): any | ResultType {
   const result = (yield call(
     callExternalAction,
     Api.persistUserOption,
@@ -193,6 +197,7 @@ function* saveGlobalOptions ({
     fullScreenSpice,
     ctrlAltEndSpice,
     smartcardSpice,
+    viewForVirtualMachines,
   }, meta: { transactionId },
 }: SaveGlobalOptionsActionType): Generator<any, any, any> {
   const { ssh, locale, shouldPersistLocale, ...standardRemoteOptions } = yield all({
@@ -208,6 +213,7 @@ function* saveGlobalOptions ({
     ctrlAltEndSpice: call(saveRemoteOption, ...Object.entries({ ctrlAltEndSpice })),
     smartcardSpice: call(saveRemoteOption, ...Object.entries({ smartcardSpice })),
     autoconnect: call(saveRemoteOption, ...Object.entries({ autoconnect })),
+    viewForVirtualMachines: call(saveRemoteOption, ...Object.entries({ viewForVirtualMachines })),
   })
 
   yield all(
@@ -280,6 +286,29 @@ function* deleteRemoteUserOption (action: any): any {
   return result
 }
 
+function* saveRemoteSilently ({ payload: { name, value } }: any): any {
+  const [userId, currentValue, optionId] = yield select(({ options, config }) => [
+    config.getIn(['user', 'id']),
+    options.getIn(['remoteOptions', name, 'content']),
+    options.getIn(['remoteOptions', name, 'id']),
+  ])
+
+  if (value !== currentValue) {
+    // set the value immediately for better user experience
+    yield put(A.setOption({ key: ['remoteOptions', name], value: { id: undefined, content: value } }))
+  }
+
+  if (value === currentValue && optionId) {
+    // the remote is already up to date
+    return
+  }
+
+  // update the remote
+  const result = yield commitSaveRemoteOption({ name, value, userId, currentValue, optionId })
+  // ignore failure
+  yield put(A.setOption({ key: ['remoteOptions', name], value: { id: result?.data?.value?.id, content: value } }))
+}
+
 function* updateNotifications (show: {current: boolean, next?: boolean}, snooze: {current: number, next?: number}): any {
   const snoozeDuration = snooze.next || snooze.current
   const showNotifications = show.next === undefined ? show.current : show.next
@@ -321,4 +350,5 @@ export default ([
   takeLatest(C.FETCH_OPTIONS, fetchUserOptions),
   takeLatest(C.EXPORT_LOCALE, exportInferredLocale),
   takeEvery(C.DELETE_USER_OPTION, deleteRemoteUserOption),
+  takeEvery(C.SAVE_USER_OPTION_SILENTLY, saveRemoteSilently),
 ]: Array<any>)

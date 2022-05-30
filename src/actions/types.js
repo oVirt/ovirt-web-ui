@@ -25,7 +25,8 @@ export type SaveGlobalOptionsActionType = {
     ctrlAltEndVnc?: boolean,
     fullScreenSpice?: boolean,
     ctrlAltEndSpice?: boolean,
-    smartcardSpice?: boolean
+    smartcardSpice?: boolean,
+    viewForVirtualMachines?: string
   |},
   meta: {|
     transactionId: string

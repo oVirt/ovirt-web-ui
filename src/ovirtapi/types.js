@@ -320,7 +320,8 @@ export type RemoteUserOptionsType = {|
   ctrlAltEndVnc?: UserOptionType<boolean>,
   fullScreenSpice?: UserOptionType<boolean>,
   ctrlAltEndSpice?: UserOptionType<boolean>,
-  smartcardSpice?: UserOptionType<boolean>
+  smartcardSpice?: UserOptionType<boolean>,
+  viewForVirtualMachines?: UserOptionType<string>
 |}
 
 export type UserOptionsType = {|

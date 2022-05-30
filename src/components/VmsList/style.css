@@ -5,6 +5,12 @@
     margin: 0 auto;
 }
 
+td .card-pf-icon {
+    height: 25px;
+    display: unset;
+    vertical-align: middle;
+}
+
 .crop {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -30,11 +36,22 @@
     margin-bottom: 10px;
 }
 
+td .vm-name {
+    margin-bottom: 0;
+}
+
 .vm-status {
     font-size: 1em;
     min-height: 46px;
     margin-bottom: 10px;
 }
+
+td .vm-status {
+    min-height: unset;
+    margin-bottom: 0;
+}
+
+
 
 .vm-detail-link {
     color: black;
@@ -71,6 +88,14 @@
     align-items: center;
 }
 
+td .pool-vm-label {
+    padding: 0;
+    float: unset;
+    height: unset;
+    margin: 0;
+    justify-content: center;
+}
+
 .actions-container {
     /*
     reserve space so that the card without action buttons has
@@ -83,6 +108,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+td .actions-container {
+    justify-content: left;
 }
 
 dl.pool-info {
@@ -121,3 +150,7 @@ dl.pool-info dd {
     font-style: italic;
     font-weight: bold;
 }
+
+:global(#page-router-render-component) .tableView  {
+    padding-top: 0;
+} 

@@ -3,14 +3,31 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { MsgContext } from '_/intl'
 import { getByPage } from '_/actions'
-import { filterVms, sortFunction } from '_/utils'
+import {
+  filterVms,
+  sortFunction,
+  SortFields,
+  ICON,
+  POOL_INFO,
+  ACTIONS,
+  NAME,
+  OS,
+  STATUS,
+} from '_/utils'
 
 import useInfiniteScroll from '@closeio/use-infinite-scroll'
-import Vm from './Vm'
-import Pool from './Pool'
+import {
+  CardVm,
+  TableVm,
+} from './Vm'
+import {
+  CardPool,
+  TablePool,
+} from './Pool'
 
 import style from './style.css'
 import { Gallery, GalleryItem } from '@patternfly/react-core'
+import TableView from './TableView'
 
 /**
  * Use Patternfly 'Single Select Card View' pattern to show every VM and Pool
@@ -20,7 +37,7 @@ import { Gallery, GalleryItem } from '@patternfly/react-core'
  * before this component is rendered.  This will prevent two "initial page" fetches
  * from running at the same time.  The `VmsList` component handles this normally.
  */
-const VmCardList = ({ vms, alwaysShowPoolCard, fetchMoreVmsAndPools }) => {
+const VmCardList = ({ vms, alwaysShowPoolCard, fetchMoreVmsAndPools, tableView }) => {
   const { msg, locale } = useContext(MsgContext)
   const sort = vms.get('sort').toJS()
   const filters = vms.get('filters').toJS()
@@ -79,31 +96,77 @@ const VmCardList = ({ vms, alwaysShowPoolCard, fetchMoreVmsAndPools }) => {
     }
   }, [vms, scrollerRef, sentinelRef, fetchMoreVmsAndPools])
 
+  const columnList = [
+    { id: ICON },
+    {
+      ...SortFields[NAME],
+      sort: true,
+    },
+    {
+      ...SortFields[STATUS],
+      sort: true,
+    },
+    { id: POOL_INFO },
+    {
+      ...SortFields[OS],
+      sort: true,
+    },
+    { id: ACTIONS },
+  ]
+
   return (
-    <div ref={scrollerRef}>
-      <Gallery hasGutter className={style['gallery-container']}>
-        {vmsAndPools.map(entity => (
-          <GalleryItem key={entity.get('id')}>{
+    <div ref={scrollerRef} className={tableView ? style.tableView : ''}>
+      { !tableView && (
+        <Gallery hasGutter className={style['gallery-container']}>
+          {vmsAndPools.map(entity => (
+            <GalleryItem key={entity.get('id')}>{
             entity.get('isVm')
-              ? <Vm vm={entity} />
-              : <Pool pool={entity} />}
-          </GalleryItem>
-        ))}
-      </Gallery>
+              ? <CardVm vm={entity} />
+              : <CardPool pool={entity} />}
+            </GalleryItem>
+          ))}
+        </Gallery>
+      )}
+      {tableView && (
+        <TableView
+          columns={columnList}
+          sort={sort}
+        >
+          { vmsAndPools.map(entity => (
+            entity.get('isVm')
+              ? (
+                <TableVm
+                  columns={columnList}
+                  key={entity.get('id')}
+                  vm={entity}
+                />
+              )
+              : (
+                <TablePool
+                  columns={columnList}
+                  key={entity.get('id')}
+                  pool={entity}
+                />
+              )
+          ))}
+        </TableView>
+      )}
       {hasMore && <div ref={sentinelRef} className={style['infinite-scroll-sentinel']}>{msg.loadingTripleDot()}</div>}
     </div>
   )
 }
 VmCardList.propTypes = {
+  tableView: PropTypes.bool.isRequired,
   vms: PropTypes.object.isRequired,
   alwaysShowPoolCard: PropTypes.bool,
   fetchMoreVmsAndPools: PropTypes.func.isRequired,
 }
 
 export default connect(
-  (state) => ({
-    vms: state.vms,
-    alwaysShowPoolCard: !state.config.get('filter'),
+  ({ vms, config, options }) => ({
+    vms,
+    alwaysShowPoolCard: !config.get('filter'),
+    tableView: options.getIn(['remoteOptions', 'viewForVirtualMachines', 'content']) === 'table',
   }),
   (dispatch) => ({
     fetchMoreVmsAndPools: () => dispatch(getByPage()),

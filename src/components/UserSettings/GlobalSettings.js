@@ -139,6 +139,7 @@ class GlobalSettings extends Component {
         ctrlAltEndSpice: false,
         preferredConsole: config.defaultUiConsole,
         smartcardSpice: AppConfiguration.smartcardSpice,
+        viewForVirtualMachines: 'card',
       },
     }
     this.handleCancel = this.handleCancel.bind(this)
@@ -578,6 +579,7 @@ export default connect(
       ctrlAltEndSpice: options.getIn(['remoteOptions', 'ctrlAltEndSpice', 'content']),
       preferredConsole: options.getIn(['remoteOptions', 'preferredConsole', 'content'], config.getIn(['defaultUiConsole'])),
       smartcardSpice: options.getIn(['remoteOptions', 'smartcardSpice', 'content']),
+      viewForVirtualMachines: options.getIn(['remoteOptions', 'viewForVirtualMachines', 'content']),
     },
     lastTransactionId: options.getIn(['lastTransactions', 'global', 'transactionId'], ''),
   }),
