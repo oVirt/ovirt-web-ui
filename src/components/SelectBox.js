@@ -1,67 +1,48 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { sortedBy } from '_/helpers'
 
-import style from './sharedStyle.css'
-import { Tooltip } from '_/components/tooltips'
 import { withMsg } from '_/intl'
+import { Select, SelectOption, SelectVariant } from '@patternfly/react-core'
 
-const NOBREAK_SPACE = '\u00A0'
-
-const MarkAsDefault = withMsg(({ msg, value, isDefault }) => {
-  if (!isDefault) {
-    return value
-  }
-  return (<>{value}{NOBREAK_SPACE}<i>{msg.defaultOption()}</i></>
-  )
-})
-
-/*
- * TODO: Update this to use a patternfly-react component. Probably use a width styled
- *       __DropdownButton__ with a set of scrolling __MenuItem__s.
- */
-
-const SelectBox = ({ sort, items = [], locale, selected, onChange, validationState, id, disabled }) => {
+const SelectBox = ({ msg, sort, items = [], locale, selected, onChange, validationState, id, disabled }) => {
+  const [open, setOpen] = useState(false)
   if (sort) {
     sortedBy(items, 'value', locale)
   }
+  const options = items.map(({ id, value: name, isDefault }) => ({ id, name, isDefault, toString: () => name }))
   const selectedId = selected ?? items?.[0]?.id ?? null
-  const validationClass = validationState === 'error' ? style['selectBox-has-error'] : ''
-  const selectedItem = items.find(item => item.id === selectedId)
+  const selectedOption = options.find(option => option.id === selectedId)
 
+  const onSelect = (event, { id = '' } = {}, isPlaceholder) => {
+    if (!isPlaceholder) {
+      setOpen(false)
+      onChange(id)
+    }
+  }
   return (
-    <div style={{ width: '100%' }} id={id}>
-      <div className='dropdown'>
-        <Tooltip id={`${id}-selectbox-tooltip`} placement={'bottom'} tooltip={selectedItem ? selectedItem.value : ''}>
-          <button
-            className={`btn btn-default dropdown-toggle ${style['dropdown-button']} ${validationClass}`}
-            type='button'
-            data-toggle='dropdown'
-            id={`${id}-button-toggle`}
-            disabled={disabled}
-          >
-            <span className={style['dropdown-button-text']} id={`${id}-button-text`} >
-              {selectedItem ? <MarkAsDefault {...selectedItem} /> : NOBREAK_SPACE}
-            </span>
-            <span className='caret' id={`${id}-button-caret`} />
-          </button>
-        </Tooltip>
-        <ul className={`dropdown-menu ${style.dropdown}`} role='menu'>
-          {items.map(item => (
-            <li role='presentation' className={item.id === selectedId ? 'selected' : ''} key={item.id}>
-              <a role='menuitem' tabIndex='-1' onClick={() => onChange(item.id)} id={`${id}-item-${item.value}`}>
-                {<MarkAsDefault {...item} />}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
+    <Select
+      id={id}
+      variant={SelectVariant.single}
+      onToggle={setOpen}
+      onSelect={onSelect}
+      selections={selectedOption}
+      isOpen={open}
+      isDisabled={disabled}
+      validated={validationState}
+    >
+      {options.map((option) => (
+        <SelectOption
+          key={option.id}
+          value={option}
+          description={option.isDefault ? msg.defaultOption() : undefined}
+        />
+      ))}
+    </Select>
   )
 }
 
 SelectBox.propTypes = {
-  /* eslint-disable react/no-unused-prop-types */
   selected: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), // id of a selected item, false-ish for the first item
   items: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
@@ -69,12 +50,12 @@ SelectBox.propTypes = {
     isDefault: PropTypes.bool,
   })).isRequired, // Array<{ id: string, value: string }>, order matters if sort is false-ish
   sort: PropTypes.bool, // sorted alphabetically by current locale with { numeric: true } if true
-  /* eslint-enable react/no-unused-prop-types */
   onChange: PropTypes.func.isRequired, // (selectedId: string) => any
   id: PropTypes.string,
   validationState: PropTypes.oneOf([false, 'default', 'error']),
   disabled: PropTypes.bool,
   locale: PropTypes.string.isRequired,
+  msg: PropTypes.object.isRequired,
 }
 
 export default withMsg(SelectBox)

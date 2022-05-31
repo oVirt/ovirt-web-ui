@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { withMsg } from '_/intl'
 import PropTypes from 'prop-types'
 
-const VmSelect = ({ vms, onChange, selected, msg }) => {
+const VmSelect = ({ vms, onChange, selected, msg, id }) => {
   const [open, setOpen] = useState(false)
 
   const options = vms.valueSeq().toJS()
@@ -27,37 +27,31 @@ const VmSelect = ({ vms, onChange, selected, msg }) => {
     }
   }
 
-  const titleId = 'vmselect-select-id-1'
   return (
-    <div>
-      <span id={titleId} hidden>
-        {msg.selectVm()}
-      </span>
-      <Select
-        variant={SelectVariant.typeahead}
-        typeAheadAriaLabel={msg.selectVm()}
-        onToggle={setOpen}
-        onSelect={onSelect}
-        onClear={clearSelection}
-        selections={selectedOption}
-        isOpen={open}
-        aria-labelledby={titleId}
-        placeholderText={msg.selectVm()}
-        noResultsFoundText={msg.noVmAvailable()}
-      >
-        {options.map((option) => (
-          <SelectOption
-            key={option.id}
-            value={option}
-          />
-        ))}
-      </Select>
-
-    </div>
+    <Select
+      id={id}
+      variant={SelectVariant.typeahead}
+      typeAheadAriaLabel={msg.selectVm()}
+      onToggle={setOpen}
+      onSelect={onSelect}
+      onClear={clearSelection}
+      selections={selectedOption}
+      isOpen={open}
+      placeholderText={msg.selectVm()}
+      noResultsFoundText={msg.noVmAvailable()}
+    >
+      {options.map((option) => (
+        <SelectOption
+          key={option.id}
+          value={option}
+        />
+      ))}
+    </Select>
   )
 }
 
 VmSelect.propTypes = {
+  id: PropTypes.string,
   vms: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
   selected: PropTypes.string.isRequired,
