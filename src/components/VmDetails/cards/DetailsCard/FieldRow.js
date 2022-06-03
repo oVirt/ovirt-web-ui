@@ -25,7 +25,7 @@ const FieldRow = ({ label, children, id, tooltip, tooltipPosition, validationSta
     </Col>
     <Col cols={7} className={style['col-data']} id={id}>
       {useFormGroup && (
-        <FormGroup validated={validationState}>
+        <FormGroup validated={validationState} className={style.maxWidth100}>
           {children}
         </FormGroup>
       )}

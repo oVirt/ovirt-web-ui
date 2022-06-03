@@ -13,6 +13,10 @@
   max-width: 100%;
 }
 
+.maxWidth100 {
+  max-width: 100%;
+}
+
 .field-row + .field-row {
   margin-top: 5px;
 }
