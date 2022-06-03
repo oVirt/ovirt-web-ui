@@ -15,6 +15,8 @@ import CardEditButton from './CardEditButton'
 import { Tooltip } from '_/components/tooltips'
 import { CheckIcon, TimesIcon } from '@patternfly/react-icons/dist/esm/icons'
 
+import { withMsg } from '_/intl'
+
 /**
  * Base VM details card.  Support common layouts and view vs edit modes.
  *
@@ -95,6 +97,7 @@ class BaseCard extends React.Component {
       disableSaveButton = false,
       disableTooltip = undefined,
       editTooltipPlacement = 'top',
+      msg,
     } = this.props
     const editing = editMode === undefined ? this.state.edit : editMode
     const hasHeading = !!title
@@ -141,8 +144,22 @@ class BaseCard extends React.Component {
 
         {editing && (
           <CardFooter className={style['base-card-footer']}>
-            <Button isDisabled={disableSaveButton} onClick={this.clickSave} id={`${idPrefix}-button-save`} icon={<CheckIcon />}/>
-            <Button onClick={this.clickCancel} id={`${idPrefix}-button-cancel`} icon={<TimesIcon />} variant='link'/>
+            <Button
+              isDisabled={disableSaveButton}
+              onClick={this.clickSave}
+              id={`${idPrefix}-button-save`}
+              aria-label={msg.save()}
+            >
+              <CheckIcon />
+            </Button>
+            <Button
+              onClick={this.clickCancel}
+              id={`${idPrefix}-button-cancel`}
+              aria-label={msg.cancel()}
+              variant='link'
+            >
+              <TimesIcon />
+            </Button>
           </CardFooter>
         )}
       </Card>
@@ -167,6 +184,8 @@ BaseCard.propTypes = {
   onCancel: PropTypes.func,
   onSave: PropTypes.func,
   children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]).isRequired,
+
+  msg: PropTypes.object.isRequired,
 }
 BaseCard.defaultProps = {
   onStartEdit: () => {},
@@ -174,4 +193,4 @@ BaseCard.defaultProps = {
   onSave: () => {},
 }
 
-export default BaseCard
+export default withMsg(BaseCard)
