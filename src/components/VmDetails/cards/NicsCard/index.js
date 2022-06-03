@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Icon } from 'patternfly-react'
 
 import { withMsg } from '_/intl'
 import { addVmNic, deleteVmNic, editVmNic } from '_/actions'
@@ -16,6 +15,7 @@ import style from './style.css'
 import NicEditor from './NicEditor'
 import NicListItem from './NicListItem'
 import { localeCompare } from '_/helpers'
+import { PlusIcon, NetworkIcon } from '@patternfly/react-icons/dist/esm/icons'
 
 /*
  * Filter the set of vNIC profiles to display to the user such that:
@@ -128,10 +128,10 @@ class NicsCard extends React.Component {
 
     return (
       <BaseCard
-        icon={{ type: 'pf', name: 'network' }}
+        icon={NetworkIcon}
         title={msg.nic()}
         editTooltip={msg.edit()}
-        editable={canEditTheCard}
+        editable={false}
         idPrefix={idPrefix}
         className={baseStyle['cell-card']}
         itemCount={vm.get('nics').size}
@@ -139,55 +139,53 @@ class NicsCard extends React.Component {
         onCancel={() => { onEditChange(false) }}
         onSave={() => { onEditChange(false) }}
       >
-        {({ isEditing }) => (
-          <Grid className={style['nics-container']}>
-            { isEditing && canCreateNic && (
-              <Row key={`${idPrefix}-new`} id={`${idPrefix}-new`}>
-                <Col>
-                  <NicEditor
-                    idPrefix={`${idPrefix}-new`}
-                    nextNicName={this.state.nextNicName}
-                    vnicProfileList={this.state.filteredVnicList}
-                    onSave={this.onCreateConfirm}
-                    trigger={({ onClick }) => (
-                      <div className={itemStyle['create-block']}>
-                        <a href='#' id={`${idPrefix}-new-button`} onClick={onClick}>
-                          <Icon className={itemStyle['create-icon']} type='fa' name='plus' />
-                          <span className={itemStyle['create-text']} >{msg.nicActionCreateNew()}</span>
-                        </a>
-                      </div>
-                    )}
-                  />
-                </Col>
-              </Row>
-            )}
+        <Grid className={style['nics-container']}>
+          { canEditTheCard && canCreateNic && (
+            <Row key={`${idPrefix}-new`} id={`${idPrefix}-new`}>
+              <Col>
+                <NicEditor
+                  idPrefix={`${idPrefix}-new`}
+                  nextNicName={this.state.nextNicName}
+                  vnicProfileList={this.state.filteredVnicList}
+                  onSave={this.onCreateConfirm}
+                  trigger={({ onClick }) => (
+                    <div className={itemStyle['create-block']}>
+                      <a href='#' id={`${idPrefix}-new-button`} onClick={onClick}>
+                        <PlusIcon className={itemStyle['create-icon']}/>
+                        <span className={itemStyle['create-text']} >{msg.nicActionCreateNew()}</span>
+                      </a>
+                    </div>
+                  )}
+                />
+              </Col>
+            </Row>
+          )}
 
-            { nicList.length === 0 && (
-              <Row>
-                <Col>
-                  <div className={itemStyle['no-items']} id={`${idPrefix}-no-nics`}>{msg.noNics()}</div>
-                </Col>
-              </Row>
-            )}
-            { nicList.length > 0 && nicList.map(nic => (
-              <Row key={nic.id} id={`${idPrefix}-${nic.name}`}>
-                <Col style={{ display: 'block' }}>
-                  <NicListItem
-                    showNicIPs={showNicIPs}
-                    idPrefix={`${idPrefix}-${nic.name}`}
-                    nic={nic}
-                    vmStatus={vmStatus}
-                    vnicProfileList={this.state.filteredVnicList}
-                    isEditing={isEditing}
-                    onEdit={nic.canEdit ? this.onEditConfirm : undefined}
-                    onDelete={nic.canDelete ? this.onDeleteConfirm : undefined}
-                  />
-                </Col>
-              </Row>
-            )
-            )}
-          </Grid>
-        )}
+          { nicList.length === 0 && (
+            <Row>
+              <Col>
+                <div className={itemStyle['no-items']} id={`${idPrefix}-no-nics`}>{msg.noNics()}</div>
+              </Col>
+            </Row>
+          )}
+          { nicList.length > 0 && nicList.map(nic => (
+            <Row key={nic.id} id={`${idPrefix}-${nic.name}`}>
+              <Col style={{ display: 'block' }}>
+                <NicListItem
+                  showNicIPs={showNicIPs}
+                  idPrefix={`${idPrefix}-${nic.name}`}
+                  nic={nic}
+                  vmStatus={vmStatus}
+                  vnicProfileList={this.state.filteredVnicList}
+                  isEditing={canEditTheCard}
+                  onEdit={nic.canEdit ? this.onEditConfirm : undefined}
+                  onDelete={nic.canDelete ? this.onDeleteConfirm : undefined}
+                />
+              </Col>
+            </Row>
+          )
+          )}
+        </Grid>
       </BaseCard>
     )
   }

@@ -1,15 +1,9 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import {
-  CardTitle,
+  Card,
   CardBody,
-  UtilizationCard,
-  UtilizationCardDetails,
-  UtilizationCardDetailsCount,
-  UtilizationCardDetailsDesc,
-  UtilizationCardDetailsLine1,
-  UtilizationCardDetailsLine2,
-} from 'patternfly-react'
+} from '@patternfly/react-core'
 import DonutChart from './UtilizationCharts/DonutChart'
 import AreaChart from './UtilizationCharts/AreaChart'
 
@@ -19,6 +13,7 @@ import style from './style.css'
 
 import NoHistoricData from './NoHistoricData'
 import NoLiveData from './NoLiveData'
+import UtilizationCardData from './UtilizationCardData'
 
 /**
  * Render current Network % utilization as a donut chart and historic % utilization values
@@ -39,22 +34,21 @@ const NetworkingCharts = ({ netStats, isRunning, id }) => {
   const history = ((netStats['usage.history'] && netStats['usage.history'].datum) || []).reverse()
 
   return (
-    <UtilizationCard className={style['chart-card']} id={id}>
-      <CardTitle>{msg.utilizationCardTitleNetworking()}</CardTitle>
+    <Card className={style['chart-card']} id={id}>
       <CardBody>
+        {msg.utilizationCardTitleNetworking()}
         { !isRunning && <NoLiveData id={`${id}-no-live-data`} /> }
         { isRunning && !haveNetworkStats &&
           <NoLiveData id={`${id}-no-live-data`} message={msg.utilizationNoNetStats()} />
         }
         { isRunning && haveNetworkStats && (
           <>
-            <UtilizationCardDetails>
-              <UtilizationCardDetailsCount id={`${id}-available`}>{available}%</UtilizationCardDetailsCount>
-              <UtilizationCardDetailsDesc>
-                <UtilizationCardDetailsLine1>{msg.utilizationCardAvailable()}</UtilizationCardDetailsLine1>
-                <UtilizationCardDetailsLine2>{msg.utilizationCardOf100()}</UtilizationCardDetailsLine2>
-              </UtilizationCardDetailsDesc>
-            </UtilizationCardDetails>
+            <UtilizationCardData
+              available={`${available}%`}
+              line1={msg.utilizationCardAvailable()}
+              line2={msg.utilizationCardOf100()}
+              idPrefix={id}
+            />
             <DonutChart
               id={`${id}-donut-chart`}
               data={[
@@ -83,7 +77,7 @@ const NetworkingCharts = ({ netStats, isRunning, id }) => {
           </>
         )}
       </CardBody>
-    </UtilizationCard>
+    </Card>
   )
 }
 NetworkingCharts.propTypes = {

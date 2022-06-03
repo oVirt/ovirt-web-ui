@@ -6,21 +6,19 @@ import { escapeHtml } from '../../../utils'
 import itemStyle from '../../itemListStyle.css'
 import style from './style.css'
 
-import { Icon } from 'patternfly-react'
 import { Grid, Row, Col } from '_/components/Grid'
 import DeleteConfirmationModal from '../../../VmModals/DeleteConfirmationModal'
 import NicEditor from './NicEditor'
 import NicLinkStateIcon from './NicLinkStateIcon'
 import { Tooltip } from '_/components/tooltips'
 import EllipsisValue from '_/components/EllipsisValue'
+import { PencilAltIcon, TrashIcon } from '@patternfly/react-icons/dist/esm/icons'
 
 /**
  * Render a single NIC in the list of Nics on the Nics Card.
  *
- * If _edit_ then render the appropriate action buttons linked to provided
- * handler functions.
  */
-const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEdit, onDelete, showNicIPs }) => {
+const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, onEdit, onDelete, showNicIPs }) => {
   const { msg } = useContext(MsgContext)
   const canEdit = !!onEdit
   const canDelete = !!onDelete
@@ -36,7 +34,7 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEd
       <span className={itemStyle['item-row-info']}>
         <div className={style['nics-title']}>
           <span id={`${idPrefix}-name`}>{nic.name}</span>
-          <span className={style['vnic-info']} id={`${idPrefix}-vnic-info`}>
+          <span className={itemStyle['item-extra_info']} id={`${idPrefix}-vnic-info`}>
             { nic.vnicProfile.id
               ? `(${nic.vnicProfile.name}/${nic.vnicProfile.network})`
               : `[${msg.nicNoVnicAssigned()}]`
@@ -75,71 +73,65 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, isEditing, onEd
         </Grid>
       </span>
 
-      {/* Actions Column (if edit) - content width, no wrapping */}
-      { isEditing && (
-        <span className={itemStyle['item-row-actions']} id={`${idPrefix}-actions`}>
-          { canEdit && (
-            <NicEditor
-              idPrefix={`${idPrefix}-edit`}
-              nic={nic}
-              vmStatus={vmStatus}
-              vnicProfileList={vnicProfileList}
-              onSave={onEdit}
-              trigger={({ onClick }) => (
-                <Tooltip id={`${idPrefix}-edit-tooltip`} tooltip={msg.nicEditTooltip()}>
-                  <a id={`${idPrefix}-edit-action`} className={itemStyle['item-action']} onClick={onClick}>
-                    <Icon type='pf' name='edit' />
-                  </a>
-                </Tooltip>
-              )}
+      {/* Actions Column - content width, no wrapping */}
+      <span className={itemStyle['item-row-actions']} id={`${idPrefix}-actions`}>
+        { canEdit && (
+          <NicEditor
+            idPrefix={`${idPrefix}-edit`}
+            nic={nic}
+            vmStatus={vmStatus}
+            vnicProfileList={vnicProfileList}
+            onSave={onEdit}
+            trigger={({ onClick }) => (
+              <Tooltip id={`${idPrefix}-edit-tooltip`} tooltip={msg.nicEditTooltip()}>
+                <a id={`${idPrefix}-edit-action`} className={itemStyle['item-action']} onClick={onClick}>
+                  <PencilAltIcon/>
+                </a>
+              </Tooltip>
+            )}
+          />
+        )}
+        { !canEdit && (
+          <Tooltip id={`${idPrefix}-edit-tooltip-disabled`} tooltip={msg.nicEditDisabledTooltip()}>
+            <PencilAltIcon
+              id={`${idPrefix}-edit-action-disabled`}
+              className={`${itemStyle['item-action']} ${itemStyle['item-action-disabled']}`}
             />
-          )}
-          { !canEdit && (
-            <Tooltip id={`${idPrefix}-edit-tooltip-disabled`} tooltip={msg.nicEditDisabledTooltip()}>
-              <Icon
-                type='pf'
-                name='edit'
-                id={`${idPrefix}-edit-action-disabled`}
-                className={`${itemStyle['item-action']} ${itemStyle['item-action-disabled']}`}
-              />
-            </Tooltip>
-          )}
+          </Tooltip>
+        )}
 
-          { canDelete && (
-            <DeleteConfirmationModal
-              id={`${idPrefix}-delete-modal`}
-              severity='danger'
-              title={msg.permanentlyDeleteNic()}
-              onDelete={() => { onDelete(nic.id) }}
-              trigger={({ onClick }) => (
-                <Tooltip id={`${idPrefix}-delete-tooltip`} tooltip={msg.nicDeleteTooltip()}>
-                  <a id={`${idPrefix}-delete-action`} className={itemStyle['item-action']} onClick={onClick}>
-                    <Icon type='pf' name='delete' />
-                  </a>
-                </Tooltip>
-              )}
-            >
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: msg.areYouSureYouWantToDeleteNic({
-                    nicName: `"<strong>${escapeHtml(nic.name)}</strong>"`,
-                  }),
-                }}
-              />
-            </DeleteConfirmationModal>
-          )}
-          { !canDelete && (
-            <Tooltip id={`${idPrefix}-delete-tooltip-disabled`} tooltip={msg.nicDeleteDisabledTooltip()}>
-              <Icon
-                type='pf'
-                name='delete'
-                id={`${idPrefix}-delete-action-disabled`}
-                className={`${itemStyle['item-action']} ${itemStyle['item-action-disabled']}`}
-              />
-            </Tooltip>
-          )}
-        </span>
-      )}
+        { canDelete && (
+          <DeleteConfirmationModal
+            id={`${idPrefix}-delete-modal`}
+            severity='danger'
+            title={msg.permanentlyDeleteNic()}
+            onDelete={() => { onDelete(nic.id) }}
+            trigger={({ onClick }) => (
+              <Tooltip id={`${idPrefix}-delete-tooltip`} tooltip={msg.nicDeleteTooltip()}>
+                <a id={`${idPrefix}-delete-action`} className={itemStyle['item-action']} onClick={onClick}>
+                  <TrashIcon style={{ color: 'red' }} />
+                </a>
+              </Tooltip>
+            )}
+          >
+            <span
+              dangerouslySetInnerHTML={{
+                __html: msg.areYouSureYouWantToDeleteNic({
+                  nicName: `"<strong>${escapeHtml(nic.name)}</strong>"`,
+                }),
+              }}
+            />
+          </DeleteConfirmationModal>
+        )}
+        { !canDelete && (
+          <Tooltip id={`${idPrefix}-delete-tooltip-disabled`} tooltip={msg.nicDeleteDisabledTooltip()}>
+            <TrashIcon
+              id={`${idPrefix}-delete-action-disabled`}
+              className={`${itemStyle['item-action']} ${itemStyle['item-action-disabled']}`}
+            />
+          </Tooltip>
+        )}
+      </span>
     </div>
   )
 }
@@ -148,7 +140,6 @@ NicListItem.propTypes = {
   nic: PropTypes.object.isRequired,
   vmStatus: PropTypes.string.isRequired,
   vnicProfileList: PropTypes.object.isRequired,
-  isEditing: PropTypes.bool.isRequired,
   showNicIPs: PropTypes.bool.isRequired,
 
   onEdit: PropTypes.func,

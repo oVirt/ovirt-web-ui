@@ -2,14 +2,17 @@ import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import { MsgContext } from '_/intl'
+import { MsgContext, withMsg } from '_/intl'
 import { PendingTaskTypes } from '_/reducers/pendingTasks'
 
 import style from './style.css'
+import itemStyle from '../../itemListStyle.css'
 
 import BaseCard from '../../BaseCard'
 import NewSnapshotModal from './NewSnapshotModal'
 import SnapshotItem from './SnapshotItem'
+import { VirtualMachineIcon } from '@patternfly/react-icons/dist/esm/icons'
+import { Grid, Row, Col } from '_/components/Grid'
 
 const DOWN_STATUS = 'down'
 const RUNNING_STATUS = 'up'
@@ -24,31 +27,46 @@ const Snapshots = ({
   isVmDown,
   canUserManipulateSnapshot,
   isVmRunning,
+  msg,
 }) => {
   const isVmInPreview = !!snapshots.find(snapshot => snapshot.get('status') === 'in_preview')
   const isVmLocked = !!snapshots.find(snapshot => snapshot.get('status') === 'locked')
   const isActionDisabled = isVmInPreview || beingCreated || beingRestored || beingDeleted || isVmLocked || !canUserManipulateSnapshot
   return (
-    <>
+    <Grid className={style['snapshot-container']}>
       { canUserManipulateSnapshot && (
-        <div className={style['snapshot-create']}>
-          <NewSnapshotModal vmId={vmId} disabled={isActionDisabled} idPrefix={`${idPrefix}-new-snapshot`} isVmRunning={isVmRunning} />
-        </div>
+        <Row key={`${idPrefix}-snapshot-add`}>
+          <Col>
+            <NewSnapshotModal vmId={vmId} disabled={isActionDisabled} idPrefix={`${idPrefix}-new-snapshot`} isVmRunning={isVmRunning} />
+          </Col>
+        </Row>
       ) }
-      {
-        snapshots.sort((a, b) => b.get('date') - a.get('date')).map((snapshot) => (
-          <SnapshotItem
-            key={snapshot.get('id')}
-            id={`${idPrefix}-${snapshot.get('description').replace(/[\s]+/g, '_')}`}
-            snapshot={snapshot}
-            vmId={vmId}
-            isEditing={!isActionDisabled}
-            hideActions={!canUserManipulateSnapshot}
-            isVmDown={isVmDown}
-          />
-        ))
+
+      { snapshots.size === 0 && (
+        <Row key={`${idPrefix}-no-snapshot`}>
+          <Col>
+            <div className={itemStyle['no-items']} id={`${idPrefix}-no-snapshots`}>{msg.noSnapshots()}</div>
+          </Col>
+        </Row>
+      )}
+
+      { snapshots.size > 0 && snapshots.sort((a, b) => b.get('date') - a.get('date')).map((snapshot) => (
+        <Row key={`${idPrefix}-${snapshot.get('description').replace(/[\s]+/g, '_')}`}>
+          <Col style={{ display: 'block' }}>
+            <SnapshotItem
+              key={snapshot.get('id')}
+              id={`${idPrefix}-${snapshot.get('description').replace(/[\s]+/g, '_')}`}
+              snapshot={snapshot}
+              vmId={vmId}
+              isEditing={!isActionDisabled}
+              hideActions={!canUserManipulateSnapshot}
+              isVmDown={isVmDown}
+            />
+          </Col>
+        </Row>
+      ))
       }
-    </>
+    </Grid>
   )
 }
 Snapshots.propTypes = {
@@ -61,6 +79,7 @@ Snapshots.propTypes = {
   isVmDown: PropTypes.bool,
   isVmRunning: PropTypes.bool,
   canUserManipulateSnapshot: PropTypes.bool,
+  msg: PropTypes.object.isRequired,
 }
 
 const ConnectedSnapshots = connect(
@@ -72,7 +91,7 @@ const ConnectedSnapshots = connect(
       beingDeleted: !!vmTasks.find(task => task.type === PendingTaskTypes.SNAPSHOT_REMOVAL),
     }
   }
-)(Snapshots)
+)(withMsg(Snapshots))
 
 /**
  * List of Snapshots taken of a VM
@@ -84,7 +103,7 @@ const SnapshotsCard = ({ vm }) => {
 
   return (
     <BaseCard
-      icon={{ type: 'pf', name: 'virtual-machine' }}
+      icon={VirtualMachineIcon}
       title={msg.snapshot()}
       itemCount={snapshots.size}
       idPrefix={idPrefix}

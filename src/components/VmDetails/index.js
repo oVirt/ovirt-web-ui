@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Card, CardBody } from 'patternfly-react'
-import { Alert } from '@patternfly/react-core'
+import { Hint, HintBody, Card, CardBody } from '@patternfly/react-core'
 import { withMsg } from '_/intl'
 
 import styles from './style.css'
@@ -62,9 +61,13 @@ class VmDetailsContainer extends React.Component {
         {vm.get('nextRunExists') && (
           <Row>
             <Col>
-              <Card>
+              <Card style={{ marginBottom: '20px' }}>
                 <CardBody>
-                  <Alert variant='info' isInline title={msg.vmHasPendingConfigurationChanges()}/>
+                  <Hint >
+                    <HintBody>
+                      {msg.vmHasPendingConfigurationChanges()}
+                    </HintBody>
+                  </Hint>
                 </CardBody>
               </Card>
             </Col>
@@ -80,7 +83,7 @@ class VmDetailsContainer extends React.Component {
           <Col cols={9} className={styles['col-utilization']}><UtilizationCard vm={vm} /></Col>
           <Col cols={3} className={styles['col-nics-disks']}>
             <NicsCard vm={vm} onEditChange={(isEdit, isDirty) => this.handleEditChange('nic', isEdit, isDirty)} />
-            <DisksCard vm={vm} onEditChange={(isEdit, isDirty) => this.handleEditChange('disk', isEdit, isDirty)} />
+            <DisksCard className={styles['col-disks']} vm={vm} onEditChange={(isEdit, isDirty) => this.handleEditChange('disk', isEdit, isDirty)} />
           </Col>
         </Row>
       </Grid>

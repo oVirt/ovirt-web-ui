@@ -7,39 +7,27 @@ import { createDiskTypeList, createStorageDomainList, isDiskNameValid } from '_/
 import { withMsg } from '_/intl'
 
 import {
-  Checkbox,
-  Col,
-  ControlLabel,
-  Form,
-  FormControl,
-  FormGroup,
-  HelpBlock,
-} from 'patternfly-react'
-import {
-  Alert,
   Button,
+  Checkbox,
+  Form,
+  FormGroup,
+  FormSelect,
+  FormSelectOption,
+  HelperText,
+  HelperTextItem,
   Modal,
   ModalVariant,
+  NumberInput,
+  TextInput,
 } from '@patternfly/react-core'
-import SelectBox from '_/components/SelectBox'
 import style from './style.css'
-import { Tooltip, InfoTooltip } from '_/components/tooltips'
+import { InfoTooltip } from '_/components/tooltips'
+import { ExclamationCircleIcon } from '@patternfly/react-icons/dist/esm/icons'
 
 const DISK_DEFAULTS = {
   bootable: false,
   diskType: 'thin', // constrain to values in DISK_TYPES
   provisionedSize: 1 * 1024 ** 3,
-}
-
-const LabelCol = ({ children, ...props }) => {
-  return (
-    <Col componentClass={ControlLabel} {...props}>
-      { children }
-    </Col>
-  )
-}
-LabelCol.propTypes = {
-  children: PropTypes.node.isRequired,
 }
 
 /**
@@ -255,7 +243,7 @@ class DiskImageEditor extends Component {
     this.close()
   }
 
-  changeAlias ({ target: { value } }) {
+  changeAlias (value) {
     this.setState(
       (state) => ({ values: { ...state.values, alias: value }, errors: { ...state.errors, alias: '' } }),
       () => {
@@ -264,16 +252,14 @@ class DiskImageEditor extends Component {
     this.changesMade = true
   }
 
-  changeSize ({ target: { value } }) {
+  changeSize (value) {
     if (isNumber(value) && value >= 0) {
       this.setState((state) => ({ values: { ...state.values, size: value } }))
       this.changesMade = true
     }
   }
 
-  changeBootable (event) {
-    const target = event.target
-    const bootable = target.type === 'checkbox' ? target.checked : target.value
+  changeBootable (bootable) {
     this.setState((state) => ({ values: { ...state.values, bootable } }))
     this.changesMade = true
   }
@@ -336,7 +322,7 @@ class DiskImageEditor extends Component {
               key='ok'
               variant='primary'
               onClick={this.handleSave}
-              disabled={!this.isFormValid()}
+              isDisabled={!this.isFormValid()}
             >
               { msg.ok() }
             </Button>,
@@ -351,79 +337,62 @@ class DiskImageEditor extends Component {
           ]}
         >
           <Form
-            horizontal
-            onSubmit={e => { e.preventDefault() }}
+            isHorizontal
             id={`${idPrefix}-modal-form`}
           >
             {/* Alias */}
-            <FormGroup controlId={`${idPrefix}-alias`} validationState={this.state.errors.alias ? 'error' : null}>
-              <LabelCol sm={3}>
-                { msg.diskEditorAliasLabel() }
-              </LabelCol>
-              <Col sm={9}>
-                <FormControl
-                  type='text'
-                  defaultValue={this.state.values.alias}
-                  onChange={this.changeAlias}
-                />
-                {this.state.errors.alias && <HelpBlock>{this.state.errors.alias}</HelpBlock>}
-              </Col>
+            <FormGroup
+              label={ msg.diskEditorAliasLabel() }
+              fieldId={`${idPrefix}-alias`}
+              validated={this.state.errors.alias ? 'error' : null}
+              helperTextInvalid={this.state.errors.alias}
+              helperTextInvalidIcon={<ExclamationCircleIcon />}
+            >
+              <TextInput
+                id={`${idPrefix}-alias`}
+                type='text'
+                defaultValue={this.state.values.alias}
+                onChange={this.changeAlias}
+              />
             </FormGroup>
 
             {/* Size Display (for edit mode) */}
             { !createMode && (
-              <FormGroup controlId={`${idPrefix}-size`}>
-                <LabelCol sm={3}>
-                  { msg.diskEditorSizeEditLabel() }
-                  { !isImage &&
-                    <InfoTooltip id={`${idPrefix}-size-tooltip`} tooltip={msg.diskEditorSizeCantChangeHelp()} />
-                }
-                </LabelCol>
-                <Col sm={9}>
-                  <div id={`${idPrefix}-size`} className={style['editor-field-read-only']}>
-                    { diskSize / 1024 ** 3 }
-                  </div>
-                </Col>
+              <FormGroup
+                label={ msg.diskEditorSizeEditLabel() }
+                labelIcon={!isImage &&
+                  <InfoTooltip id={`${idPrefix}-size-tooltip`} tooltip={msg.diskEditorSizeCantChangeHelp()} />}
+                fieldId={`${idPrefix}-size`}
+              >
+                <div id={`${idPrefix}-size`} className={style['editor-field-read-only']}>
+                  { diskSize / 1024 ** 3 }
+                </div>
               </FormGroup>
             )}
 
             {/* Size Editor (initial size for create, expand by size for edit) */}
             { (createMode || isImage) && (
-              <FormGroup controlId={`${idPrefix}-size-edit`}>
-                <LabelCol sm={3}>
-                  { createMode && (
-                    <>
-                      {msg.diskEditorSizeLabel()}
-                      <InfoTooltip id={`${idPrefix}-size-edit-tooltip`} tooltip={msg.diskEditorSizeCreateInfoTooltip()} />
-                    </>
-                  )}
-                  { !createMode && msg.diskEditorResizeLabel() }
-                </LabelCol>
-                <Col sm={2}>
-                  { createMode && (
-                    <FormControl
-                      type='number'
-                      value={this.state.values.size}
-                      onChange={this.changeSize}
-                    />
-                  )}
-                  { !createMode && (
-                    <Tooltip id={`${idPrefix}-form-tooltip`} tooltip={msg.diskEditorResizeNote()} placement='right'>
-                      <FormControl
-                        type='number'
-                        value={this.state.values.size}
-                        onChange={this.changeSize}
-                      />
-                    </Tooltip>
-                  )}
-                </Col>
+              <FormGroup
+                label={createMode ? msg.diskEditorSizeLabel() : msg.diskEditorResizeLabel()}
+                labelIcon={createMode && <InfoTooltip id={`${idPrefix}-size-edit-tooltip`} tooltip={msg.diskEditorSizeCreateInfoTooltip()} />}
+                fieldId={`${idPrefix}-size-edit`}
+                helperText={!createMode && msg.diskEditorResizeNote()}
+              >
+                <NumberInput
+                  id={`${idPrefix}-size-edit`}
+                  value={this.state.values.size}
+                  onChange={({ target: { value } }) => this.changeSize(value)}
+                  onMinus={() => this.changeSize(this.state.values.size - 1)}
+                  onPlus={() => this.changeSize(this.state.values.size + 1)}
+                  min={0}
+                />
               </FormGroup>
             )}
 
             {/* Storage Domain */}
-            <FormGroup controlId={`${idPrefix}-storage-domain`}>
-              <LabelCol sm={3}>
-                { msg.diskEditorStorageDomainLabel() }
+            <FormGroup
+              label={ msg.diskEditorStorageDomainLabel() }
+              labelIcon={(
                 <InfoTooltip
                   id={`${idPrefix}-storage-domain-edit-tooltip`}
                   tooltip={
@@ -432,36 +401,39 @@ class DiskImageEditor extends Component {
                       : msg.diskEditorStorageDomainCantChangeHelp()
                   }
                 />
-              </LabelCol>
-              <Col sm={9}>
-                { createMode && (
-                  <SelectBox
-                    id={`${idPrefix}-storage-domain`}
-                    items={this.state.storageDomainSelectList}
-                    selected={this.state.values.storageDomain}
-                    onChange={this.changeStorageDomain}
-                  />
-                )}
-                { !createMode && !isDirectLUN && (
-                  <div id={`${idPrefix}-storage-domain`} className={style['editor-field-read-only']}>
-                    {
+              )}
+              fieldId={`${idPrefix}-storage-domain`}
+            >
+              { createMode && !isDirectLUN && (
+                <FormSelect
+                  id={`${idPrefix}-storage-domain`}
+                  value={this.state.values.storageDomain}
+                  onChange={this.changeStorageDomain}
+                >
+                  {this.state.storageDomainSelectList.map((option, index) => (
+                    <FormSelectOption key={index} value={option.id} label={option.value} />
+                  ))}
+                </FormSelect>
+              )}
+              { !createMode && !isDirectLUN && (
+                <div id={`${idPrefix}-storage-domain`} className={style['editor-field-read-only']}>
+                  {
                       this.props.storageDomains.getIn([this.state.values.storageDomain, 'name']) ||
                       msg.diskEditorStorageDomainNotAvailable()
                     }
-                  </div>
-                )}
-                { isDirectLUN && (
-                  <div id={`${idPrefix}-storage-domain`} className={style['editor-field-read-only']}>
-                    { msg.diskEditorStorageDomainNotAvailable() }
-                  </div>
-                )}
-              </Col>
+                </div>
+              )}
+              { isDirectLUN && (
+                <div id={`${idPrefix}-storage-domain`} className={style['editor-field-read-only']}>
+                  { msg.diskEditorStorageDomainNotAvailable() }
+                </div>
+              )}
             </FormGroup>
 
             {/* Disk Type (thin vs preallocated) */}
-            <FormGroup controlId={`${idPrefix}-format`}>
-              <LabelCol sm={3}>
-                { msg.diskEditorDiskTypeLabel() }
+            <FormGroup
+              label={ msg.diskEditorDiskTypeLabel() }
+              labelIcon={(
                 <InfoTooltip
                   id={`${idPrefix}-format-tooltip`}
                   tooltip={
@@ -470,63 +442,58 @@ class DiskImageEditor extends Component {
                       : msg.diskEditorDiskTypeCantChangeHelp()
                   }
                 />
-              </LabelCol>
-              <Col sm={9}>
-                { createMode && (
-                  <SelectBox
-                    id={`${idPrefix}-format`}
-                    items={DISK_TYPES}
-                    selected={this.state.values.diskType}
-                    onChange={this.changeDiskType}
-                  />
-                )}
-                { !createMode && !isDirectLUN && (
-                  <div id={`${idPrefix}-format`} className={style['editor-field-read-only']}>
-                    { this.state.values.diskType === 'pre' && msg.diskEditorDiskTypeOptionPre() }
-                    { this.state.values.diskType === 'thin' && msg.diskEditorDiskTypeOptionThin() }
-                  </div>
-                )}
-                { isDirectLUN && (
-                  <div id={`${idPrefix}-format`} className={style['editor-field-read-only']}>
-                    { msg.diskEditorDiskTypeNotAvailable() }
-                  </div>
-                )}
-              </Col>
+              )}
+              fieldId={`${idPrefix}-format`}
+            >
+              { createMode && !isDirectLUN && (
+                <FormSelect
+                  id={`${idPrefix}-format`}
+                  value={this.state.values.diskType}
+                  onChange={this.changeDiskType}
+                >
+                  {DISK_TYPES.map((option, index) => (
+                    <FormSelectOption key={index} value={option.id} label={option.value} />
+                  ))}
+                </FormSelect>
+              )}
+              { !createMode && !isDirectLUN && (
+                <div id={`${idPrefix}-format`} className={style['editor-field-read-only']}>
+                  { this.state.values.diskType === 'pre' && msg.diskEditorDiskTypeOptionPre() }
+                  { this.state.values.diskType === 'thin' && msg.diskEditorDiskTypeOptionThin() }
+                </div>
+              )}
+              { isDirectLUN && (
+                <div id={`${idPrefix}-format`} className={style['editor-field-read-only']}>
+                  { msg.diskEditorDiskTypeNotAvailable() }
+                </div>
+              )}
             </FormGroup>
 
             {/* Disk Bootable */}
-            <FormGroup controlId={`${idPrefix}-bootable`}>
-              <LabelCol sm={3}>
-                { msg.diskEditorBootableLabel() }
-                {!vmIsDown && (
-                  <InfoTooltip
-                    id={`${idPrefix}-bootable-edit-tooltip`}
-                    tooltip={msg.bootableEditTooltip()}
-                  />
-                )}
-              </LabelCol>
-              <Col sm={9}>
-                <Checkbox
-                  checked={this.state.values.bootable}
-                  onChange={this.changeBootable}
-                  id={`${idPrefix}-bootable`}
-                  disabled={!vmIsDown}
+            <FormGroup
+              label={ msg.diskEditorBootableLabel() }
+              labelIcon={!vmIsDown && (
+                <InfoTooltip
+                  id={`${idPrefix}-bootable-edit-tooltip`}
+                  tooltip={msg.bootableEditTooltip()}
                 />
-              </Col>
+              )}
+              fieldId={`${idPrefix}-bootable`}
+              helperText={showBootableChangeAlert && (
+                <HelperText>
+                  <HelperTextItem variant="warning" hasIcon>
+                    {msg.diskEditorBootableChangeMessage({ diskName: currentBootableDisk.get('name') }) }
+                  </HelperTextItem>
+                </HelperText>
+              )}
+            >
+              <Checkbox
+                isChecked={this.state.values.bootable}
+                onChange={this.changeBootable}
+                id={`${idPrefix}-bootable`}
+                isDisabled={!vmIsDown}
+              />
             </FormGroup>
-            { showBootableChangeAlert && (
-              <FormGroup controlId={`${idPrefix}-bootable`} className={style['editor-bootable-alert-container']}>
-                <Col sm={3} />
-                <Col sm={9}>
-                  <Alert
-                    className={style['editor-bootable-alert']}
-                    isInline
-                    variant='warning'
-                    title={msg.diskEditorBootableChangeMessage({ diskName: currentBootableDisk.get('name') })}
-                  />
-                </Col>
-              </FormGroup>
-            )}
           </Form>
         </Modal>
       </>

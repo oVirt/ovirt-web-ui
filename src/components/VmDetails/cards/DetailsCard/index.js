@@ -34,12 +34,13 @@ import {
 } from '_/components/utils'
 
 import {
-  ExpandCollapse,
-  FormControl,
-  Icon,
-} from 'patternfly-react'
+  Alert,
+  ExpandableSection,
+  NumberInput,
+  Switch,
+} from '@patternfly/react-core'
 
-import { Switch, Alert } from '@patternfly/react-core'
+import { OffIcon, OnIcon } from '@patternfly/react-icons/dist/esm/icons'
 
 import SelectBox from '_/components/SelectBox'
 import BaseCard from '../../BaseCard'
@@ -804,13 +805,13 @@ class DetailsCard extends React.Component {
                     <Col className={style['fields-column']}>
                       <Grid>
                         { isAdmin && (
-                          <FieldRow label={msg.host()} id={`${idPrefix}-host`}>
+                          <FieldRow label={msg.host()} id={`${idPrefix}-host`} useFormGroup={false}>
                             {
                               <EllipsisValue tooltip={hostName}>{hostName}</EllipsisValue> || <NotAvailable tooltip={msg.notAvailableUntilRunning()} id={`${idPrefix}-host-not-available`} />
                             }
                           </FieldRow>
                         )}
-                        <FieldRow label={msg.ipAddress()} id={`${idPrefix}-ip`} >
+                        <FieldRow label={msg.ipAddress()} id={`${idPrefix}-ip`} useFormGroup={false} >
                           <>
                             { ip4Addresses.length === 0 && ip6Addresses.length === 0 && (
                               <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id={`${idPrefix}-ip-not-available`} />
@@ -827,7 +828,7 @@ class DetailsCard extends React.Component {
                             ))}
                           </>
                         </FieldRow>
-                        <FieldRow label={msg.fqdn()} id={`${idPrefix}-fqdn`}>
+                        <FieldRow label={msg.fqdn()} id={`${idPrefix}-fqdn`} useFormGroup={false}>
                           { <EllipsisValue tooltip={fqdn}>{fqdn}</EllipsisValue> || <NotAvailable tooltip={msg.notAvailableUntilRunningAndGuestAgent()} id={`${idPrefix}-fqdn-not-available`} /> }
                         </FieldRow>
                         <FieldRow label={msg.cluster()} id={`${idPrefix}-cluster`} tooltip={isFullEdit && !canChangeCluster && msg.clusterCanOnlyChangeWhenVmStopped()} >
@@ -856,7 +857,12 @@ class DetailsCard extends React.Component {
                         <FieldRow label={msg.template()} id={`${idPrefix}-template`}>
                           { templateName }
                         </FieldRow>
-                        <FieldRow label={msg.cd()} id={`${idPrefix}-cdrom`} tooltip={isEditing && !canChangeCd && msg.cdCanOnlyChangeWhenVmRunning()} >
+                        <FieldRow
+                          label={msg.cd()}
+                          id={`${idPrefix}-cdrom`}
+                          tooltip={isEditing && !canChangeCd && msg.cdCanOnlyChangeWhenVmRunning()}
+                          useFormGroup={isEditing && canChangeCd}
+                        >
                           { !isEditing && <EllipsisValue tooltip={cdImageName}>{cdImageName}</EllipsisValue> }
                           { isEditing && !canChangeCd && (
                             <div>
@@ -880,13 +886,13 @@ class DetailsCard extends React.Component {
                         </FieldRow>
                         <FieldRow label={isOsWindows ? msg.sysprep() : msg.cloudInit()} id={`${idPrefix}-cloud-init`}>
                           <div className={style['cloud-init-field']}>
-                            {cloudInitEnabled ? <Icon type='pf' name='on' /> : <Icon type='pf' name='off' />}
+                            {cloudInitEnabled ? <OnIcon/> : <OffIcon/>}
                             {enumMsg('Switch', cloudInitEnabled ? 'on' : 'off', msg)}
                           </div>
                         </FieldRow>
                         <FieldRow label={msg.bootMenu()} id={`${idPrefix}-boot-menu-readonly`}>
                           <div className={style['boot-menu-field']}>
-                            {bootMenuEnabled ? <Icon type='pf' name='on' /> : <Icon type='pf' name='off' />}
+                            {bootMenuEnabled ? <OnIcon/> : <OffIcon/>}
                             {enumMsg('Switch', bootMenuEnabled ? 'on' : 'off', msg)}
                           </div>
                         </FieldRow>
@@ -913,14 +919,15 @@ class DetailsCard extends React.Component {
                           { !isFullEdit && vCpuCount }
                           { isFullEdit && (
                             <div>
-                              <FormControl
+                              <NumberInput
                                 id={`${idPrefix}-cpus-edit`}
-                                className={style['cpu-input']}
-                                type='number'
                                 min={1}
                                 max={MAX_VM_VCPU_EDIT}
                                 value={vCpuCount}
+                                widthChars={5}
                                 onChange={e => this.handleChange('cpu', e.target.value)}
+                                onPlus={() => this.handleChange('cpu', vCpuCount + 1)}
+                                onMinus={() => this.handleChange('cpu', vCpuCount - 1)}
                               />
                               { !vCpuCountIsValid && (
                                 <div className={style['cpu-input-error']}>
@@ -938,16 +945,15 @@ class DetailsCard extends React.Component {
                         <FieldRow label={msg.memory()} id={`${idPrefix}-memory`}>
                           { !isFullEdit && `${userFormatOfBytes(memorySize).str}` }
                           { isFullEdit && (
-                            <div>
-                              <FormControl
-                                id={`${idPrefix}-memory-edit`}
-                                className={style['memory-input']}
-                                type='number'
-                                value={(memorySize / (1024 ** 2))}
-                                onChange={e => this.handleChange('memory', e.target.value)}
-                              />
-                              MiB
-                            </div>
+                            <NumberInput
+                              id={`${idPrefix}-memory-edit`}
+                              value={(memorySize / (1024 ** 2))}
+                              onChange={e => this.handleChange('memory', e.target.value)}
+                              unit='MiB'
+                              widthChars={5}
+                              onPlus={() => this.handleChange('memory', (memorySize / (1024 ** 2)) + 1)}
+                              onMinus={() => this.handleChange('memory', (memorySize / (1024 ** 2)) - 1)}
+                            />
                           )}
                         </FieldRow>
                       </Grid>
@@ -957,7 +963,7 @@ class DetailsCard extends React.Component {
 
                 {/* Advanced options */}
                 { isFullEdit && (
-                  <ExpandCollapse id={`${idPrefix}-advanced-options`} textCollapsed={msg.advancedOptions()} textExpanded={msg.advancedOptions()}>
+                  <ExpandableSection id={`${idPrefix}-advanced-options`} toggleText={msg.advancedOptions()}>
                     <Grid className={style['details-container']}>
                       <Row>
                         {/* First column */}
@@ -1089,7 +1095,7 @@ class DetailsCard extends React.Component {
                         </Col>
                       </Row>
                     </Grid>
-                  </ExpandCollapse>
+                  </ExpandableSection>
                 ) }
 
                 { correlatedMessages && correlatedMessages.size > 0 && correlatedMessages.map((message, key) => (

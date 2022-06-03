@@ -1,10 +1,10 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import {
-  FormControl,
-  ControlLabel,
   FormGroup,
-} from 'patternfly-react'
+  TextArea,
+  TextInput,
+} from '@patternfly/react-core'
 import { MsgContext } from '_/intl'
 
 const CloudInitForm = ({ idPrefix, vm, onChange }) => {
@@ -13,24 +13,25 @@ const CloudInitForm = ({ idPrefix, vm, onChange }) => {
   const cloudInitSshAuthorizedKeys = vm.getIn(['cloudInit', 'sshAuthorizedKeys'])
   return (
     <>
-      <FormGroup controlId={`${idPrefix}-cloud-init-hostname`}>
-        <ControlLabel>
-          {msg.hostName()}
-        </ControlLabel>
-        <FormControl
-          type='text'
+      <FormGroup
+        label={msg.hostName()}
+        fieldId={`${idPrefix}-cloud-init-hostname`}
+      >
+        <TextInput
+          id={`${idPrefix}-cloud-init-hostname`}
+          type="text"
           value={cloudInitHostName}
-          onChange={e => onChange('cloudInitHostName', e.target.value)}
+          onChange={value => onChange('cloudInitHostName', value)}
         />
       </FormGroup>
-      <FormGroup controlId={`${idPrefix}-cloud-init-ssh`}>
-        <ControlLabel>
-          {msg.sshAuthorizedKeys()}
-        </ControlLabel>
-        <FormControl
-          componentClass='textarea'
+      <FormGroup
+        label={msg.sshAuthorizedKeys()}
+        fieldId={`${idPrefix}-cloud-init-ssh`}
+      >
+        <TextArea
+          id={`${idPrefix}-cloud-init-ssh`}
           value={cloudInitSshAuthorizedKeys}
-          onChange={e => onChange('cloudInitSshAuthorizedKeys', e.target.value)}
+          onChange={value => onChange('cloudInitSshAuthorizedKeys', value)}
         />
       </FormGroup>
     </>

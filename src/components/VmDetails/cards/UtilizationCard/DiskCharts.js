@@ -1,15 +1,9 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import {
+  Card,
   CardBody,
-  CardTitle,
-  UtilizationCard,
-  UtilizationCardDetails,
-  UtilizationCardDetailsCount,
-  UtilizationCardDetailsDesc,
-  UtilizationCardDetailsLine1,
-  UtilizationCardDetailsLine2,
-} from 'patternfly-react'
+} from '@patternfly/react-core'
 import BarChart from './UtilizationCharts/BarChart'
 import DonutChart from './UtilizationCharts/DonutChart'
 
@@ -21,6 +15,7 @@ import style from './style.css'
 
 import NoHistoricData from './NoHistoricData'
 import NoLiveData from './NoLiveData'
+import UtilizationCardData from './UtilizationCardData'
 
 const EmptyBlock = () => (
   <div className={style['no-history-chart']} />
@@ -62,31 +57,27 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
   const isVmWindows = isWindows(vm.getIn(['os', 'type']))
 
   return (
-    <UtilizationCard className={style['chart-card']} id={id}>
-      <CardTitle>{msg.utilizationCardTitleDisk()}</CardTitle>
+    <Card className={style['chart-card']} id={id}>
       <CardBody>
+        {msg.utilizationCardTitleDisk()}
         { vm.get('disks').size === 0 &&
           <NoLiveData id={`${id}-no-live-data`} message={msg.utilizationCardNoAttachedDisks()} />
         }
         { vm.get('disks').size > 0 && (
           <>
-            <UtilizationCardDetails>
-              <UtilizationCardDetailsCount id={`${id}-available`}>
-                {msg.utilizationCardUnitNumber({
-                  number: floor(availableFormated.number, availableMemoryPercision),
-                  storageUnits: availableFormated.suffix !== totalFormated.suffix && availableFormated.suffix,
-                })}
-              </UtilizationCardDetailsCount>
-              <UtilizationCardDetailsDesc>
-                <UtilizationCardDetailsLine1>{msg.utilizationCardUnallocated()}</UtilizationCardDetailsLine1>
-                <UtilizationCardDetailsLine2 id={`${id}-total`}>
-                  {msg.utilizationCardOfProvisioned({
-                    number: round(totalFormated.number, 1),
-                    storageUnits: totalFormated.suffix,
-                  })}
-                </UtilizationCardDetailsLine2>
-              </UtilizationCardDetailsDesc>
-            </UtilizationCardDetails>
+            <UtilizationCardData
+              available={msg.utilizationCardUnitNumber({
+                number: floor(availableFormated.number, availableMemoryPercision),
+                storageUnits: availableFormated.suffix !== totalFormated.suffix && availableFormated.suffix,
+              })}
+              line1={msg.utilizationCardUnallocated()}
+              line2={msg.utilizationCardOfProvisioned({
+                number: round(totalFormated.number, 1),
+                storageUnits: totalFormated.suffix,
+              })}
+              idPrefix={id}
+            />
+
             { !hasDiskDetails && (
               <DonutChart
                 id={`${id}-donut-chart`}
@@ -143,7 +134,7 @@ const DiskCharts = ({ vm, diskStats, isRunning, id, ...props }) => {
           </>
         )}
       </CardBody>
-    </UtilizationCard>
+    </Card>
   )
 }
 DiskCharts.propTypes = {

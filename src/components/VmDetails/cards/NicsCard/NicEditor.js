@@ -2,20 +2,18 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
 import {
-  Col,
-  ControlLabel,
-  ExpandCollapse,
-  Form,
-  FormControl,
-  FormGroup,
-  Radio,
-} from 'patternfly-react'
-import {
   Button,
+  Form,
+  FormFieldGroupExpandable,
+  FormFieldGroupHeader,
+  FormGroup,
+  FormSelect,
+  FormSelectOption,
   Modal,
   ModalVariant,
+  TextInput,
+  Radio,
 } from '@patternfly/react-core'
-import SelectBox from '../../../SelectBox'
 import NicLinkStateIcon from './NicLinkStateIcon'
 
 import { withMsg } from '_/intl'
@@ -26,17 +24,6 @@ import { InfoTooltip } from '_/components/tooltips'
 
 const NIC_INTERFACE_DEFAULT = 'virtio'
 const NIC_INTERFACE_CANT_CHANGE = ['pci_passthrough']
-
-const LabelCol = ({ children, ...props }) => {
-  return (
-    <Col componentClass={ControlLabel} {...props}>
-      { children }
-    </Col>
-  )
-}
-LabelCol.propTypes = {
-  children: PropTypes.node.isRequired,
-}
 
 /**
  * Collect required information required to create a new NIC for a VM.
@@ -124,7 +111,7 @@ class NicEditor extends Component {
     return nic
   }
 
-  changeName ({ target: { value } }) {
+  changeName (value) {
     this.setState((state) => ({ values: { ...state.values, name: value } }))
   }
 
@@ -202,88 +189,88 @@ class NicEditor extends Component {
           ]}
         >
           <Form
-            horizontal
-            onSubmit={e => { e.preventDefault() }}
+            isHorizontal
             id={`${modalId}-form`}
           >
-            <FormGroup controlId={`${modalId}-name`}>
-              <LabelCol sm={3}>
-                { msg.nicEditorNameLabel() }
-              </LabelCol>
-              <Col sm={9}>
-                <FormControl
-                  type='text'
-                  defaultValue={this.state.values.name}
-                  onChange={this.changeName}
-                />
-              </Col>
+            <FormGroup label={ msg.nicEditorNameLabel() } fieldId={`${modalId}-name`} >
+              <TextInput
+                id={`${modalId}-name`}
+                type='text'
+                value={this.state.values.name}
+                onChange={this.changeName}
+              />
             </FormGroup>
 
-            <FormGroup controlId={`${modalId}-vnic-profile`}>
-              <LabelCol sm={3}>
-                { msg.vnicProfile() }
-              </LabelCol>
-              <Col sm={9}>
-                <SelectBox
-                  id={`${modalId}-vnic-profile`}
-                  items={vnicList}
-                  selected={this.state.values.vnicProfileId}
-                  onChange={this.changeVnicProfile}
-                />
-              </Col>
+            <FormGroup fieldId={`${modalId}-vnic-profile`} label={ msg.vnicProfile() }>
+              <FormSelect
+                id={`${modalId}-vnic-profile`}
+                value={this.state.values.vnicProfileId}
+                onChange={this.changeVnicProfile}
+              >
+                {vnicList.map((option, index) => (
+                  <FormSelectOption key={index} value={option.id} label={option.value} />
+                ))}
+              </FormSelect>
             </FormGroup>
 
-            <ExpandCollapse id='nic-edit-advanced-options' textCollapsed={msg.advancedOptions()} textExpanded={msg.advancedOptions()}>
-              <FormGroup controlId={`${modalId}-interface`}>
-                <LabelCol sm={3}>
-                  { msg.nicEditorInterfaceLabel() }
-                  { !canChangeInterface && (
-                    <InfoTooltip
-                      id={`${modalId}-interface-edit-tooltip`}
-                      tooltip={msg.nicEditorInterfaceCantEditHelp()}
-                    />
-                  )}
-                </LabelCol>
-                <Col sm={9}>
-                  { !canChangeInterface && (
-                    <div className={style['editor-value-text']} id={`${modalId}-interface`}>
-                      { nicInterface ? nicInterface.value : 'N/A' }
-                    </div>
-                  )}
-                  { canChangeInterface && (
-                    <SelectBox
-                      id={`${modalId}-interface`}
-                      items={NIC_INTERFACES}
-                      selected={this.state.values.interface}
-                      onChange={this.changeInterface}
-                    />
-                  )}
-                </Col>
-              </FormGroup>
-              <FormGroup controlId='nic-link-state-group'>
-                <LabelCol sm={3}>
-                  { msg.nicEditorLinkStateLabel() }
-                </LabelCol>
-                <Col sm={9}>
-                  <Radio
-                    id={`${modalId}-link-state-on`}
-                    name='nic-link-state-group'
-                    defaultChecked={this.state.values.linked}
-                    onChange={() => { this.changeLinked(true) }}
+            <FormFieldGroupExpandable
+              header={ <FormFieldGroupHeader titleText={{ text: msg.advancedOptions(), id: 'nic-edit-advanced-options' }} />}
+            >
+              <FormGroup
+                label={ msg.nicEditorInterfaceLabel() }
+                labelIcon={!canChangeInterface && (
+                  <InfoTooltip
+                    id={`${modalId}-interface-edit-tooltip`}
+                    tooltip={msg.nicEditorInterfaceCantEditHelp()}
+                  />
+                )}
+                fieldId={`${modalId}-interface`}
+              >
+                { !canChangeInterface && (
+                  <div className={style['editor-value-text']} id={`${modalId}-interface`}>
+                    { nicInterface ? nicInterface.value : 'N/A' }
+                  </div>
+                )}
+                { canChangeInterface && (
+                  <FormSelect
+                    id={`${modalId}-interface`}
+                    value={this.state.values.interface}
+                    onChange={this.changeInterface}
                   >
-                    { msg.nicEditorLinkStateUp() } <NicLinkStateIcon linkState idSuffix='up' showTooltip={false} />
-                  </Radio>
-                  <Radio
-                    id={`${modalId}-link-state-off`}
-                    name='nic-link-state-group'
-                    defaultChecked={!this.state.values.linked}
-                    onChange={() => { this.changeLinked(false) }}
-                  >
-                    { msg.nicEditorLinkStateDown() } <NicLinkStateIcon idSuffix='down' showTooltip={false} />
-                  </Radio>
-                </Col>
+                    {NIC_INTERFACES.map((option, index) => (
+                      <FormSelectOption key={index} value={option.id} label={option.value} />
+                    ))}
+                  </FormSelect>
+
+                )}
               </FormGroup>
-            </ExpandCollapse>
+              <FormGroup fieldId='nic-link-state-group' label={ msg.nicEditorLinkStateLabel() }>
+                <Radio
+                  id={`${modalId}-link-state-on`}
+                  name='nic-link-state-group'
+                  isChecked={this.state.values.linked}
+                  onChange={() => { this.changeLinked(true) }}
+                  label={ (
+                    <>
+                      {msg.nicEditorLinkStateUp()}
+                      <NicLinkStateIcon linkState idSuffix='up' showTooltip={false} />
+                    </>
+                  ) }
+                />
+                <Radio
+                  id={`${modalId}-link-state-off`}
+                  name='nic-link-state-group'
+                  isChecked={!this.state.values.linked}
+                  onChange={() => { this.changeLinked(false) }}
+                  label={ (
+                    <>
+                      { msg.nicEditorLinkStateDown() }
+                      <NicLinkStateIcon idSuffix='down' showTooltip={false} />
+                    </>
+                  ) }
+                />
+              </FormGroup>
+            </FormFieldGroupExpandable>
           </Form>
         </Modal>
       </>

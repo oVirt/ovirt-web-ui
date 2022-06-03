@@ -1,15 +1,9 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import {
+  Card,
   CardBody,
-  CardTitle,
-  UtilizationCard,
-  UtilizationCardDetails,
-  UtilizationCardDetailsCount,
-  UtilizationCardDetailsDesc,
-  UtilizationCardDetailsLine1,
-  UtilizationCardDetailsLine2,
-} from 'patternfly-react'
+} from '@patternfly/react-core'
 import DonutChart from './UtilizationCharts/DonutChart'
 import AreaChart from './UtilizationCharts/AreaChart'
 import { MsgContext } from '_/intl'
@@ -20,6 +14,7 @@ import style from './style.css'
 
 import NoHistoricData from './NoHistoricData'
 import NoLiveData from './NoLiveData'
+import UtilizationCardData from './UtilizationCardData'
 
 /**
  * Render current Memory use (free vs available) as a donut chart and historic use values
@@ -47,29 +42,25 @@ const MemoryCharts = ({ memoryStats, isRunning, id }) => {
     : 2
 
   return (
-    <UtilizationCard className={style['chart-card']} id={id}>
-      <CardTitle>{msg.utilizationCardTitleMemory()}</CardTitle>
+    <Card className={style['chart-card']} id={id}>
       <CardBody>
+        {msg.utilizationCardTitleMemory()}
         { !isRunning && <NoLiveData id={`${id}-no-live-data`} /> }
         { isRunning && (
           <>
-            <UtilizationCardDetails>
-              <UtilizationCardDetailsCount id={`${id}-available`}>
-                {msg.utilizationCardUnitNumber({
-                  number: floor(availableFormated.number, availableMemoryPercision),
-                  storageUnits: availableFormated.suffix !== totalFormated.suffix && availableFormated.suffix,
-                })}
-              </UtilizationCardDetailsCount>
-              <UtilizationCardDetailsDesc>
-                <UtilizationCardDetailsLine1>{msg.utilizationCardAvailable()}</UtilizationCardDetailsLine1>
-                <UtilizationCardDetailsLine2 id={`${id}-total`}>
-                  {msg.utilizationCardOf({
-                    number: round(totalFormated.number, 0),
-                    storageUnits: totalFormated.suffix,
-                  })}
-                </UtilizationCardDetailsLine2>
-              </UtilizationCardDetailsDesc>
-            </UtilizationCardDetails>
+            <UtilizationCardData
+              available={msg.utilizationCardUnitNumber({
+                number: floor(availableFormated.number, availableMemoryPercision),
+                storageUnits: availableFormated.suffix !== totalFormated.suffix && availableFormated.suffix,
+              })}
+              line1={msg.utilizationCardAvailable()}
+              line2={msg.utilizationCardOf({
+                number: round(totalFormated.number, 0),
+                storageUnits: totalFormated.suffix,
+              })}
+              idPrefix={id}
+            />
+
             <DonutChart
               id={`${id}-donut-chart`}
               data={[
@@ -98,7 +89,7 @@ const MemoryCharts = ({ memoryStats, isRunning, id }) => {
           </>
         )}
       </CardBody>
-    </UtilizationCard>
+    </Card>
   )
 }
 MemoryCharts.propTypes = {

@@ -7,7 +7,6 @@ import { createDiskForVm, editDiskOnVm, removeDisk } from '_/actions'
 import { withMsg } from '_/intl'
 import { maskForElementId, suggestDiskName, sortDisksForDisplay } from '_/components/utils'
 
-import { Icon } from 'patternfly-react'
 import { Grid, Row, Col } from '_/components/Grid'
 import BaseCard from '../../BaseCard'
 import DiskImageEditor from './DiskImageEditor'
@@ -17,6 +16,7 @@ import itemStyle from '../../itemListStyle.css'
 import baseStyle from '../../style.css'
 import style from './style.css'
 import { localeCompare } from '_/helpers'
+import { PlusIcon, StorageDomainIcon } from '@patternfly/react-icons/dist/esm/icons'
 
 function filterStorageDomains (vm, clusters, storageDomains) {
   const clusterId = vm.getIn(['cluster', 'id'])
@@ -113,7 +113,7 @@ class DisksCard extends React.Component {
   }
 
   render () {
-    const { vm, onEditChange, msg, locale } = this.props
+    const { vm, onEditChange, msg, locale, className = '' } = this.props
     const { suggestedDiskName, suggestedStorageDomain, filteredStorageDomainList } = this.state
 
     const idPrefix = 'vmdetail-disks'
@@ -129,74 +129,73 @@ class DisksCard extends React.Component {
     return (
       <BaseCard
         idPrefix={idPrefix}
-        icon={{ type: 'pf', name: 'storage-domain' }}
+        icon={StorageDomainIcon}
         title={msg.disks()}
         editTooltip={msg.edit()}
         itemCount={diskList.size}
-        className={baseStyle['cell-card']}
-        editable={canEditTheCard}
+        className={`${baseStyle['cell-card']} ${className}`}
+        editable={false}
         onStartEdit={() => { onEditChange(true) }}
         onCancel={() => { onEditChange(false) }}
         onSave={() => { onEditChange(false) }}
       >
-        {({ isEditing }) => (
-          <Grid className={style['disks-container']}>
-            { isEditing && canCreateDisks && (
-              <Row key={`${vm.get('id')}-disk-add`}>
-                <Col>
-                  <DiskImageEditor
-                    idPrefix={`${idPrefix}-new-disk`}
-                    vm={vm}
-                    suggestedName={suggestedDiskName}
-                    suggestedStorageDomain={suggestedStorageDomain}
-                    storageDomainList={filteredStorageDomainList}
-                    onSave={this.onCreateConfirm}
-                    trigger={({ onClick }) => (
-                      <div className={itemStyle['create-block']}>
-                        <a href='#' id={`${idPrefix}-new-disk-action`} onClick={onClick}>
-                          <Icon className={itemStyle['create-icon']} type='fa' name='plus' />
-                          <span className={itemStyle['create-text']} >{msg.diskActionCreateNew()}</span>
-                        </a>
-                      </div>
-                    )}
-                  />
-                </Col>
-              </Row>
-            )}
+        <Grid className={style['disks-container']}>
+          { canEditTheCard && canCreateDisks && (
+            <Row key={`${vm.get('id')}-disk-add`}>
+              <Col>
+                <DiskImageEditor
+                  idPrefix={`${idPrefix}-new-disk`}
+                  vm={vm}
+                  suggestedName={suggestedDiskName}
+                  suggestedStorageDomain={suggestedStorageDomain}
+                  storageDomainList={filteredStorageDomainList}
+                  onSave={this.onCreateConfirm}
+                  trigger={({ onClick }) => (
+                    <div className={itemStyle['create-block']}>
+                      <a href='#' id={`${idPrefix}-new-disk-action`} onClick={onClick}>
+                        <PlusIcon className={itemStyle['create-icon']}/>
+                        <span className={itemStyle['create-text']} >{msg.diskActionCreateNew()}</span>
+                      </a>
+                    </div>
+                  )}
+                />
+              </Col>
+            </Row>
+          )}
 
-            { diskList.size === 0 && (
-              <Row>
-                <Col>
-                  <div className={itemStyle['no-items']} id={`${idPrefix}-no-disks`}>{msg.noDisks()}</div>
-                </Col>
-              </Row>
-            )}
+          { diskList.size === 0 && (
+            <Row>
+              <Col>
+                <div className={itemStyle['no-items']} id={`${idPrefix}-no-disks`}>{msg.noDisks()}</div>
+              </Col>
+            </Row>
+          )}
 
-            { diskList.size > 0 && diskList.map(disk => (
-              <Row key={disk.get('id')}>
-                <Col style={{ display: 'block' }}>
-                  <DiskListItem
-                    idPrefix={`${idPrefix}-${maskForElementId(disk.get('name'))}`}
-                    vm={vm}
-                    disk={disk}
-                    storageDomainList={filteredStorageDomainList}
-                    isEditing={isEditing}
-                    canDeleteDisks={canDeleteDisks}
-                    onEdit={this.onEditConfirm}
-                    onDelete={this.onDeleteConfirm}
-                  />
-                </Col>
-              </Row>
-            )
-            )}
-          </Grid>
-        )}
+          { diskList.size > 0 && diskList.map(disk => (
+            <Row key={disk.get('id')}>
+              <Col style={{ display: 'block' }}>
+                <DiskListItem
+                  idPrefix={`${idPrefix}-${maskForElementId(disk.get('name'))}`}
+                  vm={vm}
+                  disk={disk}
+                  storageDomainList={filteredStorageDomainList}
+                  isEditing={canEditTheCard}
+                  canDeleteDisks={canDeleteDisks}
+                  onEdit={this.onEditConfirm}
+                  onDelete={this.onDeleteConfirm}
+                />
+              </Col>
+            </Row>
+          )
+          )}
+        </Grid>
       </BaseCard>
     )
   }
 }
 
 DisksCard.propTypes = {
+  className: PropTypes.string,
   vm: PropTypes.object.isRequired,
   onEditChange: PropTypes.func.isRequired,
 
