@@ -134,63 +134,61 @@ class DisksCard extends React.Component {
         editTooltip={msg.edit()}
         itemCount={diskList.size}
         className={`${baseStyle['cell-card']} ${className}`}
-        editable={canEditTheCard}
+        editable={false}
         onStartEdit={() => { onEditChange(true) }}
         onCancel={() => { onEditChange(false) }}
         onSave={() => { onEditChange(false) }}
       >
-        {({ isEditing }) => (
-          <Grid className={style['disks-container']}>
-            { isEditing && canCreateDisks && (
-              <Row key={`${vm.get('id')}-disk-add`}>
-                <Col>
-                  <DiskImageEditor
-                    idPrefix={`${idPrefix}-new-disk`}
-                    vm={vm}
-                    suggestedName={suggestedDiskName}
-                    suggestedStorageDomain={suggestedStorageDomain}
-                    storageDomainList={filteredStorageDomainList}
-                    onSave={this.onCreateConfirm}
-                    trigger={({ onClick }) => (
-                      <div className={itemStyle['create-block']}>
-                        <a href='#' id={`${idPrefix}-new-disk-action`} onClick={onClick}>
-                          <PlusIcon className={itemStyle['create-icon']}/>
-                          <span className={itemStyle['create-text']} >{msg.diskActionCreateNew()}</span>
-                        </a>
-                      </div>
-                    )}
-                  />
-                </Col>
-              </Row>
-            )}
+        <Grid className={style['disks-container']}>
+          { canEditTheCard && canCreateDisks && (
+            <Row key={`${vm.get('id')}-disk-add`}>
+              <Col>
+                <DiskImageEditor
+                  idPrefix={`${idPrefix}-new-disk`}
+                  vm={vm}
+                  suggestedName={suggestedDiskName}
+                  suggestedStorageDomain={suggestedStorageDomain}
+                  storageDomainList={filteredStorageDomainList}
+                  onSave={this.onCreateConfirm}
+                  trigger={({ onClick }) => (
+                    <div className={itemStyle['create-block']}>
+                      <a href='#' id={`${idPrefix}-new-disk-action`} onClick={onClick}>
+                        <PlusIcon className={itemStyle['create-icon']}/>
+                        <span className={itemStyle['create-text']} >{msg.diskActionCreateNew()}</span>
+                      </a>
+                    </div>
+                  )}
+                />
+              </Col>
+            </Row>
+          )}
 
-            { diskList.size === 0 && (
-              <Row>
-                <Col>
-                  <div className={itemStyle['no-items']} id={`${idPrefix}-no-disks`}>{msg.noDisks()}</div>
-                </Col>
-              </Row>
-            )}
+          { diskList.size === 0 && (
+            <Row>
+              <Col>
+                <div className={itemStyle['no-items']} id={`${idPrefix}-no-disks`}>{msg.noDisks()}</div>
+              </Col>
+            </Row>
+          )}
 
-            { diskList.size > 0 && diskList.map(disk => (
-              <Row key={disk.get('id')}>
-                <Col style={{ display: 'block' }}>
-                  <DiskListItem
-                    idPrefix={`${idPrefix}-${maskForElementId(disk.get('name'))}`}
-                    vm={vm}
-                    disk={disk}
-                    storageDomainList={filteredStorageDomainList}
-                    isEditing={isEditing}
-                    canDeleteDisks={canDeleteDisks}
-                    onEdit={this.onEditConfirm}
-                    onDelete={this.onDeleteConfirm}
-                  />
-                </Col>
-              </Row>
-            )
-            )}
-          </Grid>
-        )}
+          { diskList.size > 0 && diskList.map(disk => (
+            <Row key={disk.get('id')}>
+              <Col style={{ display: 'block' }}>
+                <DiskListItem
+                  idPrefix={`${idPrefix}-${maskForElementId(disk.get('name'))}`}
+                  vm={vm}
+                  disk={disk}
+                  storageDomainList={filteredStorageDomainList}
+                  isEditing={canEditTheCard}
+                  canDeleteDisks={canDeleteDisks}
+                  onEdit={this.onEditConfirm}
+                  onDelete={this.onDeleteConfirm}
+                />
+              </Col>
+            </Row>
+          )
+          )}
+        </Grid>
       </BaseCard>
     )
   }

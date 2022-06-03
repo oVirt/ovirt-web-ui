@@ -109,7 +109,7 @@ class BaseCard extends React.Component {
             <CardTitle>
               {TheIcon && <TheIcon className={style['base-card-title-icon']} />}
               {title}
-              {hasBadge && <Badge isRead>{itemCount}</Badge>}
+              {hasBadge && <Badge isRead className={style['base-card-item-count-badge']}>{itemCount}</Badge>}
             </CardTitle>
             <CardEditButton
               tooltip={editTooltip}

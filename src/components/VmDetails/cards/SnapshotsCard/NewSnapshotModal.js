@@ -17,6 +17,7 @@ import {
 } from '@patternfly/react-core'
 import { withMsg } from '_/intl'
 import { PlusIcon } from '@patternfly/react-icons/dist/esm/icons'
+import itemStyle from '../../itemListStyle.css'
 
 class NewSnapshotModal extends Component {
   constructor (props) {
@@ -69,10 +70,10 @@ class NewSnapshotModal extends Component {
     const modalId = `${idPrefix}-modal`
 
     return (
-      <div>
+      <div className={itemStyle['create-block']}>
         <a onClick={this.props.disabled ? () => {} : this.open} id={`${idPrefix}-button`} className={`${this.props.disabled && 'disabled'}`}>
-          <PlusIcon/>
-          { msg.createSnapshot() }
+          <PlusIcon className={itemStyle['create-icon']}/>
+          <span className={itemStyle['create-text']}>{ msg.createSnapshot() }</span>
         </a>
 
         <Modal

@@ -47,11 +47,11 @@
 
 .base-card-title-icon {
   margin-right: 6px; /* match the left margin on .badge */
-  vertical-align: top;
 }
 
 .base-card-item-count-badge {
-  vertical-align: top;
+  margin-left: 6px;
+  vertical-align: text-bottom;
 }
 
 .base-card-body {

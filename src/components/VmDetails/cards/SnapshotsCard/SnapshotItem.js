@@ -7,6 +7,7 @@ import {
   Tooltip as PFTooltip,
 } from '@patternfly/react-core'
 
+import itemStyle from '../../itemListStyle.css'
 import style from './style.css'
 
 import { withMsg } from '_/intl'
@@ -117,7 +118,7 @@ class SnapshotItem extends React.Component {
           locale={locale}
           position={this.state.isMobile || this.state.isTablet ? 'top' : 'left'}
         >
-          <a id={`${this.props.id}-info`}>
+          <a id={`${this.props.id}-info`} className={itemStyle['item-action']}>
             <InfoTooltip
               id={`${this.props.id}-info-tt`}
               tooltip={msg.details()}
@@ -136,7 +137,7 @@ class SnapshotItem extends React.Component {
             snapshot={this.props.snapshot}
             vmId={this.props.vmId}
             trigger={({ onClick }) => (
-              <SnapshotAction key='restore' id={`${this.props.id}-restore`} onClick={onClick} disabled={isRestoreDisabled}>
+              <SnapshotAction key='restore' id={`${this.props.id}-restore`} onClick={onClick} disabled={isRestoreDisabled} className={itemStyle['item-action']}>
                 <Tooltip id={`${this.props.id}-restore-tt`} tooltip={msg.snapshotRestore()}>
                   <PlayIcon className={isRestoreDisabled ? '' : style.black}/>
                 </Tooltip>
@@ -154,7 +155,7 @@ class SnapshotItem extends React.Component {
             title={msg.permanentlyDeleteSnapshot()}
             onDelete={this.props.onSnapshotDelete}
             trigger={({ onClick }) => (
-              <SnapshotAction key='delete' id={`${this.props.id}-delete`} disabled={isActionsDisabled} onClick={onClick}>
+              <SnapshotAction key='delete' id={`${this.props.id}-delete`} disabled={isActionsDisabled} onClick={onClick} className={itemStyle['item-action']}>
                 <Tooltip id={`${this.props.id}-delete-tt`} tooltip={msg.snapshotDelete()}>
                   <TrashIcon className={isActionsDisabled ? '' : style.red}/>
                 </Tooltip>
@@ -191,13 +192,13 @@ class SnapshotItem extends React.Component {
     }
 
     return (
-      <div className={style['snapshot-item']} id={this.props.id}>
-        <span className={style['snapshot-item-status']} id={`${this.props.id}-status-icon`}>{statusIcon}</span>
-        <span className={style['snapshot-item-name']} id={`${this.props.id}-description`}>
-          {getMinimizedString(this.props.snapshot.get('description'), MAX_DESCRIPTION_SIZE)}
-          <span className={style['snapshot-item-time']} id={`${this.props.id}-time`}>{`(${formatHowLongAgo(this.props.snapshot.get('date'))})`}</span>
+      <div className={itemStyle['item-row']} id={this.props.id}>
+        <span className={itemStyle['item-row-status']} id={`${this.props.id}-status-icon`}>{statusIcon}</span>
+        <span className={itemStyle['item-row-info']} id={`${this.props.id}-description`}>
+          <span className={style['snapshot-name-info']}>{getMinimizedString(this.props.snapshot.get('description'), MAX_DESCRIPTION_SIZE)}</span>
+          <span className={itemStyle['item-extra_info']} id={`${this.props.id}-time`}>{`(${formatHowLongAgo(this.props.snapshot.get('date'))})`}</span>
         </span>
-        <span className={style['snapshot-item-actions']} id={`${this.props.id}-actions`}>{ buttons }</span>
+        <span className={itemStyle['item-row-actions']} id={`${this.props.id}-actions`}>{ buttons }</span>
       </div>
     )
   }

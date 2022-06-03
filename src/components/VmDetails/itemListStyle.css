@@ -41,6 +41,7 @@
   align-items: baseline;
 
   max-width: 100%;
+  overflow: hidden;
 }
 
 .item-row .item-row-info.no-status {
@@ -61,9 +62,16 @@
 }
 
 .item-row .item-row-actions .item-action + .item-action {
-  padding-left: 5px;
+  margin-left: 5px;
 }
 
 .item-row .item-row-actions .item-action-disabled {
   color: #8B8D8F;
+}
+
+.item-extra_info {
+  margin-left: 5px;
+  color: #808080;
+  display: inline-block;
+  overflow-wrap: break-word;
 }

@@ -1,3 +1,15 @@
+.snapshot-container {
+  width: auto;
+  margin-left: -15px; /* max is -20px to edge of the containing card */
+  margin-right: -15px;
+}
+
+.snapshot-name-info {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
 .snapshot-detail-container {
     display: flex;
     width: 100%;
@@ -84,50 +96,6 @@ div.popover {
 
 .snapshot-disk-list {
   display: table;
-}
-
-.snapshot-item {
-  display: table-row;
-}
-
-.snapshot-item a {
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.snapshot-item-status {
-  display: table-cell;
-}
-
-.snapshot-item-name {
-  display: table-cell;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-.snapshot-item-time {
-  color: #808080;
-  display: inline-block;
-  overflow-wrap: break-word;
-}
-
-.snapshot-item-actions {
-  display: table-cell;
-  white-space: nowrap;
-  padding-left: 5px;
-}
-
-.snapshot-item-actions a + a {
-  margin-left: 5px;
-}
-
-.snapshot-create a svg {
-  margin-right: 5px;
-}
-
-.snapshot-create a {
-  cursor: pointer;
-  font-size: 14px;
 }
 
 .no-nics, .no-disks {

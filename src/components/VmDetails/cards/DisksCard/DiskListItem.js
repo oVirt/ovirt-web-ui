@@ -26,13 +26,12 @@ function isDiskBeingDeleted (diskId, pendingTasks) {
 /**
  * Render a single Disk in the list of Disks on the Disks Card.
  *
- * If _isEditing_ then render the appropriate action buttons linked to provided
- * handler functions.  If the action callbacks are not defined, they are assumed to
+ * If the action callbacks are not defined, they are assumed to
  * be disabled/disallowed and will be rendered as such.
  */
 const DiskListItem = ({
   idPrefix, vm, disk, storageDomainList,
-  isEditing, isDiskBeingDeleted, canDeleteDisks,
+  isDiskBeingDeleted, canDeleteDisks,
   onEdit, onDelete,
 }) => {
   const { msg } = useContext(MsgContext)
@@ -75,7 +74,7 @@ const DiskListItem = ({
             {view.name}
           </span>
         )}
-        <span id={`${idPrefix}-size`} className={style['size-info']}>
+        <span id={`${idPrefix}-size`} className={itemStyle['item-extra_info']}>
           ({view.size.value} {view.size.unit})
         </span>
         { view.bootable && (
@@ -85,68 +84,66 @@ const DiskListItem = ({
         )}
       </div>
 
-      {/* Actions Column (if edit) - content width, no wrapping */}
-      { isEditing && (
-        <div id={`${idPrefix}-actions`} className={itemStyle['item-row-actions']}>
-          { canEdit && (
-            <DiskImageEditor
-              idPrefix={`${idPrefix}-edit-disk`}
-              vm={vm}
-              disk={disk}
-              storageDomainList={storageDomainList}
-              onSave={onEdit}
-              trigger={({ onClick }) => (
-                <Tooltip id={`${idPrefix}-action-edit-tooltip`} tooltip={msg.diskEditTooltip()}>
-                  <a id={`${idPrefix}-action-edit`} className={itemStyle['item-action']} onClick={onClick} >
-                    <PencilAltIcon/>
-                  </a>
-                </Tooltip>
-              )}
+      {/* Actions Column - content width, no wrapping */}
+      <div id={`${idPrefix}-actions`} className={itemStyle['item-row-actions']}>
+        { canEdit && (
+          <DiskImageEditor
+            idPrefix={`${idPrefix}-edit-disk`}
+            vm={vm}
+            disk={disk}
+            storageDomainList={storageDomainList}
+            onSave={onEdit}
+            trigger={({ onClick }) => (
+              <Tooltip id={`${idPrefix}-action-edit-tooltip`} tooltip={msg.diskEditTooltip()}>
+                <a id={`${idPrefix}-action-edit`} className={itemStyle['item-action']} onClick={onClick} >
+                  <PencilAltIcon/>
+                </a>
+              </Tooltip>
+            )}
+          />
+        )}
+        { !canEdit && (
+          <Tooltip id={`${idPrefix}-action-edit-tooltip-disabled`} tooltip={msg.diskEditDisabledTooltip()}>
+            <PencilAltIcon
+              id={`${idPrefix}-action-edit-disabled`}
+              className={`${itemStyle['item-action']} ${itemStyle['item-action-disabled']}`}
             />
-          )}
-          { !canEdit && (
-            <Tooltip id={`${idPrefix}-action-edit-tooltip-disabled`} tooltip={msg.diskEditDisabledTooltip()}>
-              <PencilAltIcon
-                id={`${idPrefix}-action-edit-disabled`}
-                className={`${itemStyle['item-action']} ${itemStyle['item-action-disabled']}`}
-              />
-            </Tooltip>
-          )}
+          </Tooltip>
+        )}
 
-          { canDelete && (
-            <DeleteConfirmationModal
-              id={`${idPrefix}-delete-modal`}
-              title={msg.permanentlyDeleteDisk()}
-              severity='danger'
-              onDelete={() => { onDelete(vm.get('id'), view.id) }}
-              trigger={({ onClick }) => (
-                <Tooltip id={`${idPrefix}-action-delete-tooltip`} tooltip={msg.diskDeleteTooltip()}>
-                  <a id={`${idPrefix}-action-delete`} className={itemStyle['item-action']} onClick={onClick}>
-                    <TrashIcon style={{ color: 'red' }}/>
-                  </a>
-                </Tooltip>
-              )}
-            >
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: msg.areYouSureYouWantToDeleteDisk({
-                    diskName: `"<strong>${escapeHtml(view.name)}</strong>"`,
-                  }),
-                }}
-              />
-              <div>{msg.thisOperationCantBeUndone()}</div>
-            </DeleteConfirmationModal>
-          )}
-          { !canDelete && (
-            <Tooltip id={`${idPrefix}-action-delete-tooltip-disabled`} tooltip={msg.diskDeleteDisabledTooltip()}>
-              <TrashIcon
-                id={`${idPrefix}-action-delete-disabled`}
-                className={`${itemStyle['item-action']} ${itemStyle['item-action-disabled']}`}
-              />
-            </Tooltip>
-          )}
-        </div>
-      )}
+        { canDelete && (
+          <DeleteConfirmationModal
+            id={`${idPrefix}-delete-modal`}
+            title={msg.permanentlyDeleteDisk()}
+            severity='danger'
+            onDelete={() => { onDelete(vm.get('id'), view.id) }}
+            trigger={({ onClick }) => (
+              <Tooltip id={`${idPrefix}-action-delete-tooltip`} tooltip={msg.diskDeleteTooltip()}>
+                <a id={`${idPrefix}-action-delete`} className={itemStyle['item-action']} onClick={onClick}>
+                  <TrashIcon style={{ color: 'red' }}/>
+                </a>
+              </Tooltip>
+            )}
+          >
+            <span
+              dangerouslySetInnerHTML={{
+                __html: msg.areYouSureYouWantToDeleteDisk({
+                  diskName: `"<strong>${escapeHtml(view.name)}</strong>"`,
+                }),
+              }}
+            />
+            <div>{msg.thisOperationCantBeUndone()}</div>
+          </DeleteConfirmationModal>
+        )}
+        { !canDelete && (
+          <Tooltip id={`${idPrefix}-action-delete-tooltip-disabled`} tooltip={msg.diskDeleteDisabledTooltip()}>
+            <TrashIcon
+              id={`${idPrefix}-action-delete-disabled`}
+              className={`${itemStyle['item-action']} ${itemStyle['item-action-disabled']}`}
+            />
+          </Tooltip>
+        )}
+      </div>
     </div>
   )
 }
@@ -156,7 +153,6 @@ DiskListItem.propTypes = {
   disk: PropTypes.object.isRequired, // ImmutableJS Map
   storageDomainList: PropTypes.object.isRequired,
 
-  isEditing: PropTypes.bool.isRequired,
   isDiskBeingDeleted: PropTypes.bool.isRequired,
   canDeleteDisks: PropTypes.bool.isRequired,
 
