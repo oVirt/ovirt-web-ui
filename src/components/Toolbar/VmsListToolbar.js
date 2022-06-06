@@ -33,13 +33,21 @@ const VmsListToolbar = ({ match, vms, pools, filters = {}, onClearFilters, msg }
           <VmFilters/>
           <VmSort />
           <ToolbarItem>
-            <h4>
-              {
+            {
+            /* integration tests (OST) expect VM count under xpath //div[@class='col-sm-12']/h5
+            preserve this path:
+            keep the class 'col-sm-12' as marker class
+            keep the structure <div> followed by <h5> */
+            }
+            <div className='col-sm-12'>
+              <h5>
+                {
             hasFilters
               ? msg.resultsOf({ total, available })
               : msg.results({ total })
           }
-            </h4>
+              </h5>
+            </div>
           </ToolbarItem>
           <ToolbarItem alignment={{ default: 'alignRight' }}>
             <AddVmButton key='addbutton' id='route-add-vm' />
