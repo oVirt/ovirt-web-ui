@@ -12,6 +12,10 @@ import {
 
 import LogoutItem from './LogoutItem'
 
+// keep stable for integration tests
+export const USER_TOGGLE_ID = 'usermenu-user'
+export const USER_KEBBAB_TOGGLE_ID = 'kebab-usermenu-user'
+
 const UserMenu = ({ username, openAboutDialog, msg }) => {
   const [isDropdownOpen, setDropdownOpen] = useState(false)
   const onDropdownSelect = () => {}
@@ -21,7 +25,15 @@ const UserMenu = ({ username, openAboutDialog, msg }) => {
         position="right"
         onSelect={onDropdownSelect}
         isOpen={isDropdownOpen}
-        toggle={ <DropdownToggle icon={<UserIcon/>} onToggle={setDropdownOpen}>{username}</DropdownToggle> }
+        toggle={ (
+          <DropdownToggle
+            id={USER_TOGGLE_ID}
+            icon={<UserIcon/>}
+            onToggle={setDropdownOpen}
+          >
+            {username}
+          </DropdownToggle>
+        ) }
         dropdownItems={[
           <DropdownItem key="about" id='about-modal-link' onClick={openAboutDialog}>
             {msg.about()}

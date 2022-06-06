@@ -9,11 +9,17 @@ import {
   DropdownItem,
 } from '@patternfly/react-core'
 
+// keep stable for integration tests
+const USER_LOGOUT_ID = 'usermenu-logout'
+
 const LogoutItem = ({ onLogout }) => {
   const { msg } = useContext(MsgContext)
-  const idPrefix = 'usermenu'
   return (
-    <DropdownItem key='logout' onClick={onLogout} id={`${idPrefix}-logout`}>
+    <DropdownItem
+      key='logout'
+      onClick={onLogout}
+      id={USER_LOGOUT_ID}
+    >
       {msg.logOut()}
     </DropdownItem>
   )

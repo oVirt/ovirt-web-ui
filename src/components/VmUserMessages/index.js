@@ -42,7 +42,7 @@ const UserMessage = ({ record, id, onDismissMessage }) => {
           id={id}
           position={DropdownPosition.right}
           onSelect={() => setOpen(!isOpen)}
-          toggle={<KebabToggle onToggle={() => { setOpen(!isOpen); console.warn('toggle:', isOpen) } }/>}
+          toggle={<KebabToggle onToggle={() => setOpen(!isOpen) }/>}
           isOpen={isOpen}
           isPlain
           dropdownItems={[
@@ -92,7 +92,6 @@ const VmUserMessages = ({ userMessages, onClearMessages, onDismissMessage, onClo
           isDisabled={!messagesCount}
           variant='link'
           onClick={() => onClearMessages(toJS(userMessages.get('records', [])))}
-          // icon={<CloseIcon/>} // close button is on the right and used the same icon
         >
           { msg.clearAll() }
         </Button>

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { push } from 'connected-react-router'
 import { connect } from 'react-redux'
 
-import UserMenu from './UserMenu'
+import UserMenu, { USER_KEBBAB_TOGGLE_ID } from './UserMenu'
 
 import { manualRefresh } from '_/actions'
 import { MsgContext } from '_/intl'
@@ -87,7 +87,12 @@ const VmsPageHeader = ({ appReady, onRefresh, onCloseNotificationDrawer, isDrawe
               isPlain
               position="right"
               onSelect={() => setKebabDropdownOpen(!isKebabDropdownOpen)}
-              toggle={<KebabToggle onToggle={() => setKebabDropdownOpen(!isKebabDropdownOpen)} />}
+              toggle={(
+                <KebabToggle
+                  id={USER_KEBBAB_TOGGLE_ID}
+                  onToggle={() => setKebabDropdownOpen(!isKebabDropdownOpen)}
+                />
+              )}
               isOpen={isKebabDropdownOpen}
               dropdownItems={[
                 appReady && (
