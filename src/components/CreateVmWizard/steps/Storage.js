@@ -368,7 +368,7 @@ const Storage = ({
                             ariaLabel: msg.cancel(),
                             id: `${id}-cancel`,
                             icon: (<TimesIcon/>),
-                            // TODO template cannot be edited again
+                            // template cannot be edited again
                             isDisabled: isFromTemplate && !isValid,
                             onClick: () => onUpdate({
                               valid: true,

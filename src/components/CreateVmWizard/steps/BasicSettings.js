@@ -521,6 +521,7 @@ class BasicSettings extends React.Component {
               autoComplete='off'
               type='text'
               value={data.name}
+              validated={indicators.name}
               onChange={value => this.handleChange('name', value)}
             />
           </FieldRow>

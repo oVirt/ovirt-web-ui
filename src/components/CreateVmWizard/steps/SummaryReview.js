@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { Label } from '@patternfly/react-core'
 import { InfoCircleIcon } from '@patternfly/react-icons'
 
-import { MsgContext, enumMsg } from '_/intl'
+import { MsgContext, enumMsg, withMsg } from '_/intl'
 import { templateNameRenderer, userFormatOfBytes } from '_/helpers'
 import { Grid, Row, Col } from '_/components/Grid'
 import { Tooltip } from '_/components/tooltips'
@@ -16,6 +16,8 @@ import NicNameWithLabels from './NicNameWithLabels'
 import DiskNameWithLabels from './DiskNameWithLabels'
 import style from './style.css'
 import { EMPTY_VNIC_PROFILE_ID } from '_/constants'
+
+import { VirtualMachineIcon } from '@patternfly/react-icons/dist/esm/icons'
 
 const Item = ({ id, label, children }) => (
   <div className={style['review-item']}>
@@ -251,6 +253,7 @@ const SummaryReview = ({
   basic,
   vnicProfiles,
   storageDomains,
+  msg,
 }) => {
   const { locale } = useContext(MsgContext)
   const id = propsId ? `${propsId}-review` : 'create-vm-wizard-review'
@@ -260,6 +263,14 @@ const SummaryReview = ({
 
   return (
     <div className={style['review-content']}>
+      <div id={`${id}-progress-review-and-confirm`} className={style['review-progress']}>
+        <div className={style['review-icon-container']}>
+          <VirtualMachineIcon className={style['review-icon']} />
+        </div>
+        <div className={style['review-text']}>
+          {msg.createVmWizardReviewConfirm()}
+        </div>
+      </div>
       <Grid>
         <Row>
           <Col>
@@ -309,6 +320,8 @@ SummaryReview.propTypes = {
   storageDomains: PropTypes.object,
   templates: PropTypes.object,
   vnicProfiles: PropTypes.object,
+
+  msg: PropTypes.object.isRequired,
 }
 
 export default connect(
@@ -328,4 +341,4 @@ export default connect(
     templates: state.templates,
     vnicProfiles: state.vnicProfiles,
   })
-)(SummaryReview)
+)(withMsg(SummaryReview))

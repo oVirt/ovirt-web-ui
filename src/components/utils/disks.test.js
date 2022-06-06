@@ -119,8 +119,18 @@ describe('disk sorting', () => {
   })
 
   test('undefined(falsy) names go last', () => {
-    expect(sortNicsDisks([{ name: undefined }, { name: 'b' }, { name: undefined }, { name: 'a' }], 'en'))
-      .toEqual([{ name: 'a' }, { name: 'b' }, { name: undefined }, { name: undefined }])
+    expect(sortNicsDisks([
+      { name: undefined },
+      { name: 'b' },
+      { name: undefined },
+      { name: 'a' },
+    ], 'en'))
+      .toEqual([
+        { name: 'a' },
+        { name: 'b' },
+        { name: undefined },
+        { name: undefined },
+      ])
   })
 
   test('templates go before string comparison on names', () => {
