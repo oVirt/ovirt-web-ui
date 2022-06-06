@@ -113,13 +113,12 @@ const names = [HEADER_NAME, ICON_NAME, TITLE_NAME, STATUS_NAME]
  */
 const BaseCard = ({ children, idPrefix, topLineColor = 'transparent' }) => {
   const childs = { others: [] }
-  const topBorderStyling = topLineColor
-    ? {
-      borderTopStyle: 'solid',
-      borderColor: topLineColor,
-      borderWidth: '5px',
-    }
-    : {}
+  const topBorderStyling = {
+    borderTopStyle: 'solid',
+    borderColor: topLineColor,
+    borderWidth: '5px',
+  }
+
   React.Children.forEach(children, child => {
     if (names.includes(child.type.displayName)) {
       childs[child.type.displayName] = child

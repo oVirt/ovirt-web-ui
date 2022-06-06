@@ -82,7 +82,7 @@ const VmCardList = ({ vms, alwaysShowPoolCard, fetchMoreVmsAndPools }) => {
   return (
     <div className={style['scroll-container-wrapper']}>
       <div ref={scrollerRef} className={`${style['scroll-container']}`}>
-        <Gallery hasGutter>
+        <Gallery hasGutter className={style['gallery-container']}>
           {vmsAndPools.map(entity => (
             <GalleryItem key={entity.get('id')}>{
             entity.get('isVm')

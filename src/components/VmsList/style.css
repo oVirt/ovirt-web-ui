@@ -110,6 +110,14 @@ dl.pool-info dd {
 
     margin-top: 0;
     padding-top: 20px;
+
+    scrollbar-gutter: stable;
+}
+
+.gallery-container {
+    padding-left: var(--pf-global--gutter);
+    /** reserve space for scrolling: 100vw - 100% returns the scrollbar width */
+    padding-right: calc(var(--pf-global--gutter) - (100vw - 100%));
 }
 
 .cards-container {
