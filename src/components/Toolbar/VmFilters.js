@@ -1,28 +1,11 @@
-import React, { useState, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { enumMsg, withMsg } from '_/intl'
 import { saveVmsFilters } from '_/actions'
 import { localeCompare, toJS } from '_/helpers'
-import {
-  Button,
-  ButtonVariant,
-  Dropdown,
-  DropdownItem,
-  DropdownPosition,
-  DropdownToggle,
-  InputGroup,
-  Select,
-  SelectOption,
-  SelectVariant,
-  TextInput,
-  ToolbarGroup,
-  ToolbarFilter,
-  ToolbarItem,
-  ToolbarToggleGroup,
-} from '@patternfly/react-core'
 
-import { FilterIcon, SearchIcon } from '@patternfly/react-icons/dist/esm/icons'
+import Filters from './Filters'
 
 const STATUS = 'status'
 const OS = 'os'
@@ -79,74 +62,6 @@ const composeOs = (msg, locale, operatingSystems) => {
   })
 }
 
-const Filter = ({ filterIds = [], setFilters, allSupportedFilters = [], title, filterColumnId, showToolbarItem }) => {
-  const [isExpanded, setExpanded] = useState(false)
-
-  // one label can map to many IDs so it's easier work with labels
-  // and reverse map label-to-IDs on save
-  const toChip = ({ title }) => title
-  const toOption = ({ title }) => title
-  const toOptionNode = ({ title }) =>
-    <SelectOption key={ title} value={title}/>
-
-  // titles are guaranteed to be unique
-  // return first filter with matching title
-  const labelToIds = (title) => {
-    const [{ ids = {} } = {}] = allSupportedFilters.filter(filter => filter.title === title) || []
-    return ids
-  }
-  const selectedFilters = allSupportedFilters.filter(({ ids }) => filterIds.find(id => ids[id]))
-  const deleteFilter = (title) => {
-    const ids = labelToIds(title)
-    // delete all filter IDs linked to provided title
-    setFilters(filterIds.filter(id => !ids[id]))
-  }
-
-  const addFilter = (title) => {
-    const ids = labelToIds(title)
-    // add all filter IDs linked
-    setFilters([...filterIds, ...Object.keys(ids)])
-  }
-  return (
-    <ToolbarFilter
-      key={filterColumnId}
-      chips={selectedFilters.map(toChip)}
-      deleteChip={(category, option) => deleteFilter(option)}
-      deleteChipGroup={() => setFilters([])}
-      categoryName={filterColumnId}
-      showToolbarItem={showToolbarItem}
-    >
-      <Select
-        variant={SelectVariant.checkbox}
-        aria-label={title}
-        onSelect={(e, option, isPlaceholder) => {
-          if (isPlaceholder) {
-            return
-          }
-          event?.target?.checked
-            ? addFilter(option)
-            : deleteFilter(option)
-        } }
-        selections={selectedFilters.map(toOption)}
-        placeholderText={title}
-        isOpen={isExpanded}
-        onToggle={setExpanded}
-      >
-        {allSupportedFilters.map(toOptionNode)}
-      </Select>
-    </ToolbarFilter>
-  )
-}
-
-Filter.propTypes = {
-  filterIds: PropTypes.array.isRequired,
-  allSupportedFilters: PropTypes.array.isRequired,
-  setFilters: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  filterColumnId: PropTypes.string.isRequired,
-  showToolbarItem: PropTypes.bool.isRequired,
-}
-
 const VmFilters = ({ msg, locale, operatingSystems, selectedFilters, onFilterUpdate }) => {
   const filterTypes = useMemo(() => [
     {
@@ -157,91 +72,13 @@ const VmFilters = ({ msg, locale, operatingSystems, selectedFilters, onFilterUpd
     composeStatus(msg, locale),
     composeOs(msg, locale, operatingSystems),
   ], [msg, locale, operatingSystems])
-  const [currentFilterType, setCurrentFilterType] = useState(filterTypes[0])
-  const [expanded, setExpanded] = useState(false)
-  const [inputValue, setInputValue] = useState('')
-
-  const nameFilter = filterTypes.find(({ id }) => id === NAME)
-  const labelToFilter = (label) => filterTypes.find(({ title }) => title === label) ?? currentFilterType
-
-  const onFilterTypeSelect = (event) => {
-    setCurrentFilterType(labelToFilter(event?.target?.innerText))
-    setExpanded(!expanded)
-  }
-  const onFilterTypeToggle = () => setExpanded(!expanded)
-  const onNameInput = (event) => {
-    if ((event.key && event.key !== 'Enter') ||
-     !inputValue ||
-      selectedFilters?.[NAME]?.includes(inputValue)) {
-      return
-    }
-    onFilterUpdate({ ...selectedFilters, [NAME]: [...(selectedFilters?.[NAME] ?? []), inputValue] })
-    setInputValue('')
-  }
-
   return (
-    <ToolbarToggleGroup toggleIcon={<FilterIcon />} breakpoint="xl">
-      <ToolbarGroup variant="filter-group">
-        <ToolbarItem>
-          <Dropdown
-            onSelect={onFilterTypeSelect}
-            position={DropdownPosition.left}
-            toggle={(
-              <DropdownToggle onToggle={onFilterTypeToggle} style={{ width: '100%' }}>
-                <FilterIcon /> {currentFilterType.title}
-              </DropdownToggle>
-            )}
-            isOpen={expanded}
-            style={{ width: '100%' }}
-            dropdownItems={
-          filterTypes.map(({ id, title }) =>
-            <DropdownItem key={id}>{title}</DropdownItem>)
-          }
-          />
-        </ToolbarItem>
-        <ToolbarFilter
-          key={NAME}
-          chips={selectedFilters?.[NAME] ?? [] }
-          deleteChip={(category, option) => onFilterUpdate({
-            ...selectedFilters,
-            [NAME]: selectedFilters?.[NAME]?.filter?.(value => value !== option) ?? [],
-          })}
-          deleteChipGroup={() => onFilterUpdate({ ...selectedFilters, [NAME]: [] })}
-          categoryName={NAME}
-          showToolbarItem={currentFilterType.id === NAME}
-        >
-          <InputGroup>
-            <TextInput
-              id="name"
-              type="search"
-              onChange={setInputValue}
-              value={inputValue}
-              placeholder={nameFilter.placeholder}
-              onKeyDown={onNameInput}
-            />
-            <Button
-              variant={ButtonVariant.control}
-              aria-label={msg.vmFilterTypePlaceholderName()}
-              onClick={onNameInput}
-            >
-              <SearchIcon />
-            </Button>
-          </InputGroup>
-        </ToolbarFilter>
-        {filterTypes.filter(({ id }) => id !== NAME)?.map(({ id, filterValues, placeholder }) => (
-          <Filter
-            key={id}
-            filterColumnId={id}
-            showToolbarItem={currentFilterType.id === id}
-            filterIds={selectedFilters[id] ?? []}
-            allSupportedFilters={filterValues}
-            setFilters={(filtersToSave) => onFilterUpdate({ ...selectedFilters, [id]: filtersToSave })}
-            title={placeholder}
-          />
-        )
-        )}
-      </ToolbarGroup>
-    </ToolbarToggleGroup>
+    <Filters
+      selectedFilters={selectedFilters}
+      onFilterUpdate={onFilterUpdate}
+      filterTypes={filterTypes}
+      textBasedFilterId={NAME}
+    />
   )
 }
 
