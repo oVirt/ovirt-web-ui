@@ -9,7 +9,7 @@ export function filterVms (item, filters) {
   let res = true
   for (const name in filters) {
     if (compareMap[name]) {
-      res &= compareMap[name](item, filters[name])
+      res &&= compareMap[name](item, filters[name])
     }
   }
   return res

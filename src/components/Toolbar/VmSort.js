@@ -7,11 +7,14 @@ import { SortFields } from '_/utils'
 import { withMsg } from '_/intl'
 import { translate } from '_/helpers'
 import {
+  Button,
   OptionsMenu,
   OptionsMenuItemGroup,
   OptionsMenuSeparator,
   OptionsMenuItem,
   OptionsMenuToggle,
+  ToolbarGroup,
+  ToolbarItem,
 } from '@patternfly/react-core'
 import { SortAmountDownIcon, SortAmountDownAltIcon } from '@patternfly/react-icons/dist/esm/icons'
 
@@ -42,22 +45,28 @@ const VmSort = ({ sort, msg, onSortChange }) => {
     </OptionsMenuItemGroup>,
   ]
 
-  return [
-    <OptionsMenu
-      id="options-menu-multiple-options-example"
-      key='menu'
-      menuItems={menuItems}
-      isOpen={expanded}
-      toggle={(
-        <OptionsMenuToggle
-          onToggle={() => setExpanded(!expanded)}
-          toggleTemplate={msg.sortBy()}
+  return (
+    <ToolbarGroup variant='filter-group'>
+      <ToolbarItem >
+        <OptionsMenu
+          menuItems={menuItems}
+          isOpen={expanded}
+          toggle={(
+            <OptionsMenuToggle
+              onToggle={() => setExpanded(!expanded)}
+              toggleTemplate={sort?.messageDescriptor ? translate({ ...sort.messageDescriptor, msg }) : msg.sortBy()}
+            />
+          )}
+          isGrouped
         />
-      )}
-      isGrouped
-    />,
-    isAsc ? <SortAmountDownAltIcon key='altIcon'/> : <SortAmountDownIcon key='icon'/>,
-  ]
+      </ToolbarItem>
+      <ToolbarItem>
+        <Button variant='plain' aria-label={msg.sortDirection()} onClick={() => onSortChange({ ...sort, isAsc: !isAsc })}>
+          {isAsc ? <SortAmountDownAltIcon/> : <SortAmountDownIcon/>}
+        </Button>
+      </ToolbarItem>
+    </ToolbarGroup>
+  )
 }
 
 VmSort.propTypes = {

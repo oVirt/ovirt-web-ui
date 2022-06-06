@@ -31,17 +31,15 @@ const VmsListToolbar = ({ match, vms, pools, filters = {}, onClearFilters, msg }
       <Toolbar className='vm-list-toolbar' clearAllFilters={onClearFilters}>
         <ToolbarContent>
           <VmFilters/>
+          <VmSort />
           <ToolbarItem>
-            <VmSort />
-          </ToolbarItem>
-          <ToolbarItem>
-            <h5>
+            <h4>
               {
             hasFilters
               ? msg.resultsOf({ total, available })
               : msg.results({ total })
           }
-            </h5>
+            </h4>
           </ToolbarItem>
           <ToolbarItem alignment={{ default: 'alignRight' }}>
             <AddVmButton key='addbutton' id='route-add-vm' />
