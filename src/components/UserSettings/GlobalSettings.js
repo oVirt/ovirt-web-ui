@@ -4,7 +4,16 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 import { saveGlobalOptions } from '_/actions'
-import { Switch, Nav, NavItem, NavList, Split, SplitItem, TextArea } from '@patternfly/react-core'
+import {
+  Switch,
+  Nav,
+  NavItem,
+  NavList,
+  Split,
+  SplitItem,
+  TextArea,
+  Flex,
+} from '@patternfly/react-core'
 import { withMsg, localeWithFullName, DEFAULT_LOCALE } from '_/intl'
 import style from './style.css'
 
@@ -204,14 +213,14 @@ class GlobalSettings extends Component {
             tooltip: draftValues.persistLocale ? undefined : msg.optionIsNotSavedOnTheServer({ persistenceReEnableHowTo: msg.persistenceReEnableHowTo({ advancedOptions: msg.advancedOptions() }) }),
             fieldId: toId(name),
             body: (
-              <div className={style['half-width']}>
-                <SelectBox
-                  id={toId(name)}
-                  items={Object.entries(localeWithFullName).map(([id, value]) => ({ id, value, isDefault: id === DEFAULT_LOCALE }))}
-                  selected={draftValues[name]}
-                  onChange={onChange(name)}
-                />
-              </div>
+
+              <SelectBox
+                id={toId(name)}
+                items={Object.entries(localeWithFullName).map(([id, value]) => ({ id, value, isDefault: id === DEFAULT_LOCALE }))}
+                selected={draftValues[name]}
+                onChange={onChange(name)}
+              />
+
             ),
           }))('language'),
         ],
@@ -225,15 +234,15 @@ class GlobalSettings extends Component {
             key: name,
             fieldId: toId(name),
             body: (
-              <div className={style['half-width']}>
-                <SelectBox
-                  id={toId(name)}
-                  items={this.refreshIntervalList(msg)
-                    .map(({ id, value }) => ({ id, value, isDefault: id === AppConfiguration.schedulerFixedDelayInSeconds }))}
-                  selected={draftValues[name]}
-                  onChange={onChange(name)}
-                />
-              </div>
+
+              <SelectBox
+                id={toId(name)}
+                items={this.refreshIntervalList(msg)
+                  .map(({ id, value }) => ({ id, value, isDefault: id === AppConfiguration.schedulerFixedDelayInSeconds }))}
+                selected={draftValues[name]}
+                onChange={onChange(name)}
+              />
+
             ),
           }))('refreshInterval'),
         ],
@@ -261,16 +270,16 @@ class GlobalSettings extends Component {
             key: name,
             fieldId: toId(name),
             body: (
-              <div className={style['half-width']}>
-                <SelectBox
-                  id={toId(name)}
-                  items={this.dontDisturbList(msg)
-                    .map(({ id, value }) => ({ id, value, isDefault: id === AppConfiguration.notificationSnoozeDurationInMinutes }))}
-                  selected={draftValues[name]}
-                  onChange={onChange(name)}
-                  disabled={draftValues.showNotifications}
-                />
-              </div>
+
+              <SelectBox
+                id={toId(name)}
+                items={this.dontDisturbList(msg)
+                  .map(({ id, value }) => ({ id, value, isDefault: id === AppConfiguration.notificationSnoozeDurationInMinutes }))}
+                selected={draftValues[name]}
+                onChange={onChange(name)}
+                disabled={draftValues.showNotifications}
+              />
+
             ),
           }))('notificationSnoozeDuration'),
         ],
@@ -293,20 +302,20 @@ class GlobalSettings extends Component {
                 key: name,
                 fieldId: toId(name),
                 body: (
-                  <div className={style['half-width']}>
-                    <SelectBox
-                      id={toId(name)}
-                      items={this.preferredConsoleList(msg)
-                        .map(({ id, value }) => ({
-                          id,
-                          value,
-                          isDefault: id === config.defaultUiConsole,
-                        }))
+
+                  <SelectBox
+                    id={toId(name)}
+                    items={this.preferredConsoleList(msg)
+                      .map(({ id, value }) => ({
+                        id,
+                        value,
+                        isDefault: id === config.defaultUiConsole,
+                      }))
                       }
-                      selected={draftValues[name]}
-                      onChange={onChange(name)}
-                    />
-                  </div>
+                    selected={draftValues[name]}
+                    onChange={onChange(name)}
+                  />
+
                 ),
               }))('preferredConsole'),
               ((name) => ({
@@ -315,13 +324,13 @@ class GlobalSettings extends Component {
                 key: name,
                 fieldId: toId(name),
                 body: (
-                  <div className={style['half-width']}>
-                    <VmSelect
-                      id={toId(name)}
-                      selected={draftValues[name]}
-                      onChange={vmId => onChange(name)(vmId)}
-                    />
-                  </div>
+
+                  <VmSelect
+                    id={toId(name)}
+                    selected={draftValues[name]}
+                    onChange={vmId => onChange(name)(vmId)}
+                  />
+
                 ),
               }))('autoconnect'),
             ],
@@ -436,6 +445,7 @@ class GlobalSettings extends Component {
                 tooltip: msg.sshKeyTooltip(),
                 key: name,
                 fieldId: toId(name),
+                fullSize: true,
                 body: (
                   <TextArea
                     id={toId(name)}
@@ -499,13 +509,14 @@ class GlobalSettings extends Component {
     }
 
     return (
-      <div className='container'>
-        <Split hasGutter>
+      <Flex alignContent={{ default: 'alignItemsBaseline' }} justifyContent={{ default: 'justifyContentCenter' }}>
+
+        <Split hasGutter className={style['half-width']}>
           <SplitItem>
             <Nav onSelect={onSelect} theme='light'>
-              <NavList className={'card-pf global-settings-nav-list'}>
+              <NavList className='pf-c-card'>
                 { Object.entries(sections).map(([key, section]) => (
-                  <NavItem className='border' itemId={key} key={key} isActive={activeSectionKey === key}>
+                  <NavItem className={style.border} itemId={key} key={key} isActive={activeSectionKey === key}>
                     {section.title}
                   </NavItem>
                 ))
@@ -531,7 +542,7 @@ class GlobalSettings extends Component {
             </Settings>
           </SplitItem>
         </Split>
-      </div>
+      </Flex>
     )
   }
 }

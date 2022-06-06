@@ -80,19 +80,17 @@ const VmCardList = ({ vms, alwaysShowPoolCard, fetchMoreVmsAndPools }) => {
   }, [vms, scrollerRef, sentinelRef, fetchMoreVmsAndPools])
 
   return (
-    <div className={style['scroll-container-wrapper']}>
-      <div ref={scrollerRef} className={`${style['scroll-container']}`}>
-        <Gallery hasGutter className={style['gallery-container']}>
-          {vmsAndPools.map(entity => (
-            <GalleryItem key={entity.get('id')}>{
+    <div ref={scrollerRef}>
+      <Gallery hasGutter className={style['gallery-container']}>
+        {vmsAndPools.map(entity => (
+          <GalleryItem key={entity.get('id')}>{
             entity.get('isVm')
               ? <Vm vm={entity} />
               : <Pool pool={entity} />}
-            </GalleryItem>
-          ))}
-        </Gallery>
-        {hasMore && <div ref={sentinelRef} className={style['infinite-scroll-sentinel']}>{msg.loadingTripleDot()}</div>}
-      </div>
+          </GalleryItem>
+        ))}
+      </Gallery>
+      {hasMore && <div ref={sentinelRef} className={style['infinite-scroll-sentinel']}>{msg.loadingTripleDot()}</div>}
     </div>
   )
 }

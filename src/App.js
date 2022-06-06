@@ -76,28 +76,29 @@ const App = ({ history, config, appReady, activateSessionTracker }) => {
 
   return (
     <ConnectedRouter history={history}>
-
-      <OvirtApiCheckFailed />
-      <LoadingData />
-      <ToastNotifications />
-      <ConsoleNotificationsDialog/>
-      { appReady && activateSessionTracker && <SessionActivityTracker /> }
-      { appReady && <RefreshIntervalChangeHandler /> }
-      <Page
-        header={(
-          <Header>
-            <VmsPageHeader
-              title={fixedStrings.BRAND_NAME + ' ' + msg.vmPortal()}
-              onCloseNotificationDrawer={toggleNotificationDrawer}
-              isDrawerExpanded={isDrawerExpanded}
-            />
-          </Header>
-        )}
-        notificationDrawer={<VmUserMessages onClose={toggleNotificationDrawer} />}
-        isNotificationDrawerExpanded={isDrawerExpanded}
-      >
-        { appReady && renderRoutes(getRoutes()) }
-      </Page>
+      <div id='app-container'>
+        <LoadingData />
+        <ToastNotifications />
+        <ConsoleNotificationsDialog/>
+        { appReady && activateSessionTracker && <SessionActivityTracker /> }
+        { appReady && <RefreshIntervalChangeHandler /> }
+        <Page
+          header={(
+            <Header>
+              <VmsPageHeader
+                title={fixedStrings.BRAND_NAME + ' ' + msg.vmPortal()}
+                onCloseNotificationDrawer={toggleNotificationDrawer}
+                isDrawerExpanded={isDrawerExpanded}
+              />
+            </Header>
+          )}
+          notificationDrawer={<VmUserMessages onClose={toggleNotificationDrawer} />}
+          isNotificationDrawerExpanded={isDrawerExpanded}
+        >
+          <OvirtApiCheckFailed />
+          { appReady && renderRoutes(getRoutes()) }
+        </Page>
+      </div>
     </ConnectedRouter>
   )
 }

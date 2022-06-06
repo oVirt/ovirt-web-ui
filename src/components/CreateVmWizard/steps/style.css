@@ -55,10 +55,6 @@
   display: inline-block;
 }
 
-.field-row.cloud-init {
-  margin-top: -15px;
-}
-
 .sub-heading {
   text-transform: uppercase;
   margin-left: -15px;

@@ -28,7 +28,7 @@ const VmsListToolbar = ({ match, vms, pools, filters = {}, onClearFilters, msg }
 
   return (
     <>
-      <Toolbar className='vm-list-toolbar' clearAllFilters={onClearFilters}>
+      <Toolbar className='portaled-toolbars-padding' clearAllFilters={onClearFilters}>
         <ToolbarContent>
           <VmFilters/>
           <VmSort />

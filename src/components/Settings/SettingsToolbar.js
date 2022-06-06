@@ -10,7 +10,6 @@ import {
 } from '@patternfly/react-core'
 import { MsgContext } from '_/intl'
 
-import style from './style.css'
 import ConfirmationModal from '_/components/VmActions/ConfirmationModal'
 import ChangesList from './ChangesList'
 
@@ -69,7 +68,7 @@ const SettingsToolbar = ({ onSave, onReset, onCancel, enableSave, enableReset, t
           onClick: onResetConfirm,
         }}
       />
-      <Toolbar isFullHeight isSticky alignment={{ default: 'alignLeft' }} className={style['settings-toolbar']}>
+      <Toolbar isFullHeight isSticky alignment={{ default: 'alignLeft' }} className='portaled-toolbars-padding'>
         <ToolbarContent>
           <ToolbarGroup variant='button-group' alignment={{ default: 'alignLeft' }}>
             <ToolbarItem>

@@ -48,8 +48,16 @@
     justify-content: space-between;
 }
 
-.status-height {
+.content {
     margin-bottom: 30px !important;
+    text-align: center;
+}
+
+.actions-container button:first-child {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: block;
+    overflow: hidden;
 }
 
 .pool-vm-label {
@@ -95,26 +103,8 @@ dl.pool-info dd {
     display: inline-block;
 }
 
-.scroll-container-wrapper {
-    position: relative;
-}
-
-.scroll-container {
-    overflow-y: auto;
-
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-
-    margin-top: 0;
-    padding-top: 20px;
-
-    scrollbar-gutter: stable;
-}
-
 .gallery-container {
+    scrollbar-gutter: stable;
     padding-left: var(--pf-global--gutter);
     /** reserve space for scrolling: 100vw - 100% returns the scrollbar width */
     padding-right: calc(var(--pf-global--gutter) - (100vw - 100%));

@@ -9,7 +9,7 @@ import { BirthdayCakeIcon } from '@patternfly/react-icons/dist/esm/icons'
  * or default when icon not provided
  */
 
-const VmIcon = ({ icon: { data, type } = {}, className, missingIconClassName }) => {
+const VmIcon = ({ icon: { data, type } = {}, className }) => {
   if (data) {
     const src = `data:${type};base64,${data}`
     return <img src={src} className={`${style.icon} ${className}`} alt='' />
@@ -21,7 +21,6 @@ const VmIcon = ({ icon: { data, type } = {}, className, missingIconClassName }) 
 VmIcon.propTypes = {
   icon: PropTypes.object, // see the 'icons' reducer
   className: PropTypes.string, // either card-pf-icon or vm-detail-icon
-  missingIconClassName: PropTypes.string.isRequired,
 }
 
 export default VmIcon

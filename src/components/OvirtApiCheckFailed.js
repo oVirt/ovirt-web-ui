@@ -5,7 +5,8 @@ import { connect } from 'react-redux'
 import Product from '../version'
 import { MsgContext } from '_/intl'
 import { fixedStrings } from '../branding'
-import ErrorAlert from './ErrorAlert'
+
+import { Alert } from '@patternfly/react-core'
 
 const OvirtApiCheckFailed = ({ config }) => {
   const { msg } = useContext(MsgContext)
@@ -23,15 +24,14 @@ const OvirtApiCheckFailed = ({ config }) => {
   const version = major ? `${major}.${minor}` : `"${msg.unknown()}"`
 
   const required = `${Product.ovirtApiVersionRequired.major}.${Product.ovirtApiVersionRequired.minor}`
-  const htmlMessage = msg.htmlUnsupportedOvirtVersionFoundButVersionAtLeastRequired({
+  const message = msg.htmlUnsupportedOvirtVersionFoundButVersionAtLeastRequired({
     version,
     productName: fixedStrings.BRAND_NAME,
     requiredVersion: required,
   })
-  const message = (<span dangerouslySetInnerHTML={{ __html: htmlMessage }} />)
 
   return (
-    <ErrorAlert id='ovirtapi-check-failed'>{message}</ErrorAlert>
+    <Alert isInline variant="danger" id='ovirtapi-check-failed' title={message} />
   )
 }
 OvirtApiCheckFailed.propTypes = {

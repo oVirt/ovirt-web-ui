@@ -29,7 +29,7 @@ import { MsgContext } from '_/intl'
 
 const UserMessage = ({ record, id, onDismissMessage }) => {
   const { msg } = useContext(MsgContext)
-  const { isOpen, setOpen } = useState(false)
+  const [isOpen, setOpen] = useState(false)
   const { date, time } = getFormatedDateTime(record.time)
   const variant = normalizeNotificationType(record.type)
   return (
@@ -41,12 +41,12 @@ const UserMessage = ({ record, id, onDismissMessage }) => {
         <Dropdown
           id={id}
           position={DropdownPosition.right}
-          onSelect={onDismissMessage}
-          toggle={<KebabToggle onToggle={setOpen} />}
+          onSelect={() => setOpen(!isOpen)}
+          toggle={<KebabToggle onToggle={() => { setOpen(!isOpen); console.warn('toggle:', isOpen) } }/>}
           isOpen={isOpen}
           isPlain
           dropdownItems={[
-            <DropdownItem key="action" component="button">
+            <DropdownItem key="action" onClick={onDismissMessage}>
               {msg.clear()}
             </DropdownItem>,
           ]}
@@ -110,7 +110,6 @@ VmUserMessages.propTypes = {
   onClearMessages: PropTypes.func.isRequired,
   onDismissMessage: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
-  // show: PropTypes.bool.isRequired,
 }
 
 export default connect(

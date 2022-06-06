@@ -7,9 +7,6 @@ import { Provider } from 'react-redux'
 import { type Task } from 'redux-saga'
 
 import '@patternfly/react-core/dist/styles/base.css'
-import 'patternfly/dist/css/patternfly.css'
-import 'patternfly/dist/css/patternfly-additions.css'
-import 'patternfly-react/dist/css/patternfly-react.css'
 import './index-nomodules.css'
 import * as branding from '_/branding'
 
@@ -21,15 +18,6 @@ import { login } from '_/actions'
 import App from './App'
 import LocaleReloader from './intl/LocaleReloader'
 import GlobalErrorBoundary from './GlobalErrorBoundary'
-
-// Patternfly dependencies
-// jQuery needs to be globally available (webpack.ProvidePlugin can be also used for this)
-window.$ = window.jQuery = require('jquery')
-require('bootstrap/dist/js/bootstrap')
-window.patternfly = {}
-window.patternfly = require('patternfly/dist/js/patternfly')
-window.selectpicker = require('bootstrap-select/js/bootstrap-select.js')
-window.combobox = require('patternfly-bootstrap-combobox/js/bootstrap-combobox.js')
 
 function renderApp (store: Object, errorBridge: Object) {
   ReactDOM.render(

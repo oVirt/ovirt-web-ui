@@ -27,7 +27,6 @@ import {
   ToolbarContent,
 } from '@patternfly/react-core'
 
-import styles from './style.css'
 import LogoutItem from './LogoutItem'
 import AboutDialog from '../About'
 /**
@@ -40,7 +39,7 @@ const VmsPageHeader = ({ appReady, onRefresh, onCloseNotificationDrawer, isDrawe
   const [isAboutDialogOpen, setIsAboutDialogOpen] = useState(false)
 
   return (
-    <Toolbar className={styles.noBackgroundColor} isFullHeight isStatic>
+    <Toolbar isFullHeight isStatic>
       <ToolbarContent>
         <ToolbarGroup
           variant="icon-button-group"
