@@ -1,46 +1,58 @@
-import React, { useContext } from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-
-import { logout } from '_/actions'
-
-import { MsgContext } from '_/intl'
-import AboutDialog from '_/components/About'
-import { Tooltip } from '_/components/tooltips'
+import { withMsg } from '_/intl'
 import { UserIcon } from '@patternfly/react-icons/dist/esm/icons'
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownToggle,
+  ToolbarItem,
+} from '@patternfly/react-core'
 
-const UserMenu = ({ config, onLogout }) => {
-  const { msg } = useContext(MsgContext)
-  const idPrefix = 'usermenu'
+import LogoutItem from './LogoutItem'
+
+// keep stable for integration tests
+export const USER_TOGGLE_ID = 'usermenu-user'
+export const USER_KEBBAB_TOGGLE_ID = 'kebab-usermenu-user'
+
+const UserMenu = ({ username, openAboutDialog, msg }) => {
+  const [isDropdownOpen, setDropdownOpen] = useState(false)
+  const onDropdownSelect = () => {}
   return (
-    <li className='dropdown'>
-      <Tooltip id={`${idPrefix}-tooltip`} tooltip={config.getIn(['user', 'name'])} placement='bottom'>
-        <a className='dropdown-toggle nav-item-iconic' href='#' data-toggle='dropdown' id={`${idPrefix}-user`}>
-          <UserIcon /><span className='caret' />
-        </a>
-      </Tooltip>
-      <ul className='dropdown-menu'>
-        <li>
-          <AboutDialog />
-        </li>
-        <li>
-          <a href='#' onClick={e => { e.preventDefault(); onLogout() }} id={`${idPrefix}-logout`}>{msg.logOut()}</a>
-        </li>
-      </ul>
-    </li>
+    <ToolbarItem >
+      <Dropdown
+        position="right"
+        onSelect={onDropdownSelect}
+        isOpen={isDropdownOpen}
+        toggle={ (
+          <DropdownToggle
+            id={USER_TOGGLE_ID}
+            icon={<UserIcon/>}
+            onToggle={setDropdownOpen}
+          >
+            {username}
+          </DropdownToggle>
+        ) }
+        dropdownItems={[
+          <DropdownItem key="about" id='about-modal-link' onClick={openAboutDialog}>
+            {msg.about()}
+          </DropdownItem>,
+          <LogoutItem key="logout"/>]}
+      />
+    </ToolbarItem>
   )
 }
 
 UserMenu.propTypes = {
-  config: PropTypes.object.isRequired,
-  onLogout: PropTypes.func.isRequired,
+  username: PropTypes.string.isRequired,
+  msg: PropTypes.object.isRequired,
+  openAboutDialog: PropTypes.func.isRequired,
 }
 
 export default connect(
   (state) => ({
-    config: state.config,
+    username: state.config.getIn(['user', 'name'], ''),
   }),
-  (dispatch) => ({
-    onLogout: () => dispatch(logout(true)),
-  })
-)(UserMenu)
+  null
+)(withMsg(UserMenu))

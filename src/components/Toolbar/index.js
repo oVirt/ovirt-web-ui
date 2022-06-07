@@ -19,7 +19,7 @@ const VmDetailToolbar = ({ match, vms }) => {
     const poolId = vms.getIn(['vms', match.params.id, 'pool', 'id'])
     const pool = vms.getIn(['pools', poolId])
     return (
-      <Toolbar>
+      <Toolbar className='portaled-toolbars-padding'>
         <ToolbarContent >
           <ToolbarGroup alignment={{ default: 'alignRight' }}>
             <VmActions vm={vms.getIn(['vms', match.params.id])} pool={pool} />
@@ -49,7 +49,7 @@ const VmConsoleToolbar = ({ match: { params: { id, consoleType } } = {}, vms }) 
   }
 
   return (
-    <Toolbar>
+    <Toolbar className='portaled-toolbars-padding'>
       <ToolbarContent >
         <ToolbarGroup variant="button-group">
           <VmConsoleSelector

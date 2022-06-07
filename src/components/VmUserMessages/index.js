@@ -2,32 +2,60 @@ import React, { useContext, useState } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import { Notification, NotificationDrawer, MenuItem, Icon, Button } from 'patternfly-react'
-
-import style from './style.css'
+import {
+  Button,
+  Dropdown,
+  DropdownItem,
+  DropdownPosition,
+  KebabToggle,
+  NotificationDrawer,
+  NotificationDrawerBody,
+  NotificationDrawerHeader,
+  NotificationDrawerList,
+  NotificationDrawerListItem,
+  NotificationDrawerListItemBody,
+  NotificationDrawerListItemHeader,
+} from '@patternfly/react-core'
 
 import { clearUserMessages, dismissEvent } from '_/actions'
-import { getFormatedDateTime, buildMessageFromRecord, toJS } from '_/helpers'
+import {
+  getFormatedDateTime,
+  buildMessageFromRecord,
+  toJS,
+  normalizeNotificationType,
+  buildNotificationTitle,
+} from '_/helpers'
 import { MsgContext } from '_/intl'
 
 const UserMessage = ({ record, id, onDismissMessage }) => {
   const { msg } = useContext(MsgContext)
-  const time = getFormatedDateTime(record.get('time'))
+  const [isOpen, setOpen] = useState(false)
+  const { date, time } = getFormatedDateTime(record.time)
+  const variant = normalizeNotificationType(record.type)
   return (
-    <Notification seen>
-      <NotificationDrawer.Dropdown id={id}>
-        <MenuItem onClick={onDismissMessage}>
-          { msg.clear() }
-        </MenuItem>
-      </NotificationDrawer.Dropdown>
-      <Icon className='pull-left' type='pf' name='warning-triangle-o' />
-      <Notification.Content>
-        <Notification.Message>
-          { buildMessageFromRecord(record.toJS(), msg) }
-        </Notification.Message>
-        <Notification.Info leftText={time.date} rightText={time.time} />
-      </Notification.Content>
-    </Notification>
+    <NotificationDrawerListItem variant={variant} isRead={false}>
+      <NotificationDrawerListItemHeader
+        variant={variant}
+        title={buildNotificationTitle(record.titleDescriptor, msg, variant)}
+      >
+        <Dropdown
+          id={id}
+          position={DropdownPosition.right}
+          onSelect={() => setOpen(!isOpen)}
+          toggle={<KebabToggle onToggle={() => setOpen(!isOpen) }/>}
+          isOpen={isOpen}
+          isPlain
+          dropdownItems={[
+            <DropdownItem key="action" onClick={onDismissMessage}>
+              {msg.clear()}
+            </DropdownItem>,
+          ]}
+        />
+      </NotificationDrawerListItemHeader>
+      <NotificationDrawerListItemBody timestamp={`${date} ${time}`}>
+        { buildMessageFromRecord(record, msg) }
+      </NotificationDrawerListItemBody>
+    </NotificationDrawerListItem>
   )
 }
 UserMessage.propTypes = {
@@ -36,42 +64,43 @@ UserMessage.propTypes = {
   onDismissMessage: PropTypes.func.isRequired,
 }
 
-const VmUserMessages = ({ userMessages, onClearMessages, onDismissMessage, onClose, show }) => {
+const VmUserMessages = ({ userMessages, onClearMessages, onDismissMessage, onClose }) => {
   const { msg } = useContext(MsgContext)
-  const [expanded, setExpanded] = useState(false)
 
   const idPrefix = 'usermsgs'
 
   const messagesCount = userMessages.get('records').size
-  const messagesList = messagesCount
-    ? userMessages.get('records').map(r => (
+  const messagesList = userMessages
+    .get('records')
+    .map(r => (
       <UserMessage
         key={`msg-${r.get('time')}`}
-        record={r}
+        record={toJS(r)}
         id={`${idPrefix}-msg-${r.get('time')}-dropdown`}
         onDismissMessage={() => onDismissMessage(r.toJS())}
       />
     ))
-    : <NotificationDrawer.EmptyState title={msg.noMessages()} />
 
   return (
-    <NotificationDrawer hide={!show} expanded={expanded}>
-      <NotificationDrawer.Title title={msg.notifications()} onCloseClick={onClose} onExpandClick={() => setExpanded(!expanded)} />
-      <NotificationDrawer.PanelBody className={style['panel-body']}>
-        <div className={style['notifications-list']}>
+    <NotificationDrawer>
+      <NotificationDrawerHeader
+        count={messagesCount}
+        title={msg.notifications()}
+        onClose={onClose}
+      >
+        <Button
+          isDisabled={!messagesCount}
+          variant='link'
+          onClick={() => onClearMessages(toJS(userMessages.get('records', [])))}
+        >
+          { msg.clearAll() }
+        </Button>
+      </NotificationDrawerHeader>
+      <NotificationDrawerBody>
+        <NotificationDrawerList>
           {messagesList}
-        </div>
-        { messagesCount > 0 && (
-          <NotificationDrawer.PanelAction className={style['action-panel']}>
-            <NotificationDrawer.PanelActionLink data-toggle='clear-all'>
-              <Button bsStyle='link' onClick={() => onClearMessages(toJS(userMessages.get('records', [])))}>
-                <Icon type='pf' name='close' />
-                { msg.clearAll() }
-              </Button>
-            </NotificationDrawer.PanelActionLink>
-          </NotificationDrawer.PanelAction>
-        )}
-      </NotificationDrawer.PanelBody>
+        </NotificationDrawerList>
+      </NotificationDrawerBody>
     </NotificationDrawer>
   )
 }
@@ -80,7 +109,6 @@ VmUserMessages.propTypes = {
   onClearMessages: PropTypes.func.isRequired,
   onDismissMessage: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
-  show: PropTypes.bool.isRequired,
 }
 
 export default connect(

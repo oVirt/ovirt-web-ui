@@ -3,6 +3,9 @@ import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { MsgContext } from '_/intl'
+import { Breadcrumb, BreadcrumbItem } from '@patternfly/react-core'
+
+import styles from './styles.css'
 
 const NONE_VM_ROUTES = ['/settings']
 
@@ -33,30 +36,36 @@ const buildPath = ({ vms, branches, msg }) => {
   return res
 }
 
-const Breadcrumb = ({ vms, branches }) => {
+const PageBreadcrumb = ({ vms, branches }) => {
   const { msg } = useContext(MsgContext)
   const crumbs = buildPath({ vms, branches, msg })
   const idPrefix = 'breadcrumb'
-
+  const lastSegment = crumbs.pop()
   return (
-    <ol className='breadcrumb'>
-      {crumbs.map((path, index, array) =>
-        (index === (array.length - 1))
-          ? (
-            <li key={`${index}-${path.url}`} className='active' id={`${idPrefix}-last-${index}`}>
-              {path.title}
-            </li>
-          )
-          : (
-            <li key={`${index}-${path.url}`}>
-              <Link to={path.url} id={`${idPrefix}-link-${index}`}>{path.title}</Link>
-            </li>
-          )
-      )}
-    </ol>
+
+    <Breadcrumb className={styles.breadcrumb}>
+      {
+      crumbs.map((path, index, array) => (
+        <BreadcrumbItem
+          key={`${index}-${path.url}`}
+          id={`${idPrefix}-last-${index}`}
+          component="span"
+        >
+          <Link to={path.url} id={`${idPrefix}-link-${index}`}>{path.title}</Link>
+        </BreadcrumbItem>
+      ))
+      }
+
+      <BreadcrumbItem
+        isActive
+      >
+        {lastSegment.title}
+      </BreadcrumbItem>
+
+    </Breadcrumb>
   )
 }
-Breadcrumb.propTypes = {
+PageBreadcrumb.propTypes = {
   branches: PropTypes.array.isRequired,
   vms: PropTypes.object.isRequired,
 }
@@ -65,4 +74,4 @@ export default connect(
   state => ({
     vms: state.vms,
   })
-)(Breadcrumb)
+)(PageBreadcrumb)

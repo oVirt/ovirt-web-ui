@@ -1,8 +1,0 @@
-.errorContentContainer {
-    width: 40%;
-    margin-top: 10%;
-}
-
-.errorContentContainer a:global(.btn) {
-    margin: 5%;
-}

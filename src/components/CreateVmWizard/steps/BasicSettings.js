@@ -641,7 +641,7 @@ class BasicSettings extends React.Component {
           </FieldRow>
 
           {/* -- Cloud-Init -- */}
-          <FieldRow id={`${idPrefix}-cloudInitEnabled`} rowClassName={style['cloud-init']}>
+          <FieldRow id={`${idPrefix}-cloudInitEnabled`}>
             <Checkbox
               id={`${idPrefix}-cloudInitEnabled-edit`}
               isChecked={!!data.cloudInitEnabled}

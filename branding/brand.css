@@ -7,16 +7,8 @@
 
 *********************************************/
 
-:root {
-  --ovirt-masthead-height: 60px;
-  --ovirt-masthead-topborder-size: 4px;
-}
-
 /* --- Application: masthead --- */
 .obrand_masthead {
-  border-top: var(--ovirt-masthead-topborder-size) solid #00659c;
-  height: var(--ovirt-masthead-height);
-
   background-image: url(images/ovirt_masthead_bg.png);
   background-size: cover;
 }
@@ -25,7 +17,6 @@
   width: 272px;
   height: 16px;
   position: relative;
-  top: 9px;
   border: 0px;
   background-image: url(images/ovirt_masthead_logo.png);
   background-size: contain;

@@ -409,7 +409,7 @@ export const messages: { [messageId: string]: MessageType } = {
   'Applying the changes to CPU and/or Memory can be done right now but it requires ' +
   'doing a hot plug.  You can choose to apply these changes after a restart instead.',
   htmlPleaseReferToDocumentationForMoreInformation: 'Please refer to <a href="{documentationUrl}" target="_blank">documentation</a> for more information.',
-  htmlUnsupportedOvirtVersionFoundButVersionAtLeastRequired: '<strong>Unsupported {version} {productName} version</strong> found, but at least version {requiredVersion} is required.',
+  htmlUnsupportedOvirtVersionFoundButVersionAtLeastRequired: 'Unsupported {version} {productName} version found, but at least version {requiredVersion} is required.',
   icon: 'Icon',
   ifVmIsRunningClickToAccessItsGraphicsConsole: 'If the virtual machine is running, click the protocol name to access its Graphical Console.',
   info: 'Information',

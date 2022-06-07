@@ -42,7 +42,6 @@ const BaseCardIcon = ({ url, icon }) => {
     <VmIcon
       icon={icon}
       className={style['card-pf-icon']}
-      missingIconClassName='fa fa-birthday-cake card-pf-icon-circle'
     />
   )
 
@@ -134,7 +133,7 @@ const BaseCard = ({ children, idPrefix, topLineColor = 'transparent' }) => {
           <div className={style['card-icon']}>
             {childs[BaseCardIcon.displayName]}
           </div>
-          <div className={`text-center ${style['status-height']}`}>
+          <div className={style.content}>
             {childs[BaseCardTitle.displayName]}
             {childs[BaseCardStatus.displayName]}
           </div>

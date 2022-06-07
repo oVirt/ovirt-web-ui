@@ -4,15 +4,3 @@
     opacity: 0.25;
     margin-bottom: 50px;
 }
-
-.logout-container h1 {
-	font-weight: 600;
-}
-
-.logout-description {
-    margin: 25px 0px;
-    max-width: 500px;
-    display: inline-block;
-    font-size: 14px;
-    color: #72767b;
-}
