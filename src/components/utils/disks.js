@@ -10,14 +10,21 @@ export function sortDisksForDisplay (disks, locale) {
 }
 
 // Sort the Disks and NICs for display in the CreateVmWizard
-// Sort the template based ones first, then by name
+// Sort priority (from highest):
+// 1. falsy name (should go last) then
+// 2. template based (should go first) then
+// 3. by name (natural order localized string compare)
 export function sortNicsDisks (objs, locale) {
   return objs
     .sort((a, b) =>
-      a.isFromTemplate && !b.isFromTemplate
+      a.name && !b.name
         ? -1
-        : !a.isFromTemplate && b.isFromTemplate
+        : !a.name && b.name
           ? 1
-          : localeCompare(a.name, b.name, locale)
+          : a.isFromTemplate && !b.isFromTemplate
+            ? -1
+            : !a.isFromTemplate && b.isFromTemplate
+              ? 1
+              : localeCompare(a.name ?? '', b.name ?? '', locale)
     )
 }

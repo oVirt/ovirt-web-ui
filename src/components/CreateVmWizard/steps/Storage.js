@@ -1,9 +1,9 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { MsgContext, withMsg } from '_/intl'
-import { generateUnique } from '_/helpers'
+import { withMsg } from '_/intl'
 import { isNumber, convertValue } from '_/utils'
+import { generateUnique } from '_/helpers'
 import { BASIC_DATA_SHAPE, STORAGE_SHAPE } from '../dataPropTypes'
 
 import {
@@ -15,463 +15,84 @@ import {
 } from '_/components/utils'
 
 import {
+  TableComposable,
+  Tbody,
+  Th,
+  Thead,
+  Td,
+  Tr,
+} from '@patternfly/react-table'
+
+import {
   Button,
+  ButtonVariant,
   Checkbox,
-  DropdownKebab,
   EmptyState,
-  FormGroup,
-  FormControl,
-  HelpBlock,
-  MenuItem,
-  Table,
-  Label,
-} from 'patternfly-react'
-import _TableInlineEditRow from './_TableInlineEditRow'
-import SelectBox from '_/components/SelectBox'
+  EmptyStateIcon,
+  EmptyStateBody,
+  EmptyStateSecondaryActions,
+  HelperText,
+  HelperTextItem,
+  Title,
+  TextInput,
+  Tooltip,
+} from '@patternfly/react-core'
+
+import {
+  AddCircleOIcon,
+  CheckIcon,
+  InfoCircleIcon,
+  PencilAltIcon,
+  TimesIcon,
+  TrashIcon,
+} from '@patternfly/react-icons/dist/esm/icons'
 
 import style from './style.css'
-import { Tooltip, InfoTooltip } from '_/components/tooltips'
 
-export const DiskNameWithLabels = ({ id, disk }) => {
-  const { msg } = useContext(MsgContext)
-  const idPrefix = `${id}-disk-${disk.id}`
-  return (
-    <>
-      <span id={`${idPrefix}-name`}>{ disk.name }</span>
-      { disk.isFromTemplate && (
-        <Tooltip id={`${idPrefix}-template-defined-badge`} tooltip={msg.templateDefined()}>
-          <Label id={`${idPrefix}-from-template`} className={`${style['disk-label']}`}>
-            T
-          </Label>
-        </Tooltip>
-      )}
-      { disk.bootable && (
-        <Label id={`${idPrefix}-bootable`} className={style['disk-label']} bsStyle='info'>
-          { msg.diskLabelBootable() }
-        </Label>
-      )}
-    </>
-  )
-}
-DiskNameWithLabels.propTypes = {
-  id: PropTypes.string,
-  disk: PropTypes.shape({
-    id: PropTypes.string,
-    name: PropTypes.string,
-    isFromTemplate: PropTypes.bool,
-    bootable: PropTypes.bool,
-  }),
-}
+import DiskNameWithLabels from './DiskNameWithLabels'
+import SelectBox from '_/components/SelectBox'
+import { InfoTooltip } from '_/components/tooltips'
 
-/**
- * The disks table cannot be completely a controlled component, some state about rows being
- * edited needs to be held within the component.  Right now only the fact that a row is
- * being edited is being tracked in component state.
- *
- * Input field editing in the table have the same restrictions as the nics table.
- */
-class Storage extends React.Component {
-  constructor (props) {
-    super(props)
-    this.handleCellChange = this.handleCellChange.bind(this)
-    this.handleTemplateDiskStorageDomainChange = this.handleTemplateDiskStorageDomainChange.bind(this)
-    this.handleRowCancelChange = this.handleRowCancelChange.bind(this)
-    this.handleRowConfirmChange = this.handleRowConfirmChange.bind(this)
-    this.removeEditState = this.removeEditState.bind(this)
-    this.onCreateDisk = this.onCreateDisk.bind(this)
-    this.onDeleteDisk = this.onDeleteDisk.bind(this)
-    this.onEditDisk = this.onEditDisk.bind(this)
-    this.rowRenderProps = this.rowRenderProps.bind(this)
-    this.bootableInfo = this.bootableInfo.bind(this)
-    this.isBootableDiskTemplate = this.isBootableDiskTemplate.bind(this)
-    this.isEditingMode = this.isEditingMode.bind(this)
-    this.isValidDiskSize = this.isValidDiskSize.bind(this)
+const Storage = ({
+  msg,
+  locale,
+  dataCenterId,
+  cluster,
+  id: idPrefix = 'create-vm-wizard-nics',
+  onUpdate,
 
-    props.onUpdate({ valid: this.validateTemplateDiskStorageDomains() })
+  vmName,
+  optimizedFor,
+  disks,
 
-    const { msg } = this.props
-
-    this.state = {
-      editingErrors: {
-        diskInvalidName: false,
-      },
-      editing: {},
-      creating: false,
-    }
-
-    const {
-      id: idPrefix = 'create-vm-wizard-storage',
-    } = this.props
-
-    // ---- Table Row Editing Controller
-    this.inlineEditController = {
-      isEditing: ({ rowData, column, property }) => this.state.editing[rowData.id] !== undefined,
-      onActivate: ({ rowData }) => this.onEditDisk(rowData),
-      onConfirm: ({ rowData }) => this.handleRowConfirmChange(rowData),
-      onCancel: ({ rowData }) => this.handleRowCancelChange(rowData),
-    }
-
-    // ----- Table Cell Renderers
-    const headerFormatText = (label, { column }) => <Table.Heading {...column.header.props}>{label}</Table.Heading>
-
-    const inlineEditFormatter = Table.inlineEditFormatterFactory({
-      isEditing: additionalData => this.inlineEditController.isEditing(additionalData),
-
-      renderValue: (value, additionalData) => {
-        const { column } = additionalData
-
-        return (
-          <Table.Cell>
-            { column.valueView ? column.valueView(value, additionalData) : value }
-          </Table.Cell>
-        )
-      },
-
-      renderEdit: (value, additionalData) => {
-        const { column } = additionalData
-        return (
-          <Table.Cell className='editable editing'>
-            { column.editView ? column.editView(value, additionalData) : value }
-          </Table.Cell>
-        )
-      },
-    })
-
-    // ---- Table Column Definitions
-    this.columns = [
-      // name
-      {
-        header: {
-          label: msg.createVmStorageTableHeaderName(),
-          formatters: [headerFormatText],
-          props: {
-            style: {
-              width: '30%',
-            },
-          },
-        },
-        cell: {
-          formatters: [inlineEditFormatter],
-        },
-        valueView: (value, { rowData }) => {
-          return <DiskNameWithLabels id={idPrefix} disk={rowData} />
-        },
-        editView: (value, { rowData }) => {
-          const row = this.state.editing[rowData.id]
-          const { diskInvalidName } = this.state.editingErrors
-
-          return row.isFromTemplate
-            ? this.columns[0].valueView(value, { rowData })
-            : (
-              <FormGroup
-                validationState={diskInvalidName ? 'error' : null}
-                className={style['form-group-edit']}
-              >
-                <FormControl
-                  id={`${idPrefix}-${value}-name-edit`}
-                  type='text'
-                  defaultValue={row.name}
-                  onChange={e => this.handleCellChange(rowData, 'name', e.target.value)}
-                />
-                {diskInvalidName &&
-                  <HelpBlock>{msg.diskNameValidationRules()}</HelpBlock>
-                }
-              </FormGroup>
-            )
-        },
-      },
-
-      // Bootable column - displayed only when editing disk
-      // Note: only one disk can be bootable at a time
-      {
-        header: {
-          label: msg.createVmStorageTableHeaderBootable(),
-          formatters: [(...formatArgs) => this.isEditingMode() && headerFormatText(...formatArgs)],
-          props: {
-            style: {
-              width: '5%',
-            },
-          },
-        },
-        cell: {
-          formatters: [(...formatArgs) => this.isEditingMode() && inlineEditFormatter(...formatArgs)],
-        },
-        valueView: null,
-        editView: (value, { rowData }) => {
-          return (
-            <div className={style['disk-bootable-edit']}>
-              { !this.isBootableDiskTemplate() && (
-                <Checkbox
-                  aria-label='bootable checkbox'
-                  checked={this.state.editing[rowData.id].bootable}
-                  id={`${idPrefix}-bootable`}
-                  onChange={e => this.handleCellChange(rowData, 'bootable', e.target.checked)}
-                  title='Bootable flag'
-                />
-              )}
-              <div className={style['bootable-info-tooltip']}>
-                <InfoTooltip
-                  id={`${idPrefix}-bootable-tooltip`}
-                  tooltip={this.bootableInfo(rowData.bootable)}
-                />
-              </div>
-            </div>
-          )
-        },
-      },
-
-      // size
-      {
-        header: {
-          label: msg.createVmStorageTableHeaderSize(),
-          formatters: [headerFormatText],
-          props: {
-            style: {
-              width: '15%',
-            },
-          },
-        },
-        cell: {
-          formatters: [inlineEditFormatter],
-        },
-        valueView: (value, { rowData }) => {
-          return (
-            <>
-              { rowData.sized.value } { rowData.sized.unit }
-            </>
-          )
-        },
-        editView: (value, { rowData }) => {
-          const row = this.state.editing[rowData.id]
-          const sizeGiB = row.size / (1024 ** 3)
-
-          return (
-            <div className={style['disk-size-edit']}>
-              <div>
-                <FormControl
-                  id={`${idPrefix}-${value}-size-edit`}
-                  type='number'
-                  step={1}
-                  value={sizeGiB}
-                  className={style['disk-size-form-control-edit']}
-                  onChange={e => this.handleCellChange(rowData, 'size', e.target.value)}
-                />
-              </div>
-              <span className={style['disk-size-edit-label']}>GiB</span>
-              <div>
-                <InfoTooltip id={`${idPrefix}-${value}-size-edit-info-tooltip`} tooltip={msg.diskEditorSizeCreateInfoTooltip()} />
-              </div>
-            </div>
-          )
-        },
-      },
-
-      // storage domain
-      {
-        header: {
-          label: msg.createVmStorageTableHeaderStorageDomain(),
-          formatters: [headerFormatText],
-          props: {
-            style: {
-              width: '25%',
-            },
-          },
-        },
-        cell: {
-          formatters: [inlineEditFormatter],
-        },
-        valueView: (value, { rowData }) => {
-          const {
-            storageDomainId: id,
-            storageDomain: sd,
-            canUserUseStorageDomain,
-            isFromTemplate,
-          } = rowData
-
-          if (isFromTemplate && !canUserUseStorageDomain) {
-            const { storageDomains, dataCenterId, locale } = props
-            const storageDomainList = createStorageDomainList({ storageDomains, dataCenterId, includeUsage: true, locale, msg })
-
-            if (storageDomainList.length === 0) {
-              return (
-                <>
-                  {msg.createVmStorageNoStorageDomainAvailable()}
-                  <InfoTooltip
-                    id={`${idPrefix}-${rowData.id}-storage-domain-na-tooltip`}
-                    tooltip={msg.createVmStorageNoStorageDomainAvailableTooltip()}
-                  />
-                </>
-              )
-            } else {
-              if (!sd.isOk) {
-                storageDomainList.unshift({ id: '_', value: `-- ${msg.createVmStorageSelectStorageDomain()} --` })
-              }
-
-              return (
-                <SelectBox
-                  id={`${idPrefix}-${rowData.id}-storage-domain-edit`}
-                  items={storageDomainList}
-                  selected={sd.isOk ? rowData.storageDomainId : '_'}
-                  validationState={!sd.isOk && 'error'}
-                  onChange={value => this.handleTemplateDiskStorageDomainChange(rowData, value)}
-                />
-              )
-            }
-          }
-
-          return (
-            <>
-              { id === '_'
-                ? `-- ${msg.createVmStorageSelectStorageDomain()} --`
-                : sd.isOk
-                  ? sd.name
-                  : msg.createVmStorageUnknownStorageDomain()
-            }
-            </>
-          )
-        },
-        editView: (value, { rowData }) => {
-          const { storageDomains, dataCenterId, locale } = props
-          const storageDomainList = createStorageDomainList({ storageDomains, dataCenterId, includeUsage: true, locale, msg })
-          const row = this.state.editing[rowData.id]
-
-          if (storageDomainList.length > 1 || row.storageDomainId === '_') {
-            storageDomainList.unshift({ id: '_', value: `-- ${msg.createVmStorageSelectStorageDomain()} --` })
-          }
-
-          return (
-            <SelectBox
-              id={`${idPrefix}-${value}-storage-domain-edit`}
-              items={storageDomainList}
-              selected={row.storageDomainId}
-              onChange={value => this.handleCellChange(rowData, 'storageDomainId', value)}
-              validationState={row.storageDomainId === '_' && 'error'}
-            />
-          )
-        },
-      },
-
-      // disk type (thin/sparse/cow vs preallocated/raw)
-      {
-        header: {
-          label: msg.createVmStorageTableHeaderType(),
-          formatters: [headerFormatText],
-          props: {
-            style: {
-              width: '20%',
-            },
-          },
-        },
-        property: 'diskTypeLabel',
-        cell: {
-          formatters: [inlineEditFormatter],
-        },
-        editView: (value, { rowData }) => {
-          const row = this.state.editing[rowData.id]
-
-          const typeList = createDiskTypeList(msg)
-          if (!row.diskType || row.diskType === '_') {
-            typeList.unshift({ id: '_', value: `-- ${msg.createVmStorageSelectDiskType()} --` })
-          }
-
-          return (
-            <SelectBox
-              id={`${idPrefix}-${value}-diskType-edit`}
-              items={typeList}
-              selected={row.diskType || '_'}
-              onChange={value => this.handleCellChange(rowData, 'diskType', value)}
-            />
-          )
-        },
-      },
-
-      // actions
-      {
-        header: {
-          label: '',
-          formatters: [headerFormatText],
-
-          props: {
-            style: {
-              width: '20px',
-            },
-          },
-        },
-        type: 'actions',
-        cell: {
-          formatters: [
-            (value, { rowData, rowIndex }) => {
-              const hideKebab = this.state.creating === rowData.id
-              const actionsDisabled = !!this.state.creating || this.isEditingMode() || rowData.isFromTemplate
-              const templateDefined = rowData.isFromTemplate
-              const kebabId = `${idPrefix}-kebab-${rowData.name}`
-
-              return (
-                <>
-                  { hideKebab && <Table.Cell /> }
-
-                  { templateDefined && (
-                    <Table.Cell className={style['disk-from-template']}>
-                      <InfoTooltip id={`${kebabId}-info-tooltip`} tooltip={msg.createVmStorageNoEditHelpMessage()} />
-                    </Table.Cell>
-                  )}
-
-                  { !hideKebab && !templateDefined && (
-                    <Table.Cell className={style['kebab-menu-cell']}>
-                      <Tooltip id={`tooltip-${kebabId}`} tooltip={msg.createVmStorageEditActions()} placement={'bottom'}>
-                        <div className={style['kebab-menu-wrapper']}>
-                          <DropdownKebab
-                            id={kebabId}
-                            className={style['action-kebab']}
-                            pullRight
-                          >
-                            <MenuItem
-                              id={`${kebabId}-edit`}
-                              onSelect={() => { this.inlineEditController.onActivate({ rowIndex, rowData }) }}
-                              disabled={actionsDisabled}
-                            >
-                              {msg.edit()}
-                            </MenuItem>
-                            <MenuItem
-                              id={`${kebabId}-delete`}
-                              onSelect={() => { this.onDeleteDisk(rowData) }}
-                              disabled={actionsDisabled}
-                            >
-                              {msg.delete()}
-                            </MenuItem>
-                          </DropdownKebab>
-                        </div>
-                      </Tooltip>
-                    </Table.Cell>
-                  )}
-                </>
-              )
-            },
-          ],
-        },
-      },
-    ]
+  clusterId,
+  storageDomains,
+  maxDiskSizeInGiB,
+  minDiskSizeInGiB,
+}) => {
+  const columnNames = {
+    name: msg.createVmStorageTableHeaderName(),
+    size: msg.createVmStorageTableHeaderSize(),
+    storageDomain: msg.createVmStorageTableHeaderStorageDomain(),
+    // disk type (thin/sparse/cow vs preallocated/raw)
+    diskType: msg.createVmStorageTableHeaderType(),
   }
 
-  // return boolean value to answer if we are editing a Disk or not
-  isEditingMode () {
-    return Object.keys(this.state.editing).length > 0
-  }
+  const allStorageDomains = createStorageDomainList({ storageDomains, locale, msg })
+  const dataCenterStorageDomainsList = createStorageDomainList({ storageDomains, dataCenterId, locale, msg })
+  const editInProgress = disks.find(({ underConstruction }) => underConstruction)
+  const enableCreate = dataCenterStorageDomainsList.length > 0 && !editInProgress
 
   // return true if the VM has any template disks that are set bootable
-  isBootableDiskTemplate () {
-    const bootableTemplateDisks = this.props.disks
-      .filter(disk => disk.isFromTemplate && disk.bootable)
+  const isBootableDiskTemplate = () => disks.filter(disk => disk.isFromTemplate && disk.bootable).length > 0
 
-    return bootableTemplateDisks.length > 0
-  }
+  const isValidDiskSize = (size) => isNumber(size) && size >= minDiskSizeInGiB && size <= maxDiskSizeInGiB
 
   // set appropriate tooltip message regarding setting bootable flag
-  bootableInfo (isActualDiskBootable) {
-    const { msg } = this.props
-    const bootableDisk = this.props.disks.find(disk => disk.bootable)
+  const bootableInfo = (isActualDiskBootable) => {
+    const bootableDisk = disks.find(disk => disk.bootable)
 
-    if (this.isBootableDiskTemplate()) {
+    if (isBootableDiskTemplate()) {
       // template based disk cannot be edited so bootable flag cannot be removed from it
       return msg.createVmStorageNoEditBootableMessage({ diskName: bootableDisk.name })
     } else if (bootableDisk && !isActualDiskBootable) {
@@ -483,286 +104,311 @@ class Storage extends React.Component {
     return msg.createVmStorageBootableMessage()
   }
 
-  validateTemplateDiskStorageDomains ({ update, ignoreId } = {}) {
-    const { disks, storageDomains } = this.props
-    let disksAreValid = true
+  const isSdOk = ({ storageDomainId, canUserUseStorageDomain }) => allStorageDomains.find(sd => sd.id === storageDomainId) && (
+    canUserUseStorageDomain || dataCenterStorageDomainsList.find(sd => sd.id === storageDomainId))
 
-    const templateDisks = disks.filter(disk => disk.isFromTemplate)
-    for (let i = 0; disksAreValid && i < templateDisks.length; i++) {
-      let disk = templateDisks[i]
-      if (disk.id === ignoreId) {
-        continue
-      }
-      if (update && update.id === disk.id) {
-        disk = { ...disk, ...update }
-      }
-      disksAreValid = disksAreValid && storageDomains.getIn([disk.storageDomainId, 'canUserUseDomain'], false)
-    }
+  const validateTemplateDiskStorageDomains = (ignoreId) => disks
+    .filter(disk => disk.isFromTemplate)
+    .filter(disk => disk.id !== ignoreId)
+    .map(({ storageDomainId, canUserUseStorageDomain }) => !!isSdOk({ storageDomainId, canUserUseStorageDomain }))
+    .filter(valid => !valid)
+    .length === 0
 
-    return disksAreValid
+  const toGiB = size => size / (1024 ** 3)
+
+  const convertSize = size => {
+    const { value: number, unit: storageUnits } = convertValue('B', size)
+    return { number, storageUnits }
   }
 
-  onCreateDisk () {
-    const newId = generateUnique('NEW_')
-    const {
-      minDiskSizeInGiB: diskInitialSizeInGib,
-      storageDomains,
-      dataCenterId,
-      vmName,
-      disks,
-      locale,
-      msg,
-    } = this.props
+  const diskList = sortNicsDisks([...disks], locale)
 
-    // If only 1 storage domain is available, select it automatically
-    const storageDomainList = createStorageDomainList({ storageDomains, dataCenterId, locale, msg })
-    const storageDomainId = storageDomainList.length === 1 ? storageDomainList[0].id : '_'
+  const translateDiskType = diskType => diskType === 'thin'
+    ? msg.diskEditorDiskTypeOptionThin()
+    : diskType === 'pre'
+      ? msg.diskEditorDiskTypeOptionPre()
+      : diskType
+  const translateStorageDomain = storageDomainId => allStorageDomains.find(sd => sd.id === storageDomainId)?.value ?? msg.createVmStorageUnknownStorageDomain()
 
-    // Setup a new disk in the editing hash
-    this.setState(state => ({
-      creating: newId,
-      editing: {
-        ...state.editing,
-        [newId]: {
-          id: newId,
+  const onCreateDisk = () => {
+    onUpdate({
+      valid: false,
+      create: {
+        id: generateUnique('NEW_'),
+        name: '',
+        underConstruction: {
           name: suggestDiskName(vmName, disks),
 
           diskId: '_',
-          storageDomainId,
+          storageDomainId: dataCenterStorageDomainsList.length === 1 ? dataCenterStorageDomainsList[0].id : '_',
 
           bootable: disks.length === 0,
           diskType: 'thin',
-          size: (diskInitialSizeInGib * 1024 ** 3),
+          size: (minDiskSizeInGiB * 1024 ** 3),
         },
       },
-    }))
-    this.props.onUpdate({ valid: false }) // the step isn't valid until Create is done
-  }
-
-  onEditDisk (rowData) {
-    this.setState(state => ({
-      editing: {
-        ...state.editing,
-        [rowData.id]: rowData,
-      },
-    }))
-    this.props.onUpdate({ valid: false }) // the step isn't valid until Edit is done
-  }
-
-  onDeleteDisk (rowData) {
-    this.props.onUpdate({
-      valid: this.validateTemplateDiskStorageDomains({ ignoreId: rowData.id }),
-      remove: rowData.id,
     })
   }
 
-  isValidDiskSize (size) {
-    const { minDiskSizeInGiB, maxDiskSizeInGiB } = this.props
-    return isNumber(size) && size >= minDiskSizeInGiB && size <= maxDiskSizeInGiB
-  }
-
-  handleCellChange (rowData, field, value) {
-    const editingRow = this.state.editing[rowData.id]
-    const editingErrors = {}
-    switch (field) {
-      case 'size':
-        if (!this.isValidDiskSize(value)) return
-        value = +value * (1024 ** 3) // GiB to B
-        break
-      case 'name':
-        editingErrors.diskInvalidName = !isDiskNameValid(value)
-        break
-    }
-
-    if (editingRow) {
-      editingRow[field] = value
-      this.setState(state => ({
-        editingErrors: {
-          ...state.editingErrors,
-          ...editingErrors,
+  const onEditDisk = (valid, { id, ...rest }) => {
+    onUpdate({
+      valid: valid && validateTemplateDiskStorageDomains(id),
+      update: {
+        id,
+        underConstruction: {
+          ...rest,
         },
-        editing: {
-          ...state.editing,
-          [rowData.id]: editingRow,
-        },
-      }))
-    }
-  }
-
-  handleTemplateDiskStorageDomainChange (rowData, storageDomainId) {
-    const update = { id: rowData.id, storageDomainId }
-    this.props.onUpdate({
-      valid: this.validateTemplateDiskStorageDomains({ update }),
-      update,
+      },
     })
   }
 
-  // Verify changes, and if valid, push the new or editing row up via __onUpdate__
-  handleRowConfirmChange (rowData) {
-    const { creating, editing, editingErrors } = this.state
-    const actionCreate = !!creating && creating === rowData.id
-    const editedRow = editing[rowData.id]
-
-    if (Object.values(editingErrors).find(val => val) || editedRow.storageDomainId === '_') return
-
+  const onSave = ({ id, underConstruction: { bootable, ...rest } }) => {
+    const { id: prevBootableDiskId } = disks.find(disk => disk.bootable) || {}
     // if the edited disk is set bootable, make sure to remove bootable from the other disks
-    if (editedRow.bootable) {
-      const previousBootableDisk = this.props.disks.find(disk => disk.bootable)
-      if (previousBootableDisk) {
-        this.props.onUpdate({
-          update: { id: previousBootableDisk.id, bootable: false },
-        })
-      }
-    }
-
-    this.props.onUpdate({
-      [actionCreate ? 'create' : 'update']: editedRow,
-      valid: this.validateTemplateDiskStorageDomains(), // don't need to update changes on non-template disks
-    })
-    this.removeEditState(rowData.id)
-  }
-
-  // Cancel the creation or editing of a row by throwing out edit state
-  handleRowCancelChange (rowData) {
-    this.props.onUpdate({ valid: this.validateTemplateDiskStorageDomains() })
-    this.removeEditState(rowData.id)
-  }
-
-  // Drop table edit state
-  removeEditState (rowId) {
-    this.components = undefined // forces the table to reload
-    this.setState(state => {
-      const editing = state.editing
-      delete editing[rowId]
-      return {
-        editingErrors: {
-          diskInvalidName: false,
-        },
-        creating: false,
-        editing,
-      }
-    })
-  }
-
-  // Create props for each row that will be passed to the row component (TableInlineEditRow)
-  rowRenderProps (nicList, rowData, { rowIndex }) {
-    const actionButtonsTop =
-      rowIndex > 5 &&
-      rowIndex === nicList.length - 1
-
-    return {
-      role: 'row',
-
-      isEditing: () => this.inlineEditController.isEditing({ rowData }),
-      onConfirm: () => this.inlineEditController.onConfirm({ rowData, rowIndex }),
-      onCancel: () => this.inlineEditController.onCancel({ rowData, rowIndex }),
-      last: actionButtonsTop, // last === if the confirm/cancel buttons should go above the row
-    }
-  }
-
-  render () {
-    const {
-      id: idPrefix = 'create-vm-wizard-disks',
-      storageDomains,
-      disks,
-      dataCenterId,
-      msg,
-      locale,
-    } = this.props
-
-    const storageDomainList = createStorageDomainList({ storageDomains, locale, msg })
-    const dataCenterStorageDomainsList = createStorageDomainList({ storageDomains, dataCenterId, locale, msg })
-    const enableCreate = storageDomainList.length > 0 && !this.isEditingMode()
-
-    const diskList = sortNicsDisks([...disks], locale)
-      .concat(this.state.creating ? [this.state.editing[this.state.creating]] : [])
-      .map(disk => {
-        disk = this.state.editing[disk.id] || disk
-        const sd = storageDomainList.find(sd => sd.id === disk.storageDomainId)
-        const isSdOk = !!sd && (
-          disk.canUserUseStorageDomain ||
-          dataCenterStorageDomainsList.find(sd => sd.id === disk.storageDomainId)
-        )
-
-        return {
-          ...disk,
-
-          // compose raw disk info to be used for table render data
-          sized: convertValue('B', disk.size),
-          storageDomain: {
-            isOk: isSdOk,
-            name: sd && sd.value,
-          },
-          diskTypeLabel: disk.diskType === 'thin'
-            ? msg.diskEditorDiskTypeOptionThin()
-            : disk.diskType === 'pre'
-              ? msg.diskEditorDiskTypeOptionPre()
-              : disk.diskType,
-        }
+    if (bootable && prevBootableDiskId && prevBootableDiskId !== id) {
+      onUpdate({
+        update: { id: prevBootableDiskId, bootable: false },
       })
-
-    // reuse _TableInlineEditRow to allow for normal form behavior (keyboard navigation
-    // and using onChange field handlers)
-    this.components = this.components || {
-      body: {
-        row: _TableInlineEditRow,
-      },
     }
+    onUpdate({
+      valid: validateTemplateDiskStorageDomains(id),
+      update: {
+        id,
+        bootable,
+        ...rest,
+        underConstruction: undefined,
+      },
+    })
+  }
 
-    return (
-      <div className={style['settings-container']} id={idPrefix}>
-        { diskList.length === 0 && (
-          <>
-            <EmptyState>
-              <EmptyState.Icon />
-              <EmptyState.Title>{msg.createVmStorageEmptyTitle()}</EmptyState.Title>
-              <EmptyState.Info>{msg.createVmStorageEmptyInfo()}</EmptyState.Info>
-              { enableCreate && (
-                <EmptyState.Action>
-                  <Button bsStyle='primary' bsSize='large' onClick={this.onCreateDisk}>
-                    {msg.diskActionCreateNew()}
-                  </Button>
-                </EmptyState.Action>
-              )}
-              { !enableCreate && (
-                <EmptyState.Help>
-                  {msg.diskNoCreate()}
-                </EmptyState.Help>
-              )}
-            </EmptyState>
-          </>
-        ) }
-
-        { diskList.length > 0 && (
-          <>
-            <div className={style['action-buttons']}>
-              <Button bsStyle='default' disabled={!enableCreate} onClick={this.onCreateDisk}>
+  return (
+    <div className={style['settings-container']} id={idPrefix}>
+      { diskList.length === 0 && (
+        <EmptyState variant="xl" isFullHeight>
+          <EmptyStateIcon icon={AddCircleOIcon}/>
+          <Title headingLevel="h4" size="lg">
+            {msg.createVmStorageEmptyTitle()}
+          </Title>
+          <EmptyStateBody>
+            {msg.createVmStorageEmptyInfo()}
+          </EmptyStateBody>
+          { enableCreate && (
+            <EmptyStateSecondaryActions>
+              <Button onClick={onCreateDisk}>
                 {msg.diskActionCreateNew()}
               </Button>
-            </div>
-            <div className={style['disk-table']}>
-              <Table.PfProvider
-                striped
-                bordered
-                hover
-                dataTable
-                inlineEdit
-                columns={this.columns}
-                components={this.components}
-              >
-                <Table.Header />
-                <Table.Body
-                  rows={diskList}
-                  rowKey='id'
-                  onRow={(...rest) => this.rowRenderProps(diskList, ...rest)}
-                />
-              </Table.PfProvider>
-            </div>
-          </>
-        ) }
-      </div>
-    )
-  }
+            </EmptyStateSecondaryActions>
+          )}
+          { !enableCreate && (
+            <EmptyStateBody>
+              {msg.diskNoCreate()}
+            </EmptyStateBody>
+          )}
+        </EmptyState>
+      ) }
+
+      { diskList.length > 0 && (
+        <>
+          <div className={style['action-buttons']}>
+            <Button isDisabled={!enableCreate} onClick={onCreateDisk}>
+              {msg.diskActionCreateNew()}
+            </Button>
+          </div>
+          <div className={style['nic-table']}>
+            <TableComposable
+              aria-label={msg.disks()}
+              variant='compact'
+            >
+              <Thead>
+                <Tr>
+                  <Th width={35}>{columnNames.name}</Th>
+                  <Th width={15}>{columnNames.size}</Th>
+                  <Th width={30}>{columnNames.storageDomain}</Th>
+                  <Th width={20}>{columnNames.diskType}</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {diskList.map(({ id, underConstruction, ...rest }) => {
+                  const { name, storageDomainId, canUserUseStorageDomain, isFromTemplate, bootable, size, diskType } = underConstruction ?? rest
+                  const isSdValid = !!isSdOk({ storageDomainId, canUserUseStorageDomain })
+                  // for template based disk we need to accept even invalid values
+                  // as user is not able to change them (except storage domain)
+                  const isNameValid = isDiskNameValid(name) || isFromTemplate
+                  const isDiskTypeValid = (diskType && diskType !== '_') || isFromTemplate
+                  const isDiskSizeValid = isValidDiskSize(toGiB(size)) || isFromTemplate
+                  const isValid = isSdValid && isNameValid && isDiskSizeValid && isDiskTypeValid
+                  return (
+                    <Tr key={id}>
+                      <Td dataLabel={columnNames.name}>
+                        {(!underConstruction || isFromTemplate) && <DiskNameWithLabels {...{ id, name, isFromTemplate, bootable }} />}
+                        {underConstruction && !isFromTemplate && (
+                          <>
+                            <TextInput
+                              id={`${id}-name-edit`}
+                              type='text'
+                              validated={isNameValid ? 'default' : 'error'}
+                              value={name}
+                              onChange={value => onEditDisk(isValid, { id, ...underConstruction, name: value }) }
+                            />
+                            {!isNameValid && (
+                              <HelperText>
+                                <HelperTextItem variant="error" hasIcon>
+                                  {msg.diskNameValidationRules()}
+                                </HelperTextItem>
+                              </HelperText>
+                            )}
+                            <Checkbox
+                              isChecked={!!bootable}
+                              label={(
+                                <>
+                                  {msg.diskLabelBootable()}
+                                  <InfoTooltip
+                                    id={`${idPrefix}-bootable-tooltip`}
+                                    tooltip={bootableInfo(bootable)}
+                                  />
+                                </>
+                              )}
+                              isDisabled={isBootableDiskTemplate()}
+                              id={`${id}-bootable`}
+                              onChange={value => onEditDisk(isValid, { id, ...underConstruction, bootable: value }) }
+                            />
+                          </>
+                        )}
+                      </Td>
+                      <Td dataLabel={columnNames.size}>
+                        {(!underConstruction || isFromTemplate) && msg.utilizationCardUnitNumber(convertSize(size))}
+                        {underConstruction && !isFromTemplate && (
+                          <>
+                            <TextInput
+                              min={minDiskSizeInGiB}
+                              max={maxDiskSizeInGiB}
+                              id={`${id}-size-edit`}
+                              type='number'
+                              validated={isDiskSizeValid ? 'default' : 'error'}
+                              value={toGiB(size)} // GiB
+                              onChange={value => onEditDisk(
+                                isValid,
+                                {
+                                  id,
+                                  ...underConstruction,
+                                  size: +value * (1024 ** 3), // GiB to B
+                                })}
+                            />
+                            <HelperText>
+                              <HelperTextItem>
+                                GiB <InfoTooltip id={`${id}-size-edit-info-tooltip`} tooltip={msg.diskEditorSizeCreateInfoTooltip()} />
+                              </HelperTextItem>
+                            </HelperText>
+                          </>
+                        )}
+                      </Td>
+                      <Td>
+                        {!underConstruction && translateStorageDomain(storageDomainId)}
+                        {underConstruction && dataCenterStorageDomainsList.length === 0 && (
+                          <>
+                            {msg.createVmStorageNoStorageDomainAvailable()}
+                            { isFromTemplate && (
+                              <InfoTooltip
+                                id={`${id}-storage-domain-na-tooltip`}
+                                tooltip={msg.createVmStorageNoStorageDomainAvailableTooltip()}
+                              />
+                            )}
+                          </>
+                        )}
+                        {underConstruction && dataCenterStorageDomainsList.length > 0 && (
+                          <SelectBox
+                            style={{ maxWidth: '15rem' }}
+                            id={`${id}-storage-domain-edit`}
+                            placeholderText={msg.createVmStorageSelectStorageDomain()}
+                            selected={storageDomainId}
+                            items={ dataCenterStorageDomainsList.map(({ usage, ...rest }) => ({ description: usage, ...rest }))}
+                            validationState={isSdValid ? 'default' : 'error'}
+                            onChange={storageDomainId => onEditDisk(isValid, { id, ...underConstruction, storageDomainId }) }
+                          />
+                        )}
+                      </Td>
+                      <Td dataLabel={columnNames.diskType}>
+                        {(!underConstruction || isFromTemplate) && translateDiskType(diskType)}
+                        {underConstruction && !isFromTemplate && (
+                          <SelectBox
+                            id={`${id}-diskType-edit`}
+                            items={createDiskTypeList(msg)}
+                            placeholderText={msg.createVmStorageSelectDiskType()}
+                            selected={diskType}
+                            validationState={isDiskTypeValid ? 'default' : 'error'}
+                            onChange={diskType => onEditDisk(isValid, { id, ...underConstruction, diskType }) }
+                          />
+                        )}
+                      </Td>
+                      <Td modifier='fitContent'>
+                        {[
+                          !underConstruction && !isFromTemplate && {
+                            ariaLabel: msg.edit(),
+                            id: `${id}-edit`,
+                            icon: (<PencilAltIcon/>),
+                            isDisabled: editInProgress,
+                            onClick: () => onUpdate({
+                              valid: true,
+                              update: {
+                                id,
+                                underConstruction: {
+                                  ...rest,
+                                },
+                              },
+                            }),
+                          },
+                          underConstruction && {
+                            ariaLabel: msg.save(),
+                            id: `${id}-save`,
+                            icon: (<CheckIcon/>),
+                            isDisabled: !isValid,
+                            onClick: () => onSave({ id, underConstruction }),
+                          },
+                          underConstruction && {
+                            ariaLabel: msg.cancel(),
+                            id: `${id}-cancel`,
+                            icon: (<TimesIcon/>),
+                            // template cannot be edited again
+                            isDisabled: isFromTemplate && !isValid,
+                            onClick: () => onUpdate({
+                              valid: true,
+                              remove: !rest.name && id,
+                              update: {
+                                id,
+                                underConstruction: undefined,
+                              },
+                            }),
+                          },
+                          !underConstruction && !isFromTemplate && {
+                            ariaLabel: msg.delete(),
+                            id: `${id}-delete`,
+                            icon: (<TrashIcon/>),
+                            isDisabled: editInProgress,
+                            onClick: () => onUpdate({ remove: id }),
+                          },
+                        ].filter(Boolean)
+                          .map(({ ariaLabel, ...rest }, index) => (
+                            <Tooltip key={ariaLabel} content={ariaLabel}>
+                              <Button
+                                style={{ paddingLeft: '0px', paddingRight: index % 2 ? '0px' : undefined }}
+                                variant={ButtonVariant.link}
+                                aria-label={ariaLabel}
+                                { ...rest}
+                              />
+                            </Tooltip>
+                          ))}
+                        { !underConstruction && isFromTemplate && <Tooltip id={`${id}-info-tooltip`} content={msg.createVmStorageNoEditHelpMessage()}><InfoCircleIcon/></Tooltip>}
+                      </Td>
+                    </Tr>
+                  )
+                })}
+              </Tbody>
+            </TableComposable>
+          </div>
+        </>
+      ) }
+    </div>
+  )
 }
 
 Storage.propTypes = {
