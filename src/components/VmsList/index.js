@@ -4,9 +4,15 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
-import { EmptyState } from 'patternfly-react'
+import {
+  EmptyState,
+  EmptyStateIcon,
+  EmptyStateBody,
+  Title,
+} from '@patternfly/react-core'
 import VmCardList from './VmCardList'
 import { MsgContext } from '_/intl'
+import { AddCircleOIcon } from '@patternfly/react-icons/dist/esm/icons'
 
 /**
  * Component displayed when VMs or Pools exist but the data is still loading.
@@ -23,9 +29,11 @@ const NoVmAvailable = () => {
   const idPrefix = 'no-vm'
   return (
     <EmptyState>
-      <EmptyState.Icon id={`${idPrefix}-icon`} />
-      <EmptyState.Title id={`${idPrefix}-title`}>{msg.noVmAvailable()}</EmptyState.Title>
-      <EmptyState.Info id={`${idPrefix}-text`}>{msg.noVmAvailableForLoggedUser()}</EmptyState.Info>
+      <EmptyStateIcon id={`${idPrefix}-icon` } icon={AddCircleOIcon}/>
+      <Title id={`${idPrefix}-title`} headingLevel="h4" size="lg">
+        {msg.noVmAvailable()}
+      </Title>
+      <EmptyStateBody id={`${idPrefix}-text`}>{msg.noVmAvailableForLoggedUser()}</EmptyStateBody>
     </EmptyState>
   )
 }

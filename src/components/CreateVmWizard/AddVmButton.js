@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Button } from 'patternfly-react'
+import { Button } from '@patternfly/react-core'
 
 import * as Actions from '_/actions'
 import { CREATE_PAGE_TYPE } from '_/constants'
@@ -43,7 +43,6 @@ class AddVmButton extends React.Component {
       <>
         <Button
           id={`${id}-button`}
-          bsStyle='primary'
           onClick={this.openCreateWizard}
         >
           {msg.addNewVm()}

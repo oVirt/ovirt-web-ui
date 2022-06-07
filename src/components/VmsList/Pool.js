@@ -25,9 +25,8 @@ const Pool = ({ pool, icons, onStart }) => {
   const icon = icons[iconId]
 
   return (
-    <BaseCard idPrefix={idPrefix}>
+    <BaseCard idPrefix={idPrefix} topLineColor={pool.get('color')}>
       <BaseCard.Header>
-        <div className={style['pool-top-line']} style={{ backgroundColor: pool.get('color') }} />
         <span className={`${sharedStyle['operating-system-label']} ${style['pool-os-label']}`}>{ osName }</span>
         <span className={style['pool-vm-label']} style={{ backgroundColor: pool.get('color') }}>{ pool.get('name') }</span>
       </BaseCard.Header>
@@ -39,7 +38,7 @@ const Pool = ({ pool, icons, onStart }) => {
           <dt>{msg.availableVmsFromPool()}</dt><dd>{pool.get('maxUserVms')}</dd>
         </dl>
       </BaseCard.Status>
-      <VmActions isOnCard vm={pool.get('vm')} pool={pool} onStart={onStart} idPrefix={idPrefix} />
+      <VmActions className={style['actions-container']} isOnCard vm={pool.get('vm')} pool={pool} onStart={onStart} idPrefix={idPrefix} />
     </BaseCard>
   )
 }

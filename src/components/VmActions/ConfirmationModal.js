@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import PropsTypes from 'prop-types'
 import { Modal, ModalVariant, Button } from '@patternfly/react-core'
 import { MsgContext } from '_/intl'
@@ -42,6 +42,34 @@ const ConfirmationModal = ({ show, title, confirm, body, subContent, onClose, ex
         }
     </Modal>
   )
+}
+
+export const withConfirmationModal = (WrappedComponent) => {
+  const EnhancedComponent = ({ confirmation: { title, body, confirm, extra, subContent }, ...otherProps }) => {
+    const [showConfirmation, setShowConfirmation] = useState(false)
+
+    return (
+      <>
+        <WrappedComponent
+          {...otherProps}
+          onClick={() => setShowConfirmation(true)}
+        />
+        <ConfirmationModal
+          show={showConfirmation}
+          onClose={() => setShowConfirmation(false)}
+          title={title}
+          body={body}
+          confirm={confirm}
+          extra={ extra}
+          subContent={subContent}
+        />
+      </>
+    )
+  }
+  EnhancedComponent.propTypes = {
+    confirmation: PropsTypes.object.isRequired,
+  }
+  return EnhancedComponent
 }
 
 ConfirmationModal.propTypes = {

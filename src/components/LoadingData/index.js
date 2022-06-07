@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withMsg } from '_/intl'
 
-import { Spinner } from 'patternfly-react'
+import { Spinner } from '@patternfly/react-core'
 
 import style from './style.css'
 
@@ -79,7 +79,7 @@ class LoadingData extends React.Component {
     return (
       <div className={this.props.inline ? style['loading-data-container-inline'] : style['loading-data-container-fixed']}>
 
-        <Spinner loading inline size='md' />
+        <Spinner size='md' isSVG />
 
         <div className={style['loading-data-message']}>
           {msg.loadingTripleDot()}

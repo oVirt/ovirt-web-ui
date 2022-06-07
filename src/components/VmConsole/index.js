@@ -7,7 +7,7 @@ import $ from 'jquery'
 import style from './style.css'
 import * as Actions from '_/actions'
 import * as C from '_/constants'
-import { Button } from 'patternfly-react'
+import { Button } from '@patternfly/react-core'
 import { VncConsole } from '@patternfly/react-console'
 import { withMsg } from '_/intl'
 import CounterAlert from '_/components/CounterAlert'
@@ -159,7 +159,7 @@ const VmConsole = ({
               additionalButtons={[
                 <Button
                   key='full-screen'
-                  bsStyle='default'
+                  variant="secondary"
                   onClick={() => setIsFullScreen(true)}
                 >
                   {msg.fullScreen()}

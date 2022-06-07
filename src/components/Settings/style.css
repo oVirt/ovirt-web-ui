@@ -58,8 +58,9 @@
     margin-right: 10px;
 }
 
-:global(#settings-toolbar) {
-    margin-left: -20px;
+.settings-toolbar {
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 .section-list{

@@ -1,18 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { OverlayTrigger, Tooltip as PFTooltip } from 'patternfly-react'
+import {
+  Tooltip as PFTooltip,
+} from '@patternfly/react-core'
 
-const Tooltip = ({ id, tooltip, placement, children, ...rest }) => {
+const Tooltip = ({ id, tooltip, placement = 'top', children }) => {
   return (
-    <OverlayTrigger
-      overlay={
-        <PFTooltip id={id}>{tooltip}</PFTooltip>
-      }
-      placement={placement || 'top'}
-      {...rest}
-    >
+    <PFTooltip id={id} content={tooltip} position={placement || 'top'}>
       { children }
-    </OverlayTrigger>
+    </PFTooltip>
   )
 }
 Tooltip.propTypes = {

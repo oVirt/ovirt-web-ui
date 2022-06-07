@@ -25,19 +25,15 @@
 }
 
 .vm-name {
-    font-size: 0.8em;
-    min-height: 0.8em;
+    font-size: 1em;
+    min-height: 1em;
     margin-bottom: 10px;
 }
 
 .vm-status {
-    font-size: 0.8em;
+    font-size: 1em;
     min-height: 46px;
     margin-bottom: 10px;
-}
-
-.selectedVm {
-    z-index: 20;
 }
 
 .vm-detail-link {
@@ -56,29 +52,32 @@
     margin-bottom: 30px !important;
 }
 
-.pool-top-line {
-    width: 100%;
-    background: blue;
-    height: 5px;
-    margin-top: -2px;
-    margin-left: -2px;
-    float: left;
-}
-
 .pool-vm-label {
-    padding: 5px 10px;
+    padding: 0 10px;
     color: white;
-    position: absolute;
-    top: 15px;
-    left: 20px;
+    float: left;
+    height: 2rem;
+    margin-top: 5px;
+    margin-left: 5px;
+    display: flex;
+    align-items: center;
 }
 
-.pool-os-label {
-    margin-top: -5px;
+.actions-container {
+    /*
+    reserve space so that the card without action buttons has
+    the same height as other cards. To get the right height
+    use constants from PF4 button.css 
+    button height = padding-top + padding-bottom + line-height * font-size
+    */
+    --action-button-height: calc(2 * var(--pf-global--spacer--form-element) + var(--pf-global--LineHeight--md) * var(--pf-global--FontSize--md));
+    min-height: var(--action-button-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 dl.pool-info {
-    width: 65%;
     margin-right: auto;
     margin-left: auto;
     font-size: 14px;
@@ -111,15 +110,19 @@ dl.pool-info dd {
 
     margin-top: 0;
     padding-top: 20px;
+
+    scrollbar-gutter: stable;
+}
+
+.gallery-container {
+    padding-left: var(--pf-global--gutter);
+    /** reserve space for scrolling: 100vw - 100% returns the scrollbar width */
+    padding-right: calc(var(--pf-global--gutter) - (100vw - 100%));
 }
 
 .cards-container {
     display: flex;
     flex-wrap: wrap;
-}
-
-.card-box :global(.card-pf) {
-    height: calc(100% - 20px);
 }
 
 .infinite-scroll-sentinel {

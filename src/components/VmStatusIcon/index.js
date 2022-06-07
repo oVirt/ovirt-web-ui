@@ -1,34 +1,45 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 
-import { Icon } from 'patternfly-react'
 import style from './style.css'
 import { Tooltip } from '_/components/tooltips'
 import { MsgContext } from '_/intl'
 import { statusToTooltipId } from '_/vm-status'
 
 import { translate } from '_/helpers'
+import {
+  RunningIcon,
+  InProgressIcon,
+  OffIcon,
+  PauseCircleIcon,
+  AsleepIcon,
+  ExclamationTriangleIcon,
+  UnknownIcon,
+  MigrationIcon,
+  PendingIcon,
+  LockIcon,
+} from '@patternfly/react-icons/dist/esm/icons'
 
 /* eslint-disable key-spacing, no-multi-spaces */
-const VM_STATUS_TO_ICON = (msg) => ({
-  up                : { type: 'pf', name: 'on-running',        className: style.green },
-  powering_up       : { type: 'pf', name: 'in-progress'        },
-  down              : { type: 'pf', name: 'off'                },
-  paused            : { type: 'pf', name: 'paused'             },
-  suspended         : { type: 'pf', name: 'asleep'             },
-  powering_down     : { type: 'pf', name: 'in-progress'        },
-  not_responding    : { type: 'pf', name: 'warning-triangle-o' },
-  unknown           : { type: 'pf', name: 'unknown'            },
-  unassigned        : { type: 'pf', name: 'unknown'            },
-  migrating         : { type: 'pf', name: 'migration'          },
-  wait_for_launch   : { type: 'pf', name: 'pending'            },
-  reboot_in_progress: { type: 'pf', name: 'in-progress'        },
-  saving_state      : { type: 'pf', name: 'pending'            },
-  restoring_state   : { type: 'pf', name: 'in-progress'        },
-  image_locked      : { type: 'pf', name: 'locked'             },
+const VM_STATUS_TO_ICON = {
+  up                : { constructor: RunningIcon,        className: style.green },
+  powering_up       : { constructor: InProgressIcon      },
+  down              : { constructor: OffIcon                },
+  paused            : { constructor: PauseCircleIcon             },
+  suspended         : { constructor: AsleepIcon             },
+  powering_down     : { constructor: InProgressIcon       },
+  not_responding    : { constructor: ExclamationTriangleIcon },
+  unknown           : { constructor: UnknownIcon            },
+  unassigned        : { constructor: UnknownIcon            },
+  migrating         : { constructor: MigrationIcon          },
+  wait_for_launch   : { constructor: PendingIcon            },
+  reboot_in_progress: { constructor: InProgressIcon       },
+  saving_state      : { constructor: PendingIcon          },
+  restoring_state   : { constructor: InProgressIcon        },
+  image_locked      : { constructor: LockIcon             },
 
-  __default__       : { type: 'pf', name: 'zone'               },
-})
+  __default__       : { constructor: UnknownIcon               },
+}
 /* eslint-enable key-spacing, no-multi-spaces */
 
 /**
@@ -36,7 +47,7 @@ const VM_STATUS_TO_ICON = (msg) => ({
  */
 const VmStatusIcon = ({ id, status, className = undefined }) => {
   const { msg } = useContext(MsgContext)
-  const iconData = VM_STATUS_TO_ICON(msg)[status] || VM_STATUS_TO_ICON(msg).__default__
+  const iconData = VM_STATUS_TO_ICON[status] || VM_STATUS_TO_ICON.__default__
   const tooltip = translate({ ...statusToTooltipId[status] ?? status.__default__, msg })
   const classNames =
     iconData.className && className
@@ -46,10 +57,10 @@ const VmStatusIcon = ({ id, status, className = undefined }) => {
         : !iconData.className && className
           ? `${className}`
           : undefined
-
+  const Icon = iconData.constructor
   return (
     <Tooltip id={id} tooltip={tooltip} placement={'bottom'}>
-      <Icon type={iconData.type} name={iconData.name} className={classNames} />
+      <Icon className={classNames} />
     </Tooltip>
   )
 }

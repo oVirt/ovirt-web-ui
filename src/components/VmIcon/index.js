@@ -2,6 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import style from './style.css'
 
+import { BirthdayCakeIcon } from '@patternfly/react-icons/dist/esm/icons'
+
 /**
  * Large or small icon (image) associated with the VM
  * or default when icon not provided
@@ -13,7 +15,7 @@ const VmIcon = ({ icon: { data, type } = {}, className, missingIconClassName }) 
     return <img src={src} className={`${style.icon} ${className}`} alt='' />
   }
 
-  return <span className={missingIconClassName} />
+  return <BirthdayCakeIcon/>
 }
 
 VmIcon.propTypes = {

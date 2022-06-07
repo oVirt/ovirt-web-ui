@@ -45,23 +45,6 @@
     display: inline-block;
 }
 
-.action-height {
-    height: 27px;
-    margin-top: 5px !important;
-}
-
-.action-height button {
-    height: 27px;
-}
-
-:global(.actions-line .dropdown) {
-    margin-left: 5px;
-}
-
-:global(.actions-line .dropdown) > :global(.btn):first-child {
-    height: 27px;
-}
-
 :global(.dropdown-menu) > .menu-item-danger > a {
     color: #cc0000;
 }

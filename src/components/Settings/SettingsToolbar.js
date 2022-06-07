@@ -1,7 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
-import { Toolbar } from 'patternfly-react'
+import {
+  Button,
+  Toolbar,
+  ToolbarContent,
+  ToolbarGroup,
+  ToolbarItem,
+} from '@patternfly/react-core'
 import { MsgContext } from '_/intl'
 
 import style from './style.css'
@@ -40,7 +46,7 @@ const SettingsToolbar = ({ onSave, onReset, onCancel, enableSave, enableReset, t
   }
 
   return ReactDOM.createPortal(
-    <Toolbar className={style.toolbar}>
+    <>
       <ConfirmationModal
         show={showSaveConfirmModal}
         title={msg.saveChanges()}
@@ -63,38 +69,32 @@ const SettingsToolbar = ({ onSave, onReset, onCancel, enableSave, enableReset, t
           onClick: onResetConfirm,
         }}
       />
-      <button
-        className='btn btn-default'
-        disabled={!enableReset}
-        onClick={(e) => {
-          e.preventDefault()
-          setShowResetConfirmModal(true)
-        }}
-      >
-        {msg.resetSettings()}
-      </button>
-      <Toolbar.RightContent>
-        <button
-          onClick={e => {
-            e.preventDefault()
-            onCancel()
-          }}
-          className='btn btn-default'
-        >
-          {msg.cancel()}
-        </button>
-        <button
-          disabled={!enableSave}
-          onClick={e => {
-            e.preventDefault()
-            setShowSaveConfirmModal(true)
-          }}
-          className='btn btn-primary'
-        >
-          {msg.save()}
-        </button>
-      </Toolbar.RightContent>
-    </Toolbar>,
+      <Toolbar isFullHeight isSticky alignment={{ default: 'alignLeft' }} className={style['settings-toolbar']}>
+        <ToolbarContent>
+          <ToolbarGroup variant='button-group' alignment={{ default: 'alignLeft' }}>
+            <ToolbarItem>
+              <Button isDisabled={!enableReset} onClick={() => setShowResetConfirmModal(true) } >
+                {msg.resetSettings()}
+              </Button>
+            </ToolbarItem>
+          </ToolbarGroup>
+          <ToolbarGroup variant='button-group' alignment={ { default: 'alignRight' } } >
+            <ToolbarItem>
+              <Button onClick={ onCancel } variant='link' >
+                {msg.cancel()}
+              </Button>
+            </ToolbarItem>
+            <ToolbarItem>
+              <Button isDisabled={!enableSave} onClick={() => setShowSaveConfirmModal(true)} >
+                {msg.save()}
+              </Button>
+            </ToolbarItem>
+          </ToolbarGroup>
+        </ToolbarContent>
+      </Toolbar>
+
+    </>
+    ,
     container
   )
 }
