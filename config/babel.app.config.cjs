@@ -32,7 +32,7 @@ module.exports = function (api, opts = {}) {
         {
           debug: verbose,
           useBuiltIns: 'usage',
-          corejs: '3.13',
+          corejs: '3.19.1',
           exclude: ['transform-typeof-symbol'],
         },
       ],
@@ -41,15 +41,10 @@ module.exports = function (api, opts = {}) {
       [
         '@babel/preset-react',
         {
-          development: true, // isEnvDevelopment || isEnvTest,
-
-          // TODO: Consider `runtime: 'automatic'`
-          //         - 'react/jsx-runtime'
-          //         - https://reactjs.org/blog/2020/09/22/introducing-the-new-jsx-transform.html
-
-          // use the 'classic' runtime for JSX transpile
-          runtime: 'classic',
+          development: isEnvDevelopment || isEnvTest,
+          runtime: 'automatic',
           useBuiltIns: true,
+          useSpread: true,
         },
       ],
 
@@ -58,34 +53,8 @@ module.exports = function (api, opts = {}) {
         '@babel/preset-flow',
       ],
 
-      // TODO: Consider @babel/preset-typescript to enable typescript!
     ].filter(Boolean),
-
-    // plugins to extend or override the presets
-    plugins: [
-
-      // Polyfills the runtime needed for async/await, generators, and friends
-      // https://babeljs.io/docs/en/babel-plugin-transform-runtime
-      // [
-      //   '@babel/plugin-transform-runtime',
-      //   {
-      //     corejs: false,
-      //     helpers: true,
-      //     regenerator: true,
-      //     useESModules: isEnvDevelopment || isEnvProduction,
-      //     version: require('@babel/runtime/package.json').version,
-      //   },
-      // ],
-
-      // eslint-web-plugin loads this config from a different relative path
-      // than regular build script. Resolved path works for both cases.
-      isEnvDevelopment && paths.appFancyConsole,
-
-    ].filter(Boolean),
-
-    // define overrides to configs for a specific test/include/exclude case
-    overrides: [
-    ].filter(Boolean),
+    plugins: isEnvDevelopment ? ['react-refresh/babel', paths.appFancyConsole] : [],
   }
 
   if (verbose) {

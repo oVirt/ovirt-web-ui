@@ -1,4 +1,3 @@
-// Do this as the first thing so that any code reading it knows the right env.
 import chalk from 'chalk'
 import readlineSync from 'readline-sync'
 import webpack from 'webpack'
@@ -12,9 +11,6 @@ import https from 'https'
 import fs from 'fs'
 import dotenv from 'dotenv'
 import paths from '../config/paths.cjs'
-
-process.env.BABEL_ENV = 'development'
-process.env.NODE_ENV = 'development'
 
 if (process.env.ENGINE_ENV) {
   const envFilePath = `.env.${process.env.ENGINE_ENV}`
