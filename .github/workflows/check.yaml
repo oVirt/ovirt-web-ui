@@ -9,7 +9,7 @@ on:
 
 jobs:
   test_el8_offline:
-    name: EL8 - test, build and publish rpm repo for the PR (ovirt-engine-nodejs-modules build)
+    name: EL8 (ovirt-engine-nodejs-modules build) - test, build and publish rpm repo for the PR
     env:
       OFFLINE_BUILD: 1
 
@@ -35,7 +35,7 @@ jobs:
           directory: exported-artifacts/
 
   test_el8_online:
-    name: EL8 - test and build the PR, but skip the rpm builds (online build)
+    name: EL8 (online build) - test and build the PR, but skip the rpm builds
 
     runs-on: ubuntu-latest
     container:
@@ -60,3 +60,24 @@ jobs:
       #       need 1 rpm repo artifact per distro.  The rpm repo is generated from the
       #       offline build.
       #
+
+  test_el9_offline:
+    name: EL9 (ovirt-engine-nodejs-modules build) - test, build and publish rpm repo for the PR
+    env:
+      OFFLINE_BUILD: 1
+
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/ovirt/buildcontainer:el9stream
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Run automation/build.sh (installs build dependencies as necessary)
+        run: ./automation/build.sh
+
+      - name: Upload artifacts as rpm repo
+        uses: ovirt/upload-rpms-action@v2
+        with:
+          directory: exported-artifacts/
