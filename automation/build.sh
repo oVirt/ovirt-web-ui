@@ -37,7 +37,7 @@ if [[ "${version_release}" == "0" ]]; then
   # be passed via command line, specifically during a copr style pure chroot rpmbuild srpm
   # and rpm rebuild.
   if [[ $source_build -eq 1 ]] ; then
-    export SNAPSHOT_DATE=$(date --utc +%Y%m%d)
+    export SNAPSHOT_DATE=$(date --utc +%Y%m%d%H%M%S)
     export PACKAGE_RPM_SUFFIX=".$SNAPSHOT_DATE.git$SNAPSHOT_COMMIT"
   fi
 

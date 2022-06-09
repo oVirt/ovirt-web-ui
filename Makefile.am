@@ -73,7 +73,7 @@ srpm:	dist-gzip
 	@echo "srpm available at '$(TMPREPOS)'"
 	@echo
 
-snapshot-srpm: SNAPSHOT_DATE = $(shell date --utc +%Y%m%d)
+snapshot-srpm: SNAPSHOT_DATE = $(shell date --utc +%Y%m%d%H%M%S)
 snapshot-srpm: SNAPSHOT_COMMIT ?= $(shell git log -1 --pretty=format:%h)
 snapshot-srpm:
 	make srpm RELEASE_SUFFIX=".$(SNAPSHOT_DATE).git$(SNAPSHOT_COMMIT)"
@@ -84,7 +84,7 @@ rpm:	srpm
 	@echo "rpm(s) available at '$(TMPREPOS)'"
 	@echo
 
-snapshot-rpm: SNAPSHOT_DATE = $(shell date --utc +%Y%m%d)
+snapshot-rpm: SNAPSHOT_DATE = $(shell date --utc +%Y%m%d%H%M%S)
 snapshot-rpm: SNAPSHOT_COMMIT ?= $(shell git log -1 --pretty=format:%h)
 snapshot-rpm:
 	make rpm RELEASE_SUFFIX=".$(SNAPSHOT_DATE).git$(SNAPSHOT_COMMIT)"
