@@ -25,7 +25,7 @@ BuildRequires: autoconf
 BuildRequires: automake
 %if %{offline_build}
 # nodejs-modules embeds yarn and requires nodejs
-BuildRequires: ovirt-engine-nodejs-modules >= 2.2.0
+BuildRequires: ovirt-engine-nodejs-modules >= 2.3.2
 %else
 BuildRequires: nodejs >= 14.15
 BuildRequires: yarn >= 1.22
