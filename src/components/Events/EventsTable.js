@@ -141,7 +141,7 @@ const EventsTable = ({
                 <Td dataLabel={columns[1]?.label} modifier="nowrap" >
                   {new Date(time).toLocaleString(locale)}
                 </Td>
-                <Td dataLabel={columns[2]?.label}>
+                <Td dataLabel={columns[2]?.label} modifier="breakWord">
                   {description}
                 </Td>
               </Tr>
