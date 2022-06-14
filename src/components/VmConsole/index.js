@@ -27,28 +27,6 @@ const NOVNC_CONTAINER_ID = 'novnc-console-container'
 
 const focusOnConsole = () => document.querySelector(`#${NOVNC_CONTAINER_ID} canvas`)?.focus()
 
-const InfoPageContainer = ({ mainText, secondaryText, icon, secondaryComponent }) => (
-  <div className={style['download-page-container']}>
-    <div className={style['download-page-content']}>
-      <img src={icon} />
-      <span className={style['download-page-main-text']}>{ mainText }</span>
-      <span className={style['download-page-secondary-text']}>{ secondaryText }</span>
-      { secondaryComponent && (
-        <span className={style['download-page-secondary-text']}>
-          { secondaryComponent }
-        </span>
-      )}
-    </div>
-  </div>
-)
-
-InfoPageContainer.propTypes = {
-  mainText: PropTypes.string.isRequired,
-  secondaryText: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
-  icon: PropTypes.string.isRequired,
-  secondaryComponent: PropTypes.node,
-}
-
 const VmConsole = ({
   consoleType,
   vmId,
