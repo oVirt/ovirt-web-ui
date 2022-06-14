@@ -16,7 +16,7 @@ import {
   CLEAR_USER_MSGS,
 } from '_/constants'
 import { actionReducer } from './utils'
-import { toJS } from '_/helpers'
+import { localeCompare, toJS } from '_/helpers'
 import uniqueId from 'lodash/uniqueId'
 
 import type { FailedExternalActionType } from '_/actions/types'
@@ -105,15 +105,16 @@ const userMessages: any = actionReducer(initialState, {
   },
 
   [ADD_VM_EVENTS] (state: any, { payload: { events, vmId } }: any): any {
-    const allEvents = state.getIn(['events', vmId], fromJS([]))
-    const all = allEvents.toJS().map(({ id }) => id)
-    const filteredEvents = events.filter(({ id, ...rest }) => {
-      if (all[id]) {
-        console.warn('duplicate', id, rest)
-      }
-      return !all[id]
-    })
-    return state.setIn(['events', vmId], allEvents.concat(fromJS(filteredEvents)))
+    const existingEvents = toJS(state.getIn(['events', vmId], []))
+    const existingIds = new Set(existingEvents.map(({ id }) => id))
+    const filteredEvents = events
+      // keep events unique
+      .filter(({ id, ...rest }) => !existingIds[id])
+      // keep events sorted in descending order
+      .sort((a, b) => localeCompare(b?.id ?? '', a?.id ?? '', 'en'))
+
+    // newest first
+    return state.setIn(['events', vmId], fromJS([...filteredEvents, ...existingEvents]))
   },
   [ADD_LAST_VM_EVENTS] (state: any, { payload: { events, vmId } }: any): any {
     return state.setIn(['lastEvents', vmId], fromJS(events))
