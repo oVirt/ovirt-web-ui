@@ -337,8 +337,12 @@ class OverviewCard extends React.Component {
                     { lastEvents.map(({ id, time, description, severity }) => (
                       <Tooltip key={id} content={<span>{new Date(time).toLocaleString(locale)} {description}</span>}>
                         <ListItem className={style.event}>
-                          <Label icon={<EventStatus severity={severity}/>}>{formatHowLongAgo(time)}</Label>
-                          {description}
+                          <Label icon={<EventStatus severity={severity}/>}>
+                            {formatHowLongAgo(time)}
+                          </Label>
+                          <span className={style.eventText}>
+                            {description}
+                          </span>
                         </ListItem>
                       </Tooltip>
                     ))

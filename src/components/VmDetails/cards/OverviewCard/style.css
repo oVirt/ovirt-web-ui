@@ -11,17 +11,20 @@
 }
 
 .event {
+  display: flex;
+  /* event text and time label have different height */
+  align-items: center;
+}
+
+.eventText {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  display: flex;
-  align-items: center;
 }
 
 
 .event :global(.pf-c-label) {
   margin-right: 5px;
-  /* width: 100%; */
 }
 
 .operating-system-label {
