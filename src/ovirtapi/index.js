@@ -305,6 +305,17 @@ const OvirtApi = {
     assertLogin({ methodName: 'dismissEvent' })
     return httpDelete({ url: `${AppConfiguration.applicationContext}/api/events/${eventId}` })
   },
+  eventsForVm ({ vmName, newestEventId = 0, maxItems = 0 }: Object): Promise<Object> {
+    // TODO generic search is expensive: extend REST API capability to fetch directly using VM ID
+    assertLogin({ methodName: 'eventsForVm' })
+    const query = [
+      'search=' + encodeURIComponent(`vm.name=${vmName}`),
+      !!newestEventId && `from=${newestEventId}`,
+      !!maxItems && `max=${maxItems}`,
+    ].filter(Boolean).join('&')
+
+    return httpGet({ url: `${AppConfiguration.applicationContext}/api/events?${query}` })
+  },
 
   checkFilter (): Promise<Object> {
     assertLogin({ methodName: 'checkFilter' })

@@ -9,12 +9,14 @@ import {
   VmDetailToolbar,
   VmsListToolbar,
   SettingsToolbar,
+  EventsToolbar,
 } from './components/Toolbar'
 import {
   VmDetailsPage,
   VmsListPage,
   GlobalSettingsPage,
   VmConsolePage,
+  VmEventsPage,
 } from './components/Pages'
 
 import {
@@ -23,6 +25,7 @@ import {
   CONSOLE_PAGE_TYPE,
   NO_REFRESH_TYPE,
   SETTINGS_PAGE_TYPE,
+  EVENTS_PAGE_TYPE,
 } from '_/constants'
 
 /**
@@ -64,6 +67,15 @@ export default function getRoutes () {
                 toolbars: (match) => null,
                 isToolbarFullWidth: true,
                 type: CONSOLE_PAGE_TYPE,
+              },
+              {
+                path: '/vm/:id/events',
+                title: ({ msg }) => msg.events(),
+                component: VmEventsPage,
+                closeable: true,
+                toolbars: (match) => <EventsToolbar match={match}/>,
+                isToolbarFullWidth: true,
+                type: EVENTS_PAGE_TYPE,
               },
             ],
           },

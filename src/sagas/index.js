@@ -21,6 +21,8 @@ import sagasVmChanges from './vmChanges'
 import sagasVmSnapshots from '_/components/VmDetails/cards/SnapshotsCard/sagas'
 
 import {
+  addLastVmEvents,
+  addVmEvents,
   updateVms,
   setVmSnapshots,
 
@@ -377,6 +379,31 @@ function* clearEvents ({ payload: { records = [] } }) {
   yield all(sagaEvents)
 
   yield fetchAllEvents()
+}
+
+export function* fetchAllVmEvents (action) {
+  const { vmId } = action.payload
+  const { error, event: events } = yield callExternalAction(Api.eventsForVm, action)
+
+  if (error || !Array.isArray(events)) {
+    yield put(addVmEvents({ events: [], vmId }))
+    return
+  }
+
+  const internalEvents = events.map(event => Transforms.Event.toInternal({ event }))
+  yield put(addVmEvents({ events: internalEvents, vmId }))
+}
+
+export function* fetchLastVmEvents (action) {
+  const { vmId } = action.payload
+  const { error, event: events } = yield callExternalAction(Api.eventsForVm, action)
+
+  if (error || !Array.isArray(events)) {
+    return
+  }
+
+  const internalEvents = events.map(event => Transforms.Event.toInternal({ event }))
+  yield put(addLastVmEvents({ events: internalEvents, vmId }))
 }
 
 export function* fetchVmSessions ({ vmId }) {
