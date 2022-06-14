@@ -1,48 +1,31 @@
-import React, { useEffect, useState } from 'react'
+import React, {
+  useEffect,
+  useState,
+} from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { push } from 'connected-react-router'
-import $ from 'jquery'
 
 import style from './style.css'
 import * as Actions from '_/actions'
 import * as C from '_/constants'
-import { Button } from '@patternfly/react-core'
-import { VncConsole } from '@patternfly/react-console'
+import {
+  Button,
+} from '@patternfly/react-core'
+import {
+  AccessConsoles,
+  constants,
+} from '@patternfly/react-console'
+import VncConsole from './VncConsole'
 import { withMsg } from '_/intl'
-import CounterAlert from '_/components/CounterAlert'
 
 import Loader, { SIZES } from '../Loader'
 
 import { isRunning } from '../utils'
-import { isNativeConsole } from '_/utils/console'
-
-import downloadIcon from './images/download_icon.png'
-import disconnectIcon from './images/disconnect_icon.png'
 
 const NOVNC_CONTAINER_ID = 'novnc-console-container'
 
-const InfoPageContainer = ({ mainText, secondaryText, icon, secondaryComponent }) => (
-  <div className={style['download-page-container']}>
-    <div className={style['download-page-content']}>
-      <img src={icon} />
-      <span className={style['download-page-main-text']}>{ mainText }</span>
-      <span className={style['download-page-secondary-text']}>{ secondaryText }</span>
-      { secondaryComponent && (
-        <span className={style['download-page-secondary-text']}>
-          { secondaryComponent }
-        </span>
-      )}
-    </div>
-  </div>
-)
-
-InfoPageContainer.propTypes = {
-  mainText: PropTypes.string.isRequired,
-  secondaryText: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
-  icon: PropTypes.string.isRequired,
-  secondaryComponent: PropTypes.node,
-}
+const focusOnConsole = () => document.querySelector(`#${NOVNC_CONTAINER_ID} canvas`)?.focus()
 
 const VmConsole = ({
   consoleType,
@@ -56,9 +39,22 @@ const VmConsole = ({
   onDisconnected,
   goToDetails,
   openConsole,
+  displayError,
 }) => {
   const [isFullScreen, setIsFullScreen] = useState(fullScreenNoVnc)
   const isVmRunning = isRunning(vm.get('status'))
+  const onFailure = ({ reason, messageId }) => {
+    console.warn('foo ', reason, messageId)
+    onDisconnected('CONNECTION_FAILURE')
+    displayError({
+      messageDescriptor: {
+        id: messageId,
+        params: {
+          reason: reason ?? '',
+        },
+      },
+    })
+  }
 
   const {
     proxyTicket,
@@ -69,26 +65,14 @@ const VmConsole = ({
     } = {},
   } = vmConsoleState
 
-  const getNativeConsoleMessages = () => {
-    switch (consoleType) {
-      case C.RDP:
-        return [msg.downloadedRDPFile(), msg.downloadedRDP()]
-      case C.NATIVE_VNC:
-        return [msg.downloadedVVFile(), msg.downloadedVNC()]
-      case C.SPICE:
-        return [msg.downloadedVVFile(), msg.downloadedSPICE()]
-      default:
-        return []
-    }
-  }
-
   useEffect(() => {
-    if (!isVmRunning) {
+    if (!isVmRunning || consoleType !== C.BROWSER_VNC) {
       goToDetails()
     }
-  }, [isVmRunning, goToDetails])
+  }, [isVmRunning, goToDetails, consoleType])
 
   useEffect(() => {
+    // fetch credentials if page is accessed directly via URL
     if (!consoleStatus) {
       openConsole()
     }
@@ -96,7 +80,7 @@ const VmConsole = ({
 
   useEffect(() => {
     const onFullScreen = () => {
-      const elem = document.getElementById('console-component')
+      const elem = document.getElementById(NOVNC_CONTAINER_ID)
       if (!elem) {
         return
       }
@@ -109,87 +93,73 @@ const VmConsole = ({
         }
       }
 
-      if (elem.requestFullscreen) {
-        elem.requestFullscreen()
-      } else if (elem.mozRequestFullScreen) { /* Firefox */
-        elem.mozRequestFullScreen()
-      } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
-        elem.webkitRequestFullscreen()
-      } else if (elem.msRequestFullscreen) { /* IE/Edge */
-        elem.msRequestFullscreen()
-      }
+      // in dev mode fullscreen may fail if triggered by WebPack with the following:
+      // Failed to execute 'requestFullscreen' on 'Element': API can only be initiated by a user gesture
+      const requestResult = elem?.requestFullscreen() ??
+      elem?.mozRequestFullScreen() ?? /* old Firefox */
+      elem?.webkitRequestFullscreen() ?? /* old Chrome, Safari & Opera */
+      elem?.msRequestFullscreen() /* old IE/Edge */
+
+      requestResult?.catch?.((error) => {
+        console.error(error)
+        // ignore error if request was rejected - example cause on FF:
+        // Request for fullscreen was denied because requesting element is no longer in its document.
+      })
     }
     if (isFullScreen) {
       onFullScreen()
     }
+    focusOnConsole()
   }, [isFullScreen])
 
-  if (!isVmRunning) {
+  if (!isVmRunning || consoleType !== C.BROWSER_VNC) {
     return null
   }
 
-  if (consoleType === C.BROWSER_VNC && ticket && websocketHost) {
-    switch (consoleStatus) {
-      case C.INIT_CONSOLE:
-        return (
-          <div id='console-component' className={isFullScreen ? style['full-screen'] : null}>
-            {isFullScreen && (
-              <div className={style['toast-message']}>
-                <CounterAlert timeout={5} type='info' title={msg.pressF11ExitFullScreen()} />
-              </div>
-            )}
-            <VncConsole
-              encrypt
-              resizeSession
-              scaleViewport
-              textConnecting={<Loader loaderText={msg.connecting()} size={SIZES.SMALL} />}
-              textDisconnect={msg.disconnect()}
-              textSendShortcut={msg.sendShortcutKey()}
-              textCtrlAltDel={msg.sendCtrlAltDel()}
-              credentials={{ password: ticket.value }}
-              path={proxyTicket}
-              host={websocketHost}
-              port={websocketPort}
-              portalToolbarTo='vm-console-toolbar-sendkeys'
-              consoleContainerId={NOVNC_CONTAINER_ID}
-              onDisconnected={
-                (e) => !e?.detail?.clean ? onDisconnected('CONNECTION_FAILURE') : onDisconnected()
-              }
-              onConnected={() => $(`#${NOVNC_CONTAINER_ID} canvas`).focus()}
-              additionalButtons={[
-                <Button
-                  key='full-screen'
-                  variant="secondary"
-                  onClick={() => setIsFullScreen(true)}
-                >
-                  {msg.fullScreen()}
-                </Button>,
-              ]}
-            />
-          </div>
-        )
-      case C.DISCONNECTED_CONSOLE:
-        return (
-          <InfoPageContainer
-            icon={disconnectIcon}
-            mainText={msg.disconectedConsole()}
-            secondaryText={disconnectReason === 'CONNECTION_FAILURE'
-              ? <span dangerouslySetInnerHTML={{ __html: msg.connectionFailConsoleInfo() }} />
-              : msg.disconectedConsoleInfo()}
-            secondaryComponent={<Button bsStyle='primary' onClick={openConsole}>{ msg.connect() }</Button>}
-          />
-        )
-    }
-  }
-
-  if (isNativeConsole(consoleType) && consoleStatus === C.DOWNLOAD_CONSOLE) {
-    const [nativeMainText, nativeSecondaryText] = getNativeConsoleMessages()
+  if (consoleStatus === C.DISCONNECTED_CONSOLE || consoleStatus === C.INIT_CONSOLE) {
     return (
-      <InfoPageContainer
-        icon={downloadIcon}
-        mainText={nativeMainText}
-        secondaryText={nativeSecondaryText}
-      />
+      <AccessConsoles preselectedType={constants.VNC_CONSOLE_TYPE}>
+        <VncConsole
+          encrypt
+          shared
+          resizeSession
+          scaleViewport
+          textConnect={msg.connect()}
+          textConnecting={msg.connecting()}
+          textDisconnected={
+              disconnectReason === 'CONNECTION_FAILURE'
+                ? msg.connectionFailConsoleInfo()
+                : msg.disconectedConsoleInfo()
+            }
+          textDisconnect={msg.disconnect()}
+          textSendShortcut={msg.sendShortcutKey()}
+          textCtrlAltDel={msg.sendCtrlAltDel()}
+
+          credentials={{ password: ticket.value }}
+          path={proxyTicket}
+          host={websocketHost}
+          port={websocketPort}
+          consoleContainerId={NOVNC_CONTAINER_ID}
+
+          onDisconnected={(e) => e?.detail?.clean ? onDisconnected() : onDisconnected('CONNECTION_FAILURE')}
+          onConnected={focusOnConsole}
+          wsProtocols={['binary']}
+          className={isFullScreen ? style['full-screen'] : style['in-page']}
+
+          onInitFailed={(e) => onFailure({ reason: e?.detail?.reason, messageId: 'vncConsoleInitializationFailed' })}
+          onSecurityFailure={(e) => onFailure({ reason: e?.detail?.reason, messageId: 'vncConsoleHandshakeFailed' })}
+
+          additionalButtons={[
+            <Button
+              key='full-screen'
+              variant="secondary"
+              onClick={() => setIsFullScreen(true)}
+            >
+              {msg.fullScreen()}
+            </Button>,
+          ]}
+        />
+      </AccessConsoles>
     )
   }
 
@@ -216,6 +186,7 @@ VmConsole.propTypes = {
   onDisconnected: PropTypes.func.isRequired,
   goToDetails: PropTypes.func.isRequired,
   openConsole: PropTypes.func.isRequired,
+  displayError: PropTypes.func.isRequired,
 }
 
 export default connect(
@@ -235,6 +206,6 @@ export default connect(
         consoleType,
         openInPage: true,
       })),
-
+    displayError: (message) => dispatch(Actions.addUserMessage({ ...message, type: 'error' })),
   })
 )(withMsg(VmConsole))

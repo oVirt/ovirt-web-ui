@@ -75,6 +75,25 @@ body {
   padding-top: 20px;
 }
 
+#page-router-render-component .pf-c-console {
+    grid-template-rows: min-content 1fr;
+    padding-top: 0;
+    row-gap: 0;
+}
+
+/* follow the styling used by the toolbars
+* see: .portaled-toolbars-padding
+*/
+.pf-c-console  .pf-c-console__actions-vnc {
+  padding-right: 1rem;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.pf-c-console .pf-c-console__vnc{
+    position: relative;
+}
+
 a.disabled {
   color: #8b8d8f !important;
   cursor: not-allowed !important;

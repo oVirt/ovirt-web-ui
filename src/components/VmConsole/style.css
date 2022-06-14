@@ -1,88 +1,11 @@
-.modal-container div {
-    margin-top: 10px;
-}
-
-.modal-container h3 {
-    margin-top: 0;
-}
-
-.console-detail-container {
-    display: flex;
-}
-
-:global(.toolbar-pf .form-group) .color-blue {
-    color: #0088ce;
-}
-
-.console-detail-container dt {
-    clear: left;
-    float: left;
-    width: 100px;
-    min-height: 26px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    font-weight: normal;
-    text-align: right;
-    margin-right: 20px;
-    font-weight: bold;
-    line-height: 2;
-}
-
-.console-detail-container dd {
-    margin-left: 110px;
-    min-height: 26px;
-    max-width: 1000px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding-top: 2px;
-}
-
-.console-dropdown-label {
-	margin-right: 10px;
-}
-
-.console-dropdown-box {
-	margin-right: 10px;
-}
-
-.download-page-container {
-	display: flex;
-    justify-content: center;
-}
-
-
-.download-page-content {
-    margin-top: auto;
-    margin-bottom: auto;
-    text-align: center;
-}
-
-.download-page-content img {
-    width: 100px;
-}
-
-.download-page-main-text {
-	display: block;
-    font-size: 25px;
-    margin-top: 20px;
-}
-
-.download-page-secondary-text {
-	display: block;
-    font-size: 15px;
-    margin-top: 20px;
-}
-
 .full-screen :global(#novnc-console-container) {
     height: 100%;
 }
 
-.toast-message {
-  text-align: center;
-  align-content: center;
-  margin-top: 60px;
-  position: absolute;
-  width: 100%;
-  padding-left: 30%;
-  padding-right: 30%;
+.in-page :global(#novnc-console-container) {
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    position: absolute;
 }
