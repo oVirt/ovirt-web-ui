@@ -1,4 +1,4 @@
-import { takeEvery, put } from 'redux-saga/effects'
+import { takeEvery, put, select } from 'redux-saga/effects'
 
 import Api, { Transforms } from '_/ovirtapi'
 import { callExternalAction, delay, delayInMsSteps } from '_/sagas/utils'
@@ -13,9 +13,11 @@ import {
   updateVmSnapshot,
   startActionInProgress,
   stopActionInProgress,
+  addUserMessage,
 } from '_/actions'
 
 import { ADD_VM_SNAPSHOT, DELETE_VM_SNAPSHOT, RESTORE_VM_SNAPSHOT } from './constants'
+import { toJS } from '_/helpers'
 
 function* addVmSnapshot (action) {
   const { vmId } = action.payload
@@ -68,6 +70,10 @@ function* deleteVmSnapshot (action) {
 
 function* restoreVmSnapshot (action) {
   const { vmId, snapshotId } = action.payload
+  const [{ description: snapshotName } = {}, vmName] = yield select(({ vms }) => [
+    toJS(vms.getIn(['vms', vmId, 'snapshots'], [])).find(({ id }) => id === snapshotId),
+    vms.getIn(['vms', vmId, 'name']),
+  ])
   yield put(addSnapshotRestorePendingTask(vmId, snapshotId))
   yield put(startActionInProgress({ vmId, name: 'restoreSnapshot' }))
 
@@ -75,6 +81,10 @@ function* restoreVmSnapshot (action) {
 
   yield put(stopActionInProgress({ vmId, name: 'restoreSnapshot', result }))
   yield put(removeSnapshotRestorePendingTask(vmId, snapshotId))
+  if (!result.error) {
+    // restore is synchronous operation so we can interpret completed operation as success
+    yield put(addUserMessage({ messageDescriptor: { id: 'restoredSnapshot', params: { snapshotName, vmName } }, type: 'SUCCESS' }))
+  }
 }
 
 export default [
