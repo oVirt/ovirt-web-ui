@@ -390,7 +390,20 @@ export function* fetchAllVmEvents (action) {
     return
   }
 
-  const internalEvents = events.map(event => Transforms.Event.toInternal({ event }))
+  const { filterForUser, userId, userName } = yield select(({ config }) => ({
+    filterForUser: config.get('filter'),
+    userId: config.getIn(['user', 'id']),
+    userName: `${config.getIn(['user', 'name'])}@${config.get('domain')}`,
+  }))
+
+  const internalEvents = events
+    .filter(({ user }) =>
+      filterForUser
+        ? user && (user?.id === userId || user?.name === userName)
+        : true
+    )
+    .map(event => Transforms.Event.toInternal({ event }))
+
   yield put(addVmEvents({ events: internalEvents, vmId }))
 }
 
@@ -402,7 +415,20 @@ export function* fetchLastVmEvents (action) {
     return
   }
 
-  const internalEvents = events.map(event => Transforms.Event.toInternal({ event }))
+  const { filterForUser, userId, userName } = yield select(({ config }) => ({
+    filterForUser: config.get('filter'),
+    userId: config.getIn(['user', 'id']),
+    userName: `${config.getIn(['user', 'name'])}@${config.get('domain')}`,
+  }))
+
+  const internalEvents = events
+    .filter(({ user }) =>
+      filterForUser
+        ? user && (user?.id === userId || user?.name === userName)
+        : true
+    )
+    .map(event => Transforms.Event.toInternal({ event }))
+
   yield put(addLastVmEvents({ events: internalEvents, vmId }))
 }
 
