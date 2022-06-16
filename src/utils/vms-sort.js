@@ -11,14 +11,17 @@ const getFieldValueMap = (msg) => ({
 export const SortFields = {
   NAME: {
     id: 'name',
+    isNumeric: false,
     messageDescriptor: { id: 'name' },
   },
   OS: {
     id: 'os',
+    isNumeric: false,
     messageDescriptor: { id: 'operatingSystem' },
   },
   STATUS: {
     id: 'status',
+    isNumeric: false,
     messageDescriptor: { id: 'status' },
   },
 }
