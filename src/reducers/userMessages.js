@@ -1,22 +1,17 @@
 // @flow
 import * as Immutable from 'immutable'
-import { fromJS } from 'immutable'
 import {
-  ADD_LAST_VM_EVENTS,
   ADD_USER_MESSAGE,
-  ADD_VM_EVENTS,
   AUTO_ACKNOWLEDGE,
   DISMISS_USER_MSG,
   FAILED_EXTERNAL_ACTION,
   LOGIN_FAILED,
-  SET_EVENT_SORT,
   SET_USERMSG_NOTIFIED,
   SET_SERVER_MESSAGES,
-  SAVE_EVENT_FILTERS,
   CLEAR_USER_MSGS,
 } from '_/constants'
 import { actionReducer } from './utils'
-import { localeCompare, toJS } from '_/helpers'
+import { toJS } from '_/helpers'
 import uniqueId from 'lodash/uniqueId'
 
 import type { FailedExternalActionType } from '_/actions/types'
@@ -43,8 +38,6 @@ function removeEvents (targetIds: Set<string>, state: any): any {
 
 const initialState = Immutable.fromJS({
   records: [],
-  events: {},
-  lastEvents: {},
   autoAcknowledge: false,
 })
 
@@ -102,28 +95,6 @@ const userMessages: any = actionReducer(initialState, {
 
   [AUTO_ACKNOWLEDGE] (state: any, { payload: { autoAcknowledge = false } }: any): any {
     return state.set('autoAcknowledge', autoAcknowledge)
-  },
-
-  [ADD_VM_EVENTS] (state: any, { payload: { events, vmId } }: any): any {
-    const existingEvents = toJS(state.getIn(['events', vmId], []))
-    const existingIds = new Set(existingEvents.map(({ id }) => id))
-    const filteredEvents = events
-      // keep events unique
-      .filter(({ id, ...rest }) => !existingIds[id])
-      // keep events sorted in descending order
-      .sort((a, b) => localeCompare(b?.id ?? '', a?.id ?? '', 'en'))
-
-    // newest first
-    return state.setIn(['events', vmId], fromJS([...filteredEvents, ...existingEvents]))
-  },
-  [ADD_LAST_VM_EVENTS] (state: any, { payload: { events, vmId } }: any): any {
-    return state.setIn(['lastEvents', vmId], fromJS(events))
-  },
-  [SAVE_EVENT_FILTERS] (state: any, { payload: { filters } }: any): any {
-    return state.setIn(['eventFilters'], fromJS(filters))
-  },
-  [SET_EVENT_SORT] (state: any, { payload: { sort } }: any): any {
-    return state.setIn(['eventSort'], fromJS(sort))
   },
 
 })
