@@ -79,7 +79,7 @@ make install DESTDIR=%{buildroot}
 
 * Wed Mar 30 2022 Sharon Gratch <sgratch@redhat.com> - 1.8.1-1
  - fix a bug for removing deleted pool entities from VMs dashboard after refresh for the last pool
- - add an option to trigger ost run with "/ost" via Github
+ - add an option to trigger OST run with "/ost" via Github
 
 * Tue Mar 15 2022 Sharon Gratch <sgratch@redhat.com> - 1.8.0-1
  - user/account settings - support auto connect for a VM
