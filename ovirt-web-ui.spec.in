@@ -60,6 +60,23 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Fri Jun 17 2022 Sharon Gratch <sgratch@redhat.com> - 1.9.0-1
+ - migrate all VM Portal components from PatternFly 3 to PatternFly 4. No use of PatternFly 3 anymore
+ - migrate from Webpack 4 to Webpack 5 and use newest versions of Webpack plugins
+ - user/account settings - display the notification settings tooltip as hint instead
+ - VM details - allow a user to consume ISO images without granting a 'create disk' permission
+ - VM details snapshots card - display notification after a successful snapshot restore
+ - VM details snapshots card - fix a bug so that after deleting an existing snapshot, the 'create snapshot' button won't stay disabled
+ - VM details snapshots card - fix a bug so that the snapshots locking mechanism is for the current VM only
+ - add new NIC type "e1000e"
+ - i18n: add support for Georgian language as a community translation
+ - i18n: translations update, expire translations after zanata push
+ - i18n: pull translations for Georgian language (ka-GE)
+ - build: use hours, minutes and seconds in RPM snapshot name, version part
+ - build: mark the Copr make_srpm git dir as safe (git 2.35.2 security fix)
+ - github actions: add an offline build for el9
+ - update dependencies of caniuse-lite for browserslist to version 1.0.30001346
+
 * Wed Mar 30 2022 Sharon Gratch <sgratch@redhat.com> - 1.8.1-1
  - fix a bug for removing deleted pool entities from VMs dashboard after refresh for the last pool
  - add an option to trigger ost run with "/ost" via Github
