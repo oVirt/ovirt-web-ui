@@ -26,7 +26,17 @@ import { isRunning } from '../utils'
 const NOVNC_CONTAINER_ID = 'novnc-console-container'
 
 const focusOnConsole = () => document.querySelector(`#${NOVNC_CONTAINER_ID} canvas`)?.focus()
-
+/**
+ * Use cases with expected console states:
+ * 1) happy path: INIT_CONSOLE
+ *    when: console opened from different page, new credentials were fetched before
+ * 2) direct via URL: <none> -> OPENING_IN_PROGRESS -> INIT_CONSOLE
+ *    when: user visited the page directly via URL and credentials are being fetched as the page loads
+ *    limitations: auto full screen won't work because it's not triggered via user gesture
+ * 3) re-connect: INIT_CONSOLE -> DISCONNECTED_CONSOLE -> RECONNECTED_CONSOLE
+ *    when: user opened the console, disconnected and connected again using the same credentials
+ *    limitations: credentials will expire at some point
+ */
 const VmConsole = ({
   consoleType,
   vmId,
@@ -40,6 +50,7 @@ const VmConsole = ({
   goToDetails,
   openConsole,
   displayError,
+  onReconnected,
 }) => {
   const [isFullScreen, setIsFullScreen] = useState(fullScreenNoVnc)
   const isVmRunning = isRunning(vm.get('status'))
@@ -81,7 +92,13 @@ const VmConsole = ({
   useEffect(() => {
     const onFullScreen = () => {
       const elem = document.getElementById(NOVNC_CONTAINER_ID)
-      if (!elem) {
+      const requestFullscreen = elem?.requestFullscreen ??
+      elem?.mozRequestFullScreen ?? /* old Firefox */
+      elem?.webkitRequestFullscreen ?? /* old Chrome, Safari & Opera */
+      elem?.msRequestFullscreen /* old IE/Edge */
+
+      if (!elem || !requestFullscreen) {
+        setIsFullScreen(false)
         return
       }
 
@@ -93,17 +110,13 @@ const VmConsole = ({
         }
       }
 
-      // in dev mode fullscreen may fail if triggered by WebPack with the following:
-      // Failed to execute 'requestFullscreen' on 'Element': API can only be initiated by a user gesture
-      const requestResult = elem?.requestFullscreen() ??
-      elem?.mozRequestFullScreen() ?? /* old Firefox */
-      elem?.webkitRequestFullscreen() ?? /* old Chrome, Safari & Opera */
-      elem?.msRequestFullscreen() /* old IE/Edge */
-
-      requestResult?.catch?.((error) => {
-        console.error(error)
+      requestFullscreen.bind(elem)()?.catch?.((error) => {
         // ignore error if request was rejected - example cause on FF:
-        // Request for fullscreen was denied because requesting element is no longer in its document.
+        // -> Request for fullscreen was denied because requesting element is no longer in its document.
+        // -> Failed to execute 'requestFullscreen' on 'Element': API can only be initiated by a user gesture
+        console.warn(error)
+        // re-synchronize the flag with the display
+        setIsFullScreen(false)
       })
     }
     if (isFullScreen) {
@@ -116,7 +129,7 @@ const VmConsole = ({
     return null
   }
 
-  if (consoleStatus === C.DISCONNECTED_CONSOLE || consoleStatus === C.INIT_CONSOLE) {
+  if (consoleStatus === C.DISCONNECTED_CONSOLE || consoleStatus === C.INIT_CONSOLE || consoleStatus === C.RECONNECTED_CONSOLE) {
     return (
       <AccessConsoles preselectedType={constants.VNC_CONSOLE_TYPE}>
         <VncConsole
@@ -142,7 +155,7 @@ const VmConsole = ({
           consoleContainerId={NOVNC_CONTAINER_ID}
 
           onDisconnected={(e) => e?.detail?.clean ? onDisconnected() : onDisconnected('CONNECTION_FAILURE')}
-          onConnected={focusOnConsole}
+          onConnected={() => consoleStatus === C.INIT_CONSOLE ? focusOnConsole() : onReconnected() }
           wsProtocols={['binary']}
           className={isFullScreen ? style['full-screen'] : style['in-page']}
 
@@ -183,6 +196,7 @@ VmConsole.propTypes = {
   msg: PropTypes.object.isRequired,
   fullScreenNoVnc: PropTypes.bool.isRequired,
 
+  onReconnected: PropTypes.func.isRequired,
   onDisconnected: PropTypes.func.isRequired,
   goToDetails: PropTypes.func.isRequired,
   openConsole: PropTypes.func.isRequired,
@@ -199,6 +213,7 @@ export default connect(
   }),
   (dispatch, { vmId, consoleType }) => ({
     onDisconnected: (reason) => dispatch(Actions.setConsoleStatus({ vmId, status: C.DISCONNECTED_CONSOLE, reason, consoleType: C.BROWSER_VNC })),
+    onReconnected: () => dispatch(Actions.setConsoleStatus({ vmId, status: C.RECONNECTED_CONSOLE, consoleType: C.BROWSER_VNC })),
     goToDetails: () => dispatch(push(`/vm/${vmId}`)),
     openConsole: () => dispatch(
       Actions.openConsole({
