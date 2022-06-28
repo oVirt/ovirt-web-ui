@@ -72,7 +72,7 @@ const VmsPageHeader = ({ appReady, onRefresh, onCloseNotificationDrawer, isDrawe
             {appReady && (
               <ToolbarItem>
                 <Tooltip id={`${idPrefix}-tooltip`} tooltip={msg.accountSettings()} placement='bottom'>
-                  <Button aria-label={msg.accountSettings()} variant={ButtonVariant.plain} onClick={goToSettings} id={`${idPrefix}-refresh`}>
+                  <Button aria-label={msg.accountSettings()} variant={ButtonVariant.plain} onClick={goToSettings} id={`${idPrefix}-settings`}>
                     <CogIcon />
                   </Button>
                 </Tooltip>
