@@ -13,7 +13,7 @@ const Header = ({ children }) => {
   return (
     <Masthead className='obrand_masthead' display={{ default: 'inline' }}>
       <MastheadMain>
-        <MastheadBrand className='obrand_headerLogoLink' id='pageheader-logo'>
+        <MastheadBrand className='obrand_headerLogoLink' id='pageheader-logo' href="/">
           <Brand className='obrand_mastheadLogo' src={resourcesUrls.clearGif}/>
         </MastheadBrand>
       </MastheadMain>
