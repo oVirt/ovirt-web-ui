@@ -49,6 +49,7 @@ function* composeAndCreateVm ({ payload: { basic, nics, disks }, meta: { correla
       name: basic.timeZone.name,
       utc_offset: basic.timeZone.offset,
     },
+    tpm_enabled: basic.tpmEnabled,
 
     initialization: basic.cloudInitEnabled
       ? {

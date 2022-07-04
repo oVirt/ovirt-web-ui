@@ -12,6 +12,7 @@ import {
   checkTimeZone,
   isOsLinux,
   isOsWindows,
+  isTpmRequired,
 } from '../helpers'
 
 import {
@@ -322,6 +323,7 @@ class BasicSettings extends React.Component {
         changes.initTimezone = this.props.data.cloudInitEnabled && this.props.data.enableInitTimezone && isOsWindows(value, this.props.operatingSystems)
           ? this.props.data.lastInitTimezone // set the sysprep timezone as the last selected sysprep timezone
           : ''
+        changes.tpmEnabled = isTpmRequired(value, this.props.operatingSystems) || undefined
         break
       }
 

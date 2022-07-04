@@ -72,6 +72,7 @@ const handleProvisionSourceChange = (provisionSource, { defaultValues, defaultGe
   changes.isoImage = undefined
   changes.templateId = undefined
   changes.operatingSystemId = verifyOsIdToCluster(defaultValues.operatingSystemId, clusterId, { clusters, operatingSystems })
+  changes.tpmEnabled = isTpmRequired(changes.operatingSystemId, operatingSystems) || undefined
   changes.memory = defaultValues.memory
   changes.cpus = defaultValues.cpus
   changes.topology = defaultValues.topology
@@ -99,6 +100,7 @@ const handleTemplateIdChange = (templateId, defaultOptimizedFor, { templates, op
     .find(os => os.get('name') === template.getIn(['os', 'type']))
     .get('id')
   changes.operatingSystemId = verifyOsIdToCluster(suggestedOs, clusterId, { clusters, operatingSystems })
+  changes.tpmEnabled = isTpmRequired(changes.operatingSystemId, operatingSystems) || undefined
   // Check template's timezone compatibility with the template's OS, set the timezone corresponding to the template's OS
   changes.timeZone = checkTimeZone(changes.operatingSystemId, changes.templateId, { defaultGeneralTimezone, defaultWindowsTimezone, templates, operatingSystems })
   changes.cloudInitEnabled = template.getIn(['cloudInit', 'enabled'])
@@ -163,12 +165,32 @@ const verifyOsIdToCluster = (selectedOsId, clusterId, { clusters, operatingSyste
   return selectedOs ? selectedOs.get('id') : '0'
 }
 
+const isTpmRequired = (operatingSystemId, operatingSystems) => {
+  return operatingSystems.getIn([operatingSystemId, 'tpmSupport']) === 'required'
+}
+
+const getTpmChange = (operatingSystemId, operatingSystems) => {
+  const tpmSupport = operatingSystems.getIn([operatingSystemId, 'tpmSupport'])
+  switch (tpmSupport) {
+    case 'required':
+      return true
+    case 'unsupported':
+      return false
+    case 'supported':
+    default:
+      // no change
+      return undefined
+  }
+}
+
 export {
+  getTpmChange,
   handleClusterIdChange,
   handleProvisionSourceChange,
   handleTemplateIdChange,
   checkTimeZone,
   isOsWindows,
   isOsLinux,
+  isTpmRequired,
   verifyOsIdToCluster,
 }

@@ -57,6 +57,8 @@ import FieldRow from './FieldRow'
 import { Tooltip, InfoTooltip } from '_/components/tooltips'
 
 import timezones from '_/components/utils/timezones.json'
+import { getTpmChange } from '_/components/CreateVmWizard/helpers'
+import ConfirmationModal from '_/components/VmActions/ConfirmationModal'
 
 function rephraseVmType (vmType, msg) {
   const types = {
@@ -137,6 +139,7 @@ class DetailsCard extends React.Component {
     this.hotPlugNow = true
     this.nextRunUpdates = {}
     this.restartAfterSave = false
+    this.tpmUpdate = false
 
     this.handleCardOnStartEdit = this.handleCardOnStartEdit.bind(this)
     this.handleChange = this.handleChange.bind(this)
@@ -381,8 +384,12 @@ class DetailsCard extends React.Component {
         case 'os': {
           fieldUpdated = 'os'
           const os = operatingSystems.find(os => os.get('id') === value)
+          const tpmChange = getTpmChange(os.get('id'), operatingSystems)
           updates = this.updateOs(updates, os)
-
+          if (tpmChange !== undefined) {
+            updates = updates.set('tpmEnabled', tpmChange)
+            this.tpmUpdate = true
+          }
           const timeZoneName = updates.getIn(['timeZone', 'name'])
           const isWindowsTimeZone = timezones.find(timezone => timezone.id === timeZoneName)
           const isWindowsVm = isWindows(os.get('name'))
@@ -498,6 +505,7 @@ class DetailsCard extends React.Component {
 
   handleCardOnSave () {
     const isVmRunning = this.props.vm.get('status') === 'up'
+    const tpmEnabled = this.props.vm.get('tpmEnabled')
 
     if (Object.keys(this.trackUpdates).length === 0) {
       this.handleCardOnCancel()
@@ -511,8 +519,14 @@ class DetailsCard extends React.Component {
     const { maxNumOfVmCpus } = this.grabCpuOptions()
     const vCpuCount = this.state.vm.getIn(['cpu', 'vCPUs'])
     const vCpuCountIsValid = isNumberInRange(vCpuCount, 0, maxNumOfVmCpus)
+    const { vm: stateVm } = this.state
 
     if (!vCpuCountIsValid) {
+      return
+    }
+
+    if (this.tpmUpdate && tpmEnabled && stateVm.get('tpmEnabled') === false) {
+      this.setState({ promptTpmDisabled: true })
       return
     }
 
@@ -528,7 +542,6 @@ class DetailsCard extends React.Component {
       return
     }
 
-    const { vm: stateVm } = this.state
     const correlationId = generateUnique('DetailsCard-save_')
 
     // --- Create a partial VM (in the internal format expected by editVm() saga),
@@ -590,6 +603,9 @@ class DetailsCard extends React.Component {
         vmUpdates.os = {}
       }
       vmUpdates.os.type = stateVm.getIn(['os', 'type'])
+      if (tpmEnabled !== stateVm.get('tpmEnabled')) {
+        vmUpdates.tpmEnabled = stateVm.get('tpmEnabled')
+      }
     }
 
     if (this.trackUpdates.memory) {
@@ -649,6 +665,12 @@ class DetailsCard extends React.Component {
     this.hotPlugUpdates = {}
     this.hotPlugNow = true
     this.setState({ promptHotPlugChanges: false })
+    this.handleCardOnSave()
+  }
+
+  handleTpmDisabled () {
+    this.tpmUpdate = false
+    this.setState({ promptTpmDisabled: false })
     this.handleCardOnSave()
   }
 
@@ -782,6 +804,14 @@ class DetailsCard extends React.Component {
           onApplyLater={this.handleHotPlugOnApplyLater}
           onApplyNow={this.handleHotPlugOnApplyNow}
         />
+        <ConfirmationModal
+          show={this.state.promptTpmDisabled}
+          onClose={() => this.setState({ promptTpmDisabled: false })}
+          title={msg.disableTpmDevice()}
+          variant='danger'
+          body={msg.tpmNotSupportedByTheSystem()}
+          confirm={{ type: 'danger', title: msg.yes(), onClick: this.handleTpmDisabled }}
+        />
         <BaseCard
           title={msg.cardTitleDetails()}
           editable={canEditDetails || canChangeCd}
@@ -906,7 +936,7 @@ class DetailsCard extends React.Component {
                           id={`${idPrefix}-cpus`}
                           tooltip={(
                             <div>
-                              <span>The total virtual CPUs include:</span>
+                              <span>{msg.totalVirtualCpuInclude()}</span>
                               <ul className={style['cpu-tooltip-list']} >
                                 <li>{msg.totalSocketsCpuTooltipMessage({ number: numOfSockets })}</li>
                                 <li>{msg.totalCoresCpuTooltipMessage({ number: numOfCores })}</li>
