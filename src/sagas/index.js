@@ -21,8 +21,6 @@ import sagasVmChanges from './vmChanges'
 import sagasVmSnapshots from '_/components/VmDetails/cards/SnapshotsCard/sagas'
 
 import {
-  addLastVmEvents,
-  addVmEvents,
   updateVms,
   setVmSnapshots,
 

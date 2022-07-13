@@ -26,17 +26,14 @@ import { delay } from './utils'
 import {
   fetchAndPutSingleVm,
   fetchByPage,
-  fetchLastVmEvents,
   fetchPools,
   fetchSinglePool,
   fetchSingleVm,
-  fetchAllVmEvents,
   fetchVms,
 } from './index'
 import { getConsoleOptions } from './console'
 import { fetchIsoFiles } from './storageDomains'
 import { fetchUnknownIcons } from './osIcons'
-import { toJS } from '_/helpers'
 
 const BACKGROUND_REFRESH = 'BACKGROUND_REFRESH'
 
@@ -116,7 +113,6 @@ const pagesRefreshers = {
   [C.CREATE_PAGE_TYPE]: refreshCreatePage,
   [C.CONSOLE_PAGE_TYPE]: refreshConsolePage,
   [C.SETTINGS_PAGE_TYPE]: loadUserOptions,
-  [C.EVENTS_PAGE_TYPE]: refreshEventsPage,
 }
 
 function* refreshListPage () {
@@ -211,12 +207,8 @@ function* refreshListPage () {
 }
 
 function* refreshDetailPage ({ id: vmId, manualRefresh }) {
-  const { internalVm } = yield fetchAndPutSingleVm(Actions.getSingleVm({ vmId }))
+  yield fetchAndPutSingleVm(Actions.getSingleVm({ vmId }))
   yield getConsoleOptions(Actions.getConsoleOptions({ vmId }))
-
-  if (internalVm?.name) {
-    yield fetchLastVmEvents(Actions.getVmEvents({ vmId, vmName: internalVm.name, maxItems: 2 }))
-  }
 
   // TODO: If the VM is from a Pool, refresh the Pool as well.
 
@@ -240,21 +232,6 @@ function* refreshCreatePage ({ id: vmId, manualRefresh }) {
 function* refreshConsolePage ({ id: vmId }) {
   if (vmId) {
     yield fetchAndPutSingleVm(Actions.getSingleVm({ vmId, shallowFetch: true }))
-  }
-}
-
-function* refreshEventsPage ({ id: vmId }) {
-  if (!vmId) {
-    return
-  }
-  const { internalVm } = yield fetchAndPutSingleVm(Actions.getSingleVm({ vmId, shallowFetch: true }))
-  const [[newestEvent]] = yield select(({ userMessages }) => [
-    toJS(userMessages.getIn(['events', vmId], [])),
-  ])
-
-  const vmName = internalVm?.name
-  if (vmName) {
-    yield fetchAllVmEvents(Actions.getVmEvents({ vmId, vmName, newestEventId: newestEvent?.id, maxItems: 500 }))
   }
 }
 
