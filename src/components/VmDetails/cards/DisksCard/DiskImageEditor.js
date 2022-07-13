@@ -381,7 +381,7 @@ class DiskImageEditor extends Component {
                 <NumberInput
                   id={`${idPrefix}-size-edit`}
                   value={this.state.values.size}
-                  onChange={({ target: { value } }) => this.changeSize(value)}
+                  onChange={event => this.changeSize(Number(event?.target?.value))}
                   onMinus={() => this.changeSize(this.state.values.size - 1)}
                   onPlus={() => this.changeSize(this.state.values.size + 1)}
                   min={0}
