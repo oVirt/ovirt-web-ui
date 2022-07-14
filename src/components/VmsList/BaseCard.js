@@ -127,7 +127,7 @@ const BaseCard = ({ children, idPrefix, topLineColor = 'transparent' }) => {
   })
   return (
     <IdPrefixContext.Provider value={idPrefix}>
-      <Card style={topBorderStyling}>
+      <Card style={topBorderStyling} id={`${idPrefix}-box`}>
         {childs[BaseCardHeader.displayName]}
         <CardBody>
           <div className={style['card-icon']}>
