@@ -925,7 +925,7 @@ class DetailsCard extends React.Component {
                                 max={MAX_VM_VCPU_EDIT}
                                 value={vCpuCount}
                                 widthChars={5}
-                                onChange={e => this.handleChange('cpu', e.target.value)}
+                                onChange={e => this.handleChange('cpu', Number(e?.target?.value))}
                                 onPlus={() => this.handleChange('cpu', vCpuCount + 1)}
                                 onMinus={() => this.handleChange('cpu', vCpuCount - 1)}
                               />
@@ -948,7 +948,7 @@ class DetailsCard extends React.Component {
                             <NumberInput
                               id={`${idPrefix}-memory-edit`}
                               value={(memorySize / (1024 ** 2))}
-                              onChange={e => this.handleChange('memory', e.target.value)}
+                              onChange={e => this.handleChange('memory', Number(e?.target?.value))}
                               unit='MiB'
                               widthChars={5}
                               onPlus={() => this.handleChange('memory', (memorySize / (1024 ** 2)) + 1)}

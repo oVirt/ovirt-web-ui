@@ -595,7 +595,7 @@ class BasicSettings extends React.Component {
               id={`${idPrefix}-memory-edit`}
               className={style['memory-input']}
               value={data.memory}
-              onChange={value => this.handleChange('memory', value)}
+              onChange={event => this.handleChange('memory', Number(event?.target?.value)) }
               min={0}
               onMinus={() => this.handleChange('memory', data.memory - 1) }
               onPlus={() => this.handleChange('memory', data.memory + 1) }
@@ -614,7 +614,7 @@ class BasicSettings extends React.Component {
               id={`${idPrefix}-cpus-edit`}
               className={style['cpus-input']}
               value={data.cpus}
-              onChange={value => this.handleChange('cpus', value)}
+              onChange={event => this.handleChange('cpus', Number(event?.target?.value))}
               min={0}
               onMinus={() => this.handleChange('cpus', data.cpus - 1)}
               onPlus={() => this.handleChange('cpus', data.cpus + 1)}
