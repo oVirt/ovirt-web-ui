@@ -11,19 +11,51 @@ import {
   Tr,
 } from '@patternfly/react-table'
 
-import { toJS, translate } from '_/helpers'
+import { translate } from '_/helpers'
 
-import { saveEventFilters, setVmSort } from '_/actions'
-import { NAME, SortFields } from '_/utils'
+import { setVmSort } from '_/actions'
+import {
+  SortFields,
+  ICON,
+  POOL_INFO,
+  ACTIONS,
+  NAME,
+  OS,
+  STATUS,
+} from '_/utils'
+
+import {
+  TableVm,
+} from './Vm'
+import {
+  TablePool,
+} from './Pool'
 
 const TableView = ({
   msg,
   locale,
-  children: rows,
-  columns,
+  vmsAndPools,
   sort,
   setSort,
 }) => {
+  const columns = [
+    { id: ICON },
+    {
+      ...SortFields[NAME],
+      sort: true,
+    },
+    {
+      ...SortFields[STATUS],
+      sort: true,
+    },
+    { id: POOL_INFO },
+    {
+      ...SortFields[OS],
+      sort: true,
+    },
+    { id: ACTIONS },
+  ]
+
   const activeSortIndex = columns.findIndex(({ id }) => id === sort.id)
   const activeSortDirection = sort.isAsc ? 'asc' : 'desc'
 
@@ -42,7 +74,7 @@ const TableView = ({
   })
   return (
     <>
-      { rows?.length > 0 && (
+      { vmsAndPools?.length > 0 && (
         <TableComposable
           aria-label={msg.virtualMachines()}
           variant='compact'
@@ -62,7 +94,23 @@ const TableView = ({
             </Tr>
           </Thead>
           <Tbody>
-            { rows}
+            { vmsAndPools.map(entity => (
+              entity.get('isVm')
+                ? (
+                  <TableVm
+                    columns={columns}
+                    key={entity.get('id')}
+                    vm={entity}
+                  />
+                )
+                : (
+                  <TablePool
+                    columns={columns}
+                    key={entity.get('id')}
+                    pool={entity}
+                  />
+                )
+            ))}
           </Tbody>
         </TableComposable>
       ) }
@@ -71,15 +119,9 @@ const TableView = ({
 }
 
 TableView.propTypes = {
-  columns: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      messageDescriptor: PropTypes.object,
-      sort: PropTypes.bool,
-    })).isRequired,
   msg: PropTypes.object.isRequired,
   locale: PropTypes.string.isRequired,
-  children: PropTypes.array.isRequired,
+  vmsAndPools: PropTypes.array.isRequired,
   sort: PropTypes.shape({
     id: PropTypes.string.isRequired,
     isAsc: PropTypes.bool,
@@ -88,13 +130,8 @@ TableView.propTypes = {
 }
 
 export default connect(
-  ({ userMessages }, { vmId }) => ({
-    events: toJS(userMessages.getIn(['events', vmId])),
-    eventFilters: toJS(userMessages.getIn(['eventFilters'], {})),
-    eventSort: toJS(userMessages.getIn(['eventSort'])),
-  }),
+  null,
   (dispatch) => ({
-    clearAllFilters: () => dispatch(saveEventFilters({ filters: {} })),
     setSort: (sort) => dispatch(setVmSort({ sort })),
   })
 )(withMsg(TableView))
