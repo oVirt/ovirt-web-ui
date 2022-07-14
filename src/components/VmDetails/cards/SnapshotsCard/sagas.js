@@ -70,12 +70,16 @@ function* deleteVmSnapshot (action) {
 
 function* restoreVmSnapshot (action) {
   const { vmId, snapshotId } = action.payload
-  const [{ description: snapshotName } = {}, vmName] = yield select(({ vms }) => [
+  const [snapshot = {}, vmName] = yield select(({ vms }) => [
     toJS(vms.getIn(['vms', vmId, 'snapshots'], [])).find(({ id }) => id === snapshotId),
     vms.getIn(['vms', vmId, 'name']),
   ])
+  const { description: snapshotName = '' } = snapshot
+
   yield put(addSnapshotRestorePendingTask(vmId, snapshotId))
   yield put(startActionInProgress({ vmId, name: 'restoreSnapshot' }))
+  // snapshot will be unlocked on the next refresh together with the VM
+  yield put(updateVmSnapshot({ vmId, snapshot: { ...snapshot, status: 'locked' } }))
 
   const result = yield callExternalAction(Api.restoreSnapshot, action)
 
