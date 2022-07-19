@@ -38,9 +38,6 @@ dnl TODO: Fail if rpmbuild is not present
 PACKAGE_RPM_SUFFIX=${PACKAGE_RPM_SUFFIX:-"%{?release_suffix}"}
 AC_ARG_VAR([PACKAGE_RPM_SUFFIX], [suffix to use on the rpm's release string])
 
-OFFLINE_BUILD=${OFFLINE_BUILD:-1}
-AC_ARG_VAR([OFFLINE_BUILD], [control if rpm builds will use an offline build via ovirt-engine-nodejs-modules (1) or should use an online build (0)])
-
 AC_CONFIG_FILES([
 	Makefile
 	ovirt-web-ui.spec

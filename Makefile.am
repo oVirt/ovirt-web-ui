@@ -64,6 +64,7 @@ TMPREPOS = tmp.repos
 RPMBUILD_ARGS :=
 RPMBUILD_ARGS += --define="_topdir `pwd`/$(TMPREPOS)"
 RPMBUILD_ARGS += $(if $(RELEASE_SUFFIX), --define="release_suffix $$RELEASE_SUFFIX")
+RPMBUILD_ARGS += $(if $(filter 0,$(OFFLINE_BUILD)), --without ovirt_use_nodejs_modules)
 
 srpm:	dist-gzip
 	rm -fr "$(TMPREPOS)"
