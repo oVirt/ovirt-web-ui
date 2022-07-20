@@ -47,6 +47,7 @@
     "json-stable-stringify-without-jsonify": "1.0.1",
     "mini-css-extract-plugin": "2.6.0",
     "mkdirp": "1.0.4",
+    "react-intl-po": "2.2.2",
     "react-refresh": "0.11.0",
     "readline-sync": "1.4.10",
     "table": "6.7.3",
@@ -77,7 +78,6 @@
     "prop-types": "15.7.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-intl-po": "2.2.2",
     "react-redux": "7.2.6",
     "react-router": "5.2.1",
     "react-router-config": "5.1.1",
@@ -88,7 +88,8 @@
     "semver": "7.3.5"
   },
   "resolutions": {
-    "immer": ">=9.0.6"
+    "immer": ">=9.0.6",
+    "underscore": "1.13.1"
   },
   "scripts": {
     "preinstall": "test -e scripts/yarn-preinstall.sh && scripts/yarn-preinstall.sh || :",
