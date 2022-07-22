@@ -2,7 +2,12 @@
 %global product oVirt
 %global source_basename @PACKAGE_TARNAME@
 %define debug_package %{nil}
-%define offline_build @OFFLINE_BUILD@
+
+# build condition `ovirt_use_nodejs_modules`
+#   - on by default, requires a build with `--without ovirt_use_nodejs_modules` to turn off
+#   - if on, the build uses `ovirt-engine-nodejs-modules`
+#   - if off, the build uses standard `yarn` accessing all node_modules packages directly
+%bcond_without ovirt_use_nodejs_modules
 
 Name:           ovirt-web-ui
 Version:        @PACKAGE_RPM_VERSION@
@@ -23,7 +28,7 @@ BuildRequires: rpm-build
 # requirements for building the rpm from src.rpm
 BuildRequires: autoconf
 BuildRequires: automake
-%if %{offline_build}
+%if %{with ovirt_use_nodejs_modules}
 # nodejs-modules embeds yarn and requires nodejs
 BuildRequires: ovirt-engine-nodejs-modules >= 2.3.2
 %else
@@ -40,7 +45,7 @@ This package provides the VM Portal for %{product}.
 %build
 %configure
 export SKIP_AUTOGEN=1
-%if %{offline_build}
+%if %{with ovirt_use_nodejs_modules}
 rpm -qa | grep ovirt-engine-nodejs
 source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh
 %else
