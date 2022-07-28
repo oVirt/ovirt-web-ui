@@ -103,7 +103,6 @@ class NicsCard extends React.Component {
       vm.getIn(['pool', 'id']) === undefined
 
     const vmStatus = vm.get('status')
-    const canCreateNic = this.state.filteredVnicList.size > 0
 
     const showNicIPs = vm.get('status') === 'up'
     const nicList = vm.get('nics')
@@ -140,7 +139,7 @@ class NicsCard extends React.Component {
         onSave={() => { onEditChange(false) }}
       >
         <Grid className={style['nics-container']}>
-          { canEditTheCard && canCreateNic && (
+          { canEditTheCard && (
             <Row key={`${idPrefix}-new`} id={`${idPrefix}-new`}>
               <Col>
                 <NicEditor
