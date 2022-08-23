@@ -30,7 +30,7 @@ for your platform to use the same packages that will be used by CI to build the 
 
 For CentOS stream 9:
 
-    dnf copr enable -y ovirt/ovirt-master-snapshot
+    dnf copr enable -y ovirt/ovirt-master-snapshot centos-stream-9
     dnf install -y ovirt-engine-nodejs-modules
 
 **Note**: The project will not currently build on CentOS stream 9.  See
