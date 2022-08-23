@@ -33,11 +33,6 @@ For CentOS stream 9:
     dnf copr enable -y ovirt/ovirt-master-snapshot centos-stream-9
     dnf install -y ovirt-engine-nodejs-modules
 
-**Note**: The project will not currently build on CentOS stream 9.  See
-[issue 1568: EL9 build fails](https://github.com/oVirt/ovirt-web-ui/issues/1568) and
-[pull request 1563: add CI build for EL9](https://github.com/oVirt/ovirt-web-ui/pull/1563)
-for more information.
-
 For CentOS Stream 8 you need to run:
 
     dnf copr enable -y ovirt/ovirt-master-snapshot centos-stream-8
