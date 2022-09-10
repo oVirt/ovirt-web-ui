@@ -35,6 +35,11 @@ const SelectFilter = ({ filterIds = [], setFilters, allSupportedFilters = [], ti
     // add all filter IDs linked
     setFilters([...filterIds, ...Object.keys(ids)])
   }
+
+  const hasFilter = (title) => {
+    const ids = labelToIds(title)
+    return filterIds.some(id => ids[id])
+  }
   return (
     <ToolbarFilter
       key={filterColumnId}
@@ -51,9 +56,9 @@ const SelectFilter = ({ filterIds = [], setFilters, allSupportedFilters = [], ti
           if (isPlaceholder) {
             return
           }
-          event?.target?.checked
-            ? addFilter(option)
-            : deleteFilter(option)
+          hasFilter(option)
+            ? deleteFilter(option)
+            : addFilter(option)
         } }
         selections={selectedFilters.map(toOption)}
         placeholderText={placeholderText}
