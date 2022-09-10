@@ -608,7 +608,7 @@ export const messages: { [messageId: string]: MessageType } = {
     description: 'Number of all fetched VMs (including pools)',
   },
   resultsOfUnknownTotal: {
-    message: '{available} of ? Results',
+    message: '{available} of many Results',
     description: 'Number of currently fetched VMs (including pools) that satisfy current filters',
   },
   run: 'Run',
