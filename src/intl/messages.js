@@ -382,6 +382,7 @@ export const messages: { [messageId: string]: MessageType } = {
   failedToSuspendVm: 'Failed to suspend the VM',
   firstDevice: 'First Device',
   firstDeviceTooltip: 'First device in order.',
+  filter: 'Filter',
   force: 'Force',
   fqdn: { message: 'FQDN', description: 'Label for the VM guest agent reported full qualified domain name' },
   freeBrowsers: 'Free browsers:',

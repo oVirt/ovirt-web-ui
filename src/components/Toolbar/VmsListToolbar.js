@@ -13,6 +13,7 @@ import {
   Toolbar,
   ToolbarItem,
   ToolbarContent,
+  Tooltip,
 } from '@patternfly/react-core'
 import { AddVmButton } from '_/components/CreateVmWizard'
 import VmFilters from './VmFilters'
@@ -74,20 +75,24 @@ const VmsListToolbar = ({
           <ToolbarItem variant='separator'/>
           <ToolbarItem>
             <ToggleGroup aria-label={msg.toggleViewForVirtualMachines()}>
-              <ToggleGroupItem
-                icon={<ThLargeIcon />}
-                aria-label={msg.cardView()}
-                buttonId="cardView"
-                isSelected={!tableView}
-                onChange={disableTableView}
-              />
-              <ToggleGroupItem
-                icon={<TableIcon />}
-                aria-label={msg.tableView()}
-                buttonId="tableView"
-                isSelected={tableView}
-                onChange={enableTableView}
-              />
+              <Tooltip content={msg.cardView()}>
+                <ToggleGroupItem
+                  icon={<ThLargeIcon />}
+                  aria-label={msg.cardView()}
+                  buttonId="cardView"
+                  isSelected={!tableView}
+                  onChange={disableTableView}
+                />
+              </Tooltip>
+              <Tooltip content={msg.tableView()}>
+                <ToggleGroupItem
+                  icon={<TableIcon />}
+                  aria-label={msg.tableView()}
+                  buttonId="tableView"
+                  isSelected={tableView}
+                  onChange={enableTableView}
+                />
+              </Tooltip>
             </ToggleGroup>
           </ToolbarItem>
         </ToolbarContent>

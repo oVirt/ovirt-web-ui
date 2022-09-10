@@ -14,6 +14,7 @@ import {
   ToolbarFilter,
   ToolbarItem,
   ToolbarToggleGroup,
+  Tooltip,
 } from '@patternfly/react-core'
 
 import { FilterIcon, SearchIcon } from '@patternfly/react-icons/dist/esm/icons'
@@ -45,7 +46,7 @@ const Filters = ({ msg, locale, selectedFilters, onFilterUpdate, filterTypes, te
   }
 
   return (
-    <ToolbarToggleGroup toggleIcon={<FilterIcon />} breakpoint="xl">
+    <ToolbarToggleGroup toggleIcon={<Tooltip content={msg.filter()}><FilterIcon /></Tooltip>} breakpoint="xl">
       <ToolbarGroup variant="filter-group">
         <ToolbarItem>
           <Dropdown
