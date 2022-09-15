@@ -54,7 +54,6 @@ DISTCLEANDIRS = autom4te.cache \
 	build \
 	extra \
 	.zanata-cache \
-	dockerbuild \
 	.node-gyp \
 	exported-artifacts \
 	rpmbuild \
