@@ -35,8 +35,3 @@ From most recent `master`:
   - description: copy & paste from spec file
 
 - Update oVirt compose with the new release
-
-- Docker builds
-    - go to Docker Hub project, https://cloud.docker.com/u/ovirtwebui/repository/docker/ovirtwebui/ovirt-web-ui
-    - go to Builds
-    - update the "latest" build-tag with the release tag (e.g. 1.5.2). The docker build will start
