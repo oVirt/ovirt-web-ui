@@ -88,6 +88,7 @@ export function saveGlobalOptions ({
     fullScreenSpice,
     ctrlAltEndSpice,
     smartcardSpice,
+    viewForVirtualMachines,
   } = {},
 }: Object, { transactionId }: Object): SaveGlobalOptionsActionType {
   return {
@@ -107,6 +108,7 @@ export function saveGlobalOptions ({
       fullScreenSpice,
       ctrlAltEndSpice,
       smartcardSpice,
+      viewForVirtualMachines,
     },
     meta: {
       transactionId,
@@ -124,6 +126,17 @@ export function saveSSHKey ({ key, userId, sshId }: Object): Object {
     },
   }
 }
+
+export function saveRemoteOptionSilently ({ name, value }: Object): Object {
+  return {
+    type: C.SAVE_USER_OPTION_SILENTLY,
+    payload: {
+      name,
+      value,
+    },
+  }
+}
+
 export function deleteUserOption ({ optionId, userId }: Object): Object {
   return {
     type: C.DELETE_USER_OPTION,

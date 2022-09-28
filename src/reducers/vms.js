@@ -3,7 +3,7 @@ import Immutable from 'immutable'
 import AppConfiguration from '_/config'
 import * as C from '_/constants'
 import { actionReducer } from './utils'
-import { SortFields } from '_/utils'
+import { NAME, SortFields } from '_/utils'
 
 const initialState = Immutable.fromJS({
   vms: {},
@@ -13,7 +13,7 @@ const initialState = Immutable.fromJS({
     status: [],
     name: [],
   },
-  sort: { ...SortFields.NAME, isAsc: true },
+  sort: { ...SortFields[NAME], isAsc: true },
 
   missedVms: Immutable.Set(),
 

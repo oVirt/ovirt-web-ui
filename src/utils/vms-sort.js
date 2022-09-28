@@ -8,20 +8,24 @@ const getFieldValueMap = (msg) => ({
   status: (item) => enumMsg('VmStatus', item.get('status'), msg),
 })
 
+export const ICON = 'icon'
+export const NAME = 'name'
+export const OS = 'os'
+export const STATUS = 'status'
+export const POOL_INFO = 'pool_info'
+export const ACTIONS = 'actions'
+
 export const SortFields = {
-  NAME: {
-    id: 'name',
-    isNumeric: false,
+  [NAME]: {
+    id: NAME,
     messageDescriptor: { id: 'name' },
   },
-  OS: {
-    id: 'os',
-    isNumeric: false,
+  [OS]: {
+    id: OS,
     messageDescriptor: { id: 'operatingSystem' },
   },
-  STATUS: {
-    id: 'status',
-    isNumeric: false,
+  [STATUS]: {
+    id: STATUS,
     messageDescriptor: { id: 'status' },
   },
 }

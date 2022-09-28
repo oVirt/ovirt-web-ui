@@ -1166,6 +1166,7 @@ const RemoteUserOptions = {
       fullScreenSpice,
       ctrlAltEndSpice,
       smartcardSpice,
+      viewForVirtualMachines,
     } = fromEntries
 
     return {
@@ -1180,6 +1181,7 @@ const RemoteUserOptions = {
       fullScreenSpice,
       ctrlAltEndSpice,
       smartcardSpice,
+      viewForVirtualMachines,
     }
   },
 }
