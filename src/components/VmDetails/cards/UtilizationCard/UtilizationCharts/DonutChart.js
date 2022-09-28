@@ -24,6 +24,7 @@ const DonutChart = ({ data, title, subTitle, id }) => {
         title={title}
         style={{ labels: { fontSize: 12 } }}
         titleComponent={<ChartLabel style={[{ fontSize: 30 }, { fontSize: 20, fill: '#bbb' }]} />}
+        // See https://github.com/patternfly/patternfly-react/issues/7923
         labelComponent={<ChartTooltip flyoutWidth={180} />}
       />
     </div>

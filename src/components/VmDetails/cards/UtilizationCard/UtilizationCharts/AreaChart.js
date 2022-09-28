@@ -19,7 +19,8 @@ const AreaChart = ({ data, labels, id }) => {
         containerComponent={(
           <ChartVoronoiContainer
             labels={labels}
-            labelComponent={<ChartTooltip style={{ fontSize: 16 }} />}
+            // See https://github.com/patternfly/patternfly-react/issues/7923
+            labelComponent={<ChartTooltip style={{ fontSize: 16 }} flyoutWidth={55} />}
           />
         )}
       >

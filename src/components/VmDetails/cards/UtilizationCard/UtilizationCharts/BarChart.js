@@ -9,7 +9,16 @@ const CustomLabel = ({ label, offsetX, text, ...rest }) => {
   return (
     <g>
       <ChartLabel {...rest} x={offsetX} dy={40} style={{ fontSize: 20 }} text={t} />
-      <ChartTooltip {...rest} text={text} style={{ fontSize: 18 }} orientation='top' dx={-5} dy={-20}/>
+      <ChartTooltip
+        {...rest}
+        text={text}
+        style={{ fontSize: 18 }}
+        orientation='top'
+        dx={-5}
+        dy={-20}
+        // See https://github.com/patternfly/patternfly-react/issues/7923
+        flyoutWidth={350}
+      />
     </g>
   )
 }
@@ -44,7 +53,16 @@ const BarChart = ({ data, additionalLabel, thresholdWarning, thresholdError, id,
             labels={({ datum }) => msg.utilizationCardLegendUsedWithDetails({ value: datum.y, diskPath: datum.x }) }
           />
           <ChartBar barWidth={40} domain={{ y: [0, 100] }}
-            labelComponent={<ChartTooltip style={{ fontSize: 18 }} orientation='top' dx={-5} dy={-20} />}
+            labelComponent={(
+              <ChartTooltip
+                style={{ fontSize: 18 }}
+                orientation='top'
+                dx={-5}
+                dy={-20}
+                // See https://github.com/patternfly/patternfly-react/issues/7923
+                flyoutWidth={350}
+              />
+            )}
             style={{ parent: { border: '0px' } }}
             data={availableInPercent}
             labels={({ datum }) => msg.utilizationCardLegendAvailableWithDetails({ value: datum.y, diskPath: datum.x }) }
