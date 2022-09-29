@@ -321,3 +321,21 @@ export function findOsByName (operatingSystems, name) {
 export function toJS (obj) {
   return (obj && obj.toJS && obj.toJS()) || obj
 }
+
+export const isTpmRequired = (operatingSystemId, operatingSystems) => {
+  return operatingSystems.getIn([operatingSystemId, 'tpmSupport']) === 'required'
+}
+
+export const getTpmChange = (operatingSystemId, operatingSystems) => {
+  const tpmSupport = operatingSystems.getIn([operatingSystemId, 'tpmSupport'])
+  switch (tpmSupport) {
+    case 'required':
+      return true
+    case 'unsupported':
+      return false
+    case 'supported':
+    default:
+      // no change
+      return undefined
+  }
+}

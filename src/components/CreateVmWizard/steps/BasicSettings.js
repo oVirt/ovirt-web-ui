@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { localeCompare } from '_/helpers'
+import { localeCompare, isTpmRequired } from '_/helpers'
 import { withMsg } from '_/intl'
 import { isNumberInRange } from '_/utils'
 import { BASIC_DATA_SHAPE } from '../dataPropTypes'
@@ -12,7 +12,6 @@ import {
   checkTimeZone,
   isOsLinux,
   isOsWindows,
-  isTpmRequired,
 } from '../helpers'
 
 import {

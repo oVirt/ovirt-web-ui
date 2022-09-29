@@ -14,6 +14,7 @@ import {
   templateNameRenderer,
   userFormatOfBytes,
   buildMessageFromRecord,
+  getTpmChange,
 } from '_/helpers'
 import { enumMsg, MsgContext, withMsg } from '_/intl'
 import { isNumber, isNumberInRange } from '_/utils'
@@ -57,7 +58,6 @@ import FieldRow from './FieldRow'
 import { Tooltip, InfoTooltip } from '_/components/tooltips'
 
 import timezones from '_/components/utils/timezones.json'
-import { getTpmChange } from '_/components/CreateVmWizard/helpers'
 import ConfirmationModal from '_/components/VmActions/ConfirmationModal'
 
 function rephraseVmType (vmType, msg) {

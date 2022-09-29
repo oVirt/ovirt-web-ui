@@ -5,6 +5,7 @@ import {
   getClusterArchitecture,
   getDefaultOSByArchitecture,
   isWindows,
+  isTpmRequired,
 } from '_/helpers'
 
 const handleClusterIdChange = (clusterId, { blankTemplateId, defaultValues, clusters, templates, operatingSystems, storageDomains, defaultGeneralTimezone, defaultWindowsTimezone, locale }) => {
@@ -165,32 +166,12 @@ const verifyOsIdToCluster = (selectedOsId, clusterId, { clusters, operatingSyste
   return selectedOs ? selectedOs.get('id') : '0'
 }
 
-const isTpmRequired = (operatingSystemId, operatingSystems) => {
-  return operatingSystems.getIn([operatingSystemId, 'tpmSupport']) === 'required'
-}
-
-const getTpmChange = (operatingSystemId, operatingSystems) => {
-  const tpmSupport = operatingSystems.getIn([operatingSystemId, 'tpmSupport'])
-  switch (tpmSupport) {
-    case 'required':
-      return true
-    case 'unsupported':
-      return false
-    case 'supported':
-    default:
-      // no change
-      return undefined
-  }
-}
-
 export {
-  getTpmChange,
   handleClusterIdChange,
   handleProvisionSourceChange,
   handleTemplateIdChange,
   checkTimeZone,
   isOsWindows,
   isOsLinux,
-  isTpmRequired,
   verifyOsIdToCluster,
 }
