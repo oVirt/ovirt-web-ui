@@ -152,6 +152,7 @@ class DetailsCard extends React.Component {
     this.handleHotPlugOnCancel = this.handleHotPlugOnCancel.bind(this)
     this.handleHotPlugOnApplyLater = this.handleHotPlugOnApplyLater.bind(this)
     this.handleHotPlugOnApplyNow = this.handleHotPlugOnApplyNow.bind(this)
+    this.handleTpmDisabled = this.handleTpmDisabled.bind(this)
 
     this.grabCpuOptions = this.grabCpuOptions.bind(this)
     this.updateOs = this.updateOs.bind(this)
@@ -384,12 +385,10 @@ class DetailsCard extends React.Component {
         case 'os': {
           fieldUpdated = 'os'
           const os = operatingSystems.find(os => os.get('id') === value)
-          const tpmChange = getTpmChange(os.get('id'), operatingSystems)
           updates = this.updateOs(updates, os)
-          if (tpmChange !== undefined) {
-            updates = updates.set('tpmEnabled', tpmChange)
-            this.tpmUpdate = true
-          }
+          const tpmChange = getTpmChange(os.get('id'), operatingSystems)
+          updates = updates.set('tpmEnabled', tpmChange)
+          this.tpmUpdate = true
           const timeZoneName = updates.getIn(['timeZone', 'name'])
           const isWindowsTimeZone = timezones.find(timezone => timezone.id === timeZoneName)
           const isWindowsVm = isWindows(os.get('name'))
