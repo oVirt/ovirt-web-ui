@@ -72,7 +72,7 @@ const ReviewBasic = ({ id, dataCenters, clusters, isos, templates, operatingSyst
           id={`${id}-summary-vcpus-tooltip`}
           tooltip={(
             <div>
-              <span>The total virtual CPUs include:</span>
+              <span>{msg.totalVirtualCpuInclude()}</span>
               <ul className={style['cpu-tooltip-list']} >
                 <li>{msg.totalSocketsCpuTooltipMessage({ number: basic.topology.sockets })}</li>
                 <li>{msg.totalCoresCpuTooltipMessage({ number: basic.topology.cores })}</li>
@@ -86,6 +86,14 @@ const ReviewBasic = ({ id, dataCenters, clusters, isos, templates, operatingSyst
         </Tooltip>
       </Item>
       <Item id={`${id}-optimizedFor`} label={msg.optimizedFor()}>{optimizedForMap(msg)[basic.optimizedFor].value}</Item>
+      {basic.tpmEnabled !== undefined && (
+        <Item
+          id={`${id}-tpm`}
+          label={msg.tpm()}
+        >
+          {basic.tpmEnabled ? msg.yes() : msg.no()}
+        </Item>
+      )}
     </>
   )
 }

@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { localeCompare } from '_/helpers'
+import { localeCompare, isTpmRequired } from '_/helpers'
 import { withMsg } from '_/intl'
 import { isNumberInRange } from '_/utils'
 import { BASIC_DATA_SHAPE } from '../dataPropTypes'
@@ -322,6 +322,7 @@ class BasicSettings extends React.Component {
         changes.initTimezone = this.props.data.cloudInitEnabled && this.props.data.enableInitTimezone && isOsWindows(value, this.props.operatingSystems)
           ? this.props.data.lastInitTimezone // set the sysprep timezone as the last selected sysprep timezone
           : ''
+        changes.tpmEnabled = isTpmRequired(value, this.props.operatingSystems) || undefined
         break
       }
 

@@ -108,7 +108,7 @@ const OvirtApi = {
       url += `?follow=${additional.join(',')}`
       url += '&current' // performance optimization - retrieve graphic consoles from vm_dynamic
     }
-    return httpGet({ url })
+    return httpGet({ url, custHeaders: { 'All-Content': true } })
   },
   getVms ({ count, page, additional }: { count?: number, page?: number, additional?: Array<string> }): Promise<Object> {
     assertLogin({ methodName: 'getAllVms' })

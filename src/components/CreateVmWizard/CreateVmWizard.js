@@ -39,6 +39,7 @@ const DEFAULT_STATE = {
         cores: 1,
         threads: 1,
       },
+      tpmEnabled: undefined,
     },
     network: {
       nics: [],

@@ -137,6 +137,7 @@ const VM = {
       stopTime: convertEpoch(vm.stop_time),
       creationTime: convertEpoch(vm.creation_time),
       startPaused: convertBool(vm.start_paused),
+      tpmEnabled: vm.tpm_enabled !== undefined ? convertBool(vm.tpm_enabled) : undefined,
 
       stateless: vm.stateless === 'true',
 
@@ -312,6 +313,7 @@ const VM = {
           },
         },
       },
+      tpm_enabled: vm.tpmEnabled ?? undefined,
 
       time_zone: vm.timeZone && {
         name: vm.timeZone.name,
@@ -1005,6 +1007,7 @@ const OS = {
         },
       },
       isWindows: isWindows(os.description),
+      tpmSupport: os.tpm_support,
     }
   },
 
