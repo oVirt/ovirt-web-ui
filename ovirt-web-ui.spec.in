@@ -30,7 +30,7 @@ BuildRequires: autoconf
 BuildRequires: automake
 %if %{with ovirt_use_nodejs_modules}
 # nodejs-modules embeds yarn and requires nodejs
-BuildRequires: ovirt-engine-nodejs-modules >= 2.3.8
+BuildRequires: ovirt-engine-nodejs-modules >= 2.3.10
 %else
 BuildRequires: nodejs >= 14.15
 BuildRequires: yarn >= 1.22
@@ -65,6 +65,17 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Fri Sep 30 2022 Sharon Gratch <sgratch@redhat.com> - 1.9.2-1
+ - VM Details - users can now create a new NIC with an empty vNIC profile, even if they don't have permissions for NIC profiles within the DC
+ - VM details - force tooltips on the VM's react-chart charts to a constant width
+ - VMs dashboard - support table view (in additions to cards view) on the Virtual Machines dashboard screen
+ - add basic support for TPM devices for Windows 11/2022 VMs of cluster level >= 4.7
+ - build issues: specify COPR chroot explicitly
+ - build issues: remove broken Docker support
+ - bump the Zanata version to 1.9
+ - update dependencies: bump terser to 5.14.2, bump follow-redirects to 1.15.2
+ - documentation updates - remove EL9 limitation note
+
 * Fri Jul 22 2022 Sharon Gratch <sgratch@redhat.com> - 1.9.1-1
  - VM details snapshots card: add a frontend lock for the restored snapshot during the restore operation
  - VM details - force tooltips on the VM's utilization  charts to a constant width
