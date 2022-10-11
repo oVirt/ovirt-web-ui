@@ -13,6 +13,7 @@ export const BASIC_DATA_SHAPE = {
 
   operatingSystemId: PropTypes.string,
   tpmEnabled: PropTypes.bool,
+  biosType: PropTypes.string,
   memory: PropTypes.number, // in MiB
   cpus: PropTypes.number,
   optimizedFor: PropTypes.oneOf(['desktop', 'server', 'high_performance']),

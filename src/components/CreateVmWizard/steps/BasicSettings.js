@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { localeCompare, isTpmRequired } from '_/helpers'
+import { localeCompare, isTpmRequired, forceUefiBios } from '_/helpers'
 import { withMsg } from '_/intl'
 import { isNumberInRange } from '_/utils'
 import { BASIC_DATA_SHAPE } from '../dataPropTypes'
@@ -316,13 +316,14 @@ class BasicSettings extends React.Component {
 
       case 'operatingSystemId': {
         changes[field] = value
-        const { data: { templateId } } = this.props
+        const { data: { templateId }, operatingSystems, clusters, data } = this.props
         changes.timeZone = checkTimeZone(value, templateId, this.props)
         // only when changing the OS from one Windows to other Windows
         changes.initTimezone = this.props.data.cloudInitEnabled && this.props.data.enableInitTimezone && isOsWindows(value, this.props.operatingSystems)
           ? this.props.data.lastInitTimezone // set the sysprep timezone as the last selected sysprep timezone
           : ''
         changes.tpmEnabled = isTpmRequired(value, this.props.operatingSystems) || undefined
+        changes.biosType = forceUefiBios({ operatingSystemId: value, operatingSystems, clusterId: data.clusterId, clusters })
         break
       }
 

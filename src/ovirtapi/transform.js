@@ -138,6 +138,7 @@ const VM = {
       creationTime: convertEpoch(vm.creation_time),
       startPaused: convertBool(vm.start_paused),
       tpmEnabled: vm.tpm_enabled !== undefined ? convertBool(vm.tpm_enabled) : undefined,
+      biosType: vm?.bios?.type ?? undefined,
 
       stateless: vm.stateless === 'true',
 
@@ -320,9 +321,10 @@ const VM = {
         utc_offset: vm.timeZone.offset,
       },
 
-      bios: 'bootMenuEnabled' in vm
-        ? { boot_menu: { enabled: toApiBoolean(vm.bootMenuEnabled) } }
-        : undefined,
+      bios: {
+        boot_menu: 'bootMenuEnabled' in vm ? { enabled: toApiBoolean(vm.bootMenuEnabled) } : undefined,
+        type: vm.biosType ?? undefined,
+      },
 
       // NOTE: Disable cloudInit by sending "initialization: {}"
       initialization: vm.cloudInit && (
@@ -840,6 +842,7 @@ const Cluster = {
 
     const c: Object = {
       id: cluster.id,
+      biosType: cluster.bios_type,
       name: cluster.name,
       version: `${cluster.version.major}.${cluster.version.minor}`,
       dataCenterId: cluster.data_center && cluster.data_center.id,

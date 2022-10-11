@@ -50,6 +50,7 @@ function* composeAndCreateVm ({ payload: { basic, nics, disks }, meta: { correla
       utc_offset: basic.timeZone.offset,
     },
     tpm_enabled: basic.tpmEnabled,
+    bios: basic.biosType ? { type: basic.biosType } : undefined,
 
     initialization: basic.cloudInitEnabled
       ? {

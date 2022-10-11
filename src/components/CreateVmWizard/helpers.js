@@ -6,6 +6,7 @@ import {
   getDefaultOSByArchitecture,
   isWindows,
   isTpmRequired,
+  forceUefiBios,
 } from '_/helpers'
 
 const handleClusterIdChange = (clusterId, { blankTemplateId, defaultValues, clusters, templates, operatingSystems, storageDomains, defaultGeneralTimezone, defaultWindowsTimezone, locale }) => {
@@ -74,6 +75,7 @@ const handleProvisionSourceChange = (provisionSource, { defaultValues, defaultGe
   changes.templateId = undefined
   changes.operatingSystemId = verifyOsIdToCluster(defaultValues.operatingSystemId, clusterId, { clusters, operatingSystems })
   changes.tpmEnabled = isTpmRequired(changes.operatingSystemId, operatingSystems) || undefined
+  changes.biosType = forceUefiBios({ operatingSystemId: changes.operatingSystemId, operatingSystems, clusterId, clusters })
   changes.memory = defaultValues.memory
   changes.cpus = defaultValues.cpus
   changes.topology = defaultValues.topology
@@ -102,6 +104,7 @@ const handleTemplateIdChange = (templateId, defaultOptimizedFor, { templates, op
     .get('id')
   changes.operatingSystemId = verifyOsIdToCluster(suggestedOs, clusterId, { clusters, operatingSystems })
   changes.tpmEnabled = isTpmRequired(changes.operatingSystemId, operatingSystems) || undefined
+  changes.biosType = forceUefiBios({ operatingSystemId: changes.operatingSystemId, operatingSystems, clusterId, clusters })
   // Check template's timezone compatibility with the template's OS, set the timezone corresponding to the template's OS
   changes.timeZone = checkTimeZone(changes.operatingSystemId, changes.templateId, { defaultGeneralTimezone, defaultWindowsTimezone, templates, operatingSystems })
   changes.cloudInitEnabled = template.getIn(['cloudInit', 'enabled'])
