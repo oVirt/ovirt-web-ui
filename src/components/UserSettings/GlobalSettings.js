@@ -13,6 +13,7 @@ import {
   SplitItem,
   TextArea,
   Flex,
+  Radio,
 } from '@patternfly/react-core'
 import { withMsg, localeWithFullName, DEFAULT_LOCALE } from '_/intl'
 import style from './style.css'
@@ -224,6 +225,33 @@ class GlobalSettings extends Component {
 
             ),
           }))('language'),
+          ((name) => ({
+            key: name,
+            title: msg.layoutForVirtualMachines(),
+            body: (
+              <>
+                <Radio
+                  isChecked={draftValues[name] !== 'table'}
+                  name={name}
+                  onChange={(checked) => {
+                    onChange(name)(checked ? 'card' : 'table')
+                  }}
+                  label={msg.cardView()}
+                  id={toId(`${name}_card`)}
+                />
+                <Radio
+                  isChecked={draftValues[name] === 'table' }
+                  name={name}
+                  onChange={(checked) => {
+                    onChange(name)(checked ? 'table' : 'card')
+                  }}
+                  label={msg.tableView()}
+                  id={toId(`${name}_table`)}
+                />
+
+              </>
+            ),
+          }))('viewForVirtualMachines'),
         ],
       },
       refreshInterval: {
