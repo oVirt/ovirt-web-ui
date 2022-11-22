@@ -422,6 +422,7 @@ export const messages: { [messageId: string]: MessageType } = {
   isPersistMemorySnapshot: 'Content of the memory of the virtual machine is included in the snapshot.',
   itemDoesntExistOrDontHavePermissions: 'The item doesn\'t exist or you do not have the permissions to view it.',
   language: 'Language',
+  layoutForVirtualMachines: 'Layout for Virtual Machines',
   less: {
     message: 'less',
     description: 'more/less pair used to control collapsible long listing',
