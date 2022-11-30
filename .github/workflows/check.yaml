@@ -24,13 +24,13 @@ jobs:
 
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v2
+        uses: ovirt/checkout-action@main
 
       - name: Run automation/build.sh (installs build dependencies as necessary)
         run: ./automation/build.sh
 
       - name: Upload artifacts
-        uses: ovirt/upload-rpms-action@v2
+        uses: ovirt/upload-rpms-action@main
         with:
           directory: exported-artifacts/
 
@@ -48,7 +48,7 @@ jobs:
           dnf -y --disablerepo='*' --enablerepo='yarn*' install yarn
 
       - name: Checkout sources
-        uses: actions/checkout@v2
+        uses: ovirt/checkout-action@main
 
       - name: Run 'yarn install' and 'yarn build' (like a developer would)
         run: |
@@ -72,12 +72,12 @@ jobs:
 
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v2
+        uses: ovirt/checkout-action@main
 
       - name: Run automation/build.sh (installs build dependencies as necessary)
         run: ./automation/build.sh
 
       - name: Upload artifacts as rpm repo
-        uses: ovirt/upload-rpms-action@v2
+        uses: ovirt/upload-rpms-action@main
         with:
           directory: exported-artifacts/
