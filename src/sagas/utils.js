@@ -156,29 +156,42 @@ export function* delayInMsSteps (count = 20, msMultiplier = 2000) {
   }
 }
 
+export function* selectorUserAndRoles () {
+  const userAndRoles = yield select(state => ({
+    userGroups: state.config.get('userGroups'),
+    userId: state.config.getIn(['user', 'id']),
+    roles: state.roles,
+  }))
+
+  return userAndRoles
+}
+
 /**
  * Convert an entity's set of permissions to a set of permits for the app's current
  * user by mapping the permissions through their assigned roles to the permits.
  *
  * NOTE: If the user is an admin user the user's group and id membership must be
  * explicitly checked.
+ *
+ * NOTE 2: For effiency sake, use the cached lookup version `.cached()` in calling
+ * code.  This help keep the redux-saga effect queue small and memory use efficient.
  */
 export function* entityPermissionsToUserPermits (entity) {
+  const userAndRoles = yield selectorUserAndRoles()
+  return mapEntityPermits(entity, userAndRoles)
+}
+
+entityPermissionsToUserPermits.cached = function* () {
+  const userAndRoles = yield selectorUserAndRoles()
+  return (entity, ...rest) => mapEntityPermits(entity, userAndRoles, ...rest)
+}
+
+function mapEntityPermits (entity, { userGroups, userId, roles } = {}) {
   const permissions = entity.permissions
     ? Array.isArray(entity.permissions) ? entity.permissions : [entity.permissions]
     : []
 
-  const {
-    userGroups,
-    userId,
-    roles,
-  } = yield select(state => ({
-    userGroups: state.config.get('userGroups'),
-    userId: state.config.getIn(['user', 'id']),
-    roles: state.roles,
-  }))
-
-  const permitNames = []
+  const permitNames = new Set()
   for (const permission of permissions) {
     if (
       (permission.groupId && userGroups.includes(permission.groupId)) ||
@@ -188,12 +201,12 @@ export function* entityPermissionsToUserPermits (entity) {
       if (!role) {
         console.info('Could not find role in redux state, roleId:', permission.roleId)
       } else {
-        permitNames.push(...role.permitNames)
+        role.permitNames.forEach(name => permitNames.add(name))
       }
     }
   }
 
-  return Array.from(new Set(permitNames))
+  return Array.from(permitNames)
 }
 
 /**
