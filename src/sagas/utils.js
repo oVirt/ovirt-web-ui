@@ -167,25 +167,38 @@ export function* selectorUserAndRoles () {
 }
 
 /**
- * Convert an entity's set of permissions to a set of permits for the app's current
- * user by mapping the permissions through their assigned roles to the permits.
+ * Lookup users and roles from the redux store and convert an entity's set of permissions
+ * to a set of permits for the app's current user.  Function `mapEntityPermits` is called
+ * to do the actual mapping.
  *
- * NOTE: If the user is an admin user the user's group and id membership must be
- * explicitly checked.
- *
- * NOTE 2: For effiency sake, use the cached lookup version `.cached()` in calling
- * code.  This help keep the redux-saga effect queue small and memory use efficient.
+ * NOTE: For effiency sake, use the cached lookup version `cacheEntityPermissionsToUserPermits`
+ * in calling code.  This helps keep the redux-saga effect queue small and memory use efficient.
  */
 export function* entityPermissionsToUserPermits (entity) {
   const userAndRoles = yield selectorUserAndRoles()
   return mapEntityPermits(entity, userAndRoles)
 }
 
-entityPermissionsToUserPermits.cached = function* () {
+/**
+ * Curry `mapEntityPermits` with a single lookup of user and roles from the redux store.
+ *
+ * NOTE: This version is most useful when processing multiple entities at a time.
+ *
+ * @returns A function that will convert an entity's set of permissions to a set of
+ *          permits using a shared set of user and roles data.
+ */
+export function* curryEntityPermissionsToUserPermits () {
   const userAndRoles = yield selectorUserAndRoles()
   return (entity, ...rest) => mapEntityPermits(entity, userAndRoles, ...rest)
 }
 
+/**
+ * Convert an entity's set of permissions to a set of permits for the app's current
+ * user by mapping the permissions through their assigned roles to the permits.
+ *
+ * NOTE: If the user is an admin user the user's group and id membership must be
+ * explicitly checked.
+ */
 function mapEntityPermits (entity, { userGroups, userId, roles } = {}) {
   const permissions = entity.permissions
     ? Array.isArray(entity.permissions) ? entity.permissions : [entity.permissions]
