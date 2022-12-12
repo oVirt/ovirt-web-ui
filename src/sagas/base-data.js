@@ -87,7 +87,7 @@ export function* fetchAllTemplates () {
     // Calculate permits and 'canUser*'
     const _entityPermissionsToUserPermits = yield curryEntityPermissionsToUserPermits()
     for (const template of templatesInternal) {
-      template.userPermits = _entityPermissionsToUserPermits(template, true)
+      template.userPermits = _entityPermissionsToUserPermits(template)
       template.canUserUseTemplate = canUserUseTemplate(template.userPermits)
     }
 

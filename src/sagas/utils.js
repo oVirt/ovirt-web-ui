@@ -171,7 +171,7 @@ export function* selectorUserAndRoles () {
  * to a set of permits for the app's current user.  Function `mapEntityPermits` is called
  * to do the actual mapping.
  *
- * NOTE: For effiency sake, use the cached lookup version `cacheEntityPermissionsToUserPermits`
+ * NOTE: For effiency sake, use the cached lookup version `curryEntityPermissionsToUserPermits`
  * in calling code.  This helps keep the redux-saga effect queue small and memory use efficient.
  */
 export function* entityPermissionsToUserPermits (entity) {
@@ -189,7 +189,7 @@ export function* entityPermissionsToUserPermits (entity) {
  */
 export function* curryEntityPermissionsToUserPermits () {
   const userAndRoles = yield selectorUserAndRoles()
-  return (entity, ...rest) => mapEntityPermits(entity, userAndRoles, ...rest)
+  return (entity) => mapEntityPermits(entity, userAndRoles)
 }
 
 /**
