@@ -1,7 +1,7 @@
 import Api, { Transforms } from '_/ovirtapi'
 import { all, call, put, select } from 'redux-saga/effects'
 
-import { callExternalAction, entityPermissionsToUserPermits } from './utils'
+import { callExternalAction, curryEntityPermissionsToUserPermits } from './utils'
 import { canUserUseStorageDomain, canUserUseIsoImages } from '_/utils'
 
 import {
@@ -50,8 +50,9 @@ function* fetchDataCenters () {
     )
 
     // Calculate permits and 'canUser*'
+    const _entityPermissionsToUserPermits = yield curryEntityPermissionsToUserPermits()
     for (const dataCenter of dataCentersInternal) {
-      dataCenter.userPermits = yield entityPermissionsToUserPermits(dataCenter)
+      dataCenter.userPermits = _entityPermissionsToUserPermits(dataCenter)
     }
 
     return dataCentersInternal
@@ -69,8 +70,9 @@ function* fetchDataAndIsoStorageDomains () {
       .filter(storageDomain => storageDomain.type === 'data' || storageDomain.type === 'iso')
 
     // Calculate permits and 'canUser*'
+    const _entityPermissionsToUserPermits = yield curryEntityPermissionsToUserPermits()
     for (const storageDomain of storageDomainsInternal) {
-      storageDomain.userPermits = yield entityPermissionsToUserPermits(storageDomain)
+      storageDomain.userPermits = _entityPermissionsToUserPermits(storageDomain)
       storageDomain.canUserUseDomain = canUserUseStorageDomain(storageDomain.userPermits)
       storageDomain.canUserUseIsoImages = canUserUseIsoImages(storageDomain.userPermits)
     }

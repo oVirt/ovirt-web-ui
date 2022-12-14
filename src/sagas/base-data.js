@@ -8,7 +8,7 @@ import {
 
 import {
   callExternalAction,
-  entityPermissionsToUserPermits,
+  curryEntityPermissionsToUserPermits,
   mapCpuOptions,
   mapConfigKeyVersion,
 } from './utils'
@@ -35,8 +35,9 @@ export function* fetchAllClusters () {
     )
 
     // Calculate permits and 'canUser*'
+    const _entityPermissionsToUserPermits = yield curryEntityPermissionsToUserPermits()
     for (const cluster of clustersInternal) {
-      cluster.userPermits = yield entityPermissionsToUserPermits(cluster)
+      cluster.userPermits = _entityPermissionsToUserPermits(cluster)
       cluster.canUserUseCluster = canUserUseCluster(cluster.userPermits)
     }
 
@@ -84,8 +85,9 @@ export function* fetchAllTemplates () {
     )
 
     // Calculate permits and 'canUser*'
+    const _entityPermissionsToUserPermits = yield curryEntityPermissionsToUserPermits()
     for (const template of templatesInternal) {
-      template.userPermits = yield entityPermissionsToUserPermits(template)
+      template.userPermits = _entityPermissionsToUserPermits(template)
       template.canUserUseTemplate = canUserUseTemplate(template.userPermits)
     }
 
@@ -114,8 +116,9 @@ export function* fetchAllVnicProfiles () {
     )
 
     // Calculate permits and 'canUser*'
+    const _entityPermissionsToUserPermits = yield curryEntityPermissionsToUserPermits()
     for (const vnicProfile of vnicProfilesInternal) {
-      vnicProfile.userPermits = yield entityPermissionsToUserPermits(vnicProfile)
+      vnicProfile.userPermits = _entityPermissionsToUserPermits(vnicProfile)
       vnicProfile.canUserUseProfile = canUserUseVnicProfile(vnicProfile.userPermits)
     }
 

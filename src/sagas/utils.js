@@ -156,6 +156,42 @@ export function* delayInMsSteps (count = 20, msMultiplier = 2000) {
   }
 }
 
+export function* selectorUserAndRoles () {
+  const userAndRoles = yield select(state => ({
+    userGroups: state.config.get('userGroups'),
+    userId: state.config.getIn(['user', 'id']),
+    roles: state.roles,
+  }))
+
+  return userAndRoles
+}
+
+/**
+ * Lookup users and roles from the redux store and convert an entity's set of permissions
+ * to a set of permits for the app's current user.  Function `mapEntityPermits` is called
+ * to do the actual mapping.
+ *
+ * NOTE: For effiency sake, use the cached lookup version `curryEntityPermissionsToUserPermits`
+ * in calling code.  This helps keep the redux-saga effect queue small and memory use efficient.
+ */
+export function* entityPermissionsToUserPermits (entity) {
+  const userAndRoles = yield selectorUserAndRoles()
+  return mapEntityPermits(entity, userAndRoles)
+}
+
+/**
+ * Curry `mapEntityPermits` with a single lookup of user and roles from the redux store.
+ *
+ * NOTE: This version is most useful when processing multiple entities at a time.
+ *
+ * @returns A function that will convert an entity's set of permissions to a set of
+ *          permits using a shared set of user and roles data.
+ */
+export function* curryEntityPermissionsToUserPermits () {
+  const userAndRoles = yield selectorUserAndRoles()
+  return (entity) => mapEntityPermits(entity, userAndRoles)
+}
+
 /**
  * Convert an entity's set of permissions to a set of permits for the app's current
  * user by mapping the permissions through their assigned roles to the permits.
@@ -163,22 +199,12 @@ export function* delayInMsSteps (count = 20, msMultiplier = 2000) {
  * NOTE: If the user is an admin user the user's group and id membership must be
  * explicitly checked.
  */
-export function* entityPermissionsToUserPermits (entity) {
+function mapEntityPermits (entity, { userGroups, userId, roles } = {}) {
   const permissions = entity.permissions
     ? Array.isArray(entity.permissions) ? entity.permissions : [entity.permissions]
     : []
 
-  const {
-    userGroups,
-    userId,
-    roles,
-  } = yield select(state => ({
-    userGroups: state.config.get('userGroups'),
-    userId: state.config.getIn(['user', 'id']),
-    roles: state.roles,
-  }))
-
-  const permitNames = []
+  const permitNames = new Set()
   for (const permission of permissions) {
     if (
       (permission.groupId && userGroups.includes(permission.groupId)) ||
@@ -188,12 +214,12 @@ export function* entityPermissionsToUserPermits (entity) {
       if (!role) {
         console.info('Could not find role in redux state, roleId:', permission.roleId)
       } else {
-        permitNames.push(...role.permitNames)
+        role.permitNames.forEach(name => permitNames.add(name))
       }
     }
   }
 
-  return Array.from(new Set(permitNames))
+  return Array.from(permitNames)
 }
 
 /**

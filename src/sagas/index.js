@@ -35,9 +35,9 @@ import {
 
 import {
   callExternalAction,
+  curryEntityPermissionsToUserPermits,
   delay,
   doCheckTokenExpired,
-  entityPermissionsToUserPermits,
   mapCpuOptions,
 } from './utils'
 
@@ -88,8 +88,10 @@ const VM_FETCH_ADDITIONAL_SHALLOW = [
 export const EVERYONE_GROUP_ID = 'eee00000-0000-0000-0000-123456789eee'
 
 export function* transformAndPermitVm (vm) {
+  const _entityPermissionsToUserPermits = yield curryEntityPermissionsToUserPermits()
+
   const internalVm = Transforms.VM.toInternal({ vm })
-  internalVm.userPermits = yield entityPermissionsToUserPermits(internalVm)
+  internalVm.userPermits = _entityPermissionsToUserPermits(internalVm)
 
   internalVm.canUserChangeCd = canUserChangeCd(internalVm.userPermits)
   internalVm.canUserEditVm = canUserEditVm(internalVm.userPermits)
@@ -107,7 +109,7 @@ export function* transformAndPermitVm (vm) {
 
   // Permit disks fetched and transformed along with the VM
   for (const disk of internalVm.disks) {
-    disk.userPermits = yield entityPermissionsToUserPermits(disk)
+    disk.userPermits = _entityPermissionsToUserPermits(disk)
     disk.canUserEditDisk = canUserEditDisk(disk.userPermits)
   }
 
