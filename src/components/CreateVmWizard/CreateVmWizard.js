@@ -40,6 +40,7 @@ const DEFAULT_STATE = {
         threads: 1,
       },
       tpmEnabled: undefined,
+      biosType: undefined,
     },
     network: {
       nics: [],

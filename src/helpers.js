@@ -339,3 +339,8 @@ export const getTpmChange = (operatingSystemId, operatingSystems) => {
       return undefined
   }
 }
+
+export const UEFI_BIOS = 'q35_ovmf'
+export const isUefiBios = (biosType) => biosType === UEFI_BIOS || biosType === 'q35_secure_boot'
+export const forceUefiBios = ({ operatingSystemId, operatingSystems, clusters, clusterId }) =>
+  isTpmRequired(operatingSystemId, operatingSystems) && !isUefiBios(clusters?.getIn([clusterId, 'biosType'])) ? UEFI_BIOS : undefined

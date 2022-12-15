@@ -15,6 +15,9 @@ import {
   userFormatOfBytes,
   buildMessageFromRecord,
   getTpmChange,
+  isUefiBios,
+  isTpmRequired,
+  UEFI_BIOS,
 } from '_/helpers'
 import { enumMsg, MsgContext, withMsg } from '_/intl'
 import { isNumber, isNumberInRange } from '_/utils'
@@ -279,6 +282,7 @@ class DetailsCard extends React.Component {
       operatingSystems,
       clusters,
       templates,
+      vm,
     } = this.props
 
     for (let change = changeQueue.shift(); change; change = changeQueue.shift()) {
@@ -389,6 +393,10 @@ class DetailsCard extends React.Component {
           const tpmChange = getTpmChange(os.get('id'), operatingSystems)
           updates = updates.set('tpmEnabled', tpmChange)
           this.tpmUpdate = true
+          updates = updates.set(
+            'biosType',
+            isTpmRequired(value, operatingSystems) && !isUefiBios(vm.get('biosType')) ? UEFI_BIOS : undefined
+          )
           const timeZoneName = updates.getIn(['timeZone', 'name'])
           const isWindowsTimeZone = timezones.find(timezone => timezone.id === timeZoneName)
           const isWindowsVm = isWindows(os.get('name'))
@@ -605,6 +613,7 @@ class DetailsCard extends React.Component {
       if (tpmEnabled !== stateVm.get('tpmEnabled')) {
         vmUpdates.tpmEnabled = stateVm.get('tpmEnabled')
       }
+      vmUpdates.biosType = stateVm.get('biosType')
     }
 
     if (this.trackUpdates.memory) {
