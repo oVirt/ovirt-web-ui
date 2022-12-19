@@ -30,7 +30,7 @@ BuildRequires: autoconf
 BuildRequires: automake
 %if %{with ovirt_use_nodejs_modules}
 # nodejs-modules embeds yarn and requires nodejs
-BuildRequires: ovirt-engine-nodejs-modules >= 2.3.10
+BuildRequires: ovirt-engine-nodejs-modules >= 2.3.20
 %else
 BuildRequires: nodejs >= 14.15
 BuildRequires: yarn >= 1.22
@@ -65,6 +65,30 @@ make install DESTDIR=%{buildroot}
 %{_sysconfdir}/ovirt-web-ui/branding/00-ovirt.brand
 
 %changelog
+* Mon Dec 19 2022 Sharon Gratch <sgratch@redhat.com> - 1.9.3-1
+ - user/account settings - add support for the Virtual Machines layout (card/table view) property option
+ - fix a bug of displaying the correct month in the 'Created' field of the snapshot details card and in the NotificationDrawer
+   events timestamp
+ - optimize the entity permission to permit mappings code to avoid the application from hanging out in case of a large
+   amount of entities
+ - enhance the support of TPM devices for Windows 11/2022 VMs by enforcing the Q35 Chipset with UEFI Firmware Type, if
+   current firmware prevents enabling TPM
+ - github actions: update actions versions to current supported ones
+ - update dependencies of various packages:
+   minimist from 1.2.5 to 1.2.7
+   moment from 2.29.1 to 2.29.4
+   minimatch from 3.0.4 to 3.1.2
+   shelljs from 0.8.4 to 0.8.5
+   react-redux from 7.2.6 to 7.2.9
+   redux from ^4.1.2 to 4.2.0
+   redux-saga from 1.1.3 to 1.2.1
+   patternfly from 4.185.1 to 4.215.1
+   react-charts from 6.55.16 to 6.94.1
+   react-console from 4.53.20 to 4.92.1
+   react-core from 4.202.16 to 4.241.1
+   react-icons from 4.53.16 to 4.92.1
+   react-table from 4.71.16 to 4.110.1
+
 * Fri Sep 30 2022 Sharon Gratch <sgratch@redhat.com> - 1.9.2-1
  - VM Details - users can now create a new NIC with an empty vNIC profile, even if they don't have permissions for NIC profiles within the DC
  - VM details - force tooltips on the VM's react-chart charts to a constant width
