@@ -33,9 +33,9 @@ For CentOS stream 9:
     dnf copr enable -y ovirt/ovirt-master-snapshot centos-stream-9
     dnf install -y ovirt-engine-nodejs-modules
 
-For CentOS Stream 8 you need to run:
+For CentOS stream 10:
 
-    dnf copr enable -y ovirt/ovirt-master-snapshot centos-stream-8
+    dnf copr enable -y ovirt/ovirt-master-snapshot centos-stream-10
     dnf install -y ovirt-engine-nodejs-modules
 
 After installing, the package may be for development or building.  It provides `yarn` itself
@@ -57,7 +57,7 @@ with changes made to `package.json` or `yarn.lock` in a new pull request.
 
 ### Development mode
 A primary goal of VM Portal is a quick development cycle (change-build-deploy-check). The
-project uses [webpack-dev-server](http://webpack.github.io/docs/webpack-dev-server.html)
+project uses [webpack-dev-server](https://webpack.js.org/)
 to accomplish this. To start the server:
 
     ENGINE_URL=https://my.ovirt.instance:8443/ovirt-engine/ yarn start
@@ -96,8 +96,8 @@ User name and password can also be provided via shell variables or in the `doten
 
 #### Auto-Open browser
 When the dev server is started, it will attempt to open a new browser window/tab on
-your system default browser to the app's running URL.  This behavior can be modified
-by specifying the `BROWSER` environment variable.  Possible values are:
+your system default browser to the app's running URL. By default it will try to open a chromuim based browser.If there is no such browser available on the system the `yarn start` command will fail.
+This behavior can be modified by specifying the `BROWSER` environment variable.  Possible values are:
 
     BROWSER=none               # disable the feature
     BROWSER=google-chrome      # open a new tab in chrome on Linux

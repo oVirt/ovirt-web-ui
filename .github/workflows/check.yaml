@@ -8,39 +8,36 @@ on:
   pull_request:
 
 jobs:
-  test_el8_offline:
-    name: EL8 (ovirt-engine-nodejs-modules build) - test, build and publish rpm repo for the PR
+
+  test_el9_offline:
+    name: EL9 (ovirt-engine-nodejs-modules build) - test, build and publish rpm repo for the PR
     env:
       OFFLINE_BUILD: 1
 
     runs-on: ubuntu-latest
     container:
-      #
-      # Note: The ovirt build container will have all of the spec's `BuildRequires`
-      #       packages already installed.  Therefore, no additional contianer setup
-      #       is needed.
-      #
-      image: quay.io/ovirt/buildcontainer:el8stream
+      image: quay.io/ovirt/buildcontainer:el9stream
 
     steps:
       - name: Checkout sources
         uses: ovirt/checkout-action@main
+      
+      - name: install rpmlint
+        run: dnf -y install rpmlint
 
       - name: Run automation/build.sh (installs build dependencies as necessary)
         run: ./automation/build.sh
 
-      - name: Upload artifacts
+      - name: Upload artifacts as rpm repo
         uses: ovirt/upload-rpms-action@main
         with:
           directory: exported-artifacts/
-
-  test_el8_online:
-    name: EL8 (online build) - test and build the PR, but skip the rpm builds
-
+  
+  test_el9_online:
+    name: EL9 (online build) test and build the PR, but skip the rpm builds
     runs-on: ubuntu-latest
     container:
-      image: quay.io/ovirt/buildcontainer:el8stream
-
+      image: quay.io/ovirt/buildcontainer:el9stream
     steps:
       - name: Install yarn (online mode does not use ovirt-engine-nodejs-modules so yarn isn't installed)
         run: |
@@ -55,24 +52,21 @@ jobs:
           yarn install
           yarn build
 
-      #
-      # Note: The source tar, srpm and rpm are not needed for the online build.  We only
-      #       need 1 rpm repo artifact per distro.  The rpm repo is generated from the
-      #       offline build.
-      #
-
-  test_el9_offline:
-    name: EL9 (ovirt-engine-nodejs-modules build) - test, build and publish rpm repo for the PR
+  test_el10_offline:
+    name: EL10 (ovirt-engine-nodejs-modules build) - test, build and publish rpm repo for the PR
     env:
       OFFLINE_BUILD: 1
 
     runs-on: ubuntu-latest
     container:
-      image: quay.io/ovirt/buildcontainer:el9stream
+      image: quay.io/ovirt/buildcontainer:el10stream
 
     steps:
       - name: Checkout sources
         uses: ovirt/checkout-action@main
+
+      - name: install rpmlint
+        run: pip install rpmlint
 
       - name: Run automation/build.sh (installs build dependencies as necessary)
         run: ./automation/build.sh
@@ -81,3 +75,23 @@ jobs:
         uses: ovirt/upload-rpms-action@main
         with:
           directory: exported-artifacts/
+
+  test_el10_online:
+    name: EL10 (online build) test and build the PR, but skip the rpm builds
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/ovirt/buildcontainer:el10stream
+    steps:
+      - name: Install yarn (online mode does not use ovirt-engine-nodejs-modules so yarn isn't installed)
+        run: |
+          dnf -y install nodejs
+          dnf -y config-manager --add-repo https://dl.yarnpkg.com/rpm/yarn.repo
+          dnf -y --disablerepo='*' --enablerepo='yarn*' install yarn
+
+      - name: Checkout sources
+        uses: ovirt/checkout-action@main
+
+      - name: Run 'yarn install' and 'yarn build' (like a developer would)
+        run: |
+          yarn install
+          yarn build
