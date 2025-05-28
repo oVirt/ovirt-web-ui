@@ -27,6 +27,7 @@ BuildRequires: rpm-build
 # requirements for building the rpm from src.rpm
 BuildRequires: autoconf
 BuildRequires: automake
+BuildRequires: make
 %if %{with ovirt_use_nodejs_modules}
 # nodejs-modules embeds yarn and requires nodejs
 BuildRequires: ovirt-engine-nodejs-modules >= 2.3.20
