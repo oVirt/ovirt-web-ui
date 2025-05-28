@@ -9,64 +9,33 @@ on:
 
 jobs:
 
-  test_el9_offline:
-    name: EL9 (ovirt-engine-nodejs-modules build) - test, build and publish rpm repo for the PR
+  test_offline:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: centos-stream9
+            container-name: el9stream
+          - name: centos-stream10
+            container-name: el10stream
+
+    name: ${{ matrix.name }} (ovirt-engine-nodejs-modules build) - test, build and publish rpm repo for the PR
+
     env:
       OFFLINE_BUILD: 1
 
-    runs-on: ubuntu-latest
     container:
-      image: quay.io/ovirt/buildcontainer:el9stream
-
-    steps:
-      - name: Checkout sources
-        uses: ovirt/checkout-action@main
-      
-      - name: install rpmlint
-        run: dnf -y install rpmlint
-
-      - name: Run automation/build.sh (installs build dependencies as necessary)
-        run: ./automation/build.sh
-
-      - name: Upload artifacts as rpm repo
-        uses: ovirt/upload-rpms-action@main
-        with:
-          directory: exported-artifacts/
-  
-  test_el9_online:
-    name: EL9 (online build) test and build the PR, but skip the rpm builds
-    runs-on: ubuntu-latest
-    container:
-      image: quay.io/ovirt/buildcontainer:el9stream
-    steps:
-      - name: Install yarn (online mode does not use ovirt-engine-nodejs-modules so yarn isn't installed)
-        run: |
-          dnf -y config-manager --add-repo https://dl.yarnpkg.com/rpm/yarn.repo
-          dnf -y --disablerepo='*' --enablerepo='yarn*' install yarn
-
-      - name: Checkout sources
-        uses: ovirt/checkout-action@main
-
-      - name: Run 'yarn install' and 'yarn build' (like a developer would)
-        run: |
-          yarn install
-          yarn build
-
-  test_el10_offline:
-    name: EL10 (ovirt-engine-nodejs-modules build) - test, build and publish rpm repo for the PR
-    env:
-      OFFLINE_BUILD: 1
-
-    runs-on: ubuntu-latest
-    container:
-      image: quay.io/ovirt/buildcontainer:el10stream
+      image: quay.io/ovirt/buildcontainer:${{ matrix.container-name }}
 
     steps:
       - name: Checkout sources
         uses: ovirt/checkout-action@main
 
       - name: install rpmlint
-        run: pip install rpmlint
+        run: |
+          dnf -y install epel-release
+          dnf -y install rpmlint
 
       - name: Run automation/build.sh (installs build dependencies as necessary)
         run: ./automation/build.sh
@@ -76,11 +45,22 @@ jobs:
         with:
           directory: exported-artifacts/
 
-  test_el10_online:
-    name: EL10 (online build) test and build the PR, but skip the rpm builds
+  test_online:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: centos-stream9
+            container-name: el9stream
+          - name: centos-stream10
+            container-name: el10stream
+
+    name: ${{ matrix.name }} (online build) test and build the PR, but skip the rpm builds
+
     container:
-      image: quay.io/ovirt/buildcontainer:el10stream
+      image: quay.io/ovirt/buildcontainer:${{ matrix.container-name }}
+
     steps:
       - name: Install yarn (online mode does not use ovirt-engine-nodejs-modules so yarn isn't installed)
         run: |
