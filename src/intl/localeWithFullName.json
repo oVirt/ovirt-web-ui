@@ -1,13 +1,13 @@
 {
-  "cs":"Česky - Česko",
-  "de":"Deutsch - Deutschland",
-  "en":"English - United States",
-  "es":"español - España",
-  "fr":"français - France",
-  "it":"Italiano - Italia",
-  "ja":"日本語 - 日本",
-  "ko":"한국어 - 대한민국",
-  "ka":"ქართული",
+  "cs-CZ":"Česky - Česko",
+  "de-DE":"Deutsch - Deutschland",
+  "en-US":"English - United States",
+  "es-ES":"español - España",
+  "fr-FR":"français - France",
+  "it-IT":"Italiano - Italia",
+  "ja-JP":"日本語 - 日本",
+  "ko-KR":"한국어 - 대한민국",
+  "ka-GE":"ქართული",
   "pt-BR":"Português - Brasil",
   "zh-CN":"中文（简体） - 中国"
 }

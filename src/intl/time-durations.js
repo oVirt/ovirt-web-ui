@@ -1,6 +1,6 @@
 // @flow
 
-export const timeDurations: { [messageId: string]: {| message: string, description: string |} } =
+const timeDurations: { [messageId: string]: {| message: string, description: string |} } =
 {
   durationLabelStandard_S: {
     message: 'millisecond',
@@ -162,3 +162,5 @@ export const timeDurations: { [messageId: string]: {| message: string, descripti
     description: 'short label for multiple years',
   },
 }
+
+export { timeDurations }

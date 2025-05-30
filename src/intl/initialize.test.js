@@ -2,24 +2,31 @@
 import { coerceToSupportedLocale } from './initialize'
 
 describe('coerce to supported locale', () => {
-  test.each([null, '', 'pt', 'pt-PT', 'nv'])(
+  test.each([null, '', 'nv', '', 'pa-IN'])(
     'returns null for [%s]',
     locale => {
       expect(coerceToSupportedLocale(locale)).toEqual(null)
     }
   )
 
-  test.each(['pt_BR', 'pt-BR', 'pt_br', 'pt-br'])(
+  test.each(['pt_BR', 'pt-BR', 'pt_br', 'pt-br', 'pt', 'pt-PT'])(
     'returns pt-BR for [%s]',
     locale => {
       expect(coerceToSupportedLocale(locale)).toEqual('pt-BR')
     }
   )
 
-  test.each(['en_US', 'en_us', 'en-US', 'en-us', 'en'])(
-    'returns en for [%s]',
+  test.each(['fr-FR', 'fr-BE','fr-CA', 'fr-LU', 'fr-CH'])(
+    'returns fr-FR for [%s]',
     locale => {
-      expect(coerceToSupportedLocale(locale)).toEqual('en')
+      expect(coerceToSupportedLocale(locale)).toEqual('fr-FR')
+    }
+  )
+
+  test.each(['en_US', 'en_us', 'en-US', 'en-us', 'en'])(
+    'returns en-US for [%s]',
+    locale => {
+      expect(coerceToSupportedLocale(locale)).toEqual('en-US')
     }
   )
 

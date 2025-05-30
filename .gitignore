@@ -33,7 +33,6 @@ src/version.js
 
 # intl related
 /extra
-/.zanata-cache/
 
 # mock_runner
 .bash_history

@@ -1,32 +1,21 @@
 // @flow
 
 import IntlMessageFormat from 'intl-messageformat'
-import { discoverUserLocale, getLocaleFromUrl, coerceToSupportedLocale, initMomentTranslations } from './initialize'
+import {
+  coerceToSupportedLocale,
+  discoverUserLocale,
+  getLocaleFromUrl,
+  initMomentTranslations,
+} from './initialize'
 
 import { messages, type MessageIdType, type MessageType } from './messages'
-import translatedMessages from './translated-messages.json'
 import baseLocaleWithFullName from './localeWithFullName.json'
-import moment from 'moment'
 
 export { withMsg, default as MsgContext } from './MsgContext'
 
-export const DEFAULT_LOCALE: string = 'en'
+export const DEFAULT_LOCALE: string = 'en-US'
 
-const DUMMY_LOCALE: string = 'aa' // NOTE: Used for development and testing
-
-function buildBaseLocale (): {[string]: string} {
-  if (!translatedMessages[DUMMY_LOCALE]) {
-    return baseLocaleWithFullName
-  }
-  console.warn(`Enable test locale: ${DUMMY_LOCALE}`)
-  moment.defineLocale(DUMMY_LOCALE, {})
-  return {
-    ...baseLocaleWithFullName,
-    [DUMMY_LOCALE]: DUMMY_LOCALE,
-  }
-}
-
-export const localeWithFullName: {[string]: string} = buildBaseLocale()
+export const localeWithFullName: {[string]: string} = baseLocaleWithFullName
 export const BASE_LOCALE_SET: Set<string> = new Set(Object.keys(localeWithFullName))
 
 /**
@@ -49,8 +38,20 @@ function getMessage (id: MessageIdType, targetLocale: string): string {
   return id
 }
 
+function loadLocalMessages (currentLocale: string): ?Set<string> {
+  let translations = {}
+  try {
+    translations = require(`../intl/locales/${currentLocale}.json`)
+  } catch (error) {
+    console.log(error)
+    // Fallback to default locale if it seems the locale can't be imported
+    translations = require(`../intl/locales/${DEFAULT_LOCALE}.json`)
+  }
+  return translations
+}
+
 function getMessageForLocale (id: MessageIdType, targetLocale: string): ?string {
-  const messages = targetLocale === DEFAULT_LOCALE ? defaultMessages : translatedMessages[targetLocale]
+  const messages = loadLocalMessages(targetLocale)
   const message = messages[id]
   if (message) {
     return message
@@ -70,20 +71,6 @@ function formatMessage (id: MessageIdType, values: ?Object, targetLocale: string
   return messageFormat.format(values)
 }
 
-function removeMessageDescription (messages: { [MessageIdType]: MessageType }): { [MessageIdType]: string } {
-  return Object.keys(messages)
-    .map(key => {
-      const value = (messages: any)[key]
-      if (typeof value === 'object') {
-        return [key, value.message]
-      }
-      return [key, value]
-    })
-    .reduce((sum, [key, value]) => Object.assign(sum, { [key]: value }), {})
-}
-
-const defaultMessages: { [MessageIdType]: string } = removeMessageDescription(messages)
-
 function createFormattingFunctionsMap (targetLocale: string, messages: { [MessageIdType]: MessageType }): {[MessageIdType]: ((?Object) => string)} {
   return Object.keys(messages)
     .reduce((sum, key) => Object.assign(sum, { [key]: (values) => formatMessage(key, values, targetLocale) }), {})
@@ -91,10 +78,6 @@ function createFormattingFunctionsMap (targetLocale: string, messages: { [Messag
 
 export function createMessages (targetLocale: string): {[MessageIdType]: ((?Object) => string)} {
   const safeLocale = coerceToSupportedLocale(targetLocale) || DEFAULT_LOCALE
-  console.log(`Create messages for locale ${safeLocale}`)
-  if (targetLocale !== safeLocale) {
-    console.warn(`Locale ${targetLocale} is not supported and was replaced with ${safeLocale}`)
-  }
   for (const key in messageFormatCache) {
     delete messageFormatCache[key]
   }

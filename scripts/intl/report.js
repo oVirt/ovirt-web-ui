@@ -3,6 +3,9 @@ import path from 'path'
 import chalk from 'chalk'
 import { table } from 'table'
 import messages from '../../src/intl/messages.js'
+import timeModule from "../../src/intl/time-durations.js"
+
+const timeDurations = timeModule.timeDurations
 
 function round (number, precision = 0) {
   const factor = Math.pow(10, precision)
@@ -131,16 +134,30 @@ function reportCoverage (englishMessages, translatedMessagesPerLocale) {
 //
 // Run the reports...
 //
-const TRANSLATED = path.join('src', 'intl', 'translated-messages.json')
-const translatedMessagesPerLocale = JSON.parse(fs.readFileSync(TRANSLATED, 'utf8'))
-const englishMessages = messages.messages
+const TRANSLATIONS_DIR = path.join("src", "intl", "locales")
+const translatedMessagesPerLocale = {}
 
-console.log(chalk`English key count: {yellow ${Object.keys(englishMessages).length}}`)
+fs.readdirSync(TRANSLATIONS_DIR).forEach(file => {
+  const locale = path.basename(file, '.json')
+  const filePath = path.join(TRANSLATIONS_DIR, file)
+  translatedMessagesPerLocale[locale] = JSON.parse(fs.readFileSync(filePath, 'utf8'))
+})
+
+
+const baseMessages = {
+  ...messages.messages,
+  ...Object.keys(timeDurations).reduce((acc, messageId) => {
+    acc[messageId] = timeDurations[messageId].message
+    return acc
+  }, {})
+}
+console.log(`time duration: ${Object.keys(timeDurations).length} keys`)
+console.log(chalk`English key count: {yellow ${Object.keys(baseMessages).length}}`)
 console.log()
 console.log('Untranslated keys per locale:')
-reportUntranslatedKeys(englishMessages, translatedMessagesPerLocale)
+reportUntranslatedKeys(baseMessages, translatedMessagesPerLocale)
 console.log()
-reportDuplicateValues(englishMessages, translatedMessagesPerLocale)
+reportDuplicateValues(baseMessages, translatedMessagesPerLocale)
 console.log()
 console.log('Translation coverage report:')
-reportCoverage(englishMessages, translatedMessagesPerLocale)
+reportCoverage(baseMessages, translatedMessagesPerLocale)

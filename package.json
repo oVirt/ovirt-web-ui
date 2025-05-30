@@ -103,14 +103,7 @@
     "test:watch": "yarn run pretest && jest --watch --no-watchman",
     "eslint": "eslint src config scripts babel-plugin",
     "eslint:fix": "eslint src config scripts babel-plugin --fix",
-    "intl:dummy": "babel-node --presets @babel/env,@babel/flow scripts/intl/dummy-locale.js",
-    "intl:extract": "scripts/intl/intl-extract.sh",
-    "intl:push": "scripts/intl/intl-zanata-push.sh",
-    "intl:pull": "scripts/intl/intl-zanata-pull.sh",
-    "intl:apply": "scripts/intl/intl-apply.sh",
-    "intl:report": "babel-node --presets @babel/env,@babel/flow scripts/intl/report.js",
-    "intl:sync": "babel-node --presets @babel/env,@babel/flow scripts/intl/sync-messages.js",
-    "intl:check-use": "scripts/intl/check-message-use.sh"
+    "intl:report": "babel-node --presets @babel/env,@babel/flow scripts/intl/report.js"
   },
   "jest": {
     "setupFiles": [],
