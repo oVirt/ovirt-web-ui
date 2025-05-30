@@ -13,7 +13,9 @@ import 'moment/locale/pt-br'
 import 'moment/locale/zh-cn'
 import 'moment-duration-format'
 
-import { BASE_LOCALE_SET, DEFAULT_LOCALE } from './index'
+import baseLocaleWithFullName from './localeWithFullName.json'
+
+import { DEFAULT_LOCALE } from './index'
 import { timeDurations } from './time-durations'
 
 export function discoverUserLocale (): string {
@@ -31,14 +33,14 @@ export function getLocaleFromUrl (): ?string {
 
 function getBrowserLocale (): ?string {
   if (window.navigator.language) {
-    const locale = coerceToSupportedLocale(window.navigator.language)
+    const locale = window.navigator.language
     if (locale) {
       return locale
     }
   }
   if (window.navigator.languages) {
     window.navigator.languages.forEach(browserLocale => {
-      const locale = coerceToSupportedLocale(browserLocale)
+      const locale = browserLocale
       if (locale) {
         return locale
       }
@@ -48,21 +50,17 @@ function getBrowserLocale (): ?string {
 }
 
 /**
- * Take a locale string and find the most specific version of the locale that
- * is supported by the App.
+ * Take a locale string and clean it up to match the base locale set.
  *
  * For example:
- *    'en-US' -> 'en'
- *    'fr-CA' -> 'fr'
- *    'pt-PT' -> null  (since we support pt-BR and don't have a base pt translation)
+ *    'en' -> 'en-US'
+ *    'en_US' -> 'en-US'
+ *    'pt-PT' -> 'pt-BR' Because 'pt-PT' is not in the base locale set but we offer some sort of Portuguese so we return 'pt-BR'
  */
 export function coerceToSupportedLocale (locale: ?string): ?string {
+  const BASE_LOCALE_SET: Set<string> = new Set(Object.keys(baseLocaleWithFullName))
   if (!locale) {
     return null
-  }
-
-  if (/^en/.test(locale)) {
-    return 'en'
   }
 
   let commonLocale = locale.replace('_', '-')
@@ -74,24 +72,26 @@ export function coerceToSupportedLocale (locale: ?string): ?string {
     return commonLocale
   }
 
-  const languageOnlyLocale = localeArray[0]
-  return BASE_LOCALE_SET.has(languageOnlyLocale) ? languageOnlyLocale : null
+  for (const locale of BASE_LOCALE_SET) {
+    if (locale.startsWith(localeArray[0])) {
+      return locale
+    }
+  }
+
+  return null
 }
 
 //
 // moment and moment-duration-format setup
 //
 export function initMomentTranslations (locale: string, defaultLocale: string) {
-  const chosen = moment.locale([locale, defaultLocale])
-  console.log(`Locale being used by moment: ${chosen}`)
-
   //
   // Extend the moment locale object for moment-duration-format:
   //   https://github.com/jsmreese/moment-duration-format#extending-moments-locale-object
   //
-  const translations = require('./translated-time-durations.json')
-  if (translations[locale]) {
-    const t: { [messageId: string]: string } = translations[locale]
+  const translations = require(`./locales/${locale}.json`)
+  if (translations) {
+    const t: { [messageId: string]: string } = translations
 
     // for built-in translations moment.js uses lower case identifiers
     // i.e. pt-br instead of pt-BR

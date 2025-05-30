@@ -200,6 +200,32 @@ A pair of extensions are recommended to simplify debugging of the application:
   - [Redux DevTools Extension](http://extension.remotedev.io/)
   - [React Developer Tools](https://github.com/facebook/react-devtools)
 
+## Translations
+
+Translations are hosted on [Weblate](https://translate.ovirt.tech/projects/ovirt-web-ui/).
+
+Currently supported languages are:
+- Czech (Chzechia)
+- German (Germany)
+- English (United States)
+- Spanish (Spain)
+- French (France)
+- Italian (Italy)
+- Japanese (Japan)
+- Korean (South Korea)
+- Portuguese (Brazil)
+- Simplified Chinese (China)
+- Georgian (Georgia)
+
+To add a new string to the project the following steps must be taken:
+
+1. Add a new entry to intl/messages.js with a key and string value that is the base, a description is optional.
+2. Add at least a translation to the en-US.json file.
+
+After these steps the string will be available for translations on the weblate page. 
+
+To see the current completion of the languages locally run `yarn intl:report`.
+
 
 ## Goals
 - fast UI responses and start-up
