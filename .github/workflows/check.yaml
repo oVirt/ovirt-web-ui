@@ -64,7 +64,11 @@ jobs:
     steps:
       - name: Install yarn (online mode does not use ovirt-engine-nodejs-modules so yarn isn't installed)
         run: |
-          dnf -y install nodejs
+          if dnf module list nodejs &>/dev/null 2>&1; then
+            dnf -y module reset nodejs
+            dnf -y module enable nodejs:20
+            dnf -y install nodejs
+          fi
           dnf -y config-manager --add-repo https://dl.yarnpkg.com/rpm/yarn.repo
           dnf -y --disablerepo='*' --enablerepo='yarn*' install yarn
 

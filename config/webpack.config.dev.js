@@ -29,7 +29,7 @@ export default ({
     devServer: {
       host,
       port,
-      https,
+      server: https ? 'https' : 'http',
       historyApiFallback: {
         index: publicPath,
       },
