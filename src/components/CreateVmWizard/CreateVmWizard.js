@@ -258,7 +258,7 @@ class CreateVmWizard extends React.Component {
             onUpdate={({ valid = true, ...updatePayload }) => {
               this.handleListOnUpdate('storage', 'disks', updatePayload)
               this.setState(produce(draft => {
-                draft.stepNavigation.storage.valid = valid
+                draft.stepNavigation.storage.valid = valid && !draft.steps.storage.disks.some(disk => disk.underConstruction)
               }))
             }}
           />
