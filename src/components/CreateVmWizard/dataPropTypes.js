@@ -23,8 +23,9 @@ export const BASIC_DATA_SHAPE = {
   cloudInitEnabled: PropTypes.bool,
   initHostname: PropTypes.string,
   initSshKeys: PropTypes.string,
+  initUsername: PropTypes.string,
   initTimezone: PropTypes.string,
-  initAdminPassword: PropTypes.string,
+  initPassword: PropTypes.string,
   initCustomScript: PropTypes.string,
 
   topology: PropTypes.exact({
