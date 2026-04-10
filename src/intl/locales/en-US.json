@@ -612,6 +612,7 @@
     "durationLabelStandard_w": "week",
     "durationLabelStandard_ww": "weeks",
     "durationLabelStandard_y": "year",
-    "durationLabelStandard_yy": "years"
+    "durationLabelStandard_yy": "years",
+    "useConfiguredPassword": "Use already configured password"
 
 }

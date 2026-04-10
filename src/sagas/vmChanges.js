@@ -56,7 +56,8 @@ function* composeAndCreateVm ({ payload: { basic, nics, disks }, meta: { correla
         authorized_ssh_keys: basic.initSshKeys,
         custom_script: basic.initCustomScript,
         host_name: basic.initHostname,
-        root_password: basic.initAdminPassword,
+        user_name: basic.initUsername,
+        root_password: basic.initPassword,
         timezone: basic.initTimezone,
       }
       : {},

@@ -1,6 +1,7 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import PropTypes from 'prop-types'
 import {
+  Checkbox,
   FormGroup,
   TextArea,
   TextInput,
@@ -11,6 +12,9 @@ const CloudInitForm = ({ idPrefix, vm, onChange }) => {
   const { msg } = useContext(MsgContext)
   const cloudInitHostName = vm.getIn(['cloudInit', 'hostName'])
   const cloudInitSshAuthorizedKeys = vm.getIn(['cloudInit', 'sshAuthorizedKeys'])
+  const cloudInitUsername = vm.getIn(['cloudInit', 'username'])
+  const cloudInitPassword = vm.getIn(['cloudInit', 'password']) || ''
+  const [useConfiguredPassword, setUseConfiguredPassword] = useState(!!cloudInitPassword)
   return (
     <>
       <FormGroup
@@ -32,6 +36,39 @@ const CloudInitForm = ({ idPrefix, vm, onChange }) => {
           id={`${idPrefix}-cloud-init-ssh`}
           value={cloudInitSshAuthorizedKeys}
           onChange={value => onChange('cloudInitSshAuthorizedKeys', value)}
+        />
+      </FormGroup>
+      <FormGroup
+        label={msg.username()}
+        fieldId={`${idPrefix}-cloud-init-username`}
+      >
+        <TextInput
+          id={`${idPrefix}-cloud-init-username`}
+          value={cloudInitUsername}
+          onChange={value => onChange('cloudInitUsername', value)}
+        />
+      </FormGroup>
+      <Checkbox
+        id={`${idPrefix}-cloud-init-password-configured`}
+        label={msg.useConfiguredPassword()}
+        isChecked={useConfiguredPassword}
+        onChange={(checked) => {
+          setUseConfiguredPassword(checked)
+          if (!checked) {
+            onChange('cloudInitPassword', '')
+          }
+        }}
+      />
+      <FormGroup
+        label={msg.password()}
+        fieldId={`${idPrefix}-cloud-init-password`}
+      >
+        <TextInput
+          id={`${idPrefix}-cloud-init-password`}
+          type="password"
+          value={cloudInitPassword}
+          isDisabled={useConfiguredPassword}
+          onChange={value => onChange('cloudInitPassword', value)}
         />
       </FormGroup>
     </>

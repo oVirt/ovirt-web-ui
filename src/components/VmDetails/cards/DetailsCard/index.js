@@ -328,7 +328,8 @@ class DetailsCard extends React.Component {
                 { fieldName: 'cloudInitSshAuthorizedKeys', value: template.getIn(['cloudInit', 'sshAuthorizedKeys']) },
                 { fieldName: 'cloudInitTimezone', value: template.getIn(['cloudInit', 'timezone']) },
                 { fieldName: 'cloudInitCustomScript', value: template.getIn(['cloudInit', 'customScript']) },
-                { fieldName: 'cloudInitPassword', value: template.getIn(['cloudInit', 'password']) }
+                { fieldName: 'cloudInitPassword', value: template.getIn(['cloudInit', 'password']) },
+                { fieldName: 'cloudInitUsername', value: template.getIn(['cloudInit', 'username']) }
               )
             }
           }
@@ -383,6 +384,11 @@ class DetailsCard extends React.Component {
         case 'enableInitTimezone': // Configure Timezone checkbox change
           updates = updates.setIn(['cloudInit', 'timezone'], value ? lastInitTimezone : '')
           initTimezoneUpdates.enableInitTimezone = value
+          fieldUpdated = 'cloudInit'
+          break
+
+        case 'cloudInitUsername':
+          updates = updates.setIn(['cloudInit', 'username'], value)
           fieldUpdated = 'cloudInit'
           break
 
