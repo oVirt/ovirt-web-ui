@@ -131,6 +131,7 @@ dl.pool-info dd {
 }
 
 .gallery-container {
+    /* padding-top: 1rem; */
     scrollbar-gutter: stable;
     padding-left: var(--pf-global--gutter);
     /** reserve space for scrolling: 100vw - 100% returns the scrollbar width */
@@ -149,6 +150,6 @@ dl.pool-info dd {
     font-weight: bold;
 }
 
-:global(#page-router-render-component) .tableView  {
-    padding-top: 0;
+.cardView  {
+    padding-top: 20px;
 } 

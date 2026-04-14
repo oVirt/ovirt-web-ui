@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react'
 import PropTypes from 'prop-types'
+import { useBlocker } from 'react-router-dom'
 
 import SettingsToolbar from './SettingsToolbar'
-import NavigationPrompt from 'react-router-navigation-prompt'
 import NavigationConfirmationModal from '../NavigationConfirmationModal'
 import CounterAlert from '_/components/CounterAlert'
 import { generateUnique } from '_/helpers'
@@ -48,6 +48,7 @@ const Settings = ({
 }) => {
   const { msg } = useContext(MsgContext)
   const [transactionId, setTransactionId] = useState(null)
+  const [showNavConfirm, setShowNavConfirm] = useState(false)
 
   const handleSave = () => {
     const saveFields = pendingUserChanges({ currentValues, draftValues }).reduce((acc, cur) => ({ ...acc, [cur]: draftValues[cur] }), {})
@@ -59,6 +60,8 @@ const Settings = ({
   const conflictingChanges = changedInTheMeantime({ currentValues, baseValues, draftValues, sentValues })
     .map(field => translatedLabels.find(({ fieldName }) => fieldName === field)?.fieldTitle ?? field)
   const pendingChanges = pendingUserChanges({ currentValues, draftValues })
+  const hasPendingChanges = !!pendingChanges.length
+  const blocker = useBlocker(hasPendingChanges)
   const stillPendingAfterSave = stillPending({ currentValues, sentValues })
   const changedInLastTrans = changedInLastTransaction({ currentValues, sentValues })
   const enableReset = !pendingChanges.length && enableResetToDefaultSetting({ currentValues, defaultValues })
@@ -111,13 +114,49 @@ const Settings = ({
     }
   }, [partialSuccess, completeFailure, fullSuccess, pendingChanges, resetBaseValues])
 
+  useEffect(() => {
+    if (blocker.state === 'blocked') {
+      setShowNavConfirm(true)
+    }
+  }, [blocker.state])
+
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      if (!hasPendingChanges) {
+        return
+      }
+
+      event.preventDefault()
+      event.returnValue = ''
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [hasPendingChanges])
+
+  const confirmNavigation = () => {
+    setShowNavConfirm(false)
+    if (blocker.state === 'blocked') {
+      blocker.proceed()
+    }
+  }
+
+  const cancelNavigation = () => {
+    setShowNavConfirm(false)
+    if (blocker.state === 'blocked') {
+      blocker.reset()
+    }
+  }
+
   return (
     <>
-      <NavigationPrompt when={(currentLocation, nextLocation) => !!pendingChanges.length}>
-        {({ isActive, onConfirm, onCancel }) => (
-          <NavigationConfirmationModal show={isActive} onYes={onConfirm} onNo={onCancel} additionalNote={msg.allTabs()}/>
-        )}
-      </NavigationPrompt>
+      <NavigationConfirmationModal
+        show={showNavConfirm}
+        onYes={confirmNavigation}
+        onNo={cancelNavigation}
+        additionalNote={msg.allTabs()}
+      />
       <div className={showFullSuccess || partialSave.show || showCompleteFailure ? style['alert-container'] : null}>
         { showFullSuccess && (
           <CounterAlert

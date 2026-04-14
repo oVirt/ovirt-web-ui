@@ -1,29 +1,14 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
-import { ConnectedRouter } from 'connected-react-router'
-import { renderRoutes } from 'react-router-config'
+import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 
 import LoadingData from '_/components/LoadingData'
 import NoLogin from '_/components/NoLogin'
-import OvirtApiCheckFailed from '_/components/OvirtApiCheckFailed'
-import RefreshIntervalChangeHandler from '_/components/RefreshIntervalChangeHandler'
-import SessionActivityTracker from '_/components/SessionActivityTracker'
-import ToastNotifications from '_/components/ToastNotifications'
-import VmsPageHeader from '_/components/VmsPageHeader'
-import VmUserMessages from '_/components/VmUserMessages'
-import ConsoleNotificationsDialog from '_/components/VmActions/ConsoleNotificationsDialog'
 
 import getRoutes from '_/routes'
-import { fixedStrings } from '_/branding'
 import { MsgContext } from '_/intl'
-
-import {
-  Page,
-} from '@patternfly/react-core'
-
-import Header from './components/Header'
 
 function isLoginMissing (config) {
   return !config.get('loginToken') || config.get('isTokenExpired')
@@ -61,11 +46,7 @@ function isBrowserUnsupported () {
  * Main App component. Wrap the main react-router components together with
  * the various dialogs and error messages that may be needed.
  */
-const App = ({ history, config, appReady, activateSessionTracker }) => {
-  const { msg } = useContext(MsgContext)
-  const [isDrawerExpanded, setDrawerExpanded] = useState(false)
-  const toggleNotificationDrawer = () => setDrawerExpanded(!isDrawerExpanded)
-
+const App = ({ config, appReady, activateSessionTracker }) => {
   if (isBrowserUnsupported()) {
     return <UnsupportedBrowser />
   }
@@ -74,37 +55,16 @@ const App = ({ history, config, appReady, activateSessionTracker }) => {
     return <div id='app-container'><NoLogin logoutWasManual={config.get('logoutWasManual')} isTokenExpired={config.get('isTokenExpired')} /></div>
   }
 
+  const routes = getRoutes({ appReady, activateSessionTracker })
+
   return (
-    <ConnectedRouter history={history}>
-      <div id='app-container'>
-        <LoadingData />
-        <ToastNotifications />
-        <ConsoleNotificationsDialog/>
-        { appReady && activateSessionTracker && <SessionActivityTracker /> }
-        { appReady && <RefreshIntervalChangeHandler /> }
-        <Page
-          header={(
-            <Header>
-              <VmsPageHeader
-                title={fixedStrings.BRAND_NAME + ' ' + msg.vmPortal()}
-                onCloseNotificationDrawer={toggleNotificationDrawer}
-                isDrawerExpanded={isDrawerExpanded}
-              />
-            </Header>
-          )}
-          notificationDrawer={<VmUserMessages onClose={toggleNotificationDrawer} />}
-          isNotificationDrawerExpanded={isDrawerExpanded}
-        >
-          <OvirtApiCheckFailed />
-          { appReady && renderRoutes(getRoutes()) }
-        </Page>
-      </div>
-    </ConnectedRouter>
+    <div id='app-container'>
+      <LoadingData />
+      <RouterProvider router={createBrowserRouter(routes)} />
+    </div>
   )
 }
 App.propTypes = {
-  history: PropTypes.object.isRequired,
-
   config: PropTypes.object.isRequired,
   appReady: PropTypes.bool.isRequired,
   activateSessionTracker: PropTypes.bool.isRequired,
@@ -113,7 +73,7 @@ App.propTypes = {
 export default connect(
   (state) => ({
     config: state.config,
-    appReady: !!state.config.get('appConfigured'), // When is the app ready to display data components?
+    appReady: !!state.config.get('appConfigured'),
     activateSessionTracker: (state.config.get('userSessionTimeoutInterval') > 0),
   })
 )(App)

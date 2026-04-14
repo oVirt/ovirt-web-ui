@@ -1,11 +1,8 @@
 // @flow
 import { createStore, applyMiddleware, type Store, combineReducers } from 'redux'
 import createSagaMiddleware, { type SagaMiddleware, type Task } from 'redux-saga'
-import { connectRouter, routerMiddleware } from 'connected-react-router'
-import { createBrowserHistory, type History } from 'history'
 import { composeWithDevToolsDevelopmentOnly } from '@redux-devtools/extension'
 
-import AppConfiguration from '_/config'
 import OvirtApi from '_/ovirtapi'
 import reducers from '_/reducers'
 import { rootSaga } from '_/sagas'
@@ -32,29 +29,21 @@ function initializeApiTransportListener (store: Store<any, any>) {
 }
 
 /**
- * Configure the app's redux store with saga middleware, connected react-router,
- * and connected to the OvirtApi listeners.
+ * Configure the app's redux store with saga middleware and the OvirtApi listeners.
  */
-export default function configureStore (): Store<any, any> & { rootTask: Task<any>, history: History<> } {
+export default function configureStore (): Store<any, any> & { rootTask: Task<any> } {
   const sagaMiddleware: SagaMiddleware<any> = createSagaMiddleware({
     onError (error: Error) {
       console.error('Uncaught saga error (store.js): ', error)
     },
   })
 
-  // history to use for the connected react-router
-  const history: History<> = createBrowserHistory({
-    basename: AppConfiguration.applicationURL,
-  })
-
   const store: Store<any, any> = createStore(
     combineReducers({
-      router: connectRouter(history),
       ...reducers,
     }),
     composeEnhancers(
       applyMiddleware(
-        routerMiddleware(history),
         sagaMiddleware
       )
     )
@@ -66,6 +55,6 @@ export default function configureStore (): Store<any, any> & { rootTask: Task<an
   return {
     ...store,
     rootTask,
-    history,
+    // history,
   }
 }
