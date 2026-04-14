@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import PropTypes from 'prop-types'
-import { push } from 'connected-react-router'
+import { useNavigate } from 'react-router-dom'
 import { connect } from 'react-redux'
 
 import UserMenu, { USER_KEBBAB_TOGGLE_ID } from './UserMenu'
@@ -32,8 +32,9 @@ import AboutDialog from '../About'
 /**
  * Main application header on top of the page
  */
-const VmsPageHeader = ({ appReady, onRefresh, onCloseNotificationDrawer, isDrawerExpanded, unreadNotificationCount, goToSettings }) => {
+const VmsPageHeader = ({ appReady, onRefresh, onCloseNotificationDrawer, unreadNotificationCount }) => {
   const { msg } = useContext(MsgContext)
+  const navigate = useNavigate()
   const idPrefix = 'pageheader'
   const [isKebabDropdownOpen, setKebabDropdownOpen] = useState(false)
   const [isAboutDialogOpen, setIsAboutDialogOpen] = useState(false)
@@ -72,7 +73,7 @@ const VmsPageHeader = ({ appReady, onRefresh, onCloseNotificationDrawer, isDrawe
             {appReady && (
               <ToolbarItem>
                 <Tooltip id={`${idPrefix}-tooltip`} tooltip={msg.accountSettings()} placement='bottom'>
-                  <Button aria-label={msg.accountSettings()} variant={ButtonVariant.plain} onClick={goToSettings} id={`${idPrefix}-settings`}>
+                  <Button aria-label={msg.accountSettings()} variant={ButtonVariant.plain} onClick={() => navigate('/settings')} id={`${idPrefix}-settings`}>
                     <CogIcon />
                   </Button>
                 </Tooltip>
@@ -101,7 +102,7 @@ const VmsPageHeader = ({ appReady, onRefresh, onCloseNotificationDrawer, isDrawe
                   </DropdownItem>
                 ),
                 appReady && (
-                  <DropdownItem key="settings" onClick={goToSettings}>
+                  <DropdownItem key="settings" onClick={() => navigate('/settings')}>
                     <CogIcon /> {msg.accountSettings()}
                   </DropdownItem>
                 ),
@@ -123,10 +124,8 @@ const VmsPageHeader = ({ appReady, onRefresh, onCloseNotificationDrawer, isDrawe
 }
 VmsPageHeader.propTypes = {
   appReady: PropTypes.bool.isRequired,
-  isDrawerExpanded: PropTypes.bool.isRequired,
   unreadNotificationCount: PropTypes.number.isRequired,
 
-  goToSettings: PropTypes.func.isRequired,
   onRefresh: PropTypes.func.isRequired,
   onCloseNotificationDrawer: PropTypes.func.isRequired,
 }
@@ -139,6 +138,5 @@ export default connect(
   }),
   (dispatch) => ({
     onRefresh: () => dispatch(manualRefresh()),
-    goToSettings: () => dispatch(push('/settings')),
   })
 )(VmsPageHeader)

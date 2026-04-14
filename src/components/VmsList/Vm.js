@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
 
 import { startVm } from '_/actions'
 import { enumMsg, withMsg } from '_/intl'
@@ -56,17 +55,16 @@ const connectVm = (WrappedComponent) => {
     os: PropTypes.object.isRequired,
     msg: PropTypes.object.isRequired,
   }
-  return withRouter(
-    connect(
-      (state) => ({
-        icons: state.icons,
-        vms: state.vms,
-        os: state.operatingSystems, // deep immutable, {[id: string]: OperatingSystem}
-      }),
-      (dispatch, { vm }) => ({
-        onStart: () => dispatch(startVm({ vmId: vm.get('id') })),
-      })
-    )(withMsg(EnhancedComponent)))
+  return connect(
+    (state) => ({
+      icons: state.icons,
+      vms: state.vms,
+      os: state.operatingSystems, // deep immutable, {[id: string]: OperatingSystem}
+    }),
+    (dispatch, { vm }) => ({
+      onStart: () => dispatch(startVm({ vmId: vm.get('id') })),
+    })
+  )(withMsg(EnhancedComponent))
 }
 
 /**

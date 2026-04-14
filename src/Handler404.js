@@ -1,13 +1,12 @@
 import React, { useContext } from 'react'
-import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
-import { goBack } from 'connected-react-router'
+import { useNavigate } from 'react-router-dom'
 import { MsgContext } from '_/intl'
 import AppConfiguration from '_/config'
 import ErrorContent from '_/components/ErrorContent'
 
-const Handler404 = ({ goBack }) => {
+const Handler404 = () => {
   const { msg } = useContext(MsgContext)
+  const navigate = useNavigate()
   return (
     <div>
       <ErrorContent
@@ -15,7 +14,7 @@ const Handler404 = ({ goBack }) => {
         description={msg.itemDoesntExistOrDontHavePermissions()}
         leftButton={{
           href: '#',
-          onClick: goBack,
+          onClick: () => navigate(-1),
           title: msg.goBack(),
         }}
         rightButton={{
@@ -27,13 +26,4 @@ const Handler404 = ({ goBack }) => {
   )
 }
 
-Handler404.propTypes = {
-  goBack: PropTypes.func.isRequired,
-}
-
-export default connect(
-  null,
-  (dispatch) => ({
-    goBack: () => dispatch(goBack()),
-  })
-)(Handler404)
+export default Handler404

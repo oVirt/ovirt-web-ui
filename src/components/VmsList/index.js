@@ -2,7 +2,6 @@ import React, { useContext, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
 
 import style from './style.css'
 import { getByPage } from '_/actions'
@@ -22,6 +21,9 @@ import VmCardList from './VmCardList'
 import { MsgContext, withMsg } from '_/intl'
 import { AddCircleOIcon } from '@patternfly/react-icons/dist/esm/icons'
 import TableView from './TableView'
+import {
+  VmsListToolbar,
+} from '../../components/Toolbar'
 
 /**
  * Component displayed when VMs or Pools exist but the data is still loading.
@@ -117,7 +119,7 @@ const VmsList = ({
   }
 
   if (!haveVms && !havePools) {
-    <NoVmAvailable />
+    return <NoVmAvailable />
   }
 
   const sort = vms.get('sort').toJS()
@@ -142,14 +144,17 @@ const VmsList = ({
   const vmsAndPools = [...filteredVms, ...filteredPools].sort(sortFunction(sort, locale, msg))
 
   return (
-    <InfiniteScroller
-      className={tableView ? style.tableView : ''}
-      fetchMoreVmsAndPools={fetchMoreVmsAndPools}
-      vms={vms}
-    >
-      {tableView && <TableView vmsAndPools={vmsAndPools} sort={sort}/>}
-      {!tableView && <VmCardList vmsAndPools={vmsAndPools}/>}
-    </InfiniteScroller>
+    <div>
+      <VmsListToolbar/>
+      <InfiniteScroller
+        className={tableView ? style.tableView : style.cardView}
+        fetchMoreVmsAndPools={fetchMoreVmsAndPools}
+        vms={vms}
+      >
+        {tableView && <TableView vmsAndPools={vmsAndPools} sort={sort}/>}
+        {!tableView && <VmCardList vmsAndPools={vmsAndPools}/>}
+      </InfiniteScroller>
+    </div>
   )
 }
 VmsList.propTypes = {
@@ -163,7 +168,7 @@ VmsList.propTypes = {
   locale: PropTypes.string.isRequired,
 }
 
-export default withRouter(connect(
+export default connect(
   ({ vms, config, options }) => ({
     vms,
     alwaysShowPoolCard: !config.get('filter'),
@@ -176,4 +181,4 @@ export default withRouter(connect(
   (dispatch) => ({
     fetchMoreVmsAndPools: () => dispatch(getByPage()),
   })
-)(withMsg(VmsList)))
+)(withMsg(VmsList))
