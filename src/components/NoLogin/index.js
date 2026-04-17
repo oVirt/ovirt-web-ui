@@ -11,7 +11,6 @@ import {
 } from '@patternfly/react-core'
 import { MsgContext } from '_/intl'
 import AppConfiguration from '_/config'
-import Header from '../Header'
 import signOutIcon from './images/sign-out.svg'
 import style from './style.css'
 
@@ -20,8 +19,9 @@ import style from './style.css'
  */
 const NoLogin = ({ logoutWasManual = false, isTokenExpired = false }) => {
   const { msg } = useContext(MsgContext)
+  // Do not include a header here due to the header using routing and the nologin being not included in the routing.
   return (
-    <Page header={<Header/>} >
+    <Page >
       <EmptyState>
         <EmptyStateIcon icon={() => <img src={signOutIcon} className={style['logout-icon']} />} />
         <Title headingLevel="h4" size="lg">

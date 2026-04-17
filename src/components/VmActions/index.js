@@ -2,7 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import { BROWSER_VNC } from '_/constants/console'
 
 import { withMsg } from '_/intl'
 
@@ -84,6 +85,8 @@ class VmActions extends React.Component {
     const onStart = (isPool ? onStartPool : onStartVm)
 
     const consoles = getConsoleActions({ vm, msg, onOpenConsole, idPrefix, config, preferredConsole })
+    const enabledConsoles = consoles.filter(({ actionDisabled }) => !actionDisabled)
+    const singleConsoleAction = enabledConsoles.length === 1 ? enabledConsoles[0] : undefined
 
     const actions = [
       {
@@ -131,10 +134,11 @@ class VmActions extends React.Component {
       },
       {
         priority: 1,
-        actionDisabled: isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole']) || !consoles.length,
+        actionDisabled: isPool || !canConsole(status) || vm.getIn(['actionInProgress', 'getConsole']) || !enabledConsoles.length,
         shortTitle: msg.console(),
         id: `${idPrefix}-button-console`,
-        items: consoles,
+        onClick: singleConsoleAction?.onClick,
+        items: singleConsoleAction ? undefined : enabledConsoles,
       },
     ]
 
@@ -247,27 +251,38 @@ VmActions.propTypes = {
   className: PropTypes.string,
 }
 
-export default withRouter(
-  connect(
-    (state, { vm }) => ({
-      isEditable: vm.get('canUserEditVm') && state.clusters.find(cluster => cluster.get('canUserUseCluster')) !== undefined,
-      config: state.config,
-      preferredConsole: state.options.getIn(['remoteOptions', 'preferredConsole', 'content'], state.config.get('defaultUiConsole')),
-    }),
-    (dispatch, { vm, pool }) => ({
-      onShutdown: () => dispatch(Actions.shutdownVm({ vmId: vm.get('id'), force: false })),
-      onRestart: () => dispatch(Actions.restartVm({ vmId: vm.get('id'), force: false })),
-      onForceShutdown: () => dispatch(Actions.shutdownVm({ vmId: vm.get('id'), force: true })),
-      onSuspend: () => dispatch(Actions.suspendVm({ vmId: vm.get('id') })),
-      onRemove: ({ preserveDisks }) => dispatch(Actions.removeVm({ vmId: vm.get('id'), preserveDisks })),
-      onStartPool: () => dispatch(Actions.startPool({ poolId: pool.get('id') })),
-      onStartVm: () => dispatch(Actions.startVm({ vmId: vm.get('id') })),
-      onOpenConsole: ({ consoleType }) => {
-        dispatch(Actions.openConsole({
-          vmId: vm.get('id'),
-          consoleType,
-        }))
-      },
-    })
-  )(withMsg(VmActions))
-)
+const VmActionsConnected = connect(
+  (state, { vm }) => ({
+    isEditable: vm.get('canUserEditVm') && state.clusters.find(cluster => cluster.get('canUserUseCluster')) !== undefined,
+    config: state.config,
+    preferredConsole: state.options.getIn(['remoteOptions', 'preferredConsole', 'content'], state.config.get('defaultUiConsole')),
+  }),
+  (dispatch, { vm, pool, navigate }) => ({
+    onShutdown: () => dispatch(Actions.shutdownVm({ vmId: vm.get('id'), force: false })),
+    onRestart: () => dispatch(Actions.restartVm({ vmId: vm.get('id'), force: false })),
+    onForceShutdown: () => dispatch(Actions.shutdownVm({ vmId: vm.get('id'), force: true })),
+    onSuspend: () => dispatch(Actions.suspendVm({ vmId: vm.get('id') })),
+    onRemove: ({ preserveDisks }) => {
+      navigate('/')
+      dispatch(Actions.removeVm({ vmId: vm.get('id'), preserveDisks }))
+    },
+    onStartPool: () => dispatch(Actions.startPool({ poolId: pool.get('id') })),
+    onStartVm: () => dispatch(Actions.startVm({ vmId: vm.get('id') })),
+    onOpenConsole: ({ consoleType }) => {
+      dispatch(Actions.openConsole({
+        vmId: vm.get('id'),
+        consoleType,
+      }))
+      if (consoleType === BROWSER_VNC) {
+        navigate(`/vm/${vm.get('id')}/console/${consoleType}`)
+      }
+    },
+  })
+)(withMsg(VmActions))
+
+const VmActionsWithNavigate = (props) => {
+  const navigate = useNavigate()
+  return <VmActionsConnected {...props} navigate={navigate} />
+}
+
+export default VmActionsWithNavigate

@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
 
 import { startPool } from '_/actions'
 import { withMsg } from '_/intl'
@@ -48,14 +47,14 @@ const connectPool = (WrappedComponent) => {
     onStart: PropTypes.func.isRequired,
     msg: PropTypes.object.isRequired,
   }
-  return withRouter(connect(
+  return connect(
     (state) => ({
       icons: state.icons,
     }),
     (dispatch, { pool }) => ({
       onStart: () => dispatch(startPool({ poolId: pool.get('id') })),
     })
-  )(withMsg(EnhancedComponent)))
+  )(withMsg(EnhancedComponent))
 }
 
 /**
