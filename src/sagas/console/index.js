@@ -20,7 +20,6 @@ import {
 import { adjustVVFile } from './vvFileUtils'
 import RDPBuilder from './rdpBuilder'
 
-import { push } from 'connected-react-router'
 import * as C from '_/constants'
 import { canConsole, statusToTooltipId } from '_/vm-status'
 import { getConsoles } from '_/utils/console'
@@ -76,10 +75,6 @@ function* downloadOrOpenVmConsole ({
       { type: 'INTRENAL_CONSOLE', payload: { vmId, consoleId } })
     yield put(Actions.setConsoleTickets({ vmId, proxyTicket: dataTicket.proxy_ticket.value, ticket: ticket.ticket }))
     yield put(Actions.setConsoleStatus({ vmId, status: C.INIT_CONSOLE, consoleType }))
-  }
-
-  if (openInPage || isNoVNC) {
-    yield put(push('/vm/' + vmId + '/console/' + consoleType))
   }
 }
 
@@ -142,9 +137,6 @@ function* getRDPVm ({
   const data = rdpBuilder.buildRDP()
   fileDownload({ data, fileName: 'console.rdp', mimeType: 'application/rdp' })
   yield put(Actions.setConsoleStatus({ vmId, status: C.DOWNLOAD_CONSOLE, consoleType: C.RDP }))
-  if (openInPage) {
-    yield put(push('/vm/' + vmId + '/console/rdp'))
-  }
 }
 
 // -----

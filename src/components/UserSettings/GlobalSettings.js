@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
 import { connect } from 'react-redux'
-import { push } from 'connected-react-router'
+import { useLocation, useResolvedPath, useNavigate } from 'react-router-dom'
 import { saveGlobalOptions } from '_/actions'
 import {
   Switch,
@@ -15,7 +15,7 @@ import {
   Flex,
   Radio,
 } from '@patternfly/react-core'
-import { withMsg, localeWithFullName, DEFAULT_LOCALE } from '_/intl'
+import { localeWithFullName, DEFAULT_LOCALE, withMsg } from '_/intl'
 import style from './style.css'
 
 import { Settings, SettingsBase } from '../Settings'
@@ -24,6 +24,9 @@ import moment from 'moment'
 import AppConfiguration from '_/config'
 import { BROWSER_VNC, NATIVE_VNC, SPICE, RDP } from '_/constants/console'
 import VmSelect from './VmSelect'
+import {
+  SettingsToolbar,
+} from '_/components/Toolbar'
 
 const GENERAL_SECTION = 'general'
 
@@ -167,7 +170,7 @@ class GlobalSettings extends Component {
   }
 
   handleCancel () {
-    this.props.goToMainPage()
+    this.props.navigate('/')
   }
 
   onChange (field) {
@@ -538,54 +541,48 @@ class GlobalSettings extends Component {
     }
 
     return (
-      <Flex alignContent={{ default: 'alignItemsBaseline' }} justifyContent={{ default: 'justifyContentCenter' }}>
+      <div>
+        <SettingsToolbar/>
+        <Flex alignContent={{ default: 'alignItemsBaseline' }} justifyContent={{ default: 'justifyContentCenter' }}>
 
-        <Split hasGutter className={style['half-width']}>
-          <SplitItem>
-            <Nav onSelect={onSelect} theme='light'>
-              <NavList className='pf-c-card'>
-                { Object.entries(sections).map(([key, section]) => (
-                  <NavItem className={style.border} itemId={key} key={key} isActive={activeSectionKey === key}>
-                    {section.title}
-                  </NavItem>
-                ))
-                }
-              </NavList>
-            </Nav>
-          </SplitItem>
-          <SplitItem isFilled>
-            <Settings
-              draftValues={draftValues}
-              baseValues={baseValues}
-              currentValues={currentValues}
-              sentValues={sentValues}
-              translatedLabels={translatedLabels}
-              lastTransactionId={lastTransactionId}
-              resetBaseValues={this.resetBaseValues}
-              onSave={this.saveOptions}
-              onCancel={this.handleCancel}
-              onReset={this.onReset}
-              defaultValues={defaultValues}
-            >
-              <SettingsBase section={activeSection} name={activeSectionKey} />
-            </Settings>
-          </SplitItem>
-        </Split>
-      </Flex>
+          <Split hasGutter className={style['half-width']}>
+            <SplitItem>
+              <Nav onSelect={onSelect} theme='light'>
+                <NavList className='pf-c-card'>
+                  { Object.entries(sections).map(([key, section]) => (
+                    <NavItem className={style.border} itemId={key} key={key} isActive={activeSectionKey === key}>
+                      {section.title}
+                    </NavItem>
+                  ))
+                  }
+                </NavList>
+              </Nav>
+            </SplitItem>
+            <SplitItem isFilled>
+              <Settings
+                draftValues={draftValues}
+                baseValues={baseValues}
+                currentValues={currentValues}
+                sentValues={sentValues}
+                translatedLabels={translatedLabels}
+                lastTransactionId={lastTransactionId}
+                resetBaseValues={this.resetBaseValues}
+                onSave={this.saveOptions}
+                onCancel={this.handleCancel}
+                onReset={this.onReset}
+                defaultValues={defaultValues}
+              >
+                <SettingsBase section={activeSection} name={activeSectionKey} />
+              </Settings>
+            </SplitItem>
+          </Split>
+        </Flex>
+      </div>
     )
   }
 }
 
-GlobalSettings.propTypes = {
-  currentValues: PropTypes.object.isRequired,
-  config: PropTypes.object.isRequired,
-  lastTransactionId: PropTypes.string,
-  saveOptions: PropTypes.func.isRequired,
-  goToMainPage: PropTypes.func.isRequired,
-  msg: PropTypes.object.isRequired,
-}
-
-export default connect(
+const ConnectedGlobalSettings = connect(
   ({ options, config }) => ({
     config: {
       userName: config.getIn(['user', 'name']),
@@ -614,6 +611,31 @@ export default connect(
 
   (dispatch) => ({
     saveOptions: (values, transactionId) => dispatch(saveGlobalOptions({ values }, { transactionId })),
-    goToMainPage: () => dispatch(push('/')),
   })
 )(withMsg(GlobalSettings))
+
+const GlobalSettingsWithRouting = (props) => {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const match = useResolvedPath('').pathname
+
+  return (
+    <ConnectedGlobalSettings
+      {...props}
+      navigate={navigate}
+      location={location}
+      match={match}
+    />
+  )
+}
+
+GlobalSettings.propTypes = {
+  currentValues: PropTypes.object.isRequired,
+  config: PropTypes.object.isRequired,
+  navigate: PropTypes.func.isRequired,
+  lastTransactionId: PropTypes.string,
+  saveOptions: PropTypes.func.isRequired,
+  msg: PropTypes.object.isRequired,
+}
+
+export default GlobalSettingsWithRouting

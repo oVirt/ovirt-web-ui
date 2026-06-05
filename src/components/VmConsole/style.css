@@ -2,6 +2,12 @@
     height: 100%;
 }
 
+.in-page {
+    position: relative;
+    height: calc(100vh - 76px);
+    overflow: hidden;
+}
+
 .in-page :global(#novnc-console-container) {
     top: 0;
     bottom: 0;

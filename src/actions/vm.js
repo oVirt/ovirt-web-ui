@@ -14,15 +14,6 @@ export function login ({ username, domain, token, userId, sessionAgeInSecAtPageL
   }
 }
 
-export function navigateToVmDetails (vmId) {
-  return {
-    type: C.NAVIGATE_TO_VM_DETAILS,
-    payload: {
-      vmId,
-    },
-  }
-}
-
 export function getSingleVm ({ vmId, shallowFetch = false }) {
   return {
     type: C.GET_VM,

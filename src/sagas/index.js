@@ -7,7 +7,6 @@ import {
   throttle,
   select,
 } from 'redux-saga/effects'
-import { push } from 'connected-react-router'
 
 import Api, { Transforms } from '_/ovirtapi'
 import { saveToLocalStorage } from '_/storage'
@@ -57,7 +56,6 @@ import {
   GET_POOLS,
   GET_VM,
   GET_VMS,
-  NAVIGATE_TO_VM_DETAILS,
   SAVE_FILTERS,
 } from '_/constants'
 
@@ -471,10 +469,6 @@ function* delayedRemoveActiveRequest ({ payload: requestId }) {
   yield put(removeActiveRequest(requestId))
 }
 
-function* navigateToVmDetails ({ payload: { vmId } }) {
-  yield put(push(`/vm/${vmId}`))
-}
-
 export function* rootSaga () {
   yield all([
     ...sagasLogin,
@@ -490,7 +484,6 @@ export function* rootSaga () {
     takeEvery(DISMISS_EVENT, dismissEvent),
     takeEvery(CLEAR_USER_MSGS, clearEvents),
 
-    takeLatest(NAVIGATE_TO_VM_DETAILS, navigateToVmDetails),
     takeEvery(GET_VM, fetchAndPutSingleVm),
     takeEvery(GET_POOL, fetchAndPutSinglePool),
 

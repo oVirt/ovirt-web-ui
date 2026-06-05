@@ -1,10 +1,11 @@
 import React, {
+  useCallback,
   useEffect,
   useState,
 } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { push } from 'connected-react-router'
+import { useNavigate } from 'react-router-dom'
 
 import style from './style.css'
 import * as Actions from '_/actions'
@@ -47,11 +48,14 @@ const VmConsole = ({
   msg,
   fullScreenNoVnc,
   onDisconnected,
-  goToDetails,
   openConsole,
   displayError,
   onReconnected,
 }) => {
+  const navigate = useNavigate()
+  const goToDetails = useCallback(() => {
+    navigate(`/vm/${vmId}`)
+  }, [navigate, vmId])
   const [isFullScreen, setIsFullScreen] = useState(fullScreenNoVnc)
   const isVmRunning = isRunning(vm.get('status'))
   const onFailure = ({ reason, messageId }) => {
@@ -198,7 +202,6 @@ VmConsole.propTypes = {
 
   onReconnected: PropTypes.func.isRequired,
   onDisconnected: PropTypes.func.isRequired,
-  goToDetails: PropTypes.func.isRequired,
   openConsole: PropTypes.func.isRequired,
   displayError: PropTypes.func.isRequired,
 }
@@ -214,7 +217,6 @@ export default connect(
   (dispatch, { vmId, consoleType }) => ({
     onDisconnected: (reason) => dispatch(Actions.setConsoleStatus({ vmId, status: C.DISCONNECTED_CONSOLE, reason, consoleType: C.BROWSER_VNC })),
     onReconnected: () => dispatch(Actions.setConsoleStatus({ vmId, status: C.RECONNECTED_CONSOLE, consoleType: C.BROWSER_VNC })),
-    goToDetails: () => dispatch(push(`/vm/${vmId}`)),
     openConsole: () => dispatch(
       Actions.openConsole({
         vmId,

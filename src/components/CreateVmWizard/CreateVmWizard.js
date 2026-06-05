@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { Wizard } from '@patternfly/react-core'
 import produce from 'immer'
 import { List } from 'immutable'
@@ -577,7 +578,7 @@ CreateVmWizard.propTypes = {
   locale: PropTypes.string.isRequired,
 }
 
-export default connect(
+const ConnectedCreateVmWizard = connect(
   (state) => ({
     clusters: state.clusters,
     storageDomains: state.storageDomains,
@@ -593,6 +594,18 @@ export default connect(
     onCreate: (basic, nics, disks, correlationId) => dispatch(
       Actions.composeAndCreateVm({ basic, nics, disks }, { correlationId })
     ),
-    navigateToVm: (vmId) => dispatch(Actions.navigateToVmDetails(vmId)),
   })
 )(withMsg(CreateVmWizard))
+
+const CreateVmWizardWithRouting = (props) => {
+  const navigate = useNavigate()
+
+  return (
+    <ConnectedCreateVmWizard
+      {...props}
+      navigateToVm={(vmId) => navigate(`/vm/${vmId}`)}
+    />
+  )
+}
+
+export default CreateVmWizardWithRouting

@@ -1,5 +1,4 @@
 import { put, select, takeEvery, takeLatest, all, call } from 'redux-saga/effects'
-import { push } from 'connected-react-router'
 import merge from 'lodash/merge'
 
 import Api from '_/ovirtapi'
@@ -386,9 +385,7 @@ function* createVm (action) {
   // Navigate to (or just load) the VM's details
   if (successCreate && successChangeCd) {
     const vmId = createVmResult.id
-    if (action.payload.pushToDetailsOnSuccess) {
-      yield put(A.navigateToVmDetails(`/vm/${vmId}`))
-    } else {
+    if (!action.payload.pushToDetailsOnSuccess) {
       yield fetchAndPutSingleVm(A.getSingleVm({ vmId }))
     }
     return vmId
@@ -595,7 +592,6 @@ function* removeVm (action) {
   const result = yield callExternalAction(Api.remove, action)
   if (result.status === 'complete') {
     yield put(A.updateVms({ removeVmIds: [vmId] }))
-    yield put(push('/'))
   }
 
   yield stopProgress({ vmId, name: 'remove', result })

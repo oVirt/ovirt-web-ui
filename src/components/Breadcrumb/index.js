@@ -1,77 +1,85 @@
-import React, { useContext } from 'react'
-import PropTypes from 'prop-types'
-import { Link } from 'react-router-dom'
-import { connect } from 'react-redux'
+import React, { useContext, useMemo } from 'react'
+import { Link, useMatches } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { MsgContext } from '_/intl'
 import { Breadcrumb, BreadcrumbItem } from '@patternfly/react-core'
 
 import styles from './styles.css'
 
-const NONE_VM_ROUTES = ['/settings']
-
-const buildPath = ({ vms, branches, msg }) => {
-  const res = []
-  const isVmPath = !branches.find(branch => NONE_VM_ROUTES.includes(branch.match.path))
-
-  for (const branch of branches) {
-    if (typeof branch.route.title === 'function') {
-      res.push({
-        title: branch.route.title({ match: branch.match, vms, msg }),
-        url: branch.match.url,
-      })
-    } else if (typeof branch.route.title === 'string') {
-      res.push({
-        title: branch.route.title,
-        url: branch.match.url,
-      })
-    }
-    const { match: { path = '' } = {} } = branch
-    if (isVmPath && ['/'].includes(path)) {
-      res.push({
-        title: msg.virtualMachines(),
-        url: '/',
-      })
-    }
-  }
-  return res
-}
-
-const PageBreadcrumb = ({ vms, branches }) => {
+const PageBreadcrumb = () => {
   const { msg } = useContext(MsgContext)
-  const crumbs = buildPath({ vms, branches, msg })
-  const idPrefix = 'breadcrumb'
-  const lastSegment = crumbs.pop()
-  return (
+  const matches = useMatches()
+  const vms = useSelector(state => state.vms)
+  const crumbs = useMemo(() => {
+    const rawCrumbs = []
 
+    matches.forEach((match) => {
+      const context = {
+        msg,
+        vms,
+        params: match.params,
+        pathname: match.pathname,
+      }
+
+      const extraBreadcrumbs = match.handle?.extraBreadcrumbs
+      if (extraBreadcrumbs) {
+        const extraCrumbs = typeof extraBreadcrumbs === 'function' ? extraBreadcrumbs(context) : extraBreadcrumbs
+        extraCrumbs?.forEach((extraCrumb) => {
+          if (extraCrumb?.label) {
+            rawCrumbs.push(extraCrumb)
+          }
+        })
+      }
+
+      const breadcrumb = match.handle?.breadcrumb
+      if (!breadcrumb) {
+        return
+      }
+
+      const crumb = typeof breadcrumb === 'function' ? breadcrumb(context) : breadcrumb
+      if (crumb?.label) {
+        rawCrumbs.push({ ...crumb, to: crumb.to ?? match.pathname })
+      }
+    })
+
+    return rawCrumbs.filter((crumb, index, arr) => {
+      if (index === 0) {
+        return true
+      }
+      const prev = arr[index - 1]
+      return !(prev.label === crumb.label && prev.to === crumb.to)
+    })
+  }, [matches, msg, vms])
+
+  if (crumbs.length === 0) {
+    return null
+  }
+
+  const idPrefix = 'breadcrumb'
+  const lastSegment = crumbs[crumbs.length - 1]
+  const parentCrumbs = crumbs.slice(0, -1)
+
+  return (
     <Breadcrumb className={styles.breadcrumb}>
-      {
-      crumbs.map((path, index, array) => (
+      {parentCrumbs.map((path, index) => (
         <BreadcrumbItem
-          key={`${index}-${path.url}`}
+          key={`${index}-${path.to}`}
           id={`${idPrefix}-last-${index}`}
           component="span"
         >
-          <Link to={path.url} id={`${idPrefix}-link-${index}`}>{path.title}</Link>
+          <Link to={path.to} id={`${idPrefix}-link-${index}`}>
+            {path.icon ? <path.icon style={{ marginRight: '0.4rem' }} /> : null}
+            {path.label}
+          </Link>
         </BreadcrumbItem>
-      ))
-      }
+      ))}
 
-      <BreadcrumbItem
-        isActive
-      >
-        {lastSegment.title}
+      <BreadcrumbItem isActive>
+        {lastSegment.icon ? <lastSegment.icon style={{ marginRight: '0.4rem' }} /> : null}
+        {lastSegment.label}
       </BreadcrumbItem>
-
     </Breadcrumb>
   )
 }
-PageBreadcrumb.propTypes = {
-  branches: PropTypes.array.isRequired,
-  vms: PropTypes.object.isRequired,
-}
 
-export default connect(
-  state => ({
-    vms: state.vms,
-  })
-)(PageBreadcrumb)
+export default PageBreadcrumb
