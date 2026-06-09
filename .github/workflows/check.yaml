@@ -79,3 +79,6 @@ jobs:
         run: |
           yarn install
           yarn build
+
+      - name: Run 'yarn eslint' to check for linting errors
+        run: yarn eslint
