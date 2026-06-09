@@ -16,7 +16,7 @@ describe('coerce to supported locale', () => {
     }
   )
 
-  test.each(['fr-FR', 'fr-BE','fr-CA', 'fr-LU', 'fr-CH'])(
+  test.each(['fr-FR', 'fr-BE', 'fr-CA', 'fr-LU', 'fr-CH'])(
     'returns fr-FR for [%s]',
     locale => {
       expect(coerceToSupportedLocale(locale)).toEqual('fr-FR')
