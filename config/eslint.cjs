@@ -113,7 +113,6 @@ module.exports = {
         ObjectExpression: 1,
         ImportDeclaration: 1,
         ignoreComments: false,
-        ignoredNodes: ['TemplateLiteral *', 'JSXElement', 'JSXElement > *', 'JSXAttribute', 'JSXIdentifier', 'JSXNamespacedName', 'JSXMemberExpression', 'JSXSpreadAttribute', 'JSXExpressionContainer', 'JSXOpeningElement', 'JSXClosingElement', 'JSXFragment', 'JSXOpeningFragment', 'JSXClosingFragment', 'JSXText', 'JSXEmptyExpression', 'JSXSpreadChild'],
 
         flatTernaryExpressions: true,
         offsetTernaryExpressions: false,
