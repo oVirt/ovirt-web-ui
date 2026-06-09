@@ -38,7 +38,7 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, onEdit, onDelet
             { nic.vnicProfile.id
               ? `(${nic.vnicProfile.name}/${nic.vnicProfile.network})`
               : `[${msg.nicNoVnicAssigned()}]`
-          }
+            }
           </span>
         </div>
         <Grid>
@@ -54,7 +54,7 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, onEdit, onDelet
                   {msg.nicIP4()}: {ip4}
                 </EllipsisValue>
               ))
-            }
+              }
             </Col>
             <Col cols={8} wrapExpand className={style['ip6-container']} id={`${idPrefix}-ipv6`}>
               { showNicIPs && nic.ipv6.length > 0 &&
@@ -67,7 +67,7 @@ const NicListItem = ({ idPrefix, nic, vmStatus, vnicProfileList, onEdit, onDelet
                   {msg.nicIP6()}: {ip6}
                 </EllipsisValue>
               ))
-            }
+              }
             </Col>
           </Row>
         </Grid>

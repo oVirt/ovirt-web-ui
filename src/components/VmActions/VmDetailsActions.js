@@ -82,19 +82,19 @@ const VmDetailsActions = ({ actions, id, idPrefix }) => {
       )}
       isOpen={regularDropdownOpened === id}
       dropdownItems={
-             items.map(action => (
-               <DropdownItem
-                 key={action.id}
-                 component='button'
-                 onClick={action.onClick ?? (() => setActionWithConfirmationId(action.id)) }
-                 id={action.id}
-                 icon={action.icon}
-                 isDisabled={action.actionDisabled}
-               >
-                 {action.shortTitle}
-               </DropdownItem>
-             ))
-            }
+        items.map(action => (
+          <DropdownItem
+            key={action.id}
+            component='button'
+            onClick={action.onClick ?? (() => setActionWithConfirmationId(action.id)) }
+            id={action.id}
+            icon={action.icon}
+            isDisabled={action.actionDisabled}
+          >
+            {action.shortTitle}
+          </DropdownItem>
+        ))
+      }
     />
   )
 
@@ -117,23 +117,23 @@ const VmDetailsActions = ({ actions, id, idPrefix }) => {
           isOpen={kebabDropdownOpened}
           isPlain
           dropdownItems={
-             actionsWithSeparatorSlots
-               .map((action, index) => action
-                 ? (
-                   <OverflowMenuDropdownItem
-                     isShared
-                     key={action.id}
-                     component='button'
-                     onClick={action.onClick ?? (() => setActionWithConfirmationId(action.id)) }
-                     id={action.id}
-                     icon={action.icon}
-                     isDisabled={action.actionDisabled}
-                   >
-                     {action.shortTitle}
-                   </OverflowMenuDropdownItem>
-                 )
-                 : <DropdownSeparator key={`${index}`} />)
-            }
+            actionsWithSeparatorSlots
+              .map((action, index) => action
+                ? (
+                  <OverflowMenuDropdownItem
+                    isShared
+                    key={action.id}
+                    component='button'
+                    onClick={action.onClick ?? (() => setActionWithConfirmationId(action.id)) }
+                    id={action.id}
+                    icon={action.icon}
+                    isDisabled={action.actionDisabled}
+                  >
+                    {action.shortTitle}
+                  </OverflowMenuDropdownItem>
+                )
+                : <DropdownSeparator key={`${index}`} />)
+          }
         />
       </OverflowMenuControl>
     </OverflowMenu>),

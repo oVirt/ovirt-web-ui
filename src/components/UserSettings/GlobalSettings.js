@@ -343,7 +343,7 @@ class GlobalSettings extends Component {
                         value,
                         isDefault: id === config.defaultUiConsole,
                       }))
-                      }
+                    }
                     selected={draftValues[name]}
                     onChange={onChange(name)}
                   />

@@ -80,7 +80,7 @@ const VmDropdownActions = ({ actions, id }) => {
           subContent={confirmation?.subContent}
         />
       )
-    }
+      }
     </>
   )
 }

@@ -23,9 +23,9 @@ const VmCardList = ({ vmsAndPools }) => {
     <Gallery hasGutter className={style['gallery-container']}>
       {vmsAndPools.map(entity => (
         <GalleryItem key={entity.get('id')}>{
-            entity.get('isVm')
-              ? <CardVm vm={entity} />
-              : <CardPool pool={entity} />}
+          entity.get('isVm')
+            ? <CardVm vm={entity} />
+            : <CardPool pool={entity} />}
         </GalleryItem>
       ))}
     </Gallery>

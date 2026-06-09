@@ -122,7 +122,7 @@ const SnapshotDetail = ({ snapshot, vmId, id, isPoolVm, msg, locale, position, c
               <dd id={`${id}-nics`}>
                 { nicsToRender.size === 0 &&
                   <div className={style['no-nics']} id={`${id}-no-nics`}>{msg.noNics()}</div>
-          }
+                }
                 { nicsToRender.size > 0 && (
                   <LabelGroup isVertical numLabels={2}>
                     {nicsToRender.map(nicRender.bind(null, `${id}-nics`))}

@@ -60,9 +60,9 @@ const Filters = ({ msg, locale, selectedFilters, onFilterUpdate, filterTypes, te
             isOpen={expanded}
             style={{ width: '100%' }}
             dropdownItems={
-          filterTypes.map(({ id, title }) =>
-            <DropdownItem key={id}>{title}</DropdownItem>)
-          }
+              filterTypes.map(({ id, title }) =>
+                <DropdownItem key={id}>{title}</DropdownItem>)
+            }
           />
         </ToolbarItem>
         <ToolbarFilter

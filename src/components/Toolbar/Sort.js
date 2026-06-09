@@ -33,7 +33,7 @@ const Sort = ({ sort, msg, onSortChange, SortFields }) => {
             {title}
           </OptionsMenuItem>
         ))
-    }
+      }
     </OptionsMenuItemGroup>,
     <OptionsMenuSeparator key="separator"/>,
     <OptionsMenuItemGroup key="second group" aria-label={msg.sortDirection()}>

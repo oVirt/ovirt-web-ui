@@ -118,18 +118,18 @@ class NewSnapshotModal extends Component {
               />
             </FormGroup>
             {
-                this.props.isVmRunning && (
-                  <FormGroup
-                    label={msg.saveMemory()}
-                    fieldId={`${idPrefix}-snapshot-save-memory`}
-                  >
-                    <Checkbox
-                      id={`${idPrefix}-snapshot-save-memory`}
-                      isChecked={this.state.saveMemory}
-                      onChange={this.handleSaveMemoryChange}
-                    />
-                  </FormGroup>
-                )}
+              this.props.isVmRunning && (
+                <FormGroup
+                  label={msg.saveMemory()}
+                  fieldId={`${idPrefix}-snapshot-save-memory`}
+                >
+                  <Checkbox
+                    id={`${idPrefix}-snapshot-save-memory`}
+                    isChecked={this.state.saveMemory}
+                    onChange={this.handleSaveMemoryChange}
+                  />
+                </FormGroup>
+              )}
           </Form>
 
         </Modal>

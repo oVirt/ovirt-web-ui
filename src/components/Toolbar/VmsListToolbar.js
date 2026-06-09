@@ -60,12 +60,12 @@ const VmsListToolbar = ({
             <div className='col-sm-12'>
               <h5>
                 {
-            hasMoreItems
-              ? msg.resultsOfUnknownTotal({ available })
-              : hasFilters
-                ? msg.resultsOf({ total, available })
-                : msg.results({ total })
-          }
+                  hasMoreItems
+                    ? msg.resultsOfUnknownTotal({ available })
+                    : hasFilters
+                      ? msg.resultsOf({ total, available })
+                      : msg.results({ total })
+                }
               </h5>
             </div>
           </ToolbarItem>
