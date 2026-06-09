@@ -3,7 +3,7 @@ import path from 'path'
 import chalk from 'chalk'
 import { table } from 'table'
 import messages from '../../src/intl/messages.js'
-import timeModule from "../../src/intl/time-durations.js"
+import timeModule from '../../src/intl/time-durations.js'
 
 const timeDurations = timeModule.timeDurations
 
@@ -134,7 +134,7 @@ function reportCoverage (englishMessages, translatedMessagesPerLocale) {
 //
 // Run the reports...
 //
-const TRANSLATIONS_DIR = path.join("src", "intl", "locales")
+const TRANSLATIONS_DIR = path.join('src', 'intl', 'locales')
 const translatedMessagesPerLocale = {}
 
 fs.readdirSync(TRANSLATIONS_DIR).forEach(file => {
@@ -143,13 +143,12 @@ fs.readdirSync(TRANSLATIONS_DIR).forEach(file => {
   translatedMessagesPerLocale[locale] = JSON.parse(fs.readFileSync(filePath, 'utf8'))
 })
 
-
 const baseMessages = {
   ...messages.messages,
   ...Object.keys(timeDurations).reduce((acc, messageId) => {
     acc[messageId] = timeDurations[messageId].message
     return acc
-  }, {})
+  }, {}),
 }
 console.log(`time duration: ${Object.keys(timeDurations).length} keys`)
 console.log(chalk`English key count: {yellow ${Object.keys(baseMessages).length}}`)
