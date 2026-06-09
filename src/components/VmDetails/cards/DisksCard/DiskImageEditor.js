@@ -418,9 +418,9 @@ class DiskImageEditor extends Component {
               { !createMode && !isDirectLUN && (
                 <div id={`${idPrefix}-storage-domain`} className={style['editor-field-read-only']}>
                   {
-                      this.props.storageDomains.getIn([this.state.values.storageDomain, 'name']) ||
+                    this.props.storageDomains.getIn([this.state.values.storageDomain, 'name']) ||
                       msg.diskEditorStorageDomainNotAvailable()
-                    }
+                  }
                 </div>
               )}
               { isDirectLUN && (

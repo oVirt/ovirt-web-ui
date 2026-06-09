@@ -25,21 +25,21 @@ const ConfirmationModal = ({ show, title, confirm, body, subContent, onClose, ex
       ].filter(Boolean)}
     >
       {
-          typeof body === 'string'
-            ? (
-              <>
-                <p>
-                  { body }
-                </p>
-                {
-                  subContent && typeof subContent === 'string'
-                    ? <p>{ subContent }</p>
-                    : subContent
-                }
-              </>
-            )
-            : body
-        }
+        typeof body === 'string'
+          ? (
+            <>
+              <p>
+                { body }
+              </p>
+              {
+                subContent && typeof subContent === 'string'
+                  ? <p>{ subContent }</p>
+                  : subContent
+              }
+            </>
+          )
+          : body
+      }
     </Modal>
   )
 }

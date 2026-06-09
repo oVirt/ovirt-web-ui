@@ -144,10 +144,10 @@ const VmConsole = ({
           textConnect={msg.connect()}
           textConnecting={msg.connecting()}
           textDisconnected={
-              disconnectReason === 'CONNECTION_FAILURE'
-                ? msg.connectionFailConsoleInfo()
-                : msg.disconectedConsoleInfo()
-            }
+            disconnectReason === 'CONNECTION_FAILURE'
+              ? msg.connectionFailConsoleInfo()
+              : msg.disconectedConsoleInfo()
+          }
           textDisconnect={msg.disconnect()}
           textSendShortcut={msg.sendShortcutKey()}
           textCtrlAltDel={msg.sendCtrlAltDel()}

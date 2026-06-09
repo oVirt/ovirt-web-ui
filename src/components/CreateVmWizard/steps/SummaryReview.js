@@ -58,7 +58,7 @@ const ReviewBasic = ({ id, dataCenters, clusters, isos, templates, operatingSyst
             { templateNameRenderer(templates.get(basic.templateId)) }
             { basic.templateClone &&
               <Label id={`${id}-template-clone`} color="blue">clone</Label>
-          }
+            }
           </Item>
         </>
       )}
@@ -178,7 +178,7 @@ const ReviewStorage = ({ id, storageDomains, storage }) => {
         </div>
       )
       )
-    }
+      }
     </Item>
   )
 }
@@ -206,10 +206,10 @@ const ReviewAdvanced = ({ id, operatingSystems, basic }) => {
           <div className={style['review-subsection']}>
             { basic.initHostname &&
               <Item id={`${id}-cloud-init-hostname`} label={msg.hostName()}>{ basic.initHostname }</Item>
-          }
+            }
             { basic.initSshKeys &&
               <Item id={`${id}-cloud-init-sshkey`} label={msg.sshAuthorizedKeys()}>{ basic.initSshKeys }</Item>
-          }
+            }
           </div>
         </>
       )}
@@ -219,10 +219,10 @@ const ReviewAdvanced = ({ id, operatingSystems, basic }) => {
           <div className={style['review-subsection']}>
             { basic.initHostname &&
               <Item id={`${id}-sysprep-hostname`} label={msg.hostName()}>{ basic.initHostname }</Item>
-          }
+            }
             { basic.initTimezone &&
               <Item id={`${id}-sysprep-tz`} label={msg.sysPrepTimezone()}>{ basic.initTimezone }</Item>
-          }
+            }
             { basic.initAdminPassword && (
               <Item id={`${id}-sysprep-admin-pwd`} label={msg.sysPrepAdministratorPassword()}>
                 ******

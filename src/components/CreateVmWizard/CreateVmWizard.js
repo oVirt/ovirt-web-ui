@@ -537,7 +537,7 @@ class CreateVmWizard extends React.Component {
             onGoToStep={onMove}
           />
         )
-      }
+        }
         <NavigationConfirmationModal
           show={showCloseWizardDialog}
           onYes={() => {
