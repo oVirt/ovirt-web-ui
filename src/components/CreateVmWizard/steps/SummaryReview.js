@@ -1,8 +1,8 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Label } from '@patternfly/react-core'
-import { InfoCircleIcon } from '@patternfly/react-icons'
+import { EyeIcon, EyeSlashIcon, InfoCircleIcon } from '@patternfly/react-icons'
 
 import { MsgContext, enumMsg, withMsg } from '_/intl'
 import { templateNameRenderer, userFormatOfBytes } from '_/helpers'
@@ -27,6 +27,30 @@ const Item = ({ id, label, children }) => (
     </div>
   </div>
 )
+
+const RevealablePassword = ({ password }) => {
+  const [revealed, setRevealed] = useState(false)
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <span>{revealed ? password : '******'}</span>
+      <button
+        onClick={() => setRevealed(!revealed)}
+        style={{
+          background: 'none',
+          border: 'none',
+        }}
+        title={revealed ? 'Hide password' : 'Show password'}
+      >
+        {revealed ? <EyeSlashIcon /> : <EyeIcon />}
+      </button>
+    </div>
+  )
+}
+
+RevealablePassword.propTypes = {
+  password: PropTypes.string.isRequired,
+}
 
 Item.propTypes = {
   id: PropTypes.string.isRequired,
@@ -209,6 +233,14 @@ const ReviewAdvanced = ({ id, operatingSystems, basic }) => {
             }
             { basic.initSshKeys &&
               <Item id={`${id}-cloud-init-sshkey`} label={msg.sshAuthorizedKeys()}>{ basic.initSshKeys }</Item>
+            }
+            { basic.initPassword && (
+              <Item id={`${id}-cloud-init-pwd`} label={msg.password()}>
+                <RevealablePassword password={basic.initPassword} />
+              </Item>
+            )}
+            { basic.initUsername &&
+              <Item id={`${id}-cloud-init-username`} label={msg.username()}>{ basic.initUsername }</Item>
             }
           </div>
         </>

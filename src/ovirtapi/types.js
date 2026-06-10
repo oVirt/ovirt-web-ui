@@ -360,7 +360,9 @@ export type CloudInitType = {
   hostName: string,
   sshAuthorizedKeys: string,
   timezone: string,
-  customScript: string
+  customScript: string,
+  password: string,
+  username: string
 }
 
 export type ApiEventType = Object

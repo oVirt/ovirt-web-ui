@@ -679,6 +679,22 @@ class BasicSettings extends React.Component {
                   onChange={value => this.handleChange('initSshKeys', value)}
                 />
               </FieldRow>
+              <FieldRow label={msg.password()} vertical>
+                <TextInput
+                  id={`${idPrefix}-cloudInitPassword-edit`}
+                  type='password'
+                  value={data.initPassword}
+                  onChange={value => this.handleChange('initPassword', value)}
+                />
+              </FieldRow>
+              <FieldRow label={msg.username()} vertical>
+                <TextInput
+                  id={`${idPrefix}-cloudInitUsername-edit`}
+                  type='text'
+                  value={data.initUsername}
+                  onChange={value => this.handleChange('initUsername', value)}
+                />
+              </FieldRow>
             </>
           )}
 
@@ -725,8 +741,8 @@ class BasicSettings extends React.Component {
                 <TextInput
                   id={`${idPrefix}-sysPrepAdminPassword-edit`}
                   type='password'
-                  value={data.initAdminPassword}
-                  onChange={value => this.handleChange('initAdminPassword', value)}
+                  value={data.initPassword}
+                  onChange={value => this.handleChange('initPassword', value)}
                 />
               </FieldRow>
 
