@@ -16,8 +16,10 @@ jobs:
       matrix:
         include:
           - name: centos-stream9
+            shortcut: el9s
             container-name: el9stream
           - name: centos-stream10
+            shortcut: el10s
             container-name: el10stream
 
     name: ${{ matrix.name }} (ovirt-engine-nodejs-modules build) - test, build and publish rpm repo for the PR
@@ -30,7 +32,7 @@ jobs:
 
     steps:
       - name: Checkout sources
-        uses: ovirt/checkout-action@main
+        uses: actions/checkout@v7
 
       - name: install rpmlint
         run: |
@@ -41,9 +43,10 @@ jobs:
         run: ./automation/build.sh
 
       - name: Upload artifacts as rpm repo
-        uses: ovirt/upload-rpms-action@main
+        uses: actions/upload-artifact@v7
         with:
-          directory: exported-artifacts/
+          name: rpm-${{ matrix.shortcut }}
+          path: exported-artifacts/
 
   test_online:
     runs-on: ubuntu-latest
@@ -73,7 +76,7 @@ jobs:
           dnf -y --disablerepo='*' --enablerepo='yarn*' install yarn
 
       - name: Checkout sources
-        uses: ovirt/checkout-action@main
+        uses: actions/checkout@v7
 
       - name: Run 'yarn install' and 'yarn build' (like a developer would)
         run: |
