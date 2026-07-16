@@ -11,7 +11,7 @@
 
 Name:           ovirt-web-ui
 Version:        @PACKAGE_RPM_VERSION@
-Release:        @PACKAGE_RPM_RELEASE@@PACKAGE_RPM_SUFFIX@%{?checkout}%{?dist}
+Release:        @PACKAGE_RPM_RELEASE@%{?release_suffix}%{?dist}
 Summary:        VM Portal for %{product}
 License:        ASL 2.0
 URL:            https://github.com/oVirt/ovirt-web-ui
