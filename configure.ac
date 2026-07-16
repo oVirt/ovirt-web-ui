@@ -20,12 +20,15 @@ define([VERSION_MAJOR], [1])
 define([VERSION_MINOR], [9])
 define([VERSION_FIX], [5])
 define([VERSION_NUMBER], VERSION_MAJOR[.]VERSION_MINOR[.]VERSION_FIX)
-define([VERSION_RELEASE], [0])
 
 AC_INIT([ovirt-web-ui], VERSION_NUMBER, [gshereme@redhat.com])
 PACKAGE_RPM_VERSION="VERSION_NUMBER"
-PACKAGE_RPM_RELEASE="VERSION_RELEASE"
 AC_SUBST([PACKAGE_RPM_VERSION])
+
+AC_ARG_VAR([PACKAGE_RPM_RELEASE],
+    [RPM release field (default: 0.master for development, release number for release builds)])
+AS_IF([test -z "$PACKAGE_RPM_RELEASE"],
+    [PACKAGE_RPM_RELEASE="0.master"])
 AC_SUBST([PACKAGE_RPM_RELEASE])
 
 AM_INIT_AUTOMAKE([-Wall -Werror foreign -Wno-portability tar-pax])
@@ -34,9 +37,6 @@ AC_ARG_VAR([RPMBUILD], [path to rpmbuild utility])
 AC_CHECK_PROGS([RPMBUILD], [rpmbuild])
 
 dnl TODO: Fail if rpmbuild is not present
-
-PACKAGE_RPM_SUFFIX=${PACKAGE_RPM_SUFFIX:-"%{?release_suffix}"}
-AC_ARG_VAR([PACKAGE_RPM_SUFFIX], [suffix to use on the rpm's release string])
 
 AC_CONFIG_FILES([
 	Makefile

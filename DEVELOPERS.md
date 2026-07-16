@@ -1,5 +1,3 @@
-[![Copr build status](https://copr.fedorainfracloud.org/coprs/ovirt/ovirt-master-snapshot/package/ovirt-web-ui/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/ovirt/ovirt-master-snapshot/package/ovirt-web-ui/)
-
 # VM Portal - Developer information
 
 
@@ -25,17 +23,8 @@ Please report bugs and feature requests to the [GitHub issue tracker](https://gi
 
 
 #### ovirt-engine packages
-Install `ovirt-engine-nodejs-modules` from the [ovirt/ovirt-master-snapshot copr repo](https://copr.fedorainfracloud.org/coprs/ovirt/ovirt-master-snapshot/)
-for your platform to use the same packages that will be used by CI to build the app.
+Install `ovirt-engine-nodejs-modules` to use the same packages that will be used by CI to build the app.
 
-For CentOS stream 9:
-
-    dnf copr enable -y ovirt/ovirt-master-snapshot centos-stream-9
-    dnf install -y ovirt-engine-nodejs-modules
-
-For CentOS stream 10:
-
-    dnf copr enable -y ovirt/ovirt-master-snapshot centos-stream-10
     dnf install -y ovirt-engine-nodejs-modules
 
 After installing, the package may be for development or building.  It provides `yarn` itself
@@ -169,17 +158,9 @@ There are a number of different ways to build the RPM for the project:
     source /usr/share/ovirt-engine-nodejs-modules/setup-env.sh
     make rpm
 
-  2. Manual **offline** build with `automation/build.sh`:
-
-    ./automation/build.sh
-
-  3. Manual **online** build with `automation/build.sh`:
-
-    OFFLINE_BUILD=0 ./automation/build.sh
-
-  4. Each pull request push will automatically have RPMs built as part of the GitHub action
-     checks "run CI on PRs" job "test_el8_offline".  The generated artifact zip file will be
-     accessible on the action run's summary page.
+  2. Each push to master and each pull request will automatically have RPMs built as part of the
+     GitHub Actions "Build" workflow.  The generated artifact zip file will be accessible on the
+     action run's summary page.
 
 
 ### RPM Installation
@@ -191,8 +172,7 @@ existing **ovirt-engine.ear**.
 
 You can access the application at: `https://[ENGINE_FQDN]/ovirt-engine/web-ui`
 
-The latest master branch RPM can be found in the [ovirt/ovirt-master-snapshot
-copr repository](https://copr.fedorainfracloud.org/coprs/ovirt/ovirt-master-snapshot).
+The latest master branch RPM can be found on [resources.ovirt.org](https://resources.ovirt.org/pub/ovirt-master-snapshot/).
 
 
 ## Browser Developer Tools

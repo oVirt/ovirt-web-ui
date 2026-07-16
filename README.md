@@ -1,5 +1,3 @@
-[![Copr build status](https://copr.fedorainfracloud.org/coprs/ovirt/ovirt-master-snapshot/package/ovirt-web-ui/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/ovirt/ovirt-master-snapshot/package/ovirt-web-ui/)
-
 # VM Portal for oVirt
 VM Portal is a modern lightweight UI for oVirt that allows oVirt users to create, start, stop, and use virtual machines.
 
