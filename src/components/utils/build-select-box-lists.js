@@ -109,13 +109,15 @@ function createStorageDomainList ({ storageDomains, dataCenterId = null, include
           : sd.getIn(['statusPerDataCenter', dataCenterId]) === 'active')
       )
       .map(sd => {
-        const avail = convertValue('B', sd.get('availableSpace', 0))
-        const usage = msg.storageDomainFreeSpace({ size: avail.value, unit: avail.unit })
+        // available space is not reported for some domains (e.g. managed block storage)
+        const availableSpace = sd.get('availableSpace')
+        const avail = Number.isFinite(availableSpace) ? convertValue('B', availableSpace) : null
+        const usage = avail ? msg.storageDomainFreeSpace({ size: avail.value, unit: avail.unit }) : ''
         return {
           id: sd.get('id'),
           value:
             sd.get('name') +
-            (includeUsage ? ' ' + usage : ''),
+            (includeUsage && usage ? ' ' + usage : ''),
           usage,
         }
       })
