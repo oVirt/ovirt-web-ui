@@ -35,6 +35,16 @@ describe('direct determineTemplateDiskFormatAndSparse()', () => {
     },
   }))
 
+  const storageDomainMbs = fromJS(Transforms.StorageDomain.toInternal({
+    storageDomain: {
+      id: '#storageDomain_MBS',
+      type: 'data',
+      storage: {
+        type: 'managed_block_storage',
+      },
+    },
+  }))
+
   const templateDesktop = fromJS(Transforms.Template.toInternal({
     template: {
       id: '#template_desktop',
@@ -245,6 +255,50 @@ describe('direct determineTemplateDiskFormatAndSparse()', () => {
         vmIsDesktop: false,
         vmStorageAllocationIsThin: false,
         targetSD: storageDomainNfs,
+        targetCluster: cluster,
+      })
+
+      expect(changes).toEqual({ })
+    })
+
+    test('[server, server], disk is thin, changing from NFS storage domain to managed block storage domain -> raw/!sparse', () => {
+      const changes = determineTemplateDiskFormatAndSparse({
+        templateDisk: buildDisk(storageDomainNfs, 'thin'),
+        template: templateServer,
+        vmIsDesktop: false,
+        vmStorageAllocationIsThin: false,
+        targetSD: storageDomainMbs,
+        targetCluster: cluster,
+      })
+
+      expect(changes).toEqual({ format: 'raw', sparse: false })
+    })
+  })
+
+  describe('test managed block storage domains never resolve to sparse (MBS is raw-only in the engine)', () => {
+    test('[desktop, desktop], thin allocation requested, targeting a managed block storage domain -> !sparse', () => {
+      const changes = determineTemplateDiskFormatAndSparse({
+        templateDisk: buildDisk(storageDomainMbs, 'pre'),
+        template: templateDesktop,
+        vmIsDesktop: true,
+        vmStorageAllocationIsThin: true,
+        targetSD: storageDomainMbs,
+        targetCluster: cluster,
+      })
+
+      // format is unconditionally requested as 'cow' by determineTemplateDiskFormatAndSparse whenever a
+      // thin allocation is requested, regardless of target storage type; the storage domain only controls
+      // 'sparse', which for MBS must never resolve to true since the engine always creates raw MBS disks.
+      expect(changes).toEqual({ format: 'cow', sparse: false })
+    })
+
+    test('[server, server], disk is thin, stays on the same managed block storage domain -> {} / no changes', () => {
+      const changes = determineTemplateDiskFormatAndSparse({
+        templateDisk: buildDisk(storageDomainMbs, 'thin'),
+        template: templateServer,
+        vmIsDesktop: false,
+        vmStorageAllocationIsThin: false,
+        targetSD: storageDomainMbs,
         targetCluster: cluster,
       })
 

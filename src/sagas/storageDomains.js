@@ -25,9 +25,9 @@ export function* fetchDataCentersAndStorageDomains () {
   // figure out the domain's status per data center
   const sdById = storageDomains.reduce((acc, sd) => ({ ...acc, [sd.id]: sd }), {})
   for (const dataCenter of dataCenters) {
-    for (const [storageDomainId, { type }] of Object.entries(dataCenter.storageDomains)) {
-      if (type === 'data' || type === 'iso') {
-        const sd = sdById[storageDomainId]
+    for (const storageDomainId of Object.keys(dataCenter.storageDomains)) {
+      const sd = sdById[storageDomainId]
+      if (sd && (sd.type === 'data' || sd.type === 'iso')) {
         sd.statusPerDataCenter = {
           ...sd.statusPerDataCenter,
           [dataCenter.id]: dataCenter.storageDomains[storageDomainId].status,
