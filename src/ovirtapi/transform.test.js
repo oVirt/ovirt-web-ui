@@ -1,6 +1,6 @@
 /* eslint-env jest */
 
-import { VmStatistics } from './transform'
+import { DataCenter, StorageDomain, VmStatistics } from './transform'
 
 /*
  * test.each data table:
@@ -518,6 +518,38 @@ describe('Test transform.js VmStatistics.toInternal()', () => {
     (title, apiInput, expectedTransformPart) => {
       const result = VmStatistics.toInternal({ statistics: [apiInput] })
       expect(result).toMatchObject(expectedTransformPart)
+    }
+  )
+})
+
+describe('Test transform.js storage domain type of managed block storage domains', () => {
+  const STORAGE_DOMAIN_TYPE_TESTS = [
+    ['MBS domain without a type (older engines) is a data domain', { storage: { type: 'managed_block_storage' } }, 'data'],
+    ['MBS domain with type managed_block_storage (newer engines) is a data domain', { type: 'managed_block_storage', storage: { type: 'managed_block_storage' } }, 'data'],
+    ['NFS data domain keeps its type', { type: 'data', storage: { type: 'nfs' } }, 'data'],
+    ['ISO domain keeps its type', { type: 'iso', storage: { type: 'nfs' } }, 'iso'],
+  ]
+
+  test.each(STORAGE_DOMAIN_TYPE_TESTS)(
+    'StorageDomain.toInternal() [%s]',
+    (title, apiInput, expectedType) => {
+      const result = StorageDomain.toInternal({ storageDomain: { id: 'sd1', name: 'sd1', ...apiInput } })
+      expect(result.type).toEqual(expectedType)
+    }
+  )
+
+  test.each(STORAGE_DOMAIN_TYPE_TESTS)(
+    'DataCenter.toInternal() [%s]',
+    (title, apiInput, expectedType) => {
+      const result = DataCenter.toInternal({
+        dataCenter: {
+          id: 'dc1',
+          name: 'dc1',
+          version: { major: 4, minor: 7 },
+          storage_domains: { storage_domain: [{ id: 'sd1', name: 'sd1', status: 'active', ...apiInput }] },
+        },
+      })
+      expect(result.storageDomains.sd1.type).toEqual(expectedType)
     }
   )
 })
