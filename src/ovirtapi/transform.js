@@ -731,6 +731,7 @@ const StorageDomain = {
 
       case 'fcp':
       case 'iscsi':
+      case 'nvmeof':
         storageSubType = 'block'
         diskTypeToDiskAttributes.thin.format = 'cow'
         diskTypeToDiskAttributes.pre.format = 'raw'
